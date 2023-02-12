@@ -4,4 +4,10 @@
         <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="FluentAssertions" Version="6.10.0" />
+      <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.18.2" />
+      <PackageReference Include="NSwag.Core.Yaml" Version="13.18.2" />
+    </ItemGroup>
+
 </Project>

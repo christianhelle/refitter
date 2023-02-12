@@ -22,10 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Resources" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Remove="Resources\V2\Swagger.json" />
       <EmbeddedResource Include="Resources\V2\Swagger.json" />
       <None Remove="Resources\V2\Swagger.yaml" />
@@ -34,6 +30,10 @@
       <EmbeddedResource Include="Resources\V3\Swagger.json" />
       <None Remove="Resources\V3\Swagger.yaml" />
       <EmbeddedResource Include="Resources\V3\Swagger.yaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
     </ItemGroup>
 
 </Project>
