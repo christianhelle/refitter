@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refitter", "Refitter.csproj", "{E2736D92-7CE7-4B26-B1ED-CF787DEAE82C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refitter.Core", "..\Refitter.Core\Refitter.Core.csproj", "{86C5810B-7862-4239-893B-D16E4E703140}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E2736D92-7CE7-4B26-B1ED-CF787DEAE82C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2736D92-7CE7-4B26-B1ED-CF787DEAE82C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2736D92-7CE7-4B26-B1ED-CF787DEAE82C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2736D92-7CE7-4B26-B1ED-CF787DEAE82C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86C5810B-7862-4239-893B-D16E4E703140}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86C5810B-7862-4239-893B-D16E4E703140}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86C5810B-7862-4239-893B-D16E4E703140}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86C5810B-7862-4239-893B-D16E4E703140}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
