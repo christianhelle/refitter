@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
@@ -23,19 +24,45 @@ namespace Refitter.Core
         private static string GenerateClient(OpenApiDocument document)
         {
             var code = new StringBuilder();
-            code.AppendLine("public interface IApiClient")
+            code.AppendLine("using Refit;")
+                .AppendLine()
+                .AppendLine("public interface IApiClient")
                 .AppendLine("{");
 
             foreach (var kv in document.Paths)
             {
-                var path = kv.Key;
-                var item = kv.Value;
+                foreach (var operations in kv.Value)
+                {
+                    var operation = operations.Value;
+                    var parameters = operation.Parameters
+                        .Where(p => p.Kind == OpenApiParameterKind.Path)
+                        .Select(p => $"string {p.Name}")
+                        .ToList();
+
+                    var method = ToPascalCase(operations.Key);
+                    var returnTypeParameter = operation.Responses.ContainsKey("200")
+                        ? "object"
+                        : null;
+                    var returnType = returnTypeParameter == null ? "Task" : $"Task<{returnTypeParameter}>";
+
+                    var name = ToPascalCase(operation.OperationId);
+                    var parametersString = string.Join(", ", parameters);
+                    code.AppendLine($"\t[{method}(\"{kv.Key}\")]")
+                        .AppendLine($"\t{returnType} {name}({parametersString});")
+                        .AppendLine();
+                }
             }
 
             code.AppendLine("}")
                 .AppendLine();
-            
+
             return code.ToString();
+        }
+
+        private static string ToPascalCase(string str)
+        {
+            return str.Substring(0, 1).ToUpperInvariant() +
+                   str.Substring(1, str.Length - 1);
         }
 
         private static string GenerateContracts(OpenApiDocument document)
