@@ -17,7 +17,12 @@ namespace Refitter.Core
 
             var contracts = GenerateContracts(document);
             var client = GenerateClient(document);
-            return contracts;
+
+            return new StringBuilder()
+                .AppendLine(client)
+                .AppendLine()
+                .AppendLine(contracts)
+                .ToString();
         }
 
         private static string GenerateClient(OpenApiDocument document)
