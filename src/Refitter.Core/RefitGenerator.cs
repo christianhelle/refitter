@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
@@ -53,7 +52,8 @@ namespace Refitter.Core
                 }
             }
 
-            code.AppendLine("}")
+            code.Remove(code.Length - 3, 2)
+                .AppendLine("}")
                 .AppendLine();
 
             return code.ToString();
