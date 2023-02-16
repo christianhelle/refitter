@@ -15,7 +15,19 @@ namespace Refitter.Core
                 ? OpenApiYamlDocument.FromFileAsync(swaggerFile)
                 : OpenApiDocument.FromFileAsync(swaggerFile));
 
-            var contracts = GenerateContracts(document);
+            var settings = new CSharpClientGeneratorSettings
+            {
+                GenerateClientClasses = false,
+                GenerateDtoTypes = true,
+                GenerateClientInterfaces = false,
+                CSharpGeneratorSettings =
+                {
+                    JsonLibrary = CSharpJsonLibrary.SystemTextJson
+                }
+            };
+
+            var generator = new CSharpClientGenerator(document, settings);
+            var contracts = generator.GenerateFile();
             var client = GenerateClient(document);
 
             return new StringBuilder()
@@ -27,6 +39,7 @@ namespace Refitter.Core
 
         private static string GenerateClient(OpenApiDocument document)
         {
+            var generator = new CSharpClientGenerator(document, new CSharpClientGeneratorSettings());
             var code = new StringBuilder();
             code.AppendLine("using Refit;")
                 .AppendLine()
@@ -45,7 +58,7 @@ namespace Refitter.Core
 
                     var method = ToPascalCase(operations.Key);
                     var returnTypeParameter = operation.Responses.ContainsKey("200")
-                        ? "object"
+                        ? generator.GetTypeName(operation.Responses["200"].Schema, true, null)
                         : null;
                     var returnType = returnTypeParameter == null ? "Task" : $"Task<{returnTypeParameter}>";
 
@@ -68,20 +81,6 @@ namespace Refitter.Core
         {
             return str.Substring(0, 1).ToUpperInvariant() +
                    str.Substring(1, str.Length - 1);
-        }
-
-        private static string GenerateContracts(OpenApiDocument document)
-        {
-            var settings = new CSharpClientGeneratorSettings
-            {
-                GenerateClientClasses = false,
-                GenerateDtoTypes = true,
-                GenerateClientInterfaces = false,
-            };
-
-            settings.CSharpGeneratorSettings.JsonLibrary = CSharpJsonLibrary.SystemTextJson;
-            var generator = new CSharpClientGenerator(document, settings);
-            return generator.GenerateFile();
         }
     }
 }
