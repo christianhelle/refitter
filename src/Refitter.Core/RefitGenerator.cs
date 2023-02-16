@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
+using NSwag.CodeGeneration;
 using NSwag.CodeGeneration.CSharp;
 
 namespace Refitter.Core
@@ -28,7 +29,7 @@ namespace Refitter.Core
 
             var generator = new CSharpClientGenerator(document, settings);
             var contracts = generator.GenerateFile();
-            var client = GenerateClient(document);
+            var client = GenerateClient(document, generator);
 
             return new StringBuilder()
                 .AppendLine(client)
@@ -37,13 +38,18 @@ namespace Refitter.Core
                 .ToString();
         }
 
-        private static string GenerateClient(OpenApiDocument document)
+        private static string GenerateClient(OpenApiDocument document, IClientGenerator generator)
         {
-            var generator = new CSharpClientGenerator(document, new CSharpClientGeneratorSettings());
+            var title = document.Info?.Title?
+                            .Replace(" ", string.Empty)
+                            .Replace("-", string.Empty)
+                            .Replace(".", string.Empty) ??
+                        "ApiClient";
+
             var code = new StringBuilder();
             code.AppendLine("using Refit;")
                 .AppendLine()
-                .AppendLine("public interface IApiClient")
+                .AppendLine($"public interface I{ToPascalCase(title)}")
                 .AppendLine("{");
 
             foreach (var kv in document.Paths)
