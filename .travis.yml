@@ -1,7 +1,0 @@
-language: csharp
-mono: none
-dotnet: 7.0
-script:
-  - dotnet restore src\Refitter.sln
-  - dotnet build --no-restore src\Refitter.sln
-  - dotnet test --no-build src\Refitter.sln
