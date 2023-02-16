@@ -3,6 +3,11 @@ name: Build
 on:
   workflow_dispatch:
   push:
+    paths-ignore:
+      - '**/*'
+      - '!.github/workflows/build.yml'
+      - '!src/**/*.csproj'
+      - '!src/**/*.cs'
     branches:
       - '*'
   pull_request:
