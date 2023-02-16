@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Refitter.Core\Refitter.Core.csproj" />
+      <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
     </ItemGroup>
 
 </Project>
