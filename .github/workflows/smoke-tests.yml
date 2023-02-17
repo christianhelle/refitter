@@ -27,7 +27,7 @@ jobs:
 
     name: C#
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 10
 
     steps:
     - uses: actions/checkout@v2
