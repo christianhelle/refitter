@@ -43,46 +43,6 @@ function Prepare-SwaggerPetstore {
     }
 }
 
-function Build-GeneratedCode {    
-    param (
-        [Parameter(Mandatory=$false)]
-        [bool]
-        $Parallel = $true
-    )
-
-    if ($Parallel) {
-        $argumentsList = @(
-            "build ./GeneratedCode/NetStandard20/NetStandard20.csproj",
-            "build ./GeneratedCode/NetStandard21/NetStandard21.csproj",
-            "build ./GeneratedCode/Net6/Net6.csproj",
-            "build ./GeneratedCode/Net7/Net7.csproj",
-            "build ./GeneratedCode/Net48/Net48.csproj",
-            "build ./GeneratedCode/Net481/Net481.csproj",
-            "build ./GeneratedCode/Net472/Net472.csproj",
-            "build ./GeneratedCode/Net462/Net462.csproj"
-        )
-        
-        $processes = ($argumentsList | ForEach-Object {
-            Start-Process "dotnet" -Args $PSItem -NoNewWindow -PassThru
-        })
-        $processes | Wait-Process
-        $processes | ForEach-Object {
-            if ($_.ExitCode -ne 0) {
-                throw "Build Failed!"
-            }
-        }
-    } else {        
-        Write-Host "`r`nBuilding $_`r`n"
-        dotnet build ./GeneratedCode/NetStandard20/NetStandard20.csproj; ThrowOnNativeFailure
-        dotnet build ./GeneratedCode/NetStandard21/NetStandard21.csproj; ThrowOnNativeFailure
-        dotnet build ./GeneratedCode/Net48/Net48.csproj; ThrowOnNativeFailure
-        dotnet build ./GeneratedCode/Net481/Net481.csproj; ThrowOnNativeFailure
-        dotnet build ./GeneratedCode/Net472/Net472.csproj; ThrowOnNativeFailure
-        dotnet build ./GeneratedCode/Net462/Net462.csproj; ThrowOnNativeFailure
-        dotnet build ./GeneratedCode/Net452/Net452.csproj; ThrowOnNativeFailure        
-    }
-}
-
 function RunTests {
     param (
         [Parameter(Mandatory=$true)]
@@ -114,7 +74,8 @@ function RunTests {
             Copy-Item "./Output.cs" "./GeneratedCode/NetStandard21/Output.cs" -Force
             Remove-Item "./Output.cs" -Force
 
-            Build-GeneratedCode -Parallel $Parallel
+            Write-Host "`r`nBuilding $_`r`n"
+            dotnet build ./GeneratedCode/Generated.sln ThrowOnNativeFailure
         }
     }
 }
