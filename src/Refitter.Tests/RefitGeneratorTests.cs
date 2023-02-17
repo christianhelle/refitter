@@ -7,10 +7,14 @@ namespace Refitter.Tests;
 
 public class RefitGeneratorTests
 {
-    [Fact]
-    public async Task Can_Generate_Code()
+    [Theory]
+    [InlineData(SwaggerPetstoreVersions.JsonV2, "Swagger.json")]
+    [InlineData(SwaggerPetstoreVersions.JsonV3, "Swagger.json")]
+    [InlineData(SwaggerPetstoreVersions.YamlV2, "Swagger.yaml")]
+    [InlineData(SwaggerPetstoreVersions.YamlV3, "Swagger.yaml")]
+    public async Task Can_Generate_Code(SwaggerPetstoreVersions version, string filename)
     {
-        var swaggerFile = await CreateSwaggerFile();
+        var swaggerFile = await CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
         var generator = new RefitGenerator();
         var result = await generator.Generate(swaggerFile);
         result.Should().NotBeNullOrWhiteSpace();
@@ -19,7 +23,7 @@ public class RefitGeneratorTests
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        var swaggerFile = await CreateSwaggerFile();
+        var swaggerFile = await CreateSwaggerFile(EmbeddedResources.SwaggerPetstoreJsonV3, "Swagger.json");
         var generator = new RefitGenerator();
         var result = await generator.Generate(swaggerFile);
         
@@ -29,12 +33,11 @@ public class RefitGeneratorTests
             .BeTrue();
     }
 
-    private static async Task<string> CreateSwaggerFile()
+    private static async Task<string> CreateSwaggerFile(string contents, string filename)
     {
-        var contents = EmbeddedResources.SwaggerPetstoreJsonV3;
         var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, "Swagger.json");
+        var swaggerFile = Path.Combine(folder, filename);
         await File.WriteAllTextAsync(swaggerFile, contents);
         return swaggerFile;
     }
