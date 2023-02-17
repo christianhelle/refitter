@@ -23,3 +23,5 @@ jobs:
       run: dotnet build src/Refitter.sln
     - name: Test
       run: dotnet test --no-build src/Refitter.sln
+    - name: Package
+      run: dotnet pack src/Refitter.sln
