@@ -71,7 +71,7 @@ namespace Refitter.Core
 
                     var returnType = returnTypeParameter == null
                         ? "Task"
-                        : $"Task<{returnTypeParameter}>";
+                        : $"Task<{TrimImportedNamespaces(returnTypeParameter)}>";
 
                     var verb = ToPascalCase(operations.Key);
                     var name = ToPascalCase(operation.OperationId);
@@ -86,6 +86,15 @@ namespace Refitter.Core
                 .AppendLine("}");
 
             return code.ToString();
+        }
+
+        private static string TrimImportedNamespaces(string returnTypeParameter)
+        {
+            string[] wellKnownNamespaces = { "System.Collections.Generic" };
+            foreach (var wellKnownNamespace in wellKnownNamespaces)
+                if (returnTypeParameter.StartsWith(wellKnownNamespace, StringComparison.OrdinalIgnoreCase))
+                    return returnTypeParameter.Replace(wellKnownNamespace + ".", string.Empty);
+            return returnTypeParameter;
         }
 
         private static string ToPascalCase(string str)
