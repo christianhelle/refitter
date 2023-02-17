@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NJsonSchema;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
+using NSwag.CodeGeneration;
 using NSwag.CodeGeneration.CSharp;
 
 namespace Refitter.Core
@@ -63,10 +65,6 @@ namespace Refitter.Core
                 foreach (var operations in kv.Value)
                 {
                     var operation = operations.Value;
-                    var parameters = operation.Parameters
-                        .Where(p => p.Kind == OpenApiParameterKind.Path)
-                        .Select(p => $"string {p.Name}")
-                        .ToList();
 
                     var returnTypeParameter = operation.Responses.ContainsKey("200")
                         ? generator.GetTypeName(operation.Responses["200"].Schema, true, null)
@@ -76,9 +74,18 @@ namespace Refitter.Core
                         ? "Task"
                         : $"Task<{TrimImportedNamespaces(returnTypeParameter)}>";
 
+                    var parameters = operation.Parameters
+                        .Where(p => p.Kind == OpenApiParameterKind.Path)
+                        .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name}")
+                        .Union(operation.Parameters
+                        .Where(p => p.Kind == OpenApiParameterKind.Body)
+                        .Select(p => $"[Body]{GetBodyParameterType(generator, p)} {p.Name}"))
+                        .ToList();
+
                     var verb = ToPascalCase(operations.Key);
                     var name = ToPascalCase(operation.OperationId);
                     var parametersString = string.Join(", ", parameters);
+
                     code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                         .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
                         .AppendLine();
@@ -90,6 +97,17 @@ namespace Refitter.Core
 
             return code.ToString();
         }
+
+        private static string GetBodyParameterType(IClientGenerator generator, JsonSchema schema) =>
+            TrimImportedNamespaces(
+                FindSupportedType(
+                    generator.GetTypeName(
+                        schema.ActualTypeSchema,
+                        true,
+                        null)));
+
+        private static string FindSupportedType(string typeName) => 
+            typeName == "FileResponse" ? "FileParameter" : typeName;
 
         private static string TrimImportedNamespaces(string returnTypeParameter)
         {
