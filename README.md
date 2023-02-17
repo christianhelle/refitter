@@ -87,7 +87,9 @@ namespace GeneratedCode
 }
 ```
 
-The generated interface above can be used like this:
+The `RestService` class generates an implementation of `ISwaggerPetstore` that uses `HttpClient` to make its calls. 
+
+Here's an example usage of the generated code above
 
 ```cs
 using Refit;
