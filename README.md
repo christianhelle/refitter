@@ -6,11 +6,6 @@ Refitter is a CLI tool for generating a C# REST API Client using the [Refit](htt
 ## System requirements
 .NET 7.0
 
-### Installation
-```
-$ dotnet tool install --global refitter
-```
-
 ## Usage:
 
 To generate code from an OpenAPI specifications file, run the following:
