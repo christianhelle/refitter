@@ -25,6 +25,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RootNamespace>Refitter</RootNamespace>
     <Nullable>enable</Nullable>
+    <Title>Refitter</Title>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/christianhelle/refitter/main/LICENSE?token=GHSAT0AAAAAAB5BNPYRAQXX3F62Z5V6WA24Y7PXSAQ</PackageLicenseUrl>
+    <PackageTags>refit; rest; openapi</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="../../README.md" Pack="true" PackagePath="\"/>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
 </ItemGroup>
 
 </Project>
