@@ -49,8 +49,8 @@ namespace Refitter.Core
             var code = new StringBuilder();
             code.AppendLine("namespace " + generator.Settings.CSharpGeneratorSettings.Namespace)
                 .AppendLine("{")
-                .AppendLine($"\tpublic interface I{ToPascalCase(title)}")
-                .AppendLine("\t{");
+                .AppendLine($"    public interface I{ToPascalCase(title)}")
+                .AppendLine("    {");
 
             foreach (var kv in document.Paths)
             {
@@ -73,14 +73,14 @@ namespace Refitter.Core
                     var verb = ToPascalCase(operations.Key);
                     var name = ToPascalCase(operation.OperationId);
                     var parametersString = string.Join(", ", parameters);
-                    code.AppendLine($"\t\t[Refit.{verb}(\"{kv.Key}\")]")
-                        .AppendLine($"\t\t{returnType} {name}({parametersString});")
+                    code.AppendLine($"        [Refit.{verb}(\"{kv.Key}\")]")
+                        .AppendLine($"        {returnType} {name}({parametersString});")
                         .AppendLine();
                 }
             }
 
             code.Remove(code.Length - 3, 2)
-                .AppendLine("\t}")
+                .AppendLine("    }")
                 .AppendLine("}");
 
             return code.ToString();
