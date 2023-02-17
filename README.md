@@ -4,9 +4,6 @@
 # Refitter
 Refitter is a CLI tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. 
 
-## System requirements
-.NET 7.0
-
 ## Usage:
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -84,3 +81,12 @@ public interface ISwaggerPetstoreOpenAPI30
     Task DeleteUser(string username);
 }
 ```
+
+## System requirements
+.NET 7.0
+
+#
+
+For tips and tricks on software development, check out [my blog](https://christianhelle.com)
+
+If you find this useful and feel a bit generous then feel free to [buy me a coffee ☕](https://www.buymeacoffee.com/christianhelle)
