@@ -46,7 +46,7 @@ function Prepare-SwaggerPetstore {
 function RunTests {
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("dotnet-run", "rapicgen")]
+        [ValidateSet("dotnet-run", "refitter")]
         [string]
         $Method,
         
