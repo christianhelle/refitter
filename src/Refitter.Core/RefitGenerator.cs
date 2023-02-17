@@ -49,6 +49,9 @@ namespace Refitter.Core
             var code = new StringBuilder();
             code.AppendLine("namespace " + generator.Settings.CSharpGeneratorSettings.Namespace)
                 .AppendLine("{")
+                .AppendLine("    using Refit;")
+                .AppendLine("    using System.Threading.Tasks;")
+                .AppendLine()
                 .AppendLine($"    public interface I{ToPascalCase(title)}")
                 .AppendLine("    {");
 
@@ -67,13 +70,13 @@ namespace Refitter.Core
                         : null;
 
                     var returnType = returnTypeParameter == null
-                        ? "System.Threading.Tasks.Task"
-                        : $"System.Threading.Tasks.Task<{returnTypeParameter}>";
+                        ? "Task"
+                        : $"Task<{returnTypeParameter}>";
 
                     var verb = ToPascalCase(operations.Key);
                     var name = ToPascalCase(operation.OperationId);
                     var parametersString = string.Join(", ", parameters);
-                    code.AppendLine($"        [Refit.{verb}(\"{kv.Key}\")]")
+                    code.AppendLine($"        [{verb}(\"{kv.Key}\")]")
                         .AppendLine($"        {returnType} {name}({parametersString});")
                         .AppendLine();
                 }
