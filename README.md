@@ -25,10 +25,10 @@ using System.Collections.Generic;
 public interface ISwaggerPetstoreOpenAPI30
 {
     [Put("/pet")]
-    Task<Pet> UpdatePet();
+    Task<Pet> UpdatePet([Body]Pet body);
 
     [Post("/pet")]
-    Task<Pet> AddPet();
+    Task<Pet> AddPet([Body]Pet body);
 
     [Get("/pet/findByStatus")]
     Task<ICollection<Pet>> FindPetsByStatus();
@@ -37,34 +37,34 @@ public interface ISwaggerPetstoreOpenAPI30
     Task<ICollection<Pet>> FindPetsByTags();
 
     [Get("/pet/{petId}")]
-    Task<Pet> GetPetById(string petId);
+    Task<Pet> GetPetById(long? petId);
 
     [Post("/pet/{petId}")]
-    Task UpdatePetWithForm(string petId);
+    Task UpdatePetWithForm(long? petId);
 
     [Delete("/pet/{petId}")]
-    Task DeletePet(string petId);
+    Task DeletePet(long? petId);
 
     [Post("/pet/{petId}/uploadImage")]
-    Task<ApiResponse> UploadFile(string petId);
+    Task<ApiResponse> UploadFile(long? petId, [Body]FileParameter body);
 
     [Get("/store/inventory")]
     Task<IDictionary<string, int>> GetInventory();
 
     [Post("/store/order")]
-    Task<Order> PlaceOrder();
+    Task<Order> PlaceOrder([Body]Order body);
 
     [Get("/store/order/{orderId}")]
-    Task<Order> GetOrderById(string orderId);
+    Task<Order> GetOrderById(long? orderId);
 
     [Delete("/store/order/{orderId}")]
-    Task DeleteOrder(string orderId);
+    Task DeleteOrder(long? orderId);
 
     [Post("/user")]
-    Task CreateUser();
+    Task CreateUser([Body]User body);
 
     [Post("/user/createWithList")]
-    Task<User> CreateUsersWithListInput();
+    Task<User> CreateUsersWithListInput([Body]ICollection<User> body);
 
     [Get("/user/login")]
     Task<string> LoginUser();
@@ -76,7 +76,7 @@ public interface ISwaggerPetstoreOpenAPI30
     Task<User> GetUserByName(string username);
 
     [Put("/user/{username}")]
-    Task UpdateUser(string username);
+    Task UpdateUser(string username, [Body]User body);
 
     [Delete("/user/{username}")]
     Task DeleteUser(string username);
