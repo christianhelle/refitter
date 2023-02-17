@@ -38,7 +38,7 @@ namespace Refitter.Core
                 .ToString();
         }
 
-        private static string GenerateClient(OpenApiDocument document, IClientGenerator generator)
+        private static string GenerateClient(OpenApiDocument document, CSharpClientGenerator generator)
         {
             var title = document.Info?.Title?
                             .Replace(" ", string.Empty)
@@ -47,10 +47,10 @@ namespace Refitter.Core
                         "ApiClient";
 
             var code = new StringBuilder();
-            code.AppendLine("using Refit;")
-                .AppendLine()
-                .AppendLine($"public interface I{ToPascalCase(title)}")
-                .AppendLine("{");
+            code.AppendLine("namespace " + generator.Settings.CSharpGeneratorSettings.Namespace)
+                .AppendLine("{")
+                .AppendLine($"\tpublic interface I{ToPascalCase(title)}")
+                .AppendLine("\t{");
 
             foreach (var kv in document.Paths)
             {
@@ -62,23 +62,26 @@ namespace Refitter.Core
                         .Select(p => $"string {p.Name}")
                         .ToList();
 
-                    var method = ToPascalCase(operations.Key);
                     var returnTypeParameter = operation.Responses.ContainsKey("200")
                         ? generator.GetTypeName(operation.Responses["200"].Schema, true, null)
                         : null;
-                    var returnType = returnTypeParameter == null ? "Task" : $"Task<{returnTypeParameter}>";
 
+                    var returnType = returnTypeParameter == null
+                        ? "System.Threading.Tasks.Task"
+                        : $"System.Threading.Tasks.Task<{returnTypeParameter}>";
+
+                    var verb = ToPascalCase(operations.Key);
                     var name = ToPascalCase(operation.OperationId);
                     var parametersString = string.Join(", ", parameters);
-                    code.AppendLine($"\t[{method}(\"{kv.Key}\")]")
-                        .AppendLine($"\t{returnType} {name}({parametersString});")
+                    code.AppendLine($"\t\t[Refit.{verb}(\"{kv.Key}\")]")
+                        .AppendLine($"\t\t{returnType} {name}({parametersString});")
                         .AppendLine();
                 }
             }
 
             code.Remove(code.Length - 3, 2)
-                .AppendLine("}")
-                .AppendLine();
+                .AppendLine("\t}")
+                .AppendLine("}");
 
             return code.ToString();
         }
