@@ -79,8 +79,7 @@ namespace Refitter.Core
                 }
             }
 
-            code.Remove(code.Length - 3, 2)
-                .AppendLine("    }")
+            code.AppendLine("    }")
                 .AppendLine("}");
 
             return code.ToString();
