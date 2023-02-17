@@ -23,7 +23,7 @@ jobs:
       matrix:
         format: [ json, yaml ]
         version: [ V2, V3 ]
-        os: [ macos-latest, windows-2019, ubuntu-latest ]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
 
     name: C#
     runs-on: ${{ matrix.os }}
