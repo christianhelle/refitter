@@ -52,7 +52,7 @@ jobs:
     - name: Publish generated code as Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: Generated Code (OpenAPI v${{ matrix.version }} in ${{ matrix.format }})
+        name: Output.cs (${{ matrix.format }}, ${{ matrix.version }}, ${{ matrix.os }})
         path: test/Output.cs
 
     - name: Build .NET 6 generated code
