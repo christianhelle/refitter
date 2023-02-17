@@ -33,8 +33,8 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         var generator = new RefitGenerator();
         var code = await generator.Generate(searchPath);
+        await File.WriteAllTextAsync("Output.cs", code);
 
-        AnsiConsole.WriteLine(code);
         return 0;
     }
 }
