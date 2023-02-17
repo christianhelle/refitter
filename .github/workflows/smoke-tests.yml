@@ -5,7 +5,7 @@ on:
   push:
     paths-ignore:
       - '**/*'
-      - '!.github/workflows/build.yml'
+      - '!.github/workflows/smoke-tests.yml'
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
     branches:
