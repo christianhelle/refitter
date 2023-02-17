@@ -23,65 +23,99 @@ using Refit;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-public interface ISwaggerPetstoreOpenAPI30
+namespace GeneratedCode
 {
-    [Put("/pet")]
-    Task<Pet> UpdatePet([Body]Pet body);
+    public interface ISwaggerPetstore
+    {
+        [Put("/pet")]
+        Task<Pet> UpdatePet([Body]Pet body);
 
-    [Post("/pet")]
-    Task<Pet> AddPet([Body]Pet body);
+        [Post("/pet")]
+        Task<Pet> AddPet([Body]Pet body);
 
-    [Get("/pet/findByStatus")]
-    Task<ICollection<Pet>> FindPetsByStatus();
+        [Get("/pet/findByStatus")]
+        Task<ICollection<Pet>> FindPetsByStatus();
 
-    [Get("/pet/findByTags")]
-    Task<ICollection<Pet>> FindPetsByTags();
+        [Get("/pet/findByTags")]
+        Task<ICollection<Pet>> FindPetsByTags();
 
-    [Get("/pet/{petId}")]
-    Task<Pet> GetPetById(long? petId);
+        [Get("/pet/{petId}")]
+        Task<Pet> GetPetById(long? petId);
 
-    [Post("/pet/{petId}")]
-    Task UpdatePetWithForm(long? petId);
+        [Post("/pet/{petId}")]
+        Task UpdatePetWithForm(long? petId);
 
-    [Delete("/pet/{petId}")]
-    Task DeletePet(long? petId);
+        [Delete("/pet/{petId}")]
+        Task DeletePet(long? petId);
 
-    [Post("/pet/{petId}/uploadImage")]
-    Task<ApiResponse> UploadFile(long? petId, [Body]FileParameter body);
+        [Post("/pet/{petId}/uploadImage")]
+        Task<ApiResponse> UploadFile(long? petId, [Body]FileParameter body);
 
-    [Get("/store/inventory")]
-    Task<IDictionary<string, int>> GetInventory();
+        [Get("/store/inventory")]
+        Task<IDictionary<string, int>> GetInventory();
 
-    [Post("/store/order")]
-    Task<Order> PlaceOrder([Body]Order body);
+        [Post("/store/order")]
+        Task<Order> PlaceOrder([Body]Order body);
 
-    [Get("/store/order/{orderId}")]
-    Task<Order> GetOrderById(long? orderId);
+        [Get("/store/order/{orderId}")]
+        Task<Order> GetOrderById(long? orderId);
 
-    [Delete("/store/order/{orderId}")]
-    Task DeleteOrder(long? orderId);
+        [Delete("/store/order/{orderId}")]
+        Task DeleteOrder(long? orderId);
 
-    [Post("/user")]
-    Task CreateUser([Body]User body);
+        [Post("/user")]
+        Task CreateUser([Body]User body);
 
-    [Post("/user/createWithList")]
-    Task<User> CreateUsersWithListInput([Body]ICollection<User> body);
+        [Post("/user/createWithList")]
+        Task<User> CreateUsersWithListInput([Body]ICollection<User> body);
 
-    [Get("/user/login")]
-    Task<string> LoginUser();
+        [Get("/user/login")]
+        Task<string> LoginUser();
 
-    [Get("/user/logout")]
-    Task LogoutUser();
+        [Get("/user/logout")]
+        Task LogoutUser();
 
-    [Get("/user/{username}")]
-    Task<User> GetUserByName(string username);
+        [Get("/user/{username}")]
+        Task<User> GetUserByName(string username);
 
-    [Put("/user/{username}")]
-    Task UpdateUser(string username, [Body]User body);
+        [Put("/user/{username}")]
+        Task UpdateUser(string username, [Body]User body);
 
-    [Delete("/user/{username}")]
-    Task DeleteUser(string username);
+        [Delete("/user/{username}")]
+        Task DeleteUser(string username);
+    }
 }
+```
+
+The generated interface above can be used like this:
+
+```cs
+using Refit;
+using System;
+using System.Threading.Tasks;
+
+namespace GeneratedCode;
+
+internal class Program
+{
+    private static async Task Main(string[] args)
+    {
+        var client = RestService.For<ISwaggerPetstore>("https://petstore3.swagger.io/api/v3");
+        var pet = await client.GetPetById(2);
+
+        Console.WriteLine($"Name: {pet.Name}");
+        Console.WriteLine($"Category: {pet.Category.Name}");
+        Console.WriteLine($"Status: {pet.Status}");
+    }
+}
+```
+
+The code above when run will output something like this:
+
+```
+Name: Gatitotototo
+Category: Chaucito
+Status: Sold
 ```
 
 ## System requirements
