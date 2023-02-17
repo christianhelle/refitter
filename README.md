@@ -20,6 +20,7 @@ Here's an example generated output from the [Swagger Petstore example](https://p
 ```cs
 using Refit;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 public interface ISwaggerPetstoreOpenAPI30
 {
@@ -30,10 +31,10 @@ public interface ISwaggerPetstoreOpenAPI30
     Task<Pet> AddPet();
 
     [Get("/pet/findByStatus")]
-    Task<System.Collections.Generic.ICollection<Pet>> FindPetsByStatus();
+    Task<ICollection<Pet>> FindPetsByStatus();
 
     [Get("/pet/findByTags")]
-    Task<System.Collections.Generic.ICollection<Pet>> FindPetsByTags();
+    Task<ICollection<Pet>> FindPetsByTags();
 
     [Get("/pet/{petId}")]
     Task<Pet> GetPetById(string petId);
@@ -48,7 +49,7 @@ public interface ISwaggerPetstoreOpenAPI30
     Task<ApiResponse> UploadFile(string petId);
 
     [Get("/store/inventory")]
-    Task<System.Collections.Generic.IDictionary<string, int>> GetInventory();
+    Task<IDictionary<string, int>> GetInventory();
 
     [Post("/store/order")]
     Task<Order> PlaceOrder();
