@@ -26,7 +26,6 @@
     <RootNamespace>Refitter</RootNamespace>
     <Nullable>enable</Nullable>
     <Title>Refitter</Title>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/christianhelle/refitter/main/LICENSE</PackageLicenseUrl>
     <PackageTags>refit; rest; openapi</PackageTags>
   </PropertyGroup>
 
