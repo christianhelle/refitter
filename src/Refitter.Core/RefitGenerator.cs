@@ -1,15 +1,17 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
-using NSwag.CodeGeneration;
 using NSwag.CodeGeneration.CSharp;
 
 namespace Refitter.Core
 {
     public class RefitGenerator
     {
+        private const string Separator = "    ";
+
         public async Task<string> Generate(string swaggerFile)
         {
             var document = await (swaggerFile.EndsWith("yaml") || swaggerFile.EndsWith("yml")
@@ -49,11 +51,12 @@ namespace Refitter.Core
             var code = new StringBuilder();
             code.AppendLine("namespace " + generator.Settings.CSharpGeneratorSettings.Namespace)
                 .AppendLine("{")
-                .AppendLine("    using Refit;")
-                .AppendLine("    using System.Threading.Tasks;")
+                .AppendLine($"{Separator}using Refit;")
+                .AppendLine($"{Separator}using System.Threading.Tasks;")
+                .AppendLine($"{Separator}using System.Collections.Generic;")
                 .AppendLine()
-                .AppendLine($"    public interface I{ToPascalCase(title)}")
-                .AppendLine("    {");
+                .AppendLine($"{Separator}public interface I{ToPascalCase(title)}")
+                .AppendLine($"{Separator}{{");
 
             foreach (var kv in document.Paths)
             {
@@ -76,13 +79,13 @@ namespace Refitter.Core
                     var verb = ToPascalCase(operations.Key);
                     var name = ToPascalCase(operation.OperationId);
                     var parametersString = string.Join(", ", parameters);
-                    code.AppendLine($"        [{verb}(\"{kv.Key}\")]")
-                        .AppendLine($"        {returnType} {name}({parametersString});")
+                    code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
+                        .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
                         .AppendLine();
                 }
             }
 
-            code.AppendLine("    }")
+            code.AppendLine($"{Separator}}}")
                 .AppendLine("}");
 
             return code.ToString();
