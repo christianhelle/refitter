@@ -8,10 +8,10 @@ namespace Refitter.Tests;
 public class RefitGeneratorTests
 {
     [Theory]
-    [InlineData(SwaggerPetstoreVersions.JsonV2, "Swagger.json")]
-    [InlineData(SwaggerPetstoreVersions.JsonV3, "Swagger.json")]
-    [InlineData(SwaggerPetstoreVersions.YamlV2, "Swagger.yaml")]
-    [InlineData(SwaggerPetstoreVersions.YamlV3, "Swagger.yaml")]
+    [InlineData(SwaggerPetstoreVersions.JsonV2, "SwaggerPetstore.json")]
+    [InlineData(SwaggerPetstoreVersions.JsonV3, "SwaggerPetstore.json")]
+    [InlineData(SwaggerPetstoreVersions.YamlV2, "SwaggerPetstore.yaml")]
+    [InlineData(SwaggerPetstoreVersions.YamlV3, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code(SwaggerPetstoreVersions version, string filename)
     {
         var swaggerFile = await CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
@@ -23,7 +23,7 @@ public class RefitGeneratorTests
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        var swaggerFile = await CreateSwaggerFile(EmbeddedResources.SwaggerPetstoreJsonV3, "Swagger.json");
+        var swaggerFile = await CreateSwaggerFile(EmbeddedResources.SwaggerPetstoreJsonV3, "SwaggerPetstore.json");
         var generator = new RefitGenerator();
         var result = await generator.Generate(swaggerFile, "GeneratedCode");
         

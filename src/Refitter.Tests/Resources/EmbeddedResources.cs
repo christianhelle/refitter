@@ -11,7 +11,7 @@ public static class EmbeddedResources
     {
         get
         {
-            using var stream = GetStream("V2.Swagger.json");
+            using var stream = GetStream("V2.SwaggerPetstore.json");
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
@@ -21,7 +21,7 @@ public static class EmbeddedResources
     {
         get
         {
-            using var stream = GetStream("V3.Swagger.json");
+            using var stream = GetStream("V3.SwaggerPetstore.json");
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
@@ -31,7 +31,7 @@ public static class EmbeddedResources
     {
         get
         {
-            using var stream = GetStream("V2.Swagger.yaml");
+            using var stream = GetStream("V2.SwaggerPetstore.yaml");
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
@@ -41,7 +41,7 @@ public static class EmbeddedResources
     {
         get
         {
-            using var stream = GetStream("V3.Swagger.yaml");
+            using var stream = GetStream("V3.SwaggerPetstore.yaml");
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
