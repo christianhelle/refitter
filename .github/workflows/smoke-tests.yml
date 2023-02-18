@@ -19,7 +19,7 @@ jobs:
   Test:
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         format: [ json, yaml ]
         version: [ V2, V3 ]
