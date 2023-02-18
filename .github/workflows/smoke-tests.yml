@@ -38,7 +38,7 @@ jobs:
 
     - name: Generate code
       run: |
-        dotnet run --project ../src/Refitter/Refitter.csproj ./OpenApi.${{ matrix.format }}
+        dotnet run --project ../src/Refitter/Refitter.csproj ./OpenApi.${{ matrix.format }} --namespace GeneratedCode
         cp ./Output.cs ./GeneratedCode/Net6/Output.cs
         cp ./Output.cs ./GeneratedCode/Net7/Output.cs
         cp ./Output.cs ./GeneratedCode/Net48/Output.cs
