@@ -87,8 +87,6 @@ namespace GeneratedCode
 }
 ```
 
-The `RestService` class generates an implementation of `ISwaggerPetstore` that uses `HttpClient` to make its calls. 
-
 Here's an example usage of the generated code above
 
 ```cs
@@ -111,6 +109,8 @@ internal class Program
     }
 }
 ```
+
+The `RestService` class generates an implementation of `ISwaggerPetstore` that uses `HttpClient` to make its calls. 
 
 The code above when run will output something like this:
 
