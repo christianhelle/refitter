@@ -6,11 +6,6 @@ on:
     paths-ignore:
       - '**/*'
       - '!.github/workflows/production-tests.yml'
-      - '!src/**/*.csproj'
-      - '!src/**/*.cs'
-    branches:
-      - '*'
-  pull_request:
     branches:
       - '*'
 
@@ -38,7 +33,7 @@ jobs:
 
     - name: Generate code
       run: |
-        dotnet tool install --global refitter
+        dotnet tool install --global --prerelease refitter
         refitter ./OpenApi.${{ matrix.format }} --namespace GeneratedCode
         cp ./Output.cs ./GeneratedCode/Net6/Output.cs
         cp ./Output.cs ./GeneratedCode/Net7/Output.cs
