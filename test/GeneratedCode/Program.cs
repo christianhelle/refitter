@@ -1,6 +1,6 @@
 using Refit;
 using System;
-using MyNamespace;
+using GeneratedCode;
 using System.Threading.Tasks;
 
 namespace MyNamespace;
