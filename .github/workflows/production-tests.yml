@@ -33,7 +33,7 @@ jobs:
     - name: Generate code
       run: |
         dotnet tool install --global --prerelease refitter
-        refitter ./OpenApi.${{ matrix.format }}
+        refitter ./OpenApi.${{ matrix.format }} --namespace GeneratedCode
         cp ./Output.cs ./GeneratedCode/Net6/Output.cs
         cp ./Output.cs ./GeneratedCode/Net7/Output.cs
         cp ./Output.cs ./GeneratedCode/Net48/Output.cs
