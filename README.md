@@ -9,8 +9,8 @@ Refitter is a CLI tool for generating a C# REST API Client using the [Refit](htt
 
 To generate code from an OpenAPI specifications file, run the following:
 
-```
-$ refitter [path to OpenAPI spec file]
+```shell
+$ refitter [path to OpenAPI spec file] --namespace "[Your.Namespace.Of.Choice.GeneratedCode]"
 ```
 
 This will generate a file called `Output.cs` which contains the Refit interface and contract classes generated using [NSwag](https://github.com/RicoSuter/NSwag)
