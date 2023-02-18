@@ -79,11 +79,14 @@ function RunTests {
             Remove-Item "./Output.cs" -Force
 
             Write-Host "`r`nBuilding $_`r`n"
-            Start-Process "dotnet" `
+            $process = Start-Process "dotnet" `
                 -Args "build ./GeneratedCode/Generated.sln" `
                 -NoNewWindow `
-                -PassThru `
-                | Wait-Process
+                -PassThru
+            $process | Wait-Process
+            if ($process.ExitCode -ne 0) {
+                throw "Build Failed!"
+            }
         }
     }
 }
