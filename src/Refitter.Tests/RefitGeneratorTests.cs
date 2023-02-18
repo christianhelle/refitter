@@ -8,25 +8,28 @@ namespace Refitter.Tests;
 public class RefitGeneratorTests
 {
     [Theory]
-    [InlineData(SwaggerPetstoreVersions.JsonV2, "SwaggerPetstore.json")]
-    [InlineData(SwaggerPetstoreVersions.JsonV3, "SwaggerPetstore.json")]
-    [InlineData(SwaggerPetstoreVersions.YamlV2, "SwaggerPetstore.yaml")]
-    [InlineData(SwaggerPetstoreVersions.YamlV3, "SwaggerPetstore.yaml")]
-    public async Task Can_Generate_Code(SwaggerPetstoreVersions version, string filename)
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code(SampleOpenSpecifications version, string filename)
     {
         var swaggerFile = await CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
-        var generator = new RefitGenerator();
-        var result = await generator.Generate(swaggerFile, "GeneratedCode");
+        var sut = new RefitGenerator();
+        var result = await sut.Generate(swaggerFile, "GeneratedCode");
         result.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
-    public async Task Can_Build_Generated_Code()
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    public async Task Can_Build_Generated_Code(SampleOpenSpecifications version, string filename)
     {
-        var swaggerFile = await CreateSwaggerFile(EmbeddedResources.SwaggerPetstoreJsonV3, "SwaggerPetstore.json");
-        var generator = new RefitGenerator();
-        var result = await generator.Generate(swaggerFile, "GeneratedCode");
-        
+        var swaggerFile = await CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
+        var sut = new RefitGenerator();
+        var result = await sut.Generate(swaggerFile, "GeneratedCode");
         BuildHelper
             .BuildCSharp(result)
             .Should()
