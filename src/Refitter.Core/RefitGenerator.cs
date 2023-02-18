@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace Refitter.Core
     {
         private const string Separator = "    ";
 
-        public async Task<string> Generate(string swaggerFile)
+        public async Task<string> Generate(string swaggerFile, string defaultNamespace)
         {
             var document = await (swaggerFile.EndsWith("yaml") || swaggerFile.EndsWith("yml")
                 ? OpenApiYamlDocument.FromFileAsync(swaggerFile)
@@ -27,6 +28,7 @@ namespace Refitter.Core
                 GenerateClientInterfaces = false,
                 CSharpGeneratorSettings =
                 {
+                    Namespace = defaultNamespace,
                     JsonLibrary = CSharpJsonLibrary.SystemTextJson
                 }
             };
@@ -74,16 +76,10 @@ namespace Refitter.Core
                         ? "Task"
                         : $"Task<{TrimImportedNamespaces(returnTypeParameter)}>";
 
-                    var parameters = operation.Parameters
-                        .Where(p => p.Kind == OpenApiParameterKind.Path)
-                        .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name}")
-                        .Union(operation.Parameters
-                        .Where(p => p.Kind == OpenApiParameterKind.Body)
-                        .Select(p => $"[Body]{GetBodyParameterType(generator, p)} {p.Name}"))
-                        .ToList();
-
                     var verb = ToPascalCase(operations.Key);
                     var name = ToPascalCase(operation.OperationId);
+
+                    var parameters = GetParameters(generator, operation);
                     var parametersString = string.Join(", ", parameters);
 
                     code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
@@ -98,6 +94,24 @@ namespace Refitter.Core
             return code.ToString();
         }
 
+        private static IEnumerable<string> GetParameters(CSharpClientGenerator generator, OpenApiOperation operation)
+        {
+            var routeParameters = operation.Parameters
+                .Where(p => p.Kind == OpenApiParameterKind.Path)
+                .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name}")
+                .ToList();
+
+            var bodyParameters = operation.Parameters
+                .Where(p => p.Kind == OpenApiParameterKind.Body)
+                .Select(p => $"[Body]{GetBodyParameterType(generator, p)} {p.Name}")
+                .ToList();
+
+            var parameters = new List<string>();
+            parameters.AddRange(routeParameters);
+            parameters.AddRange(bodyParameters);
+            return parameters;
+        }
+
         private static string GetBodyParameterType(IClientGenerator generator, JsonSchema schema) =>
             TrimImportedNamespaces(
                 FindSupportedType(
@@ -106,7 +120,7 @@ namespace Refitter.Core
                         true,
                         null)));
 
-        private static string FindSupportedType(string typeName) => 
+        private static string FindSupportedType(string typeName) =>
             typeName == "FileResponse" ? "FileParameter" : typeName;
 
         private static string TrimImportedNamespaces(string returnTypeParameter)

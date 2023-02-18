@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Refitter.Core;
-using Spectre.Console;
 using Spectre.Console.Cli;
 using ValidationResult = Spectre.Console.ValidationResult;
 
@@ -15,6 +14,11 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [Description("Path to OpenAPI Specification file")]
         [CommandArgument(0, "[openApiPath]")]
         public string? OpenApiPath { get; set; }
+        
+        [Description("Default namespace to use for generated types")]
+        [CommandOption("-n|--namespace")]
+        [DefaultValue("GeneratedCode")]
+        public string? Namespace { get; set; }
     }
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
@@ -32,7 +36,7 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         var searchPath = settings.OpenApiPath ?? ".";
 
         var generator = new RefitGenerator();
-        var code = await generator.Generate(searchPath);
+        var code = await generator.Generate(searchPath, settings.Namespace);
         await File.WriteAllTextAsync("Output.cs", code);
 
         return 0;

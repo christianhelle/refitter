@@ -16,7 +16,7 @@ public class RefitGeneratorTests
     {
         var swaggerFile = await CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
         var generator = new RefitGenerator();
-        var result = await generator.Generate(swaggerFile);
+        var result = await generator.Generate(swaggerFile, "GeneratedCode");
         result.Should().NotBeNullOrWhiteSpace();
     }
 
@@ -25,7 +25,7 @@ public class RefitGeneratorTests
     {
         var swaggerFile = await CreateSwaggerFile(EmbeddedResources.SwaggerPetstoreJsonV3, "Swagger.json");
         var generator = new RefitGenerator();
-        var result = await generator.Generate(swaggerFile);
+        var result = await generator.Generate(swaggerFile, "GeneratedCode");
         
         BuildHelper
             .BuildCSharp(result)
