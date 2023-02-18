@@ -75,7 +75,7 @@ function RunTests {
             Remove-Item "./Output.cs" -Force
 
             Write-Host "`r`nBuilding $_`r`n"
-            dotnet build ./GeneratedCode/Generated.sln ThrowOnNativeFailure
+            Start-Process "dotnet" -Args "build ./GeneratedCode/Generated.sln" -NoNewWindow -PassThru | Wait-Process
         }
     }
 }
