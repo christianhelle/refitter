@@ -14,7 +14,6 @@ jobs:
   Test:
 
     strategy:
-      fail-fast: false
       matrix:
         format: [ json, yaml ]
         version: [ V2, V3 ]
