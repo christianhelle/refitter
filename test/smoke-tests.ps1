@@ -62,7 +62,11 @@ function RunTests {
             Remove-Item ./**/*Output.cs -Force
             Prepare-SwaggerPetstore -Version $version -Format $format
 
-            dotnet run --project ../src/Refitter/Refitter.csproj ./OpenAPI/$version/Swagger.$format
+            dotnet run `
+                --project ../src/Refitter/Refitter.csproj `
+                ./OpenAPI/$version/Swagger.$format `
+                --namespace GeneratedCode
+
             Copy-Item "./Output.cs" "./GeneratedCode/Net7/Output.cs" -Force
             Copy-Item "./Output.cs" "./GeneratedCode/Net7/Output.cs" -Force
             Copy-Item "./Output.cs" "./GeneratedCode/Net6/Output.cs" -Force
@@ -75,7 +79,11 @@ function RunTests {
             Remove-Item "./Output.cs" -Force
 
             Write-Host "`r`nBuilding $_`r`n"
-            Start-Process "dotnet" -Args "build ./GeneratedCode/Generated.sln" -NoNewWindow -PassThru | Wait-Process
+            Start-Process "dotnet" `
+                -Args "build ./GeneratedCode/Generated.sln" `
+                -NoNewWindow `
+                -PassThru `
+                | Wait-Process
         }
     }
 }
