@@ -45,7 +45,7 @@ jobs:
     - name: Prepare Swagger Petstore OpenAPI Spec
       run: cp ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }} ./openapi.${{ matrix.format }}
       working-directory: test
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
 
     - name: Generate code
       run: |
@@ -60,51 +60,51 @@ jobs:
         cp ./Output.cs ./GeneratedCode/NetStandard20/Output.cs
         cp ./Output.cs ./GeneratedCode/NetStandard21/Output.cs
       working-directory: test
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
     
     - name: Publish generated code as Artifact
       uses: actions/upload-artifact@v2
       with:
         name: Generated Code (${{ matrix.openapi }}.${{ matrix.format }}, ${{ matrix.version }}, ${{ matrix.os }})
         path: test/Output.cs
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
 
     - name: Build .NET 6 generated code
       run: dotnet build ./GeneratedCode/Net6/Net6.csproj
       working-directory: test
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
 
     - name: Build .NET 7 generated code
       run: dotnet build ./GeneratedCode/Net7/Net7.csproj
       working-directory: test
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
 
     - name: Build .NET 4.8.1 generated code
       run: dotnet build ./GeneratedCode/Net481/Net481.csproj
-      if: steps.check_files.outputs.exists == 'true' && ${{ matrix.os == 'windows-2022' }}
+      if: steps.check_files.outputs.exists && ${{ matrix.os == 'windows-2022' }}
       working-directory: test
 
     - name: Build .NET 4.8 generated code
       run: dotnet build ./GeneratedCode/Net48/Net48.csproj
       working-directory: test
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
 
     - name: Build .NET 4.7.2 generated code
       run: dotnet build ./GeneratedCode/Net472/Net472.csproj
       working-directory: test
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
 
     - name: Build .NET 4.6.2 generated code
       run: dotnet build ./GeneratedCode/Net462/Net462.csproj
       working-directory: test
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
 
     - name: Build .NET Standard 2.0 generated code
       run: dotnet build ./GeneratedCode/NetStandard20/NetStandard20.csproj
       working-directory: test
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
 
     - name: Build .NET Standard 2.1 generated code
       run: dotnet build ./GeneratedCode/NetStandard21/NetStandard21.csproj
       working-directory: test
-      if: steps.check_files.outputs.exists == 'true'
+      if: steps.check_files.outputs.exists
