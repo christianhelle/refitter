@@ -56,7 +56,7 @@ jobs:
           Exit(0)
         }
         dotnet run --project ../src/Refitter/Refitter.csproj $filename --namespace GeneratedCode
-        Copy-Item ./Output.cs $filename.cs
+        Copy-Item ./Output.cs ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}.cs
         Copy-Item ./Output.cs ./GeneratedCode/Net6/Output.cs
         Copy-Item ./Output.cs ./GeneratedCode/Net7/Output.cs
         Copy-Item ./Output.cs ./GeneratedCode/Net48/Output.cs
