@@ -43,14 +43,13 @@ function RunTests {
                 $filename = "./OpenAPI/$version/$_.$format"
                 $exists = Test-Path -Path $filename -PathType Leaf
                 if ($exists -eq $true) {
-                    Remove-Item ./**/*Output.cs -Force
                     Copy-Item $filename ./openapi.$format
-
                     dotnet run `
                         --project ../src/Refitter/Refitter.csproj `
                         ./openapi.$format `
                         --namespace GeneratedCode
 
+                    Copy-Item "./Output.cs" "./$version-$_-$format.cs"
                     Copy-Item "./Output.cs" "./GeneratedCode/Net7/Output.cs" -Force
                     Copy-Item "./Output.cs" "./GeneratedCode/Net7/Output.cs" -Force
                     Copy-Item "./Output.cs" "./GeneratedCode/Net6/Output.cs" -Force
