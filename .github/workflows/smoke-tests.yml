@@ -46,6 +46,7 @@ jobs:
             Copy-Item $filename ./openapi.${{ matrix.format }}
         }
       working-directory: test
+      shell: pwsh
 
     - name: Generate code
       run: |
