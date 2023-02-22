@@ -11,38 +11,6 @@ function ThrowOnNativeFailure {
     }
 }
 
-function Prepare-SwaggerPetstore {
-    param (
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("V2", "V3")]
-        [string]
-        $Version,
-
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("json", "yaml")]
-        [string]
-        $Format,
-
-        [Parameter(Mandatory=$false)]
-        [switch]
-        $Download
-    )
-
-    if ($Download) {
-        Write-Host "`r`nDownload Swagger Petstore $Version spec ($Format)`r`n"
-
-        if ($Version -eq "V2") {
-            Invoke-WebRequest -Uri https://petstore.swagger.io/v2/swagger.$Format -OutFile Swagger.$Format
-        }
-
-        if ($Version -eq "V3") {
-            Invoke-WebRequest -Uri https://petstore3.swagger.io/api/v3/openapi.$Format -OutFile Swagger.$Format
-        }
-    } else {
-        Copy-Item ./OpenAPI/$Version/Swagger.$Format ./Swagger.$Format
-    }
-}
-
 function RunTests {
     param (
         [Parameter(Mandatory=$true)]
@@ -55,16 +23,16 @@ function RunTests {
         $Parallel = $false
     )
 
-    "V2", "V3" | ForEach-Object {
+    "v2.0", "v3.0" | ForEach-Object {
         $version = $_
         "json", "yaml" | ForEach-Object {
             $format = $_
             Remove-Item ./**/*Output.cs -Force
-            Prepare-SwaggerPetstore -Version $version -Format $format
+            Copy-Item ./OpenAPI/$version/petstore.$format ./openapi.$format
 
             dotnet run `
                 --project ../src/Refitter/Refitter.csproj `
-                ./OpenAPI/$version/Swagger.$format `
+                ./openapi.$format `
                 --namespace GeneratedCode
 
             Copy-Item "./Output.cs" "./GeneratedCode/Net7/Output.cs" -Force
