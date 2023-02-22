@@ -21,8 +21,15 @@ jobs:
     strategy:
       matrix:
         format: [ json, yaml ]
-        version: [ V2, V3 ]
+        version: [ v2.0, v3.0 ]
         os: [ macos-latest, windows-latest, ubuntu-latest ]
+        openapi: [
+          "callback-example",
+          "link-example",
+          "uber",
+          "uspto",
+          "petstore"
+        ]
 
     name: C#
     runs-on: ${{ matrix.os }}
@@ -32,12 +39,13 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Prepare Swagger Petstore OpenAPI Spec
-      run: cp ./OpenAPI/${{ matrix.version }}/Swagger.${{ matrix.format }} ./OpenApi.${{ matrix.format }}
+      run: cp ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }} ./openapi.${{ matrix.format }}
       working-directory: test
 
     - name: Generate code
       run: |
-        dotnet run --project ../src/Refitter/Refitter.csproj ./OpenApi.${{ matrix.format }} --namespace GeneratedCode
+        dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.${{ matrix.format }} --namespace GeneratedCode
+        cp ./Output.cs ./${{ matrix.version }}-${{ matrix.openapi }}-${{ matrix.format }}.cs
         cp ./Output.cs ./GeneratedCode/Net6/Output.cs
         cp ./Output.cs ./GeneratedCode/Net7/Output.cs
         cp ./Output.cs ./GeneratedCode/Net48/Output.cs
@@ -48,11 +56,11 @@ jobs:
         cp ./Output.cs ./GeneratedCode/NetStandard21/Output.cs
       working-directory: test
     
-    # - name: Publish generated code as Artifact
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: Output.cs (${{ matrix.format }}, ${{ matrix.version }}, ${{ matrix.os }})
-    #     path: test/Output.cs
+    - name: Publish generated code as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Generated Code (${{ matrix.openapi }}.${{ matrix.format }}, ${{ matrix.version }}, ${{ matrix.os }})
+        path: test/Output.cs
 
     - name: Build .NET 6 generated code
       run: dotnet build ./GeneratedCode/Net6/Net6.csproj
