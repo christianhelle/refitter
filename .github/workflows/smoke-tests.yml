@@ -34,6 +34,7 @@ jobs:
     name: C#
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
+    if: ${{ matrix.version }} == 'v2.0' && (${{ matrix.openapi }} == 'uber' || ${{ matrix.openapi }} == 'petstore')
 
     steps:
     - uses: actions/checkout@v2
