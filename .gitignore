@@ -260,5 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 test/GeneratedCode/**/Output.cs
-test/Swagger.json
-test/Swagger.yaml
+test/openapi.json
+test/openapi.yaml
