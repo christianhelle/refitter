@@ -262,3 +262,4 @@ __pycache__/
 test/GeneratedCode/**/Output.cs
 test/openapi.json
 test/openapi.yaml
+test/*.cs
