@@ -42,7 +42,7 @@ jobs:
       id: check_files
       run: |
         if test -f "./test/OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}"; then
-          echo "exists=true" >> $GITHUB_OUTPUTelse
+          echo "exists=true" >> $GITHUB_OUTPUT
         else
           echo "exists=false" >> $GITHUB_OUTPUT
         fi
