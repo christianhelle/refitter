@@ -38,10 +38,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
+    - name: Check file existence
+      id: check_files
+      uses: andstor/file-existence-action@v1
+      with:
+        files: ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}
 
     - name: Prepare Swagger Petstore OpenAPI Spec
       run: cp ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }} ./openapi.${{ matrix.format }}
       working-directory: test
+      if: steps.check_files.outputs.files_exists == 'true'
 
     - name: Generate code
       run: |
@@ -56,12 +63,14 @@ jobs:
         cp ./Output.cs ./GeneratedCode/NetStandard20/Output.cs
         cp ./Output.cs ./GeneratedCode/NetStandard21/Output.cs
       working-directory: test
+      if: steps.check_files.outputs.files_exists == 'true'
     
     - name: Publish generated code as Artifact
       uses: actions/upload-artifact@v2
       with:
         name: Generated Code (${{ matrix.openapi }}.${{ matrix.format }}, ${{ matrix.version }}, ${{ matrix.os }})
         path: test/Output.cs
+      if: steps.check_files.outputs.files_exists == 'true'
 
     - name: Build .NET 6 generated code
       run: dotnet build ./GeneratedCode/Net6/Net6.csproj
