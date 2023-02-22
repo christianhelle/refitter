@@ -59,7 +59,7 @@ namespace Refitter.Core
                 .AppendLine($"{Separator}using System.Threading.Tasks;")
                 .AppendLine($"{Separator}using System.Collections.Generic;")
                 .AppendLine()
-                .AppendLine($"{Separator}public interface I{ToPascalCase(title)}")
+                .AppendLine($"{Separator}public interface I{CapitalizeFirstCharacter(title)}")
                 .AppendLine($"{Separator}{{");
 
             foreach (var kv in document.Paths)
@@ -76,8 +76,8 @@ namespace Refitter.Core
                         ? "Task"
                         : $"Task<{TrimImportedNamespaces(returnTypeParameter)}>";
 
-                    var verb = ToPascalCase(operations.Key);
-                    var name = ToPascalCase(operation.OperationId);
+                    var verb = CapitalizeFirstCharacter(operations.Key);
+                    var name = ToPascalCase(CapitalizeFirstCharacter(operation.OperationId));
 
                     var parameters = GetParameters(generator, operation);
                     var parametersString = string.Join(", ", parameters);
@@ -92,6 +92,16 @@ namespace Refitter.Core
                 .AppendLine("}");
 
             return code.ToString();
+        }
+
+        private static string ToPascalCase(string operationId)
+        {
+            var parts = operationId.Split('-');
+            for (var i = 0; i < parts.Length; i++)
+            {
+                parts[i] = CapitalizeFirstCharacter(parts[i]);
+            }
+            return string.Join(string.Empty, parts);
         }
 
         private static IEnumerable<string> GetParameters(CSharpClientGenerator generator, OpenApiOperation operation)
@@ -132,7 +142,7 @@ namespace Refitter.Core
             return returnTypeParameter;
         }
 
-        private static string ToPascalCase(string str)
+        private static string CapitalizeFirstCharacter(string str)
         {
             return str.Substring(0, 1).ToUpperInvariant() +
                    str.Substring(1, str.Length - 1);
