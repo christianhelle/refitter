@@ -41,6 +41,7 @@ jobs:
     - name: Check file existence
       id: check_files
       run: echo "exists = test -f ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}" >> $GITHUB_OUTPUT
+      working-directory: test
 
     - name: Prepare Swagger Petstore OpenAPI Spec
       run: cp ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }} ./openapi.${{ matrix.format }}
