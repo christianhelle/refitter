@@ -22,11 +22,7 @@ jobs:
       matrix:
         format: [ json, yaml ]
         version: [ v2.0, v3.0 ]
-        os: [ 
-          # macos-latest, 
-          # windows-latest, 
-          ubuntu-latest 
-        ]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
         openapi: [
           "callback-example",
           "link-example",
