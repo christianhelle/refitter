@@ -25,10 +25,10 @@ function RunTests {
 
     $filenames = @(
         # "api-with-examples",
-        # "callback-example",
-        # "link-example",
-        # "uber",
-        # "uspto",
+        "callback-example",
+        "link-example",
+        "uber",
+        "uspto",
         # "petstore-expanded",
         # "petstore-minimal",
         # "petstore-simple",
@@ -77,5 +77,6 @@ function RunTests {
     }
 }
 
+Remove-Item ./**/*Output.cs -Force
 Measure-Command { RunTests -Method "dotnet-run" -Parallel $Parallel }
 Write-Host "`r`n"
