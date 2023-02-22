@@ -23,11 +23,18 @@ jobs:
         format: [ json, yaml ]
         version: [ v2.0, v3.0 ]
         os: [ macos-latest, windows-latest, ubuntu-latest ]
-        openapi: [ "petstore", "uber" ]
+        openapi: [
+          "callback-example",
+          "link-example",
+          "uber",
+          "uspto",
+          "petstore"
+        ]
 
     name: C#
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
+    if: ${{ matrix.version }} == 'v2.0' && (${{ matrix.openapi }} == 'uber' || ${{ matrix.openapi }} == 'petstore')
 
     steps:
     - uses: actions/checkout@v2
