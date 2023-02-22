@@ -76,6 +76,9 @@ function RunTests {
     }
 }
 
+Remove-Item ./v2.0-*.cs -Force
+Remove-Item ./v3.0-*.cs -Force
+Remove-Item ./v3.1-*.cs -Force
 Remove-Item ./**/*Output.cs -Force
 Measure-Command { RunTests -Method "dotnet-run" -Parallel $Parallel }
 Write-Host "`r`n"
