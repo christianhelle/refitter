@@ -52,7 +52,7 @@ jobs:
 
     - name: Generate code
       run: |
-        dotnet run --project ../src/Refitter/Refitter.csproj ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }} --namespace GeneratedCode
+        dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.${{ matrix.format }} --namespace GeneratedCode
         Copy-Item ./Output.cs ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}.cs
         Copy-Item ./Output.cs ./GeneratedCode/Net6/Output.cs
         Copy-Item ./Output.cs ./GeneratedCode/Net7/Output.cs
