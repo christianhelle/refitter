@@ -45,9 +45,9 @@ jobs:
         $exists = Test-Path -Path $filename -PathType Leaf
         if ($exists -eq $true) {
           Copy-Item $filename ./openapi.${{ matrix.format }}
-          Write-Host "exists=$true" >> $GITHUB_OUTPUT
+          Write-Host ::set-output name=exists::$true
         } else {
-          Write-Host "exists=$false" >> $GITHUB_OUTPUT
+          Write-Host ::set-output name=exists::$false
         }
       working-directory: test
       shell: pwsh
