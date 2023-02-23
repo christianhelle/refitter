@@ -44,8 +44,10 @@ jobs:
         $filename = "./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}"
         $exists = Test-Path -Path $filename -PathType Leaf
         if ($exists -eq $true) {
-            Copy-Item $filename ./openapi.${{ matrix.format }}
-            echo ::set-output name=exists::'true'
+          Copy-Item $filename ./openapi.${{ matrix.format }}
+          echo ::set-output name=exists::'true'
+        } else {
+          echo ::set-output name=exists::'false'
         }
       working-directory: test
       shell: pwsh
