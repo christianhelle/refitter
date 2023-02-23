@@ -4,30 +4,24 @@ on:
   workflow_dispatch:
   push:
     paths-ignore:
-      - '**/*'
-      - '!.github/workflows/smoke-tests.yml'
-      - '!src/**/*.csproj'
-      - '!src/**/*.cs'
+      - "**/*"
+      - "!.github/workflows/smoke-tests.yml"
+      - "!src/**/*.csproj"
+      - "!src/**/*.cs"
     branches:
-      - '*'
+      - "*"
   pull_request:
     branches:
-      - '*'
+      - "*"
 
 jobs:
   template:
     strategy:
       matrix:
-        format: [ json, yaml ]
-        version: [ v2.0, v3.0 ]
-        os: [ ubuntu-latest ]
-        openapi: [
-          "callback-example",
-          "link-example",
-          "uber",
-          "uspto",
-          "petstore"
-        ]    
+        format: [json, yaml]
+        version: [v2.0, v3.0]
+        os: [ubuntu-latest]
+        openapi: ["callback-example", "link-example", "uber", "uspto", "petstore"]
     uses: ./.github/workflows/template.yml
     with:
       format: ${{ matrix.format }}
