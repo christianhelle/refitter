@@ -53,18 +53,17 @@ jobs:
     - name: Generate code
       run: |
         dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.${{ matrix.format }} --namespace GeneratedCode
-        Copy-Item ./Output.cs ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}.cs
-        Copy-Item ./Output.cs ./GeneratedCode/Net6/Output.cs
-        Copy-Item ./Output.cs ./GeneratedCode/Net7/Output.cs
-        Copy-Item ./Output.cs ./GeneratedCode/Net48/Output.cs
-        Copy-Item ./Output.cs ./GeneratedCode/Net472/Output.cs
-        Copy-Item ./Output.cs ./GeneratedCode/Net462/Output.cs
-        Copy-Item ./Output.cs ./GeneratedCode/Net481/Output.cs
-        Copy-Item ./Output.cs ./GeneratedCode/NetStandard20/Output.cs
-        Copy-Item ./Output.cs ./GeneratedCode/NetStandard21/Output.cs
+        cp ./Output.cs ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}.cs
+        cp ./Output.cs ./GeneratedCode/Net6/Output.cs
+        cp ./Output.cs ./GeneratedCode/Net7/Output.cs
+        cp ./Output.cs ./GeneratedCode/Net48/Output.cs
+        cp ./Output.cs ./GeneratedCode/Net472/Output.cs
+        cp ./Output.cs ./GeneratedCode/Net462/Output.cs
+        cp ./Output.cs ./GeneratedCode/Net481/Output.cs
+        cp ./Output.cs ./GeneratedCode/NetStandard20/Output.cs
+        cp ./Output.cs ./GeneratedCode/NetStandard21/Output.cs
       working-directory: test
       if: ${{ steps.prepare_openapi_spec.outputs.exists }} == 'true'
-      shell: pwsh
     
     - name: Publish generated code as Artifact
       uses: actions/upload-artifact@v2
