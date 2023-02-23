@@ -15,7 +15,9 @@ on:
       os:
         type: string
         default: ubuntu-latest
-        
+      command:
+        required: true
+        type: string
 
 jobs:
   
@@ -43,7 +45,7 @@ jobs:
 
     - name: Generate code
       run: |
-        dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.${{ inputs.format }} --namespace GeneratedCode
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace GeneratedCode
         cp ./Output.cs ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
         cp ./Output.cs ./ConsoleApp/Net6/Output.cs
         cp ./Output.cs ./ConsoleApp/Net7/Output.cs
