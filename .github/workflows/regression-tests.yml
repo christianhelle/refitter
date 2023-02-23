@@ -1,0 +1,26 @@
+name: Regression Tests
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - "**/*"
+      - "!.github/workflows/regression-tests.yml"
+    branches:
+      - "*"
+
+jobs:
+  template:
+    strategy:
+      matrix:
+        format: [json, yaml]
+        version: [v2.0, v3.0]
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        openapi: ["callback-example", "link-example", "uber", "uspto", "petstore"]
+    uses: ./.github/workflows/template.yml
+    with:
+      format: ${{ matrix.format }}
+      version: ${{ matrix.version }}
+      openapi: ${{ matrix.openapi }}
+      os: ${{ matrix.os }}
+      command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
