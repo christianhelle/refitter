@@ -259,7 +259,7 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-test/GeneratedCode/**/Output.cs
+test/ConsoleApp/**/Output.cs
 test/openapi.json
 test/openapi.yaml
 test/*.cs

@@ -50,20 +50,20 @@ function RunTests {
                         --namespace GeneratedCode
 
                     Copy-Item "./Output.cs" "./$version-$_-$format.cs"
-                    Copy-Item "./Output.cs" "./GeneratedCode/Net7/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./GeneratedCode/Net7/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./GeneratedCode/Net6/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./GeneratedCode/Net48/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./GeneratedCode/Net481/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./GeneratedCode/Net472/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./GeneratedCode/Net462/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./GeneratedCode/NetStandard20/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./GeneratedCode/NetStandard21/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./ConsoleApp/Net7/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./ConsoleApp/Net7/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./ConsoleApp/Net6/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./ConsoleApp/Net48/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./ConsoleApp/Net481/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./ConsoleApp/Net472/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./ConsoleApp/Net462/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./ConsoleApp/NetStandard20/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./ConsoleApp/NetStandard21/Output.cs" -Force
                     Remove-Item "./Output.cs" -Force
 
                     Write-Host "`r`nBuilding $_`r`n"
                     $process = Start-Process "dotnet" `
-                        -Args "build ./GeneratedCode/Generated.sln" `
+                        -Args "build ./ConsoleApp/ConsoleApp.sln" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
