@@ -15,105 +15,22 @@ on:
       - '*'
 
 jobs:
-
-  Test:
-
+  test:
     strategy:
       matrix:
         format: [ json, yaml ]
         version: [ v2.0, v3.0 ]
-        os: [ 
-          # macos-latest, 
-          # windows-latest, 
-          ubuntu-latest 
-        ]
+        os: [ ubuntu-latest ]
         openapi: [
           "callback-example",
           "link-example",
           "uber",
           "uspto",
           "petstore"
-        ]
-
-    name: C#
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Prepare OpenAPI Spec
-      id: prepare_openapi_spec
-      run: |
-        $filename = "./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}"
-        $exists = Test-Path -Path $filename -PathType Leaf
-        if ($exists -eq $true) {
-          Copy-Item $filename ./openapi.${{ matrix.format }}
-          "exists=$true" >> $env:GITHUB_OUTPUT
-        } else {
-          "exists=$false" >> $env:GITHUB_OUTPUT
-        }
-      working-directory: test
-      shell: pwsh
-
-    - name: Generate code
-      run: |
-        dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.${{ matrix.format }} --namespace GeneratedCode
-        cp ./Output.cs ./OpenAPI/${{ matrix.version }}/${{ matrix.openapi }}.${{ matrix.format }}.cs
-        cp ./Output.cs ./GeneratedCode/Net6/Output.cs
-        cp ./Output.cs ./GeneratedCode/Net7/Output.cs
-        cp ./Output.cs ./GeneratedCode/Net48/Output.cs
-        cp ./Output.cs ./GeneratedCode/Net472/Output.cs
-        cp ./Output.cs ./GeneratedCode/Net462/Output.cs
-        cp ./Output.cs ./GeneratedCode/Net481/Output.cs
-        cp ./Output.cs ./GeneratedCode/NetStandard20/Output.cs
-        cp ./Output.cs ./GeneratedCode/NetStandard21/Output.cs
-      working-directory: test
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
-    
-    - name: Publish generated code as Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: Generated Code (${{ matrix.openapi }}.${{ matrix.format }}, ${{ matrix.version }}, ${{ matrix.os }})
-        path: test/Output.cs
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
-
-    - name: Build .NET 6 generated code
-      run: dotnet build ./GeneratedCode/Net6/Net6.csproj
-      working-directory: test
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
-
-    - name: Build .NET 7 generated code
-      run: dotnet build ./GeneratedCode/Net7/Net7.csproj
-      working-directory: test
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
-
-    - name: Build .NET 4.8.1 generated code
-      run: dotnet build ./GeneratedCode/Net481/Net481.csproj
-      if: steps.prepare_openapi_spec.outputs.exists == 'True' && ${{ matrix.os == 'windows-2022' }}
-      working-directory: test
-
-    - name: Build .NET 4.8 generated code
-      run: dotnet build ./GeneratedCode/Net48/Net48.csproj
-      working-directory: test
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
-
-    - name: Build .NET 4.7.2 generated code
-      run: dotnet build ./GeneratedCode/Net472/Net472.csproj
-      working-directory: test
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
-
-    - name: Build .NET 4.6.2 generated code
-      run: dotnet build ./GeneratedCode/Net462/Net462.csproj
-      working-directory: test
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
-
-    - name: Build .NET Standard 2.0 generated code
-      run: dotnet build ./GeneratedCode/NetStandard20/NetStandard20.csproj
-      working-directory: test
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
-
-    - name: Build .NET Standard 2.1 generated code
-      run: dotnet build ./GeneratedCode/NetStandard21/NetStandard21.csproj
-      working-directory: test
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
+        ]    
+    uses: ./.github/workflows/template.yml
+    with:
+      format: ${{ matrix.format }}
+      version: ${{ matrix.version }}
+      openapi: ${{ matrix.openapi }}
+      os: ${{ matrix.os }}
