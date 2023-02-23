@@ -15,7 +15,7 @@ on:
       - '*'
 
 jobs:
-  test:
+  template:
     strategy:
       matrix:
         format: [ json, yaml ]

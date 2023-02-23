@@ -21,7 +21,6 @@ jobs:
   
   test:
 
-    name: C#
     runs-on: ${{ inputs.os }}
     timeout-minutes: 10
 
