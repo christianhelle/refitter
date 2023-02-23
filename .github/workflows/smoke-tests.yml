@@ -64,6 +64,7 @@ jobs:
         Copy-Item ./Output.cs ./GeneratedCode/NetStandard21/Output.cs
       working-directory: test
       if: ${{ steps.prepare_openapi_spec.outputs.exists }} == 'true'
+      shell: pwsh
     
     - name: Publish generated code as Artifact
       uses: actions/upload-artifact@v2
