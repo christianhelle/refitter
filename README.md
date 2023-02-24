@@ -89,6 +89,8 @@ namespace GeneratedCode
 
 # Using the generated code
 
+## RestService
+
 Here's an example usage of the generated code above
 
 ```cs
@@ -121,6 +123,8 @@ Name: Gatitotototo
 Category: Chaucito
 Status: Sold
 ```
+
+## ASP.NET Core and HttpClientFactory
 
 Here's an example Minimal API with the [`Refit.HttpClientFactory`](https://www.nuget.org/packages/Refit.HttpClientFactory) library:
 
