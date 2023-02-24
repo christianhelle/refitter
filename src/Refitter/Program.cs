@@ -34,9 +34,14 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var searchPath = settings.OpenApiPath ?? ".";
+        var refitGeneratorSettings = new RefitGeneratorSettings
+        {
+            OpenApiPath = searchPath,
+            Namespace = settings.Namespace ?? "GeneratedCode"
+        };
 
-        var generator = new RefitGenerator();
-        var code = await generator.Generate(searchPath, settings.Namespace);
+        var generator = await RefitGenerator.Create(refitGeneratorSettings);
+        var code = generator.Generate();
         await File.WriteAllTextAsync("Output.cs", code);
 
         return 0;

@@ -18,9 +18,9 @@ public class RefitGeneratorTests
         generateCode.Should().NotBeNullOrWhiteSpace();
     }
 
-#if !DEBUG
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+#if !DEBUG
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
@@ -37,7 +37,8 @@ public class RefitGeneratorTests
     private static async Task<string> GenerateCode(SampleOpenSpecifications version, string filename)
     {
         var swaggerFile = await CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
-        return await new RefitGenerator().Generate(swaggerFile, "GeneratedCode");
+        var sut = await RefitGenerator.Create(new RefitGeneratorSettings { OpenApiPath = swaggerFile });
+        return sut.Generate();
     }
 
     private static async Task<string> CreateSwaggerFile(string contents, string filename)
