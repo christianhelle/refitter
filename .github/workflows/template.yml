@@ -77,7 +77,7 @@ jobs:
 
     - name: Build .NET 4.8.1 generated code
       run: dotnet build ./ConsoleApp/Net481/Net481.csproj
-      if: steps.prepare_openapi_spec.outputs.exists == 'True' && ${{ inputs.os == 'windows-2022' }}
+      if: ${{ steps.prepare_openapi_spec.outputs.exists == 'True' && inputs.os == 'windows-2022' }}
       working-directory: test
 
     - name: Build .NET 4.8 generated code
