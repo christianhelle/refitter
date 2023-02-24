@@ -106,12 +106,11 @@ jobs:
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: Prepare Minimal API project
-      run: |
-        cp ./Output.cs ./MinimalApi/Output.cs
+      run: cp ./Output.cs ./MinimalApi/Output.cs
       working-directory: test
-      if: ${{ inputs.openapi }} == 'petstore'
+      if: steps.prepare_openapi_spec.outputs.exists == 'True' && ${{ inputs.openapi }} == 'petstore'
 
     - name: Build Minimal API generated code
       run: dotnet build ./MinimalApi/MinimalApi.csproj
       working-directory: test
-      if: ${{ inputs.openapi }} == 'petstore'
+      if: steps.prepare_openapi_spec.outputs.exists == 'True' && ${{ inputs.openapi }} == 'petstore'
