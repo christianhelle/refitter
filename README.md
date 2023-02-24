@@ -5,6 +5,14 @@
 # Refitter
 Refitter is a CLI tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. 
 
+## Installation:
+
+The tool is packaged as a .NET Tool and is published to nuget.org. You can install the latest version of this tool like this:
+
+```shell
+dotnet tool install --global Refitter --prerelease
+```
+
 ## Usage:
 
 To generate code from an OpenAPI specifications file, run the following:
