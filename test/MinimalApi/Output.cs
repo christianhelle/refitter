@@ -47,7 +47,7 @@ namespace GeneratedCode
         Task DeletePet(long? petId);
 
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> UploadFile(long? petId, [Body]FileParameter body);
+        Task<ApiResponse> UploadFile(long? petId, [Body]StreamPart body);
 
         /// <summary>
         /// Returns a map of status codes to quantities
