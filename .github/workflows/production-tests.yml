@@ -8,6 +8,8 @@ on:
       - "!.github/workflows/production-tests.yml"
     branches:
       - "*"
+  schedule:
+    - cron: '0 8 * * *'
 
 jobs:
   template:
