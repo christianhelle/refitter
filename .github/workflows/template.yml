@@ -3,13 +3,13 @@ name: Run Tests
 on:
   workflow_call:
     inputs:
+      openapi:
+        required: true
+        type: string
       format:
         required: true
         type: string
       version:
-        required: true
-        type: string
-      openapi:
         required: true
         type: string
       os:
