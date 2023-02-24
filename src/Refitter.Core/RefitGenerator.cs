@@ -128,11 +128,13 @@ namespace Refitter.Core
 
         private void GenerateInterfaceDeclaration(StringBuilder code)
         {
-            var title = document.Info?.Title?
-                            .Replace(" ", string.Empty)
-                            .Replace("-", string.Empty)
-                            .Replace(".", string.Empty) ??
-                        "ApiClient";
+            var title = settings.Naming.UseOpenApiTitle
+                ? document.Info?.Title?
+                      .Replace(" ", string.Empty)
+                      .Replace("-", string.Empty)
+                      .Replace(".", string.Empty) ??
+                  "ApiClient"
+                : settings.Naming.InterfaceName;
 
             code.AppendLine($"{Separator}public interface I{CapitalizeFirstCharacter(title)}")
                 .AppendLine($"{Separator}{{");
