@@ -193,7 +193,7 @@ namespace Refitter.Core
                         null)));
 
         private static string FindSupportedType(string typeName) =>
-            typeName == "FileResponse" ? "FileParameter" : typeName;
+            typeName == "FileResponse" ? "StreamPart" : typeName;
 
         private static string TrimImportedNamespaces(string returnTypeParameter)
         {
