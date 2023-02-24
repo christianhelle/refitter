@@ -71,7 +71,7 @@ namespace Refitter.Core
             code.AppendLine("namespace " + settings.Namespace)
                 .AppendLine("{");
 
-            GenerateInterfaceDeclaration(document, code);
+            GenerateInterfaceDeclaration(code);
             GenerateInterfaceBody(document, generator, code);
 
             code.AppendLine("}");
@@ -116,6 +116,9 @@ namespace Refitter.Core
 
         private void GenerateMethodXmlDocComments(OpenApiOperation operation, StringBuilder code)
         {
+            if (!settings.GenerateXmlDocCodeComments)
+                return;
+            
             if (!string.IsNullOrWhiteSpace(operation.Description))
             {
                 code.AppendLine($"{Separator}{Separator}/// <summary>")
@@ -124,7 +127,7 @@ namespace Refitter.Core
             }
         }
 
-        private void GenerateInterfaceDeclaration(OpenApiDocument document, StringBuilder code)
+        private void GenerateInterfaceDeclaration(StringBuilder code)
         {
             var title = document.Info?.Title?
                             .Replace(" ", string.Empty)

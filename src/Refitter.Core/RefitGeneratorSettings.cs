@@ -13,7 +13,7 @@ namespace Refitter.Core
 
         public bool GenerateContracts { get; set; } = true;
 
-        public bool GenerateCodeComments { get; set; }
+        public bool GenerateXmlDocCodeComments { get; set; } = true;
     }
 
     [ExcludeFromCodeCoverage]
