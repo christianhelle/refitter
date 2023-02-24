@@ -59,9 +59,10 @@ function RunTests {
                     Copy-Item "./Output.cs" "./ConsoleApp/Net462/Output.cs" -Force
                     Copy-Item "./Output.cs" "./ConsoleApp/NetStandard20/Output.cs" -Force
                     Copy-Item "./Output.cs" "./ConsoleApp/NetStandard21/Output.cs" -Force
+                    Copy-Item "./Output.cs" "./MinimalApi/Output.cs" -Force
                     Remove-Item "./Output.cs" -Force
 
-                    Write-Host "`r`nBuilding $_`r`n"
+                    Write-Host "`r`nBuilding ConsoleApp$_`r`n"
                     $process = Start-Process "dotnet" `
                         -Args "build ./ConsoleApp/ConsoleApp.sln" `
                         -NoNewWindow `
@@ -69,7 +70,19 @@ function RunTests {
                     $process | Wait-Process
                     if ($process.ExitCode -ne 0) {
                         throw "Build Failed!"
-                    }                
+                    }
+
+                    if ($_ -eq "petstore") {
+                        Write-Host "`r`nBuilding MinimalApi$_`r`n"
+                        $process = Start-Process "dotnet" `
+                            -Args "build ./MinimalApi/MinimalApi.csproj" `
+                            -NoNewWindow `
+                            -PassThru
+                        $process | Wait-Process
+                        if ($process.ExitCode -ne 0) {
+                            throw "Build Failed!"
+                        }
+                    }
                 }
             }
         }
