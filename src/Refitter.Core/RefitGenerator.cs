@@ -26,6 +26,7 @@ namespace Refitter.Core
                 GenerateClientClasses = false,
                 GenerateDtoTypes = true,
                 GenerateClientInterfaces = false,
+                GenerateExceptionClasses = false,
                 CSharpGeneratorSettings =
                 {
                     Namespace = defaultNamespace,
