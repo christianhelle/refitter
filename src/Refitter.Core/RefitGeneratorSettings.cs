@@ -21,6 +21,6 @@ namespace Refitter.Core
     {
         public bool UseOpenApiTitle { get; set; } = true;
 
-        public string ClassName { get; set; } = "ApiClient";
+        public string InterfaceName { get; set; } = "ApiClient";
     }
 }
