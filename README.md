@@ -87,6 +87,8 @@ namespace GeneratedCode
 }
 ```
 
+# Using the generated code
+
 Here's an example usage of the generated code above
 
 ```cs
@@ -118,6 +120,62 @@ The code above when run will output something like this:
 Name: Gatitotototo
 Category: Chaucito
 Status: Sold
+```
+
+Here's an example Minimal API with the [`Refit.HttpClientFactory`](https://www.nuget.org/packages/Refit.HttpClientFactory) library:
+
+```cs
+using Refit;
+using GeneratedCode;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services
+    .AddRefitClient<ISwaggerPetstore>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"));
+
+var app = builder.Build();
+app.MapGet(
+        "/pet/{id:long}",
+        async (ISwaggerPetstore petstore, long id) =>
+        {
+            try
+            {
+                return Results.Ok(await petstore.GetPetById(id));
+            }
+            catch (Refit.ApiException e)
+            {
+                return Results.StatusCode((int)e.StatusCode);
+            }
+        })
+    .WithName("GetPetById")
+    .WithOpenApi();
+
+app.UseHttpsRedirection();
+app.UseSwaggerUI();
+app.UseSwagger();
+app.Run();
+```
+
+.NET Core supports registering the generated `ISwaggerPetstore` interface via `HttpClientFactory`
+
+The following request to the API above
+```shell
+$ curl -X 'GET' 'https://localhost:5001/pet/1' -H 'accept: application/json'
+```
+
+Returns a response that looks something like this:
+```json
+{
+  "id": 1,
+  "name": "Special_char_owner_!@#$^&()`.testing",
+  "photoUrls": [
+    "https://petstore3.swagger.io/resources/photos/623389095.jpg"
+  ],
+  "tags": [],
+  "status": "Sold"
+}
 ```
 
 ## System requirements
