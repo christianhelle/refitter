@@ -6,6 +6,7 @@ on:
     paths-ignore:
       - "**/*"
       - "!.github/workflows/smoke-tests.yml"
+      - "!.github/workflows/template.yml"
       - "!src/**/*.csproj"
       - "!src/**/*.cs"
     branches:
