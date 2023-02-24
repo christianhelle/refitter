@@ -23,6 +23,7 @@ jobs:
   
   test:
 
+    name: ${{ inputs.openapi }}.${{ inputs.format }} (${{ inputs.version }}) ${{ inputs.os }}
     runs-on: ${{ inputs.os }}
     timeout-minutes: 10
 
