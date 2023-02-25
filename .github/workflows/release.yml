@@ -7,7 +7,7 @@ on:
       - "release"
 
 env:
-  VERSION: 0.2.1-alpha
+  VERSION: 0.2.2-alpha
   NUGET_REPO_URL: "https://api.nuget.org/v3/index.json"
 
 jobs:
