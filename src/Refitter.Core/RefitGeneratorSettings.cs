@@ -5,7 +5,7 @@ namespace Refitter.Core
     [ExcludeFromCodeCoverage]
     public class RefitGeneratorSettings
     {
-        public string OpenApiPath { get; set; }
+        public string OpenApiPath { get; set; } = null!;
 
         public string Namespace { get; set; } = "GeneratedCode";
 
