@@ -32,4 +32,8 @@
       <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>        
+      <PackageReference Include="FluentAssertions" Version="6.10.0" />
+    </ItemGroup>
+
 </Project>
