@@ -46,16 +46,20 @@ jobs:
 
     - name: Generate code
       run: |
+        $outputPath = "${{ inputs.openapi }}.cs"
+        $outputPath = $outputPath.Substring(0, 1).ToUpperInvariant() + $outputPath.Substring(1, $outputPath.Length - 1)
+        $namespace = ${{ inputs.openapi }}.Replace("-", "")
+        $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace GeneratedCode
-        cp ./Output.cs ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
-        cp ./Output.cs ./ConsoleApp/Net6/Output.cs
-        cp ./Output.cs ./ConsoleApp/Net7/Output.cs
-        cp ./Output.cs ./ConsoleApp/Net48/Output.cs
-        cp ./Output.cs ./ConsoleApp/Net472/Output.cs
-        cp ./Output.cs ./ConsoleApp/Net462/Output.cs
-        cp ./Output.cs ./ConsoleApp/Net481/Output.cs
-        cp ./Output.cs ./ConsoleApp/NetStandard20/Output.cs
-        cp ./Output.cs ./ConsoleApp/NetStandard21/Output.cs
+        cp $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
+        cp $outputPath ./ConsoleApp/Net6/
+        cp $outputPath ./ConsoleApp/Net7/
+        cp $outputPath ./ConsoleApp/Net48/
+        cp $outputPath ./ConsoleApp/Net472/
+        cp $outputPath ./ConsoleApp/Net462/
+        cp $outputPath ./ConsoleApp/Net481/
+        cp $outputPath ./ConsoleApp/NetStandard20/
+        cp $outputPath ./ConsoleApp/NetStandard21/
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
     
@@ -63,7 +67,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Generated Code (${{ inputs.openapi }}.${{ inputs.format }}, ${{ inputs.version }}, ${{ inputs.os }})
-        path: test/Output.cs
+        path: test/*.cs
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: Build .NET 6 generated code
@@ -107,7 +111,7 @@ jobs:
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: Prepare Minimal API project
-      run: cp ./Output.cs ./MinimalApi/Output.cs
+      run: cp Petstore.cs ./MinimalApi/
       working-directory: test
       if: ${{ steps.prepare_openapi_spec.outputs.exists == 'True' && inputs.openapi == 'petstore' }}
 
