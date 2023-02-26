@@ -40,7 +40,7 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             Namespace = settings.Namespace ?? "GeneratedCode"
         };
 
-        var generator = await RefitGenerator.Create(refitGeneratorSettings);
+        var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
         var code = generator.Generate();
         await File.WriteAllTextAsync("Output.cs", code);
 

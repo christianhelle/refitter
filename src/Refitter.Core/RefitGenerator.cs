@@ -23,7 +23,7 @@ namespace Refitter.Core
             this.document = document;
         }
 
-        public static async Task<RefitGenerator> Create(RefitGeneratorSettings settings) =>
+        public static async Task<RefitGenerator> CreateAsync(RefitGeneratorSettings settings) =>
             new(
                 settings,
                 await (settings.OpenApiPath.EndsWith("yaml") || settings.OpenApiPath.EndsWith("yml")

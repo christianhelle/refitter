@@ -108,7 +108,7 @@ public class RefitGeneratorTests
             settings.OpenApiPath = swaggerFile;
         }
 
-        var sut = await RefitGenerator.Create(settings);
+        var sut = await RefitGenerator.CreateAsync(settings);
         return sut.Generate();
     }
 
