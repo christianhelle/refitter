@@ -19,6 +19,11 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [CommandOption("-n|--namespace")]
         [DefaultValue("GeneratedCode")]
         public string? Namespace { get; set; }
+        
+        [Description("Path to Output file")]
+        [CommandOption("-o|--output")]
+        [DefaultValue("Output.cs")]
+        public string? OutputPath { get; set; }
     }
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
@@ -42,7 +47,7 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
         var code = generator.Generate();
-        await File.WriteAllTextAsync("Output.cs", code);
+        await File.WriteAllTextAsync(settings.OutputPath ?? "Output.cs", code);
 
         return 0;
     }
