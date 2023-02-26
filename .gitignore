@@ -263,3 +263,8 @@ test/ConsoleApp/**/Output.cs
 test/openapi.json
 test/openapi.yaml
 test/*.cs
+test/**/Callback-example.cs
+test/**/Link-example.cs
+test/**/Petstore.cs
+test/**/Uber.cs
+test/**/Uspto.cs
