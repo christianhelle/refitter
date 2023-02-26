@@ -60,7 +60,6 @@ function RunTests {
 
                     Copy-Item $outputPath "./$version-$_-$format.cs"
                     Copy-Item $outputPath "./ConsoleApp/Net7/" -Force
-                    Copy-Item $outputPath "./ConsoleApp/Net7/" -Force
                     Copy-Item $outputPath "./ConsoleApp/Net6/" -Force
                     Copy-Item $outputPath "./ConsoleApp/Net48/" -Force
                     Copy-Item $outputPath "./ConsoleApp/Net481/" -Force
