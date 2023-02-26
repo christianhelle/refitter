@@ -50,7 +50,7 @@ jobs:
         $outputPath = $outputPath.Substring(0, 1).ToUpperInvariant() + $outputPath.Substring(1, $outputPath.Length - 1)
         $namespace = "${{ inputs.openapi }}".Replace("-", "")
         $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace GeneratedCode --output $outputPath
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace $namespace --output $outputPath
         Copy-Item $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
         Copy-Item $outputPath ./ConsoleApp/Net6/
         Copy-Item $outputPath ./ConsoleApp/Net7/
