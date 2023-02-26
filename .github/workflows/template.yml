@@ -51,16 +51,17 @@ jobs:
         $namespace = ${{ inputs.openapi }}.Replace("-", "")
         $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace GeneratedCode
-        cp $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
-        cp $outputPath ./ConsoleApp/Net6/
-        cp $outputPath ./ConsoleApp/Net7/
-        cp $outputPath ./ConsoleApp/Net48/
-        cp $outputPath ./ConsoleApp/Net472/
-        cp $outputPath ./ConsoleApp/Net462/
-        cp $outputPath ./ConsoleApp/Net481/
-        cp $outputPath ./ConsoleApp/NetStandard20/
-        cp $outputPath ./ConsoleApp/NetStandard21/
+        Copy-Item $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
+        Copy-Item $outputPath ./ConsoleApp/Net6/
+        Copy-Item $outputPath ./ConsoleApp/Net7/
+        Copy-Item $outputPath ./ConsoleApp/Net48/
+        Copy-Item $outputPath ./ConsoleApp/Net472/
+        Copy-Item $outputPath ./ConsoleApp/Net462/
+        Copy-Item $outputPath ./ConsoleApp/Net481/
+        Copy-Item $outputPath ./ConsoleApp/NetStandard20/
+        Copy-Item $outputPath ./ConsoleApp/NetStandard21/
       working-directory: test
+      shell: pwsh
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
     
     - name: Publish generated code as Artifact
