@@ -1,4 +1,4 @@
-using GeneratedCode;
+using Petstore;
 using Refit;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -85,16 +85,14 @@ function RunTests {
         throw "Build Failed!"
     }
 
-    if ($_ -eq "petstore") {
-        Write-Host "`r`nBuilding MinimalApi`r`n"
-        $process = Start-Process "dotnet" `
-            -Args "build ./MinimalApi/MinimalApi.csproj" `
-            -NoNewWindow `
-            -PassThru
-        $process | Wait-Process
-        if ($process.ExitCode -ne 0) {
-            throw "Build Failed!"
-        }
+    Write-Host "`r`nBuilding MinimalApi`r`n"
+    $process = Start-Process "dotnet" `
+        -Args "build ./MinimalApi/MinimalApi.csproj" `
+        -NoNewWindow `
+        -PassThru
+    $process | Wait-Process
+    if ($process.ExitCode -ne 0) {
+        throw "Build Failed!"
     }
 }
 
