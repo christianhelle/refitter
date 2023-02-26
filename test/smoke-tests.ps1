@@ -47,7 +47,8 @@ function RunTests {
                     dotnet run `
                         --project ../src/Refitter/Refitter.csproj `
                         ./openapi.$format `
-                        --namespace GeneratedCode
+                        --namespace GeneratedCode `
+                        --outputPath Output.cs
 
                     Copy-Item "./Output.cs" "./$version-$_-$format.cs"
                     Copy-Item "./Output.cs" "./ConsoleApp/Net7/Output.cs" -Force
