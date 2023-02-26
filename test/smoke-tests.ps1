@@ -44,48 +44,56 @@ function RunTests {
                 $exists = Test-Path -Path $filename -PathType Leaf
                 if ($exists -eq $true) {
                     Copy-Item $filename ./openapi.$format
-                    dotnet run `
-                        --project ../src/Refitter/Refitter.csproj `
-                        ./openapi.$format `
-                        --namespace GeneratedCode `
-                        --outputPath Output.cs
+                    $outputPath = "$_.cs"
+                    $outputPath = $outputPath.Substring(0, 1).ToUpperInvariant() + $outputPath.Substring(1, $outputPath.Length - 1)
+                    $namespace = $_.Replace("-", "")
+                    $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    Copy-Item "./Output.cs" "./$version-$_-$format.cs"
-                    Copy-Item "./Output.cs" "./ConsoleApp/Net7/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./ConsoleApp/Net7/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./ConsoleApp/Net6/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./ConsoleApp/Net48/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./ConsoleApp/Net481/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./ConsoleApp/Net472/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./ConsoleApp/Net462/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./ConsoleApp/NetStandard20/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./ConsoleApp/NetStandard21/Output.cs" -Force
-                    Copy-Item "./Output.cs" "./MinimalApi/Output.cs" -Force
-                    Remove-Item "./Output.cs" -Force
-
-                    Write-Host "`r`nBuilding ConsoleApp$_`r`n"
                     $process = Start-Process "dotnet" `
-                        -Args "build ./ConsoleApp/ConsoleApp.sln" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output $outputPath" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
                     if ($process.ExitCode -ne 0) {
-                        throw "Build Failed!"
+                        throw "Refitter failed"
                     }
 
-                    if ($_ -eq "petstore") {
-                        Write-Host "`r`nBuilding MinimalApi$_`r`n"
-                        $process = Start-Process "dotnet" `
-                            -Args "build ./MinimalApi/MinimalApi.csproj" `
-                            -NoNewWindow `
-                            -PassThru
-                        $process | Wait-Process
-                        if ($process.ExitCode -ne 0) {
-                            throw "Build Failed!"
-                        }
-                    }
+                    Copy-Item $outputPath "./$version-$_-$format.cs"
+                    Copy-Item $outputPath "./ConsoleApp/Net7/" -Force
+                    Copy-Item $outputPath "./ConsoleApp/Net7/" -Force
+                    Copy-Item $outputPath "./ConsoleApp/Net6/" -Force
+                    Copy-Item $outputPath "./ConsoleApp/Net48/" -Force
+                    Copy-Item $outputPath "./ConsoleApp/Net481/" -Force
+                    Copy-Item $outputPath "./ConsoleApp/Net472/" -Force
+                    Copy-Item $outputPath "./ConsoleApp/Net462/" -Force
+                    Copy-Item $outputPath "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item $outputPath "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item $outputPath "./MinimalApi/" -Force
+                    Remove-Item $outputPath -Force
                 }
             }
+        }
+    }    
+
+    Write-Host "`r`nBuilding ConsoleApp`r`n"
+    $process = Start-Process "dotnet" `
+        -Args "build ./ConsoleApp/ConsoleApp.sln" `
+        -NoNewWindow `
+        -PassThru
+    $process | Wait-Process
+    if ($process.ExitCode -ne 0) {
+        throw "Build Failed!"
+    }
+
+    if ($_ -eq "petstore") {
+        Write-Host "`r`nBuilding MinimalApi`r`n"
+        $process = Start-Process "dotnet" `
+            -Args "build ./MinimalApi/MinimalApi.csproj" `
+            -NoNewWindow `
+            -PassThru
+        $process | Wait-Process
+        if ($process.ExitCode -ne 0) {
+            throw "Build Failed!"
         }
     }
 }
