@@ -34,7 +34,7 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
     public override ValidationResult Validate(CommandContext context, Settings settings)
     {
         if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
-            return ValidationResult.Error($"OpenApiPath is required");
+            return ValidationResult.Error("Input file is required");
 
         return File.Exists(settings.OpenApiPath)
             ? base.Validate(context, settings)
