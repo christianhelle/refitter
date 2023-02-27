@@ -24,6 +24,10 @@ jobs:
       - name: Update Version
         run: ((Get-Content -Path Refitter.Core.csproj -Raw) -Replace "1.0.0", "${{ env.VERSION }}") | Set-Content -Path Refitter.Core.csproj
         working-directory: src/Refitter.Core/
+        shell: pwsh
+      - name: Remove badges from README.md
+        run: (Get-Content .\README.md | Select-Object -Skip 4) | Set-Content README.md
+        shell: pwsh
       - name: Build
         run: dotnet build -c Release /p:UseSourceLink=true src/Refitter.sln -p:PackageVersion="${{ env.VERSION }}"
       - name: Pack
