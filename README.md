@@ -53,7 +53,7 @@ using Refit;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace GeneratedCode
+namespace Your.Namespace.Of.Choice.GeneratedCode
 {
     public interface ISwaggerPetstore
     {
@@ -167,7 +167,7 @@ using Refit;
 using System;
 using System.Threading.Tasks;
 
-namespace GeneratedCode;
+namespace Your.Namespace.Of.Choice.GeneratedCode;
 
 internal class Program
 {
@@ -199,7 +199,7 @@ Here's an example Minimal API with the [`Refit.HttpClientFactory`](https://www.n
 
 ```cs
 using Refit;
-using GeneratedCode;
+using Your.Namespace.Of.Choice.GeneratedCode;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
