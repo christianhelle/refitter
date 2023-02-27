@@ -5,6 +5,19 @@ using ValidationResult = Spectre.Console.ValidationResult;
 
 
 var app = new CommandApp<GenerateCommand>();
+app.Configure(
+    config => config
+        .SetApplicationName("refitter")
+        .SetApplicationVersion(typeof(GenerateCommand).Assembly.GetName().Version!.ToString())
+        .AddExample(
+            new[]
+            {
+                "./openapi.json",
+                "--namespace",
+                "\"Your.Namespace.Of.Choice.GeneratedCode\"",
+                "--output",
+                "./Output.cs"
+            }));
 return app.Run(args);
 
 internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
