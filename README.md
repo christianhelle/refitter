@@ -19,7 +19,7 @@ dotnet tool install --global Refitter --prerelease
 $ refitter --help
 ```
 
-```shell
+```
 USAGE:
     refitter [input file] [OPTIONS]
 
