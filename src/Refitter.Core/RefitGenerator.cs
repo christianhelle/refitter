@@ -92,7 +92,7 @@ namespace Refitter.Core
                         ? generator.GetTypeName(operation.Responses["200"].Schema, true, null)
                         : null;
 
-                    var returnType = returnTypeParameter == null
+                    var returnType = returnTypeParameter is null or "void"
                         ? "Task"
                         : $"Task<{TrimImportedNamespaces(returnTypeParameter)}>";
 
