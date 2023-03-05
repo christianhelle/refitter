@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/v/refitter.svg?style=flat-square)](http://www.nuget.org/packages/refitter)
 
 # Refitter
-Refitter is a CLI tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. 
+Refitter is a CLI tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications
 
 ## Installation:
 
