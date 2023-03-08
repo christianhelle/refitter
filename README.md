@@ -45,6 +45,8 @@ $ refitter [path to OpenAPI spec file] --namespace "[Your.Namespace.Of.Choice.Ge
 
 This will generate a file called `Output.cs` which contains the Refit interface and contract classes generated using [NSwag](https://github.com/RicoSuter/NSwag)
 
+# Using the generated code
+
 
 Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io)
 
@@ -155,8 +157,6 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
     }
 }
 ```
-
-# Using the generated code
 
 ## RestService
 
