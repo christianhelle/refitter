@@ -77,12 +77,12 @@ namespace Refitter.Core
 
                     var returnType = returnTypeParameter is null or "void"
                         ? "Task"
-                        : $"Task<{TrimImportedNamespaces(returnTypeParameter)}>";
+                        : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
 
                     var verb = CapitalizeFirstCharacter(operations.Key);
                     var name = ConvertKebabCaseToPascalCase(CapitalizeFirstCharacter(operation.OperationId));
 
-                    var parameters = GetParameters(generator, operation);
+                    var parameters = ParameterExtractor.GetParameters(generator, operation);
                     var parametersString = string.Join(", ", parameters);
 
                     GenerateMethodXmlDocComments(operation, code);
@@ -154,44 +154,6 @@ namespace Refitter.Core
             }
 
             return string.Join(string.Empty, parts);
-        }
-
-        private static IEnumerable<string> GetParameters(CSharpClientGenerator generator, OpenApiOperation operation)
-        {
-            var routeParameters = operation.Parameters
-                .Where(p => p.Kind == OpenApiParameterKind.Path)
-                .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name}")
-                .ToList();
-
-            var bodyParameters = operation.Parameters
-                .Where(p => p.Kind == OpenApiParameterKind.Body)
-                .Select(p => $"[Body]{GetBodyParameterType(generator, p)} {p.Name}")
-                .ToList();
-
-            var parameters = new List<string>();
-            parameters.AddRange(routeParameters);
-            parameters.AddRange(bodyParameters);
-            return parameters;
-        }
-
-        private static string GetBodyParameterType(IClientGenerator generator, JsonSchema schema) =>
-            TrimImportedNamespaces(
-                FindSupportedType(
-                    generator.GetTypeName(
-                        schema.ActualTypeSchema,
-                        true,
-                        null)));
-
-        private static string FindSupportedType(string typeName) =>
-            typeName == "FileResponse" ? "StreamPart" : typeName;
-
-        private static string TrimImportedNamespaces(string returnTypeParameter)
-        {
-            string[] wellKnownNamespaces = { "System.Collections.Generic" };
-            foreach (var wellKnownNamespace in wellKnownNamespaces)
-                if (returnTypeParameter.StartsWith(wellKnownNamespace, StringComparison.OrdinalIgnoreCase))
-                    return returnTypeParameter.Replace(wellKnownNamespace + ".", string.Empty);
-            return returnTypeParameter;
         }
 
         private static string CapitalizeFirstCharacter(string str)
