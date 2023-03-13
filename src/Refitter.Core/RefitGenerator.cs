@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NJsonSchema;
-using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
 using NSwag.CodeGeneration;
 using NSwag.CodeGeneration.CSharp;
@@ -15,12 +14,15 @@ namespace Refitter.Core
     {
         private readonly RefitGeneratorSettings settings;
         private readonly OpenApiDocument document;
+        private readonly CSharpClientGeneratorFactory factory;
         private const string Separator = "    ";
 
         private RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
         {
             this.settings = settings;
             this.document = document;
+
+            factory = new CSharpClientGeneratorFactory(settings, document);
         }
 
         public static async Task<RefitGenerator> CreateAsync(RefitGeneratorSettings settings) =>
@@ -32,7 +34,7 @@ namespace Refitter.Core
 
         public string Generate()
         {
-            var generator = CreateCSharpClientGenerator();
+            var generator = factory.Create();
             var contracts = settings.GenerateContracts ? generator.GenerateFile() : string.Empty;
             var client = GenerateClient(generator);
 
@@ -41,25 +43,6 @@ namespace Refitter.Core
                 .AppendLine()
                 .AppendLine(contracts)
                 .ToString();
-        }
-
-        private CSharpClientGenerator CreateCSharpClientGenerator()
-        {
-            var nswagSettings = new CSharpClientGeneratorSettings
-            {
-                GenerateClientClasses = false,
-                GenerateDtoTypes = true,
-                GenerateClientInterfaces = false,
-                GenerateExceptionClasses = false,
-                CSharpGeneratorSettings =
-                {
-                    Namespace = settings.Namespace,
-                    JsonLibrary = CSharpJsonLibrary.SystemTextJson,
-                }
-            };
-
-            var generator = new CSharpClientGenerator(document, nswagSettings);
-            return generator;
         }
 
         private string GenerateClient(CSharpClientGenerator generator)
