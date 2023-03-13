@@ -75,10 +75,8 @@ namespace Refitter.Core
                         ? "Task"
                         : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
 
-                    var verb = StringCasingExtensions.CapitalizeFirstCharacter(operations.Key);
-                    var name = StringCasingExtensions.ConvertKebabCaseToPascalCase(
-                        StringCasingExtensions.CapitalizeFirstCharacter(
-                            operation.OperationId));
+                    var verb = operations.Key.CapitalizeFirstCharacter();
+                    var name = operation.OperationId.CapitalizeFirstCharacter().ConvertKebabCaseToPascalCase();
 
                     var parameters = ParameterExtractor.GetParameters(generator, operation);
                     var parametersString = string.Join(", ", parameters);
@@ -117,7 +115,7 @@ namespace Refitter.Core
                   "ApiClient"
                 : settings.Naming.InterfaceName;
 
-            code.AppendLine($"{Separator}public interface I{StringCasingExtensions.CapitalizeFirstCharacter(title)}")
+            code.AppendLine($"{Separator}public interface I{title.CapitalizeFirstCharacter()}")
                 .AppendLine($"{Separator}{{");
         }
 
