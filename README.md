@@ -10,7 +10,7 @@ Refitter is a CLI tool for generating a C# REST API Client using the [Refit](htt
 The tool is packaged as a .NET Tool and is published to nuget.org. You can install the latest version of this tool like this:
 
 ```shell
-dotnet tool install --global Refitter --prerelease
+dotnet tool install --global Refitter
 ```
 
 ## Usage:
