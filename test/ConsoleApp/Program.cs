@@ -14,6 +14,10 @@ internal class Program
     //     Console.WriteLine($"Name: {pet.Name}");
     //     Console.WriteLine($"Category: {pet.Category.Name}");
     //     Console.WriteLine($"Status: {pet.Status}");
+
+    //     var pets = await client.FindPetsByStatus(Status.Available);
+    //     Console.WriteLine("Found " + pets.Count + " available pet(s)");
+    
     //     Console.ReadLine();
     // }
 
