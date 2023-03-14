@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema;
@@ -16,6 +15,11 @@ public static class ParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Path)
             .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name}")
             .ToList();
+        
+        var queryParameters = operation.Parameters
+            .Where(p => p.Kind == OpenApiParameterKind.Query)
+            .Select(p => $"[Query(CollectionFormat.Multi)]{GetBodyParameterType(generator, p)} {p.Name}")
+            .ToList();
 
         var bodyParameters = operation.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body)
@@ -24,6 +28,7 @@ public static class ParameterExtractor
 
         var parameters = new List<string>();
         parameters.AddRange(routeParameters);
+        parameters.AddRange(queryParameters);
         parameters.AddRange(bodyParameters);
         return parameters;
     }
