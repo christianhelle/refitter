@@ -82,7 +82,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
         /// </summary>
         [Get("/pet/findByTags")]
-        Task<ICollection<Pet>> FindPetsByTags([Query]System.Collections.Generic.ICollection<string> tags);
+        Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)]System.Collections.Generic.ICollection<string> tags);
 
         /// <summary>
         /// Returns a single pet
