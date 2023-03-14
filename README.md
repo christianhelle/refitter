@@ -76,13 +76,13 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         /// Multiple status values can be provided with comma separated strings
         /// </summary>
         [Get("/pet/findByStatus")]
-        Task<ICollection<Pet>> FindPetsByStatus();
+        Task<ICollection<Pet>> FindPetsByStatus([Query]Status? status);
 
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
         /// </summary>
         [Get("/pet/findByTags")]
-        Task<ICollection<Pet>> FindPetsByTags();
+        Task<ICollection<Pet>> FindPetsByTags([Query]System.Collections.Generic.ICollection<string> tags);
 
         /// <summary>
         /// Returns a single pet
@@ -91,13 +91,13 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         Task<Pet> GetPetById(long? petId);
 
         [Post("/pet/{petId}")]
-        Task UpdatePetWithForm(long? petId);
+        Task UpdatePetWithForm(long? petId, [Query]string name, [Query]string status);
 
         [Delete("/pet/{petId}")]
         Task DeletePet(long? petId);
 
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> UploadFile(long? petId, [Body]StreamPart body);
+        Task<ApiResponse> UploadFile(long? petId, [Query]string additionalMetadata, [Body]StreamPart body);
 
         /// <summary>
         /// Returns a map of status codes to quantities
@@ -136,7 +136,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         Task<User> CreateUsersWithListInput([Body]ICollection<User> body);
 
         [Get("/user/login")]
-        Task<string> LoginUser();
+        Task<string> LoginUser([Query]string username, [Query]string password);
 
         [Get("/user/logout")]
         Task LogoutUser();
