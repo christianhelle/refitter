@@ -18,7 +18,7 @@ public static class ParameterExtractor
         
         var queryParameters = operation.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p => $"[Query(CollectionFormat.Multi)]{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name}")
+            .Select(p => $"[Query(CollectionFormat.Multi)]{GetBodyParameterType(generator, p)} {p.Name}")
             .ToList();
 
         var bodyParameters = operation.Parameters
