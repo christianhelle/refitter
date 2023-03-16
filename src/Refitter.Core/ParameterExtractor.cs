@@ -11,7 +11,7 @@ public static class ParameterExtractor
 {
     public static IEnumerable<string> GetParameters(CSharpClientGenerator generator, OpenApiOperation operation)
     {
-        var routeParameters = operation.Parameters
+        var routeParameters = operation.ActualParameters
             .Where(p => p.Kind == OpenApiParameterKind.Path)
             .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name}")
             .ToList();
