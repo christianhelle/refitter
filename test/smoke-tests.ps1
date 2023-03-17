@@ -49,6 +49,7 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output $outputPath"
                     $process = Start-Process "dotnet" `
                         -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output $outputPath" `
                         -NoNewWindow `
@@ -71,28 +72,28 @@ function RunTests {
                     Remove-Item $outputPath -Force
                 }
             }
+            
+            Write-Host "`r`nBuilding ConsoleApp`r`n"
+            $process = Start-Process "dotnet" `
+                -Args "build ./ConsoleApp/ConsoleApp.sln" `
+                -NoNewWindow `
+                -PassThru
+            $process | Wait-Process
+            if ($process.ExitCode -ne 0) {
+                throw "Build Failed!"
+            }
+
+            Write-Host "`r`nBuilding MinimalApi`r`n"
+            $process = Start-Process "dotnet" `
+                -Args "build ./MinimalApi/MinimalApi.csproj" `
+                -NoNewWindow `
+                -PassThru
+            $process | Wait-Process
+            if ($process.ExitCode -ne 0) {
+                throw "Build Failed!"
+            }
         }
     }    
-
-    Write-Host "`r`nBuilding ConsoleApp`r`n"
-    $process = Start-Process "dotnet" `
-        -Args "build ./ConsoleApp/ConsoleApp.sln" `
-        -NoNewWindow `
-        -PassThru
-    $process | Wait-Process
-    if ($process.ExitCode -ne 0) {
-        throw "Build Failed!"
-    }
-
-    Write-Host "`r`nBuilding MinimalApi`r`n"
-    $process = Start-Process "dotnet" `
-        -Args "build ./MinimalApi/MinimalApi.csproj" `
-        -NoNewWindow `
-        -PassThru
-    $process | Wait-Process
-    if ($process.ExitCode -ne 0) {
-        throw "Build Failed!"
-    }
 }
 
 Remove-Item ./v2.0-*.cs -Force
