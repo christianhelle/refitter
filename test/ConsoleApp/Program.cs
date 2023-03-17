@@ -15,10 +15,10 @@ internal class Program
         Console.WriteLine($"Category: {pet.Category.Name}");
         Console.WriteLine($"Status: {pet.Status}");
 
-        var pets = await client.FindPetsByStatus(Petstore.Status.Available);
-        Console.WriteLine("Found " + pets.Count + " available pet(s)");        
+        // var pets = await client.FindPetsByStatus(Petstore.Status.Available);
+        // Console.WriteLine("Found " + pets.Count + " available pet(s)");        
 
-        var taggedPets = await client.FindPetsByTags(new[] {"tag1Updated", "new"});
-        Console.WriteLine("Found " + taggedPets.Count + " tagged pet(s)");
+        // var taggedPets = await client.FindPetsByTags(new[] {"tag1Updated", "new"});
+        // Console.WriteLine("Found " + taggedPets.Count + " tagged pet(s)");
     }
 }
