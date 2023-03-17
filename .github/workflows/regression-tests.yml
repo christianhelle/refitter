@@ -12,6 +12,7 @@ on:
 jobs:
   template:
     strategy:
+      fail-fast: false
       matrix:
         format: [json, yaml]
         version: [v2.0, v3.0]
