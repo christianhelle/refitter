@@ -5,10 +5,10 @@ on:
   push:
     paths-ignore:
       - "**/*"
-      - "!.github/workflows/smoke-tests.yml"
+      - "!**/*.cs"
+      - "!**/*.csproj"
       - "!.github/workflows/template.yml"
-      - "!src/**/*.csproj"
-      - "!src/**/*.cs"
+      - "!.github/workflows/smoke-tests.yml"
     branches:
       - "*"
   pull_request:
