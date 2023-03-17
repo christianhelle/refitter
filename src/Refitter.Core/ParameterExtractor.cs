@@ -15,21 +15,27 @@ public static class ParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Path)
             .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name}")
             .ToList();
-        
+
         var queryParameters = operation.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
             .Select(p => $"[Query(CollectionFormat.Multi)]{GetBodyParameterType(generator, p)} {p.Name}")
             .ToList();
 
         var bodyParameters = operation.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Body)
+            .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
             .Select(p => $"[Body]{GetBodyParameterType(generator, p)} {p.Name}")
+            .ToList();
+
+        var multipartFormParameters = operation.Parameters
+            .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
+            .Select(p => $"[Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> {p.Name}")
             .ToList();
 
         var parameters = new List<string>();
         parameters.AddRange(routeParameters);
         parameters.AddRange(queryParameters);
         parameters.AddRange(bodyParameters);
+        parameters.AddRange(multipartFormParameters);
         return parameters;
     }
 
