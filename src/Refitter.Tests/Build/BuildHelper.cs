@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Build;
 
 public static class BuildHelper
 {
