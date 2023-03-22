@@ -15,13 +15,17 @@ public class CSharpClientGeneratorFactory
         this.document = document;
     }
 
-    public CSharpClientGenerator Create() =>
+    public CustomCSharpClientGenerator Create() =>
         new(document, new CSharpClientGeneratorSettings
         {
             GenerateClientClasses = false,
             GenerateDtoTypes = true,
             GenerateClientInterfaces = false,
             GenerateExceptionClasses = false,
+            CodeGeneratorSettings =
+            {
+                PropertyNameGenerator = new CustomCSharpPropertyNameGenerator(),
+            },
             CSharpGeneratorSettings =
             {
                 Namespace = settings.Namespace,

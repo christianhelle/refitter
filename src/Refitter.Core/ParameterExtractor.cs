@@ -1,34 +1,36 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema;
 using NSwag;
-using NSwag.CodeGeneration;
-using NSwag.CodeGeneration.CSharp;
+using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
 public static class ParameterExtractor
 {
-    public static IEnumerable<string> GetParameters(CSharpClientGenerator generator, OpenApiOperation operation)
+    public static IEnumerable<string> GetParameters(CustomCSharpClientGenerator generator, OpenApiOperation operation)
     {
-        var routeParameters = operation.ActualParameters
+        var operationModel = generator.CreateOperationModel(operation);
+
+        var routeParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Path)
-            .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name.ConvertKebabCaseToCamelCase()}")
+            .Select(p => $"{JoinAttributes(GetAliasAsAttribute(p))}{p.Type} {p.VariableName}")
             .ToList();
 
-        var queryParameters = operation.Parameters
+        var queryParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p => $"[Query(CollectionFormat.Multi)]{GetBodyParameterType(generator, p)} {p.Name.ConvertKebabCaseToCamelCase()}")
+            .Select(p => $"{JoinAttributes("Query(CollectionFormat.Multi)", GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
             .ToList();
 
-        var bodyParameters = operation.Parameters
+        var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
-            .Select(p => $"[Body]{GetBodyParameterType(generator, p)} {p.Name.ConvertKebabCaseToCamelCase()}")
+            .Select(p => $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
             .ToList();
 
-        var multipartFormParameters = operation.Parameters
+        var multipartFormParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
-            .Select(p => $"[Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> {p.Name.ConvertKebabCaseToCamelCase()}")
+            .Select(p => $"{JoinAttributes("Body(BodySerializationMethod.UrlEncoded)", GetAliasAsAttribute(p))}Dictionary<string, object> {p.VariableName}")
             .ToList();
 
         var parameters = new List<string>();
@@ -39,13 +41,23 @@ public static class ParameterExtractor
         return parameters;
     }
 
-    private static string GetBodyParameterType(IClientGenerator generator, JsonSchema schema) =>
-        WellKnownNamesspaces.TrimImportedNamespaces(
-            FindSupportedType(
-                generator.GetTypeName(
-                    schema.ActualTypeSchema,
-                    true,
-                    null)));
+    private static string GetAliasAsAttribute(CSharpParameterModel parameterModel) =>
+        string.Equals(parameterModel.Name, parameterModel.VariableName, StringComparison.OrdinalIgnoreCase)
+            ? string.Empty
+            : $"AliasAs(\"{parameterModel.Name}\")";
+
+    private static string JoinAttributes(params string[] attributes)
+    {
+        var filteredAttributes = attributes.Where(a => !string.IsNullOrWhiteSpace(a));
+
+        if (!filteredAttributes.Any())
+            return string.Empty;
+
+        return "[" + string.Join(", ", filteredAttributes) + "] ";
+    }
+
+    private static string GetBodyParameterType(CSharpParameterModel parameterModel) =>
+        WellKnownNamesspaces.TrimImportedNamespaces(FindSupportedType(parameterModel.Type));
 
     private static string FindSupportedType(string typeName) =>
         typeName == "FileResponse" ? "StreamPart" : typeName;
