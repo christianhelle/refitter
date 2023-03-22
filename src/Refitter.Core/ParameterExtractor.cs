@@ -13,22 +13,22 @@ public static class ParameterExtractor
     {
         var routeParameters = operation.ActualParameters
             .Where(p => p.Kind == OpenApiParameterKind.Path)
-            .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name}")
+            .Select(p => $"{generator.GetTypeName(p.ActualTypeSchema, true, null)} {p.Name.ConvertKebabCaseToCamelCase()}")
             .ToList();
 
         var queryParameters = operation.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p => $"[Query(CollectionFormat.Multi)]{GetBodyParameterType(generator, p)} {p.Name}")
+            .Select(p => $"[Query(CollectionFormat.Multi)]{GetBodyParameterType(generator, p)} {p.Name.ConvertKebabCaseToCamelCase()}")
             .ToList();
 
         var bodyParameters = operation.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
-            .Select(p => $"[Body]{GetBodyParameterType(generator, p)} {p.Name}")
+            .Select(p => $"[Body]{GetBodyParameterType(generator, p)} {p.Name.ConvertKebabCaseToCamelCase()}")
             .ToList();
 
         var multipartFormParameters = operation.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
-            .Select(p => $"[Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> {p.Name}")
+            .Select(p => $"[Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> {p.Name.ConvertKebabCaseToCamelCase()}")
             .ToList();
 
         var parameters = new List<string>();
