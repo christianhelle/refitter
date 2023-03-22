@@ -33,7 +33,8 @@ function RunTests {
         # "petstore-minimal",
         # "petstore-simple",
         # "petstore-with-external-docs",
-        "petstore"
+        "petstore",
+        "IngramMicro"
     )
     "v2.0", "v3.0" | ForEach-Object {
         $version = $_
@@ -96,9 +97,6 @@ function RunTests {
     }    
 }
 
-Remove-Item ./v2.0-*.cs -Force
-Remove-Item ./v3.0-*.cs -Force
-Remove-Item ./v3.1-*.cs -Force
-Remove-Item ./**/*Output.cs -Force
+Remove-Item * -Include *.cs -Recurse -Force -Exclude *Program.cs
 Measure-Command { RunTests -Method "dotnet-run" -Parallel $Parallel }
 Write-Host "`r`n"

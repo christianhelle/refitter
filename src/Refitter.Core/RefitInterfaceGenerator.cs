@@ -1,6 +1,6 @@
+using System;
 using System.Text;
 using NSwag;
-using NSwag.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 
@@ -10,12 +10,12 @@ public class RefitInterfaceGenerator
 
     private readonly RefitGeneratorSettings settings;
     private readonly OpenApiDocument document;
-    private readonly CSharpClientGenerator generator;
+    private readonly CustomCSharpClientGenerator generator;
 
     public RefitInterfaceGenerator(
         RefitGeneratorSettings settings,
         OpenApiDocument document,
-        CSharpClientGenerator generator)
+        CustomCSharpClientGenerator generator)
     {
         this.settings = settings;
         this.document = document;
@@ -48,7 +48,11 @@ public class RefitInterfaceGenerator
                     : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
 
                 var verb = operations.Key.CapitalizeFirstCharacter();
-                var name = operation.OperationId.CapitalizeFirstCharacter().ConvertKebabCaseToPascalCase();
+
+                var name = generator.BaseSettings.OperationNameGenerator
+                    .GetOperationName(document, kv.Key, verb, operation)
+                    .CapitalizeFirstCharacter()
+                    .ConvertKebabCaseToPascalCase();
 
                 var parameters = ParameterExtractor.GetParameters(generator, operation);
                 var parametersString = string.Join(", ", parameters);
@@ -72,9 +76,12 @@ public class RefitInterfaceGenerator
 
         if (!string.IsNullOrWhiteSpace(operation.Description))
         {
-            code.AppendLine($"{Separator}{Separator}/// <summary>")
-                .AppendLine($"{Separator}{Separator}/// " + operation.Description)
-                .AppendLine($"{Separator}{Separator}/// </summary>");
+            code.AppendLine($"{Separator}{Separator}/// <summary>");
+
+            foreach (var line in operation.Description.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
+                code.AppendLine($"{Separator}{Separator}/// {line.Trim()}");
+
+            code.AppendLine($"{Separator}{Separator}/// </summary>");
         }
     }
 

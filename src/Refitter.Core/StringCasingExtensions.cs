@@ -5,9 +5,10 @@ public static class StringCasingExtensions
     public static string ConvertKebabCaseToPascalCase(this string str)
     {
         var parts = str.Split('-');
+
         for (var i = 0; i < parts.Length; i++)
         {
-            parts[i] = parts[i].CapitalizeFirstCharacter();
+            parts[i] = parts[i].CapitalizeFirstCharacter().Replace(".", "_");
         }
 
         return string.Join(string.Empty, parts);
