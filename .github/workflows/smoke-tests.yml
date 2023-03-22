@@ -23,7 +23,7 @@ jobs:
         format: [json, yaml]
         version: [v2.0, v3.0]
         os: [ubuntu-latest]
-        openapi: ["callback-example", "link-example", "uber", "uspto", "petstore"]
+        openapi: ["callback-example", "link-example", "uber", "uspto", "petstore", "ingram-micro"]
     uses: ./.github/workflows/template.yml
     with:
       format: ${{ matrix.format }}

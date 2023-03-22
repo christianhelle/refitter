@@ -34,7 +34,7 @@ function RunTests {
         # "petstore-simple",
         # "petstore-with-external-docs",
         "petstore",
-        "IngramMicro"
+        "ingram-micro"
     )
     "v2.0", "v3.0" | ForEach-Object {
         $version = $_
