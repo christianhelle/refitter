@@ -61,7 +61,7 @@ components:
     public async Task Replaces_KababCase_Parameters_With_PascalCase()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("string jobId");
+        generateCode.Should().Contain("string job_id");
     }
 
     [Fact]
