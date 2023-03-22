@@ -55,7 +55,7 @@ public class RefitInterfaceGenerator
 
                 GenerateMethodXmlDocComments(operation, code);
 
-                code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
+                code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key.ConvertKebabCaseToCamelCase()}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
                     .AppendLine();
             }

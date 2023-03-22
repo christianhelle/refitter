@@ -1,4 +1,4 @@
-﻿namespace Refitter.Tests;
+﻿namespace Refitter.Tests.Build;
 
 public static class ProjectFileContents
 {
