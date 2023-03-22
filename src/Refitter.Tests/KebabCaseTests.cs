@@ -86,7 +86,7 @@ components:
 
     private static async Task<string> CreateSwaggerFile(string contents)
     {
-        var filename = Guid.NewGuid().ToString() + ".yml";
+        var filename = $"{Guid.NewGuid()}.yml";
         var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
         var swaggerFile = Path.Combine(folder, filename);
