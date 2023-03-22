@@ -65,8 +65,8 @@ parameters:
     {
         var generateCode = await GenerateCode();
         using var scope = new AssertionScope();
-        generateCode.Should().Contain("Guid? orderId");
-        generateCode.Should().Contain("Guid? orderItemId");
+        generateCode.Should().Contain("Guid orderId");
+        generateCode.Should().Contain("Guid orderItemId");
     }
 
     [Fact]
