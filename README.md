@@ -179,56 +179,65 @@ namespace Your.Namespace.Of.Choice.GeneratedCode.WithApiResponse
 {
     public interface ISwaggerPetstore
     {
-        [Post("/pet")]
-        Task AddPet([Body] Pet body);
-
+        /// <summary>
+        /// Update an existing pet by Id
+        /// </summary>
         [Put("/pet")]
-        Task UpdatePet([Body] Pet body);
+        Task<IApiResponse<Pet>> UpdatePet([Body] Pet body);
+
+        /// <summary>
+        /// Add a new pet to the store
+        /// </summary>
+        [Post("/pet")]
+        Task<IApiResponse<Pet>> AddPet([Body] Pet body);
 
         /// <summary>
         /// Multiple status values can be provided with comma separated strings
         /// </summary>
         [Get("/pet/findByStatus")]
-        Task<ICollection<Pet>> FindPetsByStatus([Query(CollectionFormat.Multi)] IEnumerable<Anonymous> status);
+        Task<IApiResponse<ICollection<Pet>>> FindPetsByStatus([Query(CollectionFormat.Multi)] Status? status);
 
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
         /// </summary>
         [Get("/pet/findByTags")]
-        Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
+        Task<IApiResponse<ICollection<Pet>>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
 
         /// <summary>
         /// Returns a single pet
         /// </summary>
         [Get("/pet/{petId}")]
-        Task<Pet> GetPetById(long petId);
+        Task<IApiResponse<Pet>> GetPetById(long petId);
 
         [Post("/pet/{petId}")]
-        Task UpdatePetWithForm(long petId);
+        Task UpdatePetWithForm(long petId, [Query(CollectionFormat.Multi)] string name, [Query(CollectionFormat.Multi)] string status);
 
         [Delete("/pet/{petId}")]
         Task DeletePet(long petId);
 
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> UploadFile(long petId);
+        Task<IApiResponse<ApiResponse>> UploadFile(long petId, [Query(CollectionFormat.Multi)] string additionalMetadata, [Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> body);
 
         /// <summary>
         /// Returns a map of status codes to quantities
         /// </summary>
         [Get("/store/inventory")]
-        Task<IDictionary<string, int>> GetInventory();
-
-        [Post("/store/order")]
-        Task<Order> PlaceOrder([Body] Order body);
+        Task<IApiResponse<IDictionary<string, int>>> GetInventory();
 
         /// <summary>
-        /// For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions
+        /// Place a new order in the store
+        /// </summary>
+        [Post("/store/order")]
+        Task<IApiResponse<Order>> PlaceOrder([Body] Order body);
+
+        /// <summary>
+        /// For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions
         /// </summary>
         [Get("/store/order/{orderId}")]
-        Task<Order> GetOrderById(long orderId);
+        Task<IApiResponse<Order>> GetOrderById(long orderId);
 
         /// <summary>
-        /// For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors
+        /// For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
         /// </summary>
         [Delete("/store/order/{orderId}")]
         Task DeleteOrder(long orderId);
@@ -239,20 +248,20 @@ namespace Your.Namespace.Of.Choice.GeneratedCode.WithApiResponse
         [Post("/user")]
         Task CreateUser([Body] User body);
 
-        [Post("/user/createWithArray")]
-        Task CreateUsersWithArrayInput([Body] IEnumerable<User> body);
-
+        /// <summary>
+        /// Creates list of users with given input array
+        /// </summary>
         [Post("/user/createWithList")]
-        Task CreateUsersWithListInput([Body] IEnumerable<User> body);
+        Task<IApiResponse<User>> CreateUsersWithListInput([Body] IEnumerable<User> body);
 
         [Get("/user/login")]
-        Task<string> LoginUser([Query(CollectionFormat.Multi)] string username, [Query(CollectionFormat.Multi)] string password);
+        Task<IApiResponse<string>> LoginUser([Query(CollectionFormat.Multi)] string username, [Query(CollectionFormat.Multi)] string password);
 
         [Get("/user/logout")]
         Task LogoutUser();
 
         [Get("/user/{username}")]
-        Task<User> GetUserByName(string username);
+        Task<IApiResponse<User>> GetUserByName(string username);
 
         /// <summary>
         /// This can only be done by the logged in user.
