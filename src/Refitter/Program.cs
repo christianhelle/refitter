@@ -56,7 +56,7 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         return File.Exists(settings.OpenApiPath)
             ? base.Validate(context, settings)
-            : ValidationResult.Error($"File not found - {settings.OpenApiPath}");
+            : ValidationResult.Error($"File not found - {Path.GetFullPath(settings.OpenApiPath)}");
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
