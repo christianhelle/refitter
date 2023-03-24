@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Refitter.Core;
+using Spectre.Console;
 using Spectre.Console.Cli;
 using ValidationResult = Spectre.Console.ValidationResult;
 
@@ -75,10 +76,19 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             ReturnIApiResponse = settings.ReturnIApiResponse
         };
 
-        var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
-        var code = generator.Generate();
-        await File.WriteAllTextAsync(settings.OutputPath ?? "Output.cs", code);
-
-        return 0;
+        try
+        {
+            var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
+            var code = generator.Generate();
+            await File.WriteAllTextAsync(settings.OutputPath ?? "Output.cs", code);
+            AnsiConsole.MarkupLine($"[green]Output: {code.Length} bytes[/]");
+            return 0;
+        }
+        catch (Exception e)
+        {
+            AnsiConsole.MarkupLine($"[red]Error:{Environment.NewLine}{e.Message}[/]");
+            AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Environment.NewLine}{e.StackTrace}[/]");
+            return e.HResult;
+        }
     }
 }
