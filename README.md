@@ -50,7 +50,11 @@ This will generate a file called `Output.cs` which contains the Refit interface 
 # Using the generated code
 
 
-Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io)
+Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) using the default settings
+
+```bash
+$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode"
+```
 
 ```cs
 using Refit;
@@ -160,6 +164,111 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
 }
 ```
 
+Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to wrap the return type in `IApiResponse<T>`
+
+```bash
+$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --use-api-response
+```
+
+```cs
+using Refit;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
+namespace Your.Namespace.Of.Choice.GeneratedCode.WithApiResponse
+{
+    public interface ISwaggerPetstore
+    {
+        [Post("/pet")]
+        Task AddPet([Body] Pet body);
+
+        [Put("/pet")]
+        Task UpdatePet([Body] Pet body);
+
+        /// <summary>
+        /// Multiple status values can be provided with comma separated strings
+        /// </summary>
+        [Get("/pet/findByStatus")]
+        Task<ICollection<Pet>> FindPetsByStatus([Query(CollectionFormat.Multi)] IEnumerable<Anonymous> status);
+
+        /// <summary>
+        /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
+        /// </summary>
+        [Get("/pet/findByTags")]
+        Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
+
+        /// <summary>
+        /// Returns a single pet
+        /// </summary>
+        [Get("/pet/{petId}")]
+        Task<Pet> GetPetById(long petId);
+
+        [Post("/pet/{petId}")]
+        Task UpdatePetWithForm(long petId);
+
+        [Delete("/pet/{petId}")]
+        Task DeletePet(long petId);
+
+        [Post("/pet/{petId}/uploadImage")]
+        Task<ApiResponse> UploadFile(long petId);
+
+        /// <summary>
+        /// Returns a map of status codes to quantities
+        /// </summary>
+        [Get("/store/inventory")]
+        Task<IDictionary<string, int>> GetInventory();
+
+        [Post("/store/order")]
+        Task<Order> PlaceOrder([Body] Order body);
+
+        /// <summary>
+        /// For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions
+        /// </summary>
+        [Get("/store/order/{orderId}")]
+        Task<Order> GetOrderById(long orderId);
+
+        /// <summary>
+        /// For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors
+        /// </summary>
+        [Delete("/store/order/{orderId}")]
+        Task DeleteOrder(long orderId);
+
+        /// <summary>
+        /// This can only be done by the logged in user.
+        /// </summary>
+        [Post("/user")]
+        Task CreateUser([Body] User body);
+
+        [Post("/user/createWithArray")]
+        Task CreateUsersWithArrayInput([Body] IEnumerable<User> body);
+
+        [Post("/user/createWithList")]
+        Task CreateUsersWithListInput([Body] IEnumerable<User> body);
+
+        [Get("/user/login")]
+        Task<string> LoginUser([Query(CollectionFormat.Multi)] string username, [Query(CollectionFormat.Multi)] string password);
+
+        [Get("/user/logout")]
+        Task LogoutUser();
+
+        [Get("/user/{username}")]
+        Task<User> GetUserByName(string username);
+
+        /// <summary>
+        /// This can only be done by the logged in user.
+        /// </summary>
+        [Put("/user/{username}")]
+        Task UpdateUser(string username, [Body] User body);
+
+        /// <summary>
+        /// This can only be done by the logged in user.
+        /// </summary>
+        [Delete("/user/{username}")]
+        Task DeleteUser(string username);
+    }
+}
+```
+
 ## RestService
 
 Here's an example usage of the generated code above
@@ -176,11 +285,22 @@ internal class Program
     private static async Task Main(string[] args)
     {
         var client = RestService.For<ISwaggerPetstore>("https://petstore3.swagger.io/api/v3");
-        var pet = await client.GetPetById(2);
+        var pet = await client.GetPetById(1);
 
+        Console.WriteLine("## Using Task<T> as return type ##");
         Console.WriteLine($"Name: {pet.Name}");
         Console.WriteLine($"Category: {pet.Category.Name}");
         Console.WriteLine($"Status: {pet.Status}");
+        Console.WriteLine();
+
+        var client2 = RestService.For<WithApiResponse.ISwaggerPetstore>("https://petstore3.swagger.io/api/v3");
+        var response = await client2.GetPetById(2);
+
+        Console.WriteLine("## Using Task<IApiResponse<T>> as return type ##");
+        Console.WriteLine($"HTTP Status Code: {response.StatusCode}");
+        Console.WriteLine($"Name: {response.Content.Name}");
+        Console.WriteLine($"Category: {response.Content.Category.Name}");
+        Console.WriteLine($"Status: {response.Content.Status}");
     }
 }
 ```
@@ -190,6 +310,13 @@ The `RestService` class generates an implementation of `ISwaggerPetstore` that u
 The code above when run will output something like this:
 
 ```
+## Using Task<T> as return type ##
+Name: Gatitotototo
+Category: Chaucito
+Status: Sold
+
+## Using Task<IApiResponse<T>> as return type ##
+HTTP Status Code: OK
 Name: Gatitotototo
 Category: Chaucito
 Status: Sold
