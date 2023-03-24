@@ -43,9 +43,7 @@ public class RefitInterfaceGenerator
                     ? generator.GetTypeName(operation.Responses["200"].Schema, true, null)
                     : null;
 
-                var returnType = returnTypeParameter is null or "void"
-                    ? "Task"
-                    : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
+                var returnType = GetReturnType(returnTypeParameter);
 
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
@@ -67,6 +65,20 @@ public class RefitInterfaceGenerator
 
         code.AppendLine($"{Separator}}}");
         return code.ToString();
+    }
+
+    private string GetReturnType(string? returnTypeParameter)
+    {
+        return returnTypeParameter is null or "void"
+            ? "Task"
+            : GetConfiguredReturnType(returnTypeParameter);
+    }
+
+    private string GetConfiguredReturnType(string returnTypeParameter)
+    {
+        return settings.ReturnIApiResponse
+            ? $"Task<IApiResponse<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>>"
+            : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
     }
 
     private void GenerateMethodXmlDocComments(OpenApiOperation operation, StringBuilder code)
