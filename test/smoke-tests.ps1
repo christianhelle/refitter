@@ -60,9 +60,19 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --use-api-response --interface-only"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --interface-only"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --use-api-response --interface-only" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --interface-only" `
+                        -NoNewWindow `
+                        -PassThru
+                    $process | Wait-Process
+                    if ($process.ExitCode -ne 0) {
+                        throw "Refitter failed"
+                    }
+
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output I$outputPath --use-api-response --interface-only"
+                    $process = Start-Process "dotnet" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -89,6 +99,15 @@ function RunTests {
                     Copy-Item "I$outputPath" "./ConsoleApp/NetStandard20/" -Force
                     Copy-Item "I$outputPath" "./ConsoleApp/NetStandard21/" -Force
                     Copy-Item "I$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "IApi$outputPath" "./MinimalApi/" -Force
                     Remove-Item $outputPath -Force
                 }
             }
