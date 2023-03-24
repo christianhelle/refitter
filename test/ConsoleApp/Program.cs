@@ -14,12 +14,13 @@ internal class Program
 
     // private static async Task TestPetstoreUsingApiResponse()
     // {
-    //     var responseClient = RestService.For<Petstore.Interface.ISwaggerPetstore>("https://petstore3.swagger.io/api/v3");
-    //     IApiResponse<Petstore.Pet> pet = await responseClient.GetPetById(1);
+    //     var responseClient = RestService.For<Petstore.UsingApiResponse.ISwaggerPetstore>("https://petstore3.swagger.io/api/v3");
+    //     var response = await responseClient.GetPetById(1);
 
-    //     Console.WriteLine($"Name: {pet.Content.Name}");
-    //     Console.WriteLine($"Category: {pet.Content.Category.Name}");
-    //     Console.WriteLine($"Status: {pet.Content.Status}");
+    //     Console.WriteLine("## Using IApiResponse<T> as return type ##");
+    //     Console.WriteLine($"HTTP Status Code: {response.StatusCode}");
+    //     Console.WriteLine($"Name: {response.Content.Name}");
+    //     Console.WriteLine($"Status: {response.Content.Status}");
 
     //     var pets = await responseClient.FindPetsByStatus(Petstore.Status.Available);
     //     Console.WriteLine("Found " + pets.Content.Count + " available pet(s)");
@@ -34,7 +35,6 @@ internal class Program
     //     var pet = await client.GetPetById(1);
 
     //     Console.WriteLine($"Name: {pet.Name}");
-    //     Console.WriteLine($"Category: {pet.Category.Name}");
     //     Console.WriteLine($"Status: {pet.Status}");
 
     //     var pets = await client.FindPetsByStatus(Petstore.Status.Available);
@@ -42,5 +42,7 @@ internal class Program
 
     //     var taggedPets = await client.FindPetsByTags(new[] { "tag1Updated", "new" });
     //     Console.WriteLine("Found " + taggedPets.Count + " tagged pet(s)");
+
+    //     Console.WriteLine();
     // }
 }
