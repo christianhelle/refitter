@@ -24,17 +24,17 @@ function RunTests {
     )
 
     $filenames = @(
-        # "api-with-examples",
-        "callback-example",
-        "link-example",
-        "uber",
-        "uspto",
         # "petstore-expanded",
         # "petstore-minimal",
         # "petstore-simple",
         # "petstore-with-external-docs",
         "petstore",
-        "ingram-micro"
+        "ingram-micro",
+        # "api-with-examples",
+        "callback-example",
+        "link-example",
+        "uber",
+        "uspto"
     )
     "v2.0", "v3.0" | ForEach-Object {
         $version = $_
@@ -60,6 +60,16 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --use-api-response --interface-only"
+                    $process = Start-Process "dotnet" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --use-api-response --interface-only" `
+                        -NoNewWindow `
+                        -PassThru
+                    $process | Wait-Process
+                    if ($process.ExitCode -ne 0) {
+                        throw "Refitter failed"
+                    }
+
                     Copy-Item $outputPath "./$version-$_-$format.cs"
                     Copy-Item $outputPath "./ConsoleApp/Net7/" -Force
                     Copy-Item $outputPath "./ConsoleApp/Net6/" -Force
@@ -70,6 +80,15 @@ function RunTests {
                     Copy-Item $outputPath "./ConsoleApp/NetStandard20/" -Force
                     Copy-Item $outputPath "./ConsoleApp/NetStandard21/" -Force
                     Copy-Item $outputPath "./MinimalApi/" -Force
+                    Copy-Item "I$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "I$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "I$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "I$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "I$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "I$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "I$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "I$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "I$outputPath" "./MinimalApi/" -Force
                     Remove-Item $outputPath -Force
                 }
             }
