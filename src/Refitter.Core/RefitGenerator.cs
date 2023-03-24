@@ -27,7 +27,7 @@ namespace Refitter.Core
         public string Generate()
         {
             var generator = factory.Create();
-            var contracts = settings.GenerateContracts ? generator.GenerateFile() : string.Empty;
+            var contracts = generator.GenerateFile();
             
             var interfaceGenerator = new RefitInterfaceGenerator(settings, document, generator);
             var client = GenerateClient(interfaceGenerator);
@@ -35,7 +35,7 @@ namespace Refitter.Core
             return new StringBuilder()
                 .AppendLine(client)
                 .AppendLine()
-                .AppendLine(contracts)
+                .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
                 .ToString();
         }
 
