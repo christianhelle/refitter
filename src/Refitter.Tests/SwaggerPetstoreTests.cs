@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Refitter.Tests;
 
-public class RefitGeneratorTests
+public class SwaggerPetstoreTests
 {
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
