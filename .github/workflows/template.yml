@@ -51,6 +51,8 @@ jobs:
         $namespace = "${{ inputs.openapi }}".Replace("-", "")
         $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace $namespace --output $outputPath
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Interface" --output "I$outputPath" --interface-only
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.UsingApiResponse" --output "IApi$outputPath" --interface-only --return-api-response
         Copy-Item $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
         Copy-Item $outputPath ./ConsoleApp/Net6/
         Copy-Item $outputPath ./ConsoleApp/Net7/
@@ -60,6 +62,22 @@ jobs:
         Copy-Item $outputPath ./ConsoleApp/Net481/
         Copy-Item $outputPath ./ConsoleApp/NetStandard20/
         Copy-Item $outputPath ./ConsoleApp/NetStandard21/
+        Copy-Item "I$outputPath" ./ConsoleApp/Net6/
+        Copy-Item "I$outputPath" ./ConsoleApp/Net7/
+        Copy-Item "I$outputPath" ./ConsoleApp/Net48/
+        Copy-Item "I$outputPath" ./ConsoleApp/Net472/
+        Copy-Item "I$outputPath" ./ConsoleApp/Net462/
+        Copy-Item "I$outputPath" ./ConsoleApp/Net481/
+        Copy-Item "I$outputPath" ./ConsoleApp/NetStandard20/
+        Copy-Item "I$outputPath" ./ConsoleApp/NetStandard21/
+        Copy-Item "IApi$outputPath" ./ConsoleApp/Net6/
+        Copy-Item "IApi$outputPath" ./ConsoleApp/Net7/
+        Copy-Item "IApi$outputPath" ./ConsoleApp/Net48/
+        Copy-Item "IApi$outputPath" ./ConsoleApp/Net472/
+        Copy-Item "IApi$outputPath" ./ConsoleApp/Net462/
+        Copy-Item "IApi$outputPath" ./ConsoleApp/Net481/
+        Copy-Item "IApi$outputPath" ./ConsoleApp/NetStandard20/
+        Copy-Item "IApi$outputPath" ./ConsoleApp/NetStandard21/
       working-directory: test
       shell: pwsh
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
