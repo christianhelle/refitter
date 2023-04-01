@@ -57,12 +57,6 @@ jobs:
         Copy-Item IApiOutput.cs ./ConsoleApp/NetStandard21/
       working-directory: test
       shell: pwsh
-    
-    - name: Publish generated code as Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: Generated Code (${{ inputs.openapi }})
-        path: test/*.cs
 
     - name: Build .NET 6 generated code
       run: dotnet build ./ConsoleApp/Net6/Net6.csproj
