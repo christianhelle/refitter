@@ -132,7 +132,92 @@ function RunTests {
                 throw "Build Failed!"
             }
         }
-    }    
+    }        
+    
+    "https://petstore3.swagger.io/api/v3/openapi.json", "https://petstore3.swagger.io/api/v3/openapi.yaml" | ForEach-Object {
+        $namespace = "PetstoreFromUri"
+        $outputPath = "PetstoreFromUri.cs"
+
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output $outputPath"
+        $process = Start-Process "dotnet" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output $outputPath" `
+            -NoNewWindow `
+            -PassThru
+        $process | Wait-Process
+        if ($process.ExitCode -ne 0) {
+            throw "Refitter failed"
+        }
+
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj """$_""" --namespace $namespace.Interface --output I$outputPath --interface-only"
+        $process = Start-Process "dotnet" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Interface --output I$outputPath --interface-only" `
+            -NoNewWindow `
+            -PassThru
+        $process | Wait-Process
+        if ($process.ExitCode -ne 0) {
+            throw "Refitter failed"
+        }
+
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output I$outputPath --use-api-response --interface-only"
+        $process = Start-Process "dotnet" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only" `
+            -NoNewWindow `
+            -PassThru
+        $process | Wait-Process
+        if ($process.ExitCode -ne 0) {
+            throw "Refitter failed"
+        }
+
+        Copy-Item $outputPath "./$version-$_-$format.cs"
+        Copy-Item $outputPath "./ConsoleApp/Net7/" -Force
+        Copy-Item $outputPath "./ConsoleApp/Net6/" -Force
+        Copy-Item $outputPath "./ConsoleApp/Net48/" -Force
+        Copy-Item $outputPath "./ConsoleApp/Net481/" -Force
+        Copy-Item $outputPath "./ConsoleApp/Net472/" -Force
+        Copy-Item $outputPath "./ConsoleApp/Net462/" -Force
+        Copy-Item $outputPath "./ConsoleApp/NetStandard20/" -Force
+        Copy-Item $outputPath "./ConsoleApp/NetStandard21/" -Force
+        Copy-Item $outputPath "./MinimalApi/" -Force
+        Copy-Item "I$outputPath" "./ConsoleApp/Net7/" -Force
+        Copy-Item "I$outputPath" "./ConsoleApp/Net6/" -Force
+        Copy-Item "I$outputPath" "./ConsoleApp/Net48/" -Force
+        Copy-Item "I$outputPath" "./ConsoleApp/Net481/" -Force
+        Copy-Item "I$outputPath" "./ConsoleApp/Net472/" -Force
+        Copy-Item "I$outputPath" "./ConsoleApp/Net462/" -Force
+        Copy-Item "I$outputPath" "./ConsoleApp/NetStandard20/" -Force
+        Copy-Item "I$outputPath" "./ConsoleApp/NetStandard21/" -Force
+        Copy-Item "I$outputPath" "./MinimalApi/" -Force
+        Copy-Item "IApi$outputPath" "./ConsoleApp/Net7/" -Force
+        Copy-Item "IApi$outputPath" "./ConsoleApp/Net6/" -Force
+        Copy-Item "IApi$outputPath" "./ConsoleApp/Net48/" -Force
+        Copy-Item "IApi$outputPath" "./ConsoleApp/Net481/" -Force
+        Copy-Item "IApi$outputPath" "./ConsoleApp/Net472/" -Force
+        Copy-Item "IApi$outputPath" "./ConsoleApp/Net462/" -Force
+        Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard20/" -Force
+        Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard21/" -Force
+        Copy-Item "IApi$outputPath" "./MinimalApi/" -Force
+        Remove-Item $outputPath -Force
+        
+        Write-Host "`r`nBuilding ConsoleApp`r`n"
+        $process = Start-Process "dotnet" `
+            -Args "build ./ConsoleApp/ConsoleApp.sln" `
+            -NoNewWindow `
+            -PassThru
+        $process | Wait-Process
+        if ($process.ExitCode -ne 0) {
+            throw "Build Failed!"
+        }
+
+        Write-Host "`r`nBuilding MinimalApi`r`n"
+        $process = Start-Process "dotnet" `
+            -Args "build ./MinimalApi/MinimalApi.csproj" `
+            -NoNewWindow `
+            -PassThru
+        $process | Wait-Process
+        if ($process.ExitCode -ne 0) {
+            throw "Build Failed!"
+        }
+    }
 }
 
 Remove-Item * -Include *.cs -Recurse -Force -Exclude *Program.cs
