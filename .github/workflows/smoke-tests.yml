@@ -16,8 +16,8 @@ on:
       - "*"
 
 jobs:
-
   template:
+
     strategy:
       fail-fast: false
       matrix:
@@ -33,7 +33,6 @@ jobs:
       os: ${{ matrix.os }}
       command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
 
-  template:
     strategy:
       fail-fast: false
       matrix:
