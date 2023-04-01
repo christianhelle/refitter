@@ -16,6 +16,7 @@ on:
       - "*"
 
 jobs:
+
   template:
     strategy:
       fail-fast: false
@@ -28,6 +29,21 @@ jobs:
     with:
       format: ${{ matrix.format }}
       version: ${{ matrix.version }}
+      openapi: ${{ matrix.openapi }}
+      os: ${{ matrix.os }}
+      command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
+      
+  template:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        openapi: [
+          "https://petstore3.swagger.io/api/v3/openapi.json", 
+          "https://petstore3.swagger.io/api/v3/openapi.yaml"
+        ]
+    uses: ./.github/workflows/template-url.yml
+    with:
       openapi: ${{ matrix.openapi }}
       os: ${{ matrix.os }}
       command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
