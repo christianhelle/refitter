@@ -31,7 +31,6 @@ jobs:
         ${{ inputs.command }} "${{ inputs.openapi }}" --namespace $namespace --output Output.cs
         ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "$namespace.Interface" --output IOutput.cs --interface-only
         ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "$namespace.UsingApiResponse" --output IApiOutput.cs --interface-only --return-api-response
-        Copy-Item Output.cs ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
         Copy-Item Output.cs ./ConsoleApp/Net6/
         Copy-Item Output.cs ./ConsoleApp/Net7/
         Copy-Item Output.cs ./ConsoleApp/Net48/
@@ -62,7 +61,7 @@ jobs:
     - name: Publish generated code as Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: Generated Code (${{ inputs.openapi }}.${{ inputs.format }}, ${{ inputs.version }}, ${{ inputs.os }})
+        name: Generated Code (${{ inputs.openapi }})
         path: test/*.cs
 
     - name: Build .NET 6 generated code
