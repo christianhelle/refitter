@@ -25,6 +25,11 @@ jobs:
         version: [v2.0, v3.0]
         os: [ubuntu-latest]
         openapi: ["callback-example", "link-example", "uber", "uspto", "petstore", "ingram-micro"]
+        openapi_url: [
+          "https://petstore3.swagger.io/api/v3/openapi.json", 
+          "https://petstore3.swagger.io/api/v3/openapi.yaml"
+        ]
+    
     uses: ./.github/workflows/template.yml
     with:
       format: ${{ matrix.format }}
@@ -33,16 +38,8 @@ jobs:
       os: ${{ matrix.os }}
       command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
 
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        openapi: [
-          "https://petstore3.swagger.io/api/v3/openapi.json", 
-          "https://petstore3.swagger.io/api/v3/openapi.yaml"
-        ]
     uses: ./.github/workflows/template-url.yml
     with:
-      openapi: ${{ matrix.openapi }}
       os: ${{ matrix.os }}
+      openapi: ${{ matrix.openapi_url }}
       command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
