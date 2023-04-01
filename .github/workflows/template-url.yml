@@ -99,8 +99,9 @@ jobs:
       working-directory: test
 
     - name: Prepare Minimal API project
-      run: cp Output.cs ./MinimalApi/
+      run: Copy-Item Output.cs ./MinimalApi/
       working-directory: test
+      shell: pwsh
 
     - name: Build Minimal API generated code
       run: dotnet build ./MinimalApi/MinimalApi.csproj
