@@ -60,6 +60,9 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
             return ValidationResult.Error("Input file is required");
 
+        if (IsUrl(settings.OpenApiPath))
+            return base.Validate(context, settings);
+        
         return File.Exists(settings.OpenApiPath)
             ? base.Validate(context, settings)
             : ValidationResult.Error($"File not found - {Path.GetFullPath(settings.OpenApiPath)}");
@@ -91,4 +94,11 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             return e.HResult;
         }
     }
+
+    private bool IsUrl(string openApiPath)
+    {
+        return Uri.TryCreate(openApiPath, UriKind.Absolute, out var uriResult)
+               && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+    }
+
 }
