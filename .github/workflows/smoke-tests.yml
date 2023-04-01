@@ -32,7 +32,7 @@ jobs:
       openapi: ${{ matrix.openapi }}
       os: ${{ matrix.os }}
       command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
-      
+
   template:
     strategy:
       fail-fast: false
