@@ -74,6 +74,16 @@ components:
             .BeTrue();
     }
 
+        [Fact]
+    public async Task Can_Build_Generated_FromUrl()
+    {
+        string generateCode = await GenerateCodeFromUrl();
+        BuildHelper
+            .BuildCSharp(generateCode)
+            .Should()
+            .BeTrue();
+    }
+
     private static async Task<string> GenerateCode()
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
@@ -82,6 +92,12 @@ components:
         var sut = await RefitGenerator.CreateAsync(settings);
         var generateCode = sut.Generate();
         return generateCode;
+    }
+
+    private static Task<string> GenerateCodeFromUrl()
+    {
+        var settings = new RefitGeneratorSettings { OpenApiPath = "https://petstore.swagger.io/v2/swagger.json" };
+        return RefitGenerator.CreateAsync(settings).ContinueWith(t => t.Result.Generate());
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)
