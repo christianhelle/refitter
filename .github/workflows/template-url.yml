@@ -99,7 +99,7 @@ jobs:
       working-directory: test
 
     - name: Prepare Minimal API project
-      run: cp *.cs ./MinimalApi/
+      run: cp Output.cs ./MinimalApi/
       working-directory: test
 
     - name: Build Minimal API generated code
