@@ -58,7 +58,6 @@ jobs:
         Copy-Item IApiOutput.cs ./ConsoleApp/NetStandard21/
       working-directory: test
       shell: pwsh
-      if: steps.prepare_openapi_spec.outputs.exists == 'True'
     
     - name: Publish generated code as Artifact
       uses: actions/upload-artifact@v2
@@ -99,9 +98,8 @@ jobs:
       working-directory: test
 
     - name: Prepare Minimal API project
-      run: Copy-Item Output.cs ./MinimalApi/
+      run: cp *.cs ./MinimalApi/
       working-directory: test
-      shell: pwsh
 
     - name: Build Minimal API generated code
       run: dotnet build ./MinimalApi/MinimalApi.csproj
