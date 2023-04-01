@@ -1,0 +1,107 @@
+name: Run Tests
+
+on:
+  workflow_call:
+    inputs:
+      openapi:
+        required: true
+        type: string
+      os:
+        type: string
+        default: ubuntu-latest
+      command:
+        required: true
+        type: string
+
+jobs:
+  
+  test:
+
+    name: ${{ inputs.openapi }}.${{ inputs.format }} (${{ inputs.version }}) ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    timeout-minutes: 10
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Generate code
+      run: |
+        $namespace = "${{ inputs.openapi }}".Replace("-", "")
+        $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
+        ${{ inputs.command }} "${{ inputs.openapi }}" --namespace $namespace --output Output.cs
+        ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "$namespace.Interface" --output IOutput.cs --interface-only
+        ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "$namespace.UsingApiResponse" --output IApiOutput.cs --interface-only --return-api-response
+        Copy-Item Output.cs ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
+        Copy-Item Output.cs ./ConsoleApp/Net6/
+        Copy-Item Output.cs ./ConsoleApp/Net7/
+        Copy-Item Output.cs ./ConsoleApp/Net48/
+        Copy-Item Output.cs ./ConsoleApp/Net472/
+        Copy-Item Output.cs ./ConsoleApp/Net462/
+        Copy-Item Output.cs ./ConsoleApp/Net481/
+        Copy-Item Output.cs ./ConsoleApp/NetStandard20/
+        Copy-Item Output.cs ./ConsoleApp/NetStandard21/
+        Copy-Item IOutput.cs ./ConsoleApp/Net6/
+        Copy-Item IOutput.cs ./ConsoleApp/Net7/
+        Copy-Item IOutput.cs ./ConsoleApp/Net48/
+        Copy-Item IOutput.cs ./ConsoleApp/Net472/
+        Copy-Item IOutput.cs ./ConsoleApp/Net462/
+        Copy-Item IOutput.cs ./ConsoleApp/Net481/
+        Copy-Item IOutput.cs ./ConsoleApp/NetStandard20/
+        Copy-Item IOutput.cs ./ConsoleApp/NetStandard21/
+        Copy-Item IApiOutput.cs ./ConsoleApp/Net6/
+        Copy-Item IApiOutput.cs ./ConsoleApp/Net7/
+        Copy-Item IApiOutput.cs ./ConsoleApp/Net48/
+        Copy-Item IApiOutput.cs ./ConsoleApp/Net472/
+        Copy-Item IApiOutput.cs ./ConsoleApp/Net462/
+        Copy-Item IApiOutput.cs ./ConsoleApp/Net481/
+        Copy-Item IApiOutput.cs ./ConsoleApp/NetStandard20/
+        Copy-Item IApiOutput.cs ./ConsoleApp/NetStandard21/
+      working-directory: test
+      shell: pwsh
+      if: steps.prepare_openapi_spec.outputs.exists == 'True'
+    
+    - name: Publish generated code as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Generated Code (${{ inputs.openapi }}.${{ inputs.format }}, ${{ inputs.version }}, ${{ inputs.os }})
+        path: test/*.cs
+
+    - name: Build .NET 6 generated code
+      run: dotnet build ./ConsoleApp/Net6/Net6.csproj
+      working-directory: test
+
+    - name: Build .NET 7 generated code
+      run: dotnet build ./ConsoleApp/Net7/Net7.csproj
+      working-directory: test
+
+    - name: Build .NET 4.8.1 generated code
+      run: dotnet build ./ConsoleApp/Net481/Net481.csproj
+      working-directory: test
+
+    - name: Build .NET 4.8 generated code
+      run: dotnet build ./ConsoleApp/Net48/Net48.csproj
+      working-directory: test
+
+    - name: Build .NET 4.7.2 generated code
+      run: dotnet build ./ConsoleApp/Net472/Net472.csproj
+      working-directory: test
+
+    - name: Build .NET 4.6.2 generated code
+      run: dotnet build ./ConsoleApp/Net462/Net462.csproj
+      working-directory: test
+
+    - name: Build .NET Standard 2.0 generated code
+      run: dotnet build ./ConsoleApp/NetStandard20/NetStandard20.csproj
+      working-directory: test
+
+    - name: Build .NET Standard 2.1 generated code
+      run: dotnet build ./ConsoleApp/NetStandard21/NetStandard21.csproj
+      working-directory: test
+
+    - name: Prepare Minimal API project
+      run: cp Petstore.cs ./MinimalApi/
+      working-directory: test
+
+    - name: Build Minimal API generated code
+      run: dotnet build ./MinimalApi/MinimalApi.csproj
+      working-directory: test
