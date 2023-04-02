@@ -7,32 +7,30 @@ namespace Refitter.Tests;
 
 public class PathParametersWithUrlTests
 {
-    [Fact]
-    public async Task Can_Generate_Code()
+    [Theory]
+    [InlineData("https://petstore3.swagger.io/api/v3/openapi.json")]
+    public async Task Can_Generate_Code(string url)
     {
-        var generateCode = await GenerateCode();
+        var generateCode = await GenerateCode(url);
         generateCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
-    public async Task Can_Build_Generated_Code()
+    [Theory]
+    [InlineData("https://petstore3.swagger.io/api/v3/openapi.json")]
+    public async Task Can_Build_Generated_Code(string url)
     {
-        var generateCode = await GenerateCode();
+        var generateCode = await GenerateCode(url);
         BuildHelper
             .BuildCSharp(generateCode)
             .Should()
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(string url)
     {
-        var swaggerUrl = "https://petstore.swagger.io/v2/swagger.json";
-        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerUrl };
-
+        var settings = new RefitGeneratorSettings { OpenApiPath = url };
         var sut = await RefitGenerator.CreateAsync(settings);
         var generateCode = sut.Generate();
         return generateCode;
     }
-
-
 }
