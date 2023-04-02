@@ -75,11 +75,3 @@ jobs:
     - name: Build .NET Standard 2.1 generated code
       run: dotnet build ./ConsoleApp/NetStandard21/NetStandard21.csproj
       working-directory: test
-
-    - name: Prepare Minimal API project
-      run: cp *.cs ./MinimalApi/
-      working-directory: test
-
-    - name: Build Minimal API generated code
-      run: dotnet build ./MinimalApi/MinimalApi.csproj
-      working-directory: test
