@@ -39,22 +39,6 @@ jobs:
         Copy-Item Output.cs ./ConsoleApp/Net481/
         Copy-Item Output.cs ./ConsoleApp/NetStandard20/
         Copy-Item Output.cs ./ConsoleApp/NetStandard21/
-        Copy-Item IOutput.cs ./ConsoleApp/Net6/
-        Copy-Item IOutput.cs ./ConsoleApp/Net7/
-        Copy-Item IOutput.cs ./ConsoleApp/Net48/
-        Copy-Item IOutput.cs ./ConsoleApp/Net472/
-        Copy-Item IOutput.cs ./ConsoleApp/Net462/
-        Copy-Item IOutput.cs ./ConsoleApp/Net481/
-        Copy-Item IOutput.cs ./ConsoleApp/NetStandard20/
-        Copy-Item IOutput.cs ./ConsoleApp/NetStandard21/
-        Copy-Item IApiOutput.cs ./ConsoleApp/Net6/
-        Copy-Item IApiOutput.cs ./ConsoleApp/Net7/
-        Copy-Item IApiOutput.cs ./ConsoleApp/Net48/
-        Copy-Item IApiOutput.cs ./ConsoleApp/Net472/
-        Copy-Item IApiOutput.cs ./ConsoleApp/Net462/
-        Copy-Item IApiOutput.cs ./ConsoleApp/Net481/
-        Copy-Item IApiOutput.cs ./ConsoleApp/NetStandard20/
-        Copy-Item IApiOutput.cs ./ConsoleApp/NetStandard21/
       working-directory: test
       shell: pwsh
 
