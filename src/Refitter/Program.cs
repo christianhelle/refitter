@@ -25,8 +25,8 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 {
     public sealed class Settings : CommandSettings
     {
-        [Description("Path to OpenAPI Specification file")]
-        [CommandArgument(0, "[input file]")]
+        [Description("URL or file path to OpenAPI Specification file")]
+        [CommandArgument(0, "[URL or input file]")]
         public string? OpenApiPath { get; set; }
 
         [Description("Default namespace to use for generated types")]
