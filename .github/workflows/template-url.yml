@@ -28,9 +28,16 @@ jobs:
       run: |
         $namespace = "${{ inputs.openapi }}".Replace("-", "")
         $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
+        
+        Write-Host "${{ inputs.command }} ${{ inputs.openapi }} --namespace $namespace --output Output.cs"
         ${{ inputs.command }} "${{ inputs.openapi }}" --namespace $namespace --output Output.cs
+        
+        Write-Host "${{ inputs.command }} ${{ inputs.openapi }} --namespace "$namespace.Interface" --output IOutput.cs --interface-only"
         ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "$namespace.Interface" --output IOutput.cs --interface-only
+        
+        Write-Host "${{ inputs.command }} ${{ inputs.openapi }} --namespace "$namespace.UsingApiResponse" --output IApiOutput.cs --interface-only --return-api-response"
         ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "$namespace.UsingApiResponse" --output IApiOutput.cs --interface-only --return-api-response
+        
         Copy-Item Output.cs ./ConsoleApp/Net6/
         Copy-Item Output.cs ./ConsoleApp/Net7/
         Copy-Item Output.cs ./ConsoleApp/Net48/
@@ -39,6 +46,9 @@ jobs:
         Copy-Item Output.cs ./ConsoleApp/Net481/
         Copy-Item Output.cs ./ConsoleApp/NetStandard20/
         Copy-Item Output.cs ./ConsoleApp/NetStandard21/
+
+        Write-Host "Generated file:"
+        Get-Content Output.cs | Write-Host
       working-directory: test
       shell: pwsh
 
