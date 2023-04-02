@@ -21,13 +21,13 @@ $ refitter --help
 
 ```
 USAGE:
-    refitter [input file] [OPTIONS]
+    refitter [URL or file path] [OPTIONS]
 
 EXAMPLES:
     refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --output ./Output.cs
 
 ARGUMENTS:
-    [input file]    Path to OpenAPI Specification file
+    [URL or file path]    URL or file path to OpenAPI Specification file
 
 OPTIONS:
                                       DEFAULT                                                          
