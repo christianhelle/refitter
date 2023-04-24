@@ -30,6 +30,7 @@ public class CSharpClientGeneratorFactory
             {
                 Namespace = settings.Namespace,
                 JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant()
             }
         });
 }

@@ -51,6 +51,7 @@ jobs:
         $namespace = "${{ inputs.openapi }}".Replace("-", "")
         $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace $namespace --output $outputPath
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Internal" --output "Internal$outputPath" --internal
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Interface" --output "I$outputPath" --interface-only
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.UsingApiResponse" --output "IApi$outputPath" --interface-only --return-api-response
         Copy-Item $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
@@ -78,6 +79,14 @@ jobs:
         Copy-Item "IApi$outputPath" ./ConsoleApp/Net481/
         Copy-Item "IApi$outputPath" ./ConsoleApp/NetStandard20/
         Copy-Item "IApi$outputPath" ./ConsoleApp/NetStandard21/
+        Copy-Item "Internal$outputPath" ./ConsoleApp/Net6/
+        Copy-Item "Internal$outputPath" ./ConsoleApp/Net7/
+        Copy-Item "Internal$outputPath" ./ConsoleApp/Net48/
+        Copy-Item "Internal$outputPath" ./ConsoleApp/Net472/
+        Copy-Item "Internal$outputPath" ./ConsoleApp/Net462/
+        Copy-Item "Internal$outputPath" ./ConsoleApp/Net481/
+        Copy-Item "Internal$outputPath" ./ConsoleApp/NetStandard20/
+        Copy-Item "Internal$outputPath" ./ConsoleApp/NetStandard21/
       working-directory: test
       shell: pwsh
       if: steps.prepare_openapi_spec.outputs.exists == 'True'

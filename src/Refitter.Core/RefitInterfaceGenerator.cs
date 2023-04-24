@@ -107,8 +107,9 @@ public class RefitInterfaceGenerator
               "ApiClient"
             : settings.Naming.InterfaceName;
 
-        StringBuilder code = new StringBuilder();
-        code.AppendLine($"{Separator}public interface I{title.CapitalizeFirstCharacter()}")
+        var code = new StringBuilder();
+        var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
+        code.AppendLine($"{Separator}{modifier} interface I{title.CapitalizeFirstCharacter()}")
             .AppendLine($"{Separator}{{");
         return code.ToString();
     }

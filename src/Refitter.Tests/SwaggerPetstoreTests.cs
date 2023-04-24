@@ -103,6 +103,32 @@ public class SwaggerPetstoreTests
 
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_Internal_Contract_Types(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.TypeAccessibility = TypeAccessibility.Internal;
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("internal partial class");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_Internal_Interface(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.TypeAccessibility = TypeAccessibility.Internal;
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("internal interface");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
 #if !DEBUG
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
