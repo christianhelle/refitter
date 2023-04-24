@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/Refitter/bin/Debug/net7.0/refitter.dll",
+      "program": "${workspaceFolder}/src/Refitter/bin/Debug/net6.0/refitter.dll",
       "args": [
         "${workspaceFolder}/test/OpenAPI/v3.0/IngramMicro.json",
         "--namespace",
