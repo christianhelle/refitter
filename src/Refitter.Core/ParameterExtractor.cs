@@ -38,6 +38,7 @@ public static class ParameterExtractor
         parameters.AddRange(queryParameters);
         parameters.AddRange(bodyParameters);
         parameters.AddRange(multipartFormParameters);
+        parameters.Add("CancellationToken cancellationToken = default");
         return parameters;
     }
 
