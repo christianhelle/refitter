@@ -50,9 +50,9 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output $outputPath --internal"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output $outputPath"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output $outputPath --internal" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output $outputPath" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -60,9 +60,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --interface-only --internal"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output Internal$outputPath --internal"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --interface-only --internal" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output Internal$outputPath --internal" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -70,9 +70,19 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output I$outputPath --use-api-response --interface-only --internal"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --interface-only"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only --internal" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --interface-only" `
+                        -NoNewWindow `
+                        -PassThru
+                    $process | Wait-Process
+                    if ($process.ExitCode -ne 0) {
+                        throw "Refitter failed"
+                    }
+
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output I$outputPath --use-api-response --interface-only"
+                    $process = Start-Process "dotnet" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -108,6 +118,15 @@ function RunTests {
                     Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard20/" -Force
                     Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard21/" -Force
                     Copy-Item "IApi$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "Internal$outputPath" "./MinimalApi/" -Force
                     Remove-Item $outputPath -Force
                 }
             }
@@ -138,9 +157,9 @@ function RunTests {
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.cs"
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output $outputPath --internal"
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output $outputPath"
         $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output $outputPath --internal" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output $outputPath" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -148,9 +167,9 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj """$_""" --namespace $namespace.Interface --output I$outputPath --interface-only --internal"
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Internal --output Internal$outputPath --internal"
         $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Interface --output I$outputPath --interface-only --internal" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Internal --output Internal$outputPath --internal" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -158,9 +177,19 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output I$outputPath --use-api-response --interface-only --internal"
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj """$_""" --namespace $namespace.Interface --output I$outputPath --interface-only"
         $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only --internal" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Interface --output I$outputPath --interface-only" `
+            -NoNewWindow `
+            -PassThru
+        $process | Wait-Process
+        if ($process.ExitCode -ne 0) {
+            throw "Refitter failed"
+        }
+
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output I$outputPath --use-api-response --interface-only"
+        $process = Start-Process "dotnet" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -196,6 +225,15 @@ function RunTests {
         Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard20/" -Force
         Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard21/" -Force
         Copy-Item "IApi$outputPath" "./MinimalApi/" -Force
+        Copy-Item "Internal$outputPath" "./ConsoleApp/Net7/" -Force
+        Copy-Item "Internal$outputPath" "./ConsoleApp/Net6/" -Force
+        Copy-Item "Internal$outputPath" "./ConsoleApp/Net48/" -Force
+        Copy-Item "Internal$outputPath" "./ConsoleApp/Net481/" -Force
+        Copy-Item "Internal$outputPath" "./ConsoleApp/Net472/" -Force
+        Copy-Item "Internal$outputPath" "./ConsoleApp/Net462/" -Force
+        Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard20/" -Force
+        Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard21/" -Force
+        Copy-Item "Internal$outputPath" "./MinimalApi/" -Force
         Remove-Item $outputPath -Force
         
         Write-Host "`r`nBuilding ConsoleApp`r`n"
