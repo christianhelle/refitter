@@ -8,6 +8,7 @@ public static class RefitInterfaceImports
         string.Join(
             Environment.NewLine,
             "using Refit;",
+            "using System.Threading;",
             "using System.Threading.Tasks;",
             "using System.Collections.Generic;");
 }
