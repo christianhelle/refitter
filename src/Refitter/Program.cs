@@ -7,18 +7,65 @@ using ValidationResult = Spectre.Console.ValidationResult;
 
 var app = new CommandApp<GenerateCommand>();
 app.Configure(
-    config => config
-        .SetApplicationName("refitter")
-        .SetApplicationVersion(typeof(GenerateCommand).Assembly.GetName().Version!.ToString())
-        .AddExample(
-            new[]
-            {
-                "./openapi.json",
-                "--namespace",
-                "\"Your.Namespace.Of.Choice.GeneratedCode\"",
-                "--output",
-                "./Output.cs"
-            }));
+    config =>
+    {
+        var configuration = config
+            .SetApplicationName("refitter")
+            .SetApplicationVersion(typeof(GenerateCommand).Assembly.GetName().Version!.ToString());
+        
+        configuration
+            .AddExample(
+                new[]
+                {
+                    "./openapi.json",
+                });
+        
+        configuration
+            .AddExample(
+                new[]
+                {
+                    "https://petstore3.swagger.io/api/v3/openapi.yaml"
+                });
+        
+        configuration
+            .AddExample(
+                new[]
+                {
+                    "./openapi.json",
+                    "--namespace",
+                    "\"Your.Namespace.Of.Choice.GeneratedCode\"",
+                    "--output",
+                    "./GeneratedCode.cs"
+                });
+        
+        configuration
+            .AddExample(
+                new[]
+                {
+                    "./openapi.json",
+                    "--namespace",
+                    "\"Your.Namespace.Of.Choice.GeneratedCode\"",
+                    "--internal"
+                });
+        
+        configuration
+            .AddExample(
+                new[]
+                {
+                    "./openapi.json",
+                    "--output",
+                    "./IGeneratedCode.cs",
+                    "--interface-only"
+                });
+        
+        configuration
+            .AddExample(
+                new[]
+                {
+                    "./openapi.json",
+                    "--use-api-response"
+                });
+    });
 return app.Run(args);
 
 internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
