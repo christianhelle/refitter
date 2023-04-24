@@ -390,7 +390,7 @@ Returns a response that looks something like this:
 ```
 
 ## System requirements
-.NET 7.0
+.NET 6.0 (LTS)
 
 #
 
