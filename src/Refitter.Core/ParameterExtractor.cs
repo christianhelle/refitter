@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NJsonSchema;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 
@@ -9,7 +8,10 @@ namespace Refitter.Core;
 
 public static class ParameterExtractor
 {
-    public static IEnumerable<string> GetParameters(CustomCSharpClientGenerator generator, OpenApiOperation operation)
+    public static IEnumerable<string> GetParameters(
+        CustomCSharpClientGenerator generator,
+        OpenApiOperation operation,
+        RefitGeneratorSettings settings)
     {
         var operationModel = generator.CreateOperationModel(operation);
 
@@ -38,7 +40,10 @@ public static class ParameterExtractor
         parameters.AddRange(queryParameters);
         parameters.AddRange(bodyParameters);
         parameters.AddRange(multipartFormParameters);
-        parameters.Add("CancellationToken cancellationToken = default");
+        
+        if (settings.UseCancellationTokens)
+            parameters.Add("CancellationToken cancellationToken = default");
+        
         return parameters;
     }
 

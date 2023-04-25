@@ -22,6 +22,8 @@ namespace Refitter.Core
         public bool ReturnIApiResponse { get; set; }
 
         public TypeAccessibility TypeAccessibility { get; set; } = TypeAccessibility.Public;
+
+        public bool UseCancellationTokens { get; set; }
     }
 
     [ExcludeFromCodeCoverage]
