@@ -60,6 +60,16 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Cancellation --output WithCancellation$outputPath --cancellation-tokens"
+                    $process = Start-Process "dotnet" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Cancellation --output WithCancellation$outputPath --cancellation-tokens" `
+                        -NoNewWindow `
+                        -PassThru
+                    $process | Wait-Process
+                    if ($process.ExitCode -ne 0) {
+                        throw "Refitter failed"
+                    }
+
                     Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output Internal$outputPath --internal"
                     $process = Start-Process "dotnet" `
                         -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output Internal$outputPath --internal" `
@@ -127,6 +137,15 @@ function RunTests {
                     Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard20/" -Force
                     Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard21/" -Force
                     Copy-Item "Internal$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "WithCancellation$outputPath" "./MinimalApi/" -Force
                     Remove-Item $outputPath -Force
                 }
             }
