@@ -30,6 +30,7 @@ EXAMPLES:
     refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --internal
     refitter ./openapi.json --output ./IGeneratedCode.cs --interface-only
     refitter ./openapi.json --use-api-response
+    refitter ./openapi.json --cancellation-tokens
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file

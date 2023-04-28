@@ -65,6 +65,14 @@ app.Configure(
                     "./openapi.json",
                     "--use-api-response"
                 });
+        
+        configuration
+            .AddExample(
+                new[]
+                {
+                    "./openapi.json",
+                    "--cancellation-tokens"
+                });
     });
 return app.Run(args);
 
