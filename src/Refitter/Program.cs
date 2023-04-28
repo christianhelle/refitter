@@ -101,12 +101,12 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [DefaultValue(false)]
         public bool ReturnIApiResponse { get; set; }
 
-        [Description("Set the accessibility of the generated types to internal (default: public)")]
+        [Description("Set the accessibility of the generated types to 'internal'")]
         [CommandOption("--internal")]
         [DefaultValue(false)]
         public bool InternalTypeAccessibility { get; set; }
 
-        [Description("Use cancellation tokens (default: false)")]
+        [Description("Use cancellation tokens")]
         [CommandOption("--cancellation-tokens")]
         [DefaultValue(false)]
         public bool UseCancellationTokens { get; set; }
