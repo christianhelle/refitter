@@ -52,7 +52,7 @@ public class RefitInterfaceGenerator
                     .CapitalizeFirstCharacter()
                     .ConvertKebabCaseToPascalCase();
 
-                var parameters = ParameterExtractor.GetParameters(generator, operation);
+                var parameters = ParameterExtractor.GetParameters(generator, operation, settings);
                 var parametersString = string.Join(", ", parameters);
 
                 GenerateMethodXmlDocComments(operation, code);
