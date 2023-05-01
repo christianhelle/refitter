@@ -73,6 +73,14 @@ app.Configure(
                     "./openapi.json",
                     "--cancellation-tokens"
                 });
+        
+        configuration
+            .AddExample(
+                new[]
+                {
+                    "./openapi.json",
+                    "--no-operation-headers"
+                });
     });
 return app.Run(args);
 
@@ -118,6 +126,11 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [CommandOption("--cancellation-tokens")]
         [DefaultValue(false)]
         public bool UseCancellationTokens { get; set; }
+
+        [Description("Don't generate operation headers")]
+        [CommandOption("--no-operation-headers")]
+        [DefaultValue(false)]
+        public bool NoOperationHeaders { get; set; }
     }
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
@@ -143,6 +156,7 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             GenerateContracts = !settings.InterfaceOnly,
             ReturnIApiResponse = settings.ReturnIApiResponse,
             UseCancellationTokens = settings.UseCancellationTokens,
+            GenerateOperationHeaders = !settings.NoOperationHeaders,
             TypeAccessibility = settings.InternalTypeAccessibility
                 ? TypeAccessibility.Internal
                 : TypeAccessibility.Public
