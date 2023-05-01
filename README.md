@@ -31,6 +31,7 @@ EXAMPLES:
     refitter ./openapi.json --output ./IGeneratedCode.cs --interface-only
     refitter ./openapi.json --use-api-response
     refitter ./openapi.json --cancellation-tokens
+    refitter ./openapi.json --no-operation-headers
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -44,7 +45,8 @@ OPTIONS:
         --interface-only                               Don't generate contract types                             
         --use-api-response                             Return Task<IApiResponse<T>> instead of Task<T>           
         --internal                                     Set the accessibility of the generated types to 'internal'
-        --cancellation-tokens                          Use cancellation tokens
+        --cancellation-tokens                          Use cancellation tokens                                   
+        --no-operation-headers                         Don't generate operation headers                          
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
