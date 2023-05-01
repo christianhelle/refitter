@@ -79,40 +79,40 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         /// Update an existing pet by Id
         /// </summary>
         [Put("/pet")]
-        Task<Pet> UpdatePet([Body]Pet body);
+        Task<Pet> UpdatePet([Body] Pet body);
 
         /// <summary>
         /// Add a new pet to the store
         /// </summary>
         [Post("/pet")]
-        Task<Pet> AddPet([Body]Pet body);
+        Task<Pet> AddPet([Body] Pet body);
 
         /// <summary>
         /// Multiple status values can be provided with comma separated strings
         /// </summary>
         [Get("/pet/findByStatus")]
-        Task<ICollection<Pet>> FindPetsByStatus([Query]Status? status);
+        Task<ICollection<Pet>> FindPetsByStatus([Query(CollectionFormat.Multi)] Status? status);
 
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
         /// </summary>
         [Get("/pet/findByTags")]
-        Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)]ICollection<string> tags);
+        Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
 
         /// <summary>
         /// Returns a single pet
         /// </summary>
         [Get("/pet/{petId}")]
-        Task<Pet> GetPetById(long? petId);
+        Task<Pet> GetPetById(long petId);
 
         [Post("/pet/{petId}")]
-        Task UpdatePetWithForm(long? petId, [Query]string name, [Query]string status);
+        Task UpdatePetWithForm(long petId, [Query(CollectionFormat.Multi)] string name, [Query(CollectionFormat.Multi)] string status);
 
         [Delete("/pet/{petId}")]
-        Task DeletePet(long? petId);
+        Task DeletePet(long petId, [Header("api_key")] string api_key);
 
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> UploadFile(long? petId, [Query]string additionalMetadata, [Body]StreamPart body);
+        Task<ApiResponse> UploadFile(long petId, [Query(CollectionFormat.Multi)] string additionalMetadata, [Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> body);
 
         /// <summary>
         /// Returns a map of status codes to quantities
@@ -124,34 +124,34 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         /// Place a new order in the store
         /// </summary>
         [Post("/store/order")]
-        Task<Order> PlaceOrder([Body]Order body);
+        Task<Order> PlaceOrder([Body] Order body);
 
         /// <summary>
         /// For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions
         /// </summary>
         [Get("/store/order/{orderId}")]
-        Task<Order> GetOrderById(long? orderId);
+        Task<Order> GetOrderById(long orderId);
 
         /// <summary>
         /// For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
         /// </summary>
         [Delete("/store/order/{orderId}")]
-        Task DeleteOrder(long? orderId);
+        Task DeleteOrder(long orderId);
 
         /// <summary>
         /// This can only be done by the logged in user.
         /// </summary>
         [Post("/user")]
-        Task CreateUser([Body]User body);
+        Task CreateUser([Body] User body);
 
         /// <summary>
         /// Creates list of users with given input array
         /// </summary>
         [Post("/user/createWithList")]
-        Task<User> CreateUsersWithListInput([Body]ICollection<User> body);
+        Task<User> CreateUsersWithListInput([Body] IEnumerable<User> body);
 
         [Get("/user/login")]
-        Task<string> LoginUser([Query]string username, [Query]string password);
+        Task<string> LoginUser([Query(CollectionFormat.Multi)] string username, [Query(CollectionFormat.Multi)] string password);
 
         [Get("/user/logout")]
         Task LogoutUser();
@@ -163,7 +163,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         /// This can only be done by the logged in user.
         /// </summary>
         [Put("/user/{username}")]
-        Task UpdateUser(string username, [Body]User body);
+        Task UpdateUser(string username, [Body] User body);
 
         /// <summary>
         /// This can only be done by the logged in user.
