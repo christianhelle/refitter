@@ -30,6 +30,16 @@ public static class ParameterExtractor
             .Select(p => $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
             .ToList();
 
+        var headerParameters = new List<string>();
+
+        if(settings.GenerateOperationHeaders)
+        {
+            headerParameters = operationModel.Parameters
+                .Where(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader)
+                .Select(p => $"{JoinAttributes($"Header(\"{p.VariableName}\")", GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
+                .ToList();
+        }
+
         var multipartFormParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
             .Select(p => $"{JoinAttributes("Body(BodySerializationMethod.UrlEncoded)", GetAliasAsAttribute(p))}Dictionary<string, object> {p.VariableName}")
@@ -39,11 +49,12 @@ public static class ParameterExtractor
         parameters.AddRange(routeParameters);
         parameters.AddRange(queryParameters);
         parameters.AddRange(bodyParameters);
+        parameters.AddRange(headerParameters);
         parameters.AddRange(multipartFormParameters);
-        
+
         if (settings.UseCancellationTokens)
             parameters.Add("CancellationToken cancellationToken = default");
-        
+
         return parameters;
     }
 
