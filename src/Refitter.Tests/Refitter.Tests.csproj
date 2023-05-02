@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -7,6 +7,13 @@
 
         <IsPackable>false</IsPackable>
     </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\V2\SwaggerPetstoreWithDifferentHeaders.json" />
+      <None Remove="Resources\V2\SwaggerPetstoreWithDifferentHeaders.yaml" />
+      <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.json" />
+      <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.yaml" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
@@ -22,8 +29,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="Resources\V2\SwaggerPetstoreWithDifferentHeaders.json" />
+      <EmbeddedResource Include="Resources\V2\SwaggerPetstoreWithDifferentHeaders.yaml" />
       <EmbeddedResource Include="Resources\V2\SwaggerPetstore.json" />
       <EmbeddedResource Include="Resources\V2\SwaggerPetstore.yaml" />
+      <EmbeddedResource Include="Resources\V3\SwaggerPetstoreWithDifferentHeaders.json" />
+      <EmbeddedResource Include="Resources\V3\SwaggerPetstoreWithDifferentHeaders.yaml" />
       <EmbeddedResource Include="Resources\V3\SwaggerPetstore.json" />
       <EmbeddedResource Include="Resources\V3\SwaggerPetstore.yaml" />
     </ItemGroup>

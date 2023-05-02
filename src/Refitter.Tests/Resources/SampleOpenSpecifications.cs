@@ -6,4 +6,8 @@ public enum SampleOpenSpecifications
     SwaggerPetstoreJsonV3,
     SwaggerPetstoreYamlV2,
     SwaggerPetstoreYamlV3,
+    SwaggerPetstoreJsonV2WithDifferentHeaders,
+    SwaggerPetstoreJsonV3WithDifferentHeaders,
+    SwaggerPetstoreYamlV2WithDifferentHeaders,
+    SwaggerPetstoreYamlV3WithDifferentHeaders,     
 }
