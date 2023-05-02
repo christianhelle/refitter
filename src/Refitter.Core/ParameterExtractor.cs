@@ -36,7 +36,7 @@ public static class ParameterExtractor
         {
             headerParameters = operationModel.Parameters
                 .Where(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader)
-                .Select(p => $"{JoinAttributes($"Header(\"{p.VariableName}\")", GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
+                .Select(p => $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetBodyParameterType(p)} {p.VariableName}")
                 .ToList();
         }
 

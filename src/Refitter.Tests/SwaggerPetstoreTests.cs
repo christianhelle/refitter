@@ -161,6 +161,19 @@ public class SwaggerPetstoreTests
     }
 
     [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.yaml")]
+    public async Task Can_Generate_Code_With_OperationHeaders_With_Different_Headers(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.GenerateOperationHeaders = true;
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("[Header(\"api-key\")] string api_key");
+    }
+
+    [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
@@ -172,6 +185,7 @@ public class SwaggerPetstoreTests
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().Contain("[Header(\"api_key\")] string api_key");
     }
+
 
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
