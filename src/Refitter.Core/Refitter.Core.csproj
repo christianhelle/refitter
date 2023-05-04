@@ -27,7 +27,7 @@
 
     <ItemGroup>
       <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.18.3" />
-      <PackageReference Include="NSwag.Core.Yaml" Version="13.18.3" />
+      <PackageReference Include="NSwag.Core.Yaml" Version="13.18.5" />
     </ItemGroup>
 
 </Project>
