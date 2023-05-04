@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Text.Json;
 using Exceptionless;
 using Exceptionless.Plugins;
 using Refitter.Core;
@@ -173,15 +174,28 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             AnsiConsole.MarkupLine($"[green]Output: {code.Length} bytes[/]");
             return 0;
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            AnsiConsole.MarkupLine($"[red]Error:{Environment.NewLine}{e.Message}[/]");
-            AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Environment.NewLine}{e.StackTrace}[/]");
-            return e.HResult;
+            AnsiConsole.MarkupLine($"[red]Error:{Environment.NewLine}{exception.Message}[/]");
+            AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Environment.NewLine}{exception.StackTrace}[/]");
+            await LogError(exception, refitGeneratorSettings);
+            return exception.HResult;
         }
     }
 
-    private bool IsUrl(string openApiPath)
+    private static async Task LogError(Exception exception, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        exception
+            .ToExceptionless(
+                new ContextData(
+                    JsonSerializer.Deserialize<Dictionary<string, object>>(
+                        JsonSerializer.Serialize(refitGeneratorSettings))!))
+            .Submit();
+
+        await ExceptionlessClient.Default.ProcessQueueAsync();
+    }
+
+    private static bool IsUrl(string openApiPath)
     {
         return Uri.TryCreate(openApiPath, UriKind.Absolute, out var uriResult)
                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
