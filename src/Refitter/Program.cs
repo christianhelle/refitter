@@ -135,6 +135,11 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [CommandOption("--no-operation-headers")]
         [DefaultValue(false)]
         public bool NoOperationHeaders { get; set; }
+
+        [Description("Don't log errors or collect telemetry")]
+        [CommandOption("--no-logging")]
+        [DefaultValue(false)]
+        public bool NoLogging { get; set; }
     }
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
@@ -178,21 +183,24 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         {
             AnsiConsole.MarkupLine($"[red]Error:{Environment.NewLine}{exception.Message}[/]");
             AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Environment.NewLine}{exception.StackTrace}[/]");
-            await LogError(exception, refitGeneratorSettings);
+            await LogError(exception, settings);
             return exception.HResult;
         }
     }
 
-    private static async Task LogError(Exception exception, RefitGeneratorSettings refitGeneratorSettings)
+    private static Task LogError(Exception exception, Settings settings)
     {
+        if (settings.NoLogging)
+            return Task.CompletedTask;
+        
         exception
             .ToExceptionless(
                 new ContextData(
                     JsonSerializer.Deserialize<Dictionary<string, object>>(
-                        JsonSerializer.Serialize(refitGeneratorSettings))!))
+                        JsonSerializer.Serialize(settings))!))
             .Submit();
 
-        await ExceptionlessClient.Default.ProcessQueueAsync();
+        return ExceptionlessClient.Default.ProcessQueueAsync();
     }
 
     private static bool IsUrl(string openApiPath)
