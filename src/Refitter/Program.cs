@@ -1,9 +1,13 @@
 ﻿using System.ComponentModel;
+using System.Text.Json;
+using Exceptionless;
+using Exceptionless.Plugins;
 using Refitter.Core;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using ValidationResult = Spectre.Console.ValidationResult;
 
+ExceptionlessClient.Default.Startup("pRql7vmgecZ0Iph6MU5TJE5XsZeesdTe0yx7TN4f");
 
 var app = new CommandApp<GenerateCommand>();
 app.Configure(
@@ -131,6 +135,11 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [CommandOption("--no-operation-headers")]
         [DefaultValue(false)]
         public bool NoOperationHeaders { get; set; }
+
+        [Description("Don't log errors or collect telemetry")]
+        [CommandOption("--no-logging")]
+        [DefaultValue(false)]
+        public bool NoLogging { get; set; }
     }
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
@@ -170,15 +179,31 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             AnsiConsole.MarkupLine($"[green]Output: {code.Length} bytes[/]");
             return 0;
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            AnsiConsole.MarkupLine($"[red]Error:{Environment.NewLine}{e.Message}[/]");
-            AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Environment.NewLine}{e.StackTrace}[/]");
-            return e.HResult;
+            AnsiConsole.MarkupLine($"[red]Error:{Environment.NewLine}{exception.Message}[/]");
+            AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Environment.NewLine}{exception.StackTrace}[/]");
+            await LogError(exception, settings);
+            return exception.HResult;
         }
     }
 
-    private bool IsUrl(string openApiPath)
+    private static Task LogError(Exception exception, Settings settings)
+    {
+        if (settings.NoLogging)
+            return Task.CompletedTask;
+        
+        exception
+            .ToExceptionless(
+                new ContextData(
+                    JsonSerializer.Deserialize<Dictionary<string, object>>(
+                        JsonSerializer.Serialize(settings))!))
+            .Submit();
+
+        return ExceptionlessClient.Default.ProcessQueueAsync();
+    }
+
+    private static bool IsUrl(string openApiPath)
     {
         return Uri.TryCreate(openApiPath, UriKind.Absolute, out var uriResult)
                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
