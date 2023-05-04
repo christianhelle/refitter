@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel;
+using Exceptionless;
+using Exceptionless.Plugins;
 using Refitter.Core;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using ValidationResult = Spectre.Console.ValidationResult;
 
+ExceptionlessClient.Default.Startup("pRql7vmgecZ0Iph6MU5TJE5XsZeesdTe0yx7TN4f");
 
 var app = new CommandApp<GenerateCommand>();
 app.Configure(
