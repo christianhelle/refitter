@@ -2,11 +2,19 @@
 using System.Text.Json;
 using Exceptionless;
 using Exceptionless.Plugins;
+using Refitter;
 using Refitter.Core;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using ValidationResult = Spectre.Console.ValidationResult;
 
+
+ExceptionlessClient.Default.Configuration.SetUserIdentity(
+    SupportInformation.GetAnonymousIdentity(),
+    SupportInformation.GetSupportKey());
+
+ExceptionlessClient.Default.Configuration.UseSessions();
+ExceptionlessClient.Default.Configuration.SetVersion(typeof(GenerateCommand).Assembly.GetName().Version!);
 ExceptionlessClient.Default.Startup("pRql7vmgecZ0Iph6MU5TJE5XsZeesdTe0yx7TN4f");
 
 var app = new CommandApp<GenerateCommand>();
