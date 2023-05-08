@@ -24,21 +24,21 @@ app.Configure(
         var configuration = config
             .SetApplicationName("refitter")
             .SetApplicationVersion(typeof(GenerateCommand).Assembly.GetName().Version!.ToString());
-        
+
         configuration
             .AddExample(
                 new[]
                 {
                     "./openapi.json",
                 });
-        
+
         configuration
             .AddExample(
                 new[]
                 {
                     "https://petstore3.swagger.io/api/v3/openapi.yaml"
                 });
-        
+
         configuration
             .AddExample(
                 new[]
@@ -49,7 +49,7 @@ app.Configure(
                     "--output",
                     "./GeneratedCode.cs"
                 });
-        
+
         configuration
             .AddExample(
                 new[]
@@ -59,7 +59,7 @@ app.Configure(
                     "\"Your.Namespace.Of.Choice.GeneratedCode\"",
                     "--internal"
                 });
-        
+
         configuration
             .AddExample(
                 new[]
@@ -69,7 +69,7 @@ app.Configure(
                     "./IGeneratedCode.cs",
                     "--interface-only"
                 });
-        
+
         configuration
             .AddExample(
                 new[]
@@ -77,7 +77,7 @@ app.Configure(
                     "./openapi.json",
                     "--use-api-response"
                 });
-        
+
         configuration
             .AddExample(
                 new[]
@@ -85,7 +85,7 @@ app.Configure(
                     "./openapi.json",
                     "--cancellation-tokens"
                 });
-        
+
         configuration
             .AddExample(
                 new[]
@@ -157,7 +157,7 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         if (IsUrl(settings.OpenApiPath))
             return base.Validate(context, settings);
-        
+
         return File.Exists(settings.OpenApiPath)
             ? base.Validate(context, settings)
             : ValidationResult.Error($"File not found - {Path.GetFullPath(settings.OpenApiPath)}");
@@ -185,6 +185,7 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             var code = generator.Generate();
             await File.WriteAllTextAsync(settings.OutputPath ?? "Output.cs", code);
             AnsiConsole.MarkupLine($"[green]Output: {code.Length} bytes[/]");
+            await LogFeatureUsage(settings);
             return 0;
         }
         catch (Exception exception)
@@ -196,11 +197,39 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         }
     }
 
+    private static Task LogFeatureUsage(Settings settings)
+    {
+        if (settings.NoLogging)
+            return Task.CompletedTask;
+
+        foreach (var property in typeof(Settings).GetProperties())
+        {
+            var value = property.GetValue(settings);
+            if (value is null)
+                continue;
+
+            property.GetCustomAttributes(typeof(CommandOptionAttribute), true)
+                .OfType<CommandOptionAttribute>()
+                .Where(
+                    attribute =>
+                        !attribute.LongNames.Contains("namespace") &&
+                        !attribute.LongNames.Contains("output"))
+                .ToList()
+                .ForEach(
+                    attribute =>
+                        ExceptionlessClient.Default
+                            .CreateFeatureUsage(attribute.LongNames.FirstOrDefault() ?? property.Name)
+                            .Submit());
+        }
+
+        return ExceptionlessClient.Default.ProcessQueueAsync();
+    }
+
     private static Task LogError(Exception exception, Settings settings)
     {
         if (settings.NoLogging)
             return Task.CompletedTask;
-        
+
         exception
             .ToExceptionless(
                 new ContextData(
@@ -213,8 +242,7 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
     private static bool IsUrl(string openApiPath)
     {
-        return Uri.TryCreate(openApiPath, UriKind.Absolute, out var uriResult)
-               && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+        return Uri.TryCreate(openApiPath, UriKind.Absolute, out var uriResult) &&
+               (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
-
 }
