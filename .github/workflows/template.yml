@@ -50,11 +50,11 @@ jobs:
         $outputPath = $outputPath.Substring(0, 1).ToUpperInvariant() + $outputPath.Substring(1, $outputPath.Length - 1)
         $namespace = "${{ inputs.openapi }}".Replace("-", "")
         $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace $namespace --output $outputPath
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.WithCancellation" --output "WithCancellation$outputPath" --cancellation-tokens
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Internal" --output "Internal$outputPath" --internal
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Interface" --output "I$outputPath" --interface-only
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.UsingApiResponse" --output "IApi$outputPath" --interface-only --return-api-response
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace $namespace --output $outputPath --no-logging
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.WithCancellation" --output "WithCancellation$outputPath" --cancellation-tokens --no-logging
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Internal" --output "Internal$outputPath" --internal --no-logging
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Interface" --output "I$outputPath" --interface-only --no-logging
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.UsingApiResponse" --output "IApi$outputPath" --interface-only --return-api-response --no-logging
         Copy-Item $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
         Copy-Item $outputPath ./ConsoleApp/Net6/
         Copy-Item $outputPath ./ConsoleApp/Net7/

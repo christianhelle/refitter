@@ -26,9 +26,9 @@ jobs:
 
     - name: Generate code
       run: |        
-        ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "Petstore" --output Output.cs
-        ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "Petstore.Interface" --output IOutput.cs --interface-only
-        ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "Petstore.UsingApiResponse" --output IApiOutput.cs --interface-only --return-api-response
+        ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "Petstore" --output Output.cs --no-logging
+        ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "Petstore.Interface" --output IOutput.cs --interface-only --no-logging
+        ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "Petstore.UsingApiResponse" --output IApiOutput.cs --interface-only --return-api-response --no-logging
         
         Copy-Item Output.cs ./ConsoleApp/Net6/
         Copy-Item Output.cs ./ConsoleApp/Net7/
