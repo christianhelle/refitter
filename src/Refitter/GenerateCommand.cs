@@ -35,8 +35,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 : TypeAccessibility.Public
         };
 
+        var crlf = Environment.NewLine;
         try
         {
+            AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}{crlf}[/]");
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             var code = generator.Generate();
             await File.WriteAllTextAsync(settings.OutputPath ?? "Output.cs", code);
@@ -46,8 +48,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
         catch (Exception exception)
         {
-            AnsiConsole.MarkupLine($"[red]Error:{Environment.NewLine}{exception.Message}[/]");
-            AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Environment.NewLine}{exception.StackTrace}[/]");
+            AnsiConsole.MarkupLine($"[red]Error:{crlf}{exception.Message}[/]");
+            AnsiConsole.MarkupLine($"[yellow]Stack Trace:{crlf}{exception.StackTrace}[/]");
             await Analytics.LogError(exception, settings);
             return exception.HResult;
         }
