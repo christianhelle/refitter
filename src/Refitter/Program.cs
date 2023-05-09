@@ -213,7 +213,8 @@ internal sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 .Where(
                     attribute =>
                         !attribute.LongNames.Contains("namespace") &&
-                        !attribute.LongNames.Contains("output"))
+                        !attribute.LongNames.Contains("output") &&
+                        !attribute.LongNames.Contains("no-logging"))
                 .ToList()
                 .ForEach(
                     attribute =>
