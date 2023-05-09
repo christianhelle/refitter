@@ -8,11 +8,12 @@
       "preLaunchTask": "build",
       "program": "${workspaceFolder}/src/Refitter/bin/Debug/net6.0/refitter.dll",
       "args": [
-        "${workspaceFolder}/test/OpenAPI/v3.0/IngramMicro.json",
+        "${workspaceFolder}/test/OpenAPI/v3.0/petstore.json",
         "--namespace",
-        "Refitter.Test",
+        "Petstore.Test",
         "--output",
-        "${workspaceFolder}/test/Refitter.Test.cs"
+        "${workspaceFolder}/test/Petstore.Test.cs",
+        "--no-logging",
       ],
       "cwd": "${workspaceFolder}/src/Refitter",
       "console": "internalConsole",
