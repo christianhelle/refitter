@@ -26,7 +26,7 @@ public static class Analytics
         foreach (var property in typeof(Settings).GetProperties())
         {
             var value = property.GetValue(settings);
-            if (value is null)
+            if (value is null or false)
                 continue;
 
             property.GetCustomAttributes(typeof(CommandOptionAttribute), true)
