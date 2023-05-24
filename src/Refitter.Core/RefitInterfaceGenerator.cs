@@ -40,7 +40,7 @@ public class RefitInterfaceGenerator
                 var operation = operations.Value;
 
                 var returnTypeParameter = operation.Responses.ContainsKey("200")
-                    ? generator.GetTypeName(operation.Responses["200"].Schema, true, null)
+                    ? generator.GetTypeName(operation.Responses["200"].ActualResponse.Schema, true, null)
                     : null;
 
                 var returnType = GetReturnType(returnTypeParameter);
