@@ -1,4 +1,7 @@
 [![Build](https://github.com/christianhelle/refitter/actions/workflows/build.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/build.yml)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![Smoke Tests](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml)
 [![NuGet](https://img.shields.io/nuget/v/refitter.svg?style=flat-square)](http://www.nuget.org/packages/refitter)
 
@@ -407,6 +410,13 @@ Returns a response that looks something like this:
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/neoGeneva"><img src="https://avatars.githubusercontent.com/u/804724?v=4?s=100" width="100px;" alt="Philip Cox"/><br /><sub><b>Philip Cox</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=neoGeneva" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
