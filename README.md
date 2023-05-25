@@ -418,6 +418,7 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="http://kgame.tw"><img src="https://avatars.githubusercontent.com/u/3646532?v=4?s=100" width="100px;" alt="kgame"/><br /><sub><b>kgame</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=kgamecarter" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://yrki.no"><img src="https://avatars.githubusercontent.com/u/11573601?v=4?s=100" width="100px;" alt="Thomas Pettersen / Yrki"/><br /><sub><b>Thomas Pettersen / Yrki</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=yrki" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/1kvin"><img src="https://avatars.githubusercontent.com/u/46425980?v=4?s=100" width="100px;" alt="Artem"/><br /><sub><b>Artem</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3A1kvin" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/m7clarke"><img src="https://avatars.githubusercontent.com/u/47439144?v=4?s=100" width="100px;" alt="m7clarke"/><br /><sub><b>m7clarke</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Am7clarke" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
