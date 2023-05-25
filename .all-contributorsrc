@@ -42,6 +42,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "1kvin",
+      "name": "Artem",
+      "avatar_url": "https://avatars.githubusercontent.com/u/46425980?v=4",
+      "profile": "https://github.com/1kvin",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
