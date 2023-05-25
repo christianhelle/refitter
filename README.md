@@ -402,6 +402,17 @@ Returns a response that looks something like this:
 ## System requirements
 .NET 6.0 (LTS)
 
+## Contributors
+- @neoGeneva
+- @distantcam
+- @kgamecarter
+- @yrki
+- @1kvin
+- @m7clarke
+- @kirides
+- @guillaumeserale
+- @Roflincopter
+
 #
 
 For tips and tricks on software development, check out [my blog](https://christianhelle.com)
