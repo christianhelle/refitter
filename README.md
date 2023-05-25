@@ -416,6 +416,7 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/neoGeneva"><img src="https://avatars.githubusercontent.com/u/804724?v=4?s=100" width="100px;" alt="Philip Cox"/><br /><sub><b>Philip Cox</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=neoGeneva" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://cam.macfar.land/"><img src="https://avatars.githubusercontent.com/u/1298847?v=4?s=100" width="100px;" alt="Cameron MacFarland"/><br /><sub><b>Cameron MacFarland</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=distantcam" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://kgame.tw"><img src="https://avatars.githubusercontent.com/u/3646532?v=4?s=100" width="100px;" alt="kgame"/><br /><sub><b>kgame</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=kgamecarter" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://yrki.no"><img src="https://avatars.githubusercontent.com/u/11573601?v=4?s=100" width="100px;" alt="Thomas Pettersen / Yrki"/><br /><sub><b>Thomas Pettersen / Yrki</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=yrki" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

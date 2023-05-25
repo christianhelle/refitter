@@ -33,6 +33,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "yrki",
+      "name": "Thomas Pettersen / Yrki",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11573601?v=4",
+      "profile": "http://yrki.no",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
