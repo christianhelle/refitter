@@ -24,6 +24,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "kgamecarter",
+      "name": "kgame",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3646532?v=4",
+      "profile": "http://kgame.tw",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
