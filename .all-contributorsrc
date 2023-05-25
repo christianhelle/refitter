@@ -15,6 +15,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "distantcam",
+      "name": "Cameron MacFarland",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1298847?v=4",
+      "profile": "https://cam.macfar.land/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
