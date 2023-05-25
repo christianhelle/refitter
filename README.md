@@ -403,15 +403,15 @@ Returns a response that looks something like this:
 .NET 6.0 (LTS)
 
 ## Contributors
-- @neoGeneva
-- @distantcam
-- @kgamecarter
-- @yrki
-- @1kvin
-- @m7clarke
-- @kirides
-- @guillaumeserale
-- @Roflincopter
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 #
 
