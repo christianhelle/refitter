@@ -420,6 +420,7 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/1kvin"><img src="https://avatars.githubusercontent.com/u/46425980?v=4?s=100" width="100px;" alt="Artem"/><br /><sub><b>Artem</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3A1kvin" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/m7clarke"><img src="https://avatars.githubusercontent.com/u/47439144?v=4?s=100" width="100px;" alt="m7clarke"/><br /><sub><b>m7clarke</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Am7clarke" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kirides"><img src="https://avatars.githubusercontent.com/u/13602143?v=4?s=100" width="100px;" alt="kirides"/><br /><sub><b>kirides</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Akirides" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/guillaumeserale"><img src="https://avatars.githubusercontent.com/u/6672406?v=4?s=100" width="100px;" alt="guillaumeserale"/><br /><sub><b>guillaumeserale</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=guillaumeserale" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
