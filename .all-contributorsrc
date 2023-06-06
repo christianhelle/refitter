@@ -83,6 +83,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "damianh",
+      "name": "Damian Hickey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57436?v=4",
+      "profile": "https://www.linkedin.com/in/hickeydamian/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

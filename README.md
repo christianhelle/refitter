@@ -2,7 +2,7 @@
 [![Smoke Tests](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml)
 [![NuGet](https://img.shields.io/nuget/v/refitter.svg?style=flat-square)](http://www.nuget.org/packages/refitter)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -416,12 +416,15 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/neoGeneva"><img src="https://avatars.githubusercontent.com/u/804724?v=4?s=100" width="100px;" alt="Philip Cox"/><br /><sub><b>Philip Cox</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=neoGeneva" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://cam.macfar.land/"><img src="https://avatars.githubusercontent.com/u/1298847?v=4?s=100" width="100px;" alt="Cameron MacFarland"/><br /><sub><b>Cameron MacFarland</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=distantcam" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://kgame.tw"><img src="https://avatars.githubusercontent.com/u/3646532?v=4?s=100" width="100px;" alt="kgame"/><br /><sub><b>kgame</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=kgamecarter" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://yrki.no"><img src="https://avatars.githubusercontent.com/u/11573601?v=4?s=100" width="100px;" alt="Thomas Pettersen / Yrki"/><br /><sub><b>Thomas Pettersen / Yrki</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=yrki" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/1kvin"><img src="https://avatars.githubusercontent.com/u/46425980?v=4?s=100" width="100px;" alt="Artem"/><br /><sub><b>Artem</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3A1kvin" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://yrki.no"><img src="https://avatars.githubusercontent.com/u/11573601?v=4?s=100" width="100px;" alt="Thomas Pettersen / Yrki"/><br /><sub><b>Thomas Pettersen / Yrki</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><img src="?s=100" width="100px;" alt="1kvin"/><br /><sub><b>1kvin</b></sub><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3A1kvin" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/m7clarke"><img src="https://avatars.githubusercontent.com/u/47439144?v=4?s=100" width="100px;" alt="m7clarke"/><br /><sub><b>m7clarke</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Am7clarke" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kirides"><img src="https://avatars.githubusercontent.com/u/13602143?v=4?s=100" width="100px;" alt="kirides"/><br /><sub><b>kirides</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Akirides" title="Bug reports">🐛</a></td>
+    </tr>
+    <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/guillaumeserale"><img src="https://avatars.githubusercontent.com/u/6672406?v=4?s=100" width="100px;" alt="guillaumeserale"/><br /><sub><b>guillaumeserale</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=guillaumeserale" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Roflincopter"><img src="https://avatars.githubusercontent.com/u/1690243?v=4?s=100" width="100px;" alt="Dennis Brentjes"/><br /><sub><b>Dennis Brentjes</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=Roflincopter" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/hickeydamian/"><img src="https://avatars.githubusercontent.com/u/57436?v=4?s=100" width="100px;" alt="Damian Hickey"/><br /><sub><b>Damian Hickey</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adamianh" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
