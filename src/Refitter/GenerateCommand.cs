@@ -40,7 +40,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         {
             AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}{crlf}[/]");
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
-            var code = generator.Generate();
+            var code = generator.Generate().ReplaceLineEndings();
             await File.WriteAllTextAsync(settings.OutputPath ?? "Output.cs", code);
             AnsiConsole.MarkupLine($"[green]Output: {code.Length} bytes[/]");
             await Analytics.LogFeatureUsage(settings);
