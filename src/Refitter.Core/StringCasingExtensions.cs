@@ -13,10 +13,21 @@ public static class StringCasingExtensions
 
         return string.Join(string.Empty, parts);
     }
-    
+
     public static string ConvertKebabCaseToCamelCase(this string str)
     {
         var parts = str.Split('-');
+        for (var i = 1; i < parts.Length; i++)
+        {
+            parts[i] = parts[i].CapitalizeFirstCharacter();
+        }
+
+        return string.Join(string.Empty, parts);
+    }
+
+    public static string ConvertRouteToCamelCase(this string str)
+    {
+        var parts = str.Split('/');
         for (var i = 1; i < parts.Length; i++)
         {
             parts[i] = parts[i].CapitalizeFirstCharacter();
