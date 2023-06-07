@@ -47,10 +47,9 @@ public class RefitInterfaceGenerator
 
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
+                generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator();
                 var name = generator.BaseSettings.OperationNameGenerator
-                    .GetOperationName(document, kv.Key, verb, operation)
-                    .CapitalizeFirstCharacter()
-                    .ConvertKebabCaseToPascalCase();
+                    .GetOperationName(document, kv.Key, verb, operation);
 
                 var parameters = ParameterExtractor.GetParameters(generator, operation, settings);
                 var parametersString = string.Join(", ", parameters);
