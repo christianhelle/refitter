@@ -269,3 +269,4 @@ test/**/*Petstore*.cs
 test/**/*Uber.cs
 test/**/*Uspto.cs
 test/**/*Ingram-micro.cs
+*.lutconfig
