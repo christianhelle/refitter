@@ -20,6 +20,7 @@ public class RefitInterfaceGenerator
         this.settings = settings;
         this.document = document;
         this.generator = generator;
+        generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document);
     }
 
     public string GenerateRefitInterface()
@@ -47,7 +48,6 @@ public class RefitInterfaceGenerator
 
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
-                generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator();
                 var name = generator.BaseSettings.OperationNameGenerator
                     .GetOperationName(document, kv.Key, verb, operation);
 
