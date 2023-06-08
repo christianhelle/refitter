@@ -34,7 +34,9 @@ function RunTests {
         "callback-example",
         "link-example",
         "uber",
-        "uspto"
+        "uspto",
+        "hubspot-events",
+        "hubspot-webhooks"
     )
     "v2.0", "v3.0" | ForEach-Object {
         $version = $_
