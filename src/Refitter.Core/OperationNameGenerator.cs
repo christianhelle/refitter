@@ -12,7 +12,7 @@ public class OperationNameGenerator : IOperationNameGenerator
 
     public OperationNameGenerator(OpenApiDocument document)
     {
-        if (this.CheckForDuplicateOperationIds(document))
+        if (CheckForDuplicateOperationIds(document))
             defaultGenerator = new MultipleClientsFromFirstTagAndPathSegmentsOperationNameGenerator();
     }
 
@@ -33,12 +33,8 @@ public class OperationNameGenerator : IOperationNameGenerator
             .CapitalizeFirstCharacter()
             .ConvertKebabCaseToPascalCase()
             .ConvertRouteToCamelCase();
-}
 
-public static class IOperationNameGeneratorExtensions
-{
-    public static bool CheckForDuplicateOperationIds(
-        this IOperationNameGenerator generator,
+    public bool CheckForDuplicateOperationIds(
         OpenApiDocument document)
     {
         List<string> operationNames = new();
@@ -48,7 +44,7 @@ public static class IOperationNameGeneratorExtensions
             {
                 var operation = operations.Value;
                 operationNames.Add(
-                    generator.GetOperationName(
+                    GetOperationName(
                         document,
                         kv.Key,
                         operations.Key,
