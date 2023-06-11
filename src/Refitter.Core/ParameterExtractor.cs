@@ -9,12 +9,10 @@ namespace Refitter.Core;
 public static class ParameterExtractor
 {
     public static IEnumerable<string> GetParameters(
-        CustomCSharpClientGenerator generator,
+        CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
     {
-        var operationModel = generator.CreateOperationModel(operation);
-
         var routeParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Path)
             .Select(p => $"{JoinAttributes(GetAliasAsAttribute(p))}{p.Type} {p.VariableName}")
