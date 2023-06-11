@@ -57,6 +57,11 @@ public class RefitInterfaceGenerator
 
                 GenerateMethodXmlDocComments(operation, code);
 
+                if (operationModel.Consumes.Contains("multipart/form-data"))
+                {
+                    code.AppendLine($"{Separator}{Separator}[Multipart]");
+                }
+
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
                     .AppendLine();

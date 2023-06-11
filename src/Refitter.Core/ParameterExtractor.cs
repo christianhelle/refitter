@@ -39,7 +39,7 @@ public static class ParameterExtractor
         }
 
         var binaryBodyParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
+            .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter || p.IsFile)
             .Select(p => $"{GetAliasAsAttribute(p)}StreamPart {p.VariableName}")
             .ToList();
 
