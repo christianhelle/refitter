@@ -11,10 +11,22 @@ public class MultiPartFormDataTests
 {
    ""openapi"":""3.0.2"",
    ""paths"":{
-      ""/uploadFile"":{
+      ""/foo/{id}/files"":{
          ""post"":{
             ""summary"":""uploads a file"",
             ""operationId"":""uploadFile"",
+            ""parameters"":[
+               {
+                  ""name"":""id"",
+                  ""in"":""path"",
+                  ""description"":""Id of the foo resource"",
+                  ""required"":true,
+                  ""schema"":{
+                     ""type"":""integer"",
+                     ""format"":""int64""
+                  }
+               }
+            ],
             ""requestBody"":{
                ""content"":{
                   ""multipart/form-data"":{
@@ -37,33 +49,7 @@ public class MultiPartFormDataTests
             },
             ""responses"":{
                ""200"":{
-                  ""description"":""successful operation"",
-                  ""content"":{
-                     ""application/json"":{
-                        ""schema"":{
-                           ""$ref"":""#/components/schemas/ApiResponse""
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   },
-   ""components"":{
-      ""schemas"":{
-         ""ApiResponse"":{
-            ""type"":""object"",
-            ""properties"":{
-               ""code"":{
-                  ""type"":""integer"",
-                  ""format"":""int32""
-               },
-               ""type"":{
-                  ""type"":""string""
-               },
-               ""message"":{
-                  ""type"":""string""
+                  ""description"":""successful operation""
                }
             }
          }
