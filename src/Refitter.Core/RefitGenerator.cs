@@ -31,8 +31,10 @@ namespace Refitter.Core
         public string Generate()
         {
             var generator = factory.Create();
-            var contracts = generator.GenerateFile();
-            
+            var contracts = generator
+                .GenerateFile()
+                .Replace("System.Text.Json.Serialization.", string.Empty);
+
             var interfaceGenerator = new RefitInterfaceGenerator(settings, document, generator);
             var client = GenerateClient(interfaceGenerator);
 
