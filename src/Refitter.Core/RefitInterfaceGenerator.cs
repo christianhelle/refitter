@@ -51,10 +51,16 @@ public class RefitInterfaceGenerator
                 var name = generator.BaseSettings.OperationNameGenerator
                     .GetOperationName(document, kv.Key, verb, operation);
 
-                var parameters = ParameterExtractor.GetParameters(generator, operation, settings);
+                var operationModel = generator.CreateOperationModel(operation);
+                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
                 var parametersString = string.Join(", ", parameters);
 
                 GenerateMethodXmlDocComments(operation, code);
+
+                if (operationModel.Consumes.Contains("multipart/form-data"))
+                {
+                    code.AppendLine($"{Separator}{Separator}[Multipart]");
+                }
 
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
