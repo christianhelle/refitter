@@ -9,12 +9,14 @@ public static class RefitInterfaceImports
             ? string.Join(
                 Environment.NewLine,
                 "using Refit;",
+                "using System.Collections.Generic;",
+                "using System.Text.Json.Serialization;",
                 "using System.Threading;",
-                "using System.Threading.Tasks;",
-                "using System.Collections.Generic;")
+                "using System.Threading.Tasks;")
             : string.Join(
                 Environment.NewLine,
                 "using Refit;",
-                "using System.Threading.Tasks;",
-                "using System.Collections.Generic;");
+                "using System.Collections.Generic;",
+                "using System.Text.Json.Serialization;",
+                "using System.Threading.Tasks;");
 }
