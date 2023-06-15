@@ -24,6 +24,8 @@ public class RefitGeneratorSettings
     public TypeAccessibility TypeAccessibility { get; set; } = TypeAccessibility.Public;
 
     public bool UseCancellationTokens { get; set; }
+
+    public bool UseIsoDateFormat { get; set; }
 }
 
 [ExcludeFromCodeCoverage]
