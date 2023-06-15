@@ -56,11 +56,12 @@ public static class ParameterExtractor
         return parameters;
     }
 
-    private static string GetQueryAttribute(CSharpParameterModel p)
+    private static string GetQueryAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
     {
-        return p switch
+        return (parameter, settings) switch
         {
-            { IsArray: true } => "Query(CollectionFormat.Multi)",
+            { parameter.IsArray: true } => "Query(CollectionFormat.Multi)",
+            { parameter.IsDate: true, settings.UseIsoDateFormat: true } => "Query(Format = \"yyyy-MM-dd\")",
             _ => "Query",
         };
     }
