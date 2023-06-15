@@ -1,6 +1,8 @@
 using NSwag;
 using System;
 using System.Text;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Refitter.Core;
 
@@ -42,9 +44,10 @@ public class RefitInterfaceGenerator
             {
                 var operation = operations.Value;
 
-                var returnTypeParameter = operation.Responses.ContainsKey("200")
-                    ? generator.GetTypeName(operation.Responses["200"].ActualResponse.Schema, true, null)
-                    : null;
+                var returnTypeParameter = new[] { "200", "201", "203", "206" }
+                    .Where(code => operation.Responses.ContainsKey(code))
+                    .Select(code => generator.GetTypeName(operation.Responses[code].ActualResponse.Schema, true, null))
+                    .FirstOrDefault();
 
                 var returnType = GetReturnType(returnTypeParameter);
 
