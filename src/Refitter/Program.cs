@@ -80,6 +80,14 @@ app.Configure(
                     "./openapi.json",
                     "--no-operation-headers"
                 });
+
+        configuration
+            .AddExample(
+                new[]
+                {
+                    "./openapi.json",
+                    "--use-iso-date-format"
+                });
     });
 
 return app.Run(args);

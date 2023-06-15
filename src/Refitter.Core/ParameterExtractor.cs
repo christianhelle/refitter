@@ -20,7 +20,7 @@ public static class ParameterExtractor
 
         var queryParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p => $"{JoinAttributes(GetQueryAttribute(p), GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
+            .Select(p => $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
             .ToList();
 
         var bodyParameters = operationModel.Parameters
@@ -56,11 +56,12 @@ public static class ParameterExtractor
         return parameters;
     }
 
-    private static string GetQueryAttribute(CSharpParameterModel p)
+    private static string GetQueryAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
     {
-        return p switch
+        return (parameter, settings) switch
         {
-            { IsArray: true } => "Query(CollectionFormat.Multi)",
+            { parameter.IsArray: true } => "Query(CollectionFormat.Multi)",
+            { parameter.IsDate: true, settings.UseIsoDateFormat: true } => "Query(Format = \"yyyy-MM-dd\")",
             _ => "Query",
         };
     }

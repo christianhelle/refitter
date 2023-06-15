@@ -30,6 +30,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ReturnIApiResponse = settings.ReturnIApiResponse,
             UseCancellationTokens = settings.UseCancellationTokens,
             GenerateOperationHeaders = !settings.NoOperationHeaders,
+            UseIsoDateFormat = settings.UseIsoDateFormat,
             TypeAccessibility = settings.InternalTypeAccessibility
                 ? TypeAccessibility.Internal
                 : TypeAccessibility.Public

@@ -55,6 +55,7 @@ jobs:
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Internal" --output "Internal$outputPath" --internal --no-logging
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Interface" --output "I$outputPath" --interface-only --no-logging
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.UsingApiResponse" --output "IApi$outputPath" --interface-only --return-api-response --no-logging
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.UsingIsoDateFormat" --output "UsingIsoDateFormat$outputPath" --use-iso-date-format --no-logging
         Copy-Item $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
         Copy-Item $outputPath ./ConsoleApp/Net6/
         Copy-Item $outputPath ./ConsoleApp/Net7/
@@ -96,6 +97,14 @@ jobs:
         Copy-Item "WithCancellation$outputPath" ./ConsoleApp/Net481/
         Copy-Item "WithCancellation$outputPath" ./ConsoleApp/NetStandard20/
         Copy-Item "WithCancellation$outputPath" ./ConsoleApp/NetStandard21/
+        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net6/
+        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net7/
+        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net48/
+        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net472/
+        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net462/
+        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net481/
+        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/NetStandard20/
+        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/NetStandard21/
       working-directory: test
       shell: pwsh
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
