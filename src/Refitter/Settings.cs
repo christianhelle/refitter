@@ -53,4 +53,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--no-logging")]
     [DefaultValue(false)]
     public bool NoLogging { get; set; }
+
+    [Description("Explicitly format dates query strings parameters with ISO 8601 standard date format using delimiters (2023-06-15)")]
+    [CommandOption("--use-iso-date-format")]
+    [DefaultValue(false)]
+    public bool UseIsoDateFormat { get; set; }
 }
