@@ -2,7 +2,7 @@
 [![Smoke Tests](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml)
 [![NuGet](https://img.shields.io/nuget/v/refitter?color=blue)](http://www.nuget.org/packages/refitter)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -427,6 +427,7 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/hickeydamian/"><img src="https://avatars.githubusercontent.com/u/57436?v=4?s=100" width="100px;" alt="Damian Hickey"/><br /><sub><b>Damian Hickey</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adamianh" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/richardhu-lmg"><img src="https://avatars.githubusercontent.com/u/126430787?v=4?s=100" width="100px;" alt="richardhu-lmg"/><br /><sub><b>richardhu-lmg</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Arichardhu-lmg" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/brease-colin"><img src="https://avatars.githubusercontent.com/u/47358935?v=4?s=100" width="100px;" alt="brease-colin"/><br /><sub><b>brease-colin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abrease-colin" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/angelofb"><img src="https://avatars.githubusercontent.com/u/2032257?v=4?s=100" width="100px;" alt="angelofb"/><br /><sub><b>angelofb</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=angelofb" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
