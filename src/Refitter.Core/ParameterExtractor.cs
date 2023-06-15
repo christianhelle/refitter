@@ -58,12 +58,11 @@ public static class ParameterExtractor
 
     private static string GetQueryAttribute(CSharpParameterModel p)
     {
-        if (p.IsArray)
-            return "Query(CollectionFormat.Multi)";
-        else
+        return p switch
         {
-            return "Query";
-        }
+            { IsArray: true } => "Query(CollectionFormat.Multi)",
+            _ => "Query",
+        };
     }
 
     private static string GetAliasAsAttribute(CSharpParameterModel parameterModel) =>
