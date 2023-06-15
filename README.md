@@ -94,7 +94,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         /// Multiple status values can be provided with comma separated strings
         /// </summary>
         [Get("/pet/findByStatus")]
-        Task<ICollection<Pet>> FindPetsByStatus([Query(CollectionFormat.Multi)] Status? status);
+        Task<ICollection<Pet>> FindPetsByStatus([Query] Status? status);
 
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -109,13 +109,13 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         Task<Pet> GetPetById(long petId);
 
         [Post("/pet/{petId}")]
-        Task UpdatePetWithForm(long petId, [Query(CollectionFormat.Multi)] string name, [Query(CollectionFormat.Multi)] string status);
+        Task UpdatePetWithForm(long petId, [Query] string name, [Query] string status);
 
         [Delete("/pet/{petId}")]
         Task DeletePet(long petId, [Header("api_key")] string api_key);
 
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> UploadFile(long petId, [Query(CollectionFormat.Multi)] string additionalMetadata, [Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> body);
+        Task<ApiResponse> UploadFile(long petId, [Query] string additionalMetadata, StreamPart body);
 
         /// <summary>
         /// Returns a map of status codes to quantities
@@ -154,7 +154,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
         Task<User> CreateUsersWithListInput([Body] IEnumerable<User> body);
 
         [Get("/user/login")]
-        Task<string> LoginUser([Query(CollectionFormat.Multi)] string username, [Query(CollectionFormat.Multi)] string password);
+        Task<string> LoginUser([Query] string username, [Query] string password);
 
         [Get("/user/logout")]
         Task LogoutUser();
@@ -208,7 +208,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode.WithApiResponse
         /// Multiple status values can be provided with comma separated strings
         /// </summary>
         [Get("/pet/findByStatus")]
-        Task<IApiResponse<ICollection<Pet>>> FindPetsByStatus([Query(CollectionFormat.Multi)] Status? status);
+        Task<IApiResponse<ICollection<Pet>>> FindPetsByStatus([Query] Status? status);
 
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -223,13 +223,13 @@ namespace Your.Namespace.Of.Choice.GeneratedCode.WithApiResponse
         Task<IApiResponse<Pet>> GetPetById(long petId);
 
         [Post("/pet/{petId}")]
-        Task UpdatePetWithForm(long petId, [Query(CollectionFormat.Multi)] string name, [Query(CollectionFormat.Multi)] string status);
+        Task UpdatePetWithForm(long petId, [Query] string name, [Query] string status);
 
         [Delete("/pet/{petId}")]
-        Task DeletePet(long petId);
+        Task DeletePet(long petId, [Header("api_key")] string api_key);
 
         [Post("/pet/{petId}/uploadImage")]
-        Task<IApiResponse<ApiResponse>> UploadFile(long petId, [Query(CollectionFormat.Multi)] string additionalMetadata, [Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> body);
+        Task<IApiResponse<ApiResponse>> UploadFile(long petId, [Query] string additionalMetadata, StreamPart body);
 
         /// <summary>
         /// Returns a map of status codes to quantities
@@ -268,7 +268,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode.WithApiResponse
         Task<IApiResponse<User>> CreateUsersWithListInput([Body] IEnumerable<User> body);
 
         [Get("/user/login")]
-        Task<IApiResponse<string>> LoginUser([Query(CollectionFormat.Multi)] string username, [Query(CollectionFormat.Multi)] string password);
+        Task<IApiResponse<string>> LoginUser([Query] string username, [Query] string password);
 
         [Get("/user/logout")]
         Task LogoutUser();
