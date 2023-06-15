@@ -110,6 +110,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "angelofb",
+      "name": "angelofb",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2032257?v=4",
+      "profile": "https://github.com/angelofb",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
