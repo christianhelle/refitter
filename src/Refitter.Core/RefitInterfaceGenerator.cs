@@ -1,6 +1,6 @@
+using NSwag;
 using System;
 using System.Text;
-using NSwag;
 
 namespace Refitter.Core;
 
@@ -25,10 +25,12 @@ public class RefitInterfaceGenerator
 
     public string GenerateRefitInterface()
     {
-        var code = new StringBuilder();
-        code.AppendLine(GenerateInterfaceDeclaration());
-        code.AppendLine(GenerateInterfaceBody());
-        return code.ToString();
+        return $$"""
+                {{GenerateInterfaceDeclaration()}}
+                {{Separator}}{
+                {{GenerateInterfaceBody()}}
+                {{Separator}}}
+                """;
     }
 
     private string GenerateInterfaceBody()
@@ -68,7 +70,6 @@ public class RefitInterfaceGenerator
             }
         }
 
-        code.AppendLine($"{Separator}}}");
         return code.ToString();
     }
 
@@ -112,10 +113,7 @@ public class RefitInterfaceGenerator
               "ApiClient"
             : settings.Naming.InterfaceName;
 
-        var code = new StringBuilder();
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
-        code.AppendLine($"{Separator}{modifier} interface I{title.CapitalizeFirstCharacter()}")
-            .AppendLine($"{Separator}{{");
-        return code.ToString();
+        return $"{Separator}{modifier} interface I{title.CapitalizeFirstCharacter()}";
     }
 }
