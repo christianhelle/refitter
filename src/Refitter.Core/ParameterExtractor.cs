@@ -1,8 +1,8 @@
+using NSwag;
+using NSwag.CodeGeneration.CSharp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -20,7 +20,7 @@ public static class ParameterExtractor
 
         var queryParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p => $"{JoinAttributes("Query(CollectionFormat.Multi)", GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
+            .Select(p => $"{JoinAttributes(GetQueryAttribute(p), GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
             .ToList();
 
         var bodyParameters = operationModel.Parameters
@@ -54,6 +54,16 @@ public static class ParameterExtractor
             parameters.Add("CancellationToken cancellationToken = default");
 
         return parameters;
+    }
+
+    private static string GetQueryAttribute(CSharpParameterModel p)
+    {
+        if (p.IsArray)
+            return "Query(CollectionFormat.Multi)";
+        else
+        {
+            return "Query";
+        }
     }
 
     private static string GetAliasAsAttribute(CSharpParameterModel parameterModel) =>
