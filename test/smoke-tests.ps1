@@ -92,9 +92,19 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output I$outputPath --use-api-response --interface-only --no-logging"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only --no-logging"
                     $process = Start-Process "dotnet" `
                         -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only --no-logging" `
+                        -NoNewWindow `
+                        -PassThru
+                    $process | Wait-Process
+                    if ($process.ExitCode -ne 0) {
+                        throw "Refitter failed"
+                    }
+
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingIsoDateFormat --output UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging"
+                    $process = Start-Process "dotnet" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingIsoDateFormat --output UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -148,6 +158,15 @@ function RunTests {
                     Copy-Item "WithCancellation$outputPath" "./ConsoleApp/NetStandard20/" -Force
                     Copy-Item "WithCancellation$outputPath" "./ConsoleApp/NetStandard21/" -Force
                     Copy-Item "WithCancellation$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "UsingIsoDateFormat$outputPath" "./MinimalApi/" -Force
                     Remove-Item $outputPath -Force
                 }
             }
