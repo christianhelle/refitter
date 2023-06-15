@@ -20,7 +20,7 @@ public static class ParameterExtractor
 
         var queryParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p => $"{JoinAttributes(GetQueryAttribute(p), GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
+            .Select(p => $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
             .ToList();
 
         var bodyParameters = operationModel.Parameters
