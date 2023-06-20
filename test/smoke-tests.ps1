@@ -52,9 +52,9 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output $outputPath --no-logging"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output $outputPath --no-logging" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -62,9 +62,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Cancellation --output WithCancellation$outputPath --cancellation-tokens --no-logging"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Cancellation --output ./GeneratedCode/WithCancellation$outputPath --cancellation-tokens --no-logging"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Cancellation --output WithCancellation$outputPath --cancellation-tokens --no-logging" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Cancellation --output ./GeneratedCode/WithCancellation$outputPath --cancellation-tokens --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -72,9 +72,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output Internal$outputPath --internal --no-logging"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output Internal$outputPath --internal --no-logging" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -82,9 +82,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --interface-only --no-logging"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output I$outputPath --interface-only --no-logging" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -92,9 +92,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only --no-logging"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output ./GeneratedCode/IApi$outputPath --use-api-response --interface-only --no-logging"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only --no-logging" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output ./GeneratedCode/IApi$outputPath --use-api-response --interface-only --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -102,9 +102,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingIsoDateFormat --output UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging"
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingIsoDateFormat --output ./GeneratedCode/UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingIsoDateFormat --output UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingIsoDateFormat --output ./GeneratedCode/UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -112,62 +112,61 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Copy-Item $outputPath "./$version-$_-$format.cs"
-                    Copy-Item $outputPath "./ConsoleApp/Net7/" -Force
-                    Copy-Item $outputPath "./ConsoleApp/Net6/" -Force
-                    Copy-Item $outputPath "./ConsoleApp/Net48/" -Force
-                    Copy-Item $outputPath "./ConsoleApp/Net481/" -Force
-                    Copy-Item $outputPath "./ConsoleApp/Net472/" -Force
-                    Copy-Item $outputPath "./ConsoleApp/Net462/" -Force
-                    Copy-Item $outputPath "./ConsoleApp/NetStandard20/" -Force
-                    Copy-Item $outputPath "./ConsoleApp/NetStandard21/" -Force
-                    Copy-Item $outputPath "./MinimalApi/" -Force
-                    Copy-Item "I$outputPath" "./ConsoleApp/Net7/" -Force
-                    Copy-Item "I$outputPath" "./ConsoleApp/Net6/" -Force
-                    Copy-Item "I$outputPath" "./ConsoleApp/Net48/" -Force
-                    Copy-Item "I$outputPath" "./ConsoleApp/Net481/" -Force
-                    Copy-Item "I$outputPath" "./ConsoleApp/Net472/" -Force
-                    Copy-Item "I$outputPath" "./ConsoleApp/Net462/" -Force
-                    Copy-Item "I$outputPath" "./ConsoleApp/NetStandard20/" -Force
-                    Copy-Item "I$outputPath" "./ConsoleApp/NetStandard21/" -Force
-                    Copy-Item "I$outputPath" "./MinimalApi/" -Force
-                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net7/" -Force
-                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net6/" -Force
-                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net48/" -Force
-                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net481/" -Force
-                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net472/" -Force
-                    Copy-Item "IApi$outputPath" "./ConsoleApp/Net462/" -Force
-                    Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard20/" -Force
-                    Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard21/" -Force
-                    Copy-Item "IApi$outputPath" "./MinimalApi/" -Force
-                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net7/" -Force
-                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net6/" -Force
-                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net48/" -Force
-                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net481/" -Force
-                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net472/" -Force
-                    Copy-Item "Internal$outputPath" "./ConsoleApp/Net462/" -Force
-                    Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard20/" -Force
-                    Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard21/" -Force
-                    Copy-Item "Internal$outputPath" "./MinimalApi/" -Force
-                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net7/" -Force
-                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net6/" -Force
-                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net48/" -Force
-                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net481/" -Force
-                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net472/" -Force
-                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/Net462/" -Force
-                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/NetStandard20/" -Force
-                    Copy-Item "WithCancellation$outputPath" "./ConsoleApp/NetStandard21/" -Force
-                    Copy-Item "WithCancellation$outputPath" "./MinimalApi/" -Force
-                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net7/" -Force
-                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net6/" -Force
-                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net48/" -Force
-                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net481/" -Force
-                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net472/" -Force
-                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/Net462/" -Force
-                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/NetStandard20/" -Force
-                    Copy-Item "UsingIsoDateFormat$outputPath" "./ConsoleApp/NetStandard21/" -Force
-                    Copy-Item "UsingIsoDateFormat$outputPath" "./MinimalApi/" -Force
-                    Remove-Item $outputPath -Force
+                    Copy-Item "./GeneratedCode/$outputPath" "./$version-$_-$format.cs"
+                    Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "./GeneratedCode/$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "./GeneratedCode/I$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "./GeneratedCode/IApi$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "./GeneratedCode/Internal$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "./GeneratedCode/WithCancellation$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "./GeneratedCode/WithCancellation$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "./GeneratedCode/WithCancellation$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "./GeneratedCode/WithCancellation$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "./GeneratedCode/WithCancellation$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "./GeneratedCode/WithCancellation$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "./GeneratedCode/WithCancellation$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "./GeneratedCode/WithCancellation$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "./GeneratedCode/WithCancellation$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./MinimalApi/" -Force
                 }
             }
             
@@ -197,9 +196,9 @@ function RunTests {
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.cs"
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output $outputPath"
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath"
         $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output $outputPath" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -207,9 +206,9 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Internal --output Internal$outputPath --internal --no-logging"
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging"
         $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Internal --output Internal$outputPath --internal --no-logging" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -217,9 +216,9 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj """$_""" --namespace $namespace.Interface --output I$outputPath --interface-only --no-logging"
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj """$_""" --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging"
         $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Interface --output I$outputPath --interface-only --no-logging" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -227,9 +226,9 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output I$outputPath --use-api-response --interface-only --no-logging"
+        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output ./GeneratedCode/I$outputPath --use-api-response --interface-only --no-logging"
         $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output IApi$outputPath --use-api-response --interface-only --no-logging" `
+            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output ./GeneratedCode/IApi$outputPath --use-api-response --interface-only --no-logging" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -237,44 +236,43 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Copy-Item $outputPath "./$version-$_-$format.cs"
-        Copy-Item $outputPath "./ConsoleApp/Net7/" -Force
-        Copy-Item $outputPath "./ConsoleApp/Net6/" -Force
-        Copy-Item $outputPath "./ConsoleApp/Net48/" -Force
-        Copy-Item $outputPath "./ConsoleApp/Net481/" -Force
-        Copy-Item $outputPath "./ConsoleApp/Net472/" -Force
-        Copy-Item $outputPath "./ConsoleApp/Net462/" -Force
-        Copy-Item $outputPath "./ConsoleApp/NetStandard20/" -Force
-        Copy-Item $outputPath "./ConsoleApp/NetStandard21/" -Force
-        Copy-Item $outputPath "./MinimalApi/" -Force
-        Copy-Item "I$outputPath" "./ConsoleApp/Net7/" -Force
-        Copy-Item "I$outputPath" "./ConsoleApp/Net6/" -Force
-        Copy-Item "I$outputPath" "./ConsoleApp/Net48/" -Force
-        Copy-Item "I$outputPath" "./ConsoleApp/Net481/" -Force
-        Copy-Item "I$outputPath" "./ConsoleApp/Net472/" -Force
-        Copy-Item "I$outputPath" "./ConsoleApp/Net462/" -Force
-        Copy-Item "I$outputPath" "./ConsoleApp/NetStandard20/" -Force
-        Copy-Item "I$outputPath" "./ConsoleApp/NetStandard21/" -Force
-        Copy-Item "I$outputPath" "./MinimalApi/" -Force
-        Copy-Item "IApi$outputPath" "./ConsoleApp/Net7/" -Force
-        Copy-Item "IApi$outputPath" "./ConsoleApp/Net6/" -Force
-        Copy-Item "IApi$outputPath" "./ConsoleApp/Net48/" -Force
-        Copy-Item "IApi$outputPath" "./ConsoleApp/Net481/" -Force
-        Copy-Item "IApi$outputPath" "./ConsoleApp/Net472/" -Force
-        Copy-Item "IApi$outputPath" "./ConsoleApp/Net462/" -Force
-        Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard20/" -Force
-        Copy-Item "IApi$outputPath" "./ConsoleApp/NetStandard21/" -Force
-        Copy-Item "IApi$outputPath" "./MinimalApi/" -Force
-        Copy-Item "Internal$outputPath" "./ConsoleApp/Net7/" -Force
-        Copy-Item "Internal$outputPath" "./ConsoleApp/Net6/" -Force
-        Copy-Item "Internal$outputPath" "./ConsoleApp/Net48/" -Force
-        Copy-Item "Internal$outputPath" "./ConsoleApp/Net481/" -Force
-        Copy-Item "Internal$outputPath" "./ConsoleApp/Net472/" -Force
-        Copy-Item "Internal$outputPath" "./ConsoleApp/Net462/" -Force
-        Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard20/" -Force
-        Copy-Item "Internal$outputPath" "./ConsoleApp/NetStandard21/" -Force
-        Copy-Item "Internal$outputPath" "./MinimalApi/" -Force
-        Remove-Item $outputPath -Force
+        Copy-Item "./GeneratedCode/$outputPath" "./$version-$_-$format.cs"
+        Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net7/" -Force
+        Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net6/" -Force
+        Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net48/" -Force
+        Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net481/" -Force
+        Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net472/" -Force
+        Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net462/" -Force
+        Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/NetStandard20/" -Force
+        Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/NetStandard21/" -Force
+        Copy-Item "./GeneratedCode/$outputPath" "./MinimalApi/" -Force
+        Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net7/" -Force
+        Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net6/" -Force
+        Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net48/" -Force
+        Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net481/" -Force
+        Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net472/" -Force
+        Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/Net462/" -Force
+        Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/NetStandard20/" -Force
+        Copy-Item "./GeneratedCode/I$outputPath" "./ConsoleApp/NetStandard21/" -Force
+        Copy-Item "./GeneratedCode/I$outputPath" "./MinimalApi/" -Force
+        Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net7/" -Force
+        Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net6/" -Force
+        Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net48/" -Force
+        Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net481/" -Force
+        Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net472/" -Force
+        Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/Net462/" -Force
+        Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/NetStandard20/" -Force
+        Copy-Item "./GeneratedCode/IApi$outputPath" "./ConsoleApp/NetStandard21/" -Force
+        Copy-Item "./GeneratedCode/IApi$outputPath" "./MinimalApi/" -Force
+        Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net7/" -Force
+        Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net6/" -Force
+        Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net48/" -Force
+        Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net481/" -Force
+        Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net472/" -Force
+        Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/Net462/" -Force
+        Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/NetStandard20/" -Force
+        Copy-Item "./GeneratedCode/Internal$outputPath" "./ConsoleApp/NetStandard21/" -Force
+        Copy-Item "./GeneratedCode/Internal$outputPath" "./MinimalApi/" -Force
         
         Write-Host "`r`nBuilding ConsoleApp`r`n"
         $process = Start-Process "dotnet" `
