@@ -25,12 +25,12 @@ function RunTests {
 
     $filenames = @(
         "petstore-expanded",
-        # "petstore-minimal",
-        # "petstore-simple",
-        # "petstore-with-external-docs",
+        "petstore-minimal",
+        "petstore-simple",
+        "petstore-with-external-docs",
         "petstore",
         "ingram-micro",
-        # "api-with-examples",
+        "api-with-examples",
         "callback-example",
         "link-example",
         "uber",
@@ -236,7 +236,6 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Copy-Item "./GeneratedCode/$outputPath" "./$version-$_-$format.cs"
         Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net7/" -Force
         Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net6/" -Force
         Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net48/" -Force
