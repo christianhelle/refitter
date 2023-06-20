@@ -45,7 +45,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var code = generator.Generate().ReplaceLineEndings();
             AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
             
-            if (string.IsNullOrWhiteSpace(settings.OutputPath))
+            if (!string.IsNullOrWhiteSpace(settings.OutputPath))
             {
                 var directory = Path.GetDirectoryName(settings.OutputPath);
                 if (directory is not null && !Directory.Exists(directory))
