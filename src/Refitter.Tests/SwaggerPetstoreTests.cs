@@ -71,7 +71,7 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.Naming.UseOpenApiTitle = false;
         settings.Naming.InterfaceName = "SomeOtherName";
-        var generateCode = await GenerateCode(version, filename,settings);
+        var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().Contain("interface ISomeOtherName");
     }
 
@@ -150,8 +150,8 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", false)]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", false)]
     public async Task Can_Generate_Code_With_Correct_Usings(
-        SampleOpenSpecifications version, 
-        string filename, 
+        SampleOpenSpecifications version,
+        string filename,
         bool cancellationTokens)
     {
         var settings = new RefitGeneratorSettings();
@@ -233,6 +233,24 @@ public class SwaggerPetstoreTests
             .Should()
             .BeTrue();
     }
+
+#if !DEBUG
+    [Theory]
+    [InlineData("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
+    [InlineData("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.yaml")]
+    [InlineData("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
+    [InlineData("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.yaml")]
+    public async Task Can_Build_Generated_Code_From_Url(string url)
+    {
+        var settings = new RefitGeneratorSettings { OpenApiPath = url };
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generateCode = sut.Generate();
+        BuildHelper
+            .BuildCSharp(generateCode)
+            .Should()
+            .BeTrue();
+    }
+#endif
 
     private static async Task<string> GenerateCode(
         SampleOpenSpecifications version,
