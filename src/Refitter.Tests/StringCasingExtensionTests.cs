@@ -25,4 +25,9 @@ public class StringCasingExtensionTests
     [InlineData("foo/bar", "fooBar")]
     public void CanConvertRouteToCamelCase(string input, string expected)
         => input.ConvertRouteToCamelCase().Should().Be(expected);
+
+    [Theory]
+    [InlineData("foo bar", "FooBar")]
+    public void CanConvertSpacesToPascalCase(string input, string expected)
+        => input.ConvertSpacesToPascalCase().Should().Be(expected);
 }

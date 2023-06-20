@@ -35,7 +35,8 @@ public class OperationNameGenerator : IOperationNameGenerator
             .GetOperationName(document, path, httpMethod, operation)
             .CapitalizeFirstCharacter()
             .ConvertKebabCaseToPascalCase()
-            .ConvertRouteToCamelCase();
+            .ConvertRouteToCamelCase()
+            .ConvertSpacesToPascalCase();
 
     public bool CheckForDuplicateOperationIds(
         OpenApiDocument document)
