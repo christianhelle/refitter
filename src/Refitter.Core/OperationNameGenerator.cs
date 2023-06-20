@@ -1,6 +1,7 @@
 ﻿using NSwag;
 using NSwag.CodeGeneration.OperationNameGenerators;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Refitter.Core;
@@ -16,8 +17,10 @@ public class OperationNameGenerator : IOperationNameGenerator
             defaultGenerator = new MultipleClientsFromFirstTagAndPathSegmentsOperationNameGenerator();
     }
 
+    [ExcludeFromCodeCoverage]
     public bool SupportsMultipleClients => throw new System.NotImplementedException();
 
+    [ExcludeFromCodeCoverage]
     public string GetClientName(OpenApiDocument document, string path, string httpMethod, OpenApiOperation operation)
     {
         return defaultGenerator.GetClientName(document, path, httpMethod, operation);
