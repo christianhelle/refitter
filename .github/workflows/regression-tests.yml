@@ -7,7 +7,7 @@ on:
       - "**/*"
       - "!.github/workflows/regression-tests.yml"
     branches:
-      - "*"
+      - "main"
 
 jobs:
   template:
