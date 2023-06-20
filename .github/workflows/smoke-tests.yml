@@ -32,6 +32,7 @@ jobs:
           "uber",
           "uspto",
           "petstore",
+          "petstore-expanded",
           "ingram-micro"
         ]
     
