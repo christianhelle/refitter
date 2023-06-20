@@ -24,7 +24,7 @@ function RunTests {
     )
 
     $filenames = @(
-        # "petstore-expanded",
+        "petstore-expanded",
         # "petstore-minimal",
         # "petstore-simple",
         # "petstore-with-external-docs",
