@@ -27,7 +27,7 @@ jobs:
           "petstore-expanded",
           "petstore-minimal",
           "petstore-simple",
-          "petstore-with-external-docs"
+          "petstore-with-external-docs",
           "ingram-micro",
           "hubspot-events",
           "hubspot-webhooks"
