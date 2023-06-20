@@ -27,13 +27,19 @@ jobs:
         version: [v2.0, v3.0]
         os: [ubuntu-latest]
         openapi: [
+          "api-with-examples",
           "callback-example",
           "link-example",
           "uber",
           "uspto",
           "petstore",
           "petstore-expanded",
-          "ingram-micro"
+          "petstore-minimal",
+          "petstore-simple",
+          "petstore-with-external-docs"
+          "ingram-micro",
+          "hubspot-events",
+          "hubspot-webhooks"
         ]
     
     uses: ./.github/workflows/template.yml
