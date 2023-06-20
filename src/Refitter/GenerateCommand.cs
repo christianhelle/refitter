@@ -52,8 +52,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                     Directory.CreateDirectory(directory);
             }
             
-            AnsiConsole.MarkupLine($"[green]Output: {settings.OutputPath ?? "Output.cs"}{crlf}[/]");
-            await File.WriteAllTextAsync(settings.OutputPath ?? "Output.cs", code);
+            var outputPath = settings.OutputPath ?? "Output.cs";
+            AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}{crlf}[/]");
+            await File.WriteAllTextAsync(outputPath, code);
             
             await Analytics.LogFeatureUsage(settings);
             return 0;
