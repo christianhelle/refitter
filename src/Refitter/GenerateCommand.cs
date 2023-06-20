@@ -39,11 +39,22 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         var crlf = Environment.NewLine;
         try
         {
-            AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}{crlf}[/]");
+            AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
+            
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             var code = generator.Generate().ReplaceLineEndings();
+            AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
+            
+            if (settings.OutputPath is not null)
+            {
+                var directory = Path.GetDirectoryName(settings.OutputPath);
+                if (directory is not null && !Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+            }
+            
+            AnsiConsole.MarkupLine($"[green]Output: {settings.OutputPath ?? "Output.cs"}{crlf}[/]");
             await File.WriteAllTextAsync(settings.OutputPath ?? "Output.cs", code);
-            AnsiConsole.MarkupLine($"[green]Output: {code.Length} bytes[/]");
+            
             await Analytics.LogFeatureUsage(settings);
             return 0;
         }
