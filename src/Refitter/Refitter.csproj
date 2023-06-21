@@ -26,6 +26,7 @@
     <RootNamespace>Refitter</RootNamespace>
     <Nullable>enable</Nullable>
     <Title>Refitter</Title>
+    <IncludeSymbols>true</IncludeSymbols>
     <PackageTags>refit; rest; openapi</PackageTags>
   </PropertyGroup>
 
@@ -36,10 +37,15 @@
   <ItemGroup>
     <PackageReference Include="Exceptionless" Version="6.0.2" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.47.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
   </ItemGroup>
 
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />
-</ItemGroup>
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup> 
 
 </Project>
