@@ -33,29 +33,30 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             UseIsoDateFormat = settings.UseIsoDateFormat,
             TypeAccessibility = settings.InternalTypeAccessibility
                 ? TypeAccessibility.Internal
-                : TypeAccessibility.Public
+                : TypeAccessibility.Public,
+            AdditionalNamespaces = settings.AdditionalNamespaces!,
         };
 
         var crlf = Environment.NewLine;
         try
         {
             AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
-            
+
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             var code = generator.Generate().ReplaceLineEndings();
             AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
-            
+
             if (!string.IsNullOrWhiteSpace(settings.OutputPath))
             {
                 var directory = Path.GetDirectoryName(settings.OutputPath);
                 if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
             }
-            
+
             var outputPath = settings.OutputPath ?? "Output.cs";
             AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}{crlf}[/]");
             await File.WriteAllTextAsync(outputPath, code);
-            
+
             await Analytics.LogFeatureUsage(settings);
             return 0;
         }

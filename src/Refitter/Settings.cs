@@ -1,5 +1,5 @@
-using System.ComponentModel;
 using Spectre.Console.Cli;
+using System.ComponentModel;
 
 namespace Refitter;
 
@@ -58,4 +58,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--use-iso-date-format")]
     [DefaultValue(false)]
     public bool UseIsoDateFormat { get; set; }
+
+    [Description("Add additional namespace to generated types")]
+    [CommandOption("--additional-namespace")]
+    [DefaultValue(new string[0])]
+    public string[]? AdditionalNamespaces { get; set; }
 }
