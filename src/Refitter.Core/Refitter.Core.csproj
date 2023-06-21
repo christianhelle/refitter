@@ -30,4 +30,8 @@
       <PackageReference Include="NSwag.Core.Yaml" Version="13.19.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
 </Project>
