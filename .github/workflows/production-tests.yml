@@ -19,7 +19,21 @@ jobs:
         format: [json, yaml]
         version: [V2, V3]
         os: [macos-latest, windows-latest, ubuntu-latest]
-        openapi: ["callback-example", "link-example", "uber", "uspto", "petstore"]
+        openapi: [
+          "api-with-examples",
+          "callback-example",
+          "link-example",
+          "uber",
+          "uspto",
+          "petstore",
+          "petstore-expanded",
+          "petstore-minimal",
+          "petstore-simple",
+          "petstore-with-external-docs",
+          "ingram-micro",
+          "hubspot-events",
+          "hubspot-webhooks"
+        ]
     uses: ./.github/workflows/template.yml
     with:
       os: ${{ matrix.os }}
