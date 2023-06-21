@@ -55,6 +55,16 @@ public class RefitGenerator
         code.AppendLine(RefitInterfaceImports.GenerateNamespaceImports(settings))
             .AppendLine();
 
+        if (settings.AdditionalNamespaces.Any())
+        {
+            foreach (var ns in settings.AdditionalNamespaces)
+            {
+                code.AppendLine($"using {ns};");
+            }
+
+            code.AppendLine();
+        }
+
         code.AppendLine($$"""
             namespace {{settings.Namespace}}
             {

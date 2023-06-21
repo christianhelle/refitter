@@ -88,6 +88,16 @@ app.Configure(
                     "./openapi.json",
                     "--use-iso-date-format"
                 });
+        configuration
+            .AddExample(
+                new[]
+                {
+                     "./openapi.json",
+                     "--additional-namespace",
+                     "\"Your.Additional.Namespace\"",
+                     "--additional-namespace",
+                     "\"Your.Other.Additional.Namespace\"",
+                });
     });
 
 return app.Run(args);

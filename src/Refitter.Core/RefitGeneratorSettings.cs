@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Refitter.Core;
 
@@ -26,6 +27,8 @@ public class RefitGeneratorSettings
     public bool UseCancellationTokens { get; set; }
 
     public bool UseIsoDateFormat { get; set; }
+
+    public string[] AdditionalNamespaces { get; set; } = Array.Empty<string>();
 }
 
 [ExcludeFromCodeCoverage]
