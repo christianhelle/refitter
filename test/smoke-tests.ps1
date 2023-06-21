@@ -38,6 +38,17 @@ function RunTests {
         "hubspot-events",
         "hubspot-webhooks"
     )
+
+    $runtime = [System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier
+    $process = Start-Process "dotnet" `
+        -Args "publish ../src/Refitter/Refitter.csproj -r $runtime -c Release --self-contained" `
+        -NoNewWindow `
+        -PassThru
+    $process | Wait-Process
+    if ($process.ExitCode -ne 0) {
+        throw "Building refitter failed"
+    }
+
     "v2.0", "v3.0" | ForEach-Object {
         $version = $_
         "json", "yaml" | ForEach-Object {            
@@ -52,9 +63,9 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging"
-                    $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging" `
+                    Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging"
+                    $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+                        -Args "./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -62,9 +73,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Cancellation --output ./GeneratedCode/WithCancellation$outputPath --cancellation-tokens --no-logging"
-                    $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Cancellation --output ./GeneratedCode/WithCancellation$outputPath --cancellation-tokens --no-logging" `
+                    Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe ./openapi.$format --namespace $namespace.Cancellation --output ./GeneratedCode/WithCancellation$outputPath --cancellation-tokens --no-logging"
+                    $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+                        -Args "./openapi.$format --namespace $namespace.Cancellation --output ./GeneratedCode/WithCancellation$outputPath --cancellation-tokens --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -72,9 +83,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging"
-                    $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging" `
+                    Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe ./openapi.$format --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging"
+                    $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+                        -Args "./openapi.$format --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -82,9 +93,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging"
-                    $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging" `
+                    Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe ./openapi.$format --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging"
+                    $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+                        -Args "./openapi.$format --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -92,9 +103,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output ./GeneratedCode/IApi$outputPath --use-api-response --interface-only --no-logging"
-                    $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingApiResponse --output ./GeneratedCode/IApi$outputPath --use-api-response --interface-only --no-logging" `
+                    Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe ./openapi.$format --namespace $namespace.UsingApiResponse --output ./GeneratedCode/IApi$outputPath --use-api-response --interface-only --no-logging"
+                    $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+                        -Args "./openapi.$format --namespace $namespace.UsingApiResponse --output ./GeneratedCode/IApi$outputPath --use-api-response --interface-only --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -102,9 +113,9 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
-                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingIsoDateFormat --output ./GeneratedCode/UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging"
-                    $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.UsingIsoDateFormat --output ./GeneratedCode/UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging" `
+                    Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe ./openapi.$format --namespace $namespace.UsingIsoDateFormat --output ./GeneratedCode/UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging"
+                    $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+                        -Args "./openapi.$format --namespace $namespace.UsingIsoDateFormat --output ./GeneratedCode/UsingIsoDateFormat$outputPath --use-iso-date-format --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
@@ -196,9 +207,9 @@ function RunTests {
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.cs"
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath"
-        $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
+        Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath"
+        $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+            -Args """$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -206,9 +217,9 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging"
-        $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging" `
+        Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe ""$_"" --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging"
+        $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+            -Args """$_"" --namespace $namespace.Internal --output ./GeneratedCode/Internal$outputPath --internal --no-logging" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -216,9 +227,9 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj """$_""" --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging"
-        $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging" `
+        Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe """$_""" --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging"
+        $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+            -Args """$_"" --namespace $namespace.Interface --output ./GeneratedCode/I$outputPath --interface-only --no-logging" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
@@ -226,9 +237,9 @@ function RunTests {
             throw "Refitter failed"
         }
 
-        Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output ./GeneratedCode/I$outputPath --use-api-response --interface-only --no-logging"
-        $process = Start-Process "dotnet" `
-            -Args "run --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace.UsingApiResponse --output ./GeneratedCode/IApi$outputPath --use-api-response --interface-only --no-logging" `
+        Write-Host "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe ""$_"" --namespace $namespace.UsingApiResponse --output ./GeneratedCode/I$outputPath --use-api-response --interface-only --no-logging"
+        $process = Start-Process "../src/Refitter/bin/Release/net6.0/win-x64/refitter.exe" `
+            -Args """$_"" --namespace $namespace.UsingApiResponse --output ./GeneratedCode/IApi$outputPath --use-api-response --interface-only --no-logging" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
