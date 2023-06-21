@@ -20,6 +20,7 @@
       <EmbedUntrackedSources>true</EmbedUntrackedSources>
       <IsPackable>true</IsPackable>
       <TieredCompilation>true</TieredCompilation>
+      <PackageReadmeFile>README.md</PackageReadmeFile>
       <RootNamespace>Refitter.Core</RootNamespace>
       <Title>Refitter.Core</Title>
       <PackageTags>refit; rest; openapi</PackageTags>
