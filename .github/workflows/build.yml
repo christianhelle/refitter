@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test src/Refitter.sln --no-build --no-restore -c Release
     - name: Package
-      run: dotnet pack src/Refitter.sln --no-build --no-restore -c Release
+      run: dotnet pack src/Refitter.sln --no-build --no-restore -c Release --output .
     - name: Publish
       run: dotnet publish src/Refitter/Refitter.csproj --no-build --no-restore -c Release
     - name: Upload
