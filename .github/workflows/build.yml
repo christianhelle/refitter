@@ -19,7 +19,7 @@ env:
 
 jobs:
   build:
-    name: 🛠️ Building Refitter
+    name: 👌 Verify build
     runs-on: ubuntu-latest
     steps:
     - name: 🛒 Checkout repository
