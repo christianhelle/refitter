@@ -4,7 +4,7 @@ using NSwag.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 
-public class CSharpClientGeneratorFactory
+internal class CSharpClientGeneratorFactory
 {
     private readonly RefitGeneratorSettings settings;
     private readonly OpenApiDocument document;

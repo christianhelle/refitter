@@ -4,13 +4,13 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-public class CustomCSharpClientGenerator : CSharpClientGenerator
+internal class CustomCSharpClientGenerator : CSharpClientGenerator
 {
-    public CustomCSharpClientGenerator(OpenApiDocument document, CSharpClientGeneratorSettings settings)
+    internal CustomCSharpClientGenerator(OpenApiDocument document, CSharpClientGeneratorSettings settings)
         : base(document, settings)
     {
     }
 
-    public CSharpOperationModel CreateOperationModel(OpenApiOperation operation) =>
+    internal CSharpOperationModel CreateOperationModel(OpenApiOperation operation) =>
         CreateOperationModel(operation, Settings);
 }

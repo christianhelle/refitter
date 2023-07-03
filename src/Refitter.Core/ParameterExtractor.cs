@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Refitter.Core;
 
-public static class ParameterExtractor
+internal static class ParameterExtractor
 {
     public static IEnumerable<string> GetParameters(
         CSharpOperationModel operationModel,
