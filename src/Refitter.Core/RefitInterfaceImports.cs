@@ -1,10 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Refitter.Core;
 
 public static class RefitInterfaceImports
 {
-    public static string[] GetImportedNamespaces(RefitGeneratorSettings settings)=>
+    public static string[] GetImportedNamespaces(RefitGeneratorSettings settings) =>
         settings.UseCancellationTokens
             ? new[]
             {
@@ -21,7 +22,8 @@ public static class RefitInterfaceImports
                 "System.Text.Json.Serialization",
                 "System.Threading.Tasks"
             };
-    
+
+    [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "<Pending>")]
     public static string GenerateNamespaceImports(RefitGeneratorSettings settings) =>
         settings.UseCancellationTokens
             ? string.Join(
