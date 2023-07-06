@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refitter.Tests", "Refitter.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refitter.SourceGenerators", "Refitter.SourceGenerators\Refitter.SourceGenerators.csproj", "{7BE518F8-8842-4507-8127-25E99A7F41D0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refitter.SourceGenerators.Tests", "Refitter.SourceGenerators.Tests\Refitter.SourceGenerators.Tests.csproj", "{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{7BE518F8-8842-4507-8127-25E99A7F41D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BE518F8-8842-4507-8127-25E99A7F41D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BE518F8-8842-4507-8127-25E99A7F41D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
