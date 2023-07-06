@@ -23,7 +23,10 @@ public static class RefitInterfaceImports
                 "System.Threading.Tasks"
             };
 
-    [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "<Pending>")]
+    [SuppressMessage(
+        "MicrosoftCodeAnalysisCorrectness",
+        "RS1035:Do not use APIs banned for analyzers",
+        Justification = "This tool is cross platform")]
     public static string GenerateNamespaceImports(RefitGeneratorSettings settings) =>
         settings.UseCancellationTokens
             ? string.Join(
