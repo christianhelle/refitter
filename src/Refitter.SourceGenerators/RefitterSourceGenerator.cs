@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using Refitter.Core;
 
 namespace Refitter.SourceGenerators;
 
@@ -92,16 +89,12 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         }
     }
 
-    [SuppressMessage(
-        "MicrosoftCodeAnalysisCorrectness",
-        "RS1035:Do not use APIs banned for analyzers",
-        Justification = "<Pending>")]
     private static (RefitGeneratorSettings Settings, SourceText Source) GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
     {
         var content = file.GetText(cancellationToken)!;
-        var settings = JsonSerializer.Deserialize<RefitGeneratorSettings>(content.ToString())!;
+        var settings = JsonConvert.DeserializeObject<RefitGeneratorSettings>(content.ToString())!;
 
         if (!settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
             !File.Exists(settings.OpenApiPath))

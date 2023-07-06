@@ -34,10 +34,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Refitter.SourceGenerators\Refitter.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    </ItemGroup>
-
-    <ItemGroup>
       <AdditionalFiles Include="AdditionalFiles\SwaggerPetstore.refitter" />
     </ItemGroup>
 
