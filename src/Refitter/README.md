@@ -1,10 +1,3 @@
-[![Build](https://github.com/christianhelle/refitter/actions/workflows/build.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/build.yml)
-[![Smoke Tests](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml)
-[![NuGet](https://img.shields.io/nuget/v/refitter?color=blue)](http://www.nuget.org/packages/refitter)
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-
 # Refitter
 Refitter is a CLI tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications
 
@@ -53,7 +46,8 @@ OPTIONS:
         --cancellation-tokens                          Use cancellation tokens
         --no-operation-headers                         Don't generate operation headers
         --no-logging                                   Don't log errors or collect telemetry                                                                       
-        --use-iso-date-format                          Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)
+        --use-iso-date-format                          Explicitly format date query string parameters in ISO 8601   
+                                                       standard date format using delimiters (2023-06-15)
         --additional-namespace                         Add additional namespace to generated types
 ```
 
@@ -409,39 +403,6 @@ Returns a response that looks something like this:
 
 ## System requirements
 .NET 6.0 (LTS)
-
-## Contributors
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/neoGeneva"><img src="https://avatars.githubusercontent.com/u/804724?v=4?s=100" width="100px;" alt="Philip Cox"/><br /><sub><b>Philip Cox</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=neoGeneva" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://cam.macfar.land/"><img src="https://avatars.githubusercontent.com/u/1298847?v=4?s=100" width="100px;" alt="Cameron MacFarland"/><br /><sub><b>Cameron MacFarland</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=distantcam" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://kgame.tw"><img src="https://avatars.githubusercontent.com/u/3646532?v=4?s=100" width="100px;" alt="kgame"/><br /><sub><b>kgame</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=kgamecarter" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://yrki.no"><img src="https://avatars.githubusercontent.com/u/11573601?v=4?s=100" width="100px;" alt="Thomas Pettersen / Yrki"/><br /><sub><b>Thomas Pettersen / Yrki</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/1kvin"><img src="https://avatars.githubusercontent.com/u/46425980?v=4" width="100px;" alt="1kvin"/><br /><sub><b>1kvin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3A1kvin" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/m7clarke"><img src="https://avatars.githubusercontent.com/u/47439144?v=4?s=100" width="100px;" alt="m7clarke"/><br /><sub><b>m7clarke</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Am7clarke" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kirides"><img src="https://avatars.githubusercontent.com/u/13602143?v=4?s=100" width="100px;" alt="kirides"/><br /><sub><b>kirides</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Akirides" title="Bug reports">🐛</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/guillaumeserale"><img src="https://avatars.githubusercontent.com/u/6672406?v=4?s=100" width="100px;" alt="guillaumeserale"/><br /><sub><b>guillaumeserale</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=guillaumeserale" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Roflincopter"><img src="https://avatars.githubusercontent.com/u/1690243?v=4?s=100" width="100px;" alt="Dennis Brentjes"/><br /><sub><b>Dennis Brentjes</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=Roflincopter" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/hickeydamian/"><img src="https://avatars.githubusercontent.com/u/57436?v=4?s=100" width="100px;" alt="Damian Hickey"/><br /><sub><b>Damian Hickey</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adamianh" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/richardhu-lmg"><img src="https://avatars.githubusercontent.com/u/126430787?v=4?s=100" width="100px;" alt="richardhu-lmg"/><br /><sub><b>richardhu-lmg</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Arichardhu-lmg" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/brease-colin"><img src="https://avatars.githubusercontent.com/u/47358935?v=4?s=100" width="100px;" alt="brease-colin"/><br /><sub><b>brease-colin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abrease-colin" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/angelofb"><img src="https://avatars.githubusercontent.com/u/2032257?v=4?s=100" width="100px;" alt="angelofb"/><br /><sub><b>angelofb</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=angelofb" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/NoGRo"><img src="https://avatars.githubusercontent.com/u/5665273?v=4?s=100" width="100px;" alt="Dim Nogro"/><br /><sub><b>Dim Nogro</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=NoGRo" title="Code">💻</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 #
 

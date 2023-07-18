@@ -25,7 +25,7 @@ public class OpenApiUrlTests
         BuildHelper
             .BuildCSharp(generateCode)
             .Should()
-            .BeTrue();
+            .BeTrue(url);
     }
 
     [Theory]
@@ -42,7 +42,7 @@ public class OpenApiUrlTests
         BuildHelper
             .BuildCSharp(generateCode)
             .Should()
-            .BeTrue();
+            .BeTrue(url);
     }
 }
 #endif

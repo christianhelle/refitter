@@ -7,7 +7,7 @@ namespace Refitter;
 public static class SupportInformation
 {
     public static string GetSupportKey()
-        => GetAnonymousIdentity().Substring(0, 7);
+        => GetAnonymousIdentity()[..7];
 
     public static string GetAnonymousIdentity()
         => $"{Environment.UserName}@{GetMachineName()}".ToSha256();

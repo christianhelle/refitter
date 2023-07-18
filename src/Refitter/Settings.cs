@@ -54,13 +54,13 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool NoLogging { get; set; }
 
-    [Description("Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)")]
-    [CommandOption("--use-iso-date-format")]
-    [DefaultValue(false)]
-    public bool UseIsoDateFormat { get; set; }
-
     [Description("Add additional namespace to generated types")]
     [CommandOption("--additional-namespace")]
     [DefaultValue(new string[0])]
     public string[]? AdditionalNamespaces { get; set; }
+
+    [Description("Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)")]
+    [CommandOption("--use-iso-date-format")]
+    [DefaultValue(false)]
+    public bool UseIsoDateFormat { get; set; }
 }

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Refitter.Core;
 
-public class OperationNameGenerator : IOperationNameGenerator
+internal class OperationNameGenerator : IOperationNameGenerator
 {
     private readonly IOperationNameGenerator defaultGenerator =
         new MultipleClientsFromOperationIdOperationNameGenerator();

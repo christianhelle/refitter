@@ -2,11 +2,10 @@ using NSwag;
 using System;
 using System.Text;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace Refitter.Core;
 
-public class RefitInterfaceGenerator
+internal class RefitInterfaceGenerator
 {
     private const string Separator = "    ";
 
@@ -14,7 +13,7 @@ public class RefitInterfaceGenerator
     private readonly OpenApiDocument document;
     private readonly CustomCSharpClientGenerator generator;
 
-    public RefitInterfaceGenerator(
+    internal RefitInterfaceGenerator(
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator)

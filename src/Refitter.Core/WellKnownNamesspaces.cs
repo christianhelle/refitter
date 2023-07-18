@@ -2,7 +2,7 @@ using System;
 
 namespace Refitter.Core;
 
-public static class WellKnownNamesspaces
+internal static class WellKnownNamesspaces
 {
     private static readonly string[] wellKnownNamespaces = { "System.Collections.Generic" };
 

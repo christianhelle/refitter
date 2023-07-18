@@ -1,6 +1,7 @@
 using Refitter.Core;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using System.Diagnostics;
 
 namespace Refitter;
 
@@ -40,6 +41,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         var crlf = Environment.NewLine;
         try
         {
+            var stopwatch = Stopwatch.StartNew();
             AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
@@ -54,10 +56,11 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             }
 
             var outputPath = settings.OutputPath ?? "Output.cs";
-            AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}{crlf}[/]");
+            AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}[/]");
             await File.WriteAllTextAsync(outputPath, code);
-
             await Analytics.LogFeatureUsage(settings);
+
+            AnsiConsole.MarkupLine($"[green]Duration: {stopwatch.Elapsed}{crlf}[/]");
             return 0;
         }
         catch (Exception exception)

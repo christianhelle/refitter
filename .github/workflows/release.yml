@@ -7,11 +7,12 @@ on:
       - "release"
 
 env:
-  VERSION: 0.6.2
+  VERSION: 0.6.3
   NUGET_REPO_URL: "https://api.nuget.org/v3/index.json"
 
 jobs:
   CLI:
+    name: 🚚 Prepare new release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,9 +25,6 @@ jobs:
       - name: Update Version
         run: ((Get-Content -Path Refitter.Core.csproj -Raw) -Replace "1.0.0", "${{ env.VERSION }}") | Set-Content -Path Refitter.Core.csproj
         working-directory: src/Refitter.Core/
-        shell: pwsh
-      - name: Remove badges from README.md
-        run: (Get-Content .\README.md | Select-Object -Skip 4) | Set-Content README.md
         shell: pwsh
       - name: Build
         run: dotnet build -c Release /p:UseSourceLink=true src/Refitter.sln -p:PackageVersion="${{ env.VERSION }}"

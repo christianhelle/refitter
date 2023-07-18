@@ -22,9 +22,10 @@ jobs:
     timeout-minutes: 10
 
     steps:
-    - uses: actions/checkout@v2
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v2
 
-    - name: Generate code
+    - name: 🛠️ Generate code
       run: |        
         ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "Petstore" --output Output.cs --no-logging
         ${{ inputs.command }} "${{ inputs.openapi }}" --namespace "Petstore.Interface" --output IOutput.cs --interface-only --no-logging
@@ -44,34 +45,34 @@ jobs:
       working-directory: test
       shell: pwsh
 
-    - name: Build .NET 6 generated code
+    - name: 🛠️ Build .NET 6 generated code
       run: dotnet build ./ConsoleApp/Net6/Net6.csproj
       working-directory: test
 
-    - name: Build .NET 7 generated code
+    - name: 🛠️ Build .NET 7 generated code
       run: dotnet build ./ConsoleApp/Net7/Net7.csproj
       working-directory: test
 
-    - name: Build .NET 4.8.1 generated code
+    - name: 🛠️ Build .NET 4.8.1 generated code
       run: dotnet build ./ConsoleApp/Net481/Net481.csproj
       working-directory: test
 
-    - name: Build .NET 4.8 generated code
+    - name: 🛠️ Build .NET 4.8 generated code
       run: dotnet build ./ConsoleApp/Net48/Net48.csproj
       working-directory: test
 
-    - name: Build .NET 4.7.2 generated code
+    - name: 🛠️ Build .NET 4.7.2 generated code
       run: dotnet build ./ConsoleApp/Net472/Net472.csproj
       working-directory: test
 
-    - name: Build .NET 4.6.2 generated code
+    - name: 🛠️ Build .NET 4.6.2 generated code
       run: dotnet build ./ConsoleApp/Net462/Net462.csproj
       working-directory: test
 
-    - name: Build .NET Standard 2.0 generated code
+    - name: 🛠️ Build .NET Standard 2.0 generated code
       run: dotnet build ./ConsoleApp/NetStandard20/NetStandard20.csproj
       working-directory: test
 
-    - name: Build .NET Standard 2.1 generated code
+    - name: 🛠️ Build .NET Standard 2.1 generated code
       run: dotnet build ./ConsoleApp/NetStandard21/NetStandard21.csproj
       working-directory: test
