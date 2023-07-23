@@ -1,11 +1,18 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [0.6.3](https://github.com/christianhelle/refitter/tree/0.6.3) (2023-07-22)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.6.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.6.2...0.6.3)
+
+**Implemented enhancements:**
+
+- Add .editorconfig [\#85](https://github.com/christianhelle/refitter/pull/85) ([angelofb](https://github.com/angelofb))
+- General improvements on code, docs, and workflows [\#84](https://github.com/christianhelle/refitter/pull/84) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
+- Bump xunit from 2.4.2 to 2.5.0 [\#83](https://github.com/christianhelle/refitter/pull/83) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump xunit.runner.visualstudio from 2.4.5 to 2.5.0 [\#82](https://github.com/christianhelle/refitter/pull/82) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump Microsoft.NET.Test.Sdk from 17.6.2 to 17.6.3 [\#81](https://github.com/christianhelle/refitter/pull/81) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [0.6.2](https://github.com/christianhelle/refitter/tree/0.6.2) (2023-06-22)
