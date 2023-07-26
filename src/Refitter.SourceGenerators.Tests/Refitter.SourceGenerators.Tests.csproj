@@ -37,4 +37,8 @@
       <AdditionalFiles Include="AdditionalFiles\SwaggerPetstore.refitter" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Refitter.SourceGenerators\Refitter.SourceGenerators.csproj" OutputItemType="Analyzer" />
+    </ItemGroup>
+
 </Project>

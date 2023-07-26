@@ -1,4 +1,7 @@
 {
   "openApiPath": "../Resources/V3/SwaggerPetstore.json",
-  "OpenApiPath": "../Resources/V3/SwaggerPetstore.json"
+  "naming": {    
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstore"
+  }
 }
