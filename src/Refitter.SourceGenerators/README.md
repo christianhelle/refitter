@@ -2,7 +2,7 @@
 
 # Refitter Source Generator
 
-A Rosyln Source Generator that uses [Refitter](https://github.com/christianhelle/refitter) for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications
+A C# Source Generator that uses [Refitter](https://github.com/christianhelle/refitter) for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications
 
 ## Installation
 
