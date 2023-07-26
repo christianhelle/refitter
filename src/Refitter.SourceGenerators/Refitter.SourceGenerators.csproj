@@ -6,25 +6,32 @@
       <Nullable>enable</Nullable>
       <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
       <Authors>Christian Resma Helle</Authors>
-      <Product>Refitter Source Generators</Product>
-      <PackageId>Refitter.SourceGenerators</PackageId>
-      <AssemblyName>Refitter.SourceGenerators</AssemblyName>
+      <Product>Refitter Source Generator</Product>
+      <PackageId>Refitter.SourceGenerator</PackageId>
+      <AssemblyName>Refitter.SourceGenerator</AssemblyName>
+      <RootNamespace>Refitter.SourceGenerator</RootNamespace>
+      <Title>Refitter.SourceGenerator</Title>
       <Company>Christian Resma Helle</Company>
-      <Description>Core library used by the Refitter CLI tool for generating a C# REST API Client using the Refit library.</Description>
+      <Description>A Rosyln Source Generator that uses Refitter for generating a C# REST API Client using the Refit library</Description>
       <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
-      <PackageProjectUrl>https://github.com/christianhelle/refitter</PackageProjectUrl>
-      <RepositoryUrl>https://github.com/christianhelle/refitter</RepositoryUrl>
+      <PackageProjectUrl>https://github.com/christianhelle/refitter-sourcegenerator</PackageProjectUrl>
+      <RepositoryUrl>https://github.com/christianhelle/refitter-sourcegenerator</RepositoryUrl>
       <RepositoryType>git</RepositoryType>
       <PublishRepositoryUrl>true</PublishRepositoryUrl>
       <DebugType>embedded</DebugType>
       <EmbedUntrackedSources>true</EmbedUntrackedSources>
       <IsPackable>true</IsPackable>
       <TieredCompilation>true</TieredCompilation>
-      <RootNamespace>Refitter.SourceGenerators</RootNamespace>
-      <Title>Refitter.SourceGenerators</Title>
+      <PackageReadmeFile>README.md</PackageReadmeFile>
       <PackageTags>refit; rest; openapi</PackageTags>
+      <DevelopmentDependency>true</DevelopmentDependency>
+      <IncludeBuildOutput>false</IncludeBuildOutput>
       <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" PrivateAssets="all" />
