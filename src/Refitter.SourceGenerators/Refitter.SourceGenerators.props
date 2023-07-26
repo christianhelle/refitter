@@ -1,0 +1,7 @@
+<Project>
+
+  <ItemGroup>
+    <AdditionalFiles Include="**/*.refitter" />
+  </ItemGroup>
+
+</Project>
