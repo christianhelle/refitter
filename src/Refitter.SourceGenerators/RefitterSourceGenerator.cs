@@ -89,6 +89,10 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         }
     }
 
+    [SuppressMessage(
+        "MicrosoftCodeAnalysisCorrectness",
+        "RS1035:Do not use APIs banned for analyzers",
+        Justification = "By design")]
     private static (RefitGeneratorSettings Settings, SourceText Source) GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
