@@ -23,12 +23,9 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
 
         context.RegisterSourceOutput(
             sourceFiles,
-            (c, file) =>
-            {
-                c.AddSource(
-                    $"{file.Settings.Naming.InterfaceName}.refitter.g.cs",
-                    source: file.Source.ToString());
-            });
+            (c, file) => c.AddSource(
+                $"{file.Settings.Naming.InterfaceName}.refitter.g.cs",
+                source: file.Source.ToString()));
     }
 
     public void Initialize(GeneratorInitializationContext context)
