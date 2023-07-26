@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
       <LangVersion>latest</LangVersion>
       <Nullable>enable</Nullable>
-      <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
       <Authors>Christian Resma Helle</Authors>
       <Product>Refitter Source Generator</Product>
       <PackageId>Refitter.SourceGenerator</PackageId>
@@ -12,7 +12,7 @@
       <RootNamespace>Refitter.SourceGenerator</RootNamespace>
       <Title>Refitter.SourceGenerator</Title>
       <Company>Christian Resma Helle</Company>
-      <Description>A Rosyln Source Generator that uses Refitter for generating a C# REST API Client using the Refit library</Description>
+      <Description>A C# Source Generator that uses Refitter for generating a REST API Client using the Refit library</Description>
       <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
       <PackageProjectUrl>https://github.com/christianhelle/refitter-sourcegenerator</PackageProjectUrl>
       <RepositoryUrl>https://github.com/christianhelle/refitter-sourcegenerator</RepositoryUrl>
