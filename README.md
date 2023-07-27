@@ -9,8 +9,8 @@
 Refitter is a tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. 
 
 Refitter comes in 2 forms:
-- [.NET CLI Tool](#cli-tool) distributed via [nuget.org](http://www.nuget.org/packages/refitter)
-- [C# Source Generator](#source-generator) via the [Refitter.SourceGenerator nuget package]([nuget.org](http://www.nuget.org/packages/refitter.sourcegenerator))
+- A [.NET CLI Tool](#cli-tool) distributed via [nuget.org](http://www.nuget.org/packages/refitter) that outputs a C# file on disk
+- A [C# Source Generator](#source-generator) via the [Refitter.SourceGenerator nuget package]([nuget.org](http://www.nuget.org/packages/refitter.sourcegenerator)) that generates code on compile time based on a [.refitter](#.refitter-file-format) within the project directory
 
 ## CLI Tool
 
@@ -89,7 +89,7 @@ This source generator generates code based on any `.refitter` file included to t
 
 The generator can automatically detect all `.refitter` files inside the project that referenced the `Refitter.SourceGenerator` package and there is no need to include them manually as `AdditionalFiles`
 
-### File format
+### .Refitter File format
 
 The following is an example `.refitter` file
 
