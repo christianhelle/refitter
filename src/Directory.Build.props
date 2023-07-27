@@ -20,7 +20,6 @@
     <IsPackable>true</IsPackable>
     <TieredCompilation>true</TieredCompilation>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RootNamespace>Refitter</RootNamespace>
     <IncludeSymbols>true</IncludeSymbols>
     <PackageTags>refit; rest; openapi</PackageTags>
   </PropertyGroup>
