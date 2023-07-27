@@ -1,21 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework> 
-        <IsPackable>false</IsPackable>       
+        <TargetFramework>net6.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+        <RootNamespace>Refitter.SourceGenerators.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Resources\V2\SwaggerPetstoreWithDifferentHeaders.json" />
-      <None Remove="Resources\V2\SwaggerPetstoreWithDifferentHeaders.yaml" />
-      <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.json" />
-      <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.yaml" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
-        <PackageReference Include="xunit" Version="2.5.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+        <PackageReference Include="FluentAssertions" Version="6.11.0" />
+        <PackageReference Include="xunit" Version="2.4.2" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -37,11 +34,23 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
+      <AdditionalFiles Include="AdditionalFiles\SwaggerPetstore.refitter" />
     </ItemGroup>
 
-    <ItemGroup>        
-      <PackageReference Include="FluentAssertions" Version="6.11.0" />
+    <ItemGroup>
+      <ProjectReference Include="..\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" />
     </ItemGroup>
+
+    <Target Name="ExcludeSourceGeneratedFiles" BeforeTargets="CoreCompile">
+      <ItemGroup>
+        <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+      </ItemGroup>
+    </Target>
+
+    <Target Name="IncludeSourceGeneratedFiles" AfterTargets="CoreCompile">
+      <ItemGroup>
+        <Compile Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+      </ItemGroup>
+    </Target>
 
 </Project>
