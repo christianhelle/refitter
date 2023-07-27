@@ -27,9 +27,7 @@ jobs:
         working-directory: src/Refitter.Core/
         shell: pwsh
       - name: Build
-        run: dotnet build -c Release /p:UseSourceLink=true src/Refitter.sln -p:PackageVersion="${{ env.VERSION }}"
-      - name: Pack
-        run: dotnet pack --no-build -c Release /p:UseSourceLink=true src/Refitter.sln -p:PackageVersion="${{ env.VERSION }}"
+        run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}"
       - name: Push packages to NuGet
         run: dotnet nuget push **/*.nupkg -k ${{ secrets.NUGET_KEY }} -s ${{ env.NUGET_REPO_URL }} --no-symbols true --skip-duplicate
         continue-on-error: true
