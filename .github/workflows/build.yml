@@ -31,7 +31,7 @@ jobs:
     - name: 🗳️ Upload
       uses: actions/upload-artifact@v3
       with:
-        name: CLI Tool
+        name: Packages
         path: |
           **/*.nupkg
           README.md
