@@ -6,9 +6,10 @@ on:
       version:
         required: true
         type: string
-
-env:
-  NUGET_REPO_URL: "https://api.nuget.org/v3/index.json"
+      nuget_source:
+        required: false
+        type: string
+        default: "https://api.nuget.org/v3/index.json"
 
 jobs:
   CLI:
@@ -34,7 +35,7 @@ jobs:
           Get-ChildItem -Filter *.nupkg -Recurse | 
           ForEach-Object {              
               Write-Host "Pushing $_"
-              dotnet nuget push $_ -k ${{ secrets.NUGET_KEY }} -s ${{ env.NUGET_REPO_URL }} --no-symbols true --skip-duplicate 
+              dotnet nuget push $_ -k ${{ secrets.NUGET_KEY }} -s ${{ inputs.nuget_source }} --no-symbols true --skip-duplicate 
           }
         continue-on-error: true
       - name: Publish artifacts
