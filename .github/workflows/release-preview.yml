@@ -7,4 +7,4 @@ jobs:
   url:
     uses: ./.github/workflows/release-template.yml
     with:
-      version: 0.6.3.${{ github.run_number }}-preview
+      version: 0.7.0.${{ github.run_number }}-preview
