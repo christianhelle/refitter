@@ -29,7 +29,7 @@ jobs:
     - name: 🧪 Test
       run: dotnet test src/Refitter.sln --no-build --no-restore -c Release
     - name: 🗳️ Upload
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: CLI Tool
         path: |

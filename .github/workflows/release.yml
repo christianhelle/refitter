@@ -32,7 +32,7 @@ jobs:
         run: dotnet nuget push **/*.nupkg -k ${{ secrets.NUGET_KEY }} -s ${{ env.NUGET_REPO_URL }} --no-symbols true --skip-duplicate
         continue-on-error: true
       - name: Publish artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: CLI Tool
           path: |
