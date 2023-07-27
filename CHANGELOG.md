@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.0.26-preview](https://github.com/christianhelle/refitter/tree/0.7.0.26-preview) (2023-07-27)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.6.3...0.7.0.26-preview)
+
+**Implemented enhancements:**
+
+- Introduce C\# Source Generator and the .refitter file format [\#86](https://github.com/christianhelle/refitter/pull/86) ([christianhelle](https://github.com/christianhelle))
+
 ## [0.6.3](https://github.com/christianhelle/refitter/tree/0.6.3) (2023-07-22)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.6.2...0.6.3)
