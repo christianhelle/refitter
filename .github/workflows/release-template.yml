@@ -43,7 +43,7 @@ jobs:
         run: |
           Get-ChildItem -Filter *.nupkg -Recurse | 
           ForEach-Object {
-            dotnet nuget push $_ --api-key ${{ secrets.NUGET_KEY }} --source ${{ env.NUGET_REPO_URL }} --no-symbols true
+            dotnet nuget push $_ --api-key ${{ secrets.NUGET_KEY }} --source ${{ env.NUGET_REPO_URL }} --no-symbols
           }
       - name: Create tag
         uses: actions/github-script@v3
