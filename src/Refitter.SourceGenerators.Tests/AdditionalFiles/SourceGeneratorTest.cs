@@ -8,8 +8,8 @@ public class SourceGeneratorTest
 {
     [Fact]
     public void Should_Type_Exist() =>
-        typeof(GeneratedCode.ISwaggerPetstore)
+        typeof(ISwaggerPetstore)
             .Namespace
             .Should()
-            .Be("GeneratedCode");
+            .Be("Refitter.Tests.AdditionalFiles");
 }
