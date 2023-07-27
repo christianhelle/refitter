@@ -39,7 +39,12 @@ jobs:
             **/*.nupkg
             README.md
       - name: Push packages to NuGet
-        run: dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_KEY }} --source ${{ env.NUGET_REPO_URL }} --no-symbols true
+        shell: pwsh
+        run: |
+          Get-ChildItem -Filter *.nupkg -Recurse | 
+          ForEach-Object {
+            dotnet nuget push $_ --api-key ${{ secrets.NUGET_KEY }} --source ${{ env.NUGET_REPO_URL }} --no-symbols true
+          }
       - name: Create tag
         uses: actions/github-script@v3
         with:
