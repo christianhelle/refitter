@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+env:
+  NUGET_REPO_URL: "https://api.nuget.org/v3/index.json"
+
+jobs:
+  CLI:
+    name: 🚚 Prepare new release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Sets environment variables - branch-name
+        uses: nelonoel/branch-name@v1.0.1
+      - name: Sets environment variables - Nerdbank.GitVersioning
+        uses: dotnet/nbgv@master
+        with:
+          setAllVars: true
+      - name: Update Version
+        run: ((Get-Content -Path Refitter.Core.csproj -Raw) -Replace "1.0.0", "${{ inputs.version }}") | Set-Content -Path Refitter.Core.csproj
+        working-directory: src/Refitter.Core/
+        shell: pwsh
+      - name: Build
+        run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}"
+      - name: Push packages to NuGet
+        run: dotnet nuget push **/*.nupkg -k ${{ secrets.NUGET_KEY }} -s ${{ env.NUGET_REPO_URL }} --no-symbols true --skip-duplicate
+        continue-on-error: true
+      - name: Publish artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Packages
+          path: |
+            **/*.nupkg
+            README.md
+      - name: Create tag
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ inputs.version }}",
+              sha: context.sha
+            })
