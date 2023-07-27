@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refitter.Core", "Refitter.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refitter.Tests", "Refitter.Tests\Refitter.Tests.csproj", "{F49AB45B-01B1-4F21-B178-6BBEE1E5030E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refitter.SourceGenerators", "Refitter.SourceGenerators\Refitter.SourceGenerators.csproj", "{7BE518F8-8842-4507-8127-25E99A7F41D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refitter.SourceGenerator", "Refitter.SourceGenerator\Refitter.SourceGenerator.csproj", "{7BE518F8-8842-4507-8127-25E99A7F41D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refitter.SourceGenerators.Tests", "Refitter.SourceGenerators.Tests\Refitter.SourceGenerators.Tests.csproj", "{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refitter.SourceGenerator.Tests", "Refitter.SourceGenerator.Tests\Refitter.SourceGenerator.Tests.csproj", "{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

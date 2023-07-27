@@ -7,6 +7,7 @@
         <IsPackable>false</IsPackable>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+        <RootNamespace>Refitter.SourceGenerators.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -39,7 +40,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Refitter.SourceGenerators\Refitter.SourceGenerators.csproj" OutputItemType="Analyzer" />
+      <ProjectReference Include="..\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" />
     </ItemGroup>
 
     <Target Name="ExcludeSourceGeneratedFiles" BeforeTargets="CoreCompile">

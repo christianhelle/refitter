@@ -273,3 +273,4 @@ test/**/*Ingram-micro.cs
 test/**/*Hubspot*.cs
 *.lutconfig
 src/Refitter.SourceGenerators.Tests/Generated
+src/Refitter.SourceGenerator.Tests/Generated
