@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -40,5 +41,17 @@
     <ItemGroup>
       <ProjectReference Include="..\Refitter.SourceGenerators\Refitter.SourceGenerators.csproj" OutputItemType="Analyzer" />
     </ItemGroup>
+
+    <Target Name="ExcludeSourceGeneratedFiles" BeforeTargets="CoreCompile">
+      <ItemGroup>
+        <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+      </ItemGroup>
+    </Target>
+
+    <Target Name="IncludeSourceGeneratedFiles" AfterTargets="CoreCompile">
+      <ItemGroup>
+        <Compile Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+      </ItemGroup>
+    </Target>
 
 </Project>
