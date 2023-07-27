@@ -24,7 +24,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         context.RegisterSourceOutput(
             sourceFiles,
             (c, file) => c.AddSource(
-                $"{file.Settings.Naming.InterfaceName}.refitter.g.cs",
+                $"{file.Settings.Naming.InterfaceName}.cs",
                 source: file.Source.ToString()));
     }
 
@@ -62,7 +62,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         {
             var (settings, sourceText) = GenerateCode(file, context.CancellationToken);
 
-            context.AddSource($"{settings.Naming.InterfaceName}.refitter.g.cs", sourceText);
+            context.AddSource($"{settings.Naming.InterfaceName}.cs", sourceText);
             context.ReportDiagnostic(
                 Diagnostic.Create(
                     new DiagnosticDescriptor(
