@@ -6,9 +6,6 @@ on:
       version:
         required: true
         type: string
-      nuget_key:
-        required: true
-        type: string
       nuget_source:
         required: false
         type: string
@@ -38,7 +35,7 @@ jobs:
           Get-ChildItem -Filter *.nupkg -Recurse | 
           ForEach-Object {              
               Write-Host "Pushing $_"
-              dotnet nuget push $_ -k ${{ inputs.nuget_key }} -s ${{ inputs.nuget_source }} --no-symbols true --skip-duplicate 
+              dotnet nuget push $_ -k ${{ secrets.NUGET_KEY }} -s "${{ inputs.nuget_source }}" --no-symbols true --skip-duplicate 
           }
         continue-on-error: true
       - name: Publish artifacts

@@ -11,4 +11,3 @@ jobs:
     uses: ./.github/workflows/release-template.yml
     with:
       version: 0.7.0
-      nuget_key: ${{ secrets.NUGET_KEY }}
