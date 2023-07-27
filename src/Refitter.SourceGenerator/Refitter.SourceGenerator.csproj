@@ -14,7 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" PrivateAssets="all" />
     <PackageReference Include="H.Generators.Extensions" Version="1.15.1" PrivateAssets="all" />
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.19.0" PrivateAssets="all" />
@@ -27,9 +26,5 @@
     <None Include="$(AssemblyName).props" Pack="true" PackagePath="build" />
     <Compile Include="../Refitter.Core/*.cs" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
 
 </Project>
