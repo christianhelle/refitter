@@ -8,3 +8,4 @@ jobs:
     uses: ./.github/workflows/release-template.yml
     with:
       version: 0.7.0.${{ github.run_number }}-preview
+      nuget_key: ${{ secrets.NUGET_KEY }}
