@@ -1,0 +1,10 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  url:
+    uses: ./.github/workflows/release-template.yml
+    with:
+      version: 0.6.3.${{ github.run_number }}-preview
