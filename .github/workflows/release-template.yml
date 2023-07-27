@@ -28,11 +28,11 @@ jobs:
         shell: pwsh
       - name: Build
         run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}"
-      - name: Push packages to NuGet
+      - name: Move packages
         shell: pwsh
-        run: |
-          Get-ChildItem -Filter *.nupkg -Recurse | ForEach-Object { Move-Item -Path $_ -Destination . }
-          dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_KEY }} --source ${{ env.NUGET_REPO_URL }} --no-symbols true --skip-duplicate 
+        run: Get-ChildItem -Filter *.nupkg -Recurse | ForEach-Object { Move-Item -Path $_ -Destination . }
+      - name: Push packages to NuGet
+        run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_KEY }} --source ${{ env.NUGET_REPO_URL }} --no-symbols true --skip-duplicate 
       - name: Publish artifacts
         uses: actions/upload-artifact@v3
         with:
