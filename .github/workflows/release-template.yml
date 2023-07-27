@@ -29,7 +29,7 @@ jobs:
       - name: Build
         run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}"
       - name: Push packages to NuGet
-        run: dotnet nuget push **/*.nupkg -k ${{ secrets.NUGET_KEY }} -s ${{ env.NUGET_REPO_URL }} --no-symbols true --skip-duplicate
+        run: dotnet nuget push ./**/*.nupkg -k ${{ secrets.NUGET_KEY }} -s ${{ env.NUGET_REPO_URL }} --no-symbols true --skip-duplicate
         continue-on-error: true
       - name: Publish artifacts
         uses: actions/upload-artifact@v3
