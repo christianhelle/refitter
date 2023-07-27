@@ -93,7 +93,7 @@ The generator can automatically detect all `.refitter` files inside the project 
 
 The following is an example `.refitter` file
 
-```json
+```js
 {
   "openApiPath": "/path/to/your/openAPI", // Required
   "namespace": "Org.System.Service.Api.GeneratedCode", // Optional. Default=GeneratedCode
