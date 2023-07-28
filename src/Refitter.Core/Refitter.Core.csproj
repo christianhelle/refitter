@@ -16,8 +16,4 @@
     <PackageReference Include="NSwag.Core.Yaml" Version="13.19.0" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
-
 </Project>
