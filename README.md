@@ -150,6 +150,8 @@ $ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode"
 }
 ```
 
+**Output**
+
 ```cs
 using Refit;
 using System.Threading.Tasks;
@@ -275,6 +277,8 @@ $ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" -
   "returnIApiResponse": true
 }
 ```
+
+**Output**
 
 ```cs
 using Refit;
