@@ -12,7 +12,8 @@ on:
     - cron: '0 8 * * *'
 
 jobs:
-  template:
+
+  cli:
     strategy:
       fail-fast: false
       matrix:
@@ -41,3 +42,12 @@ jobs:
       version: ${{ matrix.version }}
       openapi: ${{ matrix.openapi }}
       command: 'dotnet tool install --global --prerelease refitter; refitter'
+
+  sourcegenerator:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]        
+    uses: ./.github/workflows/template-source-generator.yml
+    with:
+      os: ${{ matrix.os }}

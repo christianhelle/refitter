@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <LangVersion>latest</LangVersion>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="..\Program.cs">
+            <Link>Program.cs</Link>
+        </Compile>
+        <AdditionalFiles Include="..\*.refitter" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Refitter.SourceGenerator" Version="0.7.0.28-preview" />
+        <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+        <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
+    </ItemGroup>
+</Project>

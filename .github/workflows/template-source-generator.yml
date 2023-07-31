@@ -1,0 +1,24 @@
+name: Run Tests
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        type: string
+        default: ubuntu-latest
+
+jobs:
+  
+  test:
+
+    name: ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    timeout-minutes: 10
+
+    steps:
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v3
+
+    - name: 🛠️ Build SourceGenerator.sln
+      run: dotnet build
+      working-directory: test/SourceGenerator
