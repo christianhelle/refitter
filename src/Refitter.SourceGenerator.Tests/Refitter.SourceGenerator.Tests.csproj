@@ -34,7 +34,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="AdditionalFiles\SwaggerPetstore.refitter" />
+      <AdditionalFiles Include="AdditionalFiles\SwaggerPetstoreSingleInterface.refitter" />
+      <AdditionalFiles Include="AdditionalFiles\SwaggerPetstoreMultipleInterfaces.refitter" />
     </ItemGroup>
 
     <ItemGroup>
