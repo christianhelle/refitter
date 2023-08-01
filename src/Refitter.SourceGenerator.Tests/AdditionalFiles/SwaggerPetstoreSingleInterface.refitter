@@ -3,6 +3,7 @@
   "namespace": "Refitter.Tests.AdditionalFiles",
   "naming": {
     "useOpenApiTitle": false,
-    "interfaceName": "SwaggerPetstore"
+    "interfaceName": "SwaggerPetstore",
+    "filename": "SwaggerPetstore"
   }
 }
