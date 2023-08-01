@@ -2,5 +2,8 @@
   "openApiPath": "../Resources/V3/SwaggerPetstore.json",
   "namespace": "Refitter.Tests.AdditionalFiles",
   "generateContracts": false,
-  "multipleInterfaces": true
+  "multipleInterfaces": true,
+  "naming": {
+    "filename": "SwaggerPetstoreInterfaces"
+  }
 }
