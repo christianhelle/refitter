@@ -112,6 +112,16 @@ function RunTests {
                         throw "Refitter failed"
                     }
 
+                    Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.MultipleInterfaces --output ./GeneratedCode/MultipleInterfaces$outputPath --multiple-interfaces --no-logging"
+                    $process = Start-Process "dotnet" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.MultipleInterfaces --output ./GeneratedCode/MultipleInterfaces$outputPath --multiple-interfaces --no-logging" `
+                        -NoNewWindow `
+                        -PassThru
+                    $process | Wait-Process
+                    if ($process.ExitCode -ne 0) {
+                        throw "Refitter failed"
+                    }
+
                     Copy-Item "./GeneratedCode/$outputPath" "./$version-$_-$format.cs"
                     Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net7/" -Force
                     Copy-Item "./GeneratedCode/$outputPath" "./ConsoleApp/Net6/" -Force
@@ -167,6 +177,15 @@ function RunTests {
                     Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/NetStandard20/" -Force
                     Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./ConsoleApp/NetStandard21/" -Force
                     Copy-Item "./GeneratedCode/UsingIsoDateFormat$outputPath" "./MinimalApi/" -Force
+                    Copy-Item "./GeneratedCode/MultipleInterfaces$outputPath" "./ConsoleApp/Net7/" -Force
+                    Copy-Item "./GeneratedCode/MultipleInterfaces$outputPath" "./ConsoleApp/Net6/" -Force
+                    Copy-Item "./GeneratedCode/MultipleInterfaces$outputPath" "./ConsoleApp/Net48/" -Force
+                    Copy-Item "./GeneratedCode/MultipleInterfaces$outputPath" "./ConsoleApp/Net481/" -Force
+                    Copy-Item "./GeneratedCode/MultipleInterfaces$outputPath" "./ConsoleApp/Net472/" -Force
+                    Copy-Item "./GeneratedCode/MultipleInterfaces$outputPath" "./ConsoleApp/Net462/" -Force
+                    Copy-Item "./GeneratedCode/MultipleInterfaces$outputPath" "./ConsoleApp/NetStandard20/" -Force
+                    Copy-Item "./GeneratedCode/MultipleInterfaces$outputPath" "./ConsoleApp/NetStandard21/" -Force
+                    Copy-Item "./GeneratedCode/MultipleInterfaces$outputPath" "./MinimalApi/" -Force
                 }
             }
             

@@ -24,7 +24,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         context.RegisterSourceOutput(
             sourceFiles,
             (c, file) => c.AddSource(
-                $"{file.Settings.Naming.InterfaceName}.cs",
+                GetOutputFilename(file.Settings),
                 source: file.Source.ToString()));
     }
 
@@ -62,7 +62,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         {
             var (settings, sourceText) = GenerateCode(file, context.CancellationToken);
 
-            context.AddSource($"{settings.Naming.InterfaceName}.cs", sourceText);
+            context.AddSource(GetOutputFilename(settings), sourceText);
             context.ReportDiagnostic(
                 Diagnostic.Create(
                     new DiagnosticDescriptor(
@@ -79,7 +79,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
             context.ReportDiagnostic(
                 Diagnostic.Create(
                     new DiagnosticDescriptor(
-                        "REFITTER002",
+                        "REFITTER000",
                         "Refitter failed to generate code",
                         e.ToString(),
                         "Refitter",
@@ -88,6 +88,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
                     Location.None));
         }
     }
+
+    private static string GetOutputFilename(RefitGeneratorSettings settings) => $"{settings.Naming.Filename}.cs";
 
     [SuppressMessage(
         "MicrosoftCodeAnalysisCorrectness",
@@ -98,7 +100,18 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         CancellationToken cancellationToken = default)
     {
         var content = file.GetText(cancellationToken)!;
-        var settings = JsonConvert.DeserializeObject<RefitGeneratorSettings>(content.ToString())!;
+        var json = content.ToString();
+        var settings = JsonConvert.DeserializeObject<RefitGeneratorSettings>(json)!;
+        
+        Diagnostic.Create(
+            new DiagnosticDescriptor(
+                "REFITTER001",
+                "Refitter File Contents",
+                json,
+                "Refitter",
+                DiagnosticSeverity.Warning,
+                true),
+            Location.None);
 
         if (!settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
             !File.Exists(settings.OpenApiPath))

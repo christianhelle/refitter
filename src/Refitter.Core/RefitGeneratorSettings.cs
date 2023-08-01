@@ -89,8 +89,19 @@ public class RefitGeneratorSettings
     [JsonProperty("useIsoDateFormat")]
     public bool UseIsoDateFormat { get; set; }
 
+    /// <summary>
+    /// Add additional namespace to generated types
+    /// </summary>
+    [JsonPropertyName("additionalNamespaces")]
     [JsonProperty("additionalNamespaces")]
     public string[] AdditionalNamespaces { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Set to <c>true</c> to Generate a Refit interface for each endpoint
+    /// </summary>
+    [JsonPropertyName("multipleInterfaces")]
+    [JsonProperty("multipleInterfaces")]
+    public bool MultipleInterfaces { get; set; }
 }
 
 /// <summary>
@@ -112,6 +123,13 @@ public class NamingSettings
     [JsonPropertyName("interfaceName")]
     [JsonProperty("interfaceName")]
     public string InterfaceName { get; set; } = "ApiClient";
+
+    /// <summary>
+    /// Gets or sets the name of the output file. Default is "ApiClient".
+    /// </summary>
+    [JsonPropertyName("filename")]
+    [JsonProperty("filename")]
+    public string Filename { get; set; } = "ApiClient";
 }
 
 /// <summary>

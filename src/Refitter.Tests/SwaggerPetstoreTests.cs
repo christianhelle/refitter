@@ -186,7 +186,6 @@ public class SwaggerPetstoreTests
         generateCode.Should().Contain("[Header(\"api_key\")] string api_key");
     }
 
-
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -198,6 +197,19 @@ public class SwaggerPetstoreTests
         settings.GenerateOperationHeaders = false;
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotContain("[Header(\"api_key\")] string api_key");
+    }
+
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_Multiple_Interfaces(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.MultipleInterfaces = true;
+        var generateCode = await GenerateCode(version, filename, settings);
     }
 
     [Theory]
@@ -227,6 +239,24 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.ReturnIApiResponse = true;
+        var generateCode = await GenerateCode(version, filename, settings);
+        BuildHelper
+            .BuildCSharp(generateCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+#if !DEBUG
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+#endif
+    public async Task Can_Build_Generated_Code_With_Multiple_Interfaces(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.MultipleInterfaces = true;
         var generateCode = await GenerateCode(version, filename, settings);
         BuildHelper
             .BuildCSharp(generateCode)
