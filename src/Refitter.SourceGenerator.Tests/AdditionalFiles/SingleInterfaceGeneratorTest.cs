@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Refitter.Tests.AdditionalFiles;
 
-public class SourceGeneratorTest
+public class SingleInterfaceGeneratorTest
 {
     [Fact]
     public void Should_Type_Exist() =>
