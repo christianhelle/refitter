@@ -64,7 +64,7 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool UseIsoDateFormat { get; set; }
 
-    [Description("Generate an interface for each endpoint")]
+    [Description("Generate a Refit interface for each endpoint")]
     [CommandOption("--multiple-interfaces")]
     [DefaultValue(false)]
     public bool MultipleInterfaces { get; set; }

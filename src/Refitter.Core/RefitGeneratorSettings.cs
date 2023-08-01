@@ -97,7 +97,7 @@ public class RefitGeneratorSettings
     public string[] AdditionalNamespaces { get; set; } = Array.Empty<string>();
 
     /// <summary>
-    /// Set to <c>true</c> to generate an interface for each endpoint
+    /// Set to <c>true</c> to Generate a Refit interface for each endpoint
     /// </summary>
     [JsonPropertyName("multipleInterfaces")]
     [JsonProperty("multipleInterfaces")]
