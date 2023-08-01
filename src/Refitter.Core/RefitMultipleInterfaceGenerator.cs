@@ -1,6 +1,7 @@
 using System.Text;
 
 using NSwag;
+using NSwag.CodeGeneration.OperationNameGenerators;
 
 namespace Refitter.Core;
 
@@ -41,12 +42,9 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
 
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
-                var name = generator.BaseSettings.OperationNameGenerator
-                    .GetOperationName(document, kv.Key, verb, operation);
-
                 GenerateInterfaceXmlDocComments(operation, code);
                 code.AppendLine($$"""
-                                  {{GenerateInterfaceDeclaration(name)}}
+                                  {{GenerateInterfaceDeclaration(GetInterfaceName(kv, verb, operation, code))}}
                                   {{Separator}}{
                                   """);
 
@@ -69,6 +67,29 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         return code.ToString();
+    }
+
+    private string GetInterfaceName(
+        KeyValuePair<string, OpenApiPathItem> kv,
+        string verb,
+        OpenApiOperation operation,
+        StringBuilder stringBuilder)
+    {
+        var name = generator
+            .BaseSettings
+            .OperationNameGenerator
+            .GetOperationName(document, kv.Key, verb, operation);
+
+        if (stringBuilder.ToString().Contains($"interface I{name}"))
+        {
+            var counter = 2;
+            while (stringBuilder.ToString().Contains($"interface I{name}{counter}"))
+                counter++;
+
+            name = $"{name}{counter}";
+        }
+        
+        return name;
     }
 
     private string GetReturnType(string? returnTypeParameter)
@@ -118,6 +139,6 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
     private string GenerateInterfaceDeclaration(string name)
     {
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
-        return $"{Separator}{modifier} interface I{name.CapitalizeFirstCharacter()}";
+        return $"{Separator}{modifier} interface I{name.CapitalizeFirstCharacter()}Endpoint";
     }
 }
