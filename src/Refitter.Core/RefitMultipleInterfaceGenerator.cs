@@ -73,23 +73,26 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
         KeyValuePair<string, OpenApiPathItem> kv,
         string verb,
         OpenApiOperation operation,
-        StringBuilder stringBuilder)
+        StringBuilder stringBuilder) =>
+        SuffixDuplicateNameWithCounter(
+            stringBuilder,
+            generator
+                .BaseSettings
+                .OperationNameGenerator
+                .GetOperationName(document, kv.Key, verb, operation));
+
+    private static string SuffixDuplicateNameWithCounter(StringBuilder stringBuilder, string name)
     {
-        var name = generator
-            .BaseSettings
-            .OperationNameGenerator
-            .GetOperationName(document, kv.Key, verb, operation);
-
-        if (stringBuilder.ToString().Contains($"interface I{name}"))
+        if (!stringBuilder.ToString().Contains($"interface I{name}"))
         {
-            var counter = 2;
-            while (stringBuilder.ToString().Contains($"interface I{name}{counter}"))
-                counter++;
-
-            name = $"{name}{counter}";
+            return name;
         }
-        
-        return name;
+
+        var counter = 2;
+        while (stringBuilder.ToString().Contains($"interface I{name}{counter}"))
+            counter++;
+
+        return $"{name}{counter}";
     }
 
     private string GetReturnType(string? returnTypeParameter)
