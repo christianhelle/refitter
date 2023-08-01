@@ -1,11 +1,10 @@
 using NSwag;
-using System;
+
 using System.Text;
-using System.Linq;
 
 namespace Refitter.Core;
 
-internal class RefitInterfaceGenerator
+internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 {
     private const string Separator = "    ";
 
@@ -24,7 +23,7 @@ internal class RefitInterfaceGenerator
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document);
     }
 
-    public string GenerateRefitInterface()
+    public string GenerateCode()
     {
         return $$"""
                 {{GenerateInterfaceDeclaration()}}

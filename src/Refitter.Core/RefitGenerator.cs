@@ -85,7 +85,7 @@ public class RefitGenerator
         code.AppendLine($$"""
             namespace {{settings.Namespace}}
             {
-            {{interfaceGenerator.GenerateRefitInterface()}}
+            {{interfaceGenerator.GenerateCode()}}
             }
             """);
 
