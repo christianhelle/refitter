@@ -89,8 +89,19 @@ public class RefitGeneratorSettings
     [JsonProperty("useIsoDateFormat")]
     public bool UseIsoDateFormat { get; set; }
 
+    /// <summary>
+    /// Add additional namespace to generated types
+    /// </summary>
+    [JsonPropertyName("additionalNamespaces")]
     [JsonProperty("additionalNamespaces")]
     public string[] AdditionalNamespaces { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Set to <c>true</c> to generate an interface for each endpoint
+    /// </summary>
+    [JsonPropertyName("multipleInterfaces")]
+    [JsonProperty("multipleInterfaces")]
+    public bool UseMultipleInterfaces { get; set; }
 }
 
 /// <summary>
