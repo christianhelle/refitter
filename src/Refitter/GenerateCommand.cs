@@ -36,6 +36,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 ? TypeAccessibility.Internal
                 : TypeAccessibility.Public,
             AdditionalNamespaces = settings.AdditionalNamespaces!,
+            MultipleInterfaces = settings.MultipleInterfaces,
         };
 
         var crlf = Environment.NewLine;

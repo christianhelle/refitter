@@ -49,7 +49,7 @@ public class RefitGenerator
                 generator.GenerateFile(),
                 (current, import) => current.Replace($"{import}.", string.Empty));
 
-        IRefitInterfaceGenerator interfaceGenerator = settings.UseMultipleInterfaces
+        IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces
             ? new RefitMultipleInterfaceGenerator(settings, document, generator)
             : new RefitInterfaceGenerator(settings, document, generator);
 

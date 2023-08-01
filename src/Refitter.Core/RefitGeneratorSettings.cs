@@ -101,7 +101,7 @@ public class RefitGeneratorSettings
     /// </summary>
     [JsonPropertyName("multipleInterfaces")]
     [JsonProperty("multipleInterfaces")]
-    public bool UseMultipleInterfaces { get; set; }
+    public bool MultipleInterfaces { get; set; }
 }
 
 /// <summary>
