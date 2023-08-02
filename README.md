@@ -10,7 +10,7 @@ Refitter is a tool for generating a C# REST API Client using the [Refit](https:/
 
 Refitter comes in 2 forms:
 - A [.NET CLI Tool](#cli-tool) distributed via [nuget.org](http://www.nuget.org/packages/refitter) that outputs a single C# file on disk
-- A [C# Source Generator](#source-generator) via the [Refitter.SourceGenerator]([nuget.org](http://www.nuget.org/packages/refitter.sourcegenerator)) package that generates code on compile time based on a [.refitter](#.refitter-file-format) within the project directory
+- A [C# Source Generator](#source-generator) via the [Refitter.SourceGenerator](http://www.nuget.org/packages/refitter.sourcegenerator) package that generates code on compile time based on a [.refitter](#.refitter-file-format) within the project directory
 
 ## CLI Tool
 
