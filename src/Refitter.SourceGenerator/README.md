@@ -24,8 +24,7 @@ The generator can automatically detect all `.refitter` files inside the project 
   "namespace": "Org.System.Service.Api.GeneratedCode", // Optional. Default=GeneratedCode
   "naming": {
     "useOpenApiTitle": false, // Optional. Default=true
-    "interfaceName": "MyApiClient", // Optional. Default=ApiClient
-    "filename": "RefitInterfaces" // Optional. Default=ApiClient
+    "interfaceName": "MyApiClient" // Optional. Default=ApiClient
   },
   "generateContracts": true, // Optional. Default=true
   "generateXmlDocCodeComments": true, // Optional. Default=true
