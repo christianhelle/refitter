@@ -131,7 +131,7 @@ The following is an example `.refitter` file
 - `typeAccessibility` - the generated type accessibility. Possible values are `Public` and `Internal`. Default is `Public`
 - `useCancellationTokens` - Use cancellation tokens in the generated methods. Default is `false`
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
-- `multipleInterfaces` - Set to `true` to generate an interfaces for each endpoint. Default is `false`
+- `multipleInterfaces` - Set to `true` to generate an interface for each endpoint. Default is `false`
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 
 
