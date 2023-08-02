@@ -1,6 +1,10 @@
 {
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
-  "namespace": "Petstore",
-  "generateContracts": false,
-  "multipleInterfaces": true
+  "namespace": "Petstore.Interfaces",
+  "multipleInterfaces": true,
+  "naming": {    
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstoreInterfaces",
+    "filename": "SwaggerPetstoreInterfaces"
+  }
 }

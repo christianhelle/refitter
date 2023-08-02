@@ -3,6 +3,7 @@
   "namespace": "Petstore",
   "naming": {    
     "useOpenApiTitle": false,
-    "interfaceName": "SwaggerPetstoreDirect"
+    "interfaceName": "SwaggerPetstoreDirect",
+    "filename": "SwaggerPetstoreDirect"
   }
 }

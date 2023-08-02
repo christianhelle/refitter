@@ -4,6 +4,7 @@
   "returnIApiResponse": true,
   "naming": {    
     "useOpenApiTitle": false,
-    "interfaceName": "SwaggerPetstoreApiResponse"
+    "interfaceName": "SwaggerPetstoreApiResponse",
+    "filename": "SwaggerPetstoreApiResponse"
   }
 }
