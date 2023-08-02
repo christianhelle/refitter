@@ -123,13 +123,6 @@ public class NamingSettings
     [JsonPropertyName("interfaceName")]
     [JsonProperty("interfaceName")]
     public string InterfaceName { get; set; } = "ApiClient";
-
-    /// <summary>
-    /// Gets or sets the name of the output file. Default is "ApiClient".
-    /// </summary>
-    [JsonPropertyName("filename")]
-    [JsonProperty("filename")]
-    public string Filename { get; set; } = "ApiClient";
 }
 
 /// <summary>

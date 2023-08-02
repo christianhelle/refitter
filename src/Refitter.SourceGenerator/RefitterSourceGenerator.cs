@@ -1,9 +1,6 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using System.Threading;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Newtonsoft.Json;
@@ -24,7 +21,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         context.RegisterSourceOutput(
             sourceFiles,
             (c, file) => c.AddSource(
-                GetOutputFilename(file.Settings),
+                file.Filename,
                 source: file.Source.ToString()));
     }
 
@@ -60,9 +57,9 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
     {
         try
         {
-            var (settings, sourceText) = GenerateCode(file, context.CancellationToken);
+            var (sourceText, filename) = GenerateCode(file, context.CancellationToken);
 
-            context.AddSource(GetOutputFilename(settings), sourceText);
+            context.AddSource(filename, sourceText);
             context.ReportDiagnostic(
                 Diagnostic.Create(
                     new DiagnosticDescriptor(
@@ -89,16 +86,25 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         }
     }
 
-    private static string GetOutputFilename(RefitGeneratorSettings settings) => $"{settings.Naming.Filename}.cs";
-
     [SuppressMessage(
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
         Justification = "By design")]
-    private static (RefitGeneratorSettings Settings, SourceText Source) GenerateCode(
+    private static (SourceText Source, string Filename) GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
     {
+        Diagnostic.Create(
+            new DiagnosticDescriptor(
+                "REFITTER001",
+                "Refitter",
+                $"Found .refitter File: {file.Path}",
+                "Refitter",
+                DiagnosticSeverity.Info,
+                true),
+            Location.None);
+        
+        var filename = Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
         var content = file.GetText(cancellationToken)!;
         var json = content.ToString();
         var settings = JsonConvert.DeserializeObject<RefitGeneratorSettings>(json)!;
@@ -109,7 +115,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
                 "Refitter File Contents",
                 json,
                 "Refitter",
-                DiagnosticSeverity.Warning,
+                DiagnosticSeverity.Info,
                 true),
             Location.None);
 
@@ -123,6 +129,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
 
         var generator = RefitGenerator.CreateAsync(settings).GetAwaiter().GetResult();
         var refit = generator.Generate();
-        return (settings, SourceText.From(refit, Encoding.UTF8));
+        return (SourceText.From(refit, Encoding.UTF8), filename);
     }
 }
