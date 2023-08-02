@@ -4,7 +4,6 @@
   "multipleInterfaces": true,
   "naming": {    
     "useOpenApiTitle": false,
-    "interfaceName": "SwaggerPetstoreInterfaces",
-    "filename": "SwaggerPetstoreInterfaces"
+    "interfaceName": "SwaggerPetstoreInterfaces"
   }
 }
