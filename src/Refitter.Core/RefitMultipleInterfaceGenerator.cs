@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.Text;
 
 using NSwag;
@@ -74,26 +75,14 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
         string verb,
         OpenApiOperation operation,
         StringBuilder stringBuilder) =>
-        SuffixDuplicateNameWithCounter(
+        StringSuffixUtils.InterfaceNameWithCounter(
             stringBuilder,
             generator
                 .BaseSettings
                 .OperationNameGenerator
                 .GetOperationName(document, kv.Key, verb, operation));
 
-    private static string SuffixDuplicateNameWithCounter(StringBuilder stringBuilder, string name)
-    {
-        if (!stringBuilder.ToString().Contains($"interface I{name}"))
-        {
-            return name;
-        }
-
-        var counter = 2;
-        while (stringBuilder.ToString().Contains($"interface I{name}{counter}"))
-            counter++;
-
-        return $"{name}{counter}";
-    }
+    
 
     private string GetReturnType(string? returnTypeParameter)
     {

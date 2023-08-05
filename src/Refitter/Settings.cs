@@ -64,8 +64,9 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool UseIsoDateFormat { get; set; }
 
-    [Description("Generate a Refit interface for each endpoint")]
+    private const string MultipleInterfacesValues = $"{nameof(Core.MultipleInterfaces.ByEndpoint)}, {nameof(Core.MultipleInterfaces.ByTag)}";
+
+    [Description($"Generate a Refit interface for each endpoint. May be one of {MultipleInterfacesValues}")]
     [CommandOption("--multiple-interfaces")]
-    [DefaultValue(false)]
-    public bool MultipleInterfaces { get; set; }
+    public Core.MultipleInterfaces MultipleInterfaces { get; set; } = Core.MultipleInterfaces.Unset;
 }

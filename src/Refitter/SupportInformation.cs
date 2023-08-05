@@ -27,9 +27,8 @@ public static class SupportInformation
 
     private static string ToSha256(this string value)
     {
-        using var sha256 = SHA256.Create();
         var bytes = Encoding.UTF8.GetBytes(value);
-        var hash = sha256.ComputeHash(bytes);
+        var hash = SHA256.HashData(bytes);
         return Convert.ToBase64String(hash).ToLowerInvariant();
     }
 }
