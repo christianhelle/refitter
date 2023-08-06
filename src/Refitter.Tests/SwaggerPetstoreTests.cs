@@ -208,7 +208,7 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_With_Multiple_Interfaces(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.MultipleInterfaces = true;
+        settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint;
         var generateCode = await GenerateCode(version, filename, settings);
     }
 
@@ -256,7 +256,7 @@ public class SwaggerPetstoreTests
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.MultipleInterfaces = true;
+        settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint;
         var generateCode = await GenerateCode(version, filename, settings);
         BuildHelper
             .BuildCSharp(generateCode)

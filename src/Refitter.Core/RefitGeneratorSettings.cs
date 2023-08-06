@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Refitter.Core;
 
@@ -101,7 +103,21 @@ public class RefitGeneratorSettings
     /// </summary>
     [JsonPropertyName("multipleInterfaces")]
     [JsonProperty("multipleInterfaces")]
-    public bool MultipleInterfaces { get; set; }
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+    public MultipleInterfaces MultipleInterfaces { get; set; }
+}
+
+public enum MultipleInterfaces
+{
+    [JsonPropertyName("unset")]
+    [JsonProperty("unset")]
+    Unset,
+    [JsonPropertyName("byEndpoint")]
+    [JsonProperty("byEndpoint")]
+    ByEndpoint,
+    [JsonPropertyName("byTag")]
+    [JsonProperty("byTag")]
+    ByTag
 }
 
 /// <summary>

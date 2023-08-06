@@ -8,8 +8,8 @@ public class SingleInterfaceGeneratorTest
 {
     [Fact]
     public void Should_Type_Exist() =>
-        typeof(ISwaggerPetstore)
+        typeof(SingeInterface.ISwaggerPetstore)
             .Namespace
             .Should()
-            .Be("Refitter.Tests.AdditionalFiles");
+            .Be("Refitter.Tests.AdditionalFiles.SingeInterface");
 }

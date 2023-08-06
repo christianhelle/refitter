@@ -49,9 +49,12 @@ public class RefitGenerator
                 generator.GenerateFile(),
                 (current, import) => current.Replace($"{import}.", string.Empty));
 
-        IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces
-            ? new RefitMultipleInterfaceGenerator(settings, document, generator)
-            : new RefitInterfaceGenerator(settings, document, generator);
+        IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
+        {
+            MultipleInterfaces.ByEndpoint => new RefitMultipleInterfaceGenerator(settings, document, generator),
+            MultipleInterfaces.ByTag => new RefitMultipleInterfaceByTagGenerator(settings, document, generator),
+            _ => new RefitInterfaceGenerator(settings, document, generator),
+        };
 
         var client = GenerateClient(interfaceGenerator);
         return new StringBuilder()

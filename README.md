@@ -43,7 +43,7 @@ EXAMPLES:
     refitter ./openapi.json --no-operation-headers
     refitter ./openapi.json --use-iso-date-format
     refitter ./openapi.json --additional-namespace "Your.Additional.Namespace" --additional-namespace "Your.Other.Additional.Namespace"
-    refitter ./openapi.json --multiple-interfaces
+    refitter ./openapi.json --multiple-interfaces ByEndpoint
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -62,7 +62,7 @@ OPTIONS:
         --no-logging                                   Don't log errors or collect telemetry                                                                        
         --additional-namespace                         Add additional namespace to generated types                                                                  
         --use-iso-date-format                          Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)
-        --multiple-interfaces                          Generate a Refit interface for each endpoint                                                                                                                       
+        --multiple-interfaces                          Generate a Refit interface for each endpoint. May be one of ByEndpoint, ByTag
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -111,7 +111,7 @@ The following is an example `.refitter` file
   "typeAccessibility": "Public", // Optional. Values=Public|Internal. Default=Public
   "useCancellationTokens": false, // Optional. Default=false
   "useIsoDateFormat": false, // Optional. Default=false
-  "multipleInterfaces": false, // Optional. Default=false
+  "multipleInterfaces": "ByEndpoint", // Optional. May be one of "ByEndpoint" or "ByTag"
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"
@@ -131,7 +131,7 @@ The following is an example `.refitter` file
 - `typeAccessibility` - the generated type accessibility. Possible values are `Public` and `Internal`. Default is `Public`
 - `useCancellationTokens` - Use cancellation tokens in the generated methods. Default is `false`
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
-- `multipleInterfaces` - Set to `true` to generate an interface for each endpoint. Default is `false`
+- `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 
 
@@ -397,7 +397,7 @@ Here's an example generated output from the [Swagger Petstore example](https://p
 **CLI Tool**
 
 ```bash
-$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --multiple-interfaces
+$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --multiple-interfaces ByEndpoint
 ```
 
 **Source Generator ***.refitter*** file**
@@ -406,7 +406,7 @@ $ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" -
 {
   "openApiPath": "./openapi.json",
   "namespace": "Your.Namespace.Of.Choice.GeneratedCode",
-  "multipleInterfaces": true
+  "multipleInterfaces": "ByEndpoint"
 }
 ```
 
