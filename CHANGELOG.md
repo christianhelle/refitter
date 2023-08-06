@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Local smoke test bash script [\#98](https://github.com/christianhelle/refitter/pull/98) ([christianhelle](https://github.com/christianhelle))
 - Small code cleanup in Generators [\#97](https://github.com/christianhelle/refitter/pull/97) ([kirides](https://github.com/kirides))
 - Generate Multiple interfaces based on first Tag [\#95](https://github.com/christianhelle/refitter/pull/95) ([kirides](https://github.com/kirides))
 
