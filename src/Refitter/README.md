@@ -30,7 +30,7 @@ EXAMPLES:
     refitter ./openapi.json --no-operation-headers
     refitter ./openapi.json --use-iso-date-format
     refitter ./openapi.json --additional-namespace "Your.Additional.Namespace" --additional-namespace "Your.Other.Additional.Namespace"
-    refitter ./openapi.json --multiple-interfaces
+    refitter ./openapi.json --multiple-interfaces ByEndpoint
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -49,7 +49,7 @@ OPTIONS:
         --no-logging                                   Don't log errors or collect telemetry                                                                        
         --additional-namespace                         Add additional namespace to generated types                                                                  
         --use-iso-date-format                          Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)
-        --multiple-interfaces                          Generate a Refit interface for each endpoint                                                                                                                       
+        --multiple-interfaces                          Generate a Refit interface for each endpoint. May be one of ByEndpoint, ByTag                                                                                                                    
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -296,17 +296,7 @@ Here's an example generated output from the [Swagger Petstore example](https://p
 **CLI Tool**
 
 ```bash
-$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --multiple-interfaces
-```
-
-**Source Generator ***.refitter*** file**
-
-```json
-{
-  "openApiPath": "./openapi.json",
-  "namespace": "Your.Namespace.Of.Choice.GeneratedCode",
-  "multipleInterfaces": true
-}
+$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --multiple-interfaces ByEndpoint
 ```
 
 **Output**
