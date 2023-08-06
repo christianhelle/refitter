@@ -114,7 +114,7 @@ function RunTests {
 
                     Write-Host "dotnet run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.MultipleInterfaces --output ./GeneratedCode/MultipleInterfaces$outputPath --multiple-interfaces --no-logging"
                     $process = Start-Process "dotnet" `
-                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.MultipleInterfaces --output ./GeneratedCode/MultipleInterfaces$outputPath --multiple-interfaces --no-logging" `
+                        -Args "run --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace.MultipleInterfaces --output ./GeneratedCode/MultipleInterfaces$outputPath --multiple-interfaces byEndpoint --no-logging" `
                         -NoNewWindow `
                         -PassThru
                     $process | Wait-Process
