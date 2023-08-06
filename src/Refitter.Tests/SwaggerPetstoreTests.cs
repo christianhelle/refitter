@@ -263,6 +263,24 @@ public class SwaggerPetstoreTests
             .Should()
             .BeTrue();
     }
+    
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+#if !DEBUG
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+#endif
+    public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_ByTag(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.MultipleInterfaces = MultipleInterfaces.ByTag;
+        var generateCode = await GenerateCode(version, filename, settings);
+        BuildHelper
+            .BuildCSharp(generateCode)
+            .Should()
+            .BeTrue();
+    }
 
 #if !DEBUG
     [Theory]

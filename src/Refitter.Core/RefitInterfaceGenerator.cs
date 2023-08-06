@@ -107,11 +107,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     private string GenerateInterfaceDeclaration()
     {
         var title = settings.Naming.UseOpenApiTitle
-            ? document.Info?.Title?
-                  .Replace(" ", string.Empty)
-                  .Replace("-", string.Empty)
-                  .Replace(".", string.Empty) ??
-              "ApiClient"
+            ? IdentifierUtils.Sanitize(document.Info?.Title ?? "ApiClient")
             : settings.Naming.InterfaceName;
 
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
