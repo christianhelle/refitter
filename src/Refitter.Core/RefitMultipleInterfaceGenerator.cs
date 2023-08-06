@@ -1,8 +1,6 @@
-using System.Collections.Specialized;
 using System.Text;
 
 using NSwag;
-using NSwag.CodeGeneration.OperationNameGenerators;
 
 namespace Refitter.Core;
 
@@ -13,6 +11,7 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
     private readonly RefitGeneratorSettings settings;
     private readonly OpenApiDocument document;
     private readonly CustomCSharpClientGenerator generator;
+    private readonly HashSet<string> knownIdentifiers = new();
 
     internal RefitMultipleInterfaceGenerator(
         RefitGeneratorSettings settings,
@@ -34,7 +33,7 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
             {
                 var operation = operations.Value;
 
-                var returnTypeParameter = new[] { "200", "201", "203", "206" }
+                var returnTypeParameter = new[] {"200", "201", "203", "206"}
                     .Where(code => operation.Responses.ContainsKey(code))
                     .Select(code => generator.GetTypeName(operation.Responses[code].ActualResponse.Schema, true, null))
                     .FirstOrDefault();
@@ -45,7 +44,7 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
 
                 GenerateInterfaceXmlDocComments(operation, code);
                 code.AppendLine($$"""
-                                  {{GenerateInterfaceDeclaration(GetInterfaceName(kv, verb, operation, code))}}
+                                  {{GenerateInterfaceDeclaration(GetInterfaceName(kv, verb, operation))}}
                                   {{Separator}}{
                                   """);
 
@@ -73,16 +72,19 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
     private string GetInterfaceName(
         KeyValuePair<string, OpenApiPathItem> kv,
         string verb,
-        OpenApiOperation operation,
-        StringBuilder stringBuilder) =>
-        StringSuffixUtils.InterfaceNameWithCounter(
-            stringBuilder,
-            generator
+        OpenApiOperation operation)
+    {
+        var name = IdentifierUtils.Counted(
+            knownIdentifiers,
+            "I" + generator
                 .BaseSettings
                 .OperationNameGenerator
-                .GetOperationName(document, kv.Key, verb, operation));
+                .GetOperationName(document, kv.Key, verb, operation).CapitalizeFirstCharacter(),
+            suffix: "Endpoint");
+        knownIdentifiers.Add(name);
+        return name;
+    }
 
-    
 
     private string GetReturnType(string? returnTypeParameter)
     {
@@ -100,7 +102,7 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
 
     private void GenerateInterfaceXmlDocComments(OpenApiOperation operation, StringBuilder code)
     {
-        if (!settings.GenerateXmlDocCodeComments || 
+        if (!settings.GenerateXmlDocCodeComments ||
             string.IsNullOrWhiteSpace(operation.Summary))
             return;
 
@@ -121,7 +123,7 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
         {
             code.AppendLine($"{Separator}{Separator}/// <summary>");
 
-            foreach (var line in operation.Description.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
+            foreach (var line in operation.Description.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None))
                 code.AppendLine($"{Separator}{Separator}/// {line.Trim()}");
 
             code.AppendLine($"{Separator}{Separator}/// </summary>");
@@ -131,6 +133,6 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
     private string GenerateInterfaceDeclaration(string name)
     {
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
-        return $"{Separator}{modifier} interface I{name.CapitalizeFirstCharacter()}Endpoint";
+        return $"{Separator}{modifier} interface {name}";
     }
 }
