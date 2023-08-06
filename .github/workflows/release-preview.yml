@@ -7,5 +7,5 @@ jobs:
   url:
     uses: ./.github/workflows/release-template.yml
     with:
-      version: 0.7.1.${{ github.run_number }}-preview
+      version: 0.7.2.${{ github.run_number }}-preview
     secrets: inherit
