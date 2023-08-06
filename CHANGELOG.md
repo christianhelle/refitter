@@ -1,5 +1,72 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.1...HEAD)
+
+**Implemented enhancements:**
+
+- Small code cleanup in Generators [\#97](https://github.com/christianhelle/refitter/pull/97) ([kirides](https://github.com/kirides))
+- Generate Multiple interfaces based on first Tag [\#95](https://github.com/christianhelle/refitter/pull/95) ([kirides](https://github.com/kirides))
+
+**Merged pull requests:**
+
+- docs: add kirides as a contributor for code [\#96](https://github.com/christianhelle/refitter/pull/96) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
+## [0.7.1](https://github.com/christianhelle/refitter/tree/0.7.1) (2023-08-02)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.1.31-preview...0.7.1)
+
+## [0.7.1.31-preview](https://github.com/christianhelle/refitter/tree/0.7.1.31-preview) (2023-08-02)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.1.30-preview...0.7.1.31-preview)
+
+**Implemented enhancements:**
+
+- Rename source generator output to use .refitter file and replace extension with .g.cs [\#94](https://github.com/christianhelle/refitter/pull/94) ([christianhelle](https://github.com/christianhelle))
+
+## [0.7.1.30-preview](https://github.com/christianhelle/refitter/tree/0.7.1.30-preview) (2023-08-02)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.1.29-preview...0.7.1.30-preview)
+
+## [0.7.1.29-preview](https://github.com/christianhelle/refitter/tree/0.7.1.29-preview) (2023-08-01)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.0...0.7.1.29-preview)
+
+**Implemented enhancements:**
+
+- Add support for generating multiple interfaces [\#93](https://github.com/christianhelle/refitter/pull/93) ([christianhelle](https://github.com/christianhelle))
+
+## [0.7.0](https://github.com/christianhelle/refitter/tree/0.7.0) (2023-07-31)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.0.28-preview...0.7.0)
+
+**Implemented enhancements:**
+
+- Add production tests for source generators [\#92](https://github.com/christianhelle/refitter/pull/92) ([christianhelle](https://github.com/christianhelle))
+
+## [0.7.0.28-preview](https://github.com/christianhelle/refitter/tree/0.7.0.28-preview) (2023-07-28)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.0.27-preview...0.7.0.28-preview)
+
+**Implemented enhancements:**
+
+- Update NuGet package icon with 128x128 image [\#91](https://github.com/christianhelle/refitter/pull/91) ([christianhelle](https://github.com/christianhelle))
+
+## [0.7.0.27-preview](https://github.com/christianhelle/refitter/tree/0.7.0.27-preview) (2023-07-28)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.0.26-preview...0.7.0.27-preview)
+
+**Implemented enhancements:**
+
+- Add NuGet package icon [\#90](https://github.com/christianhelle/refitter/pull/90) ([christianhelle](https://github.com/christianhelle))
+
+**Merged pull requests:**
+
+- Bump xunit.runner.visualstudio from 2.4.5 to 2.5.0 [\#89](https://github.com/christianhelle/refitter/pull/89) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump Microsoft.CodeAnalysis.CSharp from 4.5.0 to 4.6.0 [\#88](https://github.com/christianhelle/refitter/pull/88) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump xunit from 2.4.2 to 2.5.0 [\#87](https://github.com/christianhelle/refitter/pull/87) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [0.7.0.26-preview](https://github.com/christianhelle/refitter/tree/0.7.0.26-preview) (2023-07-27)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.6.3...0.7.0.26-preview)
