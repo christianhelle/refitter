@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  url:
+  publish:
     uses: ./.github/workflows/release-template.yml
     with:
       version: 0.7.2.${{ github.run_number }}-preview
