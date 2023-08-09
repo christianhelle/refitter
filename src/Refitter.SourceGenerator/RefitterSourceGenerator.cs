@@ -105,6 +105,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
             Location.None);
         
         var filename = Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
+        if (filename == ".g.cs")
+        {
+            filename = "Refitter.g.cs";
+        }
+
         var content = file.GetText(cancellationToken)!;
         var json = content.ToString();
         var settings = JsonConvert.DeserializeObject<RefitGeneratorSettings>(json)!;
