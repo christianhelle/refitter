@@ -83,6 +83,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             await Analytics.LogFeatureUsage(settings);
 
             AnsiConsole.MarkupLine($"[green]Duration: {stopwatch.Elapsed}{Crlf}[/]");
+
+            DonationBanner();
             return 0;
         }
         catch (Exception exception)
@@ -97,6 +99,19 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             await Analytics.LogError(exception, settings);
             return exception.HResult;
         }
+    }
+
+    private static void DonationBanner()
+    {
+        AnsiConsole.MarkupLine("[dim]###################################################################[/]");
+        AnsiConsole.MarkupLine("[dim]#  Do you find this tool useful and feel a bit generous?          #[/]");
+        AnsiConsole.MarkupLine("[dim]#  https://github.com/sponsors/christianhelle                     #[/]");
+        AnsiConsole.MarkupLine("[dim]#  https://www.buymeacoffee.com/christianhelle                    #[/]");
+        AnsiConsole.MarkupLine("[dim]#                                                                 #[/]");
+        AnsiConsole.MarkupLine("[dim]#  Does this tool not work or does it lack something you need?    #[/]");
+        AnsiConsole.MarkupLine("[dim]#  https://github.com/christianhelle/refitter/issues              #[/]");
+        AnsiConsole.MarkupLine("[dim]###################################################################[/]");
+        AnsiConsole.WriteLine();
     }
 
     private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
