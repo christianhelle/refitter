@@ -3,13 +3,17 @@ using System.Text;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+
 using Newtonsoft.Json;
+
 using Refitter.Core;
 
 namespace Refitter.SourceGenerators;
 
 [Generator]
-public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
+public class RefitterSourceGenerator :
+    //IIncrementalGenerator,
+    ISourceGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -32,9 +36,9 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var jsonFiles =
-            context.AdditionalFiles
-                .Where(at => at.Path.EndsWith(".refitter", StringComparison.OrdinalIgnoreCase));
+        var jsonFiles = context
+            .AdditionalFiles
+            .Where(at => at.Path.EndsWith(".refitter", StringComparison.OrdinalIgnoreCase));
 
         foreach (var file in jsonFiles)
         {
@@ -103,7 +107,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
                 DiagnosticSeverity.Info,
                 true),
             Location.None);
-        
+
         var filename = Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
         if (filename == ".g.cs")
         {
@@ -113,7 +117,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         var content = file.GetText(cancellationToken)!;
         var json = content.ToString();
         var settings = JsonConvert.DeserializeObject<RefitGeneratorSettings>(json)!;
-        
+
         Diagnostic.Create(
             new DiagnosticDescriptor(
                 "REFITTER001",
