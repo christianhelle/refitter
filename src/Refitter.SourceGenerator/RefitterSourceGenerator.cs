@@ -18,11 +18,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
             .Where(text => text.Path.EndsWith(".refitter", StringComparison.InvariantCultureIgnoreCase))
             .Select(GenerateCode);
 
-        // context.RegisterSourceOutput(
-        //     sourceFiles,
-        //     (c, file) => c.AddSource(
-        //         file.Filename,
-        //         source: file.Source.ToString()));
+        context.RegisterSourceOutput(
+            sourceFiles,
+            (c, file) => c.AddSource(
+                file.Filename,
+                source: file.Source.ToString()));
     }
 
     public void Initialize(GeneratorInitializationContext context)
@@ -59,7 +59,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
         {
             var (sourceText, filename) = GenerateCode(file, context.CancellationToken);
 
-            // context.AddSource(filename, sourceText);
+            context.AddSource(filename, sourceText);
             context.ReportDiagnostic(
                 Diagnostic.Create(
                     new DiagnosticDescriptor(
@@ -134,11 +134,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator, ISourceGenerator
 
         var generator = RefitGenerator.CreateAsync(settings).GetAwaiter().GetResult();
         var refit = generator.Generate();
-
-        using var stream = File.CreateText(Path.Combine(Path.GetFullPath(file.Path), filename));
-        stream.Write(refit);
-        stream.Flush();
-        
         return (SourceText.From(refit, Encoding.UTF8), filename);
     }
 }
