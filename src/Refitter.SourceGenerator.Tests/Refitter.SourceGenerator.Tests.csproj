@@ -3,8 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <IsPackable>false</IsPackable>
-        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-        <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
         <RootNamespace>Refitter.SourceGenerators.Tests</RootNamespace>
     </PropertyGroup>
 
@@ -40,17 +38,5 @@
     <ItemGroup>
       <ProjectReference Include="..\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" />
     </ItemGroup>
-
-    <Target Name="ExcludeSourceGeneratedFiles" BeforeTargets="CoreCompile">
-      <ItemGroup>
-        <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
-      </ItemGroup>
-    </Target>
-
-    <Target Name="IncludeSourceGeneratedFiles" AfterTargets="CoreCompile">
-      <ItemGroup>
-        <Compile Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
-      </ItemGroup>
-    </Target>
 
 </Project>
