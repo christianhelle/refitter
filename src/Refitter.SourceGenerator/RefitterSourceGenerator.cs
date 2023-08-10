@@ -43,7 +43,7 @@ public class RefitterSourceGenerator :
             context.ReportDiagnostic(diagnostic);
         }
 
-        context.AddSource(filename, source: source.ToString());
+        // context.AddSource(filename, source: source.ToString());
         context.ReportDiagnostic(
             Diagnostic.Create(
                 new DiagnosticDescriptor(
@@ -97,7 +97,7 @@ public class RefitterSourceGenerator :
             return;
         }
 
-        context.AddSource(result.Filename!, result.Source!);
+        // context.AddSource(result.Filename!, result.Source!);
         context.ReportDiagnostic(
             Diagnostic.Create(
                 new DiagnosticDescriptor(
