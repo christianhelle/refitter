@@ -26,7 +26,6 @@ jobs:
       uses: actions/checkout@v3    
     - name: 🛠️ Build
       run: dotnet build src/Refitter.sln -c Release -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}"
-      continue-on-error: true
     - name: 🧪 Test
       run: dotnet test src/Refitter.sln -c Release
     - name: 🗳️ Upload
