@@ -1,6 +1,8 @@
 [![Build](https://github.com/christianhelle/refitter/actions/workflows/build.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/build.yml)
 [![Smoke Tests](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml)
 [![NuGet](https://img.shields.io/nuget/v/refitter?color=blue)](https://www.nuget.org/packages/refitter)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=christianhelle_refitter&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=christianhelle_refitter)
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
