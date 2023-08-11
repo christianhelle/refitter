@@ -61,7 +61,7 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner begin `
               /k:"christianhelle_refitter" `
               /o:"christianhelle-github" `
-              /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
+              /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
               /d:sonar.host.url="https://sonarcloud.io" `
               /d:sonar.cs.vstest.reportsPaths=**/*.trx `
               /d:sonar.cs.vscoveragexml.reportsPaths=**/*.coveragexml
@@ -93,4 +93,4 @@ jobs:
         shell: powershell
         working-directory: src
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
