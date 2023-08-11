@@ -70,9 +70,6 @@ jobs:
         run: dotnet restore
         working-directory: src
 
-      - name: Setup MSBuild.exe
-        uses: microsoft/setup-msbuild@v1.1
-
       - name: Build
         run: dotnet build -c Release
         working-directory: src
