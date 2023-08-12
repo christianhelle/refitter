@@ -150,15 +150,15 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private readonly struct GenerateCodeResult(
-        bool success,
-        SourceText? source,
-        string? filename,
-        List<Diagnostic> diagnostics)
+    private record GenerateCodeResult(
+        bool Success,
+        SourceText? Source,
+        string? Filename,
+        List<Diagnostic> Diagnostics)
     {
-        public bool Success { get; } = success;
-        public SourceText? Source { get; } = source;
-        public string? Filename { get; } = filename;
-        public List<Diagnostic> Diagnostics { get; } = diagnostics;
+        public bool Success { get; } = Success;
+        public SourceText? Source { get; } = Source;
+        public string? Filename { get; } = Filename;
+        public List<Diagnostic> Diagnostics { get; } = Diagnostics;
     }
 }
