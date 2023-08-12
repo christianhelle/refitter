@@ -27,7 +27,7 @@ jobs:
         working-directory: src/Refitter.Core/
         shell: pwsh
       - name: Build
-        run: dotnet build -c Release src/Refitter/Refitter.csproj -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}"
+        run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}"
       - name: Move packages
         shell: pwsh
         run: Get-ChildItem -Filter *.nupkg -Recurse | ForEach-Object { Move-Item -Path $_ -Destination . }
