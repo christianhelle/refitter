@@ -41,7 +41,6 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
             foreach (var op in kv.Combined)
             {
                 var operations = op.Operation;
-                var pathItem = op.PathItem;
                 var operation = operations.Value;
 
                 var returnTypeParameter = new[] {"200", "201", "203", "206"}
