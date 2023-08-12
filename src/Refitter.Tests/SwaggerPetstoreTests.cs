@@ -210,6 +210,7 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint;
         var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Theory]
