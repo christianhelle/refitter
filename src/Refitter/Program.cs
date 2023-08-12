@@ -6,107 +6,72 @@ Analytics.Configure();
 
 var app = new CommandApp<GenerateCommand>();
 app.Configure(
-    config =>
+    configuration =>
     {
-        var configuration = config
+        configuration
             .SetApplicationName("refitter")
             .SetApplicationVersion(typeof(GenerateCommand).Assembly.GetName().Version!.ToString());
 
         configuration
-            .AddExample(
-                new[]
-                {
-                    "./openapi.json",
-                });
+            .AddExample("./openapi.json");
+
+        configuration
+            .AddExample("https://petstore3.swagger.io/api/v3/openapi.yaml");
 
         configuration
             .AddExample(
-                new[]
-                {
-                    "https://petstore3.swagger.io/api/v3/openapi.yaml"
-                });
+                "./openapi.json",
+                "--namespace",
+                "\"Your.Namespace.Of.Choice.GeneratedCode\"",
+                "--output",
+                "./GeneratedCode.cs");
 
         configuration
             .AddExample(
-                new[]
-                {
-                    "./openapi.json",
-                    "--namespace",
-                    "\"Your.Namespace.Of.Choice.GeneratedCode\"",
-                    "--output",
-                    "./GeneratedCode.cs"
-                });
+                "./openapi.json",
+                "--namespace",
+                "\"Your.Namespace.Of.Choice.GeneratedCode\"",
+                "--internal");
 
         configuration
             .AddExample(
-                new[]
-                {
-                    "./openapi.json",
-                    "--namespace",
-                    "\"Your.Namespace.Of.Choice.GeneratedCode\"",
-                    "--internal"
-                });
+                "./openapi.json",
+                "--output",
+                "./IGeneratedCode.cs",
+                "--interface-only");
 
         configuration
             .AddExample(
-                new[]
-                {
-                    "./openapi.json",
-                    "--output",
-                    "./IGeneratedCode.cs",
-                    "--interface-only"
-                });
+                "./openapi.json",
+                "--use-api-response");
 
         configuration
             .AddExample(
-                new[]
-                {
-                    "./openapi.json",
-                    "--use-api-response"
-                });
+                "./openapi.json",
+                "--cancellation-tokens");
 
         configuration
             .AddExample(
-                new[]
-                {
-                    "./openapi.json",
-                    "--cancellation-tokens"
-                });
+                "./openapi.json",
+                "--no-operation-headers");
 
         configuration
             .AddExample(
-                new[]
-                {
-                    "./openapi.json",
-                    "--no-operation-headers"
-                });
+                "./openapi.json",
+                "--use-iso-date-format");
 
         configuration
             .AddExample(
-                new[]
-                {
-                    "./openapi.json",
-                    "--use-iso-date-format"
-                });
+                "./openapi.json",
+                "--additional-namespace",
+                "\"Your.Additional.Namespace\"",
+                "--additional-namespace",
+                "\"Your.Other.Additional.Namespace\"");
 
         configuration
             .AddExample(
-                new[]
-                {
-                     "./openapi.json",
-                     "--additional-namespace",
-                     "\"Your.Additional.Namespace\"",
-                     "--additional-namespace",
-                     "\"Your.Other.Additional.Namespace\"",
-                });
-
-        configuration
-            .AddExample(
-                new[]
-                {
-                    "./openapi.json",
-                    "--multiple-interfaces"
-                });
+                "./openapi.json",
+                "--multiple-interfaces");
     });
 
 return app.Run(args);
