@@ -8,11 +8,11 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
-Refitter is a tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface and contracts from OpenAPI specifications. The [.NET CLI Tool](#cli-tool) distributed via [nuget.org](http://www.nuget.org/packages/refitter) that outputs a single C# file on disk
+Refitter is a tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface and contracts from OpenAPI specifications. 
 
 Refitter comes in 2 forms:
 - A [.NET CLI Tool](#cli-tool) distributed via [nuget.org](http://www.nuget.org/packages/refitter) that outputs a single C# file on disk
-- A [C# Source Generator](#source-generator) via the [Refitter.SourceGenerator](http://www.nuget.org/packages/refitter.sourcegenerator) package that generates code on compile time based on a [.refitter](#.refitter-file-format) within the project directory
+- A [C# Source Generator](#source-generator) via the [Refitter.SourceGenerator](http://www.nuget.org/packages/refitter.sourcegenerator) package that generates code on compile time based on a [.refitter](#.refitter-file-format) within the project directory.
 
 ## CLI Tool
 
@@ -78,6 +78,10 @@ This will generate a file called `Output.cs` which contains the Refit interface 
 ## Source Generator
 
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter.core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications
+
+The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder. The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code 
+
+***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
 
 ### Installation
 
