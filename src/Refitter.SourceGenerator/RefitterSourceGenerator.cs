@@ -2,7 +2,6 @@
 using System.Text;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 
 using Newtonsoft.Json;
 
@@ -23,9 +22,9 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         context.RegisterImplementationSourceOutput(sourceFiles, ProcessResults);
     }
 
-    private static void ProcessResults(SourceProductionContext context, GenerateCodeResult result)
+    private static void ProcessResults(SourceProductionContext context, List<Diagnostic> diagnostics)
     {
-        foreach (var diagnostic in result.Diagnostics)
+        foreach (var diagnostic in diagnostics)
         {
             context.ReportDiagnostic(diagnostic);
         }
@@ -46,7 +45,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
         Justification = "By design")]
-    private static GenerateCodeResult GenerateCode(
+    private static List<Diagnostic> GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
     {
@@ -114,8 +113,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                     output, 
                     refit, 
                     Encoding.UTF8);
-                    
-                return new(false, null, null, diagnostics);
+
+                return diagnostics;
             }
             catch (Exception e)
             {
@@ -131,7 +130,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                         Location.None));
             }
 
-            return new(true, SourceText.From(refit, Encoding.UTF8), filename, diagnostics);
+            return diagnostics;
         }
         catch (Exception e)
         {
@@ -146,19 +145,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                         true),
                     Location.None));
 
-            return new(false, null, null, diagnostics);
+            return diagnostics;
         }
-    }
-
-    private record GenerateCodeResult(
-        bool Success,
-        SourceText? Source,
-        string? Filename,
-        List<Diagnostic> Diagnostics)
-    {
-        public bool Success { get; } = Success;
-        public SourceText? Source { get; } = Source;
-        public string? Filename { get; } = Filename;
-        public List<Diagnostic> Diagnostics { get; } = Diagnostics;
     }
 }
