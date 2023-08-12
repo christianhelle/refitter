@@ -11,9 +11,7 @@ using Refitter.Core;
 namespace Refitter.SourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
-public class RefitterSourceGenerator :
-    IIncrementalGenerator,
-    ISourceGenerator
+public class RefitterSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -22,82 +20,16 @@ public class RefitterSourceGenerator :
             .Where(text => text.Path.EndsWith(".refitter", StringComparison.InvariantCultureIgnoreCase))
             .Select(GenerateCode);
 
-        context.RegisterSourceOutput(
-            sourceFiles,
-            (sourceProductionContext, file) =>
-                AddSource(
-                    sourceProductionContext,
-                    file.Source!,
-                    file.Filename!,
-                    file.Diagnostics));
+        context.RegisterImplementationSourceOutput(sourceFiles, ProcessResults);
     }
 
-    private static void AddSource(
-        SourceProductionContext context,
-        SourceText source,
-        string filename,
-        List<Diagnostic> diagnostics)
+    private static void ProcessResults(SourceProductionContext context, GenerateCodeResult result)
     {
-        foreach (var diagnostic in diagnostics)
-        {
-            context.ReportDiagnostic(diagnostic);
-        }
-
-        // context.AddSource(filename, source: source.ToString());
-        context.ReportDiagnostic(
-            Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    "REFITTER001",
-                    "Refitter",
-                    "Refitter generated code successfully",
-                    "Refitter",
-                    DiagnosticSeverity.Info,
-                    true),
-                Location.None));
-    }
-
-    public void Initialize(GeneratorInitializationContext context)
-    {
-        // Method intentionally left empty.
-    }
-
-    public void Execute(GeneratorExecutionContext context)
-    {
-        var jsonFiles = context
-            .AdditionalFiles
-            .Where(at => at.Path.EndsWith(".refitter", StringComparison.OrdinalIgnoreCase));
-
-        foreach (var file in jsonFiles)
-        {
-            context.ReportDiagnostic(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER001",
-                        "Refitter",
-                        $"Found .refitter file: {file}",
-                        "Refitter",
-                        DiagnosticSeverity.Info,
-                        true),
-                    Location.None));
-
-            TryGenerateCode(context, file);
-        }
-    }
-
-    private static void TryGenerateCode(GeneratorExecutionContext context, AdditionalText file)
-    {
-        var result = GenerateCode(file, context.CancellationToken);
         foreach (var diagnostic in result.Diagnostics)
         {
             context.ReportDiagnostic(diagnostic);
         }
 
-        if (!result.Success)
-        {
-            return;
-        }
-
-        // context.AddSource(result.Filename!, result.Source!);
         context.ReportDiagnostic(
             Diagnostic.Create(
                 new DiagnosticDescriptor(
