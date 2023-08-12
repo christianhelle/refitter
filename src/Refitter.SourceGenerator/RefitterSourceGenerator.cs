@@ -9,6 +9,7 @@ using Refitter.Core;
 
 namespace Refitter.SourceGenerator;
 
+[ExcludeFromCodeCoverage]
 [Generator(LanguageNames.CSharp)]
 public class RefitterSourceGenerator : IIncrementalGenerator
 {
