@@ -1,7 +1,7 @@
 {
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore.Interfaces",
-  "multipleInterfaces": true,
+  "multipleInterfaces": "ByEndpoint",
   "naming": {    
     "useOpenApiTitle": false,
     "interfaceName": "SwaggerPetstoreInterfaces"
