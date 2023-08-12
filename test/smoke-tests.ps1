@@ -318,6 +318,5 @@ function RunTests {
     }
 }
 
-Remove-Item * -Include *.cs -Recurse -Force -Exclude *Program.cs
 Measure-Command { RunTests -Method "dotnet-run" -Parallel $Parallel }
 Write-Host "`r`n"
