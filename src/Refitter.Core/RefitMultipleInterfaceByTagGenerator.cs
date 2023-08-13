@@ -41,7 +41,6 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
             foreach (var op in kv.Combined)
             {
                 var operations = op.Operation;
-                var pathItem = op.PathItem;
                 var operation = operations.Value;
 
                 var returnTypeParameter = new[] {"200", "201", "203", "206"}
@@ -82,14 +81,14 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
         }
 
         var code = new StringBuilder();
-        foreach (var kv in interfacesByGroup)
+        foreach (var value in interfacesByGroup.Select(kv => kv.Value))
         {
-            while (char.IsWhiteSpace(kv.Value[kv.Value.Length - 1]))
+            while (char.IsWhiteSpace(value[value.Length - 1]))
             {
-                kv.Value.Length--;
+                value.Length--;
             }
 
-            code.AppendLine(kv.Value.ToString());
+            code.AppendLine(value.ToString());
             code.AppendLine($"{Separator}}}");
             code.AppendLine();
         }

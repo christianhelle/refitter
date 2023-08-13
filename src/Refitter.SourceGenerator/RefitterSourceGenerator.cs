@@ -2,7 +2,6 @@
 using System.Text;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 
 using Newtonsoft.Json;
 
@@ -10,10 +9,9 @@ using Refitter.Core;
 
 namespace Refitter.SourceGenerator;
 
+[ExcludeFromCodeCoverage]
 [Generator(LanguageNames.CSharp)]
-public class RefitterSourceGenerator :
-    IIncrementalGenerator,
-    ISourceGenerator
+public class RefitterSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -22,82 +20,16 @@ public class RefitterSourceGenerator :
             .Where(text => text.Path.EndsWith(".refitter", StringComparison.InvariantCultureIgnoreCase))
             .Select(GenerateCode);
 
-        context.RegisterSourceOutput(
-            sourceFiles,
-            (sourceProductionContext, file) =>
-                AddSource(
-                    sourceProductionContext,
-                    file.Source!,
-                    file.Filename!,
-                    file.Diagnostics));
+        context.RegisterImplementationSourceOutput(sourceFiles, ProcessResults);
     }
 
-    private static void AddSource(
-        SourceProductionContext context,
-        SourceText source,
-        string filename,
-        List<Diagnostic> diagnostics)
+    private static void ProcessResults(SourceProductionContext context, List<Diagnostic> diagnostics)
     {
         foreach (var diagnostic in diagnostics)
         {
             context.ReportDiagnostic(diagnostic);
         }
 
-        // context.AddSource(filename, source: source.ToString());
-        context.ReportDiagnostic(
-            Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    "REFITTER001",
-                    "Refitter",
-                    "Refitter generated code successfully",
-                    "Refitter",
-                    DiagnosticSeverity.Info,
-                    true),
-                Location.None));
-    }
-
-    public void Initialize(GeneratorInitializationContext context)
-    {
-        // Method intentionally left empty.
-    }
-
-    public void Execute(GeneratorExecutionContext context)
-    {
-        var jsonFiles = context
-            .AdditionalFiles
-            .Where(at => at.Path.EndsWith(".refitter", StringComparison.OrdinalIgnoreCase));
-
-        foreach (var file in jsonFiles)
-        {
-            context.ReportDiagnostic(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER001",
-                        "Refitter",
-                        $"Found .refitter file: {file}",
-                        "Refitter",
-                        DiagnosticSeverity.Info,
-                        true),
-                    Location.None));
-
-            TryGenerateCode(context, file);
-        }
-    }
-
-    private static void TryGenerateCode(GeneratorExecutionContext context, AdditionalText file)
-    {
-        var result = GenerateCode(file, context.CancellationToken);
-        foreach (var diagnostic in result.Diagnostics)
-        {
-            context.ReportDiagnostic(diagnostic);
-        }
-
-        if (!result.Success)
-        {
-            return;
-        }
-
-        // context.AddSource(result.Filename!, result.Source!);
         context.ReportDiagnostic(
             Diagnostic.Create(
                 new DiagnosticDescriptor(
@@ -114,7 +46,7 @@ public class RefitterSourceGenerator :
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
         Justification = "By design")]
-    private static GenerateCodeResult GenerateCode(
+    private static List<Diagnostic> GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
     {
@@ -182,8 +114,8 @@ public class RefitterSourceGenerator :
                     output, 
                     refit, 
                     Encoding.UTF8);
-                    
-                return new(false, null, null, diagnostics);
+
+                return diagnostics;
             }
             catch (Exception e)
             {
@@ -199,7 +131,7 @@ public class RefitterSourceGenerator :
                         Location.None));
             }
 
-            return new(true, SourceText.From(refit, Encoding.UTF8), filename, diagnostics);
+            return diagnostics;
         }
         catch (Exception e)
         {
@@ -214,19 +146,7 @@ public class RefitterSourceGenerator :
                         true),
                     Location.None));
 
-            return new(false, null, null, diagnostics);
+            return diagnostics;
         }
-    }
-
-    private readonly struct GenerateCodeResult(
-        bool success,
-        SourceText? source,
-        string? filename,
-        List<Diagnostic> diagnostics)
-    {
-        public bool Success { get; } = success;
-        public SourceText? Source { get; } = source;
-        public string? Filename { get; } = filename;
-        public List<Diagnostic> Diagnostics { get; } = diagnostics;
     }
 }

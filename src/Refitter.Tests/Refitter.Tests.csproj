@@ -10,6 +10,7 @@
       <None Remove="Resources\V2\SwaggerPetstoreWithDifferentHeaders.yaml" />
       <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.json" />
       <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.yaml" />
+      <None Remove="README.md" />
     </ItemGroup>
 
     <ItemGroup>

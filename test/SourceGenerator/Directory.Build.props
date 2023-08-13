@@ -9,9 +9,10 @@
             <Link>Program.cs</Link>
         </Compile>
         <AdditionalFiles Include="..\*.refitter" />
+        <Compile Include="../Generated/*.cs" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Refitter.SourceGenerator" Version="0.7.1.31-preview" />
+        <PackageReference Include="Refitter.SourceGenerator" Version="0.7.3.33-preview" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
         <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
     </ItemGroup>
