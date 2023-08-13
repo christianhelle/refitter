@@ -6,7 +6,7 @@ using Spectre.Console.Cli;
 namespace Refitter;
 
 [ExcludeFromCodeCoverage]
-internal class Program
+static class Program
 {
     static int Main(string[] args)
     {
