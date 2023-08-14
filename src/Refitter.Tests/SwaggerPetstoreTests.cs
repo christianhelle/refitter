@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
+
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.Resources;
+
 using Xunit;
 
 namespace Refitter.Tests;
@@ -199,6 +201,21 @@ public class SwaggerPetstoreTests
         generateCode.Should().NotContain("[Header(\"api_key\")] string api_key");
     }
 
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_Accept_Request_Header(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.GenerateOperationHeaders = true;
+        var generateCode = await GenerateCode(version, filename, settings);
+        if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
+            generateCode.Should().Contain("[Headers(\"Accept: application/json\")]");
+        else if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV2 or SampleOpenSpecifications.SwaggerPetstoreYamlV2)
+            generateCode.Should().NotContain("[Headers(\"Accept: application/json\")]");
+    }
 
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
@@ -264,7 +281,7 @@ public class SwaggerPetstoreTests
             .Should()
             .BeTrue();
     }
-    
+
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
 #if !DEBUG
