@@ -28,6 +28,7 @@ EXAMPLES:
     refitter ./openapi.json --use-api-response
     refitter ./openapi.json --cancellation-tokens
     refitter ./openapi.json --no-operation-headers
+    refitter ./openapi.json --no-accept-headers
     refitter ./openapi.json --use-iso-date-format
     refitter ./openapi.json --additional-namespace "Your.Additional.Namespace" --additional-namespace "Your.Other.Additional.Namespace"
     refitter ./openapi.json --multiple-interfaces ByEndpoint
@@ -45,7 +46,8 @@ OPTIONS:
         --use-api-response                             Return Task<IApiResponse<T>> instead of Task<T>                                                              
         --internal                                     Set the accessibility of the generated types to 'internal'                                                   
         --cancellation-tokens                          Use cancellation tokens                                                                                      
-        --no-operation-headers                         Don't generate operation headers                                                                             
+        --no-operation-headers                         Don't generate operation headers 
+        --no-accept-headers                            Don't add <Accept> header to output file                                                             
         --no-logging                                   Don't log errors or collect telemetry                                                                        
         --additional-namespace                         Add additional namespace to generated types                                                                  
         --use-iso-date-format                          Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)
