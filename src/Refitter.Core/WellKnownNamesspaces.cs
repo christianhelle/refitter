@@ -4,13 +4,15 @@ namespace Refitter.Core;
 
 internal static class WellKnownNamesspaces
 {
-    private static readonly string[] wellKnownNamespaces = { "System.Collections.Generic" };
-
-    public static string TrimImportedNamespaces(string returnTypeParameter)
+    private static readonly string[] WellKnownNamespaces =
     {
-        foreach (var wellKnownNamespace in wellKnownNamespaces)
-            if (returnTypeParameter.StartsWith(wellKnownNamespace, StringComparison.OrdinalIgnoreCase))
-                return returnTypeParameter.Replace(wellKnownNamespace + ".", string.Empty);
-        return returnTypeParameter;
-    }
+        "System.Collections.Generic"
+    };
+
+    public static string TrimImportedNamespaces(string returnTypeParameter) =>
+        WellKnownNamespaces
+            .Where(s => returnTypeParameter.StartsWith(s, StringComparison.OrdinalIgnoreCase))
+            .Select(s => returnTypeParameter.Replace(s + ".", string.Empty))
+            .FirstOrDefault() ??
+        returnTypeParameter;
 }
