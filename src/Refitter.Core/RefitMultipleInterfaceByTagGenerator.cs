@@ -1,11 +1,10 @@
 ﻿using System.Text;
 
 using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
+internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 {
     private const string Separator = "    ";
 
@@ -18,6 +17,7 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator)
+        : base(settings, document, generator)
     {
         this.settings = settings;
         this.document = document;
@@ -25,7 +25,7 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document);
     }
 
-    public string GenerateCode()
+    public override string GenerateCode()
     {
         var ungroupedTitle = settings.Naming.UseOpenApiTitle
             ? IdentifierUtils.Sanitize(document.Info?.Title ?? "ApiClient")
@@ -68,7 +68,7 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
 
                 GenerateMethodXmlDocComments(operation, sb);
-                GenerateMultipartFormData(operationModel, sb);
+                GenerateForMultipartFormData(operationModel, sb);
                 GenerateAcceptHeaders(operations, operation, sb);
 
                 var opName = GetOperationName(op.PathItem.Key, operations.Key, operation);
@@ -92,30 +92,6 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
         }
 
         return code.ToString();
-    }
-
-    private static void GenerateMultipartFormData(CSharpOperationModel operationModel, StringBuilder sb)
-    {
-        if (operationModel.Consumes.Contains("multipart/form-data"))
-        {
-            sb.AppendLine($"{Separator}{Separator}[Multipart]");
-        }
-    }
-
-    private void GenerateAcceptHeaders(KeyValuePair<string, OpenApiOperation> operations, OpenApiOperation operation, StringBuilder sb)
-    {
-        if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
-        {
-            //Generate header "Accept"
-            var contentTypes = operations.Value.Responses.Select(code => operation.Responses[code.Key].Content.Keys);
-            //remove duplicates
-            var uniqueContentTypes = contentTypes.GroupBy(x => x).SelectMany(y => y.First());
-
-            if (uniqueContentTypes.Any())
-            {
-                sb.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
-            }
-        }
     }
 
     private string GetGroupName(OpenApiOperation operation, string ungroupedTitle)
@@ -153,50 +129,6 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
                 .GetOperationName(document, name, verb, operation).CapitalizeFirstCharacter());
         knownIdentifiers.Add(generatedName);
         return generatedName;
-    }
-
-    private string GetReturnType(string? returnTypeParameter)
-    {
-        return returnTypeParameter is null or "void"
-            ? "Task"
-            : GetConfiguredReturnType(returnTypeParameter);
-    }
-
-    private string GetConfiguredReturnType(string returnTypeParameter)
-    {
-        return settings.ReturnIApiResponse
-            ? $"Task<IApiResponse<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>>"
-            : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
-    }
-
-    private void GenerateInterfaceXmlDocComments(OpenApiOperation operation, StringBuilder code)
-    {
-        if (!settings.GenerateXmlDocCodeComments ||
-            string.IsNullOrWhiteSpace(operation.Summary))
-            return;
-
-        code.AppendLine(
-            $$"""
-              {{Separator}}/// <summary>
-              {{Separator}}/// {{operation.Summary}}
-              {{Separator}}/// </summary>
-              """);
-    }
-
-    private void GenerateMethodXmlDocComments(OpenApiOperation operation, StringBuilder code)
-    {
-        if (!settings.GenerateXmlDocCodeComments)
-            return;
-
-        if (!string.IsNullOrWhiteSpace(operation.Description))
-        {
-            code.AppendLine($"{Separator}{Separator}/// <summary>");
-
-            foreach (var line in operation.Description.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None))
-                code.AppendLine($"{Separator}{Separator}/// {line.Trim()}");
-
-            code.AppendLine($"{Separator}{Separator}/// </summary>");
-        }
     }
 
     private string GenerateInterfaceDeclaration(string name)

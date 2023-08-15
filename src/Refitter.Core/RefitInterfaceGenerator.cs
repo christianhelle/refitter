@@ -2,6 +2,8 @@ using NSwag;
 
 using System.Text;
 
+using NSwag.CodeGeneration.CSharp.Models;
+
 namespace Refitter.Core;
 
 internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
@@ -23,7 +25,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document);
     }
 
-    public string GenerateCode()
+    public virtual string GenerateCode()
     {
         return $$"""
                 {{GenerateInterfaceDeclaration()}}
@@ -58,25 +60,9 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
                 var parametersString = string.Join(", ", parameters);
 
-
                 GenerateMethodXmlDocComments(operation, code);
-
-                if (operationModel.Consumes.Contains("multipart/form-data"))
-                {
-                    code.AppendLine($"{Separator}{Separator}[Multipart]");
-                }
-
-                if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3) {
-                    //Generate header "Accept"
-                    var contentTypes = operations.Value.Responses.Select(code => operation.Responses[code.Key].Content.Keys);
-                    //remove duplicates
-                    var uniqueContentTypes = contentTypes.GroupBy(x => x).SelectMany(y => y.First());
-
-                    if (uniqueContentTypes.Any())
-                    {
-                        code.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
-                    }
-                }
+                GenerateForMultipartFormData(operationModel, code);
+                GenerateAcceptHeaders(operations, operation, code);
 
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
@@ -87,7 +73,34 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         return code.ToString();
     }
 
-    private string GetReturnType(string? returnTypeParameter)
+    protected static void GenerateForMultipartFormData(CSharpOperationModel operationModel, StringBuilder code)
+    {
+        if (operationModel.Consumes.Contains("multipart/form-data"))
+        {
+            code.AppendLine($"{Separator}{Separator}[Multipart]");
+        }
+    }
+
+    protected void GenerateAcceptHeaders(
+        KeyValuePair<string, OpenApiOperation> operations, 
+        OpenApiOperation operation, 
+        StringBuilder code)
+    {
+        if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
+        {
+            //Generate header "Accept"
+            var contentTypes = operations.Value.Responses.Select(code => operation.Responses[code.Key].Content.Keys);
+            //remove duplicates
+            var uniqueContentTypes = contentTypes.GroupBy(x => x).SelectMany(y => y.First());
+
+            if (uniqueContentTypes.Any())
+            {
+                code.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
+            }
+        }
+    }
+
+    protected string GetReturnType(string? returnTypeParameter)
     {
         return returnTypeParameter is null or "void"
             ? "Task"
@@ -101,7 +114,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
     }
 
-    private void GenerateMethodXmlDocComments(OpenApiOperation operation, StringBuilder code)
+    protected void GenerateMethodXmlDocComments(OpenApiOperation operation, StringBuilder code)
     {
         if (!settings.GenerateXmlDocCodeComments)
             return;
@@ -125,5 +138,19 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         return $"{Separator}{modifier} interface I{title.CapitalizeFirstCharacter()}";
+    }
+
+    protected void GenerateInterfaceXmlDocComments(OpenApiOperation operation, StringBuilder code)
+    {
+        if (!settings.GenerateXmlDocCodeComments ||
+            string.IsNullOrWhiteSpace(operation.Summary))
+            return;
+
+        code.AppendLine(
+            $"""
+             {Separator}/// <summary>
+             {Separator}/// {operation.Summary}
+             {Separator}/// </summary>
+             """);
     }
 }

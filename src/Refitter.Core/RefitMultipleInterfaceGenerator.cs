@@ -4,7 +4,7 @@ using NSwag;
 
 namespace Refitter.Core;
 
-internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
+internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
 {
     private const string Separator = "    ";
 
@@ -16,7 +16,8 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
     internal RefitMultipleInterfaceGenerator(
         RefitGeneratorSettings settings,
         OpenApiDocument document,
-        CustomCSharpClientGenerator generator)
+        CustomCSharpClientGenerator generator) 
+        : base(settings, document, generator)
     {
         this.settings = settings;
         this.document = document;
@@ -24,7 +25,7 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document);
     }
 
-    public string GenerateCode()
+    public override string GenerateCode()
     {
         var code = new StringBuilder();
         foreach (var kv in document.Paths)
@@ -53,23 +54,8 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
 
                 GenerateMethodXmlDocComments(operation, code);
-
-                if (operationModel.Consumes.Contains("multipart/form-data"))
-                {
-                    code.AppendLine($"{Separator}{Separator}[Multipart]");
-                }
-
-                if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3) {
-                    //Generate header "Accept"
-                    var contentTypes = operations.Value.Responses.Select(code => operation.Responses[code.Key].Content.Keys);
-                    //remove duplicates
-                    var uniqueContentTypes = contentTypes.GroupBy(x => x).SelectMany(y => y.First());
-
-                    if (uniqueContentTypes.Any())
-                    {
-                        code.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
-                    }
-                }
+                GenerateForMultipartFormData(operationModel, code);
+                GenerateAcceptHeaders(operations, operation, code);
 
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} Execute({parametersString});")
@@ -95,51 +81,6 @@ internal class RefitMultipleInterfaceGenerator : IRefitInterfaceGenerator
             suffix: "Endpoint");
         knownIdentifiers.Add(name);
         return name;
-    }
-
-
-    private string GetReturnType(string? returnTypeParameter)
-    {
-        return returnTypeParameter is null or "void"
-            ? "Task"
-            : GetConfiguredReturnType(returnTypeParameter);
-    }
-
-    private string GetConfiguredReturnType(string returnTypeParameter)
-    {
-        return settings.ReturnIApiResponse
-            ? $"Task<IApiResponse<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>>"
-            : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
-    }
-
-    private void GenerateInterfaceXmlDocComments(OpenApiOperation operation, StringBuilder code)
-    {
-        if (!settings.GenerateXmlDocCodeComments ||
-            string.IsNullOrWhiteSpace(operation.Summary))
-            return;
-
-        code.AppendLine(
-            $$"""
-              {{Separator}}/// <summary>
-              {{Separator}}/// {{operation.Summary}}
-              {{Separator}}/// </summary>
-              """);
-    }
-
-    private void GenerateMethodXmlDocComments(OpenApiOperation operation, StringBuilder code)
-    {
-        if (!settings.GenerateXmlDocCodeComments)
-            return;
-
-        if (!string.IsNullOrWhiteSpace(operation.Description))
-        {
-            code.AppendLine($"{Separator}{Separator}/// <summary>");
-
-            foreach (var line in operation.Description.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None))
-                code.AppendLine($"{Separator}{Separator}/// {line.Trim()}");
-
-            code.AppendLine($"{Separator}{Separator}/// </summary>");
-        }
     }
 
     private string GenerateInterfaceDeclaration(string name)
