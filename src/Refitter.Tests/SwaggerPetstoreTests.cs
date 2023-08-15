@@ -209,12 +209,22 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_With_Accept_Request_Header(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.GenerateOperationHeaders = true;
         var generateCode = await GenerateCode(version, filename, settings);
         if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
             generateCode.Should().Contain("[Headers(\"Accept: application/json\")]");
         else if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV2 or SampleOpenSpecifications.SwaggerPetstoreYamlV2)
             generateCode.Should().NotContain("[Headers(\"Accept: application/json\")]");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_No_Accept_Request_Header(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AddAcceptHeaders = false;
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotContain("[Headers(\"Accept");
     }
 
     [Theory]

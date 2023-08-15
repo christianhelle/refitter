@@ -73,6 +73,18 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
                     sb.AppendLine($"{Separator}{Separator}[Multipart]");
                 }
 
+                if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3) {
+                    //Generate header "Accept"
+                    var contentTypes = operations.Value.Responses.Select(code => operation.Responses[code.Key].Content.Keys);
+                    //remove duplicates
+                    var uniqueContentTypes = contentTypes.GroupBy(x => x).SelectMany(y => y.First());
+
+                    if (uniqueContentTypes.Any())
+                    {
+                        sb.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
+                    }
+                }
+
                 var opName = GetOperationName(op.PathItem.Key, operations.Key, operation);
                 sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {opName}({parametersString});")

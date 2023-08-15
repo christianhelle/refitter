@@ -66,7 +66,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     code.AppendLine($"{Separator}{Separator}[Multipart]");
                 }
 
-                if (document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3) {
+                if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3) {
                     //Generate header "Accept"
                     var contentTypes = operations.Value.Responses.Select(code => operation.Responses[code.Key].Content.Keys);
                     //remove duplicates
@@ -77,7 +77,6 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                         code.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
                     }
                 }
-               
 
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
