@@ -1,6 +1,7 @@
 ﻿using System.Text;
 
 using NSwag;
+using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -67,23 +68,8 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
 
                 GenerateMethodXmlDocComments(operation, sb);
-
-                if (operationModel.Consumes.Contains("multipart/form-data"))
-                {
-                    sb.AppendLine($"{Separator}{Separator}[Multipart]");
-                }
-
-                if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3) {
-                    //Generate header "Accept"
-                    var contentTypes = operations.Value.Responses.Select(code => operation.Responses[code.Key].Content.Keys);
-                    //remove duplicates
-                    var uniqueContentTypes = contentTypes.GroupBy(x => x).SelectMany(y => y.First());
-
-                    if (uniqueContentTypes.Any())
-                    {
-                        sb.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
-                    }
-                }
+                GenerateMultipartFormData(operationModel, sb);
+                GenerateAcceptHeaders(operations, operation, sb);
 
                 var opName = GetOperationName(op.PathItem.Key, operations.Key, operation);
                 sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
@@ -106,6 +92,30 @@ internal class RefitMultipleInterfaceByTagGenerator : IRefitInterfaceGenerator
         }
 
         return code.ToString();
+    }
+
+    private static void GenerateMultipartFormData(CSharpOperationModel operationModel, StringBuilder sb)
+    {
+        if (operationModel.Consumes.Contains("multipart/form-data"))
+        {
+            sb.AppendLine($"{Separator}{Separator}[Multipart]");
+        }
+    }
+
+    private void GenerateAcceptHeaders(KeyValuePair<string, OpenApiOperation> operations, OpenApiOperation operation, StringBuilder sb)
+    {
+        if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
+        {
+            //Generate header "Accept"
+            var contentTypes = operations.Value.Responses.Select(code => operation.Responses[code.Key].Content.Keys);
+            //remove duplicates
+            var uniqueContentTypes = contentTypes.GroupBy(x => x).SelectMany(y => y.First());
+
+            if (uniqueContentTypes.Any())
+            {
+                sb.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
+            }
+        }
     }
 
     private string GetGroupName(OpenApiOperation operation, string ungroupedTitle)
