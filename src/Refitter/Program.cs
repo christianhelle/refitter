@@ -66,6 +66,11 @@ static class Program
                 configuration
                     .AddExample(
                         "./openapi.json",
+                        "--no-accept-headers");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
                         "--use-iso-date-format");
 
                 configuration
