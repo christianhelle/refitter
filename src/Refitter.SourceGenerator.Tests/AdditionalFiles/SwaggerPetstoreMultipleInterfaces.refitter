@@ -4,6 +4,7 @@
   "generateContracts": false,
   "multipleInterfaces": "ByEndpoint",
   "additionalNamespaces": ["Refitter.Tests.AdditionalFiles.SingeInterface"],
+  "addAcceptHeaders": false,
   "naming": {
     "filename": "SwaggerPetstoreInterfaces"
   }

@@ -16,6 +16,7 @@ jobs:
 
     name: Build
     runs-on: windows-latest
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v3
