@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.20.0" />
-    <PackageReference Include="NSwag.Core.Yaml" Version="13.19.0" />
+    <PackageReference Include="NSwag.Core.Yaml" Version="13.20.0" />
   </ItemGroup>
 
 </Project>
