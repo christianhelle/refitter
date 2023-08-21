@@ -10,6 +10,7 @@ internal class Program
     {
         // await TestPetstoreUsingDirectTypes();
         // await TestPetstoreUsingApiResponse();
+        await Task.Delay(0);
     }
 
     // private static async Task TestPetstoreUsingApiResponse()
