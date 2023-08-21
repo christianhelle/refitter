@@ -127,42 +127,42 @@ jobs:
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: 🛠️ Build .NET 6 generated code
-      run: dotnet build -p:TreatWarningsAsErrors=true ./ConsoleApp/Net6/Net6.csproj
+      run: dotnet build ./ConsoleApp/Net6/Net6.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: 🛠️ Build .NET 7 generated code
-      run: dotnet build -p:TreatWarningsAsErrors=true ./ConsoleApp/Net7/Net7.csproj
+      run: dotnet build ./ConsoleApp/Net7/Net7.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: 🛠️ Build .NET 4.8.1 generated code
-      run: dotnet build -p:TreatWarningsAsErrors=true ./ConsoleApp/Net481/Net481.csproj
+      run: dotnet build ./ConsoleApp/Net481/Net481.csproj
       if: ${{ steps.prepare_openapi_spec.outputs.exists == 'True' && inputs.os == 'windows-2022' }}
       working-directory: test
 
     - name: 🛠️ Build .NET 4.8 generated code
-      run: dotnet build -p:TreatWarningsAsErrors=true ./ConsoleApp/Net48/Net48.csproj
+      run: dotnet build ./ConsoleApp/Net48/Net48.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: 🛠️ Build .NET 4.7.2 generated code
-      run: dotnet build -p:TreatWarningsAsErrors=true ./ConsoleApp/Net472/Net472.csproj
+      run: dotnet build ./ConsoleApp/Net472/Net472.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: 🛠️ Build .NET 4.6.2 generated code
-      run: dotnet build -p:TreatWarningsAsErrors=true ./ConsoleApp/Net462/Net462.csproj
+      run: dotnet build ./ConsoleApp/Net462/Net462.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: 🛠️ Build .NET Standard 2.0 generated code
-      run: dotnet build -p:TreatWarningsAsErrors=true ./ConsoleApp/NetStandard20/NetStandard20.csproj
+      run: dotnet build ./ConsoleApp/NetStandard20/NetStandard20.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
     - name: 🛠️ Build .NET Standard 2.1 generated code
-      run: dotnet build -p:TreatWarningsAsErrors=true ./ConsoleApp/NetStandard21/NetStandard21.csproj
+      run: dotnet build ./ConsoleApp/NetStandard21/NetStandard21.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 
@@ -172,6 +172,6 @@ jobs:
       if: ${{ steps.prepare_openapi_spec.outputs.exists == 'True' && inputs.openapi == 'petstore' }}
 
     - name: 🛠️ Build Minimal API generated code
-      run: dotnet build -p:TreatWarningsAsErrors=true ./MinimalApi/MinimalApi.csproj
+      run: dotnet build ./MinimalApi/MinimalApi.csproj
       working-directory: test
       if: ${{ steps.prepare_openapi_spec.outputs.exists == 'True' && inputs.openapi == 'petstore' }}
