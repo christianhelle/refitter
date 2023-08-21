@@ -89,9 +89,14 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
         {
             //Generate header "Accept"
-            var contentTypes = operations.Value.Responses.Select(code => operation.Responses[code.Key].Content.Keys);
+            var contentTypes = operations.Value.Responses.Select(pair => operation.Responses[pair.Key].Content.Keys);
+            
             //remove duplicates
-            var uniqueContentTypes = contentTypes.GroupBy(x => x).SelectMany(y => y.First());
+            var uniqueContentTypes = contentTypes
+                .GroupBy(x => x)
+                .SelectMany(y => y.First())
+                .Distinct()
+                .ToList();
 
             if (uniqueContentTypes.Any())
             {
