@@ -50,7 +50,7 @@ jobs:
         dotnet-coverageconverter --CoverageFilesFolder . --ProcessAllFiles
         Get-ChildItem '*.coveragexml' -Recurse `
         | Select-Object -First 1 `
-        | Copy-Item -Path { $_.FullName } -Destination { $_.Name -Replace ".coveragexml", ".coverage.xml" }
+        | Copy-Item -Path { $_.FullName } -Destination { $_.Name -Replace ".coveragexml", ".xml" }
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
