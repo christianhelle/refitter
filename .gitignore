@@ -272,3 +272,4 @@ test/**/*Uspto.cs
 test/**/*Ingram-micro.cs
 test/**/*Hubspot*.cs
 *.lutconfig
+src/.tools
