@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -773,6 +773,9 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/brease-colin"><img src="https://avatars.githubusercontent.com/u/47358935?v=4?s=100" width="100px;" alt="brease-colin"/><br /><sub><b>brease-colin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abrease-colin" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/angelofb"><img src="https://avatars.githubusercontent.com/u/2032257?v=4?s=100" width="100px;" alt="angelofb"/><br /><sub><b>angelofb</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=angelofb" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/NoGRo"><img src="https://avatars.githubusercontent.com/u/5665273?v=4?s=100" width="100px;" alt="Dim Nogro"/><br /><sub><b>Dim Nogro</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=NoGRo" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/yadanilov19"><img src="https://avatars.githubusercontent.com/u/17161065?v=4?s=100" width="100px;" alt="yadanilov19"/><br /><sub><b>yadanilov19</b></sub></a><br /><a href="#ideas-yadanilov19" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
