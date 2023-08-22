@@ -142,7 +142,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             : settings.Naming.InterfaceName;
 
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
-        return $"{Separator}{modifier} interface I{title.CapitalizeFirstCharacter()}";
+        return $"""
+                {Separator}{GetGeneratedCodeAttribute()}
+                {Separator}{modifier} interface I{title.CapitalizeFirstCharacter()}
+                """;
     }
 
     protected void GenerateInterfaceXmlDocComments(OpenApiOperation operation, StringBuilder code)
@@ -158,4 +161,9 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
              {Separator}/// </summary>
              """);
     }
+
+    protected string GetGeneratedCodeAttribute() =>
+        $"""
+         [System.CodeDom.Compiler.GeneratedCode("Refitter", "{GetType().Assembly.GetName().Version}")]
+         """;
 }
