@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Refitter.Tests.AdditionalFiles.NoFilename
 {
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface ISwaggerPetstore
     {
         /// <summary>

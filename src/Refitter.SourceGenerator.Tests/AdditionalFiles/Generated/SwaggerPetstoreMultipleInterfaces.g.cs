@@ -14,6 +14,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Update an existing pet
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IUpdatePetEndpoint
     {
         /// <summary>
@@ -26,6 +27,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Add a new pet to the store
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IAddPetEndpoint
     {
         /// <summary>
@@ -38,6 +40,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Finds Pets by status
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IFindPetsByStatusEndpoint
     {
         /// <summary>
@@ -50,6 +53,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Finds Pets by tags
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IFindPetsByTagsEndpoint
     {
         /// <summary>
@@ -62,6 +66,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Find pet by ID
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IGetPetByIdEndpoint
     {
         /// <summary>
@@ -74,6 +79,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Updates a pet in the store with form data
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IUpdatePetWithFormEndpoint
     {
         [Post("/pet/{petId}")]
@@ -83,6 +89,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Deletes a pet
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IDeletePetEndpoint
     {
         [Delete("/pet/{petId}")]
@@ -92,6 +99,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// uploads an image
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IUploadFileEndpoint
     {
         [Post("/pet/{petId}/uploadImage")]
@@ -101,6 +109,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Returns pet inventories by status
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IGetInventoryEndpoint
     {
         /// <summary>
@@ -113,6 +122,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Place an order for a pet
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IPlaceOrderEndpoint
     {
         /// <summary>
@@ -125,6 +135,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Find purchase order by ID
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IGetOrderByIdEndpoint
     {
         /// <summary>
@@ -137,6 +148,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Delete purchase order by ID
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IDeleteOrderEndpoint
     {
         /// <summary>
@@ -149,6 +161,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Create user
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface ICreateUserEndpoint
     {
         /// <summary>
@@ -161,6 +174,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Creates list of users with given input array
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface ICreateUsersWithListInputEndpoint
     {
         /// <summary>
@@ -173,6 +187,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Logs user into the system
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface ILoginUserEndpoint
     {
         [Get("/user/login")]
@@ -182,6 +197,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Logs out current logged in user session
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface ILogoutUserEndpoint
     {
         [Get("/user/logout")]
@@ -191,6 +207,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Get user by user name
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IGetUserByNameEndpoint
     {
         [Get("/user/{username}")]
@@ -200,6 +217,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Update user
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IUpdateUserEndpoint
     {
         /// <summary>
@@ -212,6 +230,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// <summary>
     /// Delete user
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public interface IDeleteUserEndpoint
     {
         /// <summary>

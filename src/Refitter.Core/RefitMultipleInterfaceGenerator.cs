@@ -86,6 +86,9 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
     private string GenerateInterfaceDeclaration(string name)
     {
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
-        return $"{Separator}{modifier} interface {name}";
+        return $"""
+                {Separator}{GetGeneratedCodeAttribute()}
+                {Separator}{modifier} interface {name}
+                """;
     }
 }
