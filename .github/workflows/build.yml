@@ -48,9 +48,8 @@ jobs:
       run: |
         dotnet tool update dotnet-coverageconverter --global
         dotnet-coverageconverter --CoverageFilesFolder . --ProcessAllFiles
-        Get-ChildItem '*.coveragexml' -Recurse `
-        | Select-Object -First 1 `
-        | Copy-Item -Path { $_.FullName } -Destination ./coverage.xml
+        Get-ChildItem '*.coveragexml' -Recurse | Select-Object -First 1 | Copy-Item -Path { $_.FullName } -Destination ./coverage.xml
+        ls .\coverage.xml
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
