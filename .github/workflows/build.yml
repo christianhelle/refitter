@@ -21,13 +21,18 @@ jobs:
   build:
     name: 👌 Verify build
     runs-on: ubuntu-latest
+    
     steps:
+    
     - name: 🛒 Checkout repository
       uses: actions/checkout@v3    
+    
     - name: 🛠️ Build
       run: dotnet build src/Refitter.sln -c Release -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}"
+    
     - name: 🧪 Test
       run: dotnet test src/Refitter.sln -c Release --collect "Code coverage"
+    
     - name: 🗳️ Upload
       uses: actions/upload-artifact@v3
       with:
@@ -35,6 +40,14 @@ jobs:
         path: |
           **/*.nupkg
           README.md
+
+    - name: Convert Code Coverage
+      working-directory: src
+      continue-on-error: true
+      run: |
+        dotnet tool update dotnet-coverageconverter --tool-path .tools\coverage
+        .\.tools\coverage\dotnet-coverageconverter.exe --CoverageFilesFolder . --ProcessAllFiles
+
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       env:
