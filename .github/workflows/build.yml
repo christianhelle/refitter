@@ -44,12 +44,14 @@ jobs:
     - name: Convert Code Coverage
       working-directory: src
       continue-on-error: true
+      shell: pwsh
       run: |
         dotnet tool update dotnet-coverageconverter --global
         dotnet-coverageconverter --CoverageFilesFolder . --ProcessAllFiles
+        Get-ChildItem '*.coveragexml' -Recurse | foreach { Move-Item $_.FullName ./ }
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        files: '**/*.coveragexml'
+        files: '*.coveragexml'
