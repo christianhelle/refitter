@@ -67,7 +67,7 @@ internal static class ParameterExtractor
     }
 
     private static string GetAliasAsAttribute(CSharpParameterModel parameterModel) =>
-        string.Equals(parameterModel.Name, parameterModel.VariableName, StringComparison.OrdinalIgnoreCase)
+        string.Equals(parameterModel.Name, parameterModel.VariableName)
             ? string.Empty
             : $"AliasAs(\"{parameterModel.Name}\")";
 
