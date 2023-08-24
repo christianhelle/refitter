@@ -8,11 +8,10 @@
         <Compile Include="..\Program.cs">
             <Link>Program.cs</Link>
         </Compile>
-        <AdditionalFiles Include="..\*.refitter" />
-        <Compile Include="../Generated/*.cs" />
+        <Compile Include="../../GeneratedCode/*.cs" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Refitter.SourceGenerator" Version="0.7.3.35-preview" />
+        <PackageReference Include="Refit" Version="7.0.0" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
         <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
     </ItemGroup>

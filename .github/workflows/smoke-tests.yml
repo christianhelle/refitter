@@ -5,8 +5,8 @@ on:
   push:
     paths-ignore:
       - "**/*"
-      - "!**/*.cs"
-      - "!**/*.csproj"
+      - '!src/**/*.cs'
+      - '!src/**/*.csproj'
       - "!.github/workflows/template.yml"
       - "!.github/workflows/template-url.yml"
       - "!.github/workflows/smoke-tests.yml"
