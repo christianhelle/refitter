@@ -23,14 +23,18 @@ function GenerateAndBuild {
         
         [Parameter(Mandatory=$true)]
         [string]
-        $outputPath
+        $outputPath,
+        
+        [Parameter(Mandatory=$false)]
+        [string]
+        $args
     )
     
     Get-ChildItem '*.generated.cs' -Recurse | foreach { Remove-Item -Path $_.FullName }
 
-    Write-Host "dotnet run --no-build --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging"
+    Write-Host "dotnet run --no-build --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
     $process = Start-Process "dotnet" `
-        -Args "run --no-build --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging" `
+        -Args "run --no-build --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
         -NoNewWindow `
         -PassThru
     $process | Wait-Process
@@ -94,13 +98,12 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    GenerateAndBuild -format $format -namespace $namespace -outputPath $outputPath
-                    GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath"
-                    GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath"
-                    GenerateAndBuild -format $format -namespace "$namespace.Interface" -outputPath "I$outputPath"
-                    GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath"
-                    GenerateAndBuild -format $format -namespace "$namespace.UsingIsoDateFormat" -outputPath "UsingIsoDateFormat$outputPath"
-                    GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfaces" -outputPath "MultipleInterfaces$outputPath"
+                    GenerateAndBuild -format $format -namespace $namespace -outputPath $outputPath -args "--settings-file ./SourceGenerator/swagger-petstore-direct.refitter"
+                    GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens"
+                    GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal"
+                    GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response"
+                    GenerateAndBuild -format $format -namespace "$namespace.UsingIsoDateFormat" -outputPath "UsingIsoDateFormat$outputPath" -args "--use-iso-date-format"
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfaces" -outputPath "MultipleInterfaces$outputPath" -args "--multiple-interfaces ByEndpoint"
                 }
             }
         }
