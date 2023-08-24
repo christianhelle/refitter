@@ -2,6 +2,7 @@ using Refitter.Core;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace Refitter;
 
@@ -45,6 +46,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         {
             var stopwatch = Stopwatch.StartNew();
             AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
+            
+            if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            {
+                var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
+                refitGeneratorSettings = JsonSerializer.Deserialize<RefitGeneratorSettings>(json)!;
+                refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
+            }
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             var code = generator.Generate().ReplaceLineEndings();

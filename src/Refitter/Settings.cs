@@ -9,6 +9,10 @@ public sealed class Settings : CommandSettings
     [CommandArgument(0, "[URL or input file]")]
     public string? OpenApiPath { get; set; }
 
+    [Description("Path to .refitter settings file. Specifying this will ignore all other settings")]
+    [CommandOption("-s|--settings-file")]
+    public string? SettingsFilePath { get; set; }
+
     [Description("Default namespace to use for generated types")]
     [CommandOption("-n|--namespace")]
     [DefaultValue("GeneratedCode")]
