@@ -90,7 +90,8 @@ static class Program
                 configuration
                     .AddExample(
                         "./openapi.json",
-                        "--multiple-interfaces");
+                        "--multiple-interfaces",
+                        "ByEndpoint");
             });
 
         return app.Run(args);
