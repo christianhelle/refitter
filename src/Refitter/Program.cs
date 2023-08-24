@@ -29,6 +29,12 @@ static class Program
                 configuration
                     .AddExample(
                         "./openapi.json",
+                        "--settings-file",
+                        "./openapi.refitter");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
                         "--namespace",
                         "\"Your.Namespace.Of.Choice.GeneratedCode\"",
                         "--output",
