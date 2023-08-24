@@ -2,7 +2,47 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.2...HEAD)
+
+**Implemented enhancements:**
+
+- Add support for using .refitter file from CLI [\#127](https://github.com/christianhelle/refitter/pull/127) ([christianhelle](https://github.com/christianhelle))
+- Fix parameters' casing in openAPI document are not honoured in Refit interface methods [\#125](https://github.com/christianhelle/refitter/pull/125) ([christianhelle](https://github.com/christianhelle))
+- Exclude from generated code from code coverage [\#123](https://github.com/christianhelle/refitter/pull/123) ([christianhelle](https://github.com/christianhelle))
+- Add Codecov workflow and badge [\#120](https://github.com/christianhelle/refitter/pull/120) ([christianhelle](https://github.com/christianhelle))
+- Fix duplicate Accept headers [\#119](https://github.com/christianhelle/refitter/pull/119) ([christianhelle](https://github.com/christianhelle))
+- Fix issue where \[Headers\("Accept"\)\] is always generated [\#111](https://github.com/christianhelle/refitter/pull/111) ([christianhelle](https://github.com/christianhelle))
+- Add Accept Request Header [\#108](https://github.com/christianhelle/refitter/pull/108) ([guillaumeserale](https://github.com/guillaumeserale))
+- Resolve SonarCloud detected code smells [\#105](https://github.com/christianhelle/refitter/pull/105) ([christianhelle](https://github.com/christianhelle))
+- Enable SonarCloud [\#103](https://github.com/christianhelle/refitter/pull/103) ([christianhelle](https://github.com/christianhelle))
+- Source Generator Hack - Write to disk instead of the syntax tree [\#102](https://github.com/christianhelle/refitter/pull/102) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Parameters' casing in openAPI document are not honoured  in Refit interface methods [\#124](https://github.com/christianhelle/refitter/issues/124)
+- Add support for using .refitter file from CLI [\#121](https://github.com/christianhelle/refitter/issues/121)
+- Duplicate Accept Headers [\#118](https://github.com/christianhelle/refitter/issues/118)
+- Missing "Accept" Request Header in generated files based on OAS 3.0  [\#107](https://github.com/christianhelle/refitter/issues/107)
+- Refitter Source Generator - generated code not being picked up by Refit's Source Generator [\#100](https://github.com/christianhelle/refitter/issues/100)
+- Remove source generator from docs and builds [\#101](https://github.com/christianhelle/refitter/pull/101) ([christianhelle](https://github.com/christianhelle))
+
+**Merged pull requests:**
+
+- Bump FluentAssertions from 6.11.0 to 6.12.0 [\#126](https://github.com/christianhelle/refitter/pull/126) ([dependabot[bot]](https://github.com/apps/dependabot))
+- docs: add yadanilov19 as a contributor for ideas [\#122](https://github.com/christianhelle/refitter/pull/122) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Bump Microsoft.CodeAnalysis.CSharp from 4.6.0 to 4.7.0 [\#117](https://github.com/christianhelle/refitter/pull/117) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update docs regarding accept headers [\#116](https://github.com/christianhelle/refitter/pull/116) ([christianhelle](https://github.com/christianhelle))
+- Bump Microsoft.NET.Test.Sdk from 17.7.0 to 17.7.1 [\#115](https://github.com/christianhelle/refitter/pull/115) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump H.Generators.Extensions from 1.15.1 to 1.16.0 [\#114](https://github.com/christianhelle/refitter/pull/114) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump NSwag.CodeGeneration.CSharp from 13.19.0 to 13.20.0 [\#113](https://github.com/christianhelle/refitter/pull/113) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump NSwag.Core.Yaml from 13.19.0 to 13.20.0 [\#112](https://github.com/christianhelle/refitter/pull/112) ([dependabot[bot]](https://github.com/apps/dependabot))
+- docs: add Roflincopter as a contributor for ideas [\#110](https://github.com/christianhelle/refitter/pull/110) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add guillaumeserale as a contributor for bug [\#109](https://github.com/christianhelle/refitter/pull/109) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Restore source generator in docs and builds [\#104](https://github.com/christianhelle/refitter/pull/104) ([christianhelle](https://github.com/christianhelle))
+
+## [0.7.2](https://github.com/christianhelle/refitter/tree/0.7.2) (2023-08-07)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.1...0.7.2)
 
 **Implemented enhancements:**
 
@@ -12,69 +52,34 @@
 
 **Merged pull requests:**
 
+- Bump Microsoft.NET.Test.Sdk from 17.6.3 to 17.7.0 [\#99](https://github.com/christianhelle/refitter/pull/99) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add kirides as a contributor for code [\#96](https://github.com/christianhelle/refitter/pull/96) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
 ## [0.7.1](https://github.com/christianhelle/refitter/tree/0.7.1) (2023-08-02)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.1.31-preview...0.7.1)
-
-## [0.7.1.31-preview](https://github.com/christianhelle/refitter/tree/0.7.1.31-preview) (2023-08-02)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.1.30-preview...0.7.1.31-preview)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.0...0.7.1)
 
 **Implemented enhancements:**
 
 - Rename source generator output to use .refitter file and replace extension with .g.cs [\#94](https://github.com/christianhelle/refitter/pull/94) ([christianhelle](https://github.com/christianhelle))
-
-## [0.7.1.30-preview](https://github.com/christianhelle/refitter/tree/0.7.1.30-preview) (2023-08-02)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.1.29-preview...0.7.1.30-preview)
-
-## [0.7.1.29-preview](https://github.com/christianhelle/refitter/tree/0.7.1.29-preview) (2023-08-01)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.0...0.7.1.29-preview)
-
-**Implemented enhancements:**
-
 - Add support for generating multiple interfaces [\#93](https://github.com/christianhelle/refitter/pull/93) ([christianhelle](https://github.com/christianhelle))
 
 ## [0.7.0](https://github.com/christianhelle/refitter/tree/0.7.0) (2023-07-31)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.0.28-preview...0.7.0)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.6.3...0.7.0)
 
 **Implemented enhancements:**
 
 - Add production tests for source generators [\#92](https://github.com/christianhelle/refitter/pull/92) ([christianhelle](https://github.com/christianhelle))
-
-## [0.7.0.28-preview](https://github.com/christianhelle/refitter/tree/0.7.0.28-preview) (2023-07-28)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.0.27-preview...0.7.0.28-preview)
-
-**Implemented enhancements:**
-
 - Update NuGet package icon with 128x128 image [\#91](https://github.com/christianhelle/refitter/pull/91) ([christianhelle](https://github.com/christianhelle))
-
-## [0.7.0.27-preview](https://github.com/christianhelle/refitter/tree/0.7.0.27-preview) (2023-07-28)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.0.26-preview...0.7.0.27-preview)
-
-**Implemented enhancements:**
-
 - Add NuGet package icon [\#90](https://github.com/christianhelle/refitter/pull/90) ([christianhelle](https://github.com/christianhelle))
+- Introduce C\# Source Generator and the .refitter file format [\#86](https://github.com/christianhelle/refitter/pull/86) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
 - Bump xunit.runner.visualstudio from 2.4.5 to 2.5.0 [\#89](https://github.com/christianhelle/refitter/pull/89) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump Microsoft.CodeAnalysis.CSharp from 4.5.0 to 4.6.0 [\#88](https://github.com/christianhelle/refitter/pull/88) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump xunit from 2.4.2 to 2.5.0 [\#87](https://github.com/christianhelle/refitter/pull/87) ([dependabot[bot]](https://github.com/apps/dependabot))
-
-## [0.7.0.26-preview](https://github.com/christianhelle/refitter/tree/0.7.0.26-preview) (2023-07-27)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.6.3...0.7.0.26-preview)
-
-**Implemented enhancements:**
-
-- Introduce C\# Source Generator and the .refitter file format [\#86](https://github.com/christianhelle/refitter/pull/86) ([christianhelle](https://github.com/christianhelle))
 
 ## [0.6.3](https://github.com/christianhelle/refitter/tree/0.6.3) (2023-07-22)
 
