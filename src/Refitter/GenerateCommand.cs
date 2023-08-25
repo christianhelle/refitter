@@ -45,6 +45,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         try
         {
             var stopwatch = Stopwatch.StartNew();
+            AnsiConsole.MarkupLine($"[green]Refitter v{GetType().Assembly.GetName().Version!}[/]");
             AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
             
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
