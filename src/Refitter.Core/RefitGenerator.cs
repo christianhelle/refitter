@@ -1,6 +1,7 @@
 ﻿using NSwag;
 
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Refitter.Core;
 
@@ -27,13 +28,94 @@ public class RefitGenerator
     /// <returns>A new instance of the <see cref="RefitGenerator"/> class.</returns>
     public static async Task<RefitGenerator> CreateAsync(RefitGeneratorSettings settings)
     {
+        OpenApiDocument document;
         if (IsHttp(settings.OpenApiPath) && IsYaml(settings.OpenApiPath))
-            return new RefitGenerator(settings, await OpenApiYamlDocument.FromUrlAsync(settings.OpenApiPath));
-        if (IsHttp(settings.OpenApiPath))
-            return new RefitGenerator(settings, await OpenApiDocument.FromUrlAsync(settings.OpenApiPath));
-        if (IsYaml(settings.OpenApiPath))
-            return new RefitGenerator(settings, await OpenApiYamlDocument.FromFileAsync(settings.OpenApiPath));
-        return new RefitGenerator(settings, await OpenApiDocument.FromFileAsync(settings.OpenApiPath));
+        {
+            document = await OpenApiYamlDocument.FromUrlAsync(settings.OpenApiPath);
+        }
+        else if (IsHttp(settings.OpenApiPath))
+        {
+            document = await OpenApiDocument.FromUrlAsync(settings.OpenApiPath);
+        }
+        else if (IsYaml(settings.OpenApiPath))
+        {
+            document = await OpenApiYamlDocument.FromFileAsync(settings.OpenApiPath);
+        }
+        else
+        {
+            document = await OpenApiDocument.FromFileAsync(settings.OpenApiPath);
+        }
+
+        ProcessTagFilters(document, settings.IncludeTags);
+        ProcessPathFilters(document, settings.IncludePathMatches);
+
+        return new RefitGenerator(settings, document);
+    }
+
+    private static void ProcessTagFilters(OpenApiDocument document,
+        string[] includeTags)
+    {
+        if (includeTags.Length == 0)
+        {
+            return;
+        }
+        var clonedPaths = document.Paths
+            .Where(x => x.Value != null)
+            .ToArray();
+        foreach (var path in clonedPaths)
+        {
+            var methods = path.Value
+                .Where(x => x.Value != null)
+                .ToArray();
+            foreach (var method in methods)
+            {
+                var exclude = true;
+                foreach (var tag in includeTags)
+                {
+                    if (method.Value.Tags?.Any(x => x == tag) == true)
+                    {
+                        exclude = false;
+                    }
+                }
+                if (exclude)
+                {
+                    path.Value.Remove(method.Key);
+                }
+                if (path.Value.Count == 0)
+                {
+                    document.Paths.Remove(path.Key);
+                }
+            }
+        }
+    }
+
+    private static void ProcessPathFilters(OpenApiDocument document,
+        string[] pathMatchExpressions)
+    {
+        if (pathMatchExpressions.Length == 0)
+        {
+            return;
+        }
+        
+        // compile all expressions here once, as we will use them more than once
+        var regexes = pathMatchExpressions.Select(x => new Regex(x, RegexOptions.Compiled)).ToArray();
+
+        var clonedPaths = document.Paths.ToArray();
+        foreach (var path in clonedPaths)
+        {
+            var exclude = true;
+            foreach (var regex in regexes)
+            {
+                if (regex.IsMatch(path.Key))
+                {
+                    exclude = false;
+                }
+            }
+            if (exclude)
+            {
+                document.Paths.Remove(path.Key);
+            }
+        }
     }
 
     /// <summary>
