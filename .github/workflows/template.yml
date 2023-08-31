@@ -18,9 +18,6 @@ on:
       command:
         required: true
         type: string
-      args:
-        required: false
-        type: string
 
 jobs:
   
@@ -29,6 +26,18 @@ jobs:
     name: ${{ inputs.openapi }}.${{ inputs.format }} (${{ inputs.version }}) ${{ inputs.os }}
     runs-on: ${{ inputs.os }}
     timeout-minutes: 10
+
+    strategy:
+      matrix:
+        args: [
+          "--cancellation-tokens",
+          "--internal",
+          "--use-api-response",
+          "--use-iso-date-format",
+          "--multiple-interfaces ByEndpoint",
+          "--match-path ^/pet/.*",
+          "--tag pet"
+        ]
 
     steps:
     - name: 🛒 Checkout repository
@@ -54,7 +63,7 @@ jobs:
         $outputPath = $outputPath.Substring(0, 1).ToUpperInvariant() + $outputPath.Substring(1, $outputPath.Length - 1)
         $namespace = "${{ inputs.openapi }}".Replace("-", "")
         $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --no-logging ${{ inputs.args }}
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --no-logging ${{ matrix.args }}
         Copy-Item $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
         Copy-Item $outputPath ./ConsoleApp/Net6/
         Copy-Item $outputPath ./ConsoleApp/Net7/
