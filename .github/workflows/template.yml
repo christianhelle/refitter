@@ -64,7 +64,6 @@ jobs:
         $namespace = "${{ inputs.openapi }}".Replace("-", "")
         $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --no-logging ${{ matrix.args }}
-        Copy-Item $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
         Copy-Item $outputPath ./ConsoleApp/Net6/
         Copy-Item $outputPath ./ConsoleApp/Net7/
         Copy-Item $outputPath ./ConsoleApp/Net48/
