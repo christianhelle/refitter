@@ -118,13 +118,3 @@ jobs:
       run: dotnet build ./ConsoleApp/NetStandard21/NetStandard21.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
-
-    - name: ⚙️ Prepare Minimal API project
-      run: cp Petstore.cs ./MinimalApi/
-      working-directory: test
-      if: ${{ steps.prepare_openapi_spec.outputs.exists == 'True' && inputs.openapi == 'petstore' }}
-
-    - name: 🛠️ Build Minimal API generated code
-      run: dotnet build ./MinimalApi/MinimalApi.csproj
-      working-directory: test
-      if: ${{ steps.prepare_openapi_spec.outputs.exists == 'True' && inputs.openapi == 'petstore' }}
