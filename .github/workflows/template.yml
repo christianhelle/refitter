@@ -19,7 +19,7 @@ on:
         required: true
         type: string
       args:
-        required: true
+        required: false
         type: string
 
 jobs:
