@@ -59,19 +59,15 @@ jobs:
 
     - name: 🛠️ Generate code
       run: |
-        $outputPath = "${{ inputs.openapi }}.cs"
-        $outputPath = $outputPath.Substring(0, 1).ToUpperInvariant() + $outputPath.Substring(1, $outputPath.Length - 1)
-        $namespace = "${{ inputs.openapi }}".Replace("-", "")
-        $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --no-logging ${{ matrix.args }}
-        Copy-Item $outputPath ./ConsoleApp/Net6/
-        Copy-Item $outputPath ./ConsoleApp/Net7/
-        Copy-Item $outputPath ./ConsoleApp/Net48/
-        Copy-Item $outputPath ./ConsoleApp/Net472/
-        Copy-Item $outputPath ./ConsoleApp/Net462/
-        Copy-Item $outputPath ./ConsoleApp/Net481/
-        Copy-Item $outputPath ./ConsoleApp/NetStandard20/
-        Copy-Item $outputPath ./ConsoleApp/NetStandard21/
+        Copy-Item Output.cs ./ConsoleApp/Net6/
+        Copy-Item Output.cs ./ConsoleApp/Net7/
+        Copy-Item Output.cs ./ConsoleApp/Net48/
+        Copy-Item Output.cs ./ConsoleApp/Net472/
+        Copy-Item Output.cs ./ConsoleApp/Net462/
+        Copy-Item Output.cs ./ConsoleApp/Net481/
+        Copy-Item Output.cs ./ConsoleApp/NetStandard20/
+        Copy-Item Output.cs ./ConsoleApp/NetStandard21/
       working-directory: test
       shell: pwsh
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
