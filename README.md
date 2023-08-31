@@ -131,6 +131,11 @@ The following is an example `.refitter` file
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"
+  ],
+  "tag": [ // Optional. OpenAPI Tag to include when generating code
+    "Pet",
+    "Store",
+    "User"
   ]
 }
 ```
@@ -150,6 +155,8 @@ The following is an example `.refitter` file
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
+- `tag` - A collection of tags to use a filter for including endpoints that contain this tag.
+- `match-path` - A collection of regular expressions used to filter paths. 
 
 
 # Using the generated code
