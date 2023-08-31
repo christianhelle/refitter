@@ -27,6 +27,18 @@ jobs:
     runs-on: ${{ inputs.os }}
     timeout-minutes: 10
 
+    strategy:
+      matrix:
+        args: [
+          "--cancellation-tokens",
+          "--internal",
+          "--use-api-response",
+          "--use-iso-date-format",
+          "--multiple-interfaces ByEndpoint",
+          "--match-path ^/pet/.*",
+          "--tag pet"
+        ]
+
     steps:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v3
@@ -47,74 +59,15 @@ jobs:
 
     - name: 🛠️ Generate code
       run: |
-        $outputPath = "${{ inputs.openapi }}.cs"
-        $outputPath = $outputPath.Substring(0, 1).ToUpperInvariant() + $outputPath.Substring(1, $outputPath.Length - 1)
-        $namespace = "${{ inputs.openapi }}".Replace("-", "")
-        $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace $namespace --output $outputPath --no-logging
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.WithCancellation" --output "WithCancellation$outputPath" --cancellation-tokens --no-logging
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Internal" --output "Internal$outputPath" --internal --no-logging
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.Interface" --output "I$outputPath" --interface-only --no-logging
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.UsingApiResponse" --output "IApi$outputPath" --interface-only --return-api-response --no-logging
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.UsingIsoDateFormat" --output "UsingIsoDateFormat$outputPath" --use-iso-date-format --no-logging
-        ${{ inputs.command }} ./openapi.${{ inputs.format }} --namespace "$namespace.MultipleInterfaces" --output "MultipleInterfaces$outputPath" --multiple-interfaces byEndpoint --no-logging
-        Copy-Item $outputPath ./OpenAPI/${{ inputs.version }}/${{ inputs.openapi }}.${{ inputs.format }}.cs
-        Copy-Item $outputPath ./ConsoleApp/Net6/
-        Copy-Item $outputPath ./ConsoleApp/Net7/
-        Copy-Item $outputPath ./ConsoleApp/Net48/
-        Copy-Item $outputPath ./ConsoleApp/Net472/
-        Copy-Item $outputPath ./ConsoleApp/Net462/
-        Copy-Item $outputPath ./ConsoleApp/Net481/
-        Copy-Item $outputPath ./ConsoleApp/NetStandard20/
-        Copy-Item $outputPath ./ConsoleApp/NetStandard21/
-        Copy-Item "I$outputPath" ./ConsoleApp/Net6/
-        Copy-Item "I$outputPath" ./ConsoleApp/Net7/
-        Copy-Item "I$outputPath" ./ConsoleApp/Net48/
-        Copy-Item "I$outputPath" ./ConsoleApp/Net472/
-        Copy-Item "I$outputPath" ./ConsoleApp/Net462/
-        Copy-Item "I$outputPath" ./ConsoleApp/Net481/
-        Copy-Item "I$outputPath" ./ConsoleApp/NetStandard20/
-        Copy-Item "I$outputPath" ./ConsoleApp/NetStandard21/
-        Copy-Item "IApi$outputPath" ./ConsoleApp/Net6/
-        Copy-Item "IApi$outputPath" ./ConsoleApp/Net7/
-        Copy-Item "IApi$outputPath" ./ConsoleApp/Net48/
-        Copy-Item "IApi$outputPath" ./ConsoleApp/Net472/
-        Copy-Item "IApi$outputPath" ./ConsoleApp/Net462/
-        Copy-Item "IApi$outputPath" ./ConsoleApp/Net481/
-        Copy-Item "IApi$outputPath" ./ConsoleApp/NetStandard20/
-        Copy-Item "IApi$outputPath" ./ConsoleApp/NetStandard21/
-        Copy-Item "Internal$outputPath" ./ConsoleApp/Net6/
-        Copy-Item "Internal$outputPath" ./ConsoleApp/Net7/
-        Copy-Item "Internal$outputPath" ./ConsoleApp/Net48/
-        Copy-Item "Internal$outputPath" ./ConsoleApp/Net472/
-        Copy-Item "Internal$outputPath" ./ConsoleApp/Net462/
-        Copy-Item "Internal$outputPath" ./ConsoleApp/Net481/
-        Copy-Item "Internal$outputPath" ./ConsoleApp/NetStandard20/
-        Copy-Item "Internal$outputPath" ./ConsoleApp/NetStandard21/
-        Copy-Item "WithCancellation$outputPath" ./ConsoleApp/Net6/
-        Copy-Item "WithCancellation$outputPath" ./ConsoleApp/Net7/
-        Copy-Item "WithCancellation$outputPath" ./ConsoleApp/Net48/
-        Copy-Item "WithCancellation$outputPath" ./ConsoleApp/Net472/
-        Copy-Item "WithCancellation$outputPath" ./ConsoleApp/Net462/
-        Copy-Item "WithCancellation$outputPath" ./ConsoleApp/Net481/
-        Copy-Item "WithCancellation$outputPath" ./ConsoleApp/NetStandard20/
-        Copy-Item "WithCancellation$outputPath" ./ConsoleApp/NetStandard21/
-        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net6/
-        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net7/
-        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net48/
-        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net472/
-        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net462/
-        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/Net481/
-        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/NetStandard20/
-        Copy-Item "UsingIsoDateFormat$outputPath" ./ConsoleApp/NetStandard21/
-        Copy-Item "MultipleInterfaces$outputPath" ./ConsoleApp/Net6/
-        Copy-Item "MultipleInterfaces$outputPath" ./ConsoleApp/Net7/
-        Copy-Item "MultipleInterfaces$outputPath" ./ConsoleApp/Net48/
-        Copy-Item "MultipleInterfaces$outputPath" ./ConsoleApp/Net472/
-        Copy-Item "MultipleInterfaces$outputPath" ./ConsoleApp/Net462/
-        Copy-Item "MultipleInterfaces$outputPath" ./ConsoleApp/Net481/
-        Copy-Item "MultipleInterfaces$outputPath" ./ConsoleApp/NetStandard20/
-        Copy-Item "MultipleInterfaces$outputPath" ./ConsoleApp/NetStandard21/
+        ${{ inputs.command }} ./openapi.${{ inputs.format }} --no-logging ${{ matrix.args }}
+        Copy-Item Output.cs ./ConsoleApp/Net6/
+        Copy-Item Output.cs ./ConsoleApp/Net7/
+        Copy-Item Output.cs ./ConsoleApp/Net48/
+        Copy-Item Output.cs ./ConsoleApp/Net472/
+        Copy-Item Output.cs ./ConsoleApp/Net462/
+        Copy-Item Output.cs ./ConsoleApp/Net481/
+        Copy-Item Output.cs ./ConsoleApp/NetStandard20/
+        Copy-Item Output.cs ./ConsoleApp/NetStandard21/
       working-directory: test
       shell: pwsh
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
@@ -165,13 +118,3 @@ jobs:
       run: dotnet build ./ConsoleApp/NetStandard21/NetStandard21.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
-
-    - name: ⚙️ Prepare Minimal API project
-      run: cp Petstore.cs ./MinimalApi/
-      working-directory: test
-      if: ${{ steps.prepare_openapi_spec.outputs.exists == 'True' && inputs.openapi == 'petstore' }}
-
-    - name: 🛠️ Build Minimal API generated code
-      run: dotnet build ./MinimalApi/MinimalApi.csproj
-      working-directory: test
-      if: ${{ steps.prepare_openapi_spec.outputs.exists == 'True' && inputs.openapi == 'petstore' }}

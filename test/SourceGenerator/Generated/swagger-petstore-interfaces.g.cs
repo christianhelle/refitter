@@ -12,11 +12,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Update an existing pet
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IUpdatePetEndpoint
     {
         /// <summary>
         /// Update an existing pet by Id
         /// </summary>
+        [Headers("Accept: application/xml, application/json")]
         [Put("/pet")]
         Task<Pet> Execute([Body] Pet body);
     }
@@ -24,11 +26,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Add a new pet to the store
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IAddPetEndpoint
     {
         /// <summary>
         /// Add a new pet to the store
         /// </summary>
+        [Headers("Accept: application/xml, application/json")]
         [Post("/pet")]
         Task<Pet> Execute([Body] Pet body);
     }
@@ -36,11 +40,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Finds Pets by status
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IFindPetsByStatusEndpoint
     {
         /// <summary>
         /// Multiple status values can be provided with comma separated strings
         /// </summary>
+        [Headers("Accept: application/json")]
         [Get("/pet/findByStatus")]
         Task<ICollection<Pet>> Execute([Query] Status? status);
     }
@@ -48,11 +54,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Finds Pets by tags
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IFindPetsByTagsEndpoint
     {
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
         /// </summary>
+        [Headers("Accept: application/json")]
         [Get("/pet/findByTags")]
         Task<ICollection<Pet>> Execute([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
     }
@@ -60,11 +68,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Find pet by ID
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IGetPetByIdEndpoint
     {
         /// <summary>
         /// Returns a single pet
         /// </summary>
+        [Headers("Accept: application/xml, application/json")]
         [Get("/pet/{petId}")]
         Task<Pet> Execute(long petId);
     }
@@ -72,6 +82,7 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Updates a pet in the store with form data
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IUpdatePetWithFormEndpoint
     {
         [Post("/pet/{petId}")]
@@ -81,6 +92,7 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Deletes a pet
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IDeletePetEndpoint
     {
         [Delete("/pet/{petId}")]
@@ -90,8 +102,10 @@ namespace Petstore.Interfaces
     /// <summary>
     /// uploads an image
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IUploadFileEndpoint
     {
+        [Headers("Accept: application/json")]
         [Post("/pet/{petId}/uploadImage")]
         Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata, StreamPart body);
     }
@@ -99,11 +113,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Returns pet inventories by status
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IGetInventoryEndpoint
     {
         /// <summary>
         /// Returns a map of status codes to quantities
         /// </summary>
+        [Headers("Accept: application/json")]
         [Get("/store/inventory")]
         Task<IDictionary<string, int>> Execute();
     }
@@ -111,11 +127,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Place an order for a pet
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IPlaceOrderEndpoint
     {
         /// <summary>
         /// Place a new order in the store
         /// </summary>
+        [Headers("Accept: application/json")]
         [Post("/store/order")]
         Task<Order> Execute([Body] Order body);
     }
@@ -123,11 +141,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Find purchase order by ID
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IGetOrderByIdEndpoint
     {
         /// <summary>
         /// For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions
         /// </summary>
+        [Headers("Accept: application/json")]
         [Get("/store/order/{orderId}")]
         Task<Order> Execute(long orderId);
     }
@@ -135,6 +155,7 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Delete purchase order by ID
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IDeleteOrderEndpoint
     {
         /// <summary>
@@ -147,11 +168,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Create user
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface ICreateUserEndpoint
     {
         /// <summary>
         /// This can only be done by the logged in user.
         /// </summary>
+        [Headers("Accept: application/json, application/xml")]
         [Post("/user")]
         Task Execute([Body] User body);
     }
@@ -159,11 +182,13 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Creates list of users with given input array
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface ICreateUsersWithListInputEndpoint
     {
         /// <summary>
         /// Creates list of users with given input array
         /// </summary>
+        [Headers("Accept: application/xml, application/json")]
         [Post("/user/createWithList")]
         Task<User> Execute([Body] IEnumerable<User> body);
     }
@@ -171,8 +196,10 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Logs user into the system
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface ILoginUserEndpoint
     {
+        [Headers("Accept: application/json")]
         [Get("/user/login")]
         Task<string> Execute([Query] string username, [Query] string password);
     }
@@ -180,6 +207,7 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Logs out current logged in user session
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface ILogoutUserEndpoint
     {
         [Get("/user/logout")]
@@ -189,8 +217,10 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Get user by user name
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IGetUserByNameEndpoint
     {
+        [Headers("Accept: application/json")]
         [Get("/user/{username}")]
         Task<User> Execute(string username);
     }
@@ -198,6 +228,7 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Update user
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IUpdateUserEndpoint
     {
         /// <summary>
@@ -210,6 +241,7 @@ namespace Petstore.Interfaces
     /// <summary>
     /// Delete user
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "0.7.3.0")]
     public interface IDeleteUserEndpoint
     {
         /// <summary>
@@ -225,7 +257,7 @@ namespace Petstore.Interfaces
 
 //----------------------
 // <auto-generated>
-//     Generated using the NSwag toolchain v13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0)) (http://NSwag.org)
+//     Generated using the NSwag toolchain v13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0)) (http://NSwag.org)
 // </auto-generated>
 //----------------------
 
@@ -238,6 +270,7 @@ namespace Petstore.Interfaces
 #pragma warning disable 8073 // Disable "CS8073 The result of the expression is always 'false' since a value of type 'T' is never equal to 'null' of type 'T?'"
 #pragma warning disable 3016 // Disable "CS3016 Arrays as attribute arguments is not CLS-compliant"
 #pragma warning disable 8603 // Disable "CS8603 Possible null reference return"
+#pragma warning disable 8604 // Disable "CS8604 Possible null reference argument for parameter"
 
 namespace Petstore.Interfaces
 {
@@ -245,7 +278,7 @@ namespace Petstore.Interfaces
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public partial class Order
     {
 
@@ -295,7 +328,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public partial class Customer
     {
 
@@ -325,7 +358,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public partial class Address
     {
 
@@ -360,7 +393,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public partial class Category
     {
 
@@ -385,7 +418,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public partial class User
     {
 
@@ -444,7 +477,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public partial class Tag
     {
 
@@ -469,7 +502,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public partial class Pet
     {
 
@@ -521,7 +554,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public partial class ApiResponse
     {
 
@@ -551,7 +584,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public enum Status
     {
 
@@ -566,7 +599,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public enum OrderStatus
     {
 
@@ -581,7 +614,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public enum PetStatus
     {
 
@@ -596,7 +629,7 @@ namespace Petstore.Interfaces
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v10.0.0.0))")]
     public partial class FileParameter
     {
         public FileParameter(System.IO.Stream data)
@@ -635,3 +668,4 @@ namespace Petstore.Interfaces
 #pragma warning restore 8073
 #pragma warning restore 3016
 #pragma warning restore 8603
+#pragma warning restore 8604

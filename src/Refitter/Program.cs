@@ -92,6 +92,22 @@ static class Program
                         "./openapi.json",
                         "--multiple-interfaces",
                         "ByEndpoint");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
+                        "--tag",
+                        "Pet",
+                        "--tag",
+                        "Store",
+                        "--tag",
+                        "User");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
+                        "--match-path",
+                        "'^/pet/.*'");
             });
 
         return app.Run(args);

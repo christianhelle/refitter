@@ -19,7 +19,6 @@ on:
 jobs:
   
   file:
-
     strategy:
       fail-fast: false
       matrix:
@@ -51,7 +50,6 @@ jobs:
       command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
   
   url:
-
     strategy:
       fail-fast: false
       matrix:
