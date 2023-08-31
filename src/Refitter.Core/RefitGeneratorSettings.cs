@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -112,6 +114,20 @@ public class RefitGeneratorSettings
     [JsonProperty("multipleInterfaces")]
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     public MultipleInterfaces MultipleInterfaces { get; set; }
+
+    /// <summary>
+    /// Set to <c>true</c> to Generate a Refit interface for each endpoint
+    /// </summary>
+    [JsonPropertyName("includePathMatches")]
+    [JsonProperty("includePathMatches")]
+    public string[] IncludePathMatches{ get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Set to <c>true</c> to Generate a Refit interface for each endpoint
+    /// </summary>
+    [JsonPropertyName("includeTags")]
+    [JsonProperty("includeTags")]
+    public string[] IncludeTags { get; set; } = Array.Empty<string>();
 }
 
 public enum MultipleInterfaces

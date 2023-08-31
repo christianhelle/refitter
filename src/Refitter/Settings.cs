@@ -78,4 +78,14 @@ public sealed class Settings : CommandSettings
     [Description($"Generate a Refit interface for each endpoint. May be one of {MultipleInterfacesValues}")]
     [CommandOption("--multiple-interfaces")]
     public Core.MultipleInterfaces MultipleInterfaces { get; set; } = Core.MultipleInterfaces.Unset;
+
+    [Description("Only include Paths that match the provided regular expression. May be set multiple times.")]
+    [CommandOption("--match-path")]
+    [DefaultValue(new string[0])]
+    public string[]? MatchPaths { get; set; }
+
+    [Description("Only include Endpoints that contain this tag. May be set multiple times and result in OR'ed evaluation.")]
+    [CommandOption("--tag")]
+    [DefaultValue(new string[0])]
+    public string[]? Tags { get; set; }
 }
