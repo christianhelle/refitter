@@ -45,7 +45,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
       - name: Setup Ruby
-        uses: ruby/setup-ruby@0a29871fe2b0200a17a4497bae54fe5df0d973aa # v1.115.3
+        uses: ruby/setup-ruby@v1
       - name: Install github_changelog_generator
         run: gem install github_changelog_generator
       - name: Re-generate CHANGELOG.md
