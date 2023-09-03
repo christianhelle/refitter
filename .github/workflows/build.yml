@@ -46,6 +46,8 @@ jobs:
           token: ${{ secrets.PAT }}
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
       - name: Install github_changelog_generator
         run: gem install github_changelog_generator
       - name: Re-generate CHANGELOG.md
