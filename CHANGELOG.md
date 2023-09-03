@@ -2,10 +2,37 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.3...HEAD)
 
 **Implemented enhancements:**
 
+- Feature: Filtering of endpoints and tags [\#132](https://github.com/christianhelle/refitter/pull/132) ([kirides](https://github.com/kirides))
+
+**Fixed bugs:**
+
+- Proposal: filter generated interfaces [\#131](https://github.com/christianhelle/refitter/issues/131)
+
+**Merged pull requests:**
+
+- Update docs with new --tag and --match-path features [\#134](https://github.com/christianhelle/refitter/pull/134) ([christianhelle](https://github.com/christianhelle))
+- Bump H.Generators.Extensions from 1.16.0 to 1.18.0 [\#133](https://github.com/christianhelle/refitter/pull/133) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump Microsoft.NET.Test.Sdk from 17.7.1 to 17.7.2 [\#130](https://github.com/christianhelle/refitter/pull/130) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [0.7.3](https://github.com/christianhelle/refitter/tree/0.7.3) (2023-08-25)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.3.37-preview...0.7.3)
+
+**Implemented enhancements:**
+
+- Fix incorrect assembly and file version [\#129](https://github.com/christianhelle/refitter/pull/129) ([christianhelle](https://github.com/christianhelle))
+
+## [0.7.3.37-preview](https://github.com/christianhelle/refitter/tree/0.7.3.37-preview) (2023-08-25)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.2...0.7.3.37-preview)
+
+**Implemented enhancements:**
+
+- Improve local smoke tests and introduce dev containers support [\#128](https://github.com/christianhelle/refitter/pull/128) ([christianhelle](https://github.com/christianhelle))
 - Add support for using .refitter file from CLI [\#127](https://github.com/christianhelle/refitter/pull/127) ([christianhelle](https://github.com/christianhelle))
 - Fix parameters' casing in openAPI document are not honoured in Refit interface methods [\#125](https://github.com/christianhelle/refitter/pull/125) ([christianhelle](https://github.com/christianhelle))
 - Exclude from generated code from code coverage [\#123](https://github.com/christianhelle/refitter/pull/123) ([christianhelle](https://github.com/christianhelle))
