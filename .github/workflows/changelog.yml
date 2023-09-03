@@ -29,7 +29,6 @@ jobs:
       - name: Re-generate CHANGELOG.md
         run: github_changelog_generator --user christianhelle --project refitter --token ${{ secrets.PAT }}
       - name: Git commit CHANGELOG.md
-        if: github.ref == 'refs/heads/main'
         run: |
           git config --global user.name "Continuous Integration"
           git config --global user.email "username@users.noreply.github.com"
