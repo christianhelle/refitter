@@ -357,7 +357,7 @@ public class SwaggerPetstoreTests
         string filename,
         RefitGeneratorSettings? settings = null)
     {
-        var swaggerFile = await CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
+        var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
         if (settings is null)
         {
             settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
@@ -369,14 +369,5 @@ public class SwaggerPetstoreTests
 
         var sut = await RefitGenerator.CreateAsync(settings);
         return sut.Generate();
-    }
-
-    private static async Task<string> CreateSwaggerFile(string contents, string filename)
-    {
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
     }
 }
