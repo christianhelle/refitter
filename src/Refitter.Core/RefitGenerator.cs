@@ -25,30 +25,22 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         return new RefitGenerator(settings, openApiDocument);
     }
 
-    private static void ProcessTagFilters(OpenApiDocument document,
-        string[] includeTags)
+    private static void ProcessTagFilters(OpenApiDocument document, IReadOnlyCollection<string> includeTags)
     {
-        if (includeTags.Length == 0)
+        if (includeTags.Count == 0)
         {
             return;
         }
-        var clonedPaths = document.Paths
-            .Where(x => x.Value != null)
-            .ToArray();
+        var clonedPaths = document.Paths.Where(pair => pair.Value != null);
         foreach (var path in clonedPaths)
         {
-            var methods = path.Value
-                .Where(x => x.Value != null)
-                .ToArray();
+            var methods = path.Value.Where(pair => pair.Value != null);
             foreach (var method in methods)
             {
                 var exclude = true;
                 foreach (var tag in includeTags)
                 {
-                    if (method.Value.Tags?.Any(x => x == tag) == true)
-                    {
-                        exclude = false;
-                    }
+                    exclude = method.Value.Tags?.Exists(x => x == tag) != true;
                 }
                 if (exclude)
                 {
