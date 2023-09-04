@@ -63,23 +63,14 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
         
         // compile all expressions here once, as we will use them more than once
-        var regexes = pathMatchExpressions.Select(x => new Regex(x, RegexOptions.Compiled)).ToArray();
+        var regexes = pathMatchExpressions.Select(x => new Regex(x, RegexOptions.Compiled)).ToList();
+        var paths = document.Paths.Keys
+            .Where(pathKey => regexes.TrueForAll(regex => !regex.IsMatch(pathKey)))
+            .ToArray();
 
-        var clonedPaths = document.Paths.ToArray();
-        foreach (var path in clonedPaths)
+        foreach (string pathKey in paths)
         {
-            var exclude = true;
-            foreach (var regex in regexes)
-            {
-                if (regex.IsMatch(path.Key))
-                {
-                    exclude = false;
-                }
-            }
-            if (exclude)
-            {
-                document.Paths.Remove(path.Key);
-            }
+            document.Paths.Remove(pathKey);
         }
     }
 
