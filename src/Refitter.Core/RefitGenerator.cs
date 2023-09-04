@@ -8,19 +8,8 @@ namespace Refitter.Core;
 /// <summary>
 /// Generates Refit clients and interfaces based on an OpenAPI specification.
 /// </summary>
-public class RefitGenerator
+public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
 {
-    private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
-    private readonly CSharpClientGeneratorFactory factory;
-
-    private RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
-    {
-        this.settings = settings;
-        this.document = document;
-        factory = new CSharpClientGeneratorFactory(settings, document);
-    }
-
     /// <summary>
     /// Creates a new instance of the <see cref="RefitGenerator"/> class asynchronously.
     /// </summary>
@@ -108,6 +97,7 @@ public class RefitGenerator
     /// <returns>The generated code as a string.</returns>
     public string Generate()
     {
+        var factory = new CSharpClientGeneratorFactory(settings, document);
         var generator = factory.Create();
         var contracts = RefitInterfaceImports
             .GetImportedNamespaces(settings)
