@@ -12,7 +12,7 @@ public class OpenApiDocumentFactoryTests
     [Theory]
     [InlineData("https://developers.intellihr.io/docs/v1/swagger.json")] // GZIP encoded
     [InlineData("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
-    public async Task Can_Build_Generated_Code_From_Url(string url)
+    public async Task Create_From_Uri_Returns_NotNull(string url)
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
         (await OpenApiDocumentFactory.CreateAsync(settings))
@@ -25,7 +25,7 @@ public class OpenApiDocumentFactoryTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
-    public async Task Can_Generate_Code_With_Multiple_Interfaces(SampleOpenSpecifications version, string filename)
+    public async Task Create_From_File_Returns_NotNull(SampleOpenSpecifications version, string filename)
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
