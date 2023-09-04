@@ -8,19 +8,8 @@ namespace Refitter.Core;
 /// <summary>
 /// Generates Refit clients and interfaces based on an OpenAPI specification.
 /// </summary>
-public class RefitGenerator
+public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
 {
-    private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
-    private readonly CSharpClientGeneratorFactory factory;
-
-    private RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
-    {
-        this.settings = settings;
-        this.document = document;
-        factory = new CSharpClientGeneratorFactory(settings, document);
-    }
-
     /// <summary>
     /// Creates a new instance of the <see cref="RefitGenerator"/> class asynchronously.
     /// </summary>
@@ -28,28 +17,12 @@ public class RefitGenerator
     /// <returns>A new instance of the <see cref="RefitGenerator"/> class.</returns>
     public static async Task<RefitGenerator> CreateAsync(RefitGeneratorSettings settings)
     {
-        OpenApiDocument document;
-        if (IsHttp(settings.OpenApiPath) && IsYaml(settings.OpenApiPath))
-        {
-            document = await OpenApiYamlDocument.FromUrlAsync(settings.OpenApiPath);
-        }
-        else if (IsHttp(settings.OpenApiPath))
-        {
-            document = await OpenApiDocument.FromUrlAsync(settings.OpenApiPath);
-        }
-        else if (IsYaml(settings.OpenApiPath))
-        {
-            document = await OpenApiYamlDocument.FromFileAsync(settings.OpenApiPath);
-        }
-        else
-        {
-            document = await OpenApiDocument.FromFileAsync(settings.OpenApiPath);
-        }
+        var openApiDocument = await OpenApiDocumentFactory.CreateAsync(settings);
 
-        ProcessTagFilters(document, settings.IncludeTags);
-        ProcessPathFilters(document, settings.IncludePathMatches);
+        ProcessTagFilters(openApiDocument, settings.IncludeTags);
+        ProcessPathFilters(openApiDocument, settings.IncludePathMatches);
 
-        return new RefitGenerator(settings, document);
+        return new RefitGenerator(settings, openApiDocument);
     }
 
     private static void ProcessTagFilters(OpenApiDocument document,
@@ -124,6 +97,7 @@ public class RefitGenerator
     /// <returns>The generated code as a string.</returns>
     public string Generate()
     {
+        var factory = new CSharpClientGeneratorFactory(settings, document);
         var generator = factory.Create();
         var contracts = RefitInterfaceImports
             .GetImportedNamespaces(settings)
@@ -193,25 +167,5 @@ public class RefitGenerator
             // </auto-generated>
 
             """);
-    }
-
-    /// <summary>
-    /// Determines whether the specified path is an HTTP URL.
-    /// </summary>
-    /// <param name="path">The path to check.</param>
-    /// <returns>True if the path is an HTTP URL, otherwise false.</returns>
-    private static bool IsHttp(string path)
-    {
-        return path.StartsWith("http://") || path.StartsWith("https://");
-    }
-
-    /// <summary>
-    /// Determines whether the specified path is a YAML file.
-    /// </summary>
-    /// <param name="path">The path to check.</param>
-    /// <returns>True if the path is a YAML file, otherwise false.</returns>
-    private static bool IsYaml(string path)
-    {
-        return path.EndsWith("yaml") || path.EndsWith("yml");
     }
 }
