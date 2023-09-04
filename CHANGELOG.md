@@ -6,10 +6,12 @@
 
 **Implemented enhancements:**
 
+- Fix issue when downloading an OpenAPI spec from a URL that returns a GZIP stream [\#136](https://github.com/christianhelle/refitter/pull/136) ([christianhelle](https://github.com/christianhelle))
 - Feature: Filtering of endpoints and tags [\#132](https://github.com/christianhelle/refitter/pull/132) ([kirides](https://github.com/kirides))
 
 **Fixed bugs:**
 
+- Downloading OpenAPI specification from URI using `content-encoding: gzip` fails [\#135](https://github.com/christianhelle/refitter/issues/135)
 - Proposal: filter generated interfaces [\#131](https://github.com/christianhelle/refitter/issues/131)
 
 **Merged pull requests:**
