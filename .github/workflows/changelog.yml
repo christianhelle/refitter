@@ -10,9 +10,13 @@ on:
       - '!src/**/*.cs'
     branches:
       - 'main'
+  pull_request:
+    types:
+      - closed  
 
 jobs:
   changelog:
+    if: github.event.pull_request.merged == true && github.repository == 'christianhelle/refitter'
     runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout repository
