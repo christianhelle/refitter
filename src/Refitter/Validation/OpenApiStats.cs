@@ -69,14 +69,14 @@ public class OpenApiStats : OpenApiVisitorBase
     public override string ToString()
     {
         return $"""
-                Path Items: {PathItemCount}
-                Operations: {OperationCount}
-                Parameters: {ParameterCount}
-                Request Bodies: {RequestBodyCount}
-                Responses: {ResponseCount}
-                Links: {LinkCount}
-                Callbacks: {CallbackCount}
-                Schemas: {SchemaCount}
+                 - Path Items: {PathItemCount}
+                 - Operations: {OperationCount}
+                 - Parameters: {ParameterCount}
+                 - Request Bodies: {RequestBodyCount}
+                 - Responses: {ResponseCount}
+                 - Links: {LinkCount}
+                 - Callbacks: {CallbackCount}
+                 - Schemas: {SchemaCount}
                 """;
     }
 }
