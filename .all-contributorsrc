@@ -143,6 +143,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "danpowell88",
+      "name": "Daniel Powell",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1100397?v=4",
+      "profile": "https://github.com/danpowell88",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
