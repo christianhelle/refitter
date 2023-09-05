@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -789,6 +789,7 @@ Returns a response that looks something like this:
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/yadanilov19"><img src="https://avatars.githubusercontent.com/u/17161065?v=4?s=100" width="100px;" alt="yadanilov19"/><br /><sub><b>yadanilov19</b></sub></a><br /><a href="#ideas-yadanilov19" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/danpowell88"><img src="https://avatars.githubusercontent.com/u/1100397?v=4?s=100" width="100px;" alt="Daniel Powell"/><br /><sub><b>Daniel Powell</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adanpowell88" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
