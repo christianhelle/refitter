@@ -12,6 +12,14 @@ static class Program
     {
         Analytics.Configure();
 
+        if (args.Length == 0)
+        {
+            args = new[]
+            {
+                "--help"
+            };
+        }
+
         var app = new CommandApp<GenerateCommand>();
         app.Configure(
             configuration =>
