@@ -53,7 +53,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             AnsiConsole.MarkupLine($"[green]Refitter v{GetType().Assembly.GetName().Version!}[/]");
             AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
 
-            await ValidateOpenApiSpec(settings);
+            if (!settings.SkipValidation)
+            {
+                await ValidateOpenApiSpec(settings);
+            }
 
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
