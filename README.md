@@ -74,6 +74,7 @@ OPTIONS:
         --multiple-interfaces                          Generate a Refit interface for each endpoint. May be one of ByEndpoint, ByTag                                
         --match-path                                   Only include Paths that match the provided regular expression. May be set multiple times                     
         --tag                                          Only include Endpoints that contain this tag. May be set multiple times and result in OR'ed evaluation       
+        --skip-validation                              Skip validation of the OpenAPI specification                                                                 
 ```
 
 To generate code from an OpenAPI specifications file, run the following:

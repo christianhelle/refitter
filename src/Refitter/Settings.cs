@@ -88,4 +88,8 @@ public sealed class Settings : CommandSettings
     [CommandOption("--tag")]
     [DefaultValue(new string[0])]
     public string[]? Tags { get; set; }
+    
+    [Description("Skip validation of the OpenAPI specification")]
+    [CommandOption("--skip-validation")]
+    public bool SkipValidation { get; set; }
 }
