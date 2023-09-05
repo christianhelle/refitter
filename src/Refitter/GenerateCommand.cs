@@ -3,11 +3,15 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.Diagnostics;
 using System.Text.Json;
+using Microsoft.OpenApi.Models;
+using Refitter.Validation;
 
 namespace Refitter;
 
 public sealed class GenerateCommand : AsyncCommand<Settings>
 {
+    private static readonly string Crlf = Environment.NewLine;
+
     public override ValidationResult Validate(CommandContext context, Settings settings)
     {
         if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
@@ -43,13 +47,14 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             IncludeTags = settings.Tags ?? Array.Empty<string>(),
         };
 
-        var crlf = Environment.NewLine;
         try
         {
             var stopwatch = Stopwatch.StartNew();
             AnsiConsole.MarkupLine($"[green]Refitter v{GetType().Assembly.GetName().Version!}[/]");
             AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
-            
+
+            await ValidateOpenApiSpec(settings);
+
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
                 var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
@@ -73,15 +78,58 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             await File.WriteAllTextAsync(outputPath, code);
             await Analytics.LogFeatureUsage(settings);
 
-            AnsiConsole.MarkupLine($"[green]Duration: {stopwatch.Elapsed}{crlf}[/]");
+            AnsiConsole.MarkupLine($"[green]Duration: {stopwatch.Elapsed}{Crlf}[/]");
             return 0;
         }
         catch (Exception exception)
         {
-            AnsiConsole.MarkupLine($"[red]Error:{crlf}{exception.Message}[/]");
-            AnsiConsole.MarkupLine($"[yellow]Stack Trace:{crlf}{exception.StackTrace}[/]");
+            if (exception is not OpenApiValidationException)
+            {
+                AnsiConsole.MarkupLine($"[red]Error:{Crlf}{exception.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Exception:{Crlf}{exception.GetType()}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");
+            }
+
             await Analytics.LogError(exception, settings);
             return exception.HResult;
+        }
+    }
+
+    private static async Task ValidateOpenApiSpec(Settings settings)
+    {
+        var validationResult = await OpenApiValidator.Validate(settings.OpenApiPath!);
+        if (!validationResult.IsValid)
+        {
+            AnsiConsole.MarkupLine($"[red]{Crlf}OpenAPI validation failed:{Crlf}[/]");
+            
+            foreach (var error in validationResult.Diagnostics.Errors)
+            {
+                TryWriteLine(error, "red", "Error");
+            }
+
+            foreach (var warning in validationResult.Diagnostics.Warnings)
+            {
+                TryWriteLine(warning, "yellow", "Warning");
+            }
+            
+            validationResult.ThrowIfInvalid();
+        }
+        
+        AnsiConsole.MarkupLine($"[green]{Crlf}OpenAPI statistics:{Crlf}{validationResult.Statistics}{Crlf}[/]");
+    }
+
+    private static void TryWriteLine(
+        OpenApiError error,
+        string color,
+        string label)
+    {
+        try
+        {
+            AnsiConsole.MarkupLine($"[{color}]{label}:{Crlf}{error}{Crlf}[/]");
+        }
+        catch
+        {
+            // ignored
         }
     }
 
