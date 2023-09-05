@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Show help text if no arguments are passed [\#140](https://github.com/christianhelle/refitter/pull/140) ([christianhelle](https://github.com/christianhelle))
 - Resolve SonarCloud Code Smells [\#137](https://github.com/christianhelle/refitter/pull/137) ([christianhelle](https://github.com/christianhelle))
 - Fix issue when downloading an OpenAPI spec from a URL that returns a GZIP stream [\#136](https://github.com/christianhelle/refitter/pull/136) ([christianhelle](https://github.com/christianhelle))
 - Feature: Filtering of endpoints and tags [\#132](https://github.com/christianhelle/refitter/pull/132) ([kirides](https://github.com/kirides))
@@ -17,6 +18,7 @@
 
 **Merged pull requests:**
 
+- docs: add danpowell88 as a contributor for bug [\#139](https://github.com/christianhelle/refitter/pull/139) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update docs with new --tag and --match-path features [\#134](https://github.com/christianhelle/refitter/pull/134) ([christianhelle](https://github.com/christianhelle))
 - Bump H.Generators.Extensions from 1.16.0 to 1.18.0 [\#133](https://github.com/christianhelle/refitter/pull/133) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump Microsoft.NET.Test.Sdk from 17.7.1 to 17.7.2 [\#130](https://github.com/christianhelle/refitter/pull/130) ([dependabot[bot]](https://github.com/apps/dependabot))
