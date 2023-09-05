@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Introduce OpenAPI validation [\#141](https://github.com/christianhelle/refitter/pull/141) ([christianhelle](https://github.com/christianhelle))
 - Show help text if no arguments are passed [\#140](https://github.com/christianhelle/refitter/pull/140) ([christianhelle](https://github.com/christianhelle))
 - Resolve SonarCloud Code Smells [\#137](https://github.com/christianhelle/refitter/pull/137) ([christianhelle](https://github.com/christianhelle))
 - Fix issue when downloading an OpenAPI spec from a URL that returns a GZIP stream [\#136](https://github.com/christianhelle/refitter/pull/136) ([christianhelle](https://github.com/christianhelle))
