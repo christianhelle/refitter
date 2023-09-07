@@ -55,6 +55,15 @@ paths:
       responses:
         '200':
           description: 'successful operation'
+  /baz:
+    get:
+      tags:
+      - 'Baz'
+      operationId: 'Get all bazs'
+      description: 'Get all bazs'      
+      responses:
+        '200':
+          description: 'successful operation'
 ";
 
     [Fact]
@@ -65,11 +74,12 @@ paths:
     }
 
     [Fact]
-    public async Task Generates_Bar_Methods()
+    public async Task Generates_BarAndBaz_Methods()
     {
         string generateCode = await GenerateCode();
         generateCode.Should().Contain("\"/bar\"");
         generateCode.Should().Contain("\"/bar/{id}\"");
+        generateCode.Should().Contain("\"/baz\"");
         generateCode.Should().NotContain("/foo");
     }
 
@@ -89,7 +99,7 @@ paths:
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
-            IncludeTags = new[] { "Bar" }
+            IncludeTags = new[] { "Bar", "Baz" }
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);

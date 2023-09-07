@@ -31,17 +31,18 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         {
             return;
         }
-        var clonedPaths = document.Paths.Where(pair => pair.Value != null);
+        var clonedPaths = document.Paths.Where(pair => pair.Value != null)
+            // as we modify the document.Paths
+            // we have to enumerate on a snapshot of the items
+            .ToArray();
         foreach (var path in clonedPaths)
         {
-            var methods = path.Value.Where(pair => pair.Value != null);
+            var methods = path.Value.Where(pair => pair.Value != null)
+                // same reason as with document.Paths
+                .ToArray();
             foreach (var method in methods)
             {
-                var exclude = true;
-                foreach (var tag in includeTags)
-                {
-                    exclude = method.Value.Tags?.Exists(x => x == tag) != true;
-                }
+                var exclude = method.Value.Tags?.Exists(includeTags.Contains) != true;
                 if (exclude)
                 {
                     path.Value.Remove(method.Key);
