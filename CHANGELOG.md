@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [0.7.5](https://github.com/christianhelle/refitter/tree/0.7.5) (2023-09-07)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.4...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.4...0.7.5)
 
 **Fixed bugs:**
 
