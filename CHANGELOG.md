@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.3...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.4...HEAD)
+
+**Fixed bugs:**
+
+- Filter `--tag` broken [\#142](https://github.com/christianhelle/refitter/issues/142)
+
+**Merged pull requests:**
+
+- Fix \#142 by changing includeTags filtering and restoring collection snapshots [\#143](https://github.com/christianhelle/refitter/pull/143) ([kirides](https://github.com/kirides))
+
+## [0.7.4](https://github.com/christianhelle/refitter/tree/0.7.4) (2023-09-05)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.3...0.7.4)
 
 **Implemented enhancements:**
 
