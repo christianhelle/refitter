@@ -16,7 +16,7 @@ on:
 
 jobs:
   changelog:
-    if: github.event.pull_request.merged == true && github.repository == 'christianhelle/refitter'
+    if: github.repository == 'christianhelle/refitter'
     runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout repository
