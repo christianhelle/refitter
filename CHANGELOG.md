@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.5...HEAD)
+
+**Merged pull requests:**
+
+- Bump Microsoft.OpenApi.Readers from 1.6.7 to 1.6.8 [\#144](https://github.com/christianhelle/refitter/pull/144) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [0.7.5](https://github.com/christianhelle/refitter/tree/0.7.5) (2023-09-07)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.4...0.7.5)
