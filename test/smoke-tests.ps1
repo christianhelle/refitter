@@ -117,9 +117,9 @@ function RunTests {
         
         Get-ChildItem '*.generated.cs' -Recurse | foreach { Remove-Item -Path $_.FullName }
 
-        Write-Host "dotnet run --no-build --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath"
-        $process = Start-Process "dotnet" `
-            -Args "run --no-build --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
+        Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
+        $process = Start-Process "./bin/refitter" `
+            -Args """$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
