@@ -4,8 +4,17 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.5...HEAD)
 
+**Implemented enhancements:**
+
+- Skip default values when collecting feature usages for Analytics [\#145](https://github.com/christianhelle/refitter/pull/145) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Unexpected initial token 'Boolean' when populating object [\#138](https://github.com/christianhelle/refitter/issues/138)
+
 **Merged pull requests:**
 
+- Add matchPath option in example .refitter file in README [\#146](https://github.com/christianhelle/refitter/pull/146) ([christianhelle](https://github.com/christianhelle))
 - Bump Microsoft.OpenApi.Readers from 1.6.7 to 1.6.8 [\#144](https://github.com/christianhelle/refitter/pull/144) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [0.7.5](https://github.com/christianhelle/refitter/tree/0.7.5) (2023-09-07)
