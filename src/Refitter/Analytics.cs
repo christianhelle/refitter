@@ -1,6 +1,10 @@
+using System.Reflection;
 using System.Text.Json;
 using Exceptionless;
 using Exceptionless.Plugins;
+
+using Refitter.Core;
+
 using Spectre.Console.Cli;
 
 namespace Refitter;
@@ -25,9 +29,10 @@ public static class Analytics
 
         foreach (var property in typeof(Settings).GetProperties())
         {
-            var value = property.GetValue(settings);
-            if (value is null or false)
+            if (!CanLogFeature(settings, property))
+            {
                 continue;
+            }
 
             property.GetCustomAttributes(typeof(CommandOptionAttribute), true)
                 .OfType<CommandOptionAttribute>()
@@ -45,6 +50,22 @@ public static class Analytics
         }
 
         return ExceptionlessClient.Default.ProcessQueueAsync();
+    }
+
+    private static bool CanLogFeature(Settings settings, PropertyInfo property)
+    {
+        var value = property.GetValue(settings);
+        if (value is null or false)
+            return false;
+        
+        if (property.PropertyType == typeof(string[]) && ((string[])value).Length == 0)
+            return false;
+        
+        if (property.PropertyType == typeof(MultipleInterfaces) && 
+            ((MultipleInterfaces)value) == MultipleInterfaces.Unset)
+            return false;
+        
+        return true;
     }
 
     public static Task LogError(Exception exception, Settings settings)
