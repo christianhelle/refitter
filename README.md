@@ -137,6 +137,10 @@ The following is an example `.refitter` file
     "Pet",
     "Store",
     "User"
+  ],
+  "matchPath": [ // Optional. Only include Paths that match the provided regular expression
+    "^/pet/.*",
+    "^/store/.*",
   ]
 }
 ```
