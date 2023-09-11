@@ -53,7 +53,7 @@ The following is an example `.refitter` file
   ],
   "matchPath": [ // Optional. Only include Paths that match the provided regular expression
     "^/pet/.*",
-    "^/store/.*",
+    "^/store/.*"
   ]
 }
 ```
