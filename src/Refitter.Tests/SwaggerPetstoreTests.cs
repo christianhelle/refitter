@@ -370,4 +370,15 @@ public class SwaggerPetstoreTests
         var sut = await RefitGenerator.CreateAsync(settings);
         return sut.Generate();
     }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_Obsolete_Attribute(SampleOpenSpecifications version, string filename)
+    {
+        var generateCode = await GenerateCode(version, filename);
+        generateCode.Should().Contain("[Obsolete]");
+    }
 }
