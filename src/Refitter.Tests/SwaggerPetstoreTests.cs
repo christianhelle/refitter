@@ -379,7 +379,7 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_Obsolete_Attribute(SampleOpenSpecifications version, string filename)
     {
         var generateCode = await GenerateCode(version, filename);
-        generateCode.Should().Contain("[Obsolete]");
+        generateCode.Should().Contain("[System.Obsolete]");
     }
 
     [Theory]

@@ -144,7 +144,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     {
         if (operation.IsDeprecated)
         {
-            code.AppendLine($"{Separator}{Separator}[Obsolete]");
+            code.AppendLine($"{Separator}{Separator}[System.Obsolete]");
         }
     }
 

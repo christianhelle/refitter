@@ -224,7 +224,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode.WithApiResponse
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
         /// </summary>
-        [Obsolete]
+        [System.Obsolete]
         [Get("/pet/findByTags")]
         Task<IApiResponse<ICollection<Pet>>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
 
