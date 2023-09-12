@@ -1,10 +1,13 @@
-using Refitter.Core;
-using Spectre.Console;
-using Spectre.Console.Cli;
 using System.Diagnostics;
 using System.Text.Json;
+
 using Microsoft.OpenApi.Models;
+
+using Refitter.Core;
 using Refitter.Validation;
+
+using Spectre.Console;
+using Spectre.Console.Cli;
 
 namespace Refitter;
 
@@ -14,7 +17,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
     {
-        if (!settings.NoLogging) 
+        if (!settings.NoLogging)
             Analytics.Configure();
 
         if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
@@ -48,6 +51,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             MultipleInterfaces = settings.MultipleInterfaces,
             IncludePathMatches = settings.MatchPaths ?? Array.Empty<string>(),
             IncludeTags = settings.Tags ?? Array.Empty<string>(),
+            GenerateDeprecatedOperations = !settings.NoDeprecatedOperations,
         };
 
         try
@@ -59,7 +63,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                     ? "[green]Support key: Unavailable when logging is disabled[/]"
                     : $"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
 
-            if (!settings.SkipValidation) 
+            if (!settings.SkipValidation)
                 await ValidateOpenApiSpec(settings);
 
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))

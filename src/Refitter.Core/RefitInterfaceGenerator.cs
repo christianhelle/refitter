@@ -43,6 +43,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             {
                 var operation = operations.Value;
 
+                if (!settings.GenerateDeprecatedOperations && operation.IsDeprecated)
+                {
+                    continue;
+                }
+
                 var returnTypeParameter = new[] { "200", "201", "203", "206" }
                     .Where(code => operation.Responses.ContainsKey(code))
                     .Select(code => generator.GetTypeName(operation.Responses[code].ActualResponse.Schema, true, null))

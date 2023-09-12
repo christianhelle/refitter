@@ -35,6 +35,7 @@ EXAMPLES:
     refitter ./openapi.json --multiple-interfaces ByEndpoint
     refitter ./openapi.json --tag Pet --tag Store --tag User
     refitter ./openapi.json --match-path '^/pet/.*'
+    refitter ./openapi.json --no-deprecated-operations
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -59,6 +60,7 @@ OPTIONS:
         --match-path                                   Only include Paths that match the provided regular expression. May be set multiple times                     
         --tag                                          Only include Endpoints that contain this tag. May be set multiple times and result in OR'ed evaluation       
         --skip-validation                              Skip validation of the OpenAPI specification                                                                 
+        --no-deprecated-operations                     Don't generate deprecated operations
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -222,6 +224,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode.WithApiResponse
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
         /// </summary>
+        [Obsolete]
         [Get("/pet/findByTags")]
         Task<IApiResponse<ICollection<Pet>>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
 
