@@ -36,7 +36,8 @@ jobs:
           "--use-iso-date-format",
           "--multiple-interfaces ByEndpoint",
           "--match-path ^/pet/.*",
-          "--tag pet"
+          "--tag pet",
+          "--no-deprecated-operations"
         ]
 
     steps:
