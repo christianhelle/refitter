@@ -152,6 +152,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "Ekkeir",
+      "name": "Ekkeir",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36194685?v=4",
+      "profile": "https://github.com/Ekkeir",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
