@@ -6,6 +6,8 @@
 
 **Implemented enhancements:**
 
+- Mark deprecated operations [\#147](https://github.com/christianhelle/refitter/issues/147)
+- GenerateObsoleteAttribute [\#154](https://github.com/christianhelle/refitter/pull/154) ([angelofb](https://github.com/angelofb))
 - Disable support keys if --no-logging is specified [\#153](https://github.com/christianhelle/refitter/pull/153) ([christianhelle](https://github.com/christianhelle))
 - Skip default values when collecting feature usages for Analytics [\#145](https://github.com/christianhelle/refitter/pull/145) ([christianhelle](https://github.com/christianhelle))
 
