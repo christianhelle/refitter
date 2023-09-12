@@ -54,12 +54,12 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         {
             var stopwatch = Stopwatch.StartNew();
             AnsiConsole.MarkupLine($"[green]Refitter v{GetType().Assembly.GetName().Version!}[/]");
-            AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
+            
+            if (!settings.NoLogging)
+                AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
 
-            if (!settings.SkipValidation)
-            {
+            if (!settings.SkipValidation) 
                 await ValidateOpenApiSpec(settings);
-            }
 
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
