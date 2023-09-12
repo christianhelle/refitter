@@ -16,7 +16,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
     internal RefitMultipleInterfaceGenerator(
         RefitGeneratorSettings settings,
         OpenApiDocument document,
-        CustomCSharpClientGenerator generator) 
+        CustomCSharpClientGenerator generator)
         : base(settings, document, generator)
     {
         this.settings = settings;
@@ -34,7 +34,12 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
             {
                 var operation = operations.Value;
 
-                var returnTypeParameter = new[] {"200", "201", "203", "206"}
+                if (!settings.GenerateDeprecatedOperations && operation.IsDeprecated)
+                {
+                    continue;
+                }
+
+                var returnTypeParameter = new[] { "200", "201", "203", "206" }
                     .Where(code => operation.Responses.ContainsKey(code))
                     .Select(code => generator.GetTypeName(operation.Responses[code].ActualResponse.Schema, true, null))
                     .FirstOrDefault();
@@ -54,6 +59,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
 
                 GenerateMethodXmlDocComments(operation, code);
+                GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);
 

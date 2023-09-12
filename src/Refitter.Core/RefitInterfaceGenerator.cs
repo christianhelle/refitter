@@ -1,7 +1,6 @@
-using NSwag;
-
 using System.Text;
 
+using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
@@ -44,6 +43,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             {
                 var operation = operations.Value;
 
+                if (!settings.GenerateDeprecatedOperations && operation.IsDeprecated)
+                {
+                    continue;
+                }
+
                 var returnTypeParameter = new[] { "200", "201", "203", "206" }
                     .Where(code => operation.Responses.ContainsKey(code))
                     .Select(code => generator.GetTypeName(operation.Responses[code].ActualResponse.Schema, true, null))
@@ -61,6 +65,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
 
                 GenerateMethodXmlDocComments(operation, code);
+                GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);
 
@@ -82,15 +87,15 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     }
 
     protected void GenerateAcceptHeaders(
-        KeyValuePair<string, OpenApiOperation> operations, 
-        OpenApiOperation operation, 
+        KeyValuePair<string, OpenApiOperation> operations,
+        OpenApiOperation operation,
         StringBuilder code)
     {
         if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
         {
             //Generate header "Accept"
             var contentTypes = operations.Value.Responses.Select(pair => operation.Responses[pair.Key].Content.Keys);
-            
+
             //remove duplicates
             var uniqueContentTypes = contentTypes
                 .GroupBy(x => x)
@@ -132,6 +137,14 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 code.AppendLine($"{Separator}{Separator}/// {line.Trim()}");
 
             code.AppendLine($"{Separator}{Separator}/// </summary>");
+        }
+    }
+
+    protected void GenerateObsoleteAttribute(OpenApiOperation operation, StringBuilder code)
+    {
+        if (operation.IsDeprecated)
+        {
+            code.AppendLine($"{Separator}{Separator}[System.Obsolete]");
         }
     }
 

@@ -1,5 +1,6 @@
-using Spectre.Console.Cli;
 using System.ComponentModel;
+
+using Spectre.Console.Cli;
 
 namespace Refitter;
 
@@ -88,8 +89,13 @@ public sealed class Settings : CommandSettings
     [CommandOption("--tag")]
     [DefaultValue(new string[0])]
     public string[]? Tags { get; set; }
-    
+
     [Description("Skip validation of the OpenAPI specification")]
     [CommandOption("--skip-validation")]
     public bool SkipValidation { get; set; }
+
+    [Description("Don't generate deprecated operations")]
+    [CommandOption("--no-deprecated-operations")]
+    [DefaultValue(false)]
+    public bool NoDeprecatedOperations { get; set; }
 }

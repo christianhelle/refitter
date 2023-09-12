@@ -2,13 +2,12 @@
 
 using Spectre.Console.Cli;
 
-
 namespace Refitter;
 
 [ExcludeFromCodeCoverage]
-static class Program
+internal static class Program
 {
-    static int Main(string[] args)
+    private static int Main(string[] args)
     {
         if (args.Length == 0)
         {
@@ -116,6 +115,11 @@ static class Program
                         "./openapi.json",
                         "--match-path",
                         "'^/pet/.*'");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
+                        "--no-deprecated-operations");
             });
 
         return app.Run(args);

@@ -34,7 +34,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
         var byGroup = document.Paths
             .SelectMany(x => x.Value, (k, v) => (PathItem: k, Operation: v))
-            .GroupBy(x => GetGroupName(x.Operation.Value, ungroupedTitle), (k, v) => new {Key = k, Combined = v});
+            .GroupBy(x => GetGroupName(x.Operation.Value, ungroupedTitle), (k, v) => new { Key = k, Combined = v });
 
         Dictionary<string, StringBuilder> interfacesByGroup = new();
         foreach (var kv in byGroup)
@@ -44,7 +44,12 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 var operations = op.Operation;
                 var operation = operations.Value;
 
-                var returnTypeParameter = new[] {"200", "201", "203", "206"}
+                if (!settings.GenerateDeprecatedOperations && operation.IsDeprecated)
+                {
+                    continue;
+                }
+
+                var returnTypeParameter = new[] { "200", "201", "203", "206" }
                     .Where(code => operation.Responses.ContainsKey(code))
                     .Select(code => generator.GetTypeName(operation.Responses[code].ActualResponse.Schema, true, null))
                     .FirstOrDefault();
@@ -68,6 +73,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
 
                 GenerateMethodXmlDocComments(operation, sb);
+                GenerateObsoleteAttribute(operation, sb);
                 GenerateForMultipartFormData(operationModel, sb);
                 GenerateAcceptHeaders(operations, operation, sb);
 
@@ -112,7 +118,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             $"I{name.CapitalizeFirstCharacter()}",
             suffix: "Api"
             );
-        
+
         knownIdentifiers.Add(generatedName);
         return generatedName;
     }
