@@ -38,7 +38,9 @@ static class Program
                     .AddExample(
                         "./openapi.json",
                         "--settings-file",
-                        "./openapi.refitter");
+                        "./openapi.refitter",
+                        "--output",
+                        "./GeneratedCode.cs");
 
                 configuration
                     .AddExample(
