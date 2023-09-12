@@ -795,7 +795,7 @@ Returns a response that looks something like this:
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/yadanilov19"><img src="https://avatars.githubusercontent.com/u/17161065?v=4?s=100" width="100px;" alt="yadanilov19"/><br /><sub><b>yadanilov19</b></sub></a><br /><a href="#ideas-yadanilov19" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/danpowell88"><img src="https://avatars.githubusercontent.com/u/1100397?v=4?s=100" width="100px;" alt="Daniel Powell"/><br /><sub><b>Daniel Powell</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adanpowell88" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Ekkeir"><img src="https://avatars.githubusercontent.com/u/36194685?v=4?s=100" width="100px;" alt="Ekkeir"/><br /><sub><b>Ekkeir</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=Ekkeir" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Ekkeir"><img src="https://avatars.githubusercontent.com/u/36194685?v=4?s=100" width="100px;" alt="Ekkeir"/><br /><sub><b>Ekkeir</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=Ekkeir" title="Documentation">📖</a> <a href="https://github.com/christianhelle/refitter/issues?q=author%3AEkkeir" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
