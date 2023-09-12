@@ -14,6 +14,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
     {
+        if (!settings.NoLogging) 
+            Analytics.Configure();
+
         if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
             return ValidationResult.Error("Input file is required");
 
