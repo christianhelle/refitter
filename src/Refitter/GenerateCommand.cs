@@ -14,6 +14,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
     {
+        if (!settings.NoLogging) 
+            Analytics.Configure();
+
         if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
             return ValidationResult.Error("Input file is required");
 
@@ -51,12 +54,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         {
             var stopwatch = Stopwatch.StartNew();
             AnsiConsole.MarkupLine($"[green]Refitter v{GetType().Assembly.GetName().Version!}[/]");
-            AnsiConsole.MarkupLine($"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
+            AnsiConsole.MarkupLine(
+                settings.NoLogging
+                    ? "[green]Support key: Unavailable when logging is disabled[/]"
+                    : $"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
 
-            if (!settings.SkipValidation)
-            {
+            if (!settings.SkipValidation) 
                 await ValidateOpenApiSpec(settings);
-            }
 
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
@@ -104,7 +108,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (!validationResult.IsValid)
         {
             AnsiConsole.MarkupLine($"[red]{Crlf}OpenAPI validation failed:{Crlf}[/]");
-            
+
             foreach (var error in validationResult.Diagnostics.Errors)
             {
                 TryWriteLine(error, "red", "Error");
@@ -114,10 +118,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             {
                 TryWriteLine(warning, "yellow", "Warning");
             }
-            
+
             validationResult.ThrowIfInvalid();
         }
-        
+
         AnsiConsole.MarkupLine($"[green]{Crlf}OpenAPI statistics:{Crlf}{validationResult.Statistics}{Crlf}[/]");
     }
 

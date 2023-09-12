@@ -10,8 +10,6 @@ static class Program
 {
     static int Main(string[] args)
     {
-        Analytics.Configure();
-
         if (args.Length == 0)
         {
             args = new[]
