@@ -38,7 +38,7 @@ USAGE:
 EXAMPLES:
     refitter ./openapi.json
     refitter https://petstore3.swagger.io/api/v3/openapi.yaml
-    refitter ./openapi.json --settings-file ./openapi.refitter
+    refitter ./openapi.json --settings-file ./openapi.refitter --output ./GeneratedCode.cs
     refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --output ./GeneratedCode.cs
     refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --internal
     refitter ./openapi.json --output ./IGeneratedCode.cs --interface-only
