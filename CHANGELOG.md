@@ -21,6 +21,7 @@
 
 **Merged pull requests:**
 
+- Update docs with deails about --no-deprecated-operations [\#155](https://github.com/christianhelle/refitter/pull/155) ([christianhelle](https://github.com/christianhelle))
 - Fix documentation regarding --settings-file usage [\#152](https://github.com/christianhelle/refitter/pull/152) ([christianhelle](https://github.com/christianhelle))
 - docs: add Ekkeir as a contributor for bug [\#151](https://github.com/christianhelle/refitter/pull/151) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add Ekkeir as a contributor for doc [\#150](https://github.com/christianhelle/refitter/pull/150) ([allcontributors[bot]](https://github.com/apps/allcontributors))
