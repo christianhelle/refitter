@@ -12,8 +12,15 @@
 
 - Unexpected initial token 'Boolean' when populating object [\#138](https://github.com/christianhelle/refitter/issues/138)
 
+**Closed issues:**
+
+- Improving documentation for --settings-file cli tool parameter [\#148](https://github.com/christianhelle/refitter/issues/148)
+
 **Merged pull requests:**
 
+- Fix documentation regarding --settings-file usage [\#152](https://github.com/christianhelle/refitter/pull/152) ([christianhelle](https://github.com/christianhelle))
+- docs: add Ekkeir as a contributor for bug [\#151](https://github.com/christianhelle/refitter/pull/151) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add Ekkeir as a contributor for doc [\#150](https://github.com/christianhelle/refitter/pull/150) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Add matchPath option in example .refitter file in README [\#146](https://github.com/christianhelle/refitter/pull/146) ([christianhelle](https://github.com/christianhelle))
 - Bump Microsoft.OpenApi.Readers from 1.6.7 to 1.6.8 [\#144](https://github.com/christianhelle/refitter/pull/144) ([dependabot[bot]](https://github.com/apps/dependabot))
 
