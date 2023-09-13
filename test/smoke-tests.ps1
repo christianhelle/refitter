@@ -30,7 +30,7 @@ function GenerateAndBuild {
         $args
     )
     
-    Get-ChildItem '*.generated.cs' -Recurse | foreach { Remove-Item -Path $_.FullName }
+    Get-ChildItem '*.generated.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName }
 
     Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
     $process = Start-Process "./bin/refitter" `
