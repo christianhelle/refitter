@@ -32,9 +32,9 @@ function GenerateAndBuild {
     
     Get-ChildItem '*.generated.cs' -Recurse | foreach { Remove-Item -Path $_.FullName }
 
-    Write-Host "dotnet run --no-build --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
-    $process = Start-Process "dotnet" `
-        -Args "run --no-build --project ../src/Refitter/Refitter.csproj ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
+    Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
+    $process = Start-Process "./bin/refitter" `
+        -Args "./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
         -NoNewWindow `
         -PassThru
     $process | Wait-Process
@@ -81,8 +81,8 @@ function RunTests {
         "hubspot-webhooks"
     )
     
-    Write-Host "dotnet build --project ../src/Refitter/Refitter.csproj"
-    Start-Process "dotnet" -Args "build -p:TreatWarningsAsErrors=true ../src/Refitter/Refitter.csproj" -NoNewWindow -PassThru | Wait-Process
+    Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin"
+    Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin" -NoNewWindow -PassThru | Wait-Process
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
@@ -104,7 +104,7 @@ function RunTests {
                     GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response"
                     GenerateAndBuild -format $format -namespace "$namespace.UsingIsoDateFormat" -outputPath "UsingIsoDateFormat$outputPath" -args "--use-iso-date-format"
                     GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfaces" -outputPath "MultipleInterfaces$outputPath" -args "--multiple-interfaces ByEndpoint"
-                    GenerateAndBuild -format $format -namespace "$namespace.TagFiltered" -outputPath "TagFiltered$outputPath" -args "--tag pet"
+                    GenerateAndBuild -format $format -namespace "$namespace.TagFiltered" -outputPath "TagFiltered$outputPath" -args "--tag pet --tag user --tag store"
                     GenerateAndBuild -format $format -namespace "$namespace.MatchPathFiltered" -outputPath "MatchPathFiltered$outputPath" -args "--match-path ^/pet/.*"
                 }
             }
@@ -117,9 +117,9 @@ function RunTests {
         
         Get-ChildItem '*.generated.cs' -Recurse | foreach { Remove-Item -Path $_.FullName }
 
-        Write-Host "dotnet run --no-build --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath"
-        $process = Start-Process "dotnet" `
-            -Args "run --no-build --project ../src/Refitter/Refitter.csproj ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
+        Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
+        $process = Start-Process "./bin/refitter" `
+            -Args """$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
