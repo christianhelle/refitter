@@ -32,11 +32,20 @@ function GenerateAndBuild {
     
     Get-ChildItem '*.generated.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName }
 
-    Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
-    $process = Start-Process "./bin/refitter" `
-        -Args "./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
-        -NoNewWindow `
-        -PassThru
+    if ($args.Contains("settings-file")) {        
+        Write-Host "refitter --output ./GeneratedCode/$outputPath --no-logging $args"
+        $process = Start-Process "./bin/refitter" `
+            -Args "--no-logging $args" `
+            -NoNewWindow `
+            -PassThru
+    } else {        
+        Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
+        $process = Start-Process "./bin/refitter" `
+            -Args "./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
+            -NoNewWindow `
+            -PassThru
+    }
+
     $process | Wait-Process
     if ($process.ExitCode -ne 0) {
         throw "Refitter failed"
@@ -83,6 +92,8 @@ function RunTests {
     
     Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin"
     Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin" -NoNewWindow -PassThru | Wait-Process
+    
+    GenerateAndBuild -format " " -namespace " " -outputPath " " -args "--settings-file ./petstore.refitter"
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
@@ -98,7 +109,6 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    GenerateAndBuild -format $format -namespace $namespace -outputPath $outputPath -args "--settings-file ./SourceGenerator/swagger-petstore-direct.refitter"
                     GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens"
                     GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal"
                     GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response"
