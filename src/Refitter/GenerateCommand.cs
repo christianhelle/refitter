@@ -24,6 +24,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             return ValidationResult.Error("Input or settings file is required");
 
+        if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
+            !string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            return ValidationResult.Error(
+                "You should either specify an input URL/file directly " +
+                "or use specify it in 'openApiPath' from the settings file, " +
+                "not both");
+
         if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
         {
             var json = File.ReadAllText(settings.SettingsFilePath);
