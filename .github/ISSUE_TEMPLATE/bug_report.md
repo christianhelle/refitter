@@ -2,8 +2,9 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: 'bug'
-assignees: 'christianhelle'
+labels: bug
+assignees: christianhelle
+
 ---
 
 **Describe the bug**
