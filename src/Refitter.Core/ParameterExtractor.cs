@@ -50,6 +50,13 @@ internal static class ParameterExtractor
         parameters.AddRange(headerParameters);
         parameters.AddRange(binaryBodyParameters);
 
+        parameters = parameters.OrderBy(c => c.Contains("?")).ToList();
+        for (int index = 0; index < parameters.Count; index++)
+        {
+            if (parameters[index].Contains("?"))
+                parameters[index] += " = null";
+        }
+
         if (settings.UseCancellationTokens)
             parameters.Add("CancellationToken cancellationToken = default");
 
@@ -81,8 +88,19 @@ internal static class ParameterExtractor
         return "[" + string.Join(", ", filteredAttributes) + "] ";
     }
 
-    private static string GetBodyParameterType(CSharpParameterModel parameterModel) =>
-        WellKnownNamesspaces.TrimImportedNamespaces(FindSupportedType(parameterModel.Type));
+    private static string GetBodyParameterType(CSharpParameterModel parameterModel)
+    {
+        var type = WellKnownNamesspaces
+            .TrimImportedNamespaces(
+                FindSupportedType(
+                    parameterModel.Type));
+
+        if (!type.EndsWith("?") &&
+            (parameterModel.IsNullable || parameterModel.IsOptional || !parameterModel.IsRequired)) 
+            type += "?";
+
+        return type;
+    }
 
     private static string FindSupportedType(string typeName) =>
         typeName == "FileResponse" ? "StreamPart" : typeName;
