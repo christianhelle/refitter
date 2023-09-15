@@ -50,15 +50,22 @@ internal static class ParameterExtractor
         parameters.AddRange(headerParameters);
         parameters.AddRange(binaryBodyParameters);
 
+        parameters = ReOrderNullableParameters(parameters);
+
+        if (settings.UseCancellationTokens)
+            parameters.Add("CancellationToken cancellationToken = default");
+
+        return parameters;
+    }
+
+    private static List<string> ReOrderNullableParameters(List<string> parameters)
+    {
         parameters = parameters.OrderBy(c => c.Contains("?")).ToList();
         for (int index = 0; index < parameters.Count; index++)
         {
             if (parameters[index].Contains("?"))
                 parameters[index] += " = null";
         }
-
-        if (settings.UseCancellationTokens)
-            parameters.Add("CancellationToken cancellationToken = default");
 
         return parameters;
     }
