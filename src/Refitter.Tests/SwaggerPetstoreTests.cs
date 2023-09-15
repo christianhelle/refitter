@@ -183,7 +183,7 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.GenerateOperationHeaders = true;
         var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"api-key\")] string api_key");
+        generateCode.Should().Contain("[Header(\"api-key\")] string? api_key");
     }
 
     [Theory]
@@ -196,7 +196,7 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.GenerateOperationHeaders = true;
         var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"api_key\")] string api_key");
+        generateCode.Should().Contain("[Header(\"api_key\")] string? api_key");
     }
 
     [Theory]
@@ -209,7 +209,7 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.GenerateOperationHeaders = false;
         var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("[Header(\"api_key\")] string api_key");
+        generateCode.Should().NotContain("[Header(\"api_key\")] string? api_key");
     }
 
     [Theory]
