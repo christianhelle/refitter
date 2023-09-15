@@ -63,6 +63,13 @@ paths:
     }
 
     [Fact]
+    public async Task Generates_CancellationToken_Last()
+    {
+        string generateCode = await GenerateCode();
+        generateCode.Should().Contain("CancellationToken cancellationToken = default);");
+    }
+
+    [Fact]
     public async Task Can_Build_Generated_Code()
     {
         string generateCode = await GenerateCode();
@@ -75,7 +82,11 @@ paths:
     private static async Task<string> GenerateCode()
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            UseCancellationTokens = true
+        };
 
         var sut = await RefitGenerator.CreateAsync(settings);
         var generateCode = sut.Generate();
