@@ -50,7 +50,7 @@ internal static class ParameterExtractor
         parameters.AddRange(headerParameters);
         parameters.AddRange(binaryBodyParameters);
 
-        parameters = ReOrderNullableParameters(parameters);
+        parameters = ReOrderNullableParameters(parameters, settings);
 
         if (settings.UseCancellationTokens)
             parameters.Add("CancellationToken cancellationToken = default");
@@ -58,13 +58,18 @@ internal static class ParameterExtractor
         return parameters;
     }
 
-    private static List<string> ReOrderNullableParameters(List<string> parameters)
+    private static List<string> ReOrderNullableParameters(
+        List<string> parameters,
+        RefitGeneratorSettings settings)
     {
+        if (!settings.OptionalParameters)
+            return parameters;
+        
         parameters = parameters.OrderBy(c => c.Contains("?")).ToList();
         for (int index = 0; index < parameters.Count; index++)
         {
             if (parameters[index].Contains("?"))
-                parameters[index] += " = null";
+                parameters[index] += " = default";
         }
 
         return parameters;

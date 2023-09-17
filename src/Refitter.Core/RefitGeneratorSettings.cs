@@ -133,6 +133,13 @@ public class RefitGeneratorSettings
     [JsonPropertyName("operationNameTemplate")]
     [JsonProperty("operationNameTemplate")]
     public string? OperationNameTemplate { get; set; }
+
+    /// <summary>
+    /// Set to <c>true</c> to re-order optional parameters to the end of the parameter list
+    /// </summary>
+    [JsonPropertyName("optionalParameters")]
+    [JsonProperty("optionalParameters")]
+    public bool OptionalParameters { get; set; }
 }
 
 public enum MultipleInterfaces

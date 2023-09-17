@@ -59,7 +59,7 @@ paths:
     public async Task Generates_Nullable_Parameters(string parameterName)
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain($"string? {parameterName} = null");
+        generateCode.Should().Contain($"string? {parameterName} = default");
     }
 
     [Fact]
@@ -85,7 +85,8 @@ paths:
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
-            UseCancellationTokens = true
+            UseCancellationTokens = true,
+            OptionalParameters = true,
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
