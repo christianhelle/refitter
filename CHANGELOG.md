@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - Mark deprecated operations [\#147](https://github.com/christianhelle/refitter/issues/147)
+- Speed up local smoke tests [\#156](https://github.com/christianhelle/refitter/pull/156) ([christianhelle](https://github.com/christianhelle))
 - GenerateObsoleteAttribute [\#154](https://github.com/christianhelle/refitter/pull/154) ([angelofb](https://github.com/angelofb))
 - Disable support keys if --no-logging is specified [\#153](https://github.com/christianhelle/refitter/pull/153) ([christianhelle](https://github.com/christianhelle))
 - Skip default values when collecting feature usages for Analytics [\#145](https://github.com/christianhelle/refitter/pull/145) ([christianhelle](https://github.com/christianhelle))
@@ -21,6 +22,7 @@
 
 **Merged pull requests:**
 
+- Bump xunit from 2.5.0 to 2.5.1 [\#159](https://github.com/christianhelle/refitter/pull/159) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Update docs with deails about --no-deprecated-operations [\#155](https://github.com/christianhelle/refitter/pull/155) ([christianhelle](https://github.com/christianhelle))
 - Fix documentation regarding --settings-file usage [\#152](https://github.com/christianhelle/refitter/pull/152) ([christianhelle](https://github.com/christianhelle))
 - docs: add Ekkeir as a contributor for bug [\#151](https://github.com/christianhelle/refitter/pull/151) ([allcontributors[bot]](https://github.com/apps/allcontributors))
