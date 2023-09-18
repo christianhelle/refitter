@@ -34,11 +34,13 @@ paths:
         - in: 'query'
           name: 'Description'
           description: 'Job description'
+          nullable: true
           schema:
             type: 'string'
         - in: 'query'
           name: 'Contact'
           description: 'Contact Person'
+          nullable: true
           schema:
             type: 'string'
       responses:
