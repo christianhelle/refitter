@@ -23,6 +23,7 @@
 **Merged pull requests:**
 
 - Bump xunit from 2.5.0 to 2.5.1 [\#159](https://github.com/christianhelle/refitter/pull/159) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump xunit.runner.visualstudio from 2.5.0 to 2.5.1 [\#158](https://github.com/christianhelle/refitter/pull/158) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Update docs with deails about --no-deprecated-operations [\#155](https://github.com/christianhelle/refitter/pull/155) ([christianhelle](https://github.com/christianhelle))
 - Fix documentation regarding --settings-file usage [\#152](https://github.com/christianhelle/refitter/pull/152) ([christianhelle](https://github.com/christianhelle))
 - docs: add Ekkeir as a contributor for bug [\#151](https://github.com/christianhelle/refitter/pull/151) ([allcontributors[bot]](https://github.com/apps/allcontributors))
