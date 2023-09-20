@@ -15,7 +15,7 @@ namespace Refitter.Tests.AdditionalFiles.ByTag
     /// Update an existing pet
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IPetApi
+    public partial interface IPetApi
     {
         /// <summary>
         /// Update an existing pet by Id
@@ -61,7 +61,7 @@ namespace Refitter.Tests.AdditionalFiles.ByTag
     /// Returns pet inventories by status
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IStoreApi
+    public partial interface IStoreApi
     {
         /// <summary>
         /// Returns a map of status codes to quantities
@@ -92,7 +92,7 @@ namespace Refitter.Tests.AdditionalFiles.ByTag
     /// Create user
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IUserApi
+    public partial interface IUserApi
     {
         /// <summary>
         /// This can only be done by the logged in user.

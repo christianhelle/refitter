@@ -66,14 +66,14 @@ paths:
     public async Task Generates_Foo_Interface()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("interface IFooApi");
+        generateCode.Should().Contain("partial interface IFooApi");
     }
 
     [Fact]
     public async Task Generates_Bar_Interface()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("interface IBarApi");
+        generateCode.Should().Contain("partial interface IBarApi");
     }
 
     [Fact]

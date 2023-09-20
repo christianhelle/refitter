@@ -52,7 +52,7 @@ parameters:
 
 #### Example generated Refit interface
 ```cs
-public interface IReferenceparameters
+public partial interface IReferenceparameters
 {
 	/// <summary>
 	/// This method allows to remove an order item from an order, by specifying their ids.

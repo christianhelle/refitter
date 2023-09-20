@@ -66,28 +66,28 @@ paths:
     public async Task Generates_IGetAllFooEndpoint()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("interface IGetAllFoosEndpoint");
+        generateCode.Should().Contain("partial interface IGetAllFoosEndpoint");
     }
 
     [Fact]
     public async Task Generates_IGetFooDetailsEndpoint()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("interface IGetFooDetailsEndpoint");
+        generateCode.Should().Contain("partial interface IGetFooDetailsEndpoint");
     }
 
     [Fact]
     public async Task Generates_IGetAllBarEndpoint()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("interface IGetAllBarsEndpoint");
+        generateCode.Should().Contain("partial interface IGetAllBarsEndpoint");
     }
 
     [Fact]
     public async Task Generates_IGetBarDetailsEndpoint()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("interface IGetBarDetailsEndpoint");
+        generateCode.Should().Contain("partial interface IGetBarDetailsEndpoint");
     }
 
     [Fact]
