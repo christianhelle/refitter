@@ -28,7 +28,7 @@ paths:
         - in: 'query'
           name: 'Title'
           description: 'Job title'
-          required: true
+          nullable: true
           schema:
             type: 'string'
         - in: 'query'
@@ -56,6 +56,7 @@ paths:
     }
 
     [Theory]
+    [InlineData("title")]
     [InlineData("contact")]
     [InlineData("description")]
     public async Task Generates_Nullable_Parameters(string parameterName)
