@@ -6,7 +6,9 @@
 
 **Implemented enhancements:**
 
+- Generate Refit interfaces as `partial` by default [\#161](https://github.com/christianhelle/refitter/issues/161)
 - Mark deprecated operations [\#147](https://github.com/christianhelle/refitter/issues/147)
+- Generate Refit interfaces as partial [\#162](https://github.com/christianhelle/refitter/pull/162) ([christianhelle](https://github.com/christianhelle))
 - Speed up local smoke tests [\#156](https://github.com/christianhelle/refitter/pull/156) ([christianhelle](https://github.com/christianhelle))
 - GenerateObsoleteAttribute [\#154](https://github.com/christianhelle/refitter/pull/154) ([angelofb](https://github.com/angelofb))
 - Disable support keys if --no-logging is specified [\#153](https://github.com/christianhelle/refitter/pull/153) ([christianhelle](https://github.com/christianhelle))
