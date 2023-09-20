@@ -15,7 +15,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Update an existing pet
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IUpdatePetEndpoint
+    public partial interface IUpdatePetEndpoint
     {
         /// <summary>
         /// Update an existing pet by Id
@@ -28,7 +28,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Add a new pet to the store
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IAddPetEndpoint
+    public partial interface IAddPetEndpoint
     {
         /// <summary>
         /// Add a new pet to the store
@@ -41,7 +41,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Finds Pets by status
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IFindPetsByStatusEndpoint
+    public partial interface IFindPetsByStatusEndpoint
     {
         /// <summary>
         /// Multiple status values can be provided with comma separated strings
@@ -54,7 +54,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Finds Pets by tags
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IFindPetsByTagsEndpoint
+    public partial interface IFindPetsByTagsEndpoint
     {
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -67,7 +67,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Find pet by ID
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IGetPetByIdEndpoint
+    public partial interface IGetPetByIdEndpoint
     {
         /// <summary>
         /// Returns a single pet
@@ -80,7 +80,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Updates a pet in the store with form data
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IUpdatePetWithFormEndpoint
+    public partial interface IUpdatePetWithFormEndpoint
     {
         [Post("/pet/{petId}")]
         Task Execute(long petId, [Query] string name, [Query] string status);
@@ -90,7 +90,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Deletes a pet
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IDeletePetEndpoint
+    public partial interface IDeletePetEndpoint
     {
         [Delete("/pet/{petId}")]
         Task Execute(long petId, [Header("api_key")] string api_key);
@@ -100,7 +100,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// uploads an image
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IUploadFileEndpoint
+    public partial interface IUploadFileEndpoint
     {
         [Post("/pet/{petId}/uploadImage")]
         Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata, StreamPart body);
@@ -110,7 +110,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Returns pet inventories by status
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IGetInventoryEndpoint
+    public partial interface IGetInventoryEndpoint
     {
         /// <summary>
         /// Returns a map of status codes to quantities
@@ -123,7 +123,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Place an order for a pet
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IPlaceOrderEndpoint
+    public partial interface IPlaceOrderEndpoint
     {
         /// <summary>
         /// Place a new order in the store
@@ -136,7 +136,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Find purchase order by ID
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IGetOrderByIdEndpoint
+    public partial interface IGetOrderByIdEndpoint
     {
         /// <summary>
         /// For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions
@@ -149,7 +149,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Delete purchase order by ID
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IDeleteOrderEndpoint
+    public partial interface IDeleteOrderEndpoint
     {
         /// <summary>
         /// For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
@@ -162,7 +162,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Create user
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface ICreateUserEndpoint
+    public partial interface ICreateUserEndpoint
     {
         /// <summary>
         /// This can only be done by the logged in user.
@@ -175,7 +175,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Creates list of users with given input array
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface ICreateUsersWithListInputEndpoint
+    public partial interface ICreateUsersWithListInputEndpoint
     {
         /// <summary>
         /// Creates list of users with given input array
@@ -188,7 +188,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Logs user into the system
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface ILoginUserEndpoint
+    public partial interface ILoginUserEndpoint
     {
         [Get("/user/login")]
         Task<string> Execute([Query] string username, [Query] string password);
@@ -198,7 +198,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Logs out current logged in user session
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface ILogoutUserEndpoint
+    public partial interface ILogoutUserEndpoint
     {
         [Get("/user/logout")]
         Task Execute();
@@ -208,7 +208,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Get user by user name
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IGetUserByNameEndpoint
+    public partial interface IGetUserByNameEndpoint
     {
         [Get("/user/{username}")]
         Task<User> Execute(string username);
@@ -218,7 +218,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Update user
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IUpdateUserEndpoint
+    public partial interface IUpdateUserEndpoint
     {
         /// <summary>
         /// This can only be done by the logged in user.
@@ -231,7 +231,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     /// Delete user
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface IDeleteUserEndpoint
+    public partial interface IDeleteUserEndpoint
     {
         /// <summary>
         /// This can only be done by the logged in user.
