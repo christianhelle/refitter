@@ -157,7 +157,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         return $"""
                 {Separator}{GetGeneratedCodeAttribute()}
-                {Separator}{modifier} interface I{title.CapitalizeFirstCharacter()}
+                {Separator}{modifier} partial interface I{title.CapitalizeFirstCharacter()}
                 """;
     }
 

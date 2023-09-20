@@ -94,7 +94,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         return $"""
                 {Separator}{GetGeneratedCodeAttribute()}
-                {Separator}{modifier} interface {name}
+                {Separator}{modifier} partial interface {name}
                 """;
     }
 }

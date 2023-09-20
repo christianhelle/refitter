@@ -26,6 +26,17 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Partial_Interfaces(SampleOpenSpecifications version, string filename)
+    {
+        var generateCode = await GenerateCode(version, filename);
+        generateCode.Should().Contain("partial interface");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_Contracts(SampleOpenSpecifications version, string filename)
     {
         var generateCode = await GenerateCode(
@@ -126,7 +137,7 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.TypeAccessibility = TypeAccessibility.Internal;
         var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("internal interface");
+        generateCode.Should().Contain("internal partial interface");
     }
 
     [Theory]
