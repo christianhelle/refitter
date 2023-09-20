@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using NSwag.CodeGeneration.Models;
+
 namespace Refitter.Core;
 
 internal static class ParameterExtractor
@@ -20,12 +22,12 @@ internal static class ParameterExtractor
 
         var queryParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p => $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
+            .Select(p => $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetBodyParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
-            .Select(p => $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetBodyParameterType(p)} {p.VariableName}")
+            .Select(p => $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetBodyParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var headerParameters = new List<string>();
@@ -34,7 +36,7 @@ internal static class ParameterExtractor
         {
             headerParameters = operationModel.Parameters
                 .Where(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader)
-                .Select(p => $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetBodyParameterType(p)} {p.VariableName}")
+                .Select(p => $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetBodyParameterType(p, settings)} {p.VariableName}")
                 .ToList();
         }
 
@@ -100,15 +102,18 @@ internal static class ParameterExtractor
         return "[" + string.Join(", ", filteredAttributes) + "] ";
     }
 
-    private static string GetBodyParameterType(CSharpParameterModel parameterModel)
+    private static string GetBodyParameterType(
+        ParameterModelBase parameterModel,
+        RefitGeneratorSettings settings)
     {
         var type = WellKnownNamesspaces
             .TrimImportedNamespaces(
                 FindSupportedType(
                     parameterModel.Type));
 
-        if (!type.EndsWith("?") &&
-            (parameterModel.IsNullable || parameterModel.IsOptional || !parameterModel.IsRequired)) 
+        if (settings.OptionalParameters &&
+            !type.EndsWith("?") &&
+            (parameterModel.IsNullable || parameterModel.IsOptional || !parameterModel.IsRequired))
             type += "?";
 
         return type;
