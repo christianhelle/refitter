@@ -194,7 +194,7 @@ using System.Collections.Generic;
 
 namespace Your.Namespace.Of.Choice.GeneratedCode
 {
-    public interface ISwaggerPetstore
+    public partial interface ISwaggerPetstore
     {
         /// <summary>
         /// Update an existing pet by Id
@@ -322,7 +322,7 @@ using System.Collections.Generic;
 
 namespace Your.Namespace.Of.Choice.GeneratedCode.WithApiResponse
 {
-    public interface ISwaggerPetstore
+    public partial interface ISwaggerPetstore
     {
         /// <summary>
         /// Update an existing pet by Id
@@ -447,7 +447,7 @@ $ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" -
 /// <summary>
 /// Update an existing pet
 /// </summary>
-public interface IUpdatePetEndpoint
+public partial interface IUpdatePetEndpoint
 {
     /// <summary>
     /// Update an existing pet by Id
@@ -459,7 +459,7 @@ public interface IUpdatePetEndpoint
 /// <summary>
 /// Add a new pet to the store
 /// </summary>
-public interface IAddPetEndpoint
+public partial interface IAddPetEndpoint
 {
     /// <summary>
     /// Add a new pet to the store
@@ -471,7 +471,7 @@ public interface IAddPetEndpoint
 /// <summary>
 /// Finds Pets by status
 /// </summary>
-public interface IFindPetsByStatusEndpoint
+public partial interface IFindPetsByStatusEndpoint
 {
     /// <summary>
     /// Multiple status values can be provided with comma separated strings
@@ -483,7 +483,7 @@ public interface IFindPetsByStatusEndpoint
 /// <summary>
 /// Finds Pets by tags
 /// </summary>
-public interface IFindPetsByTagsEndpoint
+public partial interface IFindPetsByTagsEndpoint
 {
     /// <summary>
     /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -495,7 +495,7 @@ public interface IFindPetsByTagsEndpoint
 /// <summary>
 /// Find pet by ID
 /// </summary>
-public interface IGetPetByIdEndpoint
+public partial interface IGetPetByIdEndpoint
 {
     /// <summary>
     /// Returns a single pet
@@ -507,7 +507,7 @@ public interface IGetPetByIdEndpoint
 /// <summary>
 /// Updates a pet in the store with form data
 /// </summary>
-public interface IUpdatePetWithFormEndpoint
+public partial interface IUpdatePetWithFormEndpoint
 {
     [Post("/pet/{petId}")]
     Task Execute(long petId, [Query] string name, [Query] string status);
@@ -516,7 +516,7 @@ public interface IUpdatePetWithFormEndpoint
 /// <summary>
 /// Deletes a pet
 /// </summary>
-public interface IDeletePetEndpoint
+public partial interface IDeletePetEndpoint
 {
     [Delete("/pet/{petId}")]
     Task Execute(long petId, [Header("api_key")] string api_key);
@@ -525,7 +525,7 @@ public interface IDeletePetEndpoint
 /// <summary>
 /// uploads an image
 /// </summary>
-public interface IUploadFileEndpoint
+public partial interface IUploadFileEndpoint
 {
     [Post("/pet/{petId}/uploadImage")]
     Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata, StreamPart body);
@@ -534,7 +534,7 @@ public interface IUploadFileEndpoint
 /// <summary>
 /// Returns pet inventories by status
 /// </summary>
-public interface IGetInventoryEndpoint
+public partial interface IGetInventoryEndpoint
 {
     /// <summary>
     /// Returns a map of status codes to quantities
@@ -546,7 +546,7 @@ public interface IGetInventoryEndpoint
 /// <summary>
 /// Place an order for a pet
 /// </summary>
-public interface IPlaceOrderEndpoint
+public partial interface IPlaceOrderEndpoint
 {
     /// <summary>
     /// Place a new order in the store
@@ -558,7 +558,7 @@ public interface IPlaceOrderEndpoint
 /// <summary>
 /// Find purchase order by ID
 /// </summary>
-public interface IGetOrderByIdEndpoint
+public partial interface IGetOrderByIdEndpoint
 {
     /// <summary>
     /// For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions
@@ -570,7 +570,7 @@ public interface IGetOrderByIdEndpoint
 /// <summary>
 /// Delete purchase order by ID
 /// </summary>
-public interface IDeleteOrderEndpoint
+public partial interface IDeleteOrderEndpoint
 {
     /// <summary>
     /// For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
@@ -582,7 +582,7 @@ public interface IDeleteOrderEndpoint
 /// <summary>
 /// Create user
 /// </summary>
-public interface ICreateUserEndpoint
+public partial interface ICreateUserEndpoint
 {
     /// <summary>
     /// This can only be done by the logged in user.
@@ -594,7 +594,7 @@ public interface ICreateUserEndpoint
 /// <summary>
 /// Creates list of users with given input array
 /// </summary>
-public interface ICreateUsersWithListInputEndpoint
+public partial interface ICreateUsersWithListInputEndpoint
 {
     /// <summary>
     /// Creates list of users with given input array
@@ -606,7 +606,7 @@ public interface ICreateUsersWithListInputEndpoint
 /// <summary>
 /// Logs user into the system
 /// </summary>
-public interface ILoginUserEndpoint
+public partial interface ILoginUserEndpoint
 {
     [Get("/user/login")]
     Task<string> Execute([Query] string username, [Query] string password);
@@ -615,7 +615,7 @@ public interface ILoginUserEndpoint
 /// <summary>
 /// Logs out current logged in user session
 /// </summary>
-public interface ILogoutUserEndpoint
+public partial interface ILogoutUserEndpoint
 {
     [Get("/user/logout")]
     Task Execute();
@@ -624,7 +624,7 @@ public interface ILogoutUserEndpoint
 /// <summary>
 /// Get user by user name
 /// </summary>
-public interface IGetUserByNameEndpoint
+public partial interface IGetUserByNameEndpoint
 {
     [Get("/user/{username}")]
     Task<User> Execute(string username);
@@ -633,7 +633,7 @@ public interface IGetUserByNameEndpoint
 /// <summary>
 /// Update user
 /// </summary>
-public interface IUpdateUserEndpoint
+public partial interface IUpdateUserEndpoint
 {
     /// <summary>
     /// This can only be done by the logged in user.
@@ -645,7 +645,7 @@ public interface IUpdateUserEndpoint
 /// <summary>
 /// Delete user
 /// </summary>
-public interface IDeleteUserEndpoint
+public partial interface IDeleteUserEndpoint
 {
     /// <summary>
     /// This can only be done by the logged in user.
