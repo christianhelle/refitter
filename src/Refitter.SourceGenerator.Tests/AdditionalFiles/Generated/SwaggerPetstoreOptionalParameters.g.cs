@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Refitter.Tests.AdditionalFiles.OptionalParameters
 {
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public interface ISwaggerPetstoreWithOptionalParameters
+    public partial interface ISwaggerPetstoreWithOptionalParameters
     {
         /// <summary>
         /// Update an existing pet by Id

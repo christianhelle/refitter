@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Refitter.Tests.AdditionalFiles.SingeInterface
 {
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public partial interface ISwaggerPetstore
+    public partial interface ISwaggerPetstoreInterface
     {
         /// <summary>
         /// Update an existing pet by Id
