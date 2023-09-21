@@ -61,7 +61,7 @@ OPTIONS:
         --tag                                          Only include Endpoints that contain this tag. May be set multiple times and result in OR'ed evaluation       
         --skip-validation                              Skip validation of the OpenAPI specification                                                                 
         --no-deprecated-operations                     Don't generate deprecated operations                                                                         
-        --operation-name-template                      Generate operation names using pattern like '{operationName}Async'                                                                         
+        --operation-name-template                      Generate operation names using pattern like '{operationName}Async'                                           
 ```
 
 To generate code from an OpenAPI specifications file, run the following:

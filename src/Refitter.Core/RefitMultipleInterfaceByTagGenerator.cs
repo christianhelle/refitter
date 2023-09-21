@@ -8,9 +8,6 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 {
     private const string Separator = "    ";
 
-    private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
-    private readonly CustomCSharpClientGenerator generator;
     private readonly HashSet<string> knownIdentifiers = new();
 
     internal RefitMultipleInterfaceByTagGenerator(
@@ -19,10 +16,6 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
         CustomCSharpClientGenerator generator)
         : base(settings, document, generator)
     {
-        this.settings = settings;
-        this.document = document;
-        this.generator = generator;
-        generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document);
     }
 
     public override string GenerateCode()
@@ -128,11 +121,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
         string verb,
         OpenApiOperation operation)
     {
-        var generatedName = IdentifierUtils.Counted(knownIdentifiers,
-            generator
-                .BaseSettings
-                .OperationNameGenerator
-                .GetOperationName(document, name, verb, operation).CapitalizeFirstCharacter());
+        var generatedName = IdentifierUtils.Counted(knownIdentifiers, GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true));
         knownIdentifiers.Add(generatedName);
         return generatedName;
     }

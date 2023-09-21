@@ -26,6 +26,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (IsUrl(settings.OpenApiPath))
             return base.Validate(context, settings);
 
+        if (!string.IsNullOrWhiteSpace(settings.OperationNameTemplate) && !settings.OperationNameTemplate.Contains("{operationName}"))
+            return ValidationResult.Error("'{operationName}' placeholder must be present in operation name template");
+
         return File.Exists(settings.OpenApiPath)
             ? base.Validate(context, settings)
             : ValidationResult.Error($"File not found - {Path.GetFullPath(settings.OpenApiPath)}");
