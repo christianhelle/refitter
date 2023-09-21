@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Refitter.Tests.AdditionalFiles.SingeInterface
+#nullable enable
+namespace Refitter.Tests.AdditionalFiles.OptionalParameters
 {
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public partial interface ISwaggerPetstoreInterface
+    public partial interface ISwaggerPetstoreWithOptionalParameters
     {
         /// <summary>
         /// Update an existing pet by Id
@@ -31,14 +32,14 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </summary>
         [Headers("Accept: application/json")]
         [Get("/pet/findByStatus")]
-        Task<ICollection<Pet>> FindPetsByStatus([Query] Status? status);
+        Task<ICollection<Pet>> FindPetsByStatus([Query] Status? status = default);
 
         /// <summary>
         /// Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
         /// </summary>
         [Headers("Accept: application/json")]
         [Get("/pet/findByTags")]
-        Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
+        Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string>? tags = default);
 
         /// <summary>
         /// Returns a single pet
@@ -48,14 +49,14 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         Task<Pet> GetPetById(long petId);
 
         [Post("/pet/{petId}")]
-        Task UpdatePetWithForm(long petId, [Query] string name, [Query] string status);
+        Task UpdatePetWithForm(long petId, [Query] string? name = default, [Query] string? status = default);
 
         [Delete("/pet/{petId}")]
-        Task DeletePet(long petId, [Header("api_key")] string api_key);
+        Task DeletePet(long petId, [Header("api_key")] string? api_key = default);
 
         [Headers("Accept: application/json")]
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> UploadFile(long petId, [Query] string additionalMetadata, StreamPart body);
+        Task<ApiResponse> UploadFile(long petId, StreamPart body, [Query] string? additionalMetadata = default);
 
         /// <summary>
         /// Returns a map of status codes to quantities
@@ -69,7 +70,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </summary>
         [Headers("Accept: application/json")]
         [Post("/store/order")]
-        Task<Order> PlaceOrder([Body] Order body);
+        Task<Order> PlaceOrder([Body] Order? body = default);
 
         /// <summary>
         /// For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions
@@ -89,18 +90,18 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </summary>
         [Headers("Accept: application/json, application/xml")]
         [Post("/user")]
-        Task CreateUser([Body] User body);
+        Task CreateUser([Body] User? body = default);
 
         /// <summary>
         /// Creates list of users with given input array
         /// </summary>
         [Headers("Accept: application/xml, application/json")]
         [Post("/user/createWithList")]
-        Task<User> CreateUsersWithListInput([Body] IEnumerable<User> body);
+        Task<User> CreateUsersWithListInput([Body] IEnumerable<User>? body = default);
 
         [Headers("Accept: application/json")]
         [Get("/user/login")]
-        Task<string> LoginUser([Query] string username, [Query] string password);
+        Task<string> LoginUser([Query] string? username = default, [Query] string? password = default);
 
         [Get("/user/logout")]
         Task LogoutUser();
@@ -113,7 +114,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// This can only be done by the logged in user.
         /// </summary>
         [Put("/user/{username}")]
-        Task UpdateUser(string username, [Body] User body);
+        Task UpdateUser(string username, [Body] User? body = default);
 
         /// <summary>
         /// This can only be done by the logged in user.
@@ -143,7 +144,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
 #pragma warning disable 8603 // Disable "CS8603 Possible null reference return"
 #pragma warning disable 8604 // Disable "CS8604 Possible null reference argument for parameter"
 
-namespace Refitter.Tests.AdditionalFiles.SingeInterface
+namespace Refitter.Tests.AdditionalFiles.OptionalParameters
 {
     using System = global::System;
 

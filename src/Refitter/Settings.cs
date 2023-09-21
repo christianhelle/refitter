@@ -104,4 +104,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--operation-name-template")]
     [DefaultValue(null)]
     public string? OperationNameTemplate { get; internal set; }
+    
+    [Description("Generate nullable parameters as optional parameters")]
+    [CommandOption("--optional-nullable-parameters")]
+    [DefaultValue(false)]
+    public bool OptionalNullableParameters { get; set; }
 }

@@ -209,7 +209,7 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.GenerateOperationHeaders = false;
         var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("[Header(\"api_key\")] string api_key");
+        generateCode.Should().NotContain("[Header(\"api_key\")] string? api_key");
     }
 
     [Theory]
