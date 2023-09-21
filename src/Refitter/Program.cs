@@ -120,6 +120,12 @@ internal static class Program
                     .AddExample(
                         "./openapi.json",
                         "--no-deprecated-operations");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
+                        "--operation-name-template",
+                        "'{operationName}Async'");
             });
 
         return app.Run(args);

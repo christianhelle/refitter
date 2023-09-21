@@ -57,8 +57,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
-                var name = generator.BaseSettings.OperationNameGenerator
-                    .GetOperationName(document, kv.Key, verb, operation);
+                var name = GetOperationName(kv.Key, operation, verb);
 
                 var operationModel = generator.CreateOperationModel(operation);
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
@@ -76,6 +75,22 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         return code.ToString();
+    }
+
+    private string GetOperationName(string path, OpenApiOperation operation, string verb)
+    {
+        const string operationNamePlaceholder = "{operationName}";
+
+        var operationName = generator.BaseSettings.OperationNameGenerator
+                            .GetOperationName(document, path, verb, operation);
+
+        if (settings.OperationNameTemplate?.Contains(operationNamePlaceholder) ?? false)
+        {
+            operationName = settings.OperationNameTemplate!
+                           .Replace(operationNamePlaceholder, operationName);
+        }
+
+        return operationName;
     }
 
     protected static void GenerateForMultipartFormData(CSharpOperationModel operationModel, StringBuilder code)

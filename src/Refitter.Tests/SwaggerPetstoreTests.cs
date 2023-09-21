@@ -405,4 +405,17 @@ public class SwaggerPetstoreTests
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotContain(@"/pet/findByTags");
     }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_Operation_Name_Template(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.OperationNameTemplate = "{operationName}Async";
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("FindPetsByStatusAsync");
+    }
 }

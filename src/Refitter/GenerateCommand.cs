@@ -52,6 +52,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             IncludePathMatches = settings.MatchPaths ?? Array.Empty<string>(),
             IncludeTags = settings.Tags ?? Array.Empty<string>(),
             GenerateDeprecatedOperations = !settings.NoDeprecatedOperations,
+            OperationNameTemplate = settings.OperationNameTemplate,
         };
 
         try
