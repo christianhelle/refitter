@@ -162,6 +162,15 @@
         "doc",
         "bug"
       ]
+    },
+    {
+      "login": "waylonmtz",
+      "name": "Waylon Martinez",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4604579?v=4",
+      "profile": "https://github.com/waylonmtz",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
