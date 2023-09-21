@@ -8,6 +8,7 @@ public sealed class Settings : CommandSettings
 {
     [Description("URL or file path to OpenAPI Specification file")]
     [CommandArgument(0, "[URL or input file]")]
+    [DefaultValue(null)]
     public string? OpenApiPath { get; set; }
 
     [Description("Path to .refitter settings file. Specifying this will ignore all other settings (except for --output)")]
