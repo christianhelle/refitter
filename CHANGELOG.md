@@ -8,6 +8,7 @@
 
 - Generate Refit interfaces as `partial` by default [\#161](https://github.com/christianhelle/refitter/issues/161)
 - Mark deprecated operations [\#147](https://github.com/christianhelle/refitter/issues/147)
+- Introduce `--operation-name-template` command line argument [\#164](https://github.com/christianhelle/refitter/pull/164) ([angelofb](https://github.com/angelofb))
 - Generate Refit interfaces as partial [\#162](https://github.com/christianhelle/refitter/pull/162) ([christianhelle](https://github.com/christianhelle))
 - Optional OpenAPI Path in CLI arguments [\#160](https://github.com/christianhelle/refitter/pull/160) ([christianhelle](https://github.com/christianhelle))
 - Speed up local smoke tests [\#156](https://github.com/christianhelle/refitter/pull/156) ([christianhelle](https://github.com/christianhelle))
@@ -26,6 +27,7 @@
 
 **Merged pull requests:**
 
+- docs: add waylonmtz as a contributor for bug [\#165](https://github.com/christianhelle/refitter/pull/165) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit from 2.5.0 to 2.5.1 [\#159](https://github.com/christianhelle/refitter/pull/159) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump xunit.runner.visualstudio from 2.5.0 to 2.5.1 [\#158](https://github.com/christianhelle/refitter/pull/158) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Update docs with deails about --no-deprecated-operations [\#155](https://github.com/christianhelle/refitter/pull/155) ([christianhelle](https://github.com/christianhelle))
