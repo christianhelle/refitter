@@ -20,15 +20,36 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (!settings.NoLogging)
             Analytics.Configure();
 
-        if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
-            return ValidationResult.Error("Input file is required");
+        if (string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
+            string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            return ValidationResult.Error("Input or settings file is required");
 
-        if (IsUrl(settings.OpenApiPath))
+        if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
+            !string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            return ValidationResult.Error(
+                "You should either specify an input URL/file directly " +
+                "or use specify it in 'openApiPath' from the settings file, " +
+                "not both");
+
+        if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+        {
+            var json = File.ReadAllText(settings.SettingsFilePath);
+            var refitGeneratorSettings = JsonSerializer.Deserialize<RefitGeneratorSettings>(json)!;
+            settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
+            
+            if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
+                return ValidationResult.Error(
+                    "The 'openApiPath' in settings file is required when " +
+                    "URL or file path to OpenAPI Specification file " +
+                    "is not specified in command line argument");
+        }
+
+        if (IsUrl(settings.OpenApiPath!))
             return base.Validate(context, settings);
 
         return File.Exists(settings.OpenApiPath)
             ? base.Validate(context, settings)
-            : ValidationResult.Error($"File not found - {Path.GetFullPath(settings.OpenApiPath)}");
+            : ValidationResult.Error($"File not found - {Path.GetFullPath(settings.OpenApiPath!)}");
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
