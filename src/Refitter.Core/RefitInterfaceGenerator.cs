@@ -7,7 +7,7 @@ namespace Refitter.Core;
 
 internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 {
-    private const string Separator = "    ";
+    protected const string Separator = "    ";
 
     protected readonly RefitGeneratorSettings settings;
     protected readonly OpenApiDocument document;

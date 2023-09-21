@@ -6,8 +6,6 @@ namespace Refitter.Core;
 
 internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 {
-    private const string Separator = "    ";
-
     private readonly HashSet<string> knownIdentifiers = new();
 
     internal RefitMultipleInterfaceByTagGenerator(

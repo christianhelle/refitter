@@ -6,8 +6,6 @@ namespace Refitter.Core;
 
 internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
 {
-    private const string Separator = "    ";
-
     private readonly HashSet<string> knownIdentifiers = new();
 
     internal RefitMultipleInterfaceGenerator(
@@ -73,7 +71,10 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
     {
         var name = IdentifierUtils.Counted(
             knownIdentifiers,
-            "I" + GenerateOperationName(kv.Key, verb, operation, capitalizeFirstCharacter: true),
+            "I" + generator
+                .BaseSettings
+                .OperationNameGenerator
+                .GetOperationName(document, kv.Key, verb, operation).CapitalizeFirstCharacter(),
             suffix: "Endpoint");
         knownIdentifiers.Add(name);
         return name;
