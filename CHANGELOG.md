@@ -9,6 +9,7 @@
 - Generate Refit interfaces as `partial` by default [\#161](https://github.com/christianhelle/refitter/issues/161)
 - Mark deprecated operations [\#147](https://github.com/christianhelle/refitter/issues/147)
 - Introduce `--operation-name-template` command line argument [\#164](https://github.com/christianhelle/refitter/pull/164) ([angelofb](https://github.com/angelofb))
+- Add support for optional parameters via the `--optional-nullable-parameters` CLI argument [\#163](https://github.com/christianhelle/refitter/pull/163) ([christianhelle](https://github.com/christianhelle))
 - Generate Refit interfaces as partial [\#162](https://github.com/christianhelle/refitter/pull/162) ([christianhelle](https://github.com/christianhelle))
 - Optional OpenAPI Path in CLI arguments [\#160](https://github.com/christianhelle/refitter/pull/160) ([christianhelle](https://github.com/christianhelle))
 - Speed up local smoke tests [\#156](https://github.com/christianhelle/refitter/pull/156) ([christianhelle](https://github.com/christianhelle))
@@ -18,6 +19,7 @@
 
 **Fixed bugs:**
 
+- Generated nullable query method params are not set to a default value of null [\#157](https://github.com/christianhelle/refitter/issues/157)
 - Path to OpenAPI spec file is required in CLI command even when using a `--settings-file` parameter. [\#149](https://github.com/christianhelle/refitter/issues/149)
 - Unexpected initial token 'Boolean' when populating object [\#138](https://github.com/christianhelle/refitter/issues/138)
 
