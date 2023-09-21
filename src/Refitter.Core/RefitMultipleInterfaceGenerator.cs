@@ -6,11 +6,6 @@ namespace Refitter.Core;
 
 internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
 {
-    private const string Separator = "    ";
-
-    private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
-    private readonly CustomCSharpClientGenerator generator;
     private readonly HashSet<string> knownIdentifiers = new();
 
     internal RefitMultipleInterfaceGenerator(
@@ -19,10 +14,6 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
         CustomCSharpClientGenerator generator)
         : base(settings, document, generator)
     {
-        this.settings = settings;
-        this.document = document;
-        this.generator = generator;
-        generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document);
     }
 
     public override string GenerateCode()

@@ -99,4 +99,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--no-deprecated-operations")]
     [DefaultValue(false)]
     public bool NoDeprecatedOperations { get; set; }
+
+    [Description("Generate operation names using pattern")]
+    [CommandOption("--operation-name-template")]
+    [DefaultValue(null)]
+    public string? OperationNameTemplate { get; internal set; }
 }

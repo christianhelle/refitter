@@ -129,6 +129,10 @@ public class RefitGeneratorSettings
     [JsonPropertyName("generateDeprecatedOperations")]
     [JsonProperty("generateDeprecatedOperations")]
     public bool GenerateDeprecatedOperations { get; set; } = true;
+
+    [JsonPropertyName("operationNameTemplate")]
+    [JsonProperty("operationNameTemplate")]
+    public string? OperationNameTemplate { get; set; }
 }
 
 public enum MultipleInterfaces

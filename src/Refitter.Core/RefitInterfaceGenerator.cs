@@ -7,11 +7,11 @@ namespace Refitter.Core;
 
 internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 {
-    private const string Separator = "    ";
+    protected const string Separator = "    ";
 
-    private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
-    private readonly CustomCSharpClientGenerator generator;
+    protected readonly RefitGeneratorSettings settings;
+    protected readonly OpenApiDocument document;
+    protected readonly CustomCSharpClientGenerator generator;
 
     internal RefitInterfaceGenerator(
         RefitGeneratorSettings settings,
@@ -57,8 +57,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
-                var name = generator.BaseSettings.OperationNameGenerator
-                    .GetOperationName(document, kv.Key, verb, operation);
+                var name = GenerateOperationName(kv.Key, verb, operation);
 
                 var operationModel = generator.CreateOperationModel(operation);
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
@@ -76,6 +75,27 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         return code.ToString();
+    }
+
+    protected string GenerateOperationName(string path, string verb, OpenApiOperation operation, bool capitalizeFirstCharacter = false)
+    {
+        const string operationNamePlaceholder = "{operationName}";
+
+        var operationName = generator
+            .BaseSettings
+            .OperationNameGenerator
+            .GetOperationName(document, path, verb, operation);
+
+        if (capitalizeFirstCharacter)
+            operationName = operationName.CapitalizeFirstCharacter();
+
+        if (settings.OperationNameTemplate?.Contains(operationNamePlaceholder) ?? false)
+        {
+            operationName = settings.OperationNameTemplate!
+                           .Replace(operationNamePlaceholder, operationName);
+        }
+
+        return operationName;
     }
 
     protected static void GenerateForMultipartFormData(CSharpOperationModel operationModel, StringBuilder code)
