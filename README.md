@@ -133,7 +133,8 @@ The following is an example `.refitter` file
   "useCancellationTokens": false, // Optional. Default=false
   "useIsoDateFormat": false, // Optional. Default=false
   "multipleInterfaces": "ByEndpoint", // Optional. May be one of "ByEndpoint" or "ByTag"
-  "generateDeprecatedOperations": false,
+  "generateDeprecatedOperations": false, // Optional. Default=true
+  "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName}
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"
@@ -168,6 +169,7 @@ The following is an example `.refitter` file
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
+- `operationNameTemplate` Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async
 
 
 # Using the generated code
