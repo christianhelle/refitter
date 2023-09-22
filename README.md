@@ -133,6 +133,7 @@ The following is an example `.refitter` file
   "useCancellationTokens": false, // Optional. Default=false
   "useIsoDateFormat": false, // Optional. Default=false
   "multipleInterfaces": "ByEndpoint", // Optional. May be one of "ByEndpoint" or "ByTag"
+  "generateDeprecatedOperations": false,
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"
@@ -165,7 +166,8 @@ The following is an example `.refitter` file
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
-- `includePathMatches` - A collection of regular expressions used to filter paths. 
+- `includePathMatches` - A collection of regular expressions used to filter paths.
+- `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
 
 
 # Using the generated code
