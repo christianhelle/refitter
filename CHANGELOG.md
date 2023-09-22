@@ -29,6 +29,8 @@
 
 **Merged pull requests:**
 
+- Update .refitter file format documentation [\#169](https://github.com/christianhelle/refitter/pull/169) ([christianhelle](https://github.com/christianhelle))
+- docs: add vinaymadupathi as a contributor for bug [\#168](https://github.com/christianhelle/refitter/pull/168) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump H.Generators.Extensions from 1.18.0 to 1.19.0 [\#166](https://github.com/christianhelle/refitter/pull/166) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add waylonmtz as a contributor for bug [\#165](https://github.com/christianhelle/refitter/pull/165) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit from 2.5.0 to 2.5.1 [\#159](https://github.com/christianhelle/refitter/pull/159) ([dependabot[bot]](https://github.com/apps/dependabot))
