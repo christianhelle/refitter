@@ -7,41 +7,53 @@ using Xunit;
 
 namespace Refitter.Tests.Examples;
 
-public class OptionalNullableParametersTests
+public class DeprecatedMultipleInterfaceEndpointsSkippedTests
 {
     private const string OpenApiSpec = @"
 openapi: '3.0.0'
 paths:
-  /job/{Id}:
-    post:
+  /foo/{id}:
+    get:
       tags:
-      - 'Jobs'
-      operationId: 'Update job details'
-      description: 'Update the details of the specified job.'
+      - 'Foo'
+      operationId: 'Get foo details'
+      description: 'Get the details of the specified foo'
       parameters:
         - in: 'path'
-          name: 'Id'
-          description: 'Foo Id'
+          name: 'id'
+          description: 'Foo ID'
           required: true
           schema:
             type: 'string'
-        - in: 'query'
-          name: 'Title'
-          description: 'Job title'
-          nullable: true
-          schema:
-            type: 'string'
-        - in: 'query'
-          name: 'Description'
-          description: 'Job description'
-          optional: true
-          schema:
-            type: 'string'
-        - in: 'query'
-          name: 'Contact'
-          description: 'Contact Person'
-          schema:
-            type: 'string'
+      responses:
+        '200':
+          description: 'successful operation'
+  /foo:
+    get:
+      tags:
+      - 'Foo'
+      operationId: 'Get all foos'
+      description: 'Get all foos'      
+      responses:
+        '200':
+          description: 'successful operation'
+  /bar:
+    get:
+      tags:
+      - 'Bar'
+      operationId: 'Get all bars'
+      description: 'Get all bars'
+      deprecated: true
+      responses:
+        '200':
+          description: 'successful operation'
+  /bar/{id}:
+    get:
+      tags:
+      - 'Bar'
+      operationId: 'Get bar details'
+      description: 'Get the details of the specified bar'  
+      deprecated: true
       responses:
         '200':
           description: 'successful operation'
@@ -53,29 +65,26 @@ paths:
         string generateCode = await GenerateCode();
         generateCode.Should().NotBeNullOrWhiteSpace();
     }
-    
-    [Fact]
-    public async Task Generates_Nullable_Directive()
-    {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("#nullable");
-    }
 
-    [Theory]
-    [InlineData("title")]
-    [InlineData("contact")]
-    [InlineData("description")]
-    public async Task Generates_Nullable_Parameters(string parameterName)
+    [Fact]
+    public async Task Should_NotContain_Obsolete_Attribute()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain($"string? {parameterName} = default");
+        generateCode.Should().NotContain("[System.Obsolete]");
     }
 
     [Fact]
-    public async Task Generates_CancellationToken_Last()
+    public async Task Should_NotContain_GetAllBars()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("CancellationToken cancellationToken = default);");
+        generateCode.Should().NotContain("GetAllBarsEndpoint");
+    }
+
+    [Fact]
+    public async Task Should_NotContain_GetBarDetails()
+    {
+        string generateCode = await GenerateCode();
+        generateCode.Should().NotContain("GetBarDetailsEndpoint");
     }
 
     [Fact]
@@ -94,8 +103,8 @@ paths:
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
-            UseCancellationTokens = true,
-            OptionalParameters = true,
+            GenerateDeprecatedOperations = false,
+            MultipleInterfaces = MultipleInterfaces.ByEndpoint,
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);

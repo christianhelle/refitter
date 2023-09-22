@@ -9,10 +9,7 @@ on:
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
     branches:
-      - 'main'
-  pull_request:
-    types:
-      - closed  
+      - 'main' 
 
 jobs:
   changelog:

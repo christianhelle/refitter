@@ -133,16 +133,19 @@ The following is an example `.refitter` file
   "useCancellationTokens": false, // Optional. Default=false
   "useIsoDateFormat": false, // Optional. Default=false
   "multipleInterfaces": "ByEndpoint", // Optional. May be one of "ByEndpoint" or "ByTag"
+  "generateDeprecatedOperations": false, // Optional. Default=true
+  "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName}
+  "optionalParameters": false, // Optional. Default=false
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"
   ],
-  "tag": [ // Optional. OpenAPI Tag to include when generating code
+  "includeTags": [ // Optional. OpenAPI Tag to include when generating code
     "Pet",
     "Store",
     "User"
   ],
-  "matchPath": [ // Optional. Only include Paths that match the provided regular expression
+  "includePathMatches": [ // Optional. Only include Paths that match the provided regular expression
     "^/pet/.*",
     "^/store/.*"
   ]
@@ -164,8 +167,11 @@ The following is an example `.refitter` file
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
-- `tag` - A collection of tags to use a filter for including endpoints that contain this tag.
-- `match-path` - A collection of regular expressions used to filter paths. 
+- `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
+- `includePathMatches` - A collection of regular expressions used to filter paths.
+- `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
+- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async
+- `optionalParameters` - Generate non-required parameters as nullable optional parameters
 
 
 # Using the generated code

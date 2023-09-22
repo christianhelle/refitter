@@ -44,11 +44,11 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                     "is not specified in command line argument");
         }
 
-        if (IsUrl(settings.OpenApiPath!))
-            return base.Validate(context, settings);
-
         if (!string.IsNullOrWhiteSpace(settings.OperationNameTemplate) && !settings.OperationNameTemplate.Contains("{operationName}"))
             return ValidationResult.Error("'{operationName}' placeholder must be present in operation name template");
+
+        if (IsUrl(settings.OpenApiPath!))
+            return base.Validate(context, settings);
 
         return File.Exists(settings.OpenApiPath)
             ? base.Validate(context, settings)
