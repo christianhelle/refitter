@@ -29,6 +29,7 @@
 
 **Merged pull requests:**
 
+- Bump H.Generators.Extensions from 1.18.0 to 1.19.0 [\#166](https://github.com/christianhelle/refitter/pull/166) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add waylonmtz as a contributor for bug [\#165](https://github.com/christianhelle/refitter/pull/165) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit from 2.5.0 to 2.5.1 [\#159](https://github.com/christianhelle/refitter/pull/159) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump xunit.runner.visualstudio from 2.5.0 to 2.5.1 [\#158](https://github.com/christianhelle/refitter/pull/158) ([dependabot[bot]](https://github.com/apps/dependabot))
