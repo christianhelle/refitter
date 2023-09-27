@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.5...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.0...HEAD)
+
+**Merged pull requests:**
+
+- Bump Microsoft.OpenApi.Readers from 1.6.8 to 1.6.9 [\#171](https://github.com/christianhelle/refitter/pull/171) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [0.8.0](https://github.com/christianhelle/refitter/tree/0.8.0) (2023-09-23)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.7.5...0.8.0)
 
 **Implemented enhancements:**
 
@@ -13,7 +21,7 @@
 - Generate Refit interfaces as partial [\#162](https://github.com/christianhelle/refitter/pull/162) ([christianhelle](https://github.com/christianhelle))
 - Optional OpenAPI Path in CLI arguments [\#160](https://github.com/christianhelle/refitter/pull/160) ([christianhelle](https://github.com/christianhelle))
 - Speed up local smoke tests [\#156](https://github.com/christianhelle/refitter/pull/156) ([christianhelle](https://github.com/christianhelle))
-- GenerateObsoleteAttribute [\#154](https://github.com/christianhelle/refitter/pull/154) ([angelofb](https://github.com/angelofb))
+- Mark deprecated operations [\#154](https://github.com/christianhelle/refitter/pull/154) ([angelofb](https://github.com/angelofb))
 - Disable support keys if --no-logging is specified [\#153](https://github.com/christianhelle/refitter/pull/153) ([christianhelle](https://github.com/christianhelle))
 - Skip default values when collecting feature usages for Analytics [\#145](https://github.com/christianhelle/refitter/pull/145) ([christianhelle](https://github.com/christianhelle))
 
