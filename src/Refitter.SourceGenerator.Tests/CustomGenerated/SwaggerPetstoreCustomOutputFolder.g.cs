@@ -12,7 +12,7 @@ using Refitter.Tests.AdditionalFiles.SingeInterface;
 namespace Refitter.Tests.CustomGenerated
 {
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public partial interface IApiInCustomGeneratedPath
+    public partial interface IApiInCustomGeneratedFolder
     {
         /// <summary>
         /// Update an existing pet by Id

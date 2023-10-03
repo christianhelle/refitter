@@ -8,15 +8,15 @@ using Xunit;
 
 namespace Refitter.SourceGenerators.Tests;
 
-public class CustomOutputPathGeneratorTests
+public class CustomOutputFolderGeneratorTests
 {
     [Fact]
     public void Can_Create_File_In_Custom_Path() =>
-        File.Exists("../../../CustomGenerated/CustomOutputPath.g.cs").Should().BeTrue();
+        File.Exists("../../../CustomGenerated/CustomOutputFolder.g.cs").Should().BeTrue();
 
     [Fact]
     public void Can_Resolve_Refit_Interface() =>
-        RestService.For<IApiInCustomGeneratedPath>("https://petstore3.swagger.io/api/v3")
+        RestService.For<IApiInCustomGeneratedFolder>("https://petstore3.swagger.io/api/v3")
             .Should()
             .NotBeNull();
 }

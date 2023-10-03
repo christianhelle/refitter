@@ -93,7 +93,7 @@ This will generate a file called `Output.cs` which contains the Refit interface 
 
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter.core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications
 
-The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder. The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code 
+The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `--outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code 
 
 ***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
 
@@ -136,7 +136,7 @@ The following is an example `.refitter` file
   "generateDeprecatedOperations": false, // Optional. Default=true
   "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName}
   "optionalParameters": false, // Optional. Default=false
-  "output": "../CustomOutput" // Optional. Default=./Generated 
+  "outputFolder": "../CustomOutput" // Optional. Default=./Generated
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"
@@ -167,7 +167,7 @@ The following is an example `.refitter` file
 - `useCancellationTokens` - Use cancellation tokens in the generated methods. Default is `false`
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
-- `output` - a string describing a relative path to a desired output folder. Default is `./Generated`
+- `outputFolder` - a string describing a relative path to a desired output folder. Default is `./Generated`
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.

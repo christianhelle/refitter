@@ -6,6 +6,6 @@
   "additionalNamespaces": ["Refitter.Tests.AdditionalFiles.SingeInterface"],
   "naming": {
     "useOpenApiTitle": false,
-    "interfaceName": "ApiInCustomGeneratedPath"
+    "interfaceName": "ApiInCustomGeneratedFolder"
   }
 }
