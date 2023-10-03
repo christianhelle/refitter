@@ -140,6 +140,13 @@ public class RefitGeneratorSettings
     [JsonPropertyName("optionalParameters")]
     [JsonProperty("optionalParameters")]
     public bool OptionalParameters { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the relative path to which the output files are generated. (default: ./Generated)
+    /// </summary>
+    [JsonPropertyName("output")]
+    [JsonProperty("output")]
+    public string OutputPath { get; set; } = "./Generated";
 }
 
 public enum MultipleInterfaces

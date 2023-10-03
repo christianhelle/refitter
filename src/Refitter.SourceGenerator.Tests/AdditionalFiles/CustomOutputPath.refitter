@@ -1,0 +1,11 @@
+{
+  "openApiPath": "../Resources/V3/SwaggerPetstore.json",
+  "namespace": "Refitter.Tests.CustomGenerated",
+  "output": "../CustomGenerated",
+  "generateContracts": false,
+  "additionalNamespaces": ["Refitter.Tests.AdditionalFiles.SingeInterface"],
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "ApiInCustomGeneratedPath"
+  }
+}
