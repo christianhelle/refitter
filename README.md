@@ -136,6 +136,7 @@ The following is an example `.refitter` file
   "generateDeprecatedOperations": false, // Optional. Default=true
   "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName}
   "optionalParameters": false, // Optional. Default=false
+  "output": "../CustomOutput" // Optional. Default=./Generated 
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"
@@ -166,6 +167,7 @@ The following is an example `.refitter` file
 - `useCancellationTokens` - Use cancellation tokens in the generated methods. Default is `false`
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
+- `output` - a string describing a relative path to a desired output folder. Default is `./Generated`
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
