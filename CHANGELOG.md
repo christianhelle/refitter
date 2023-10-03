@@ -4,8 +4,13 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.0...HEAD)
 
+**Implemented enhancements:**
+
+- Allow for custom relative output path in .refitter [\#172](https://github.com/christianhelle/refitter/pull/172) ([Noblix](https://github.com/Noblix))
+
 **Merged pull requests:**
 
+- docs: add Noblix as a contributor for code [\#173](https://github.com/christianhelle/refitter/pull/173) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump Microsoft.OpenApi.Readers from 1.6.8 to 1.6.9 [\#171](https://github.com/christianhelle/refitter/pull/171) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [0.8.0](https://github.com/christianhelle/refitter/tree/0.8.0) (2023-09-23)
