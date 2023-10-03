@@ -103,7 +103,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             cancellationToken.ThrowIfCancellationRequested();
             try 
             {
-                var folder = Path.Combine(Path.GetDirectoryName(file.Path), "Generated");
+                var folder = Path.Combine(Path.GetDirectoryName(file.Path), settings.OutputFolder);
                 var output = Path.Combine(folder, filename);
                 if (!Directory.Exists(folder))
                 {
