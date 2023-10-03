@@ -180,6 +180,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "Noblix",
+      "name": "Noblix",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22076883?v=4",
+      "profile": "https://github.com/Noblix",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
