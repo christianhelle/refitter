@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-19-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -808,6 +808,7 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Ekkeir"><img src="https://avatars.githubusercontent.com/u/36194685?v=4?s=100" width="100px;" alt="Ekkeir"/><br /><sub><b>Ekkeir</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=Ekkeir" title="Documentation">📖</a> <a href="https://github.com/christianhelle/refitter/issues?q=author%3AEkkeir" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/waylonmtz"><img src="https://avatars.githubusercontent.com/u/4604579?v=4?s=100" width="100px;" alt="Waylon Martinez"/><br /><sub><b>Waylon Martinez</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Awaylonmtz" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vinaymadupathi"><img src="https://avatars.githubusercontent.com/u/38102900?v=4?s=100" width="100px;" alt="vkmadupa"/><br /><sub><b>vkmadupa</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Avinaymadupathi" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Noblix"><img src="https://avatars.githubusercontent.com/u/22076883?v=4?s=100" width="100px;" alt="Noblix"/><br /><sub><b>Noblix</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=Noblix" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
