@@ -20,6 +20,7 @@ public static class DependencyInjectionGenerator
             $$""""
               namespace {{settings.Namespace}}
               {
+                  using System;
                   using Microsoft.Extensions.DependencyInjection;
                   using Polly;
                   using Polly.Contrib.WaitAndRetry;
