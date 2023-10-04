@@ -217,7 +217,7 @@ public class DependencyInjectionSettings
     /// </summary>
     [JsonPropertyName("baseUrl")]
     [JsonProperty("baseUrl")]
-    public string BaseUrl { get; set; }
+    public string BaseUrl { get; set; } = null!;
 
     /// <summary>
     /// A collection of HttpMessageHandlers to be added to the HttpClient pipeline.
