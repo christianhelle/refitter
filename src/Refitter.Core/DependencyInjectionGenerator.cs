@@ -65,7 +65,8 @@ public static class DependencyInjectionGenerator
             code.AppendLine();
         }
         
-        code.Remove(code.Length - 3, 3);
+        code.Remove(code.Length - 2, 2);
+        code.AppendLine();
         code.AppendLine("            return services;");
         code.AppendLine("        }");
         code.AppendLine("    }");
