@@ -6,10 +6,10 @@ public static class DependencyInjectionGenerator
 {
     public static string Generate(
         RefitGeneratorSettings settings,
-        IEnumerable<string> interfaceNames)
+        string[] interfaceNames)
     {
         var iocSettings = settings.DependencyInjectionSettings;
-        if (iocSettings is null)
+        if (iocSettings is null || !interfaceNames.Any())
             return string.Empty;
 
         var code = new StringBuilder();
