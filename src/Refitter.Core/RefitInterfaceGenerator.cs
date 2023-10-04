@@ -28,11 +28,12 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     {
         return new RefitGeneratedCode(
             $$"""
-              {{GenerateInterfaceDeclaration()}}
+              {{GenerateInterfaceDeclaration(out var interfaceName)}}
               {{Separator}}{
               {{GenerateInterfaceBody()}}
               {{Separator}}}
-              """);
+              """,
+            interfaceName);
     }
 
     private string GenerateInterfaceBody()
@@ -169,12 +170,13 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
     }
 
-    private string GenerateInterfaceDeclaration()
+    private string GenerateInterfaceDeclaration(out string interfaceName)
     {
         var title = settings.Naming.UseOpenApiTitle
             ? IdentifierUtils.Sanitize(document.Info?.Title ?? "ApiClient")
             : settings.Naming.InterfaceName;
 
+        interfaceName = $"I{title.CapitalizeFirstCharacter()}";
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         return $"""
                 {Separator}{GetGeneratedCodeAttribute()}

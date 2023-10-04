@@ -28,6 +28,8 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             .GroupBy(x => GetGroupName(x.Operation.Value, ungroupedTitle), (k, v) => new { Key = k, Combined = v });
 
         Dictionary<string, StringBuilder> interfacesByGroup = new();
+        var interfaceNames = new List<string>();
+        
         foreach (var kv in byGroup)
         {
             foreach (var op in kv.Combined)
@@ -53,8 +55,11 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 {
                     interfacesByGroup[kv.Key] = sb = new StringBuilder();
                     GenerateInterfaceXmlDocComments(operation, sb);
+
+                    var interfaceName = GetInterfaceName(kv.Key);
+                    interfaceNames.Add(interfaceName);
                     sb.AppendLine($$"""
-                                    {{GenerateInterfaceDeclaration(GetInterfaceName(kv.Key))}}
+                                    {{GenerateInterfaceDeclaration(interfaceName)}}
                                     {{Separator}}{
                                     """);
                 }
@@ -88,7 +93,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             code.AppendLine();
         }
 
-        return new RefitGeneratedCode(code.ToString());
+        return new RefitGeneratedCode(code.ToString(), interfaceNames.ToArray());
     }
 
     private string GetGroupName(OpenApiOperation operation, string ungroupedTitle)
