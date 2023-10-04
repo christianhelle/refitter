@@ -2,7 +2,7 @@
 
 namespace Refitter.Core;
 
-public class DependencyInjectionGenerator
+public static class DependencyInjectionGenerator
 {
     public static string Generate(
         RefitGeneratorSettings settings,
