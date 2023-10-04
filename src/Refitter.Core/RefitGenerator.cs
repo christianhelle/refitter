@@ -101,6 +101,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .AppendLine(generatedCode.SourceCode)
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
+            .AppendLine(DependencyInjectionGenerator.Generate(settings, generatedCode.InterfaceNames))
             .ToString();
     }
 
@@ -131,14 +132,15 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             code.AppendLine("#nullable enable");
         }
 
+        var refitInterfaces = interfaceGenerator.GenerateCode();
         code.AppendLine($$"""
-            namespace {{settings.Namespace}}
-            {
-            {{interfaceGenerator.GenerateCode()}}
-            }
-            """);
+                          namespace {{settings.Namespace}}
+                          {
+                          {{refitInterfaces}}
+                          }
+                          """);
 
-        return new RefitGeneratedCode(code.ToString());
+        return new RefitGeneratedCode(code.ToString(), refitInterfaces.InterfaceNames);
     }
 
     /// <summary>
