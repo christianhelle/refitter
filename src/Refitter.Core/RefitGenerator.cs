@@ -102,7 +102,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
             .AppendLine(DependencyInjectionGenerator.Generate(settings, generatedCode.InterfaceNames))
-            .ToString();
+            .ToString()
+            .TrimEnd();
     }
 
     /// <summary>
