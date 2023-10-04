@@ -11,11 +11,11 @@ public class MultipleInterfacesByEndpointWithIoCTests
 openapi: '3.0.0'
 paths:
   /foo/{id}:
-    get:
+    delete:
       tags:
       - 'Foo'
-      operationId: 'Get foo details'
-      description: 'Get the details of the specified foo'
+      operationId: 'Delete foo'
+      description: 'Delete the specified foo'
       parameters:
         - in: 'path'
           name: 'id'
@@ -26,30 +26,12 @@ paths:
       responses:
         '200':
           description: 'successful operation'
-  /foo:
-    get:
-      tags:
-      - 'Foo'
-      operationId: 'Get all foos'
-      description: 'Get all foos'      
-      responses:
-        '200':
-          description: 'successful operation'
-  /bar:
-    get:
-      tags:
-      - 'Bar'
-      operationId: 'Get all bars'
-      description: 'Get all bars'      
-      responses:
-        '200':
-          description: 'successful operation'
   /bar/{id}:
-    get:
+    delete:
       tags:
       - 'Bar'
-      operationId: 'Get bar details'
-      description: 'Get the details of the specified bar'   
+      operationId: 'Delete bar'
+      description: 'Delete the specified bar' 
       responses:
         '200':
           description: 'successful operation'
@@ -91,6 +73,13 @@ paths:
     }
 
     [Fact]
+    public async Task Generates_IServiceCollectionExtensions()
+    {
+        string generateCode = await GenerateCode();
+        generateCode.Should().Contain("static class IServiceCollectionExtensions");
+    }
+
+    [Fact]
     public async Task Can_Build_Generated_Code()
     {
         string generateCode = await GenerateCode();
@@ -106,6 +95,7 @@ paths:
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
+            GenerateContracts = false,
             MultipleInterfaces = MultipleInterfaces.ByEndpoint,
             DependencyInjectionSettings = new DependencyInjectionSettings
             {
