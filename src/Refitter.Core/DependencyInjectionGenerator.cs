@@ -25,7 +25,7 @@ public static class DependencyInjectionGenerator
                   using Polly.Contrib.WaitAndRetry;
                   using Polly.Extensions.Http;
 
-                  public static class ServiceCollectionExtensions
+                  public static class IServiceCollectionExtensions
                   {
                       public static IServiceCollection ConfigureRefitClients(this IServiceCollection services)
                       {

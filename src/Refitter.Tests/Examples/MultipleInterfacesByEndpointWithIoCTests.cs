@@ -45,31 +45,17 @@ paths:
     }
 
     [Fact]
-    public async Task Generates_IGetAllFooEndpoint()
+    public async Task Generates_IDeleteFooEndpoint()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IGetAllFoosEndpoint");
+        generateCode.Should().Contain("partial interface IDeleteFooEndpoint");
     }
 
     [Fact]
-    public async Task Generates_IGetFooDetailsEndpoint()
+    public async Task Generates_IDeleteBarEndpoint()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IGetFooDetailsEndpoint");
-    }
-
-    [Fact]
-    public async Task Generates_IGetAllBarEndpoint()
-    {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IGetAllBarsEndpoint");
-    }
-
-    [Fact]
-    public async Task Generates_IGetBarDetailsEndpoint()
-    {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IGetBarDetailsEndpoint");
+        generateCode.Should().Contain("partial interface IDeleteBarEndpoint");
     }
 
     [Fact]
