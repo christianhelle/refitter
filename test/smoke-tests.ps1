@@ -94,7 +94,6 @@ function RunTests {
     Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin" -NoNewWindow -PassThru | Wait-Process
     
     GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter"
-    return;
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
