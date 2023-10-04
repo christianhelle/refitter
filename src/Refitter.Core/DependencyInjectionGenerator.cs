@@ -15,35 +15,28 @@ public static class DependencyInjectionGenerator
         var code = new StringBuilder();
 
         code.AppendLine();
-        code.AppendLine("using Microsoft.Extensions.DependencyInjection;");
-
-        if (iocSettings.UsePolly)
-        {
-            code.AppendLine(
-                """
-                using Polly;
-                using Polly.Contrib.WaitAndRetry;
-                using Polly.Extensions.Http;
-                """);
-        }
-
         code.AppendLine();
         code.AppendLine(
-            $$"""
+            $$""""
               namespace {{settings.Namespace}}
               {
+                  using Microsoft.Extensions.DependencyInjection;
+                  using Polly;
+                  using Polly.Contrib.WaitAndRetry;
+                  using Polly.Extensions.Http;
+
                   public static class ServiceCollectionExtensions
                   {
                       public static IServiceCollection ConfigureRefitClients(this IServiceCollection services)
                       {
-              """);
+              """");
         foreach (var interfaceName in interfaceNames)
         {
             code.Append(
                 $$"""
                               services
                                   .AddRefitClient<{{interfaceName}}>()
-                                  .ConfigureHttpClient(c => c.BaseAddress = new Uri({{iocSettings.BaseUrl}}))
+                                  .ConfigureHttpClient(c => c.BaseAddress = new Uri("{{iocSettings.BaseUrl}}"))
                   """);
 
             foreach (string httpMessageHandler in iocSettings.HttpMessageHandlers)
@@ -73,9 +66,11 @@ public static class DependencyInjectionGenerator
         }
         
         code.Remove(code.Length - 3, 3);
+        code.AppendLine("            return services;");
         code.AppendLine("        }");
         code.AppendLine("    }");
         code.AppendLine("}");
+        code.AppendLine();
         return code.ToString();
     }
 }
