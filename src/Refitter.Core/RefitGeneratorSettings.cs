@@ -147,6 +147,13 @@ public class RefitGeneratorSettings
     [JsonPropertyName("outputFolder")]
     [JsonProperty("outputFolder")]
     public string OutputFolder { get; set; } = "./Generated";
+
+    /// <summary>
+    /// Register generated interface to the .NET Core DI container
+    /// </summary>
+    [JsonPropertyName("serviceCollectionRegistration")]
+    [JsonProperty("serviceCollectionRegistration")]
+    public bool ServiceCollectionRegistration { get; set; }
 }
 
 public enum MultipleInterfaces

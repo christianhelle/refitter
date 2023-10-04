@@ -109,4 +109,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--optional-nullable-parameters")]
     [DefaultValue(false)]
     public bool OptionalNullableParameters { get; set; }
+    
+    [Description("Generate code that registers the generated interfaces with Microsoft.Extensions.DependencyInjection")]
+    [CommandOption("--service-collection-registration")]
+    [DefaultValue(false)]
+    public bool ServiceCollectionRegistration { get; set; }
 }
