@@ -16,7 +16,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
     {
     }
 
-    public override string GenerateCode()
+    public override RefitGeneratedCode GenerateCode()
     {
         var code = new StringBuilder();
         foreach (var kv in document.Paths)
@@ -61,7 +61,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
             }
         }
 
-        return code.ToString();
+        return new RefitGeneratedCode(code.ToString());
     }
 
     private string GetInterfaceName(

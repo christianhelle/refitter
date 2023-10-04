@@ -16,7 +16,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
     {
     }
 
-    public override string GenerateCode()
+    public override RefitGeneratedCode GenerateCode()
     {
         var ungroupedTitle = settings.Naming.UseOpenApiTitle
             ? IdentifierUtils.Sanitize(document.Info?.Title ?? "ApiClient")
@@ -88,7 +88,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             code.AppendLine();
         }
 
-        return code.ToString();
+        return new RefitGeneratedCode(code.ToString());
     }
 
     private string GetGroupName(OpenApiOperation operation, string ungroupedTitle)

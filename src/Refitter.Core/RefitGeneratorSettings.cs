@@ -149,11 +149,11 @@ public class RefitGeneratorSettings
     public string OutputFolder { get; set; } = "./Generated";
 
     /// <summary>
-    /// Register generated interface to the .NET Core DI container
+    /// Gets or sets the settings describing how to register generated interface to the .NET Core DI container
     /// </summary>
-    [JsonPropertyName("serviceCollectionRegistration")]
-    [JsonProperty("serviceCollectionRegistration")]
-    public bool ServiceCollectionRegistration { get; set; }
+    [JsonPropertyName("dependencyInjectionSettings")]
+    [JsonProperty("dependencyInjectionSettings")]
+    public DependencyInjectionSettings? DependencyInjectionSettings { get; set; }
 }
 
 public enum MultipleInterfaces
@@ -204,4 +204,37 @@ public enum TypeAccessibility
     /// Indicates that the type is only accessible within its own assembly.
     /// </summary>
     Internal
+}
+
+/// <summary>
+/// Dependency Injection settings describing how the Refit client should be configured.
+/// This can be used to configure the HttpClient pipeline with additional handlers
+/// </summary>
+public class DependencyInjectionSettings
+{
+    /// <summary>
+    /// Base Address for the HttpClient
+    /// </summary>
+    public string BaseUrl { get; set; }
+
+    /// <summary>
+    /// A collection of HttpMessageHandlers to be added to the HttpClient pipeline.
+    /// This can be for telemetry logging, authorization, etc.
+    /// </summary>
+    public string[] HttpMessageHandlers { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Set this to true to use Polly for transient fault handling.
+    /// </summary>
+    public bool UsePolly { get; set; }
+
+    /// <summary>
+    /// Default max retry count for Polly. Default is 6.
+    /// </summary>
+    public int PollyMaxRetryCount { get; set; } = 6;
+
+    /// <summary>
+    /// The median delay to target before the first retry in seconds. Default is 1 second
+    /// </summary>
+    public int FirstBackoffRetryInSeconds { get; set; } = 1;
 }

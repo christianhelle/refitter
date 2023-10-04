@@ -24,14 +24,15 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document);
     }
 
-    public virtual string GenerateCode()
+    public virtual RefitGeneratedCode GenerateCode()
     {
-        return $$"""
-                {{GenerateInterfaceDeclaration()}}
-                {{Separator}}{
-                {{GenerateInterfaceBody()}}
-                {{Separator}}}
-                """;
+        return new RefitGeneratedCode(
+            $$"""
+              {{GenerateInterfaceDeclaration()}}
+              {{Separator}}{
+              {{GenerateInterfaceBody()}}
+              {{Separator}}}
+              """);
     }
 
     private string GenerateInterfaceBody()
