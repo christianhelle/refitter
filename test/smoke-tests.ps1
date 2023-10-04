@@ -35,7 +35,7 @@ function GenerateAndBuild {
     if ($args.Contains("settings-file")) {        
         Write-Host "refitter --output ./GeneratedCode/$outputPath --no-logging $args"
         $process = Start-Process "./bin/refitter" `
-            -Args "--no-logging $args" `
+            -Args "--output ./GeneratedCode/$outputPath --no-logging $args" `
             -NoNewWindow `
             -PassThru
     } else {        
@@ -93,7 +93,8 @@ function RunTests {
     Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin"
     Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin" -NoNewWindow -PassThru | Wait-Process
     
-    GenerateAndBuild -format " " -namespace " " -outputPath " " -args "--settings-file ./petstore.refitter"
+    GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter"
+    return;
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
