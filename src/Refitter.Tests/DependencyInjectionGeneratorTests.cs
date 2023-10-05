@@ -34,7 +34,7 @@ public class DependencyInjectionGeneratorTests
                 "IPetApi",
                 "IStoreApi"
             });
-        
+
         code.Should().Contain("AddRefitClient<IPetApi>()");
         code.Should().Contain("AddRefitClient<IStoreApi>()");
     }
@@ -49,7 +49,7 @@ public class DependencyInjectionGeneratorTests
                 "IPetApi",
                 "IStoreApi"
             });
-        
+
         code.Should().Contain("AddHttpMessageHandler<AuthorizationMessageHandler>()");
         code.Should().Contain("AddHttpMessageHandler<DiagnosticMessageHandler>()");
     }
@@ -64,7 +64,7 @@ public class DependencyInjectionGeneratorTests
                 "IPetApi",
                 "IStoreApi"
             });
-        
+
         code.Should().Contain("using Polly");
         code.Should().Contain("AddPolicyHandler");
         code.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
@@ -81,10 +81,26 @@ public class DependencyInjectionGeneratorTests
                 "IPetApi",
                 "IStoreApi"
             });
-        
+
         code.Should().NotContain("using Polly");
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
         code.Should().NotContain("AddPolicyHandler");
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
+    }
+
+    [Fact]
+    public void Can_Generate_Without_BaseUrl()
+    {
+        settings.DependencyInjectionSettings!.BaseUrl = null;
+        string code = DependencyInjectionGenerator.Generate(
+            settings,
+            new[]
+            {
+                "IPetApi",
+                "IStoreApi"
+            });
+
+        code.Should().Contain("Uri baseUrl");
+        code.Should().Contain(".ConfigureHttpClient(c => c.BaseAddress = baseUrl)");
     }
 }
