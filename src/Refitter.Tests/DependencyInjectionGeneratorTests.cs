@@ -18,7 +18,9 @@ public class DependencyInjectionGeneratorTests
                 "AuthorizationMessageHandler",
                 "DiagnosticMessageHandler"
             },
-            UsePolly = true
+            UsePolly = true,
+            PollyMaxRetryCount = 3,
+            FirstBackoffRetryInSeconds = 0.5,
         }
     };
 
