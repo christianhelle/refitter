@@ -246,5 +246,5 @@ public class DependencyInjectionSettings
     /// </summary>
     [JsonPropertyName("firstBackoffRetryInSeconds")]
     [JsonProperty("firstBackoffRetryInSeconds")]
-    public int FirstBackoffRetryInSeconds { get; set; } = 1;
+    public double FirstBackoffRetryInSeconds { get; set; } = 1.0;
 }
