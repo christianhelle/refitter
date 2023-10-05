@@ -62,7 +62,7 @@ paths:
     public async Task Generates_IServiceCollectionExtensions()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("static class IServiceCollectionExtensions");
+        generateCode.Should().Contain("static partial class IServiceCollectionExtensions");
     }
 
     [Fact]

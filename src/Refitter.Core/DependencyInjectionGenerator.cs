@@ -14,6 +14,14 @@ public static class DependencyInjectionGenerator
 
         var code = new StringBuilder();
 
+        var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
+            ? "public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Uri baseUrl)"
+            : "public static IServiceCollection ConfigureRefitClients(this IServiceCollection services)";
+        
+        var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
+            ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
+            : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
+
         code.AppendLine();
         code.AppendLine();
         code.AppendLine(
@@ -26,9 +34,9 @@ public static class DependencyInjectionGenerator
                   using Polly.Contrib.WaitAndRetry;
                   using Polly.Extensions.Http;
 
-                  public static class IServiceCollectionExtensions
+                  public static partial class IServiceCollectionExtensions
                   {
-                      public static IServiceCollection ConfigureRefitClients(this IServiceCollection services)
+                      {{methodDeclaration}}
                       {
               """");
         foreach (var interfaceName in interfaceNames)
@@ -37,7 +45,7 @@ public static class DependencyInjectionGenerator
                 $$"""
                               services
                                   .AddRefitClient<{{interfaceName}}>()
-                                  .ConfigureHttpClient(c => c.BaseAddress = new Uri("{{iocSettings.BaseUrl}}"))
+                                  {{configureRefitClient}}
                   """);
 
             foreach (string httpMessageHandler in iocSettings.HttpMessageHandlers)
