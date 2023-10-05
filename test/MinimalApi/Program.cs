@@ -4,9 +4,10 @@ using Refit;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services
-    .AddRefitClient<ISwaggerPetstore>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"));
+
+builder.Services.AddLogging(logging => logging.AddDebug());
+builder.Services.AddTransient<TelemetryDelegatingHandler>();
+builder.Services.ConfigureRefitClients();
 
 var app = builder.Build();
 app.MapGet(
@@ -29,3 +30,4 @@ app.UseHttpsRedirection();
 app.UseSwaggerUI();
 app.UseSwagger();
 app.Run();
+
