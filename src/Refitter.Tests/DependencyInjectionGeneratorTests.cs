@@ -63,7 +63,26 @@ public class DependencyInjectionGeneratorTests
                 "IStoreApi"
             });
         
+        code.Should().Contain("using Polly");
         code.Should().Contain("AddPolicyHandler");
         code.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
+    }
+
+    [Fact]
+    public void Can_Generate_Without_Polly()
+    {
+        settings.DependencyInjectionSettings!.UsePolly = false;
+        string code = DependencyInjectionGenerator.Generate(
+            settings,
+            new[]
+            {
+                "IPetApi",
+                "IStoreApi"
+            });
+        
+        code.Should().NotContain("using Polly");
+        code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
+        code.Should().NotContain("AddPolicyHandler");
+        code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
     }
 }

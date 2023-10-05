@@ -21,6 +21,19 @@ public static class DependencyInjectionGenerator
         var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
             : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
+        
+        var usings = iocSettings.UsePolly
+            ? """
+              using System;
+                  using Microsoft.Extensions.DependencyInjection;
+                  using Polly;
+                  using Polly.Contrib.WaitAndRetry;
+                  using Polly.Extensions.Http;
+              """
+            : """
+              using System;
+                  using Microsoft.Extensions.DependencyInjection;
+              """;
 
         code.AppendLine();
         code.AppendLine();
@@ -28,11 +41,7 @@ public static class DependencyInjectionGenerator
             $$""""
               namespace {{settings.Namespace}}
               {
-                  using System;
-                  using Microsoft.Extensions.DependencyInjection;
-                  using Polly;
-                  using Polly.Contrib.WaitAndRetry;
-                  using Polly.Extensions.Http;
+                  {{usings}}
 
                   public static partial class IServiceCollectionExtensions
                   {
