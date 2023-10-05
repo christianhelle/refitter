@@ -149,7 +149,17 @@ The following is an example `.refitter` file
   "includePathMatches": [ // Optional. Only include Paths that match the provided regular expression
     "^/pet/.*",
     "^/store/.*"
-  ]
+  ],
+  "dependencyInjectionSettings": {
+    "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
+    "httpMessageHandlers": [ // Optional
+        "AuthorizationMessageHandler", 
+        "TelemetryMessageHandler" 
+    ],
+    "usePolly": true, // Optional. Set this to true, to configure Polly with a retry policy that uses a jittered backoff. Default=false
+    "pollyMaxRetryCount": 3, // Optional. Default=6
+    "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
+  }
 }
 ```
 
@@ -174,6 +184,12 @@ The following is an example `.refitter` file
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
 - `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
+- `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
+  - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
+  - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
+  - `usePolly` - Set this to true to configure the HttpClient to use Polly using a retry policy with a jittered backoff
+  - `pollyMaxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
+  - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
 
 
 # Using the generated code
