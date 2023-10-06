@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.1...HEAD)
+
+**Implemented enhancements:**
+
+- Add support for generating IServiceCollection extension methods for registering Refit clients [\#174](https://github.com/christianhelle/refitter/pull/174) ([christianhelle](https://github.com/christianhelle))
+
+**Merged pull requests:**
+
+- docs: add Noblix as a contributor for ideas [\#177](https://github.com/christianhelle/refitter/pull/177) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
+## [0.8.1](https://github.com/christianhelle/refitter/tree/0.8.1) (2023-10-03)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.0...0.8.1)
 
 **Implemented enhancements:**
 
