@@ -327,6 +327,23 @@ public class SwaggerPetstoreTests
     }
 
     [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
+    public async Task Can_Generate_Code_With_Multiple_Interfaces_And_OperationNameTemplate(
+        SampleOpenSpecifications version,
+        string filename,
+        MultipleInterfaces multipleInterfaces)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.MultipleInterfaces = multipleInterfaces;
+        settings.OperationNameTemplate = "ExecuteAsync";
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("ExecuteAsync(");
+    }
+
+    [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
 #if !DEBUG
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
