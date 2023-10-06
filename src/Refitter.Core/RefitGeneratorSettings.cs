@@ -126,10 +126,17 @@ public class RefitGeneratorSettings
     [JsonProperty("includeTags")]
     public string[] IncludeTags { get; set; } = Array.Empty<string>();
 
+    /// <summary>
+    /// Set to <c>true</c> to generate deprecated operations, otherwise <c>false</c>
+    /// </summary>
     [JsonPropertyName("generateDeprecatedOperations")]
     [JsonProperty("generateDeprecatedOperations")]
     public bool GenerateDeprecatedOperations { get; set; } = true;
 
+    /// <summary>
+    /// Generate operation names using pattern. 
+    /// When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface.
+    /// </summary>
     [JsonPropertyName("operationNameTemplate")]
     [JsonProperty("operationNameTemplate")]
     public string? OperationNameTemplate { get; set; }
