@@ -190,6 +190,15 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "attilah",
+      "name": "Attila Hajdrik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/230432?v=4",
+      "profile": "https://www.veezla.io",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
