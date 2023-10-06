@@ -44,7 +44,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                     "is not specified in command line argument");
         }
 
-        if (!string.IsNullOrWhiteSpace(settings.OperationNameTemplate) && !settings.OperationNameTemplate.Contains("{operationName}"))
+        if (!string.IsNullOrWhiteSpace(settings.OperationNameTemplate) &&
+            !settings.OperationNameTemplate.Contains("{operationName}") &&
+            settings.MultipleInterfaces != MultipleInterfaces.ByEndpoint)
             return ValidationResult.Error("'{operationName}' placeholder must be present in operation name template");
 
         if (IsUrl(settings.OpenApiPath!))
