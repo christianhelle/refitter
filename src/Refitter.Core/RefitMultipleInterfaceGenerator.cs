@@ -16,9 +16,11 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
     {
     }
 
-    public override string GenerateCode()
+    public override RefitGeneratedCode GenerateCode()
     {
         var code = new StringBuilder();
+        var interfaceNames = new List<string>();
+        
         foreach (var kv in document.Paths)
         {
             foreach (var operations in kv.Value)
@@ -40,8 +42,11 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
                 GenerateInterfaceXmlDocComments(operation, code);
+                
+                var interfaceName = GetInterfaceName(kv, verb, operation);
+                interfaceNames.Add(interfaceName);
                 code.AppendLine($$"""
-                                  {{GenerateInterfaceDeclaration(GetInterfaceName(kv, verb, operation))}}
+                                  {{GenerateInterfaceDeclaration(interfaceName)}}
                                   {{Separator}}{
                                   """);
 
@@ -61,7 +66,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
             }
         }
 
-        return code.ToString();
+        return new RefitGeneratedCode(code.ToString(), interfaceNames.ToArray());
     }
 
     private string GetInterfaceName(

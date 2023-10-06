@@ -77,7 +77,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             IncludeTags = settings.Tags ?? Array.Empty<string>(),
             GenerateDeprecatedOperations = !settings.NoDeprecatedOperations,
             OperationNameTemplate = settings.OperationNameTemplate,
-            OptionalParameters = settings.OptionalNullableParameters
+            OptionalParameters = settings.OptionalNullableParameters,
         };
 
         try
