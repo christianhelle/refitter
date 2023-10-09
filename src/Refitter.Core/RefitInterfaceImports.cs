@@ -1,9 +1,8 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Refitter.Core;
 
-public static class RefitInterfaceImports
+internal static class RefitInterfaceImports
 {
     public static string[] GetImportedNamespaces(RefitGeneratorSettings settings) =>
         settings.UseCancellationTokens

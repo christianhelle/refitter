@@ -1,6 +1,6 @@
 namespace Refitter.Core;
 
-public static class StringCasingExtensions
+internal static class StringCasingExtensions
 {
     public static string ConvertKebabCaseToPascalCase(this string str)
     {
