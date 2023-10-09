@@ -1,0 +1,11 @@
+- name: CLI Tool
+  href: cli-tool.md
+
+- name: Source Generator
+  href: source-generator.md
+
+- name: Using the generated code
+  href: using-the-generated-code.md
+
+- name: .refitter file format
+  href: refitter-file-format.md
