@@ -4,8 +4,11 @@
 - name: Source Generator
   href: source-generator.md
 
+- name: .refitter file format
+  href: refitter-file-format.md
+
 - name: Using the generated code
   href: using-the-generated-code.md
 
-- name: .refitter file format
-  href: refitter-file-format.md
+- name: Examples
+  href: examples.md

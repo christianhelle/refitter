@@ -1,4 +1,4 @@
-# Source Generator
+## Source Generator
 
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](/api/Refitter.Core.html) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications
 
@@ -6,7 +6,7 @@ The Refitter source generator is a bit untraditional in a sense that it creates 
 
 ***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
 
-### Installation
+#### Installation
 
 The source generator is distributed as a NuGet package and should be installed to the project that will contain the generated code
 
@@ -14,7 +14,7 @@ The source generator is distributed as a NuGet package and should be installed t
 dotnet add package Refitter.SourceGenerator
 ```
 
-### Usage
+#### Usage
 
 This source generator generates code based on any [.refitter](refitter-file-format.md) file included to the project as `AdditionalFiles`.
 

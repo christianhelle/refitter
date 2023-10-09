@@ -1,4 +1,4 @@
-# .Refitter File format
+## .Refitter File format
 
 The following is an example `.refitter` file
 

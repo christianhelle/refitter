@@ -1,6 +1,4 @@
-# CLI Tool
-
-### Installation:
+## CLI Tool
 
 The tool is packaged as a .NET Tool and is published to nuget.org. You can install the latest version of this tool like this:
 
@@ -8,7 +6,7 @@ The tool is packaged as a .NET Tool and is published to nuget.org. You can insta
 dotnet tool install --global Refitter
 ```
 
-### Usage:
+#### Usage:
 
 ```shell
 $ refitter --help
@@ -77,5 +75,5 @@ This will generate a file called `Output.cs` which contains the Refit interface 
 The settings file uses the [.refitter file format](refitter-file-format.md)
 
 
-## System requirements
+#### System requirements
 .NET 6.0 (LTS)
