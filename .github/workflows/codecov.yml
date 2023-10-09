@@ -11,6 +11,11 @@ on:
     branches:
       - '*'
   pull_request:
+    paths-ignore:
+      - '**/*'
+      - '!.github/workflows/codecov.yml'
+      - '!src/**/*.csproj'
+      - '!src/**/*.cs'
     branches:
       - '*'
 
