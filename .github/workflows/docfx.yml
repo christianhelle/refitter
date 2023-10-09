@@ -6,6 +6,7 @@ on:
       paths-ignore:
         - '**/*'
         - '!.github/workflows/docfx.yml'
+        - '!docs/docfx_project/**'
         - '!src/**/*.csproj'
         - '!src/**/*.cs'
       branches:
