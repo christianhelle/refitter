@@ -6,10 +6,13 @@
 
 **Implemented enhancements:**
 
+- Allow for naming of methods when generating interfaces by endpoint [\#176](https://github.com/christianhelle/refitter/issues/176)
+- Allow method name customization when generating multiple interfaces by endpoint [\#181](https://github.com/christianhelle/refitter/pull/181) ([christianhelle](https://github.com/christianhelle))
 - Add support for generating IServiceCollection extension methods for registering Refit clients [\#174](https://github.com/christianhelle/refitter/pull/174) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
+- docs: add attilah as a contributor for ideas [\#180](https://github.com/christianhelle/refitter/pull/180) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add Noblix as a contributor for ideas [\#177](https://github.com/christianhelle/refitter/pull/177) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
 ## [0.8.1](https://github.com/christianhelle/refitter/tree/0.8.1) (2023-10-03)
