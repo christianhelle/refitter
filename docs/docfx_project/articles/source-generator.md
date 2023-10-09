@@ -16,6 +16,6 @@ dotnet add package Refitter.SourceGenerator
 
 ### Usage
 
-This source generator generates code based on any [.refitter](articles/refitter-file-format.md) file included to the project as `AdditionalFiles`.
+This source generator generates code based on any [.refitter](refitter-file-format.md) file included to the project as `AdditionalFiles`.
 
-The generator can automatically detect all [.refitter](articles/refitter-file-format.md) files inside the project that referenced the `Refitter.SourceGenerator` package and there is no need to include them manually as `AdditionalFiles`
+The generator can automatically detect all [.refitter](refitter-file-format.md) files inside the project that referenced the `Refitter.SourceGenerator` package and there is no need to include them manually as `AdditionalFiles`
