@@ -100,7 +100,7 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool NoDeprecatedOperations { get; set; }
 
-    [Description("Generate operation names using pattern")]
+    [Description("Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface.")]
     [CommandOption("--operation-name-template")]
     [DefaultValue(null)]
     public string? OperationNameTemplate { get; internal set; }

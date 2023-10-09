@@ -59,8 +59,9 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);
 
+                var methodName = settings.OperationNameTemplate ?? "Execute";
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
-                    .AppendLine($"{Separator}{Separator}{returnType} Execute({parametersString});")
+                    .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
                     .AppendLine($"{Separator}}}")
                     .AppendLine();
             }
