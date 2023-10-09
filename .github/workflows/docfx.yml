@@ -13,6 +13,7 @@ on:
 
 jobs:
     publish-docs:
+      if: github.ref == 'refs/heads/main' && github.repository == 'christianhelle/refitter'
       runs-on: ubuntu-latest
       steps:
       - name: Checkout
