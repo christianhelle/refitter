@@ -1,3 +1,5 @@
+name: Github Pages
+
 on:
     workflow_dispatch:
     push:
