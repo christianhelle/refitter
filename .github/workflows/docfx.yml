@@ -28,7 +28,7 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-            deploy_key: ${{ secrets.PAT }}
-            external_repository: refitter/refitter.github.io
-            publish_dir: ./public
+          personal_token: ${{ secrets.PAT }}
+          external_repository: refitter/refitter.github.io
+          publish_dir: ./public
   
