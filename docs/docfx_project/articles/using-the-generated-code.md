@@ -540,7 +540,7 @@ Category: Chaucito
 Status: Sold
 ```
 
-## ASP.NET Core and HttpClientFactory
+## HttpClientFactory
 
 Here's an example Minimal API with the [`Refit.HttpClientFactory`](https://www.nuget.org/packages/Refit.HttpClientFactory) library:
 
