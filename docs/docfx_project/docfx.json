@@ -47,6 +47,9 @@
     ],
     "output": "_site",
     "globalMetadataFiles": [],
+    "globalMetadata": {
+      "_appLogoPath": "images/logo.png"
+    },
     "fileMetadataFiles": [],
     "template": [
       "default",
