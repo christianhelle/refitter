@@ -74,5 +74,8 @@ $ refitter [path to OpenAPI spec file] --namespace "[Your.Namespace.Of.Choice.Ge
 
 This will generate a file called `Output.cs` which contains the Refit interface and contract classes generated using [NSwag](https://github.com/RicoSuter/NSwag)
 
+The settings file uses the [.refitter file format](articles/refitter-file-format.md)
+
+
 ## System requirements
 .NET 6.0 (LTS)
