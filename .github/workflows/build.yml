@@ -40,3 +40,7 @@ jobs:
         path: |
           **/*.nupkg
           README.md
+    - name: 🛠️ Build Docs
+      run: |
+        dotnet tool update -g docfx
+        docfx docs/docfx_project/docfx.json
