@@ -30,5 +30,6 @@ jobs:
         with:
           personal_token: ${{ secrets.PAT }}
           external_repository: refitter/refitter.github.io
-          publish_dir: ./public
+          publish_dir: docs/docfx_project/_site
+          publish_branch: main
   
