@@ -1,2 +1,8 @@
-- name: Introduction
-  href: intro.md
+- name: CLI Tool
+  href: cli-tool.md
+
+- name: Source Generator
+  href: source-generator.md
+
+- name: Using the generated code
+  href: using-the-generated-code.md
