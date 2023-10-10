@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.2...HEAD)
+
+**Implemented enhancements:**
+
+- Use Internal types to improve docfx documentation generation [\#183](https://github.com/christianhelle/refitter/pull/183) ([christianhelle](https://github.com/christianhelle))
+
+**Merged pull requests:**
+
+- Add docfx site [\#182](https://github.com/christianhelle/refitter/pull/182) ([christianhelle](https://github.com/christianhelle))
+
+## [0.8.2](https://github.com/christianhelle/refitter/tree/0.8.2) (2023-10-09)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.1...0.8.2)
 
 **Implemented enhancements:**
 
