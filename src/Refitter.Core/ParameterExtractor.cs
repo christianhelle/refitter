@@ -1,9 +1,5 @@
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using NSwag.CodeGeneration.Models;
 
 namespace Refitter.Core;

@@ -1,5 +1,3 @@
-using System;
-
 namespace Refitter.Core;
 
 internal static class WellKnownNamesspaces

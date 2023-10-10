@@ -1,6 +1,6 @@
 namespace Refitter.Core;
 
-public record RefitGeneratedCode(
+internal record RefitGeneratedCode(
     string SourceCode,
     params string[] InterfaceNames)
 {
