@@ -1,13 +1,9 @@
-﻿using System.Text.Json.Serialization;
-
-using NJsonSchema.CodeGeneration.CSharp;
-
-namespace Refitter.Core;
+﻿namespace Refitter.Core;
 
 /// <summary>
 /// CSharp code generator settings
 /// </summary>
-public class NSwagCodeGeneratorSettings
+public class CodeGeneratorSettings
 {
     /// <summary>
     /// Gets or sets the .NET namespace of the generated types (default: GeneratedCode).

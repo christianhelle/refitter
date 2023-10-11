@@ -142,5 +142,5 @@ public class RefitGeneratorSettings
     /// Gets or sets the settings describing how to generate types using NSwag
     /// </summary>
     [JsonPropertyName("codeGeneratorSettings")]
-    public NSwagCodeGeneratorSettings? CodeGeneratorSettings { get; set; }
+    public CodeGeneratorSettings? CodeGeneratorSettings { get; set; }
 }

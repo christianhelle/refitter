@@ -26,7 +26,7 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings();
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain(settings.CodeGeneratorSettings!.DateType);
@@ -42,7 +42,7 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings();
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain(settings.CodeGeneratorSettings!.DateTimeType);
@@ -58,7 +58,7 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings();
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain("ICollection<");
@@ -74,7 +74,7 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings();
         settings.CodeGeneratorSettings!.DateType = "DateTime";
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
@@ -91,7 +91,7 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings();
         settings.CodeGeneratorSettings!.DateTimeType = "DateTime";
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
@@ -108,7 +108,7 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings();
         settings.CodeGeneratorSettings!.ArrayType = "System.Collection.Generic.IList";
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
