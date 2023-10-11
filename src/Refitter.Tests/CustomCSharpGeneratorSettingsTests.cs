@@ -31,6 +31,7 @@ public class CustomCSharpGeneratorSettingsTests
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain(settings.CodeGeneratorSettings!.DateType);
     }
+
     [Theory]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -46,6 +47,7 @@ public class CustomCSharpGeneratorSettingsTests
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain(settings.CodeGeneratorSettings!.DateTimeType);
     }
+
     [Theory]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -61,7 +63,7 @@ public class CustomCSharpGeneratorSettingsTests
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain("ICollection<");
     }
-    
+
     [Theory]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -78,7 +80,7 @@ public class CustomCSharpGeneratorSettingsTests
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain("DateTime");
     }
-    
+
     [Theory]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -95,7 +97,7 @@ public class CustomCSharpGeneratorSettingsTests
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain("DateTime");
     }
-    
+
     [Theory]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
