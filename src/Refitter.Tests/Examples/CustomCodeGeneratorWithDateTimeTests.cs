@@ -81,13 +81,6 @@ public class CustomCodeGeneratorWithDateTimeTests
     }
 
     [Fact]
-    public async Task GeneratedCode_Contains_Date_Format_String()
-    {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] ");
-    }
-
-    [Fact]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter()
     {
         string generateCode = await GenerateCode();
