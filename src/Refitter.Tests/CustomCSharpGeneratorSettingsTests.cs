@@ -25,8 +25,8 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.ContractsGeneratorSettings = new CSharpGeneratorSettings();
-        settings.ContractsGeneratorSettings!.DateType = "DateTime";
+        settings.CodeGeneratorSettings = new CSharpGeneratorSettings();
+        settings.CodeGeneratorSettings!.DateType = "DateTime";
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain("DateTime");
@@ -42,8 +42,8 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.ContractsGeneratorSettings = new CSharpGeneratorSettings();
-        settings.ContractsGeneratorSettings!.DateTimeType = "DateTime";
+        settings.CodeGeneratorSettings = new CSharpGeneratorSettings();
+        settings.CodeGeneratorSettings!.DateTimeType = "DateTime";
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain("DateTime");
@@ -59,8 +59,8 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.ContractsGeneratorSettings = new CSharpGeneratorSettings();
-        settings.ContractsGeneratorSettings!.ArrayType = "System.Collection.Generic.IList";
+        settings.CodeGeneratorSettings = new CSharpGeneratorSettings();
+        settings.CodeGeneratorSettings!.ArrayType = "System.Collection.Generic.IList";
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
         generateCode.Should().Contain("System.Collection.Generic.IList<");

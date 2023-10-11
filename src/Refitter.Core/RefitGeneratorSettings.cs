@@ -141,10 +141,10 @@ public class RefitGeneratorSettings
     public DependencyInjectionSettings? DependencyInjectionSettings { get; set; }
 
     /// <summary>
-    /// Gets or sets the settings describing how to generate contracts using NSwag
+    /// Gets or sets the settings describing how to generate types using NSwag
     /// </summary>
-    [JsonPropertyName("contractsGeneratorSettings")]
-    public CSharpGeneratorSettings? ContractsGeneratorSettings { get; set; }
+    [JsonPropertyName("codeGeneratorSettings")]
+    public CSharpGeneratorSettings? CodeGeneratorSettings { get; set; }
 }
 
 /// <summary>

@@ -32,7 +32,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             });
 
         MapCSharpGeneratorSettings(
-            settings.ContractsGeneratorSettings,
+            settings.CodeGeneratorSettings,
             generator.Settings.CSharpGeneratorSettings);
 
         return generator;
