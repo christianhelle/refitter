@@ -25,6 +25,7 @@
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(AssemblyName).props" Pack="true" PackagePath="build" />
     <Compile Include="../Refitter.Core/*.cs" />
+    <Compile Include="../Refitter.Core/Settings/*.cs" />
   </ItemGroup>
 
 </Project>
