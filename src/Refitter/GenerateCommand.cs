@@ -34,7 +34,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
         {
             var json = File.ReadAllText(settings.SettingsFilePath);
-            var refitGeneratorSettings = JsonSerializer.Deserialize<RefitGeneratorSettings>(json)!;
+            var refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
             settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
             
             if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
@@ -97,13 +97,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
                 var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
-                refitGeneratorSettings = JsonSerializer.Deserialize<RefitGeneratorSettings>(
-                    json,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    })!;
+                refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
                 refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
             }
 

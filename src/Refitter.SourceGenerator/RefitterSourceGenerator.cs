@@ -73,13 +73,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
             var content = file.GetText(cancellationToken)!;
             var json = content.ToString();
-            var settings = JsonSerializer.Deserialize<RefitGeneratorSettings>(
-                json,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                })!;
+            var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
             cancellationToken.ThrowIfCancellationRequested();
 
             diagnostics.Add(
