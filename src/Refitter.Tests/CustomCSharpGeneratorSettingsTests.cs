@@ -1,4 +1,5 @@
 using System.Dynamic;
+using System.Text.Json;
 
 using Atc.Test;
 
@@ -20,12 +21,58 @@ public class CustomCSharpGeneratorSettingsTests
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
     [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Default_DateType(
+        SampleOpenSpecifications version,
+        string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotBeNullOrWhiteSpace();
+        generateCode.Should().Contain(settings.CodeGeneratorSettings!.DateType);
+    }
+    [Theory]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Default_DateTimeType(
+        SampleOpenSpecifications version,
+        string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotBeNullOrWhiteSpace();
+        generateCode.Should().Contain(settings.CodeGeneratorSettings!.DateTimeType);
+    }
+    [Theory]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Default_ArrayType(
+        SampleOpenSpecifications version,
+        string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotBeNullOrWhiteSpace();
+        generateCode.Should().Contain("ICollection<");
+    }
+    
+    [Theory]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Custom_DateType(
         SampleOpenSpecifications version,
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.CodeGeneratorSettings = new CSharpGeneratorSettings();
+        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
         settings.CodeGeneratorSettings!.DateType = "DateTime";
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
@@ -42,7 +89,7 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.CodeGeneratorSettings = new CSharpGeneratorSettings();
+        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
         settings.CodeGeneratorSettings!.DateTimeType = "DateTime";
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
@@ -59,7 +106,7 @@ public class CustomCSharpGeneratorSettingsTests
         string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.CodeGeneratorSettings = new CSharpGeneratorSettings();
+        settings.CodeGeneratorSettings = new NSwagCodeGeneratorSettings();
         settings.CodeGeneratorSettings!.ArrayType = "System.Collection.Generic.IList";
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotBeNullOrWhiteSpace();
