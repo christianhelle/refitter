@@ -46,6 +46,35 @@ The following is an example `.refitter` file
     "usePolly": true, // Optional. Set this to true, to configure Polly with a retry policy that uses a jittered backoff. Default=false
     "pollyMaxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
+  },
+  "codeGeneratorSettings": { // Optional. Default settings are the values set in this example
+    "namespace": "GeneratedCode",
+    "requiredPropertiesMustBeDefined": true,
+    "generateDataAnnotations": true,
+    "anyType": "object",
+    "dateType": "System.DateTimeOffset",
+    "dateTimeType": "System.DateTimeOffset",
+    "timeType": "System.TimeSpan",
+    "timeSpanType": "System.TimeSpan",
+    "arrayType": "System.Collections.Generic.ICollection",
+    "dictionaryType": "System.Collections.Generic.IDictionary",
+    "arrayInstanceType": "System.Collections.ObjectModel.Collection",
+    "dictionaryInstanceType": "System.Collections.Generic.Dictionary",
+    "arrayBaseType": "System.Collections.ObjectModel.Collection",
+    "dictionaryBaseType": "System.Collections.Generic.Dictionary",
+    "propertySetterAccessModifier": "",
+    "generateImmutableArrayProperties": false,
+    "generateImmutableDictionaryProperties": false,
+    "handleReferences": false,
+    "jsonSerializerSettingsTransformationMethod": null,
+    "generateJsonMethods": false,
+    "enforceFlagEnums": false,
+    "inlineNamedDictionaries": false,
+    "inlineNamedTuples": true,
+    "inlineNamedArrays": false,
+    "generateOptionalPropertiesAsNullable": false,
+    "generateNullableReferenceTypes": false,
+    "generateNativeRecords": false
   }
 }
 ```
