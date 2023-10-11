@@ -199,6 +199,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "bielik01",
+      "name": "bielik01",
+      "avatar_url": "https://avatars.githubusercontent.com/u/920950?v=4",
+      "profile": "https://github.com/bielik01",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
