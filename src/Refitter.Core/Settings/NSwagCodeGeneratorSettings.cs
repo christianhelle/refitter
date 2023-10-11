@@ -81,23 +81,6 @@ public class NSwagCodeGeneratorSettings
     public string DictionaryBaseType { get; set; } = "System.Collections.Generic.Dictionary";
 
     /// <summary>
-    /// Gets or sets the CSharp class style (default: 'Poco').
-    /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public CSharpClassStyle ClassStyle { get; set; } = CSharpClassStyle.Poco;
-
-    /// <summary>
-    /// Gets or sets the CSharp JSON library to use (default: 'NewtonsoftJson', 'SystemTextJson' is experimental/not complete).
-    /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public CSharpJsonLibrary JsonLibrary { get; set; } = CSharpJsonLibrary.NewtonsoftJson;
-
-    /// <summary>
-    /// Gets or sets the access modifier of generated classes and interfaces (default: 'public').
-    /// </summary>
-    public string TypeAccessModifier { get; set; } = "public";
-
-    /// <summary>
     /// Gets the access modifier of property setters (default: '').
     /// </summary>
     public string PropertySetterAccessModifier { get; set; } = string.Empty;
