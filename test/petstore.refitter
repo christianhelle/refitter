@@ -10,5 +10,10 @@
     "usePolly": true,
     "pollyMaxRetryCount": 3,
     "firstBackoffRetryInSeconds": 0.5
+  },
+  "codeGeneratorSettings": {
+    "dateType": "System.DateTime",
+    "dateTimeType": "System.DateTime",
+    "arrayType": "System.Collections.Generic.IList"
   }
 }
