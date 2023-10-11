@@ -97,7 +97,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
                 var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
-                refitGeneratorSettings = JsonSerializer.Deserialize<RefitGeneratorSettings>(json)!;
+                refitGeneratorSettings = JsonSerializer.Deserialize<RefitGeneratorSettings>(
+                    json,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    })!;
                 refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
             }
 
