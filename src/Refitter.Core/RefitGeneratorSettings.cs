@@ -4,6 +4,8 @@ using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
+using NJsonSchema.CodeGeneration.CSharp;
+
 namespace Refitter.Core;
 
 /// <summary>
@@ -161,6 +163,13 @@ public class RefitGeneratorSettings
     [JsonPropertyName("dependencyInjectionSettings")]
     [JsonProperty("dependencyInjectionSettings")]
     public DependencyInjectionSettings? DependencyInjectionSettings { get; set; }
+
+    /// <summary>
+    /// Gets or sets the settings describing how to generate contracts using NSwag
+    /// </summary>
+    [JsonPropertyName("contractsGeneratorSettings")]
+    [JsonProperty("contractsGeneratorSettings")]
+    public CSharpGeneratorSettings? ContractsGeneratorSettings { get; set; }
 }
 
 /// <summary>
