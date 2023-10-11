@@ -39,7 +39,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
     }
 
     private static void MapCSharpGeneratorSettings(
-        CSharpGeneratorSettings? source,
+        NSwagCodeGeneratorSettings? source,
         CSharpGeneratorSettings destination)
     {
         if (source is null)
@@ -47,7 +47,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             return;
         }
 
-        var defaultInstance = new CSharpGeneratorSettings();
+        var defaultInstance = new NSwagCodeGeneratorSettings();
         foreach (var property in source.GetType().GetProperties())
         {
             if (property.PropertyType != typeof(string) &&
