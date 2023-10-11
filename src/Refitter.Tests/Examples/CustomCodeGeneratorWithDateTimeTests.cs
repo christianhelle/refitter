@@ -124,7 +124,6 @@ public class CustomCodeGeneratorWithDateTimeTests
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
-            UseIsoDateFormat = true,
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
                 DateType = "System.DateTime",
