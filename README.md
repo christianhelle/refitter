@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-21-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-22-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -830,6 +830,9 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vinaymadupathi"><img src="https://avatars.githubusercontent.com/u/38102900?v=4?s=100" width="100px;" alt="vkmadupa"/><br /><sub><b>vkmadupa</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Avinaymadupathi" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Noblix"><img src="https://avatars.githubusercontent.com/u/22076883?v=4?s=100" width="100px;" alt="Noblix"/><br /><sub><b>Noblix</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=Noblix" title="Code">💻</a> <a href="#ideas-Noblix" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.veezla.io"><img src="https://avatars.githubusercontent.com/u/230432?v=4?s=100" width="100px;" alt="Attila Hajdrik"/><br /><sub><b>Attila Hajdrik</b></sub></a><br /><a href="#ideas-attilah" title="Ideas, Planning, & Feedback">🤔</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/bielik01"><img src="https://avatars.githubusercontent.com/u/920950?v=4?s=100" width="100px;" alt="bielik01"/><br /><sub><b>bielik01</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abielik01" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
