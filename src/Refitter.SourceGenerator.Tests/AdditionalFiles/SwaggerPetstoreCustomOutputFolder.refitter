@@ -2,6 +2,7 @@
   "openApiPath": "../Resources/V3/SwaggerPetstore.json",
   "namespace": "Refitter.Tests.CustomGenerated",
   "outputFolder": "../CustomGenerated",
+  "outputFileName": "CustomGenerated.cs",
   "generateContracts": false,
   "additionalNamespaces": ["Refitter.Tests.AdditionalFiles.SingeInterface"],
   "naming": {
