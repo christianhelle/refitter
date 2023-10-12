@@ -113,6 +113,13 @@ public class RefitGeneratorSettings
     public string OutputFolder { get; set; } = "./Generated";
 
     /// <summary>
+    /// Gets or sets the filename of the generated code.
+    /// For the CLI tool, the default is Output.cs
+    /// For the Source Generator, this is the name of the generated class and the default is [.refitter defined naming OR .refitter filename].g.cs)
+    /// </summary>
+    public string? OutputFilename { get; set; }
+
+    /// <summary>
     /// Gets or sets the settings describing how to register generated interface to the .NET Core DI container
     /// </summary>
     public DependencyInjectionSettings? DependencyInjectionSettings { get; set; }
