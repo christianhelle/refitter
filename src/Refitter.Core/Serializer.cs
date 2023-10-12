@@ -12,7 +12,8 @@ public static class Serializer
 {
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
     /// <summary>
