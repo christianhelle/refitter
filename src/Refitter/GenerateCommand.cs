@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Text.Json;
 
 using Microsoft.OpenApi.Models;
 
@@ -36,12 +35,21 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var json = File.ReadAllText(settings.SettingsFilePath);
             var refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
             settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
-            
+
             if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
                 return ValidationResult.Error(
                     "The 'openApiPath' in settings file is required when " +
                     "URL or file path to OpenAPI Specification file " +
                     "is not specified in command line argument");
+
+            if (!string.IsNullOrWhiteSpace(settings.OutputPath) && 
+                settings.OutputPath != Settings.DefaultOutputPath &&
+                (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder) || 
+                 !string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFilename)))
+                return ValidationResult.Error(
+                    "You should either specify an output path directly from --output " +
+                    "or use specify it in 'outputFolder' and 'outputFilename' from the settings file, " +
+                    "not both");
         }
 
         if (!string.IsNullOrWhiteSpace(settings.OperationNameTemplate) &&
@@ -112,7 +120,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                     Directory.CreateDirectory(directory);
             }
 
-            var outputPath = settings.OutputPath ?? "Output.cs";
+            var outputPath = GetOutputPath(settings, refitGeneratorSettings);
             AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}[/]");
             await File.WriteAllTextAsync(outputPath, code);
             await Analytics.LogFeatureUsage(settings);
@@ -132,6 +140,21 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             await Analytics.LogError(exception, settings);
             return exception.HResult;
         }
+    }
+
+    private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        var outputPath = settings.OutputPath != Settings.DefaultOutputPath && !string.IsNullOrWhiteSpace(settings.OutputPath)
+                        ? settings.OutputPath
+                        : refitGeneratorSettings.OutputFilename ?? "Output.cs";
+
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder) &&
+            refitGeneratorSettings.OutputFolder != RefitGeneratorSettings.DefaultOutputFolder)
+        {
+            outputPath = Path.Combine(refitGeneratorSettings.OutputFolder, outputPath);
+        }
+
+        return outputPath;
     }
 
     private static async Task ValidateOpenApiSpec(Settings settings)
