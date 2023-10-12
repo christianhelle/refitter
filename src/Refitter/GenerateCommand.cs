@@ -113,15 +113,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var code = generator.Generate().ReplaceLineEndings();
             AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
 
-            if (!string.IsNullOrWhiteSpace(settings.OutputPath))
-            {
-                var directory = Path.GetDirectoryName(settings.OutputPath);
-                if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
-                    Directory.CreateDirectory(directory);
-            }
-
             var outputPath = GetOutputPath(settings, refitGeneratorSettings);
             AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}[/]");
+
+            var directory = Path.GetDirectoryName(outputPath);
+            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
             await File.WriteAllTextAsync(outputPath, code);
             await Analytics.LogFeatureUsage(settings);
 
