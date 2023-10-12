@@ -9,6 +9,8 @@ namespace Refitter.Core;
 [ExcludeFromCodeCoverage]
 public class RefitGeneratorSettings
 {
+    public const string DefaultOutputFolder = "./Generated";
+
     /// <summary>
     /// Gets or sets the path to the Open API.
     /// </summary>
@@ -110,7 +112,7 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Gets or sets the relative path to a folder in which the output files are generated. (default: ./Generated)
     /// </summary>
-    public string OutputFolder { get; set; } = "./Generated";
+    public string OutputFolder { get; set; } = DefaultOutputFolder;
 
     /// <summary>
     /// Gets or sets the filename of the generated code.
