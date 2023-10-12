@@ -189,7 +189,13 @@ The following is an example `.refitter` file
     "inlineNamedArrays": false,
     "generateOptionalPropertiesAsNullable": false,
     "generateNullableReferenceTypes": false,
-    "generateNativeRecords": false
+    "generateNativeRecords": false,
+    "generateDefaultValues": true,
+    "inlineNamedAny": false,
+    "excludedTypeNames": [
+      "ExcludedTypeFoo",
+      "ExcludedTypeBar"
+    ]
   }
 }
 ```
@@ -249,6 +255,9 @@ The following is an example `.refitter` file
   - `generateOptionalPropertiesAsNullable` - Default is false,
   - `generateNullableReferenceTypes` - Default is false,
   - `generateNativeRecords` - Default is false
+  - `generateDefaultValues` - Default is true
+  - `inlineNamedAny` - Default is false
+  - `excludedTypeNames` - Default is empty
 
 
 # Using the generated code
