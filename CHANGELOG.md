@@ -6,6 +6,8 @@
 
 **Implemented enhancements:**
 
+- NSwag contracts [\#186](https://github.com/christianhelle/refitter/issues/186)
+- Add support for customizable type and contract generator settings [\#188](https://github.com/christianhelle/refitter/pull/188) ([christianhelle](https://github.com/christianhelle))
 - Use Internal types to improve docfx documentation generation [\#183](https://github.com/christianhelle/refitter/pull/183) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
