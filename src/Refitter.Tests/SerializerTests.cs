@@ -1,0 +1,56 @@
+﻿using System.Diagnostics;
+using System.Reflection;
+using System.Text.Json;
+
+using Atc.Test;
+
+using FluentAssertions;
+
+using Refitter.Core;
+
+using Xunit;
+
+namespace Refitter.Tests;
+
+public class SerializerTests
+{
+    [Theory, AutoNSubstituteData]
+    public void Can_Serialize_RefitGeneratorSettings(
+        RefitGeneratorSettings settings)
+    {
+        Serializer
+            .Serialize(settings)
+            .Should()
+            .NotBeNullOrWhiteSpace();
+    }
+
+    [Theory, AutoNSubstituteData]
+    public void Can_Deserialize_RefitGeneratorSettings(
+        RefitGeneratorSettings settings)
+    {
+        var json = Serializer.Serialize(settings);
+        Serializer
+            .Deserialize<RefitGeneratorSettings>(json)
+            .Should()
+            .BeEquivalentTo(settings);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public void Deserialize_Is_Case_Insensitive(
+        RefitGeneratorSettings settings)
+    {
+        var json = Serializer.Serialize(settings);
+        foreach (var property in typeof(RefitGeneratorSettings).GetProperties())
+        {
+            var jsonProperty = "\"" + property.Name + "\"";
+            json = json.Replace(
+                jsonProperty, 
+                jsonProperty.ToUpperInvariant());
+        }
+
+        Serializer
+            .Deserialize<RefitGeneratorSettings>(json)
+            .Should()
+            .BeEquivalentTo(settings);
+    }
+}

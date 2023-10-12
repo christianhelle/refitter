@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json;
 
 using Microsoft.CodeAnalysis;
-
-using Newtonsoft.Json;
 
 using Refitter.Core;
 
@@ -74,7 +73,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
             var content = file.GetText(cancellationToken)!;
             var json = content.ToString();
-            var settings = JsonConvert.DeserializeObject<RefitGeneratorSettings>(json)!;
+            var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
             cancellationToken.ThrowIfCancellationRequested();
 
             diagnostics.Add(
@@ -101,7 +100,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var refit = generator.Generate();
 
             cancellationToken.ThrowIfCancellationRequested();
-            try 
+            try
             {
                 var folder = Path.Combine(Path.GetDirectoryName(file.Path), settings.OutputFolder);
                 var output = Path.Combine(folder, filename);
@@ -111,8 +110,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 }
 
                 File.WriteAllText(
-                    output, 
-                    refit, 
+                    output,
+                    refit,
                     Encoding.UTF8);
 
                 return diagnostics;

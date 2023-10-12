@@ -76,8 +76,8 @@ public static class Analytics
         exception
             .ToExceptionless(
                 new ContextData(
-                    JsonSerializer.Deserialize<Dictionary<string, object>>(
-                        JsonSerializer.Serialize(settings))!))
+                    Serializer.Deserialize<Dictionary<string, object>>(
+                        Serializer.Serialize(settings))!))
             .Submit();
 
         return ExceptionlessClient.Default.ProcessQueueAsync();

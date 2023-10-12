@@ -1,36 +1,79 @@
+using System.Diagnostics;
+
 using NJsonSchema.CodeGeneration.CSharp;
+
 using NSwag;
 using NSwag.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 
-internal class CSharpClientGeneratorFactory
+internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, OpenApiDocument document)
 {
-    private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
-
-    public CSharpClientGeneratorFactory(RefitGeneratorSettings settings, OpenApiDocument document)
+    public CustomCSharpClientGenerator Create()
     {
-        this.settings = settings;
-        this.document = document;
+        var generator = new CustomCSharpClientGenerator(
+            document,
+            new CSharpClientGeneratorSettings
+            {
+                GenerateClientClasses = false,
+                GenerateDtoTypes = true,
+                GenerateClientInterfaces = false,
+                GenerateExceptionClasses = false,
+                CodeGeneratorSettings =
+                {
+                    PropertyNameGenerator = new CustomCSharpPropertyNameGenerator(),
+                },
+                CSharpGeneratorSettings =
+                {
+                    Namespace = settings.Namespace,
+                    JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                    TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant(),
+                }
+            });
+
+        MapCSharpGeneratorSettings(
+            settings.CodeGeneratorSettings,
+            generator.Settings.CSharpGeneratorSettings);
+
+        return generator;
     }
 
-    public CustomCSharpClientGenerator Create() =>
-        new(document, new CSharpClientGeneratorSettings
+    private static void MapCSharpGeneratorSettings(
+        CodeGeneratorSettings? source,
+        CSharpGeneratorSettings destination)
+    {
+        if (source is null)
         {
-            GenerateClientClasses = false,
-            GenerateDtoTypes = true,
-            GenerateClientInterfaces = false,
-            GenerateExceptionClasses = false,
-            CodeGeneratorSettings =
+            return;
+        }
+
+        var defaultInstance = new CodeGeneratorSettings();
+        foreach (var property in source.GetType().GetProperties())
+        {
+            if (property.PropertyType != typeof(string) &&
+                property.PropertyType != typeof(bool))
             {
-                PropertyNameGenerator = new CustomCSharpPropertyNameGenerator(),
-            },
-            CSharpGeneratorSettings =
-            {
-                Namespace = settings.Namespace,
-                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
-                TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant()
+                continue;
             }
-        });
+
+            var value = property.GetValue(source);
+            if (value == null)
+            {
+                continue;
+            }
+
+            if (value.Equals(property.GetValue(defaultInstance)))
+            {
+                continue;
+            }
+
+            var settingsProperty = destination.GetType().GetProperty(property.Name);
+            if (settingsProperty == null)
+            {
+                continue;
+            }
+
+            settingsProperty.SetValue(destination, value);
+        }
+    }
 }
