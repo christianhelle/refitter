@@ -65,12 +65,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
         try
         {
-            var filename = Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
-            if (filename == ".g.cs")
-            {
-                filename = "Refitter.g.cs";
-            }
-
             var content = file.GetText(cancellationToken)!;
             var json = content.ToString();
             var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
@@ -102,7 +96,13 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                var folder = Path.Combine(Path.GetDirectoryName(file.Path), settings.OutputFolder);
+                var filename = settings.OutputFilename ?? Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
+                if (filename == ".g.cs")
+                {
+                    filename = "Refitter.g.cs";
+                }
+                
+                var folder = Path.Combine(Path.GetDirectoryName(file.Path)!, settings.OutputFolder);
                 var output = Path.Combine(folder, filename);
                 if (!Directory.Exists(folder))
                 {
