@@ -12,7 +12,9 @@
 
 **Merged pull requests:**
 
+- Bump xunit.runner.visualstudio from 2.5.1 to 2.5.3 [\#191](https://github.com/christianhelle/refitter/pull/191) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump Exceptionless from 6.0.2 to 6.0.3 [\#190](https://github.com/christianhelle/refitter/pull/190) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump xunit from 2.5.1 to 2.5.2 [\#189](https://github.com/christianhelle/refitter/pull/189) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add bielik01 as a contributor for ideas [\#187](https://github.com/christianhelle/refitter/pull/187) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add bielik01 as a contributor for bug [\#185](https://github.com/christianhelle/refitter/pull/185) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Add docfx site [\#182](https://github.com/christianhelle/refitter/pull/182) ([christianhelle](https://github.com/christianhelle))
