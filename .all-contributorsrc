@@ -218,6 +218,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "alrz",
+      "name": "Alireza Habibi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3105979?v=4",
+      "profile": "https://github.com/alrz",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
