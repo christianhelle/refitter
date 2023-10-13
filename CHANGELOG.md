@@ -12,6 +12,7 @@
 
 **Merged pull requests:**
 
+- Bump Exceptionless from 6.0.2 to 6.0.3 [\#190](https://github.com/christianhelle/refitter/pull/190) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add bielik01 as a contributor for ideas [\#187](https://github.com/christianhelle/refitter/pull/187) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add bielik01 as a contributor for bug [\#185](https://github.com/christianhelle/refitter/pull/185) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Add docfx site [\#182](https://github.com/christianhelle/refitter/pull/182) ([christianhelle](https://github.com/christianhelle))
