@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-23-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-24-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -900,6 +900,7 @@ Returns a response that looks something like this:
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/bielik01"><img src="https://avatars.githubusercontent.com/u/920950?v=4?s=100" width="100px;" alt="bielik01"/><br /><sub><b>bielik01</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abielik01" title="Bug reports">🐛</a> <a href="#ideas-bielik01" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/naaeef"><img src="https://avatars.githubusercontent.com/u/43339071?v=4?s=100" width="100px;" alt="naaeef"/><br /><sub><b>naaeef</b></sub></a><br /><a href="#ideas-naaeef" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/alrz"><img src="https://avatars.githubusercontent.com/u/3105979?v=4?s=100" width="100px;" alt="Alireza Habibi"/><br /><sub><b>Alireza Habibi</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Aalrz" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
