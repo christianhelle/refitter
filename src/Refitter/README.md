@@ -138,7 +138,7 @@ The following is an example `.refitter` file
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
-- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using multipleIinterfaces=ByEndpoint, This is name of the Execute() method in the interface
+- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
@@ -146,6 +146,36 @@ The following is an example `.refitter` file
   - `usePolly` - Set this to true to configure the HttpClient to use Polly using a retry policy with a jittered backoff
   - `pollyMaxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
+- `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
+  - `requiredPropertiesMustBeDefined` - Default is true,
+  - `generateDataAnnotations` - Default is true,
+  - `anyType` - Default is `object`,
+  - `dateType` - Default is `System.DateTimeOffset`,
+  - `dateTimeType` - Default is `System.DateTimeOffset`,
+  - `timeType` - Default is `System.TimeSpan`,
+  - `timeSpanType` - Default is `System.TimeSpan`,
+  - `arrayType` - Default is `System.Collections.Generic.ICollection`,
+  - `dictionaryType` - Default is `System.Collections.Generic.IDictionary`,
+  - `arrayInstanceType` - Default is `System.Collections.ObjectModel.Collection`,
+  - `dictionaryInstanceType` - Default is `System.Collections.Generic.Dictionary`,
+  - `arrayBaseType` - Default is `System.Collections.ObjectModel.Collection`,
+  - `dictionaryBaseType` - Default is `System.Collections.Generic.Dictionary`,
+  - `propertySetterAccessModifier` - Default is ``,
+  - `generateImmutableArrayProperties` - Default is false,
+  - `generateImmutableDictionaryProperties` - Default is false,
+  - `handleReferences` - Default is false,
+  - `jsonSerializerSettingsTransformationMethod` - Default is null,
+  - `generateJsonMethods` - Default is false,
+  - `enforceFlagEnums` - Default is false,
+  - `inlineNamedDictionaries` - Default is false,
+  - `inlineNamedTuples` - Default is true,
+  - `inlineNamedArrays` - Default is false,
+  - `generateOptionalPropertiesAsNullable` - Default is false,
+  - `generateNullableReferenceTypes` - Default is false,
+  - `generateNativeRecords` - Default is false
+  - `generateDefaultValues` - Default is true
+  - `inlineNamedAny` - Default is false
+  - `excludedTypeNames` - Default is empty
 
 To generate code from an OpenAPI specifications file, run the following:
 

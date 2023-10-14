@@ -135,7 +135,6 @@ The following is an example `.refitter` file
   - `pollyMaxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
-  - `namespace` - Default is `GeneratedCode`,
   - `requiredPropertiesMustBeDefined` - Default is true,
   - `generateDataAnnotations` - Default is true,
   - `anyType` - Default is `object`,

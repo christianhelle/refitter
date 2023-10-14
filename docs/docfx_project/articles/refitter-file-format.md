@@ -50,7 +50,6 @@ The following is an example `.refitter` file
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
   },
   "codeGeneratorSettings": { // Optional. Default settings are the values set in this example
-    "namespace": "GeneratedCode",
     "requiredPropertiesMustBeDefined": true,
     "generateDataAnnotations": true,
     "anyType": "object",
@@ -90,7 +89,6 @@ The following is an example `.refitter` file
 Here are some basic explanations of each property:
 
 - `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS
-- `namespace` - the namespace used in the generated code. If not specified, this defaults to `GeneratedCode`
 - `naming.useOpenApiTitle` - a boolean indicating whether the OpenApi title should be used. Default is `true`
 - `naming.interfaceName` - the name of the generated interface. The generated code will automatically prefix this with `I` so if this set to `MyApiClient` then the generated interface is called `IMyApiClient`. Default is `ApiClient`
 - `generateContracts` - a boolean indicating whether contracts should be generated. A use case for this is several API clients use the same contracts. Default is `true`
@@ -117,7 +115,6 @@ Here are some basic explanations of each property:
   - `pollyMaxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
-  - `namespace` - Default is `GeneratedCode`,
   - `requiredPropertiesMustBeDefined` - Default is true,
   - `generateDataAnnotations` - Default is true,
   - `anyType` - Default is `object`,
