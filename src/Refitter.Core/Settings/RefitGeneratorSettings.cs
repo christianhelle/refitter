@@ -115,7 +115,7 @@ public class RefitGeneratorSettings
 
     /// <summary>
     /// Generate operation names using pattern. 
-    /// When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface.
+    /// When using <see cref="MultipleInterfaces"/> <see cref="ByEndpoint"/>, this is name of the Execute() method in the interface.
     /// </summary>
     [JsonPropertyName("operationNameTemplate")]
     public string? OperationNameTemplate { get; set; }
