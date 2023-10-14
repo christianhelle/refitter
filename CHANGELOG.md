@@ -6,12 +6,18 @@
 
 **Implemented enhancements:**
 
-- NSwag contracts [\#186](https://github.com/christianhelle/refitter/issues/186)
+- Manually run refit generator so the source can be directly added to the compilation rather than writing to a file [\#196](https://github.com/christianhelle/refitter/issues/196)
 - Add support for customizable type and contract generator settings [\#188](https://github.com/christianhelle/refitter/pull/188) ([christianhelle](https://github.com/christianhelle))
 - Use Internal types to improve docfx documentation generation [\#183](https://github.com/christianhelle/refitter/pull/183) ([christianhelle](https://github.com/christianhelle))
 
+**Fixed bugs:**
+
+- Remove `namespace` settings from `codeGeneratorSettings` [\#197](https://github.com/christianhelle/refitter/pull/197) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
+- docs: add alrz as a contributor for bug [\#195](https://github.com/christianhelle/refitter/pull/195) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add naaeef as a contributor for ideas [\#194](https://github.com/christianhelle/refitter/pull/194) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit.runner.visualstudio from 2.5.1 to 2.5.3 [\#191](https://github.com/christianhelle/refitter/pull/191) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump Exceptionless from 6.0.2 to 6.0.3 [\#190](https://github.com/christianhelle/refitter/pull/190) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump xunit from 2.5.1 to 2.5.2 [\#189](https://github.com/christianhelle/refitter/pull/189) ([dependabot[bot]](https://github.com/apps/dependabot))
