@@ -6,11 +6,6 @@
 public class CodeGeneratorSettings
 {
     /// <summary>
-    /// Gets or sets the .NET namespace of the generated types (default: GeneratedCode).
-    /// </summary>
-    public string Namespace { get; set; } = "GeneratedCode";
-
-    /// <summary>
     /// Gets or sets a value indicating whether a required property must be defined in JSON
     /// (sets Required.Always when the property is required) (default: true).
     /// </summary>

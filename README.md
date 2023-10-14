@@ -163,7 +163,6 @@ The following is an example `.refitter` file
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
   },
   "codeGeneratorSettings": { // Optional. Default settings are the values set in this example
-    "namespace": "GeneratedCode",
     "requiredPropertiesMustBeDefined": true,
     "generateDataAnnotations": true,
     "anyType": "object",
@@ -219,7 +218,7 @@ The following is an example `.refitter` file
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
-- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async
+- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using `"multipleIinterfaces": "ByEndpoint"`, This is name of the Execute() method in the interface
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
@@ -228,7 +227,6 @@ The following is an example `.refitter` file
   - `pollyMaxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
-  - `namespace` - Default is `GeneratedCode`,
   - `requiredPropertiesMustBeDefined` - Default is true,
   - `generateDataAnnotations` - Default is true,
   - `anyType` - Default is `object`,
