@@ -16,6 +16,7 @@
 
 **Merged pull requests:**
 
+- Bump xunit from 2.5.2 to 2.5.3 [\#198](https://github.com/christianhelle/refitter/pull/198) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add alrz as a contributor for bug [\#195](https://github.com/christianhelle/refitter/pull/195) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add naaeef as a contributor for ideas [\#194](https://github.com/christianhelle/refitter/pull/194) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit.runner.visualstudio from 2.5.1 to 2.5.3 [\#191](https://github.com/christianhelle/refitter/pull/191) ([dependabot[bot]](https://github.com/apps/dependabot))
