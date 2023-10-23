@@ -42,14 +42,20 @@ public class SchemaCleaner
             }
         }
 
-        var seen = new HashSet<string>();
+        var seenIds = new HashSet<string>();
+        var seen = new HashSet<JsonSchema>();
         while (toProcess.Count > 0)
         {
             var schema = toProcess.Pop();
+            if (!seen.Add(schema.ActualSchema))
+            {
+                continue;
+            }
+
             // NOTE: NSwag schema stuff seems weird, with all their "Actual..."
             if (schemaIdLookup.TryGetValue(schema.ActualSchema, out var refId))
             {
-                if (!seen.Add(refId))
+                if (!seenIds.Add(refId))
                 {
                     // prevent recursion
                     continue;
@@ -62,7 +68,7 @@ public class SchemaCleaner
             }
         }
 
-        return seen;
+        return seenIds;
     }
 
     IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
