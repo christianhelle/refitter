@@ -6,32 +6,33 @@ namespace Refitter.Core;
 
 public class SchemaCleaner
 {
-    private readonly OpenApiDocument _doc;
+    private readonly OpenApiDocument document;
 
-    public SchemaCleaner(OpenApiDocument doc)
+    public SchemaCleaner(OpenApiDocument document)
     {
-        _doc = doc;
+        this.document = document;
     }
+
     public void RemoveUnreferencedSchema()
     {
-        var usage = FindUsedSchema(_doc);
+        var usage = FindUsedSchema(document);
 
-        var unused = _doc.Components.Schemas.Where(s => !usage.Contains(s.Key))
+        var unused = document.Components.Schemas.Where(s => !usage.Contains(s.Key))
             .ToArray();
 
         foreach (var unusedSchema in unused)
         {
-            _doc.Components.Schemas.Remove(unusedSchema);
+            document.Components.Schemas.Remove(unusedSchema);
         }
     }
 
     HashSet<string> FindUsedSchema(OpenApiDocument doc)
     {
         var toProcess = new Stack<JsonSchema>();
-        var schemaIdLookup = _doc.Components.Schemas
+        var schemaIdLookup = document.Components.Schemas
             .ToDictionary(x => x.Value,
                 x => x.Key);
-        
+
         foreach (var kvp in doc.Paths)
         {
             var pathItem = kvp.Value;
@@ -54,6 +55,7 @@ public class SchemaCleaner
                     continue;
                 }
             }
+
             foreach (var subSchema in EnumerateSchema(schema.ActualSchema))
             {
                 TryPush(subSchema, toProcess);
@@ -69,7 +71,7 @@ public class SchemaCleaner
         {
             yield return p;
         }
-        
+
         foreach (var op in pathItem.Values)
         {
             if (op.RequestBody != null)
@@ -86,13 +88,14 @@ public class SchemaCleaner
             {
                 yield return p;
             }
-                
+
             foreach (var resp in op.ActualResponses.Select(x => x.Value))
             {
                 foreach (var header in resp.Headers.Select(x => x.Value))
                 {
                     yield return header;
                 }
+
                 foreach (var mediaType in resp.Content.Select(x => x.Value))
                 {
                     yield return mediaType.Schema;
@@ -100,13 +103,14 @@ public class SchemaCleaner
             }
         }
     }
-    
+
     private void TryPush(JsonSchema? schema, Stack<JsonSchema> stack)
     {
         if (schema == null)
         {
             return;
         }
+
         stack.Push(schema);
     }
 
@@ -133,6 +137,7 @@ public class SchemaCleaner
                     yield return s;
                 }
             }
+
             if (schema.Items != null)
             {
                 foreach (JsonSchema s in schema.Items)
@@ -140,28 +145,31 @@ public class SchemaCleaner
                     yield return s;
                 }
             }
+
             yield return schema.Not;
-            
-            
-            
+
+
             foreach (var subSchema in schema.AllOf)
             {
                 yield return subSchema;
             }
+
             foreach (var subSchema in schema.AnyOf)
             {
                 yield return subSchema;
             }
+
             foreach (var subSchema in schema.OneOf)
             {
                 yield return subSchema;
             }
+
             foreach (var kvp in schema.Properties)
             {
                 var subSchema = kvp.Value;
                 yield return subSchema;
             }
-            
+
             foreach (var kvp in schema.Definitions)
             {
                 var subSchema = kvp.Value;
