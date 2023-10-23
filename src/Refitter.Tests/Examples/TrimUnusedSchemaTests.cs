@@ -17,6 +17,12 @@ paths:
       tags:
         - Warehouses
       operationId: CreateWarehouse
+      parameters:
+      - name: 'token'
+        in: 'query'
+        description: 'Some Token'
+        required: false
+        type: 'string'
       requestBody:
         content:
           application/json:
@@ -25,6 +31,11 @@ paths:
       responses:
         '201':
           description: Created
+          headers:
+            X-Rate-Limit:
+              type: 'integer'
+              format: 'int32'
+              description: 'calls per hour allowed by the user'
           content:
             application/json:
               schema:
@@ -129,6 +140,15 @@ components:
           type: string
           nullable: true
       additionalProperties: false
+    UserComponent2:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/UserComponent'
+      properties:
+        info2:
+          type: string
+          nullable: true
+      additionalProperties: false
     ProblemDetails:
       required:
         - $type
@@ -173,7 +193,7 @@ components:
         generateCode.Should().Contain("class Component");
         generateCode.Should().Contain("class ProblemDetails");
 
-        generateCode.Should().Contain("Task<Warehouse> CreateWarehouse([Body] Warehouse ");
+        generateCode.Should().Contain("Task<Warehouse> CreateWarehouse([Query] string token, [Body] Warehouse ");
 
         generateCode.Should().NotContain("class UserComponent");
     }
