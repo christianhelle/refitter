@@ -45,6 +45,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             GenerateDeprecatedOperations = !settings.NoDeprecatedOperations,
             OperationNameTemplate = settings.OperationNameTemplate,
             OptionalParameters = settings.OptionalNullableParameters,
+            TrimUnusedSchema = settings.TrimUnusedSchema,
         };
 
         try

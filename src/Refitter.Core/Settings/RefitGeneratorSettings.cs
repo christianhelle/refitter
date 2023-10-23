@@ -130,4 +130,7 @@ public class RefitGeneratorSettings
     /// Gets or sets the settings describing how to generate types using NSwag
     /// </summary>
     public CodeGeneratorSettings? CodeGeneratorSettings { get; set; }
+    
+    [JsonPropertyName("trimUnusedSchema")]
+    public bool TrimUnusedSchema { get; set; }
 }

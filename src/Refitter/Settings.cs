@@ -111,4 +111,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--optional-nullable-parameters")]
     [DefaultValue(false)]
     public bool OptionalNullableParameters { get; set; }
+
+    [Description("Removes unreferenced components schema to keep the generated output to a minimum")]
+    [CommandOption("--trim-unused-schema")]
+    [DefaultValue(false)]
+    public bool TrimUnusedSchema { get; set; }
 }
