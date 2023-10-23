@@ -12,63 +12,130 @@ public class TrimUnusedSchemaTests
     private const string OpenApiSpec = @"
 openapi: 3.0.1
 paths:
-  /v1/Logins/login:
+  /v1/Warehouses:
     post:
       tags:
-        - Logins
-      operationId: PerformLogin
+        - Warehouses
+      operationId: CreateWarehouse
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: '#/components/schemas/Warehouse'
       responses:
-        '200':
-          description: Success
+        '201':
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResult'
-        '422':
-          description: Client Error
+                $ref: '#/components/schemas/Warehouse'
+        '400':
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Server Error
 components:
   schemas:
-    LoginRequest:
+    Metadata:
       type: object
       properties:
-        username:
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
           type: string
           nullable: true
-        password:
+        lastModifiedAt:
+          type: string
+          format: date-time
+        lastModifiedBy:
           type: string
           nullable: true
       additionalProperties: false
-    LoginResult:
+    SomeComponent:
+      required:
+        - $type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Component'
+      properties:
+        $type:
+          type: string
+        typeId:
+          type: integer
+          format: int64
+      additionalProperties: false
+      discriminator:
+        propertyName: $type
+    SomeComponentState:
+      enum:
+        - Active
+        - Inactive
+        - Blocked
+        - Deleted
+      type: string
+    SomeComponentType:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Component'
+      properties:
+        state:
+          $ref: '#/components/schemas/SomeComponentState'
+        isBaseRole:
+          type: boolean
+        name:
+          type: string
+          nullable: true
+        numberingId:
+          type: string
+          nullable: true
+      additionalProperties: false
+    Component:
       type: object
       properties:
-        userId:
-          type: string
-          format: uuid
-        accessToken:
+        id:
+          type: integer
+          format: int64
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+      additionalProperties: false
+    LoadingAddress:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SomeComponent'
+      properties:
+        info:
           type: string
           nullable: true
-        accessTokenExpiresAt:
-          type: string
-          format: date-time
-        refreshToken:
+      additionalProperties: false
+    Warehouse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SomeComponent'
+      properties:
+        info:
           type: string
           nullable: true
-        refreshTokenExpiresAt:
+      additionalProperties: false
+    UserComponent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SomeComponent'
+      properties:
+        info:
           type: string
-          format: date-time
+          nullable: true
       additionalProperties: false
     ProblemDetails:
+      required:
+        - $type
       type: object
       properties:
+        $type:
+          type: string
         type:
           type: string
           nullable: true
@@ -86,42 +153,8 @@ components:
           type: string
           nullable: true
       additionalProperties: { }
-    RefreshLoginRequest:
-      type: object
-      properties:
-        refreshToken:
-          type: string
-          nullable: true
-      additionalProperties: false
-    RefreshLoginResult:
-      type: object
-      properties:
-        userId:
-          type: string
-          format: uuid
-        accessToken:
-          type: string
-          nullable: true
-        accessTokenExpiresAt:
-          type: string
-          format: date-time
-        refreshToken:
-          type: string
-          nullable: true
-        refreshTokenExpiresAt:
-          type: string
-          format: date-time
-      additionalProperties: false
-    User:
-      type: object
-      properties:
-        id:
-          type: string
-          nullable: true
-        username:
-          type: string
-          nullable: true
-      additionalProperties: false
+      discriminator:
+        propertyName: $type
 ";
 
     [Fact]
@@ -135,15 +168,14 @@ components:
     public async Task Removes_Unreferenced_Schema()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("class LoginRequest");
-        generateCode.Should().Contain("class LoginResult");
+        generateCode.Should().Contain("class Warehouse");
+        generateCode.Should().Contain("class SomeComponent");
+        generateCode.Should().Contain("class Component");
         generateCode.Should().Contain("class ProblemDetails");
 
-        generateCode.Should().Contain("Task<LoginResult> PerformLogin([Body] LoginRequest ");
-        
-        generateCode.Should().NotContain("class User");
-        generateCode.Should().NotContain("class RefreshLoginResult");
-        generateCode.Should().NotContain("class RefreshLoginRequest");
+        generateCode.Should().Contain("Task<Warehouse> CreateWarehouse([Body] Warehouse ");
+
+        generateCode.Should().NotContain("class UserComponent");
     }
 
     [Fact]

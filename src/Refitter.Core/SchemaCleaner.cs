@@ -54,7 +54,7 @@ public class SchemaCleaner
                     continue;
                 }
             }
-            foreach (var subSchema in EnumerateSchema(schema))
+            foreach (var subSchema in EnumerateSchema(schema.ActualSchema))
             {
                 TryPush(subSchema, toProcess);
             }
