@@ -1,13 +1,12 @@
 ﻿using Refitter.Core;
 
 using Spectre.Console;
-using Spectre.Console.Cli;
 
 namespace Refitter;
 
 public class SettingsValidator
 {
-    public ValidationResult Validate(CommandContext context, Settings settings)
+    public ValidationResult Validate(Settings settings)
     {
         if (BothSettingsFilesAreEmpty(settings) || BothSettingsFilesArePresent(settings))
         {
