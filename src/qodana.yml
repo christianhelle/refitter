@@ -1,2 +1,3 @@
+fixesStrategy: cleanup
 dotnet:
   solution: Refitter.sln
