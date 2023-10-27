@@ -19,7 +19,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (!settings.NoLogging)
             Analytics.Configure();
 
-        return new SettingsValidator().Validate(settings);
+        return SettingsValidator.Validate(settings);
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
