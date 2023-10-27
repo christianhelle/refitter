@@ -83,7 +83,7 @@ public class SettingsValidator
             "not both");
     }
 
-    private ValidationResult ValidateOperationNameAndUrl(Settings settings)
+    private static ValidationResult ValidateOperationNameAndUrl(Settings settings)
     {
         if (!string.IsNullOrWhiteSpace(settings.OperationNameTemplate) &&
             !settings.OperationNameTemplate.Contains("{operationName}") &&
