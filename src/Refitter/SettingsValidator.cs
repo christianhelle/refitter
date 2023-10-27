@@ -100,7 +100,7 @@ public class SettingsValidator
         return ValidationResult.Error("'{operationName}' placeholder must be present in operation name template");
     }
 
-    private ValidationResult ValidateFileExistence(Settings settings)
+    private static ValidationResult ValidateFileExistence(Settings settings)
     {
         return File.Exists(settings.OpenApiPath)
             ? ValidationResult.Success()
