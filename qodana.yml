@@ -1,3 +1,3 @@
-fixesStrategy: cleanup
+fixesStrategy: apply
 dotnet:
   solution: Refitter.sln
