@@ -38,7 +38,7 @@ public class SettingsValidator
             "not both");
     }
 
-    private ValidationResult ValidateFilePath(Settings settings)
+    private static ValidationResult ValidateFilePath(Settings settings)
     {
         var json = File.ReadAllText(settings.SettingsFilePath!);
         var refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
