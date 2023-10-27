@@ -21,8 +21,8 @@ jobs:
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2023.2
         with:
-            args: --property=qodana.net.solution=Refitter.sln
-            push-fixes: pull-request
-            
+          args: --apply-fixes --property=qodana.net.solution=Refitter.sln
+          push-fixes: pull-request
+          pr-mode: false
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
