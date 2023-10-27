@@ -47,7 +47,7 @@ public class SettingsValidator
         return ValidateFileAndOutputSettings(settings, refitGeneratorSettings);
     }
 
-    private ValidationResult ValidateFileAndOutputSettings(
+    private static ValidationResult ValidateFileAndOutputSettings(
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings)
     {
