@@ -4,9 +4,9 @@ using Spectre.Console;
 
 namespace Refitter;
 
-public class SettingsValidator
+public static class SettingsValidator
 {
-    public ValidationResult Validate(Settings settings)
+    public static ValidationResult Validate(Settings settings)
     {
         if (BothSettingsFilesAreEmpty(settings) || BothSettingsFilesArePresent(settings))
         {
