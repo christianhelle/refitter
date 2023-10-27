@@ -1,3 +1,5 @@
-fixesStrategy: apply
+version: "1.0"
+linter: jetbrains/qodana-dotnet:2023.2
 dotnet:
   solution: Refitter.sln
+fixesStrategy: apply
