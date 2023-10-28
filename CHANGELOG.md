@@ -7,6 +7,11 @@
 **Implemented enhancements:**
 
 - Manually run refit generator so the source can be directly added to the compilation rather than writing to a file [\#196](https://github.com/christianhelle/refitter/issues/196)
+- Single output [\#184](https://github.com/christianhelle/refitter/issues/184)
+- 🤖 Apply quick-fixes by Qodana [\#203](https://github.com/christianhelle/refitter/pull/203) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Enable JetBrains Qodana auto-fixes [\#202](https://github.com/christianhelle/refitter/pull/202) ([christianhelle](https://github.com/christianhelle))
+- Add JetBrains Qodana GitHub workflow [\#201](https://github.com/christianhelle/refitter/pull/201) ([christianhelle](https://github.com/christianhelle))
+- Output filename customization [\#200](https://github.com/christianhelle/refitter/pull/200) ([christianhelle](https://github.com/christianhelle))
 - Add support for customizable type and contract generator settings [\#188](https://github.com/christianhelle/refitter/pull/188) ([christianhelle](https://github.com/christianhelle))
 - Use Internal types to improve docfx documentation generation [\#183](https://github.com/christianhelle/refitter/pull/183) ([christianhelle](https://github.com/christianhelle))
 
