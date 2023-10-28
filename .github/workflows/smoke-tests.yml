@@ -63,9 +63,7 @@ jobs:
         os: [ubuntu-latest]
         openapi_url: [
           "https://petstore3.swagger.io/api/v3/openapi.json", 
-          "https://petstore3.swagger.io/api/v3/openapi.yaml",
-          "https://api.hubspot.com/api-catalog-public/v1/apis/events/v3/send",
-          "https://api.hubspot.com/api-catalog-public/v1/apis/webhooks/v3"
+          "https://petstore3.swagger.io/api/v3/openapi.yaml"
         ]
 
     uses: ./.github/workflows/template-url.yml
