@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Text.Json;
 
 using Microsoft.OpenApi.Models;
 
@@ -20,41 +19,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (!settings.NoLogging)
             Analytics.Configure();
 
-        if (string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
-            string.IsNullOrWhiteSpace(settings.SettingsFilePath))
-            return ValidationResult.Error("Input or settings file is required");
-
-        if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
-            !string.IsNullOrWhiteSpace(settings.SettingsFilePath))
-            return ValidationResult.Error(
-                "You should either specify an input URL/file directly " +
-                "or use specify it in 'openApiPath' from the settings file, " +
-                "not both");
-
-        if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
-        {
-            var json = File.ReadAllText(settings.SettingsFilePath);
-            var refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
-            settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
-            
-            if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
-                return ValidationResult.Error(
-                    "The 'openApiPath' in settings file is required when " +
-                    "URL or file path to OpenAPI Specification file " +
-                    "is not specified in command line argument");
-        }
-
-        if (!string.IsNullOrWhiteSpace(settings.OperationNameTemplate) &&
-            !settings.OperationNameTemplate.Contains("{operationName}") &&
-            settings.MultipleInterfaces != MultipleInterfaces.ByEndpoint)
-            return ValidationResult.Error("'{operationName}' placeholder must be present in operation name template");
-
-        if (IsUrl(settings.OpenApiPath!))
-            return base.Validate(context, settings);
-
-        return File.Exists(settings.OpenApiPath)
-            ? base.Validate(context, settings)
-            : ValidationResult.Error($"File not found - {Path.GetFullPath(settings.OpenApiPath!)}");
+        return SettingsValidator.Validate(settings);
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -105,15 +70,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var code = generator.Generate().ReplaceLineEndings();
             AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
 
-            if (!string.IsNullOrWhiteSpace(settings.OutputPath))
-            {
-                var directory = Path.GetDirectoryName(settings.OutputPath);
-                if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
-                    Directory.CreateDirectory(directory);
-            }
-
-            var outputPath = settings.OutputPath ?? "Output.cs";
+            var outputPath = GetOutputPath(settings, refitGeneratorSettings);
             AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}[/]");
+
+            var directory = Path.GetDirectoryName(outputPath);
+            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
             await File.WriteAllTextAsync(outputPath, code);
             await Analytics.LogFeatureUsage(settings);
 
@@ -132,6 +95,21 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             await Analytics.LogError(exception, settings);
             return exception.HResult;
         }
+    }
+
+    private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        var outputPath = settings.OutputPath != Settings.DefaultOutputPath && !string.IsNullOrWhiteSpace(settings.OutputPath)
+                        ? settings.OutputPath
+                        : refitGeneratorSettings.OutputFilename ?? "Output.cs";
+
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder) &&
+            refitGeneratorSettings.OutputFolder != RefitGeneratorSettings.DefaultOutputFolder)
+        {
+            outputPath = Path.Combine(refitGeneratorSettings.OutputFolder, outputPath);
+        }
+
+        return outputPath;
     }
 
     private static async Task ValidateOpenApiSpec(Settings settings)
@@ -170,11 +148,5 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         {
             // ignored
         }
-    }
-
-    private static bool IsUrl(string openApiPath)
-    {
-        return Uri.TryCreate(openApiPath, UriKind.Absolute, out var uriResult) &&
-               (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
 }

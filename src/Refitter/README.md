@@ -93,6 +93,7 @@ The following is an example `.refitter` file
   "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName} when multipleInterfaces != ByEndpoint
   "optionalParameters": false, // Optional. Default=false
   "outputFolder": "../CustomOutput" // Optional. Default=./Generated
+  "outputFilename": "RefitInterface.cs", // Optional. Default=Output.cs for CLI tool
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"
@@ -106,7 +107,7 @@ The following is an example `.refitter` file
     "^/pet/.*",
     "^/store/.*"
   ],
-  "dependencyInjectionSettings": {
+  "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
         "AuthorizationMessageHandler", 
@@ -115,6 +116,41 @@ The following is an example `.refitter` file
     "usePolly": true, // Optional. Set this to true, to configure Polly with a retry policy that uses a jittered backoff. Default=false
     "pollyMaxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
+  },
+  "codeGeneratorSettings": { // Optional. Default settings are the values set in this example
+    "namespace": "GeneratedCode",
+    "requiredPropertiesMustBeDefined": true,
+    "generateDataAnnotations": true,
+    "anyType": "object",
+    "dateType": "System.DateTimeOffset",
+    "dateTimeType": "System.DateTimeOffset",
+    "timeType": "System.TimeSpan",
+    "timeSpanType": "System.TimeSpan",
+    "arrayType": "System.Collections.Generic.ICollection",
+    "dictionaryType": "System.Collections.Generic.IDictionary",
+    "arrayInstanceType": "System.Collections.ObjectModel.Collection",
+    "dictionaryInstanceType": "System.Collections.Generic.Dictionary",
+    "arrayBaseType": "System.Collections.ObjectModel.Collection",
+    "dictionaryBaseType": "System.Collections.Generic.Dictionary",
+    "propertySetterAccessModifier": "",
+    "generateImmutableArrayProperties": false,
+    "generateImmutableDictionaryProperties": false,
+    "handleReferences": false,
+    "jsonSerializerSettingsTransformationMethod": null,
+    "generateJsonMethods": false,
+    "enforceFlagEnums": false,
+    "inlineNamedDictionaries": false,
+    "inlineNamedTuples": true,
+    "inlineNamedArrays": false,
+    "generateOptionalPropertiesAsNullable": false,
+    "generateNullableReferenceTypes": false,
+    "generateNativeRecords": false,
+    "generateDefaultValues": true,
+    "inlineNamedAny": false,
+    "excludedTypeNames": [
+      "ExcludedTypeFoo",
+      "ExcludedTypeBar"
+    ]
   }
 }
 ```
@@ -134,11 +170,12 @@ The following is an example `.refitter` file
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
 - `outputFolder` - a string describing a relative path to a desired output folder. Default is `./Generated`
+- `outputFilename` - Output filename. Default is `Output.cs` when used from the CLI tool, otherwise its the .refitter filename. So `Petstore.refitter` becomes `Petstore.cs`.
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
-- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using `"multipleIinterfaces": "ByEndpoint"`, This is name of the Execute() method in the interface
+- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL

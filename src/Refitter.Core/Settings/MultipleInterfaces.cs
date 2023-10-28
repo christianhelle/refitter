@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Refitter.Core;
+﻿namespace Refitter.Core;
 
 /// <summary>
 /// Enum representing the different options for generating multiple Refit interfaces.
@@ -10,17 +8,16 @@ public enum MultipleInterfaces
     /// <summary>
     /// Do not generate multiple interfaces
     /// </summary>
-    [JsonPropertyName("unset")] Unset,
+    Unset,
 
     /// <summary>
     /// Generate a Refit interface for each endpoint with a single Execute() method. 
-    /// The method name can be customized using the --operation-name-template command line option, 
-    /// or the operationNameTemplate property in the settings file.
+    /// The method name can be customized using the <see cref="RefitGeneratorSettings.OperationNameTemplate"/> setting.
     /// </summary>
-    [JsonPropertyName("byEndpoint")] ByEndpoint,
+    ByEndpoint,
 
     /// <summary>
     /// Generate a Refit interface for each tag
     /// </summary>
-    [JsonPropertyName("byTag")] ByTag
+    ByTag
 }
