@@ -74,11 +74,11 @@ internal static class DependencyInjectionGenerator
                                               .WaitAndRetryAsync(
                                                   Backoff.DecorrelatedJitterBackoffV2(
                                                       TimeSpan.FromSeconds({{iocSettings.FirstBackoffRetryInSeconds}}),
-                                                      {{iocSettings.PollyMaxRetryCount}}))
+                                                      {{iocSettings.PollyMaxRetryCount}})))
                       """);
             }
 
-            code.Append(");");
+            code.Append(";");
             code.AppendLine();
             code.AppendLine();
         }
