@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 
 namespace Refitter.Core;
 
@@ -65,6 +66,7 @@ internal static class DependencyInjectionGenerator
 
             if (iocSettings.UsePolly)
             {
+                var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 code.AppendLine();
                 code.Append(
                     $$"""
@@ -73,7 +75,7 @@ internal static class DependencyInjectionGenerator
                                               .HandleTransientHttpError()
                                               .WaitAndRetryAsync(
                                                   Backoff.DecorrelatedJitterBackoffV2(
-                                                      TimeSpan.FromSeconds({{iocSettings.FirstBackoffRetryInSeconds}}),
+                                                      TimeSpan.FromSeconds({{durationString}}),
                                                       {{iocSettings.PollyMaxRetryCount}})))
                       """);
             }
