@@ -567,6 +567,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
                             Backoff.DecorrelatedJitterBackoffV2(
                                 TimeSpan.FromSeconds(0.5),
                                 3)));
+
             return services;
         }
     }
