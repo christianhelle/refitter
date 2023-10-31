@@ -4,5 +4,15 @@
   "naming": {
     "useOpenApiTitle": false,
     "interfaceName": "SwaggerPetstoreInterface"
+  },
+  "dependencyInjectionSettings": {
+    "baseUrl": "https://petstore3.swagger.io/api/v3",
+    "usePolly": true,
+    "pollyMaxRetryCount": 3,
+    "firstBackoffRetryInSeconds": 0.5,
+    "httpMessageHandlers": [
+      "EmptyMessageHandler",
+      "AnotherEmptyMessageHandler"
+    ]
   }
 }

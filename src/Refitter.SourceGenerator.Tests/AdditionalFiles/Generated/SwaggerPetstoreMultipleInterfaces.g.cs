@@ -243,3 +243,135 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
 
 
 }
+
+
+
+
+
+namespace Refitter.Tests.AdditionalFiles.ByEndpoint
+{
+    using System;
+    using Microsoft.Extensions.DependencyInjection;
+
+    public static partial class IServiceCollectionExtensions
+    {
+        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Uri baseUrl)
+        {
+            services
+                .AddRefitClient<IUpdatePetEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IAddPetEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IFindPetsByStatusEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IFindPetsByTagsEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IGetPetByIdEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IUpdatePetWithFormEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IDeletePetEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IUploadFileEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IGetInventoryEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IPlaceOrderEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IGetOrderByIdEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IDeleteOrderEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<ICreateUserEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<ICreateUsersWithListInputEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<ILoginUserEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<ILogoutUserEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IGetUserByNameEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IUpdateUserEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            services
+                .AddRefitClient<IDeleteUserEndpoint>()
+                .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            return services;
+        }
+    }
+}

@@ -541,3 +541,34 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
 #pragma warning restore 3016
 #pragma warning restore 8603
 #pragma warning restore 8604
+
+
+namespace Refitter.Tests.AdditionalFiles.SingeInterface
+{
+    using System;
+    using Microsoft.Extensions.DependencyInjection;
+    using Polly;
+    using Polly.Contrib.WaitAndRetry;
+    using Polly.Extensions.Http;
+
+    public static partial class IServiceCollectionExtensions
+    {
+        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services)
+        {
+            services
+                .AddRefitClient<ISwaggerPetstoreInterface>()
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"))
+                .AddHttpMessageHandler<EmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>()
+                .AddPolicyHandler(
+                    HttpPolicyExtensions
+                        .HandleTransientHttpError()
+                        .WaitAndRetryAsync(
+                            Backoff.DecorrelatedJitterBackoffV2(
+                                TimeSpan.FromSeconds(0.5),
+                                3)));
+
+            return services;
+        }
+    }
+}
