@@ -8,6 +8,7 @@
 
 - Manually run refit generator so the source can be directly added to the compilation rather than writing to a file [\#196](https://github.com/christianhelle/refitter/issues/196)
 - Single output [\#184](https://github.com/christianhelle/refitter/issues/184)
+- Fix extra close paranthesis in IServiceCollectionExtensions [\#207](https://github.com/christianhelle/refitter/pull/207) ([christianhelle](https://github.com/christianhelle))
 - 🤖 Apply quick-fixes by Qodana [\#203](https://github.com/christianhelle/refitter/pull/203) ([github-actions[bot]](https://github.com/apps/github-actions))
 - Enable JetBrains Qodana auto-fixes [\#202](https://github.com/christianhelle/refitter/pull/202) ([christianhelle](https://github.com/christianhelle))
 - Add JetBrains Qodana GitHub workflow [\#201](https://github.com/christianhelle/refitter/pull/201) ([christianhelle](https://github.com/christianhelle))
@@ -21,6 +22,7 @@
 
 **Merged pull requests:**
 
+- docs: add EEParker as a contributor for bug [\#206](https://github.com/christianhelle/refitter/pull/206) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit from 2.5.2 to 2.5.3 [\#198](https://github.com/christianhelle/refitter/pull/198) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add alrz as a contributor for bug [\#195](https://github.com/christianhelle/refitter/pull/195) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add naaeef as a contributor for ideas [\#194](https://github.com/christianhelle/refitter/pull/194) ([allcontributors[bot]](https://github.com/apps/allcontributors))
