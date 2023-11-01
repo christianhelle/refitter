@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.3...HEAD)
+
+**Implemented enhancements:**
+
+- NSwag contracts [\#186](https://github.com/christianhelle/refitter/issues/186)
+
+**Fixed bugs:**
+
+- IServiceCollectionExtensions extra closing parenthesis with httpMessageHandlers [\#205](https://github.com/christianhelle/refitter/issues/205)
+
+## [0.8.3](https://github.com/christianhelle/refitter/tree/0.8.3) (2023-10-31)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.2...0.8.3)
 
 **Implemented enhancements:**
 
