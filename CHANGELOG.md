@@ -12,6 +12,10 @@
 
 - IServiceCollectionExtensions extra closing parenthesis with httpMessageHandlers [\#205](https://github.com/christianhelle/refitter/issues/205)
 
+**Merged pull requests:**
+
+- Bump xunit from 2.5.3 to 2.6.0 [\#209](https://github.com/christianhelle/refitter/pull/209) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [0.8.3](https://github.com/christianhelle/refitter/tree/0.8.3) (2023-10-31)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.2...0.8.3)
