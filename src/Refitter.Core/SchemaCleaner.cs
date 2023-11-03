@@ -1,4 +1,6 @@
-﻿using NJsonSchema;
+﻿using System.Text.RegularExpressions;
+
+using NJsonSchema;
 
 using NSwag;
 
@@ -7,10 +9,12 @@ namespace Refitter.Core;
 public class SchemaCleaner
 {
     private readonly OpenApiDocument document;
+    private readonly string[] keepSchemaPatterns;
 
-    public SchemaCleaner(OpenApiDocument document)
+    public SchemaCleaner(OpenApiDocument document, string[] keepSchemaPatterns)
     {
         this.document = document;
+        this.keepSchemaPatterns = keepSchemaPatterns;
     }
 
     public void RemoveUnreferencedSchema()
@@ -32,6 +36,22 @@ public class SchemaCleaner
         var schemaIdLookup = document.Components.Schemas
             .ToDictionary(x => x.Value,
                 x => x.Key);
+
+        var keepSchemaRegexes = keepSchemaPatterns
+            .Select(x => new Regex(x, RegexOptions.Compiled))
+            .ToArray();
+
+        if (doc.Components?.Schemas != null)
+        {
+            foreach (var kvp in doc.Components.Schemas)
+            {
+                var schema = kvp.Key;
+                if (keepSchemaRegexes.Any(x => x.IsMatch(schema)))
+                {
+                    TryPush(kvp.Value, toProcess);
+                }
+            }
+        }
 
         foreach (var kvp in doc.Paths)
         {

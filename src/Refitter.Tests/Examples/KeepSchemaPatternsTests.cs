@@ -7,47 +7,11 @@ using Xunit;
 
 namespace Refitter.Tests.Examples;
 
-public class TrimUnusedSchemaTests
+public class KeepSchemaPatternsTests
 {
     private const string OpenApiSpec = @"
 openapi: 3.0.1
-paths:
-  /v1/Warehouses:
-    post:
-      tags:
-        - Warehouses
-      operationId: CreateWarehouse
-      parameters:
-      - name: 'token'
-        in: 'query'
-        description: 'Some Token'
-        required: false
-        type: 'string'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Warehouse'
-      responses:
-        '201':
-          description: Created
-          headers:
-            X-Rate-Limit:
-              type: 'integer'
-              format: 'int32'
-              description: 'calls per hour allowed by the user'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Warehouse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '500':
-          description: Server Error
+paths: {}
 components:
   schemas:
     Metadata:
@@ -149,32 +113,6 @@ components:
           type: string
           nullable: true
       additionalProperties: false
-    ProblemDetails:
-      required:
-        - $type
-      type: object
-      properties:
-        $type:
-          type: string
-        type:
-          type: string
-          nullable: true
-        title:
-          type: string
-          nullable: true
-        status:
-          type: integer
-          format: int32
-          nullable: true
-        detail:
-          type: string
-          nullable: true
-        instance:
-          type: string
-          nullable: true
-      additionalProperties: { }
-      discriminator:
-        propertyName: $type
 ";
 
     [Fact]
@@ -185,17 +123,15 @@ components:
     }
 
     [Fact]
-    public async Task Removes_Unreferenced_Schema()
+    public async Task Keeps_Unreferenced_Schema()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("class Warehouse");
+
+        generateCode.Should().NotContain("class UserComponent2");
+        generateCode.Should().Contain("class UserComponent");
         generateCode.Should().Contain("class SomeComponent");
         generateCode.Should().Contain("class Component");
-        generateCode.Should().Contain("class ProblemDetails");
-
-        generateCode.Should().Contain("Task<Warehouse> CreateWarehouse([Query] string token, [Body] Warehouse ");
-
-        generateCode.Should().NotContain("class UserComponent");
+        generateCode.Should().Contain("class Metadata");
     }
 
     [Fact]
@@ -211,11 +147,7 @@ components:
     private static async Task<string> GenerateCode()
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings
-        {
-            OpenApiPath = swaggerFile,
-            TrimUnusedSchema = true,
-        };
+        var settings = new RefitGeneratorSettings {OpenApiPath = swaggerFile, TrimUnusedSchema = true, KeepSchemaPatterns = new[] {"^UserComponent$"},};
 
         var sut = await RefitGenerator.CreateAsync(settings);
         var generateCode = sut.Generate();

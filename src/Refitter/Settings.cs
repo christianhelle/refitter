@@ -116,4 +116,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--trim-unused-schema")]
     [DefaultValue(false)]
     public bool TrimUnusedSchema { get; set; }
+    
+    [Description("Force to keep matching schema, uses regular expressions. Use together with \"--trim-unused-schema\". Can be set multiple times.")]
+    [CommandOption("--keep-schema")]
+    [DefaultValue(new string[0])]
+    public string[]? KeepSchemaPatterns { get; set; }
 }
