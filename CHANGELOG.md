@@ -14,6 +14,7 @@
 
 **Merged pull requests:**
 
+- Bump xunit from 2.6.0 to 2.6.1 [\#210](https://github.com/christianhelle/refitter/pull/210) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump xunit from 2.5.3 to 2.6.0 [\#209](https://github.com/christianhelle/refitter/pull/209) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [0.8.3](https://github.com/christianhelle/refitter/tree/0.8.3) (2023-10-31)
