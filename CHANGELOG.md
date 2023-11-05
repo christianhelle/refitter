@@ -7,6 +7,8 @@
 **Implemented enhancements:**
 
 - NSwag contracts [\#186](https://github.com/christianhelle/refitter/issues/186)
+- Remove unused schema definitions \(e.g. `--remove-unreferenced-schema` \)  [\#170](https://github.com/christianhelle/refitter/issues/170)
+- Remove unreferenced schema, add `--trim-unused-schema` & `--keep-schema` [\#199](https://github.com/christianhelle/refitter/pull/199) ([kirides](https://github.com/kirides))
 
 **Fixed bugs:**
 
