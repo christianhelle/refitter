@@ -22,7 +22,19 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         ProcessTagFilters(openApiDocument, settings.IncludeTags);
         ProcessPathFilters(openApiDocument, settings.IncludePathMatches);
 
+        ProcessContractFilter(openApiDocument, settings.TrimUnusedSchema, settings.KeepSchemaPatterns);
+
         return new RefitGenerator(settings, openApiDocument);
+    }
+
+    private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches)
+    {
+        if (!removeUnusedSchema)
+        {
+            return;
+        }
+        var cleaner = new SchemaCleaner(openApiDocument, includeSchemaMatches);
+        cleaner.RemoveUnreferencedSchema();
     }
 
     private static void ProcessTagFilters(OpenApiDocument document, IReadOnlyCollection<string> includeTags)

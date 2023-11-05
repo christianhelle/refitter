@@ -130,4 +130,16 @@ public class RefitGeneratorSettings
     /// Gets or sets the settings describing how to generate types using NSwag
     /// </summary>
     public CodeGeneratorSettings? CodeGeneratorSettings { get; set; }
+    
+    /// <summary>
+    /// Set to <c>true</c> to apply tree-shaking to the OpenApi schema.
+    /// This works in conjunction with <see cref="IncludeTags"/> and <see cref="IncludePathMatches"/>.
+    /// </summary>
+    public bool TrimUnusedSchema { get; set; }
+    
+    /// <summary>
+    /// Array of regular expressions that determine if a schema needs to be kept.
+    /// This works in conjunction with <see cref="TrimUnusedSchema"/>.
+    /// </summary>
+    public string[] KeepSchemaPatterns { get; set; } = Array.Empty<string>();
 }
