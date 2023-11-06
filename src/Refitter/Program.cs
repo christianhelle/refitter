@@ -119,6 +119,20 @@ internal static class Program
                 configuration
                     .AddExample(
                         "./openapi.json",
+                        "--trim-unused-schema");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
+                        "--trim-unused-schema",
+                        " --keep-schema",
+                        "'^Model$'", 
+                        "--keep-schema",
+                        "'^Person.+'");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
                         "--no-deprecated-operations");
                 configuration
                     .AddExample(

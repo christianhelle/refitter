@@ -40,6 +40,11 @@ The following is an example `.refitter` file
     "^/pet/.*",
     "^/store/.*"
   ],
+  "trimUnusedSchema": false, // Optional. Default=false
+  "keepSchemaPatterns": [ // Optional. Force to keep matching schema, uses regular expressions. Use together with trimUnusedSchema=true
+    "^Model$",
+    "^Person.+"
+  ],
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
@@ -88,6 +93,7 @@ The following is an example `.refitter` file
 ```
 
 - `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS
+- `namespace` - the namespace used in the generated code. If not specified, this defaults to `GeneratedCode`
 - `naming.useOpenApiTitle` - a boolean indicating whether the OpenApi title should be used. Default is `true`
 - `naming.interfaceName` - the name of the generated interface. The generated code will automatically prefix this with `I` so if this set to `MyApiClient` then the generated interface is called `IMyApiClient`. Default is `ApiClient`
 - `generateContracts` - a boolean indicating whether contracts should be generated. A use case for this is several API clients use the same contracts. Default is `true`
@@ -106,8 +112,10 @@ The following is an example `.refitter` file
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
-- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using `"multipleIinterfaces": "ByEndpoint"`, This is name of the Execute() method in the interface
+- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
+- `trimUnusedSchema` - Removes unreferenced components schema to keep the generated output to a minimum
+- `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline

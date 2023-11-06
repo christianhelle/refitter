@@ -55,6 +55,8 @@ EXAMPLES:
     refitter ./openapi.json --no-deprecated-operations
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
+    refitter ./openapi.json --trim-unused-schema
+    refitter ./openapi.json --trim-unused-schema --keep-schema '^Model$' --keep-schema '^Person.+'
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -81,7 +83,9 @@ OPTIONS:
         --skip-validation                                  Skip validation of the OpenAPI specification                                                                                              
         --no-deprecated-operations                         Don't generate deprecated operations                                                                                                      
         --operation-name-template                          Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface
-        --optional-nullable-parameters                     Generate nullable parameters as optional parameters                                                                                       
+        --optional-nullable-parameters                     Generate nullable parameters as optional parameters
+        --trim-unused-schema                               Removes unreferenced components schema to keep the generated output to a minimum
+        --keep-schema                                      Force to keep matching schema, uses regular expressions. Use together with "--trim-unused-schema". Can be set multiple times                                                                                       
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -154,6 +158,11 @@ The following is an example `.refitter` file
     "^/pet/.*",
     "^/store/.*"
   ],
+  "trimUnusedSchema": false, // Optional. Default=false
+  "keepSchemaPatterns": [ // Optional. Force to keep matching schema, uses regular expressions. Use together with trimUnusedSchema=true
+    "^Model$",
+    "^Person.+"
+  ],
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
@@ -221,8 +230,10 @@ The following is an example `.refitter` file
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
-- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using `"multipleIinterfaces": "ByEndpoint"`, This is name of the Execute() method in the interface
+- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
+- `trimUnusedSchema` - Removes unreferenced components schema to keep the generated output to a minimum
+- `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
