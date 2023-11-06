@@ -8,6 +8,7 @@
 
 - NSwag contracts [\#186](https://github.com/christianhelle/refitter/issues/186)
 - Remove unused schema definitions \(e.g. `--remove-unreferenced-schema` \)  [\#170](https://github.com/christianhelle/refitter/issues/170)
+- Update docs on trimming unused schemas [\#213](https://github.com/christianhelle/refitter/pull/213) ([christianhelle](https://github.com/christianhelle))
 - Remove unreferenced schema, add `--trim-unused-schema` & `--keep-schema` [\#199](https://github.com/christianhelle/refitter/pull/199) ([kirides](https://github.com/kirides))
 
 **Fixed bugs:**
@@ -16,6 +17,7 @@
 
 **Merged pull requests:**
 
+- docs: add jods4 as a contributor for ideas [\#212](https://github.com/christianhelle/refitter/pull/212) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit from 2.6.0 to 2.6.1 [\#210](https://github.com/christianhelle/refitter/pull/210) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump xunit from 2.5.3 to 2.6.0 [\#209](https://github.com/christianhelle/refitter/pull/209) ([dependabot[bot]](https://github.com/apps/dependabot))
 
