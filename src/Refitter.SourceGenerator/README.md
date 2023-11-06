@@ -71,7 +71,6 @@ The following is an example `.refitter` file
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
   },
   "codeGeneratorSettings": { // Optional. Default settings are the values set in this example
-    "namespace": "GeneratedCode",
     "requiredPropertiesMustBeDefined": true,
     "generateDataAnnotations": true,
     "anyType": "object",
