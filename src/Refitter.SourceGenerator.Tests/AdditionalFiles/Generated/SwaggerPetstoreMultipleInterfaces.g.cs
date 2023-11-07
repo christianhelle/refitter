@@ -248,6 +248,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
 
 
 
+#nullable enable
 namespace Refitter.Tests.AdditionalFiles.ByEndpoint
 {
     using System;
@@ -255,121 +256,140 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
 
     public static partial class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Uri baseUrl)
+        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Uri baseUrl, Action<IHttpClientBuilder>? builder = default)
         {
-            services
+            var clientBuilderIUpdatePetEndpoint = services
                 .AddRefitClient<IUpdatePetEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIUpdatePetEndpoint);
 
-            services
+            var clientBuilderIAddPetEndpoint = services
                 .AddRefitClient<IAddPetEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIAddPetEndpoint);
 
-            services
+            var clientBuilderIFindPetsByStatusEndpoint = services
                 .AddRefitClient<IFindPetsByStatusEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIFindPetsByStatusEndpoint);
 
-            services
+            var clientBuilderIFindPetsByTagsEndpoint = services
                 .AddRefitClient<IFindPetsByTagsEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIFindPetsByTagsEndpoint);
 
-            services
+            var clientBuilderIGetPetByIdEndpoint = services
                 .AddRefitClient<IGetPetByIdEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIGetPetByIdEndpoint);
 
-            services
+            var clientBuilderIUpdatePetWithFormEndpoint = services
                 .AddRefitClient<IUpdatePetWithFormEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIUpdatePetWithFormEndpoint);
 
-            services
+            var clientBuilderIDeletePetEndpoint = services
                 .AddRefitClient<IDeletePetEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIDeletePetEndpoint);
 
-            services
+            var clientBuilderIUploadFileEndpoint = services
                 .AddRefitClient<IUploadFileEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIUploadFileEndpoint);
 
-            services
+            var clientBuilderIGetInventoryEndpoint = services
                 .AddRefitClient<IGetInventoryEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIGetInventoryEndpoint);
 
-            services
+            var clientBuilderIPlaceOrderEndpoint = services
                 .AddRefitClient<IPlaceOrderEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIPlaceOrderEndpoint);
 
-            services
+            var clientBuilderIGetOrderByIdEndpoint = services
                 .AddRefitClient<IGetOrderByIdEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIGetOrderByIdEndpoint);
 
-            services
+            var clientBuilderIDeleteOrderEndpoint = services
                 .AddRefitClient<IDeleteOrderEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIDeleteOrderEndpoint);
 
-            services
+            var clientBuilderICreateUserEndpoint = services
                 .AddRefitClient<ICreateUserEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderICreateUserEndpoint);
 
-            services
+            var clientBuilderICreateUsersWithListInputEndpoint = services
                 .AddRefitClient<ICreateUsersWithListInputEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderICreateUsersWithListInputEndpoint);
 
-            services
+            var clientBuilderILoginUserEndpoint = services
                 .AddRefitClient<ILoginUserEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderILoginUserEndpoint);
 
-            services
+            var clientBuilderILogoutUserEndpoint = services
                 .AddRefitClient<ILogoutUserEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderILogoutUserEndpoint);
 
-            services
+            var clientBuilderIGetUserByNameEndpoint = services
                 .AddRefitClient<IGetUserByNameEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIGetUserByNameEndpoint);
 
-            services
+            var clientBuilderIUpdateUserEndpoint = services
                 .AddRefitClient<IUpdateUserEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIUpdateUserEndpoint);
 
-            services
+            var clientBuilderIDeleteUserEndpoint = services
                 .AddRefitClient<IDeleteUserEndpoint>()
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+            builder?.Invoke(clientBuilderIDeleteUserEndpoint);
 
             return services;
         }

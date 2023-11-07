@@ -16,8 +16,8 @@ internal static class DependencyInjectionGenerator
         var code = new StringBuilder();
 
         var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
-            ? "public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Uri baseUrl)"
-            : "public static IServiceCollection ConfigureRefitClients(this IServiceCollection services)";
+            ? "public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Uri baseUrl, Action<IHttpClientBuilder>? builder = default)"
+            : "public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default)";
         
         var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
@@ -40,6 +40,7 @@ internal static class DependencyInjectionGenerator
         code.AppendLine();
         code.AppendLine(
             $$""""
+              #nullable enable
               namespace {{settings.Namespace}}
               {
                   {{usings}}
@@ -51,9 +52,10 @@ internal static class DependencyInjectionGenerator
               """");
         foreach (var interfaceName in interfaceNames)
         {
+            var clientBuilderName = $"clientBuilder{interfaceName}"; 
             code.Append(
                 $$"""
-                              services
+                              var {{clientBuilderName}} = services
                                   .AddRefitClient<{{interfaceName}}>()
                                   {{configureRefitClient}}
                   """);
@@ -81,6 +83,9 @@ internal static class DependencyInjectionGenerator
             }
 
             code.Append(";");
+            code.AppendLine();
+            code.Append($"            builder?.Invoke({clientBuilderName});");
+
             code.AppendLine();
             code.AppendLine();
         }

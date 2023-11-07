@@ -543,6 +543,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
 #pragma warning restore 8604
 
 
+#nullable enable
 namespace Refitter.Tests.AdditionalFiles.SingeInterface
 {
     using System;
@@ -553,9 +554,9 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
 
     public static partial class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services)
+        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default)
         {
-            services
+            var clientBuilderISwaggerPetstoreInterface = services
                 .AddRefitClient<ISwaggerPetstoreInterface>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"))
                 .AddHttpMessageHandler<EmptyMessageHandler>()
@@ -567,6 +568,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
                             Backoff.DecorrelatedJitterBackoffV2(
                                 TimeSpan.FromSeconds(0.5),
                                 3)));
+            builder?.Invoke(clientBuilderISwaggerPetstoreInterface);
 
             return services;
         }
