@@ -8,6 +8,7 @@
 
 - NSwag contracts [\#186](https://github.com/christianhelle/refitter/issues/186)
 - Remove unused schema definitions \(e.g. `--remove-unreferenced-schema` \)  [\#170](https://github.com/christianhelle/refitter/issues/170)
+- Add Action\<IHttpClientBuilder\>? parameter in ConfigureRefitClients [\#215](https://github.com/christianhelle/refitter/pull/215) ([Noblix](https://github.com/Noblix))
 - Update docs on trimming unused schemas [\#213](https://github.com/christianhelle/refitter/pull/213) ([christianhelle](https://github.com/christianhelle))
 - Remove unreferenced schema, add `--trim-unused-schema` & `--keep-schema` [\#199](https://github.com/christianhelle/refitter/pull/199) ([kirides](https://github.com/kirides))
 
