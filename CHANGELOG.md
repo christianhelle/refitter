@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.3...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.4...HEAD)
+
+**Merged pull requests:**
+
+- Bump H.Generators.Extensions from 1.19.0 to 1.20.0 [\#216](https://github.com/christianhelle/refitter/pull/216) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [0.8.4](https://github.com/christianhelle/refitter/tree/0.8.4) (2023-11-07)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.3...0.8.4)
 
 **Implemented enhancements:**
 
