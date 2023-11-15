@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump Microsoft.Extensions.Http.Polly from 7.0.13 to 8.0.0 [\#218](https://github.com/christianhelle/refitter/pull/218) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump Microsoft.NET.Test.Sdk from 17.7.2 to 17.8.0 [\#217](https://github.com/christianhelle/refitter/pull/217) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump H.Generators.Extensions from 1.19.0 to 1.20.0 [\#216](https://github.com/christianhelle/refitter/pull/216) ([dependabot[bot]](https://github.com/apps/dependabot))
 
