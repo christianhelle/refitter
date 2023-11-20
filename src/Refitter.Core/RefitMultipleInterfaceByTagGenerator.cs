@@ -51,12 +51,13 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
+                string interfaceName = null;
                 if (!interfacesByGroup.TryGetValue(kv.Key, out var sb))
                 {
                     interfacesByGroup[kv.Key] = sb = new StringBuilder();
                     GenerateInterfaceXmlDocComments(operation, sb);
 
-                    var interfaceName = GetInterfaceName(kv.Key);
+                    interfaceName = GetInterfaceName(kv.Key);
                     interfaceNames.Add(interfaceName);
                     sb.AppendLine($$"""
                                     {{GenerateInterfaceDeclaration(interfaceName)}}
@@ -73,7 +74,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 GenerateForMultipartFormData(operationModel, sb);
                 GenerateAcceptHeaders(operations, operation, sb);
 
-                var opName = GetOperationName(op.PathItem.Key, operations.Key, operation);
+                var opName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
                 sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {opName}({parametersString});")
                     .AppendLine();
@@ -120,12 +121,13 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
     }
 
     private string GetOperationName(
+        string interfaceName,
         string name,
         string verb,
         OpenApiOperation operation)
     {
-        var generatedName = IdentifierUtils.Counted(knownIdentifiers, GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true));
-        knownIdentifiers.Add(generatedName);
+        var generatedName = IdentifierUtils.Counted(knownIdentifiers, GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true), parent: interfaceName);
+        knownIdentifiers.Add($"{interfaceName}.{generatedName}");
         return generatedName;
     }
 
