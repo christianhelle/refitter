@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.4...HEAD)
 
+**Implemented enhancements:**
+
+- Added InterfaceName to avoid counting in operation names [\#223](https://github.com/christianhelle/refitter/pull/223) ([edimarquez](https://github.com/edimarquez))
+
 **Merged pull requests:**
 
 - Bump xunit.runner.visualstudio from 2.5.3 to 2.5.4 [\#221](https://github.com/christianhelle/refitter/pull/221) ([dependabot[bot]](https://github.com/apps/dependabot))
