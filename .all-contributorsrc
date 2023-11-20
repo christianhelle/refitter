@@ -245,6 +245,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "edimarquez",
+      "name": "Edimarquez Medeiros",
+      "avatar_url": "https://avatars.githubusercontent.com/u/41791719?v=4",
+      "profile": "https://github.com/edimarquez",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
