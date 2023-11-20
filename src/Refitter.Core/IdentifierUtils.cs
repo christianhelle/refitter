@@ -6,20 +6,20 @@ internal static class IdentifierUtils
     /// Returns <c>{value}{counter}{suffix}</c> if <c>{value}{name}</c> exists in <paramref name="knownIdentifiers"/>
     /// else returns <c>{value}{name}</c>.
     /// </summary>
-    public static string Counted(ISet<string> knownIdentifiers, string name, string suffix = "")
+    public static string Counted(ISet<string> knownIdentifiers, string name, string suffix = "", string parent = null)
     {
-        if (!knownIdentifiers.Contains($"{name}{suffix}"))
+        if (!knownIdentifiers.Contains(string.IsNullOrEmpty(parent) ? $"{name}{suffix}" : $"{parent}.{name}{suffix}"))
         {
             return $"{name}{suffix}";
         }
 
         var counter = 2;
-        while (knownIdentifiers.Contains($"{name}{counter}{suffix}"))
+        while (knownIdentifiers.Contains(string.IsNullOrEmpty(parent) ? $"{name}{counter}{suffix}" : $"{parent}.{name}{counter}{suffix}"))
             counter++;
 
         return $"{name}{counter}{suffix}";
     }
-    
+
     /// <summary>
     /// Removes invalid character from an identifier string
     /// </summary>
