@@ -22,6 +22,11 @@ public class StringCasingExtensionTests
         => input.CapitalizeFirstCharacter().Should().Be(expected);
 
     [Theory]
+    [InlineData("", "")]
+    public void CaptilalizeFirstLetterHandlesEmptyStrings(string input, string expected)
+        => input.CapitalizeFirstCharacter().Should().Be(expected);
+
+    [Theory]
     [InlineData("foo/bar", "fooBar")]
     public void CanConvertRouteToCamelCase(string input, string expected)
         => input.ConvertRouteToCamelCase().Should().Be(expected);
