@@ -6,7 +6,7 @@
 [![Qodana](https://github.com/christianhelle/refitter/actions/workflows/qodana.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/qodana.yml)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-27-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-28-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -916,6 +916,7 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/EEParker"><img src="https://avatars.githubusercontent.com/u/15874076?v=4?s=100" width="100px;" alt="Jeff Parker, PE"/><br /><sub><b>Jeff Parker, PE</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AEEParker" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jods4"><img src="https://avatars.githubusercontent.com/u/3832820?v=4?s=100" width="100px;" alt="jods"/><br /><sub><b>jods</b></sub></a><br /><a href="#ideas-jods4" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/edimarquez"><img src="https://avatars.githubusercontent.com/u/41791719?v=4?s=100" width="100px;" alt="Edimarquez Medeiros"/><br /><sub><b>Edimarquez Medeiros</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=edimarquez" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/safakkesikci"><img src="https://avatars.githubusercontent.com/u/7067252?v=4?s=100" width="100px;" alt="safakkesikci"/><br /><sub><b>safakkesikci</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Asafakkesikci" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
