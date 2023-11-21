@@ -52,4 +52,15 @@ internal static class StringCasingExtensions
 
         return string.Join(string.Empty, parts);
     }
+
+    public static string ConvertColonsToPascalCase(this string str)
+    {
+        var parts = str.Split(':');
+        for (var i = 0; i < parts.Length; i++)
+        {
+            parts[i] = parts[i].CapitalizeFirstCharacter();
+        }
+
+        return string.Join(string.Empty, parts);
+    }
 }
