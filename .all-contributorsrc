@@ -254,6 +254,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "safakkesikci",
+      "name": "safakkesikci",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7067252?v=4",
+      "profile": "https://github.com/safakkesikci",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
