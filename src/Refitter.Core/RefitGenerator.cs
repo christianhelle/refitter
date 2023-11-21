@@ -17,7 +17,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     /// <returns>A new instance of the <see cref="RefitGenerator"/> class.</returns>
     public static async Task<RefitGenerator> CreateAsync(RefitGeneratorSettings settings)
     {
-        var openApiDocument = await OpenApiDocumentFactory.CreateAsync(settings);
+        var openApiDocument = await GetOpenApiDocument(settings);
 
         ProcessTagFilters(openApiDocument, settings.IncludeTags);
         ProcessPathFilters(openApiDocument, settings.IncludePathMatches);
@@ -25,6 +25,36 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         ProcessContractFilter(openApiDocument, settings.TrimUnusedSchema, settings.KeepSchemaPatterns);
 
         return new RefitGenerator(settings, openApiDocument);
+    }
+
+    private static async Task<OpenApiDocument> GetOpenApiDocument(RefitGeneratorSettings settings)
+    {
+        var specialCharacters = new[]
+        {
+            ":"
+        };
+
+        return specialCharacters.Aggregate(
+            await OpenApiDocumentFactory.CreateAsync(settings),
+            SanitizePath);
+    }
+
+    private static OpenApiDocument SanitizePath(
+        OpenApiDocument openApiDocument, 
+        string stringToRemove)
+    {
+        var paths = openApiDocument.Paths.Keys
+            .Where(pathKey => pathKey.Contains(stringToRemove))
+            .ToArray();
+
+        foreach (var path in paths)
+        {
+            var value = openApiDocument.Paths[path];
+            openApiDocument.Paths.Remove(path);
+            openApiDocument.Paths.Add(path.Replace(stringToRemove, string.Empty), value);
+        }
+
+        return openApiDocument;
     }
 
     private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches)
