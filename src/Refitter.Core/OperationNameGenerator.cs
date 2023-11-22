@@ -35,7 +35,8 @@ internal class OperationNameGenerator : IOperationNameGenerator
             .CapitalizeFirstCharacter()
             .ConvertKebabCaseToPascalCase()
             .ConvertRouteToCamelCase()
-            .ConvertSpacesToPascalCase();
+            .ConvertSpacesToPascalCase()
+            .ConvertColonsToPascalCase();
 
     public bool CheckForDuplicateOperationIds(
         OpenApiDocument document)
