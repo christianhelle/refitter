@@ -6,11 +6,19 @@
 
 **Implemented enhancements:**
 
+- Handle paths that contain colons [\#227](https://github.com/christianhelle/refitter/pull/227) ([christianhelle](https://github.com/christianhelle))
 - Added InterfaceName to avoid counting in operation names [\#223](https://github.com/christianhelle/refitter/pull/223) ([edimarquez](https://github.com/edimarquez))
+
+**Fixed bugs:**
+
+- if a path contain colon \(":"\) character then must be replace it [\#225](https://github.com/christianhelle/refitter/issues/225)
 
 **Merged pull requests:**
 
+- docs: add safakkesikci as a contributor for bug [\#226](https://github.com/christianhelle/refitter/pull/226) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add edimarquez as a contributor for code [\#224](https://github.com/christianhelle/refitter/pull/224) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit.runner.visualstudio from 2.5.3 to 2.5.4 [\#221](https://github.com/christianhelle/refitter/pull/221) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump xunit from 2.6.1 to 2.6.2 [\#220](https://github.com/christianhelle/refitter/pull/220) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump Microsoft.SourceLink.GitHub from 1.1.1 to 8.0.0 [\#219](https://github.com/christianhelle/refitter/pull/219) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump Microsoft.Extensions.Http.Polly from 7.0.13 to 8.0.0 [\#218](https://github.com/christianhelle/refitter/pull/218) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump Microsoft.NET.Test.Sdk from 17.7.2 to 17.8.0 [\#217](https://github.com/christianhelle/refitter/pull/217) ([dependabot[bot]](https://github.com/apps/dependabot))
