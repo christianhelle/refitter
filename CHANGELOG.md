@@ -15,6 +15,7 @@
 
 **Merged pull requests:**
 
+- Bump Microsoft.CodeAnalysis.CSharp from 4.7.0 to 4.8.0 [\#228](https://github.com/christianhelle/refitter/pull/228) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add safakkesikci as a contributor for bug [\#226](https://github.com/christianhelle/refitter/pull/226) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add edimarquez as a contributor for code [\#224](https://github.com/christianhelle/refitter/pull/224) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit.runner.visualstudio from 2.5.3 to 2.5.4 [\#221](https://github.com/christianhelle/refitter/pull/221) ([dependabot[bot]](https://github.com/apps/dependabot))
