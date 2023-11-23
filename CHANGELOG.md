@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [0.8.5](https://github.com/christianhelle/refitter/tree/0.8.5) (2023-11-23)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.4...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.4...0.8.5)
 
 **Implemented enhancements:**
 
