@@ -4,8 +4,14 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.5...HEAD)
 
+**Implemented enhancements:**
+
+- Ensure Task\<ApiResponse\> is Returned for Void Methods in Generator [\#238](https://github.com/christianhelle/refitter/pull/238) ([mortenlaursen](https://github.com/mortenlaursen))
+
 **Merged pull requests:**
 
+- docs: add mortenlaursen as a contributor for code [\#239](https://github.com/christianhelle/refitter/pull/239) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add folbrecht as a contributor for bug [\#234](https://github.com/christianhelle/refitter/pull/234) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump H.Generators.Extensions from 1.20.0 to 1.22.0 [\#232](https://github.com/christianhelle/refitter/pull/232) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [0.8.5](https://github.com/christianhelle/refitter/tree/0.8.5) (2023-11-23)
