@@ -1,4 +1,5 @@
 using Petstore;
+
 using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +17,11 @@ app.MapGet(
         {
             try
             {
-                return Results.Ok(await petstore.GetPetById(id));
+                var response = await petstore.GetPetById(id);
+                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                    return Results.StatusCode((int)response.StatusCode);
+
+                return Results.Ok(response.Content);
             }
             catch (Refit.ApiException e)
             {
@@ -24,6 +29,19 @@ app.MapGet(
             }
         })
     .WithName("GetPetById")
+    .WithOpenApi();
+
+app.MapDelete(
+        "/pet/{id:long}",
+        async (ISwaggerPetstore petstore, long id) =>
+        {
+            var response = await petstore.DeletePet(id, null);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                return Results.Ok();
+            else
+                return Results.StatusCode((int)response.StatusCode);
+        })
+    .WithName("DeletePet")
     .WithOpenApi();
 
 app.UseHttpsRedirection();
