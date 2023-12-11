@@ -12,6 +12,7 @@
 
 - docs: add mortenlaursen as a contributor for code [\#239](https://github.com/christianhelle/refitter/pull/239) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump xunit from 2.6.2 to 2.6.3 [\#237](https://github.com/christianhelle/refitter/pull/237) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump xunit.runner.visualstudio from 2.5.4 to 2.5.5 [\#235](https://github.com/christianhelle/refitter/pull/235) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add folbrecht as a contributor for bug [\#234](https://github.com/christianhelle/refitter/pull/234) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump H.Generators.Extensions from 1.20.0 to 1.22.0 [\#232](https://github.com/christianhelle/refitter/pull/232) ([dependabot[bot]](https://github.com/apps/dependabot))
 
