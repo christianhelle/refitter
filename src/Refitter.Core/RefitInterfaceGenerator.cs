@@ -79,7 +79,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         return code.ToString();
     }
 
-    protected string GenerateOperationName(string path, string verb, OpenApiOperation operation, bool capitalizeFirstCharacter = false)
+    protected string GenerateOperationName(
+        string path,
+        string verb,
+        OpenApiOperation operation,
+        bool capitalizeFirstCharacter = false)
     {
         const string operationNamePlaceholder = "{operationName}";
 
@@ -94,7 +98,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         if (settings.OperationNameTemplate?.Contains(operationNamePlaceholder) ?? false)
         {
             operationName = settings.OperationNameTemplate!
-                           .Replace(operationNamePlaceholder, operationName);
+                .Replace(operationNamePlaceholder, operationName);
         }
 
         return operationName;
@@ -135,8 +139,15 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     protected string GetReturnType(string? returnTypeParameter)
     {
         return returnTypeParameter is null or "void"
-            ? "Task"
+            ? GetDefaultReturnType()
             : GetConfiguredReturnType(returnTypeParameter);
+    }
+
+    private string GetDefaultReturnType()
+    {
+        return settings.ReturnIApiResponse
+            ? "Task<IApiResponse>"
+            : "Task";
     }
 
     private string GetConfiguredReturnType(string returnTypeParameter)
