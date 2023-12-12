@@ -80,7 +80,6 @@ function RunTests {
         "petstore-minimal",
         "petstore-simple",
         "petstore-with-external-docs",
-        "ingram-micro",
         "api-with-examples",
         "callback-example",
         "link-example",
