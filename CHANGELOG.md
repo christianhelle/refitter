@@ -8,6 +8,7 @@
 
 - chore\(deps\): update actions/github-script action to v7 [\#245](https://github.com/christianhelle/refitter/pull/245) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update actions/checkout action to v4 [\#244](https://github.com/christianhelle/refitter/pull/244) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency microsoft.openapi.odata to v1.5.0 [\#242](https://github.com/christianhelle/refitter/pull/242) ([renovate[bot]](https://github.com/apps/renovate))
 - chore: Configure Renovate [\#240](https://github.com/christianhelle/refitter/pull/240) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [0.8.6](https://github.com/christianhelle/refitter/tree/0.8.6) (2023-12-11)
