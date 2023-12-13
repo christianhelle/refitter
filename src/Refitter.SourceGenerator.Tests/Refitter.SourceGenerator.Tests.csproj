@@ -39,7 +39,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" />
+      <ProjectReference 
+        Include="..\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" 
+        OutputItemType="Analyzer" 
+        ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>
