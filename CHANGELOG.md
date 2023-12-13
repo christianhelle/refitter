@@ -4,8 +4,13 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.6...HEAD)
 
+**Implemented enhancements:**
+
+- Fix source generator error - System.IO.FileNotFoundException: Could not load file or assembly 'Microsoft.Bcl.AsyncInterfaces' [\#247](https://github.com/christianhelle/refitter/pull/247) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
+- docs: add manuel-fernandez-rodriguez as a contributor for bug [\#246](https://github.com/christianhelle/refitter/pull/246) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update actions/github-script action to v7 [\#245](https://github.com/christianhelle/refitter/pull/245) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update actions/checkout action to v4 [\#244](https://github.com/christianhelle/refitter/pull/244) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.openapi.odata to v1.5.0 [\#242](https://github.com/christianhelle/refitter/pull/242) ([renovate[bot]](https://github.com/apps/renovate))
