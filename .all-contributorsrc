@@ -281,6 +281,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "manuel-fernandez-rodriguez",
+      "name": "manuel-fernandez-rodriguez",
+      "avatar_url": "https://avatars.githubusercontent.com/u/48520205?v=4",
+      "profile": "https://github.com/manuel-fernandez-rodriguez",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
