@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using System.Text.Json;
 
 using Microsoft.CodeAnalysis;
 
@@ -67,8 +66,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         {
             var content = file.GetText(cancellationToken)!;
             var json = content.ToString();
-            var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
-            cancellationToken.ThrowIfCancellationRequested();
 
             diagnostics.Add(
                 Diagnostic.Create(
@@ -81,6 +78,13 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                         true),
                     Location.None));
 
+            var settings = TryDeserialize(json);
+            if (settings is null)
+            {
+                return diagnostics;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
             if (!settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
                 !File.Exists(settings.OpenApiPath))
             {
@@ -101,7 +105,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 {
                     filename = "Refitter.g.cs";
                 }
-                
+
                 var folder = Path.Combine(Path.GetDirectoryName(file.Path)!, settings.OutputFolder);
                 var output = Path.Combine(folder, filename);
                 if (!Directory.Exists(folder))
@@ -122,8 +126,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                     Diagnostic.Create(
                         new DiagnosticDescriptor(
                             "REFITTER000",
-                            "Refitter failed to write generated code",
-                            e.ToString(),
+                            "Error",
+                            $"Refitter failed to write generated code: {e}",
                             "Refitter",
                             DiagnosticSeverity.Error,
                             true),
@@ -138,14 +142,26 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 Diagnostic.Create(
                     new DiagnosticDescriptor(
                         "REFITTER000",
-                        "Refitter failed to generate code",
-                        e.ToString(),
+                        "Error",
+                        $"Refitter failed to generate code: {e}",
                         "Refitter",
                         DiagnosticSeverity.Error,
                         true),
                     Location.None));
 
             return diagnostics;
+        }
+    }
+
+    private static RefitGeneratorSettings? TryDeserialize(string json)
+    {
+        try
+        {
+            return Serializer.Deserialize<RefitGeneratorSettings>(json);
+        }
+        catch
+        {
+            return null;
         }
     }
 }
