@@ -6,7 +6,7 @@
 [![Qodana](https://github.com/christianhelle/refitter/actions/workflows/qodana.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/qodana.yml)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-30-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-31-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -921,6 +921,7 @@ Returns a response that looks something like this:
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/folbrecht"><img src="https://avatars.githubusercontent.com/u/145537846?v=4?s=100" width="100px;" alt="folbrecht"/><br /><sub><b>folbrecht</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Afolbrecht" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/mortenlaursen"><img src="https://avatars.githubusercontent.com/u/28759737?v=4?s=100" width="100px;" alt="mortenlaursen"/><br /><sub><b>mortenlaursen</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=mortenlaursen" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/manuel-fernandez-rodriguez"><img src="https://avatars.githubusercontent.com/u/48520205?v=4?s=100" width="100px;" alt="manuel-fernandez-rodriguez"/><br /><sub><b>manuel-fernandez-rodriguez</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amanuel-fernandez-rodriguez" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
