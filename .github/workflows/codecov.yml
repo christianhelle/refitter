@@ -36,7 +36,7 @@ jobs:
       run: dotnet test src/Refitter.Tests/Refitter.Tests.csproj -c Release --collect "Code coverage" -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}"
     
     - name: 🗳️ Upload
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Packages
         path: |
