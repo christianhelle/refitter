@@ -1,9 +1,10 @@
-﻿namespace MauiExample;
-
-public partial class AppShell : Shell
+﻿namespace MauiExample
 {
-	public AppShell()
-	{
-		InitializeComponent();
-	}
+    public partial class AppShell : Shell
+    {
+        public AppShell()
+        {
+            InitializeComponent();
+        }
+    }
 }

@@ -1,36 +1,25 @@
-﻿using Petstore;
-
-namespace MauiExample;
-
-public partial class MainPage : ContentPage
+﻿namespace MauiExample
 {
-	int count = 0;
-	ISwaggerPetstore petstore;
+    public partial class MainPage : ContentPage
+    {
+        int count = 0;
 
-	public MainPage(ISwaggerPetstore petstore)
-	{
-		InitializeComponent();
-		this.petstore = petstore;
-	}
+        public MainPage()
+        {
+            InitializeComponent();
+        }
 
-	private async void OnCounterClicked(object sender, EventArgs e)
-	{
-		count++;
+        private void OnCounterClicked(object sender, EventArgs e)
+        {
+            count++;
 
-		try
-		{
-			var response = await petstore.GetPetById(count);
-			if (response.StatusCode != System.Net.HttpStatusCode.OK)
-				CounterBtn.Text = $"Error: {response.StatusCode}";
-			else
-				CounterBtn.Text = response.Content.Name;
-		}
-		catch (Refit.ApiException ex)
-		{
-			CounterBtn.Text = "Refit call failed: " + ex.Message;			
-		}
+            if (count == 1)
+                CounterBtn.Text = $"Clicked {count} time";
+            else
+                CounterBtn.Text = $"Clicked {count} times";
 
-		SemanticScreenReader.Announce(CounterBtn.Text);
-	}
+            SemanticScreenReader.Announce(CounterBtn.Text);
+        }
+    }
+
 }
-

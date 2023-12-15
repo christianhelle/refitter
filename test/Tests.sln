@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinimalApi", "MinimalApi\Mi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refitter.SourceGenerator", "..\src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj", "{DA450DC9-C1BE-4E22-971E-7D4DD96B3072}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MauiExample", "MauiExample\MauiExample.csproj", "{8A8C17CC-BBFF-4243-83AA-DA997DBB59F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,12 @@ Global
 		{DA450DC9-C1BE-4E22-971E-7D4DD96B3072}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA450DC9-C1BE-4E22-971E-7D4DD96B3072}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA450DC9-C1BE-4E22-971E-7D4DD96B3072}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A8C17CC-BBFF-4243-83AA-DA997DBB59F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A8C17CC-BBFF-4243-83AA-DA997DBB59F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A8C17CC-BBFF-4243-83AA-DA997DBB59F8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8A8C17CC-BBFF-4243-83AA-DA997DBB59F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A8C17CC-BBFF-4243-83AA-DA997DBB59F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A8C17CC-BBFF-4243-83AA-DA997DBB59F8}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
