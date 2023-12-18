@@ -1,8 +1,16 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [0.8.7](https://github.com/christianhelle/refitter/tree/0.8.7) (2023-12-17)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.6...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.6.39-preview...0.8.7)
+
+**Fixed bugs:**
+
+- Error on build - dependency to Microsoft.Bcl.AsyncInterfaces [\#233](https://github.com/christianhelle/refitter/issues/233)
+
+## [0.8.6.39-preview](https://github.com/christianhelle/refitter/tree/0.8.6.39-preview) (2023-12-14)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.6...0.8.6.39-preview)
 
 **Implemented enhancements:**
 
