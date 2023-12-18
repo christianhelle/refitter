@@ -51,7 +51,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
-                string interfaceName = null;
+                string interfaceName = null!;
                 if (!interfacesByGroup.TryGetValue(kv.Key, out var sb))
                 {
                     interfacesByGroup[kv.Key] = sb = new StringBuilder();
