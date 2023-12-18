@@ -6,7 +6,7 @@ internal static class IdentifierUtils
     /// Returns <c>{value}{counter}{suffix}</c> if <c>{value}{name}</c> exists in <paramref name="knownIdentifiers"/>
     /// else returns <c>{value}{name}</c>.
     /// </summary>
-    public static string Counted(ISet<string> knownIdentifiers, string name, string suffix = "", string parent = null)
+    public static string Counted(ISet<string> knownIdentifiers, string name, string suffix = "", string parent = "")
     {
         if (!knownIdentifiers.Contains(string.IsNullOrEmpty(parent) ? $"{name}{suffix}" : $"{parent}.{name}{suffix}"))
         {
