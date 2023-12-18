@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7...HEAD)
+
+**Implemented enhancements:**
+
+- Upgrade to .NET 8.0 [\#250](https://github.com/christianhelle/refitter/pull/250) ([christianhelle](https://github.com/christianhelle))
+
 ## [0.8.7](https://github.com/christianhelle/refitter/tree/0.8.7) (2023-12-17)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.6.39-preview...0.8.7)
