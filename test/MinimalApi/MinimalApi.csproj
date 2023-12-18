@@ -1,18 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
-      <AdditionalFiles Include="petstore.refitter" />
+    <AdditionalFiles Include="petstore.refitter" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" />
+    <ProjectReference 
+      Include="..\..\src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" 
+      OutputItemType="Analyzer" 
+      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>

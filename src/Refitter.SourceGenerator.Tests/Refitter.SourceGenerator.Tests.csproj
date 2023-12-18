@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <RootNamespace>Refitter.SourceGenerators.Tests</RootNamespace>
     </PropertyGroup>
@@ -39,7 +39,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" />
+      <ProjectReference 
+        Include="..\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" 
+        OutputItemType="Analyzer" 
+        ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>

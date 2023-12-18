@@ -63,6 +63,7 @@ jobs:
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --no-logging ${{ matrix.args }}
         Copy-Item Output.cs ./ConsoleApp/Net6/
         Copy-Item Output.cs ./ConsoleApp/Net7/
+        Copy-Item Output.cs ./ConsoleApp/Net8/
         Copy-Item Output.cs ./ConsoleApp/Net48/
         Copy-Item Output.cs ./ConsoleApp/Net472/
         Copy-Item Output.cs ./ConsoleApp/Net462/
@@ -87,6 +88,11 @@ jobs:
 
     - name: 🛠️ Build .NET 7 generated code
       run: dotnet build ./ConsoleApp/Net7/Net7.csproj
+      working-directory: test
+      if: steps.prepare_openapi_spec.outputs.exists == 'True'
+
+    - name: 🛠️ Build .NET 8 generated code
+      run: dotnet build ./ConsoleApp/Net8/Net8.csproj
       working-directory: test
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
 

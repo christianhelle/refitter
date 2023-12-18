@@ -2,7 +2,6 @@
 
 namespace Refitter.Validation;
 
-[Serializable]
 public class OpenApiValidationException : Exception
 {
     public OpenApiValidationResult ValidationResult { get; } = null!;
@@ -12,11 +11,5 @@ public class OpenApiValidationException : Exception
         : base("OpenAPI validation failed")
     {
         ValidationResult = validationResult;
-    }
-    
-    protected OpenApiValidationException(
-        SerializationInfo info,
-        StreamingContext context) : base(info, context)
-    {
     }
 }
