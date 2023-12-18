@@ -84,7 +84,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             AnsiConsole.MarkupLine($"[green]Duration: {stopwatch.Elapsed}{Crlf}[/]");
 
-            DonationBanner();
+            if (!settings.NoBanner)
+                DonationBanner();
+
             return 0;
         }
         catch (Exception exception)

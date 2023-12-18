@@ -121,4 +121,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--keep-schema")]
     [DefaultValue(new string[0])]
     public string[]? KeepSchemaPatterns { get; set; }
+
+    [Description("Don't show donation banner")]
+    [CommandOption("--no-banner")]
+    [DefaultValue(false)]
+    public bool NoBanner { get; set; }
 }
