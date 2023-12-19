@@ -6,7 +6,12 @@
 
 **Implemented enhancements:**
 
+- Add donation banner for Github Sponsors and buymeacoffee.com [\#252](https://github.com/christianhelle/refitter/pull/252) ([christianhelle](https://github.com/christianhelle))
 - Upgrade to .NET 8.0 [\#250](https://github.com/christianhelle/refitter/pull/250) ([christianhelle](https://github.com/christianhelle))
+
+**Merged pull requests:**
+
+- Disable app data backup in AndroidManifest.xml for example MAUI app [\#253](https://github.com/christianhelle/refitter/pull/253) ([christianhelle](https://github.com/christianhelle))
 
 ## [0.8.7](https://github.com/christianhelle/refitter/tree/0.8.7) (2023-12-17)
 
