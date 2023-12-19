@@ -15,7 +15,7 @@ dotnet tool install --global Refitter
 $ refitter --help
 ```
 
-```
+```pwsh
 USAGE:
     refitter [URL or input file] [OPTIONS]
 
@@ -35,11 +35,11 @@ EXAMPLES:
     refitter ./openapi.json --multiple-interfaces ByEndpoint
     refitter ./openapi.json --tag Pet --tag Store --tag User
     refitter ./openapi.json --match-path '^/pet/.*'
+    refitter ./openapi.json --trim-unused-schema
+    refitter ./openapi.json --trim-unused-schema  --keep-schema '^Model$' --keep-schema '^Person.+'
     refitter ./openapi.json --no-deprecated-operations
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
-    refitter ./openapi.json --trim-unused-schema
-    refitter ./openapi.json --trim-unused-schema --keep-schema '^Model$' --keep-schema '^Person.+'
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -47,6 +47,7 @@ ARGUMENTS:
 OPTIONS:
                                           DEFAULT                                                                                                                                                    
     -h, --help                                             Prints help information                                                                                                                   
+    -v, --version                                          Prints version information                                                                                                                
     -s, --settings-file                                    Path to .refitter settings file. Specifying this will ignore all other settings (except for --output)                                     
     -n, --namespace                       GeneratedCode    Default namespace to use for generated types                                                                                              
     -o, --output                          Output.cs        Path to Output file                                                                                                                       
@@ -66,9 +67,10 @@ OPTIONS:
         --skip-validation                                  Skip validation of the OpenAPI specification                                                                                              
         --no-deprecated-operations                         Don't generate deprecated operations                                                                                                      
         --operation-name-template                          Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface
-        --optional-nullable-parameters                     Generate nullable parameters as optional parameters
-        --trim-unused-schema                               Removes unreferenced components schema to keep the generated output to a minimum
-        --keep-schema                                      Force to keep matching schema, uses regular expressions. Use together with "--trim-unused-schema". Can be set multiple times                                                                                       
+        --optional-nullable-parameters                     Generate nullable parameters as optional parameters                                                                                       
+        --trim-unused-schema                               Removes unreferenced components schema to keep the generated output to a minimum                                                          
+        --keep-schema                                      Force to keep matching schema, uses regular expressions. Use together with "--trim-unused-schema". Can be set multiple times              
+        --no-banner                                        Don't show donation banner                                                                                                                           
 ```
 
 ### .Refitter File format
