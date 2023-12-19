@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Show error reporting suggestion banner upon error [\#254](https://github.com/christianhelle/refitter/pull/254) ([christianhelle](https://github.com/christianhelle))
 - Add donation banner for Github Sponsors and buymeacoffee.com [\#252](https://github.com/christianhelle/refitter/pull/252) ([christianhelle](https://github.com/christianhelle))
 - Upgrade to .NET 8.0 [\#250](https://github.com/christianhelle/refitter/pull/250) ([christianhelle](https://github.com/christianhelle))
 
