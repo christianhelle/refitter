@@ -76,7 +76,7 @@ components:
         { 
             OpenApiPath = swaggerFile,
             MultipleInterfaces = MultipleInterfaces.ByTag,
-            CodeGeneratorSettings = new CodeGeneratorSettings { ArrayType = "IList" }
+            CodeGeneratorSettings = new CodeGeneratorSettings { ArrayType = "System.Collections.Generic.IList" }
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
