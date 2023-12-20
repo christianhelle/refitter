@@ -42,13 +42,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                     continue;
                 }
 
-                var returnTypeParameter = new[] { "200", "201", "203", "206" }
-                    .Where(code => operation.Responses.ContainsKey(code))
-                    .Select(code => generator.GetTypeName(operation.Responses[code].ActualResponse.Schema, true, null))
-                    .FirstOrDefault();
-
-                var returnType = GetReturnType(returnTypeParameter);
-
+                var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
                 string interfaceName = null!;
