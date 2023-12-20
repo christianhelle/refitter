@@ -22,19 +22,15 @@
 
 ## [0.8.7](https://github.com/christianhelle/refitter/tree/0.8.7) (2023-12-17)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.6.39-preview...0.8.7)
-
-**Fixed bugs:**
-
-- Error on build - dependency to Microsoft.Bcl.AsyncInterfaces [\#233](https://github.com/christianhelle/refitter/issues/233)
-
-## [0.8.6.39-preview](https://github.com/christianhelle/refitter/tree/0.8.6.39-preview) (2023-12-14)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.6...0.8.6.39-preview)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.6...0.8.7)
 
 **Implemented enhancements:**
 
 - Fix source generator error - System.IO.FileNotFoundException: Could not load file or assembly 'Microsoft.Bcl.AsyncInterfaces' [\#247](https://github.com/christianhelle/refitter/pull/247) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Error on build - dependency to Microsoft.Bcl.AsyncInterfaces [\#233](https://github.com/christianhelle/refitter/issues/233)
 
 **Merged pull requests:**
 
