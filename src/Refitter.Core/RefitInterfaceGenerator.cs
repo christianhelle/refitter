@@ -50,15 +50,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     continue;
                 }
 
-                var returnTypeParameter = new[] { "200", "201", "203", "206" }
-                    .Where(code => operation.Responses.ContainsKey(code))
-                    .Select(code => generator.GetTypeName(operation.Responses[code].ActualResponse.Schema, true, null))
-                    .FirstOrDefault();
-
-                var returnType = GetReturnType(returnTypeParameter);
-
+                var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
-
                 var name = GenerateOperationName(kv.Key, verb, operation);
 
                 var operationModel = generator.CreateOperationModel(operation);
@@ -77,6 +70,33 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         return code.ToString();
+    }
+
+    protected string GetTypeName(OpenApiOperation operation)
+    {
+        var returnTypeParameter = 
+            (new[] { "200", "201", "203", "206" })
+                .Where(operation.Responses.ContainsKey)
+                .Select(code => GetTypeName(code, operation))
+                .FirstOrDefault();
+
+        return GetReturnType(returnTypeParameter);
+    }
+
+    private string GetTypeName(string code, OpenApiOperation operation)
+    {
+        var schema = operation.Responses[code].ActualResponse.Schema;
+        var typeName = generator.GetTypeName(schema, true, null);
+
+        if (!string.IsNullOrWhiteSpace(settings.CodeGeneratorSettings?.ArrayType) &&
+            schema?.Type == NJsonSchema.JsonObjectType.Array)
+        {
+            typeName = typeName
+                .Replace("ICollection", settings.CodeGeneratorSettings!.ArrayType)
+                .Replace("IEnumerable", settings.CodeGeneratorSettings!.ArrayType);
+        }
+
+        return typeName;
     }
 
     protected string GenerateOperationName(
