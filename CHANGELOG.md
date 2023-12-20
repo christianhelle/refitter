@@ -6,12 +6,18 @@
 
 **Implemented enhancements:**
 
+- Fix issue where codeGeneratorSettings arrayType setting is not respected in Refit interface [\#257](https://github.com/christianhelle/refitter/pull/257) ([christianhelle](https://github.com/christianhelle))
 - Show error reporting suggestion banner upon error [\#254](https://github.com/christianhelle/refitter/pull/254) ([christianhelle](https://github.com/christianhelle))
 - Add donation banner for Github Sponsors and buymeacoffee.com [\#252](https://github.com/christianhelle/refitter/pull/252) ([christianhelle](https://github.com/christianhelle))
 - Upgrade to .NET 8.0 [\#250](https://github.com/christianhelle/refitter/pull/250) ([christianhelle](https://github.com/christianhelle))
 
+**Fixed bugs:**
+
+- Unable to change arrayType to List or IList [\#255](https://github.com/christianhelle/refitter/issues/255)
+
 **Merged pull requests:**
 
+- docs: add eliyammine as a contributor for bug [\#256](https://github.com/christianhelle/refitter/pull/256) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Disable app data backup in AndroidManifest.xml for example MAUI app [\#253](https://github.com/christianhelle/refitter/pull/253) ([christianhelle](https://github.com/christianhelle))
 
 ## [0.8.7](https://github.com/christianhelle/refitter/tree/0.8.7) (2023-12-17)
