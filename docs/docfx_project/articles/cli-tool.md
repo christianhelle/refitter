@@ -1,4 +1,4 @@
-## CLI Tool
+# CLI Tool
 
 The tool is packaged as a .NET Tool and is published to nuget.org. You can install the latest version of this tool like this:
 
@@ -6,13 +6,13 @@ The tool is packaged as a .NET Tool and is published to nuget.org. You can insta
 dotnet tool install --global Refitter
 ```
 
-#### Usage:
+## Usage
 
 ```shell
-$ refitter --help
+refitter --help
 ```
 
-```
+```shell
 USAGE:
     refitter [URL or input file] [OPTIONS]
 
@@ -32,6 +32,8 @@ EXAMPLES:
     refitter ./openapi.json --multiple-interfaces ByEndpoint
     refitter ./openapi.json --tag Pet --tag Store --tag User
     refitter ./openapi.json --match-path '^/pet/.*'
+    refitter ./openapi.json --trim-unused-schema
+    refitter ./openapi.json --trim-unused-schema  --keep-schema '^Model$' --keep-schema '^Person.+'
     refitter ./openapi.json --no-deprecated-operations
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
@@ -42,6 +44,7 @@ ARGUMENTS:
 OPTIONS:
                                           DEFAULT                                                                                                                                                    
     -h, --help                                             Prints help information                                                                                                                   
+    -v, --version                                          Prints version information                                                                                                                
     -s, --settings-file                                    Path to .refitter settings file. Specifying this will ignore all other settings (except for --output)                                     
     -n, --namespace                       GeneratedCode    Default namespace to use for generated types                                                                                              
     -o, --output                          Output.cs        Path to Output file                                                                                                                       
@@ -62,18 +65,21 @@ OPTIONS:
         --no-deprecated-operations                         Don't generate deprecated operations                                                                                                      
         --operation-name-template                          Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface
         --optional-nullable-parameters                     Generate nullable parameters as optional parameters                                                                                       
+        --trim-unused-schema                               Removes unreferenced components schema to keep the generated output to a minimum                                                          
+        --keep-schema                                      Force to keep matching schema, uses regular expressions. Use together with "--trim-unused-schema". Can be set multiple times              
+        --no-banner                                        Don't show donation banner                                                                                                                           
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
 
 ```shell
-$ refitter [path to OpenAPI spec file] --namespace "[Your.Namespace.Of.Choice.GeneratedCode]"
+refitter [path to OpenAPI spec file] --namespace "[Your.Namespace.Of.Choice.GeneratedCode]"
 ```
 
 This will generate a file called `Output.cs` which contains the Refit interface and contract classes generated using [NSwag](https://github.com/RicoSuter/NSwag)
 
 The settings file uses the [.refitter file format](refitter-file-format.md)
 
+## System requirements
 
-#### System requirements
 .NET 6.0 (LTS)
