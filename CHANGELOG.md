@@ -13,10 +13,12 @@
 
 **Fixed bugs:**
 
+- File not found when using uri [\#258](https://github.com/christianhelle/refitter/issues/258)
 - Unable to change arrayType to List or IList [\#255](https://github.com/christianhelle/refitter/issues/255)
 
 **Merged pull requests:**
 
+- chore\(deps\): update xunit-dotnet monorepo [\#259](https://github.com/christianhelle/refitter/pull/259) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add eliyammine as a contributor for bug [\#256](https://github.com/christianhelle/refitter/pull/256) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Disable app data backup in AndroidManifest.xml for example MAUI app [\#253](https://github.com/christianhelle/refitter/pull/253) ([christianhelle](https://github.com/christianhelle))
 
