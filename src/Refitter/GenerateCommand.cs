@@ -116,19 +116,22 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         var result = await OpenApiReader.ParseOpenApi(refitGeneratorSettings.OpenApiPath);
         var document = result.OpenApiDocument;
 
-        if (document.Paths.Any(pair => pair.Value.Parameters.Any(parameter=> parameter.Reference?.IsExternal == true)))
+        if (!document.Paths.Any(pair => pair.Value.Parameters.Any(parameter => parameter.Reference?.IsExternal == true)))
         {
-            AnsiConsole.WriteLine();
-            AnsiConsole.MarkupLine("[yellow]OpenAPI specifications contains external references[/]");
-            AnsiConsole.MarkupLine("[yellow]Attempting to merge of all external references...[/]");
+            return await RefitGenerator.CreateAsync(refitGeneratorSettings);
         }
-        
+
+        AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine("[yellow]OpenAPI specifications contains external references.[/]");
+        AnsiConsole.MarkupLine("[yellow]Attempting to merge of all external references into single document...[/]");
+
         var contents = await OpenApiMerger.Merge(refitGeneratorSettings.OpenApiPath!);
         var mergedPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         mergedPath = Path.ChangeExtension(mergedPath, Path.GetExtension(refitGeneratorSettings.OpenApiPath));
         await File.WriteAllTextAsync(mergedPath, contents);
         
         refitGeneratorSettings.OpenApiPath = mergedPath;
+
         return await RefitGenerator.CreateAsync(refitGeneratorSettings);
     }
 
