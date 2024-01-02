@@ -137,9 +137,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return outputPath;
     }
 
-    private static async Task ValidateOpenApiSpec(Settings settings)
+    private static async Task ValidateOpenApiSpec(string openApiPath)
     {
-        var validationResult = await OpenApiValidator.Validate(settings.OpenApiPath!);
+        var validationResult = await OpenApiValidator.Validate(openApiPath);
         if (!validationResult.IsValid)
         {
             AnsiConsole.MarkupLine($"[red]{Crlf}OpenAPI validation failed:{Crlf}[/]");
