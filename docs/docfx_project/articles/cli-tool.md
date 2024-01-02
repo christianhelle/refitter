@@ -82,4 +82,4 @@ The settings file uses the [.refitter file format](refitter-file-format.md)
 
 ## System requirements
 
-.NET 6.0 (LTS)
+.NET 8.0 (LTS)
