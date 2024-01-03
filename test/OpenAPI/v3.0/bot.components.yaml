@@ -1,0 +1,818 @@
+openapi: 3.0.3
+info:
+  title: QQ 机器人 OpenAPI 对象定义
+  version: v1.0.0
+paths:
+  # 这里只是放置个 path 配置避免格式检查报错
+# 对象定义
+components:
+  # path 参数统一定义在这里
+  parameters:
+    PathGuildID:
+      name: guild_id
+      description: 频道ID
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/BaseGuildID'
+    PathChannelID:
+      name: channel_id
+      description: 子频道ID
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/BaseChannelID'
+    PathUserID:
+      name: user_id
+      description: 成员ID
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/BaseUserID'
+    PathRoleID:
+      name: role_id
+      description: 身份组ID
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/BaseRoleID'
+    PathMessageID:
+      name: message_id
+      description: 消息ID
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/BaseMessageID'
+    PathScheduleID:
+      name: schedule_id
+      description: 日程ID
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/BaseScheduleID'
+  schemas:
+    BaseGuildID:
+      type: string
+      format: int64
+      description: 频道ID
+    BaseChannelID:
+      type: string
+      format: int64
+      description: 子频道ID
+    BaseChannelCategoryID:
+      type: string
+      format: int64
+      description: 子频道分组ID，仅子频道支持分组
+    BaseUserID:
+      type: string
+      format: int64
+      description: 用户ID
+    BaseRoleID:
+      type: string
+      format: int64
+      description: 身份组ID
+    BaseMessageID:
+      type: string
+      description: 消息ID
+    BaseSequenceInChannel:
+      type: string
+      description: |
+        子频道消息 seq，用于消息间的排序，seq 在同一子频道中按从先到后的顺序递增，不同的子频道之间消息无法排序
+    BaseScheduleID:
+      type: string
+      format: int64
+      description: 日程ID
+    Guild:
+      description: |
+        频道对象,频道对象中所涉及的 ID 类数据，都仅在机器人场景流通，与真实的 ID 无关。
+        请不要理解为真实的 ID
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/BaseGuildID'
+        name:
+          type: string
+          description: 频道名称
+        icon:
+          type: string
+          description: 频道头像地址
+        owner_id:
+          $ref: '#/components/schemas/BaseUserID'
+        owner:
+          type: boolean
+          description: 当前人是否是创建人
+        member_count:
+          type: integer
+          description: 成员数
+          format: int32
+        max_members:
+          type: integer
+          description: 最大成员数
+          format: int32
+        description:
+          type: string
+          description: 描述
+        joined_at:
+          type: string
+          description: 加入时间
+    User:
+      description: |
+        用户对象中所涉及的 ID 类数据，都仅在机器人场景流通，与真实的 ID 无关。
+        请不要理解为真实的 ID
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/BaseUserID'
+        username:
+          type: string
+          description: 用户名
+        avatar:
+          type: string
+          description: 用户头像地址
+        bot:
+          type: boolean
+          description: 是否是机器人
+        union_openid:
+          type: string
+          description: |
+            特殊关联应用的 openid，需要特殊申请并配置后才会返回。如需申请，请联系平台运营人员
+        union_user_account:
+          type: string
+          description: |
+            机器人关联的互联应用的用户信息，与union_openid关联的应用是同一个。
+            如需申请，请联系平台运营人员
+    Channel:
+      description: 子频道对象,子频道对象中所涉及的 ID 类数据，都仅在机器人场景流通，与真实的 ID 无关。请不要理解为真实的 ID
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/BaseChannelID'
+        guild_id:
+          $ref: '#/components/schemas/BaseGuildID'
+        name:
+          type: string
+          description: 子频道名称
+        type:
+          $ref: '#/components/schemas/ChannelType'
+        sub_type:
+          $ref: '#/components/schemas/ChannelSubType'
+        position:
+          type: integer
+          description: 排序值
+        parent_id:
+          type: string
+          description: 所属分组 id，仅对子频道有效，对 子频道分组（ChannelType=4） 无效
+        owner_id:
+          $ref: '#/components/schemas/BaseUserID'
+        private_type:
+          $ref: '#/components/schemas/PrivateType'
+        speak_permission:
+          $ref: '#/components/schemas/SpeakPermission'
+        application_id:
+          $ref: '#/components/schemas/Application'
+    Member:
+      description: 成员对象
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        nick:
+          type: string
+          description: 用户的昵称
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseRoleID'
+          description: 用户在频道内的身份组ID
+        joined_at:
+          type: string
+          format: date-time
+          description: '用户加入频道的时间, ISO8601格式'
+    Role:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/BaseRoleID'
+        name:
+          type: string
+          description: 名称
+        color:
+          type: integer
+          description: ARGB的HEX十六进制颜色值转换后的十进制数值
+        hoist:
+          type: integer
+          description: '是否在成员列表中单独展示: 0-否, 1-是'
+        number:
+          type: integer
+          description: 人数
+        member_limit:
+          type: integer
+          description: 成员上限
+          format: uint32
+      description: 频道身份组对象
+    ChannelPermissions:
+      description: |
+        子频道权限对象, 权限是QQ频道管理频道成员的一种方式，管理员可以对不同的人、不同的子频道设置特定的权限。
+          * 用户的权限包括个人权限和身份组权限两部分，最终生效是取两种权限的并集。
+          * 权限使用位图表示，传递时序列化为十进制数值字符串。如权限值为0x6FFF，会被序列化为十进制'28671'
+      type: object
+      properties:
+        channel_id:
+          $ref: '#/components/schemas/BaseChannelID'
+        user_id:
+          $ref: '#/components/schemas/BaseUserID'
+        role_id:
+          $ref: '#/components/schemas/BaseRoleID'
+        permissions:
+          $ref: '#/components/schemas/Permissions'
+    Message:
+      type: object
+      description: 消息对象
+      properties:
+        id:
+          $ref: '#/components/schemas/BaseMessageID'
+        channel_id:
+          $ref: '#/components/schemas/BaseChannelID'
+        guild_id:
+          $ref: '#/components/schemas/BaseGuildID'
+        content:
+          type: string
+          description: 消息内容
+        timestamp:
+          type: string
+          format: date-time
+          description: '消息创建时间,ISO8601 timestamp'
+        edited_timestamp:
+          type: string
+          format: date-time
+          description: '消息编辑时间,ISO8601 timestamp'
+        mention_everyone:
+          type: boolean
+          description: 是否是@全员消息
+        author:
+          $ref: '#/components/schemas/User'
+        attachments:
+          type: array
+          description: 附件
+          items:
+            $ref: '#/components/schemas/MessageAttachment'
+        embeds:
+          type: array
+          description: embed
+          items:
+            $ref: '#/components/schemas/MessageEmbed'
+        mentions:
+          type: array
+          description: 消息中@的人
+          items:
+            $ref: '#/components/schemas/User'
+        member:
+          $ref: '#/components/schemas/Member'
+        ark:
+          $ref: '#/components/schemas/MessageArk'
+        seq:
+          type: integer
+          description: |
+            用于消息间的排序，seq 在同一子频道中按从先到后的顺序递增，不同的子频道之前消息无法排序
+        seq_in_channel:
+          $ref: "#/components/schemas/BaseSequenceInChannel"
+        message_reference:
+          $ref: "#/components/schemas/MessageReference"
+    MessageReference:
+      type: object
+      description: 引用消息对象
+      properties:
+        message_id:
+          $ref: '#/components/schemas/BaseMessageID'
+        ignore_get_message_error:
+          type: boolean
+          description: 是否忽略获取引用消息详情错误，默认否，仅在发送引用消息的时候使用
+    MessageAttachment:
+      type: object
+      description: 消息附件
+      properties:
+        url:
+          type: string
+          description: 下载地址
+    MessageEmbed:
+      type: object
+      description: embed消息
+      properties:
+        title:
+          type: string
+          description: 标题
+        prompt:
+          type: string
+          description: 消息弹窗内容
+        thumbnail:
+          $ref: '#/components/schemas/MessageEmbedThumbnail'
+        fields:
+          type: array
+          description: embed 字段数据
+          items:
+            $ref: '#/components/schemas/MessageEmbedField'
+    MessageEmbedThumbnail:
+      type: object
+      description: 消息封面
+      properties:
+        url:
+          type: string
+          description: 图片地址
+    MessageEmbedField:
+      type: object
+      description: embed字段
+      properties:
+        name:
+          type: string
+          description: 字段
+    MessageArk:
+      type: object
+      description: ark消息
+      properties:
+        template_id:
+          type: integer
+          description: ark模板id（需要先申请）
+        kv:
+          type: array
+          description: kv值列表
+          items:
+            $ref: '#/components/schemas/MessageArkKv'
+    MessageArkKv:
+      description: ARK消息KV
+      type: object
+      properties:
+        key:
+          type: string
+          description: key
+        value:
+          type: string
+          description: value
+        obj:
+          type: array
+          description: ark obj类型的列表
+          items:
+            $ref: '#/components/schemas/MessageArkObj'
+    MessageArkObj:
+      type: object
+      description: MessageArkObj
+      properties:
+        obj_kv:
+          type: array
+          description: ark objkv列表
+          items:
+            $ref: '#/components/schemas/MessageArkObjKv'
+    MessageArkObjKv:
+      type: object
+      description: MessageArkObjKv
+      properties:
+        key:
+          type: string
+          description: key
+        value:
+          type: string
+          description: value
+    MessageAudited:
+      type: object
+      description: 消息审核对象
+      properties:
+        audit_id:
+          type: string
+          description: 消息审核 id
+        message_id:
+          type: string
+          description: 消息 id，只有审核通过事件才会有值
+        guild_id:
+          type: string
+          description: 频道 id
+        channel_id:
+          type: string
+          description: 子频道 id
+        audit_time:
+          type: string
+          format: date-time
+          description: '消息审核时间,ISO8601 timestamp'
+        create_time:
+          type: string
+          format: date-time
+          description: '消息创建时间,ISO8601 timestamp'
+        seq_in_channel:
+          $ref: "#/components/schemas/BaseSequenceInChannel"
+    DMS:
+      type: object
+      description: 私信会话对象
+      properties:
+        guild_id:
+          type: string
+          description: 私信会话关联的频道ID
+          format: int64
+        channel_id:
+          type: string
+          description: 私信会话关联的子频道ID
+        create_time:
+          type: string
+          format: int64
+          description: 创建私信会话时间戳
+    Announces:
+      type: object
+      description: 公告对象
+      properties:
+        guild_id:
+          $ref: '#/components/schemas/BaseGuildID'
+        channel_id:
+          $ref: '#/components/schemas/BaseChannelID'
+        message_id:
+          $ref: '#/components/schemas/BaseMessageID'
+    Schedule:
+      type: object
+      description: 日程对象
+      properties:
+        id:
+          $ref: '#/components/schemas/BaseScheduleID'
+        name:
+          type: string
+          description: 日程名称
+        description:
+          type: string
+          description: 日程描述
+        start_timestamp:
+          type: string
+          description: 日程开始时间戳(ms)
+          format: int64
+        end_timestamp:
+          type: string
+          description: 日程结束时间戳(ms)
+          format: int64
+        creator:
+          $ref: '#/components/schemas/Member'
+        jump_channel_id:
+          description: 日程开始时跳转到的子频道 id
+          type: string
+          format: int64
+        remind_type:
+          $ref: '#/components/schemas/RemindType'
+    Emoji:
+      type: object
+      description: 表情对象
+      properties:
+        id:
+          $ref: '#/components/schemas/EmojiID'
+        type:
+          $ref: '#/components/schemas/EmojiType'
+    MessageReaction:
+      type: object
+      description: 表情表态对象
+      properties:
+        user_id:
+          $ref: '#/components/schemas/BaseUserID'
+        guild_id:
+          $ref: '#/components/schemas/BaseGuildID'
+        channel_id:
+          $ref: '#/components/schemas/BaseChannelID'
+        target:
+          $ref: '#/components/schemas/ReactionTarget'
+        emoji:
+          $ref: '#/components/schemas/Emoji'
+    ReactionTarget:
+      type: object
+      description: 表情表态的目标对象
+      properties:
+        id:
+          type: string
+          description: 表态对象ID
+        type:
+          $ref: '#/components/schemas/ReactionTargetType'
+    AudioControl:
+      type: object
+      description: 语音对象
+      properties:
+        audio_url:
+          type: string
+          description: 音频数据的url status为0时传
+        text:
+          type: string
+          description: 状态文本（比如：简单爱-周杰伦），可选，status为0时传，其他操作不传
+        status:
+          $ref: '#/components/schemas/AudioControlStatus'
+    APIPermission:
+      type: object
+      description: 接口权限对象
+      properties:
+        path:
+          type: string
+          description: 'API 接口名，例如 /guilds/{guild_id}/members/{user_id}'
+        method:
+          type: string
+          description: 请求方法，例如 GET
+        desc:
+          type: string
+          description: API 接口名称，例如 获取频道信
+        auth_status:
+          type: integer
+          description: 授权状态，auth_stats 为 1 时已授权
+    APIPermissionDemand:
+      type: object
+      description: 接口权限需求对象，用于往目标频道的子频道发送申请接口权限消息
+      properties:
+        guild_id:
+          $ref: '#/components/schemas/BaseGuildID'
+        channel_id:
+          $ref: '#/components/schemas/BaseChannelID'
+        api_identify:
+          $ref: '#/components/schemas/APIPermissionDemandIdentify'
+        title:
+          type: string
+          description: 接口权限链接中的接口权限描述信息
+        desc:
+          type: string
+          description: 接口权限链接中的机器人可使用功能的描述信息
+    APIPermissionDemandIdentify:
+      type: object
+      description: 接口权限需求标识对象
+      properties:
+        path:
+          type: string
+          description: 'API 接口名，例如 /guilds/{guild_id}/members/{user_id}'
+        name:
+          type: string
+          description: 请求方法，例如 GET
+    ChannelCreate:
+      type: object
+      description: 创建子频道请求对象
+      properties:
+        name:
+          type: string
+          description: 子频道名称
+        type:
+          $ref: '#/components/schemas/ChannelType'
+        sub_type:
+          $ref: '#/components/schemas/ChannelSubType'
+        position:
+          type: integer
+          description: 排序值
+        parent_id:
+          $ref: '#/components/schemas/BaseChannelCategoryID'
+        private_type:
+          $ref: '#/components/schemas/PrivateType'
+        private_user_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseUserID'
+          description: 子频道私密类型成员 ID
+      required:
+        - name
+        - type
+        - sub_type
+    ChannelUpdate:
+      type: object
+      description: 修子频道请求对象
+      properties:
+        name:
+          type: string
+          description: 子频道名称
+        type:
+          $ref: '#/components/schemas/ChannelType'
+        sub_type:
+          $ref: '#/components/schemas/ChannelSubType'
+        position:
+          type: integer
+          description: 排序值
+        parent_id:
+          $ref: '#/components/schemas/BaseChannelCategoryID'
+        private_type:
+          $ref: '#/components/schemas/PrivateType'
+    GuildRole:
+      type: object
+      description: 频道身份组对象
+      properties:
+        id:
+          $ref: '#/components/schemas/BaseGuildID'
+        name:
+          type: string
+          description: 名称
+        color:
+          type: number
+          description: ARGB 的 HEX 十六进制颜色值转换后的十进制数值（例：4294927682）
+        hoist:
+          type: number
+          description: 是否在成员列表中单独展示, 0-否, 1-是
+        number:
+          type: number
+          description: 人数
+        member_limit:
+          type: number
+          description: 成员上限
+    MessageSend:
+      type: object
+      description: 用户发送消息的数据对象
+      properties:
+        content:
+          type: string
+          description: 消息内容，文本内容，支持内嵌格式
+        embed:
+          $ref: "#/components/schemas/MessageEmbed"
+        ark:
+          $ref: "#/components/schemas/MessageArk"
+        message_reference:
+          $ref: "#/components/schemas/MessageReference"
+        image:
+          type: string
+          description: 图片url地址，平台会转存该图片，用于下发图片消息
+        msg_id:
+          type: string
+          description: 要回复的消息id(Message.id), 在 AT_CREATE_MESSAGE 事件中获取，携带之后此条回复视为被动消息
+      minProperties: 1
+    ScheduleCreate:
+      type: object
+      description: 日程创建对象
+      properties:
+        name:
+          type: string
+          description: 日程名称
+        description:
+          type: string
+          description: 日程描述
+        start_timestamp:
+          type: string
+          description: 日程开始时间戳(ms)
+          format: int64
+        end_timestamp:
+          type: string
+          description: 日程结束时间戳(ms)
+          format: int64
+        creator:
+          $ref: '#/components/schemas/Member'
+        jump_channel_id:
+          type: string
+          description: 日程开始时跳转到的子频道 id
+          format: int64
+        remind_type:
+          type: string
+          description: 日程提醒类型
+      required:
+        - name
+        - start_timestamp
+        - end_timestamp
+        - remind_type
+    ScheduleUpdate:
+      type: object
+      description: 日程更新对象
+      properties:
+        name:
+          type: string
+          description: 日程名称
+        description:
+          type: string
+          description: 日程描述
+        start_timestamp:
+          type: string
+          description: 日程开始时间戳(ms)
+          format: int64
+        end_timestamp:
+          type: string
+          description: 日程结束时间戳(ms)
+          format: int64
+        creator:
+          $ref: '#/components/schemas/Member'
+        jump_channel_id:
+          type: string
+          description: 日程开始时跳转到的子频道 id
+          format: int64
+        remind_type:
+          type: string
+          description: 日程提醒类型
+    SessionStartLimit:
+      type: object
+      description: 创建 Session 限制信息
+      properties:
+        total:
+          type: integer
+          description: 每 24 小时可创建 Session 数
+        remaining:
+          type: integer
+          description: 目前还可以创建的 Session 数
+        reset_after:
+          type: integer
+          description: 重置计数的剩余时间(ms)
+        max_concurrency:
+          type: integer
+          description: 每 5s 可以创建的 Session 数
+    DefaultRoleIDs:
+      type: string
+      description: |
+        统默认生成下列身份组ID:
+          * `1` - 全体成员
+          * `2` - 管理员
+          * `4` - 群主/创建者
+          * `5` - 子频道管理员
+      enum: [1,2,4,5]
+    ChannelType:
+      type: integer
+      description: |
+        子频道类型:
+          * `0` - 文字子频道
+          * `1` - 保留，不可用
+          * `2` - 语音子频道
+          * `3` - 保留，不可用
+          * `4` - 子频道分组
+          * `10005` - 直播子频道
+          * `10006` - 应用子频道
+          * `10007` - 论坛子频道
+          | 注：由于QQ频道还在持续的迭代中，经常会有新的子频道类型增加，文档更新不一定及时，开发者识别 ChannelType 时，请注意相关的未知 ID 的处理。
+      enum: [0,1,2,3,4,10005,10006,10007]
+    ChannelSubType:
+      type: integer
+      description: |
+        子频道子类型:
+          * `0` - 闲聊
+          * `1` - 公告
+          * `2` - 攻略
+          * `3` - 开黑
+          | 目前只有文字子频道具有 ChannelSubType 二级分类，同时二级分类也可能会不断增加，开发者也需要注意对未知 ID 的处理
+      enum: [0,1,2,3]
+    PrivateType:
+      type: integer
+      description: |
+        子频道私密类型:
+          * `0` - 公开频道
+          * `1` - 群主管理员可见
+          * `2` - 群主管理员+指定成员，可使用 修改子频道权限接口 指定成员
+      enum: [0,1,2]
+    SpeakPermission:
+      type: integer
+      description: |
+        子频道发言权限:
+          * `0` - 无效类型
+          * `1` - 所有人
+          * `2` - 群主管理员+指定成员，可使用 修改子频道权限接口 指定成员
+      enum: [0,1,2]
+    Application:
+      type: string
+      description: |
+        应用子频道的应用类型:
+          * `1000000` - 王者开黑大厅
+          * `1000001` - 互动小游戏
+          * `1000010` - 腾讯投票
+          * `1000051` - 飞车开黑大厅
+          * `1000050` - 日程提醒
+          * `1000070` - CoDM 开黑大厅
+          * `1010000` - 和平精英开黑大厅
+        | 由于QQ频道还在持续的迭代中，应用子频道的 application_id 还会持续新增，后续会不定期补充到文档中
+    Permissions:
+      type: string
+      description: |
+        * 用户/角色拥有的(子)频道权限
+        * 权限是QQ频道管理频道成员的一种方式，管理员可以对不同的人、不同的子频道设置特定的权限。用户的权限包括个人权限和身份组权限两部分，最终生效是取两种权限的并集。
+        * 权限使用位图表示，传递时序列化为十进制数值字符串。如权限值为0x6FFF，会被序列化为十进制"28671"。
+          | 权限 | 值 | 描述 |
+          | --- | --- | --- |
+          | 可查看子频道 | 0x0000000001 (1 << 0) | 支持`指定成员`可见类型，支持`身份组`可见类型 |
+          | 可管理子频道 | 0x0000000002 (1 << 1) | 创建者、管理员、子频道管理员都具有此权限 |
+          | 可发言子频道 | 0x0000000004 (1 << 2) | 支持`指定成员`发言类型，支持`身份组`发言类型  |
+    RemindType:
+      type: string
+      description: |
+        日程提醒类型:
+          * `0` - 不提醒
+          * `1` - 开始时提醒
+          * `2` - 开始前 5 分钟提醒
+          * `3` - 开始前 15 分钟提醒
+          * `4` - 开始前 30 分钟提醒
+          * `5` - 开始前 60 分钟提醒
+    AudioControlStatus:
+      type: integer
+      description: |
+        播放状态:
+          * `0` - 开始播放操作
+          * `1` - 暂停播放操作
+          * `2` - 继续播放操作
+          * `3` - 停止播放操作
+    ReactionTargetType:
+      type: string
+      description: |
+        表态对象类型:
+          * `0` - 消息
+          * `1` - 帖子
+          * `2` - 评论
+          * `3` - 回复
+    EmojiType:
+      type: integer
+      description: |
+        表情类型 :
+          * `1` - 系统表情
+          * `2` - emoji表情
+    EmojiID:
+      type: string
+      description: |
+        emoji 表情列表，请访问 [表情列表](https://bot.q.qq.com/wiki/develop/api/openapi/emoji/model.html#emoji-%E5%88%97%E8%A1%A8)
+    PinsMessage:
+      type: object
+      description: 精华消息对象
+      properties:
+        guild_id:
+          $ref: '#/components/schemas/BaseGuildID'
+        channel_id:
+          $ref: '#/components/schemas/BaseChannelID'
+        message_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseMessageID'
