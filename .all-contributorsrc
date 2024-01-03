@@ -299,6 +299,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "kami-poi",
+      "name": "kami-poi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47322691?v=4",
+      "profile": "https://github.com/kami-poi",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
