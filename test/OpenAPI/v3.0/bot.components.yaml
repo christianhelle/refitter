@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: QQ 机器人 OpenAPI 对象定义
+  title: Bot OpenAPI
   version: v1.0.0
 paths:
   # 这里只是放置个 path 配置避免格式检查报错

@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: QQ 机器人 OpenAPI
+  title: Bot OpenAPI
   description: |
     QQ 频道机器人通过开放的平台承载机器人的定制化功能，让开发者获得更畅快的开发体验。
   version: v1.0.0
