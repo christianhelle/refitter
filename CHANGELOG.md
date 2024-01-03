@@ -6,6 +6,8 @@
 
 **Implemented enhancements:**
 
+- Support $ref references to separate files in OpenAPI specifications. [\#192](https://github.com/christianhelle/refitter/issues/192)
+- Add support for OAS files with external references [\#260](https://github.com/christianhelle/refitter/pull/260) ([christianhelle](https://github.com/christianhelle))
 - Fix issue where codeGeneratorSettings arrayType setting is not respected in Refit interface [\#257](https://github.com/christianhelle/refitter/pull/257) ([christianhelle](https://github.com/christianhelle))
 - Show error reporting suggestion banner upon error [\#254](https://github.com/christianhelle/refitter/pull/254) ([christianhelle](https://github.com/christianhelle))
 - Add donation banner for Github Sponsors and buymeacoffee.com [\#252](https://github.com/christianhelle/refitter/pull/252) ([christianhelle](https://github.com/christianhelle))
@@ -15,6 +17,7 @@
 
 - File not found when using uri [\#258](https://github.com/christianhelle/refitter/issues/258)
 - Unable to change arrayType to List or IList [\#255](https://github.com/christianhelle/refitter/issues/255)
+- I can not generate interface [\#249](https://github.com/christianhelle/refitter/issues/249)
 
 **Merged pull requests:**
 
