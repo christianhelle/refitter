@@ -86,7 +86,8 @@ function RunTests {
         "uber",
         "uspto",
         "hubspot-events",
-        "hubspot-webhooks"
+        "hubspot-webhooks",
+        "bot.paths.yaml"
     )
     
     Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin"
