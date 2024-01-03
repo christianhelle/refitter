@@ -74,7 +74,8 @@ function RunTests {
         $Parallel = $false
     )
 
-    $filenames = @(
+    $filenames = @(        
+        "bot.paths",
         "petstore",
         "petstore-expanded",
         "petstore-minimal",
@@ -86,8 +87,7 @@ function RunTests {
         "uber",
         "uspto",
         "hubspot-events",
-        "hubspot-webhooks",
-        "bot.paths.yaml"
+        "hubspot-webhooks"
     )
     
     Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin"
