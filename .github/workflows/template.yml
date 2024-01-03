@@ -34,7 +34,6 @@ jobs:
           "--internal",
           "--use-api-response",
           "--use-iso-date-format",
-          "--multiple-interfaces ByEndpoint",
           "--match-path ^/pet/.*",
           "--tag pet",
           "--no-deprecated-operations"

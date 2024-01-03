@@ -74,7 +74,8 @@ function RunTests {
         $Parallel = $false
     )
 
-    $filenames = @(
+    $filenames = @(        
+        "bot.paths",
         "petstore",
         "petstore-expanded",
         "petstore-minimal",

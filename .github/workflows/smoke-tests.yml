@@ -44,7 +44,8 @@ jobs:
           "petstore-simple",
           "petstore-with-external-docs",
           "hubspot-events",
-          "hubspot-webhooks"
+          "hubspot-webhooks",
+          "bot.paths"
         ]
     
     uses: ./.github/workflows/template.yml

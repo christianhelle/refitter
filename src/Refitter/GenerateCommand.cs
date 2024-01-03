@@ -3,6 +3,8 @@ using System.Diagnostics;
 using Microsoft.OpenApi.Models;
 
 using Refitter.Core;
+using Refitter.Merger;
+using Refitter.OAS;
 using Refitter.Validation;
 
 using Spectre.Console;
@@ -58,9 +60,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                     ? "[green]Support key: Unavailable when logging is disabled[/]"
                     : $"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
 
-            if (!settings.SkipValidation)
-                await ValidateOpenApiSpec(settings);
-
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
                 var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
@@ -68,7 +67,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
             }
 
-            var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
+            var generator = await CreateGenerator(refitGeneratorSettings);
+            if (!settings.SkipValidation)
+                await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath);
+            
             var code = generator.Generate().ReplaceLineEndings();
             AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
 
@@ -109,6 +111,30 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
     }
 
+    private static async Task<RefitGenerator> CreateGenerator(RefitGeneratorSettings refitGeneratorSettings)
+    {
+        var result = await OpenApiReader.ParseOpenApi(refitGeneratorSettings.OpenApiPath);
+        var document = result.OpenApiDocument;
+
+        if (!document.Paths.Any(pair => pair.Value.Parameters.Any(parameter => parameter.Reference?.IsExternal == true)))
+        {
+            return await RefitGenerator.CreateAsync(refitGeneratorSettings);
+        }
+
+        AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine("[yellow]OpenAPI specifications contains external references.[/]");
+        AnsiConsole.MarkupLine("[yellow]Attempting to merge of all external references into single document...[/]");
+
+        var contents = await OpenApiMerger.Merge(refitGeneratorSettings.OpenApiPath!);
+        var mergedPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        mergedPath = Path.ChangeExtension(mergedPath, Path.GetExtension(refitGeneratorSettings.OpenApiPath));
+        await File.WriteAllTextAsync(mergedPath, contents);
+        
+        refitGeneratorSettings.OpenApiPath = mergedPath;
+
+        return await RefitGenerator.CreateAsync(refitGeneratorSettings);
+    }
+
     private static void DonationBanner()
     {
         AnsiConsole.MarkupLine("[dim]###################################################################[/]");
@@ -137,9 +163,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return outputPath;
     }
 
-    private static async Task ValidateOpenApiSpec(Settings settings)
+    private static async Task ValidateOpenApiSpec(string openApiPath)
     {
-        var validationResult = await OpenApiValidator.Validate(settings.OpenApiPath!);
+        var validationResult = await OpenApiValidator.Validate(openApiPath);
         if (!validationResult.IsValid)
         {
             AnsiConsole.MarkupLine($"[red]{Crlf}OpenAPI validation failed:{Crlf}[/]");
