@@ -3,8 +3,6 @@ using System.Diagnostics;
 using Microsoft.OpenApi.Models;
 
 using Refitter.Core;
-using Refitter.Merger;
-using Refitter.OAS;
 using Refitter.Validation;
 
 using Spectre.Console;
@@ -67,7 +65,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
             }
 
-            var generator = await CreateGenerator(refitGeneratorSettings);
+            var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             if (!settings.SkipValidation)
                 await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath);
             
@@ -109,30 +107,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             await Analytics.LogError(exception, settings);
             return exception.HResult;
         }
-    }
-
-    private static async Task<RefitGenerator> CreateGenerator(RefitGeneratorSettings refitGeneratorSettings)
-    {
-        var result = await OpenApiReader.ParseOpenApi(refitGeneratorSettings.OpenApiPath);
-        var document = result.OpenApiDocument;
-
-        if (!document.Paths.Any(pair => pair.Value.Parameters.Any(parameter => parameter.Reference?.IsExternal == true)))
-        {
-            return await RefitGenerator.CreateAsync(refitGeneratorSettings);
-        }
-
-        AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine("[yellow]OpenAPI specifications contains external references.[/]");
-        AnsiConsole.MarkupLine("[yellow]Attempting to merge of all external references into single document...[/]");
-
-        var contents = await OpenApiMerger.Merge(refitGeneratorSettings.OpenApiPath!);
-        var mergedPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-        mergedPath = Path.ChangeExtension(mergedPath, Path.GetExtension(refitGeneratorSettings.OpenApiPath));
-        await File.WriteAllTextAsync(mergedPath, contents);
-        
-        refitGeneratorSettings.OpenApiPath = mergedPath;
-
-        return await RefitGenerator.CreateAsync(refitGeneratorSettings);
     }
 
     private static void DonationBanner()

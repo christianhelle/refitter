@@ -3,6 +3,10 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Extensions;
+using Microsoft.OpenApi.Readers;
+
 namespace Refitter.Core;
 
 /// <summary>
@@ -21,7 +25,6 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         ProcessTagFilters(openApiDocument, settings.IncludeTags);
         ProcessPathFilters(openApiDocument, settings.IncludePathMatches);
-
         ProcessContractFilter(openApiDocument, settings.TrimUnusedSchema, settings.KeepSchemaPatterns);
 
         return new RefitGenerator(settings, openApiDocument);
@@ -33,9 +36,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         {
             ":"
         };
-
+        
         return specialCharacters.Aggregate(
-            await OpenApiDocumentFactory.CreateAsync(settings),
+            await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath),
             SanitizePath);
     }
 

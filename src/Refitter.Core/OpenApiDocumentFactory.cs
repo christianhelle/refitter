@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Microsoft.OpenApi.Extensions;
+using Microsoft.OpenApi.Readers;
 
 using NSwag;
 
@@ -12,61 +13,21 @@ public static class OpenApiDocumentFactory
     /// <summary>
     /// Creates a new instance of the <see cref="OpenApiDocument"/> class asynchronously.
     /// </summary>
-    /// <param name="settings">The settings used to configure the generator.</param>
+    /// <param name="openApiPath">The path or URL to the OpenAPI specification.</param>
     /// <returns>A new instance of the <see cref="OpenApiDocument"/> class.</returns>
-    public static async Task<OpenApiDocument> CreateAsync(RefitGeneratorSettings settings)
+    public static async Task<OpenApiDocument> CreateAsync(string openApiPath)
     {
-        OpenApiDocument document;
-        if (IsHttp(settings.OpenApiPath))
-        {
-            var content = await GetHttpContent(settings);
+        var readResult = await OpenApiMultiFileReader.Read(openApiPath);
+        var specificationVersion = readResult.OpenApiDiagnostic.SpecificationVersion;
 
-            if (IsYaml(settings.OpenApiPath))
-            {
-                document = await OpenApiYamlDocument.FromYamlAsync(content);
-            }
-            else
-            {
-                document = await OpenApiDocument.FromJsonAsync(content);
-            }
-        }
-        else 
+        if (IsYaml(openApiPath))
         {
-            if (IsYaml(settings.OpenApiPath))
-            {
-                document = await OpenApiYamlDocument.FromFileAsync(settings.OpenApiPath);
-            }
-            else
-            {
-                document = await OpenApiDocument.FromFileAsync(settings.OpenApiPath);
-            }
+            var yaml = readResult.OpenApiDocument.SerializeAsYaml(specificationVersion);
+            return await OpenApiYamlDocument.FromYamlAsync(yaml);
         }
 
-        return document;
-    }
-
-    /// <summary>
-    /// Gets the content of the URI as a string and decompresses it if necessary. 
-    /// </summary>
-    /// <param name="settings">The settings used to configure the generator.</param>
-    /// <returns>The content of the HTTP request.</returns>
-    private static async Task<string> GetHttpContent(RefitGeneratorSettings settings)
-    {
-        var httpMessageHandler = new HttpClientHandler();
-        httpMessageHandler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-        using var http = new HttpClient(httpMessageHandler);
-        var content = await http.GetStringAsync(settings.OpenApiPath);
-        return content;
-    }
-
-    /// <summary>
-    /// Determines whether the specified path is an HTTP URL.
-    /// </summary>
-    /// <param name="path">The path to check.</param>
-    /// <returns>True if the path is an HTTP URL, otherwise false.</returns>
-    private static bool IsHttp(string path)
-    {
-        return path.StartsWith("http://") || path.StartsWith("https://");
+        var json = readResult.OpenApiDocument.SerializeAsJson(specificationVersion);
+        return await OpenApiDocument.FromJsonAsync(json);
     }
 
     /// <summary>
