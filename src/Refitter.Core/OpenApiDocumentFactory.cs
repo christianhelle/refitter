@@ -1,5 +1,6 @@
-﻿using Microsoft.OpenApi.Extensions;
-using Microsoft.OpenApi.Models;
+﻿using System.Net;
+
+using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Readers;
 
 using NSwag;
@@ -20,24 +21,48 @@ public static class OpenApiDocumentFactory
     /// <returns>A new instance of the <see cref="NSwag.OpenApiDocument"/> class.</returns>
     public static async Task<OpenApiDocument> CreateAsync(string openApiPath)
     {
-        var readResult = await OpenApiMultiFileReader.Read(openApiPath);
-        var specificationVersion = readResult.OpenApiDiagnostic.SpecificationVersion;
-
-        PopulateMissingRequiredFields(openApiPath, readResult);
-
-        if (IsYaml(openApiPath))
+        try
         {
-            var yaml = readResult.OpenApiDocument.SerializeAsYaml(specificationVersion);
-            return await OpenApiYamlDocument.FromYamlAsync(yaml);
+            var readResult = await OpenApiMultiFileReader.Read(openApiPath);
+            if (readResult.ContainedExternalReferences)
+                return await CreateUsingNSwagAsync(openApiPath);
+
+            var specificationVersion = readResult.OpenApiDiagnostic.SpecificationVersion;
+            PopulateMissingRequiredFields(openApiPath, readResult);
+
+            if (IsYaml(openApiPath))
+            {
+                var yaml = readResult.OpenApiDocument.SerializeAsYaml(specificationVersion);
+                return await OpenApiYamlDocument.FromYamlAsync(yaml);
+            }
+
+            var json = readResult.OpenApiDocument.SerializeAsJson(specificationVersion);
+            return await OpenApiDocument.FromJsonAsync(json);
+        }
+        catch
+        {    
+            return await CreateUsingNSwagAsync(openApiPath);
+        }
+    }
+
+    private static async Task<OpenApiDocument> CreateUsingNSwagAsync(string openApiPath)
+    {
+        if (IsHttp(openApiPath))
+        {
+            var content = await GetHttpContent(openApiPath);
+            return IsYaml(openApiPath) 
+                ? await OpenApiYamlDocument.FromYamlAsync(content) 
+                : await OpenApiDocument.FromJsonAsync(content);
         }
 
-        var json = readResult.OpenApiDocument.SerializeAsJson(specificationVersion);
-        return await OpenApiDocument.FromJsonAsync(json);
+        return IsYaml(openApiPath) 
+            ? await OpenApiYamlDocument.FromFileAsync(openApiPath) 
+            : await OpenApiDocument.FromFileAsync(openApiPath);
     }
 
     private static void PopulateMissingRequiredFields(
         string openApiPath,
-        ReadResult readResult)
+        Result readResult)
     {
         var document = readResult.OpenApiDocument;
         if (document.Info is null)
@@ -54,6 +79,31 @@ public static class OpenApiDocumentFactory
             document.Info.Version ??= readResult.OpenApiDiagnostic.SpecificationVersion.GetDisplayName();
         }
     }
+
+    /// <summary>
+    /// Determines whether the specified path is an HTTP URL.
+    /// </summary>
+    /// <param name="path">The path to check.</param>
+    /// <returns>True if the path is an HTTP URL, otherwise false.</returns>
+    private static bool IsHttp(string path)
+    {
+        return path.StartsWith("http://") || path.StartsWith("https://");
+    }
+
+    /// <summary>
+    /// Gets the content of the URI as a string and decompresses it if necessary. 
+    /// </summary>
+    /// <param name="settings">The settings used to configure the generator.</param>
+    /// <returns>The content of the HTTP request.</returns>
+    private static async Task<string> GetHttpContent(string openApiPath)
+    {
+        var httpMessageHandler = new HttpClientHandler();
+        httpMessageHandler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+        using var http = new HttpClient(httpMessageHandler);
+        var content = await http.GetStringAsync(openApiPath);
+        return content;
+    }
+
 
     /// <summary>
     /// Determines whether the specified path is a YAML file.
