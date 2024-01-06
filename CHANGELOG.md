@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7.41-preview...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency xunit to v2.6.5 [\#266](https://github.com/christianhelle/refitter/pull/266) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add kami-poi as a contributor for ideas [\#261](https://github.com/christianhelle/refitter/pull/261) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
+## [0.8.7.41-preview](https://github.com/christianhelle/refitter/tree/0.8.7.41-preview) (2024-01-03)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7...0.8.7.41-preview)
 
 **Implemented enhancements:**
 
