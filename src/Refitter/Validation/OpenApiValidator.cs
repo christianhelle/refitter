@@ -10,17 +10,7 @@ public static class OpenApiValidator
 {
     public static async Task<OpenApiValidationResult> Validate(string openApiFile)
     {
-        var directoryName = new FileInfo(openApiFile).DirectoryName;
-        var openApiReaderSettings = new OpenApiReaderSettings
-        {
-            BaseUrl = openApiFile.StartsWith("http", StringComparison.OrdinalIgnoreCase)
-                ? new Uri(openApiFile)
-                : new Uri($"file://{directoryName}{Path.DirectorySeparatorChar}")
-        };
-
-        await using var stream = await GetStream(openApiFile, CancellationToken.None);
-        var reader = new OpenApiStreamReader(openApiReaderSettings);
-        var result = await reader.ReadAsync(stream, CancellationToken.None);
+        var result = await OpenApiMultiFileReader.Read(openApiFile);
 
         var statsVisitor = new OpenApiStats();
         var walker = new OpenApiWalker(statsVisitor);
