@@ -24,7 +24,7 @@ public static class OpenApiDocumentFactory
         try
         {
             var readResult = await OpenApiMultiFileReader.Read(openApiPath);
-            if (readResult.ContainedExternalReferences)
+            if (!readResult.ContainedExternalReferences)
                 return await CreateUsingNSwagAsync(openApiPath);
 
             var specificationVersion = readResult.OpenApiDiagnostic.SpecificationVersion;
