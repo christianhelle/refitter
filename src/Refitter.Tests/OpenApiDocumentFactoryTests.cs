@@ -15,7 +15,7 @@ public class OpenApiDocumentFactoryTests
     public async Task Create_From_Uri_Returns_NotNull(string url)
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
-        (await OpenApiDocumentFactory.CreateAsync(settings))
+        (await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath))
             .Should()
             .NotBeNull();
     }
@@ -29,7 +29,7 @@ public class OpenApiDocumentFactoryTests
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
-        (await OpenApiDocumentFactory.CreateAsync(settings))
+        (await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath))
             .Should()
             .NotBeNull();
     }

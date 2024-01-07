@@ -90,7 +90,9 @@ internal static class DependencyInjectionGenerator
             code.AppendLine();
         }
         
-        code.Remove(code.Length - 2, 2);
+#pragma warning disable RS1035
+        code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
+#pragma warning restore RS1035
         code.AppendLine();
         code.AppendLine("            return services;");
         code.AppendLine("        }");

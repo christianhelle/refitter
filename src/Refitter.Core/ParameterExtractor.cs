@@ -18,12 +18,12 @@ internal static class ParameterExtractor
 
         var queryParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p => $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetBodyParameterType(p, settings)} {p.VariableName}")
+            .Select(p => $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetQueryParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
-            .Select(p => $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetBodyParameterType(p, settings)} {p.VariableName}")
+            .Select(p => $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var headerParameters = new List<string>();
@@ -32,7 +32,7 @@ internal static class ParameterExtractor
         {
             headerParameters = operationModel.Parameters
                 .Where(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader)
-                .Select(p => $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetBodyParameterType(p, settings)} {p.VariableName}")
+                .Select(p => $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {p.VariableName}")
                 .ToList();
         }
 
@@ -98,7 +98,7 @@ internal static class ParameterExtractor
         return "[" + string.Join(", ", filteredAttributes) + "] ";
     }
 
-    private static string GetBodyParameterType(
+    private static string GetParameterType(
         ParameterModelBase parameterModel,
         RefitGeneratorSettings settings)
     {
@@ -111,6 +111,19 @@ internal static class ParameterExtractor
             !type.EndsWith("?") &&
             (parameterModel.IsNullable || parameterModel.IsOptional || !parameterModel.IsRequired))
             type += "?";
+
+        return type;
+    }
+
+    private static string GetQueryParameterType(
+        ParameterModelBase parameterModel,
+        RefitGeneratorSettings settings)
+    {
+        var type = GetParameterType(parameterModel, settings);
+
+        if (parameterModel.IsQuery && 
+            parameterModel.Type.Equals("object", StringComparison.OrdinalIgnoreCase))
+            type = "string";
 
         return type;
     }
