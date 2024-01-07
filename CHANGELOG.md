@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7.41-preview...HEAD)
 
+**Implemented enhancements:**
+
+- Use OasReader library for loading OAS documents with external references [\#267](https://github.com/christianhelle/refitter/pull/267) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - chore\(deps\): update dependency xunit to v2.6.5 [\#266](https://github.com/christianhelle/refitter/pull/266) ([renovate[bot]](https://github.com/apps/renovate))
