@@ -10,6 +10,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency oasreader to v1.6.11.14 [\#268](https://github.com/christianhelle/refitter/pull/268) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency xunit to v2.6.5 [\#266](https://github.com/christianhelle/refitter/pull/266) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add kami-poi as a contributor for ideas [\#261](https://github.com/christianhelle/refitter/pull/261) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
