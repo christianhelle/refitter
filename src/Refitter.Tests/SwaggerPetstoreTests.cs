@@ -486,4 +486,42 @@ public class SwaggerPetstoreTests
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().Contain("FindPetsByStatusAsync");
     }
+
+    [Theory]
+    [InlineData(OperationNameGeneratorTypes.Default)]
+    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromOperationId)]
+    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromPathSegments)]
+    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationName)]
+    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndPathSegments)]
+    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationId)]
+    [InlineData(OperationNameGeneratorTypes.SingleClientFromOperationId)]
+    [InlineData(OperationNameGeneratorTypes.SingleClientFromPathSegments)]
+    public async Task Can_Generate_Code_With_OperationNameGenerator(OperationNameGeneratorTypes type)
+    {
+        var version = SampleOpenSpecifications.SwaggerPetstoreJsonV3;
+        var filename = "SwaggerPetstore.json";
+        var settings = new RefitGeneratorSettings
+        {
+            OperationNameGenerator = type
+        };
+        var generateCode = await GenerateCode(version, filename, settings);
+        BuildHelper
+            .BuildCSharp(generateCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_Without_AdditionalProperties(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.GenerateDefaultAdditionalProperties = false;
+        settings.OperationNameTemplate = "{operationName}Async";
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotContain("Dictionary<string, object> AdditionalProperties");
+    }
 }
