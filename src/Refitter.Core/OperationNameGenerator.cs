@@ -44,9 +44,9 @@ internal class OperationNameGenerator : IOperationNameGenerator
                 break;
 
             default:
-                defaultGenerator = CheckForDuplicateOperationIds(document)
-                    ? new MultipleClientsFromFirstTagAndPathSegmentsOperationNameGenerator()
-                    : new MultipleClientsFromOperationIdOperationNameGenerator();
+                defaultGenerator = new MultipleClientsFromOperationIdOperationNameGenerator();
+                if (CheckForDuplicateOperationIds(document))
+                    defaultGenerator = new MultipleClientsFromFirstTagAndPathSegmentsOperationNameGenerator();
                 break;
         }
     }
