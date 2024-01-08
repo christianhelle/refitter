@@ -10,6 +10,8 @@
 
 **Merged pull requests:**
 
+- Implement CustomCSharpPropertyNameGenerator  [\#271](https://github.com/christianhelle/refitter/pull/271) ([christianhelle](https://github.com/christianhelle))
+- docs: add Xeevis as a contributor for bug [\#270](https://github.com/christianhelle/refitter/pull/270) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency oasreader to v1.6.11.14 [\#268](https://github.com/christianhelle/refitter/pull/268) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency xunit to v2.6.5 [\#266](https://github.com/christianhelle/refitter/pull/266) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add kami-poi as a contributor for ideas [\#261](https://github.com/christianhelle/refitter/pull/261) ([allcontributors[bot]](https://github.com/apps/allcontributors))
