@@ -46,7 +46,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             OperationNameTemplate = settings.OperationNameTemplate,
             OptionalParameters = settings.OptionalNullableParameters,
             TrimUnusedSchema = settings.TrimUnusedSchema,
-            KeepSchemaPatterns = settings.KeepSchemaPatterns ?? Array.Empty<string>()
+            KeepSchemaPatterns = settings.KeepSchemaPatterns ?? Array.Empty<string>(),
+            OperationNameGenerator = settings.OperationNameGenerator,
         };
 
         try

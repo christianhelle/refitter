@@ -1,5 +1,7 @@
 using System.ComponentModel;
 
+using Refitter.Core;
+
 using Spectre.Console.Cli;
 
 namespace Refitter;
@@ -126,4 +128,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--no-banner")]
     [DefaultValue(false)]
     public bool NoBanner { get; set; }
+    
+    [Description("The NSwag IOperationNameGenerator implementation to use")]
+    [CommandOption("--operation-name-generator")]
+    [DefaultValue(OperationNameGeneratorTypes.Default)]
+    public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
 }
