@@ -69,6 +69,7 @@ internal class OperationNameGenerator : IOperationNameGenerator
             .GetOperationName(document, path, httpMethod, operation)
             .CapitalizeFirstCharacter()
             .ConvertKebabCaseToPascalCase()
+            .ConvertSnakeCaseToPascalCase()
             .ConvertRouteToCamelCase()
             .ConvertSpacesToPascalCase()
             .ConvertColonsToPascalCase();
