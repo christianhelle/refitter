@@ -6,7 +6,7 @@
 [![Qodana](https://github.com/christianhelle/refitter/actions/workflows/qodana.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/qodana.yml)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-33-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-34-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -926,6 +926,7 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/manuel-fernandez-rodriguez"><img src="https://avatars.githubusercontent.com/u/48520205?v=4?s=100" width="100px;" alt="manuel-fernandez-rodriguez"/><br /><sub><b>manuel-fernandez-rodriguez</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amanuel-fernandez-rodriguez" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/eliyammine"><img src="https://avatars.githubusercontent.com/u/6644807?v=4?s=100" width="100px;" alt="Eli Yammine"/><br /><sub><b>Eli Yammine</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Aeliyammine" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kami-poi"><img src="https://avatars.githubusercontent.com/u/47322691?v=4?s=100" width="100px;" alt="kami-poi"/><br /><sub><b>kami-poi</b></sub></a><br /><a href="#ideas-kami-poi" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Xeevis"><img src="https://avatars.githubusercontent.com/u/5835044?v=4?s=100" width="100px;" alt="Xeevis"/><br /><sub><b>Xeevis</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AXeevis" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
