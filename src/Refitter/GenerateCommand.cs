@@ -48,6 +48,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             TrimUnusedSchema = settings.TrimUnusedSchema,
             KeepSchemaPatterns = settings.KeepSchemaPatterns ?? Array.Empty<string>(),
             OperationNameGenerator = settings.OperationNameGenerator,
+            GenerateDefaultAdditionalProperties = !settings.SkipDefaultAdditionalProperties,
         };
 
         try

@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 using NJsonSchema.CodeGeneration.CSharp;
 
 using NSwag;
@@ -11,6 +9,14 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 {
     public CustomCSharpClientGenerator Create()
     {
+        if (!settings.GenerateDefaultAdditionalProperties)
+        {
+            foreach (var kvp in document.Components.Schemas)
+            {
+                kvp.Value.ActualSchema.AllowAdditionalProperties = false;
+            }
+        }
+
         var generator = new CustomCSharpClientGenerator(
             document,
             new CSharpClientGeneratorSettings

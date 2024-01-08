@@ -133,4 +133,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--operation-name-generator")]
     [DefaultValue(OperationNameGeneratorTypes.Default)]
     public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
+
+    [Description("Set to true to skip default additional properties")]
+    [CommandOption("--skip-default-additional-properties")]
+    [DefaultValue(false)]
+    public bool SkipDefaultAdditionalProperties { get; set; }
 }
