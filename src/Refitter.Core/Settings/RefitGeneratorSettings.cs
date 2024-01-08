@@ -142,4 +142,14 @@ public class RefitGeneratorSettings
     /// This works in conjunction with <see cref="TrimUnusedSchema"/>.
     /// </summary>
     public string[] KeepSchemaPatterns { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// The NSwag IOperationNameGenerator implementation to use
+    /// </summary>
+    public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
+
+    /// <summary>
+    /// Set to <c>false</c> to skip default additional properties. Default is <c>true</c>
+    /// </summary>
+    public bool GenerateDefaultAdditionalProperties { get; set; } = true;
 }

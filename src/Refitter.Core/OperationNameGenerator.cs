@@ -3,17 +3,52 @@ using NSwag.CodeGeneration.OperationNameGenerators;
 
 using System.Diagnostics.CodeAnalysis;
 
+using GeneratorType = Refitter.Core.OperationNameGeneratorTypes;
+
 namespace Refitter.Core;
 
 internal class OperationNameGenerator : IOperationNameGenerator
 {
-    private readonly IOperationNameGenerator defaultGenerator =
-        new MultipleClientsFromOperationIdOperationNameGenerator();
+    private readonly IOperationNameGenerator defaultGenerator;
 
-    public OperationNameGenerator(OpenApiDocument document)
+    public OperationNameGenerator(OpenApiDocument document, RefitGeneratorSettings settings)
     {
-        if (CheckForDuplicateOperationIds(document))
-            defaultGenerator = new MultipleClientsFromFirstTagAndPathSegmentsOperationNameGenerator();
+        switch (settings.OperationNameGenerator)
+        {
+            case GeneratorType.MultipleClientsFromOperationId:
+                defaultGenerator = new MultipleClientsFromOperationIdOperationNameGenerator();
+                break;
+
+            case GeneratorType.MultipleClientsFromPathSegments:
+                defaultGenerator = new MultipleClientsFromPathSegmentsOperationNameGenerator();
+                break;
+
+            case GeneratorType.MultipleClientsFromFirstTagAndOperationId:
+                defaultGenerator = new MultipleClientsFromFirstTagAndOperationIdGenerator();
+                break;
+
+            case GeneratorType.MultipleClientsFromFirstTagAndOperationName:
+                defaultGenerator = new MultipleClientsFromFirstTagAndOperationNameGenerator();
+                break;
+
+            case GeneratorType.MultipleClientsFromFirstTagAndPathSegments:
+                defaultGenerator = new MultipleClientsFromFirstTagAndPathSegmentsOperationNameGenerator();
+                break;
+
+            case GeneratorType.SingleClientFromOperationId:
+                defaultGenerator = new SingleClientFromOperationIdOperationNameGenerator();
+                break;
+
+            case GeneratorType.SingleClientFromPathSegments:
+                defaultGenerator = new SingleClientFromPathSegmentsOperationNameGenerator();
+                break;
+
+            default:
+                defaultGenerator = new MultipleClientsFromOperationIdOperationNameGenerator();
+                if (CheckForDuplicateOperationIds(document))
+                    defaultGenerator = new MultipleClientsFromFirstTagAndPathSegmentsOperationNameGenerator();
+                break;
+        }
     }
 
     [ExcludeFromCodeCoverage]
@@ -34,11 +69,12 @@ internal class OperationNameGenerator : IOperationNameGenerator
             .GetOperationName(document, path, httpMethod, operation)
             .CapitalizeFirstCharacter()
             .ConvertKebabCaseToPascalCase()
+            .ConvertSnakeCaseToPascalCase()
             .ConvertRouteToCamelCase()
             .ConvertSpacesToPascalCase()
             .ConvertColonsToPascalCase();
 
-    public bool CheckForDuplicateOperationIds(
+    private bool CheckForDuplicateOperationIds(
         OpenApiDocument document)
     {
         List<string> operationNames = new();

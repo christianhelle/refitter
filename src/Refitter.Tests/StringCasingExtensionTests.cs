@@ -40,4 +40,9 @@ public class StringCasingExtensionTests
     [InlineData("foo:bar", "FooBar")]
     public void CanConvertColonsToPascalCase(string input, string expected)
         => input.ConvertColonsToPascalCase().Should().Be(expected);
+
+    [Theory]
+    [InlineData("foo_bar", "FooBar")]
+    public void CanConvertSnakeCaseToPascalCase(string input, string expected)
+        => input.ConvertSnakeCaseToPascalCase().Should().Be(expected);
 }

@@ -21,7 +21,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         this.settings = settings;
         this.document = document;
         this.generator = generator;
-        generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document);
+        generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
     public virtual RefitGeneratedCode GenerateCode()
