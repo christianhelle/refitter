@@ -2,11 +2,25 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7.41-preview...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7...HEAD)
 
 **Implemented enhancements:**
 
+- Support $ref references to separate files in OpenAPI specifications. [\#192](https://github.com/christianhelle/refitter/issues/192)
+- Configurable IOperationNameGenerator implementations [\#272](https://github.com/christianhelle/refitter/pull/272) ([christianhelle](https://github.com/christianhelle))
 - Use OasReader library for loading OAS documents with external references [\#267](https://github.com/christianhelle/refitter/pull/267) ([christianhelle](https://github.com/christianhelle))
+- Add support for OAS files with external references [\#260](https://github.com/christianhelle/refitter/pull/260) ([christianhelle](https://github.com/christianhelle))
+- Fix issue where codeGeneratorSettings arrayType setting is not respected in Refit interface [\#257](https://github.com/christianhelle/refitter/pull/257) ([christianhelle](https://github.com/christianhelle))
+- Show error reporting suggestion banner upon error [\#254](https://github.com/christianhelle/refitter/pull/254) ([christianhelle](https://github.com/christianhelle))
+- Add donation banner for Github Sponsors and buymeacoffee.com [\#252](https://github.com/christianhelle/refitter/pull/252) ([christianhelle](https://github.com/christianhelle))
+- Upgrade to .NET 8.0 [\#250](https://github.com/christianhelle/refitter/pull/250) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Already defines a member with the same parameter types [\#269](https://github.com/christianhelle/refitter/issues/269)
+- File not found when using uri [\#258](https://github.com/christianhelle/refitter/issues/258)
+- Unable to change arrayType to List or IList [\#255](https://github.com/christianhelle/refitter/issues/255)
+- I can not generate interface [\#249](https://github.com/christianhelle/refitter/issues/249)
 
 **Merged pull requests:**
 
@@ -16,28 +30,6 @@
 - chore\(deps\): update dependency xunit to v2.6.5 [\#266](https://github.com/christianhelle/refitter/pull/266) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update nswag monorepo to v14 \(major\) [\#262](https://github.com/christianhelle/refitter/pull/262) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add kami-poi as a contributor for ideas [\#261](https://github.com/christianhelle/refitter/pull/261) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-
-## [0.8.7.41-preview](https://github.com/christianhelle/refitter/tree/0.8.7.41-preview) (2024-01-03)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7...0.8.7.41-preview)
-
-**Implemented enhancements:**
-
-- Support $ref references to separate files in OpenAPI specifications. [\#192](https://github.com/christianhelle/refitter/issues/192)
-- Add support for OAS files with external references [\#260](https://github.com/christianhelle/refitter/pull/260) ([christianhelle](https://github.com/christianhelle))
-- Fix issue where codeGeneratorSettings arrayType setting is not respected in Refit interface [\#257](https://github.com/christianhelle/refitter/pull/257) ([christianhelle](https://github.com/christianhelle))
-- Show error reporting suggestion banner upon error [\#254](https://github.com/christianhelle/refitter/pull/254) ([christianhelle](https://github.com/christianhelle))
-- Add donation banner for Github Sponsors and buymeacoffee.com [\#252](https://github.com/christianhelle/refitter/pull/252) ([christianhelle](https://github.com/christianhelle))
-- Upgrade to .NET 8.0 [\#250](https://github.com/christianhelle/refitter/pull/250) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- File not found when using uri [\#258](https://github.com/christianhelle/refitter/issues/258)
-- Unable to change arrayType to List or IList [\#255](https://github.com/christianhelle/refitter/issues/255)
-- I can not generate interface [\#249](https://github.com/christianhelle/refitter/issues/249)
-
-**Merged pull requests:**
-
 - chore\(deps\): update xunit-dotnet monorepo [\#259](https://github.com/christianhelle/refitter/pull/259) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add eliyammine as a contributor for bug [\#256](https://github.com/christianhelle/refitter/pull/256) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Disable app data backup in AndroidManifest.xml for example MAUI app [\#253](https://github.com/christianhelle/refitter/pull/253) ([christianhelle](https://github.com/christianhelle))
