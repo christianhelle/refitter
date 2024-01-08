@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 using Refitter.Core;
 
@@ -128,14 +129,25 @@ public sealed class Settings : CommandSettings
     [CommandOption("--no-banner")]
     [DefaultValue(false)]
     public bool NoBanner { get; set; }
-    
-    [Description("The NSwag IOperationNameGenerator implementation to use")]
-    [CommandOption("--operation-name-generator")]
-    [DefaultValue(OperationNameGeneratorTypes.Default)]
-    public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
 
     [Description("Set to true to skip default additional properties")]
     [CommandOption("--skip-default-additional-properties")]
     [DefaultValue(false)]
     public bool SkipDefaultAdditionalProperties { get; set; }
+    
+    [Description("""
+                 The NSwag IOperationNameGenerator implementation to use. 
+                 May be one of: 
+                 - Default
+                 - MultipleClientsFromOperationId
+                 - MultipleClientsFromPathSegments
+                 - MultipleClientsFromFirstTagAndOperationId
+                 - MultipleClientsFromFirstTagAndOperationName
+                 - MultipleClientsFromFirstTagAndPathSegments
+                 - SingleClientFromOperationId
+                 - SingleClientFromPathSegments
+                 """)]
+    [CommandOption("--operation-name-generator")]
+    [DefaultValue(OperationNameGeneratorTypes.Default)]
+    public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
 }
