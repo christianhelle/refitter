@@ -79,6 +79,7 @@ OPTIONS:
                                                                  - MultipleClientsFromFirstTagAndPathSegments                                                                                              
                                                                  - SingleClientFromOperationId                                                                                                             
                                                                  - SingleClientFromPathSegments                                                                                                            
+                                                                 See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html for more information                                    
 ```
 
 To generate code from an OpenAPI specifications file, run the following:

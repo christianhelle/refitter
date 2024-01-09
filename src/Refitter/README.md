@@ -82,6 +82,7 @@ OPTIONS:
                                                                  - MultipleClientsFromFirstTagAndPathSegments                                                                                              
                                                                  - SingleClientFromOperationId                                                                                                             
                                                                  - SingleClientFromPathSegments                                                                                                            
+                                                                 See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html for more information                                    
 ```
 
 ### .Refitter File format
@@ -129,6 +130,8 @@ The following is an example `.refitter` file
     "^Model$",
     "^Person.+"
   ],
+  "generateDefaultAdditionalProperties": true, // Optional. default=true
+  "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional

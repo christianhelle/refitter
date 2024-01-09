@@ -146,6 +146,7 @@ public sealed class Settings : CommandSettings
                  - MultipleClientsFromFirstTagAndPathSegments
                  - SingleClientFromOperationId
                  - SingleClientFromPathSegments
+                 See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html for more information.
                  """)]
     [CommandOption("--operation-name-generator")]
     [DefaultValue(OperationNameGeneratorTypes.Default)]
