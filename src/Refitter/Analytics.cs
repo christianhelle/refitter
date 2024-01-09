@@ -65,6 +65,10 @@ public static class Analytics
             ((MultipleInterfaces)value) == MultipleInterfaces.Unset)
             return false;
         
+        if (property.PropertyType == typeof(OperationNameGeneratorTypes) && 
+            ((OperationNameGeneratorTypes)value) == OperationNameGeneratorTypes.Default)
+            return false;
+        
         return true;
     }
 
