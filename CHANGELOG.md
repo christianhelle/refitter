@@ -4,6 +4,14 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.1...HEAD)
 
+**Implemented enhancements:**
+
+- Serialize OperationNameGenerator enum as string [\#278](https://github.com/christianhelle/refitter/pull/278) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- `operationNameGenerator` enum not resolved from .refitter file [\#277](https://github.com/christianhelle/refitter/issues/277)
+
 **Merged pull requests:**
 
 - Remove Qodana workflow and badge [\#276](https://github.com/christianhelle/refitter/pull/276) ([christianhelle](https://github.com/christianhelle))
