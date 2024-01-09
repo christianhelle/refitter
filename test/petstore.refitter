@@ -17,5 +17,6 @@
     "dateType": "System.DateTime",
     "dateTimeType": "System.DateTime",
     "arrayType": "System.Collections.Generic.IList"
-  }
+  },
+  "operationNameGenerator": "Default"
 }
