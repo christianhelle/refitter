@@ -82,6 +82,7 @@ OPTIONS:
                                                                  - MultipleClientsFromFirstTagAndPathSegments                                                                                              
                                                                  - SingleClientFromOperationId                                                                                                             
                                                                  - SingleClientFromPathSegments                                                                                                            
+                                                                 See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html for more information                                    
 ```
 
 ### .Refitter File format
