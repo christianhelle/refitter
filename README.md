@@ -250,6 +250,8 @@ The following is an example `.refitter` file
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
 - `trimUnusedSchema` - Removes unreferenced components schema to keep the generated output to a minimum
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
+- `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
+- `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
