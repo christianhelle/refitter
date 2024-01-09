@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Add new options to .refitter file format docs [\#274](https://github.com/christianhelle/refitter/pull/274) ([christianhelle](https://github.com/christianhelle))
 - Update --operation-name-generator options documentation [\#273](https://github.com/christianhelle/refitter/pull/273) ([christianhelle](https://github.com/christianhelle))
 
 ## [0.9.0](https://github.com/christianhelle/refitter/tree/0.9.0) (2024-01-08)
