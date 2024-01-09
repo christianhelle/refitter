@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.1...HEAD)
+
+**Merged pull requests:**
+
+- Remove Qodana workflow and badge [\#276](https://github.com/christianhelle/refitter/pull/276) ([christianhelle](https://github.com/christianhelle))
+- Update dependency Microsoft.Extensions.Http.Polly to v8.0.1 [\#275](https://github.com/christianhelle/refitter/pull/275) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [0.9.1](https://github.com/christianhelle/refitter/tree/0.9.1) (2024-01-09)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.0...0.9.1)
 
 **Merged pull requests:**
 
