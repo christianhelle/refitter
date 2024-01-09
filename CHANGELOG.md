@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.0...HEAD)
+
+**Merged pull requests:**
+
+- Update --operation-name-generator options documentation [\#273](https://github.com/christianhelle/refitter/pull/273) ([christianhelle](https://github.com/christianhelle))
+
+## [0.9.0](https://github.com/christianhelle/refitter/tree/0.9.0) (2024-01-08)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.8.7...0.9.0)
 
 **Implemented enhancements:**
 
