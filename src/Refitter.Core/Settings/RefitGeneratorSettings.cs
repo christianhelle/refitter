@@ -146,6 +146,7 @@ public class RefitGeneratorSettings
     /// <summary>
     /// The NSwag IOperationNameGenerator implementation to use
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
 
     /// <summary>
