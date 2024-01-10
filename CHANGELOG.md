@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.2...HEAD)
+
+**Implemented enhancements:**
+
+- Fix type accessibility deserialization. [\#279](https://github.com/christianhelle/refitter/pull/279) ([DJ4ddi](https://github.com/DJ4ddi))
+
+**Merged pull requests:**
+
+- docs: add DJ4ddi as a contributor for code [\#280](https://github.com/christianhelle/refitter/pull/280) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
+## [0.9.2](https://github.com/christianhelle/refitter/tree/0.9.2) (2024-01-09)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.1...0.9.2)
 
 **Implemented enhancements:**
 
