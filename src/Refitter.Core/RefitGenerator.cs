@@ -3,10 +3,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Extensions;
-using Microsoft.OpenApi.Readers;
-
 namespace Refitter.Core;
 
 /// <summary>
@@ -128,6 +124,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     {
         var factory = new CSharpClientGeneratorFactory(settings, document);
         var generator = factory.Create();
+        var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = RefitInterfaceImports
             .GetImportedNamespaces(settings)
             .Aggregate(
@@ -136,9 +133,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
-            MultipleInterfaces.ByEndpoint => new RefitMultipleInterfaceGenerator(settings, document, generator),
-            MultipleInterfaces.ByTag => new RefitMultipleInterfaceByTagGenerator(settings, document, generator),
-            _ => new RefitInterfaceGenerator(settings, document, generator),
+            MultipleInterfaces.ByEndpoint => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
+            MultipleInterfaces.ByTag => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
+            _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
         };
 
         var generatedCode = GenerateClient(interfaceGenerator);

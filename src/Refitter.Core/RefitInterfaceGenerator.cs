@@ -12,15 +12,18 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     protected readonly RefitGeneratorSettings settings;
     protected readonly OpenApiDocument document;
     protected readonly CustomCSharpClientGenerator generator;
+    protected readonly XmlDocumentationGenerator docGenerator;
 
     internal RefitInterfaceGenerator(
         RefitGeneratorSettings settings,
         OpenApiDocument document,
-        CustomCSharpClientGenerator generator)
+        CustomCSharpClientGenerator generator,
+        XmlDocumentationGenerator docGenerator)
     {
         this.settings = settings;
         this.document = document;
         this.generator = generator;
+        this.docGenerator = docGenerator;
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
@@ -58,7 +61,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
                 var parametersString = string.Join(", ", parameters);
 
-                GenerateMethodXmlDocComments(operation, code);
+                this.docGenerator.AppendMethodDocumentation(operationModel, code);
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);
@@ -177,22 +180,6 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
     }
 
-    protected void GenerateMethodXmlDocComments(OpenApiOperation operation, StringBuilder code)
-    {
-        if (!settings.GenerateXmlDocCodeComments)
-            return;
-
-        if (!string.IsNullOrWhiteSpace(operation.Description))
-        {
-            code.AppendLine($"{Separator}{Separator}/// <summary>");
-
-            foreach (var line in operation.Description.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
-                code.AppendLine($"{Separator}{Separator}/// {line.Trim()}");
-
-            code.AppendLine($"{Separator}{Separator}/// </summary>");
-        }
-    }
-
     protected void GenerateObsoleteAttribute(OpenApiOperation operation, StringBuilder code)
     {
         if (operation.IsDeprecated)
@@ -213,20 +200,6 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 {Separator}{GetGeneratedCodeAttribute()}
                 {Separator}{modifier} partial interface I{title.CapitalizeFirstCharacter()}
                 """;
-    }
-
-    protected void GenerateInterfaceXmlDocComments(OpenApiOperation operation, StringBuilder code)
-    {
-        if (!settings.GenerateXmlDocCodeComments ||
-            string.IsNullOrWhiteSpace(operation.Summary))
-            return;
-
-        code.AppendLine(
-            $"""
-             {Separator}/// <summary>
-             {Separator}/// {operation.Summary}
-             {Separator}/// </summary>
-             """);
     }
 
     protected string GetGeneratedCodeAttribute() =>
