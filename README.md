@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-34-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-35-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -942,6 +942,7 @@ Returns a response that looks something like this:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/eliyammine"><img src="https://avatars.githubusercontent.com/u/6644807?v=4?s=100" width="100px;" alt="Eli Yammine"/><br /><sub><b>Eli Yammine</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Aeliyammine" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kami-poi"><img src="https://avatars.githubusercontent.com/u/47322691?v=4?s=100" width="100px;" alt="kami-poi"/><br /><sub><b>kami-poi</b></sub></a><br /><a href="#ideas-kami-poi" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Xeevis"><img src="https://avatars.githubusercontent.com/u/5835044?v=4?s=100" width="100px;" alt="Xeevis"/><br /><sub><b>Xeevis</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AXeevis" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DJ4ddi"><img src="https://avatars.githubusercontent.com/u/1696102?v=4?s=100" width="100px;" alt="DJ4ddi"/><br /><sub><b>DJ4ddi</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=DJ4ddi" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
