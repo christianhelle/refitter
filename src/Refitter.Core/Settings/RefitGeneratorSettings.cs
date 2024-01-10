@@ -59,6 +59,7 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Gets or sets the generated type accessibility. (default: Public)
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public TypeAccessibility TypeAccessibility { get; set; } = TypeAccessibility.Public;
 
     /// <summary>
