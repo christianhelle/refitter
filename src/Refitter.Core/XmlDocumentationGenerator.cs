@@ -74,7 +74,7 @@ public class XmlDocumentationGenerator
             this.AppendXmlCommentBlock("returns", method.ResultDescription, code);
         }
 
-        this.AppendXmlCommentBlock("throws", BuildErrorDescription(method.Responses), code, new Dictionary<string, string>
+        this.AppendXmlCommentBlock("throws", this.BuildErrorDescription(method.Responses), code, new Dictionary<string, string>
             { ["cref"] = "ApiException" });
     }
 
@@ -125,11 +125,11 @@ public class XmlDocumentationGenerator
     /// </summary>
     /// <param name="responses">The responses to document.</param>
     /// <returns>A string detailing the response codes and their description (if available).</returns>
-    private static string BuildErrorDescription(IReadOnlyCollection<CSharpResponseModel> responses)
+    private string BuildErrorDescription(IEnumerable<CSharpResponseModel> responses)
     {
         var errorDescription = new StringBuilder("Thrown when the request returns a non-success status code");
         var errorResponses = responses.Where(response => !HttpUtilities.IsSuccessStatusCode(response.StatusCode)).ToList();
-        if (!errorResponses.Any())
+        if (!this._settings.GenerateExceptionStatusComments || !errorResponses.Any())
             return errorDescription.Append(".").ToString();
 
         errorDescription.Append(":");

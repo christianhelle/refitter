@@ -19,7 +19,7 @@ namespace Refitter.Tests
         /// <summary>
         /// The generator to use for testing.
         /// </summary>
-        private readonly XmlDocumentationGenerator _generator =
+        private XmlDocumentationGenerator _generator =
             new(new RefitGeneratorSettings { GenerateXmlDocCodeComments = true });
 
         private static CSharpOperationModel CreateOperationModel(OpenApiOperation operation)
@@ -45,7 +45,8 @@ namespace Refitter.Tests
             var interfaceDefinition = new OpenApiOperation { Summary = "Test\n", };
             this._generator.AppendInterfaceDocumentation(interfaceDefinition, docs);
             docs.ToString().Trim().Should().NotBe("/// <summary>Test</summary>");
-            docs.ToString().Trim().Should().Contain("<summary>").And.Contain("Test");
+            docs.ToString().Trim().Should().Contain("<summary>")
+                .And.Contain("Test");
         }
 
         [Fact]
@@ -108,13 +109,37 @@ namespace Refitter.Tests
         [Fact]
         public void Can_Generate_Method_Throws_With_Response_Code()
         {
+            this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+            {
+                GenerateXmlDocCodeComments = true,
+                GenerateExceptionStatusComments = true,
+            });
             var docs = new StringBuilder();
             var method = CreateOperationModel(new OpenApiOperation
             {
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
             this._generator.AppendMethodDocumentation(method, docs);
-            docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">").And.Contain("/// 400: TestResponse");
+            docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">")
+                .And.Contain("/// 400: TestResponse");
+        }
+
+        [Fact]
+        public void Can_Generate_Method_Throws_Without_Response_Code()
+        {
+            this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+            {
+                GenerateXmlDocCodeComments = true,
+                GenerateExceptionStatusComments = false,
+            });
+            var docs = new StringBuilder();
+            var method = CreateOperationModel(new OpenApiOperation
+            {
+                Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
+            });
+            this._generator.AppendMethodDocumentation(method, docs);
+            docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">")
+                .And.NotContain("/// 400: TestResponse");
         }
     }
 }
