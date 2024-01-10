@@ -18,5 +18,6 @@
     "dateTimeType": "System.DateTime",
     "arrayType": "System.Collections.Generic.IList"
   },
-  "operationNameGenerator": "Default"
+  "operationNameGenerator": "default",
+  "typeAccessibility": "internal"
 }
