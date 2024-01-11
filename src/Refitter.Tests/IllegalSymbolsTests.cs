@@ -8,10 +8,10 @@ using Xunit;
 
 namespace Refitter.Tests;
 
-public class IllegalSymbolsInPathTests
+public class IllegalSymbolsTests
 {
     [Fact]
-    public async Task Compiler_Could_Build_Generated_Code_From_Swagger_With_Illegal_Symbols()
+    public async Task Compiler_Should_Build_Generated_Code_From_Swagger_With_Illegal_Symbols_In_Paths()
     {
         var generateCode = await GenerateCode("SwaggerIllegalPaths");
         BuildHelper
