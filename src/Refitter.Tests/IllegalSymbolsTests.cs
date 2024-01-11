@@ -11,7 +11,7 @@ namespace Refitter.Tests;
 public class IllegalSymbolsTests
 {
     [Fact]
-    public async Task Illegal_Symbols_In_Paths__Should_Compile_Successfully()
+    public async Task Illegal_Symbols_In_Paths__Should_Build_Successfully()
     {
         var generateCode = await GenerateCode(EmbeddedResources.SwaggerIllegalPathsJsonV3);
         BuildHelper
@@ -21,7 +21,7 @@ public class IllegalSymbolsTests
     }
 
     [Fact]
-    public async Task Illegal_Symbols_In_Title__Should_Compile_Successfully()
+    public async Task Illegal_Symbols_In_Title__Should_Build_Successfully()
     {
         var generateCode = await GenerateCode(EmbeddedResources.SwaggerIllegalSymbolsInTitleJsonV3);
         BuildHelper
