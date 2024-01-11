@@ -112,6 +112,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             .OperationNameGenerator
             .GetOperationName(document, path, verb, operation);
 
+        operationName = IdentifierUtils.Sanitize(operationName);
+
         if (capitalizeFirstCharacter)
             operationName = operationName.CapitalizeFirstCharacter();
 
@@ -121,7 +123,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 .Replace(operationNamePlaceholder, operationName);
         }
 
-        return IdentifierUtils.Sanitize(operationName);
+        return operationName;
     }
 
     protected static void GenerateForMultipartFormData(CSharpOperationModel operationModel, StringBuilder code)
