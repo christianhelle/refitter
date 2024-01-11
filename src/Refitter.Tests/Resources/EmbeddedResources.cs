@@ -107,6 +107,17 @@ public static class EmbeddedResources
         }
     }
 
+    public static string SwaggerIllegalSymbolsInTitleJsonV3
+    {
+        get
+        {
+            using var stream = GetStream("V3.SwaggerIllegalTitle.json");
+            using var reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
+        }
+    }
+
     public static string GetSwaggerPetstore(SampleOpenSpecifications version)
     {
         return version switch

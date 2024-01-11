@@ -11,9 +11,19 @@ namespace Refitter.Tests;
 public class IllegalSymbolsTests
 {
     [Fact]
-    public async Task Compiler_Should_Build_Generated_Code_From_Swagger_With_Illegal_Symbols_In_Paths()
+    public async Task Illegal_Symbols_In_Paths__Should_Compile_Successfully()
     {
-        var generateCode = await GenerateCode("SwaggerIllegalPaths");
+        var generateCode = await GenerateCode(EmbeddedResources.SwaggerIllegalPathsJsonV3);
+        BuildHelper
+            .BuildCSharp(generateCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Fact]
+    public async Task Illegal_Symbols_In_Title__Should_Compile_Successfully()
+    {
+        var generateCode = await GenerateCode(EmbeddedResources.SwaggerIllegalSymbolsInTitleJsonV3);
         BuildHelper
             .BuildCSharp(generateCode)
             .Should()
@@ -21,10 +31,10 @@ public class IllegalSymbolsTests
     }
 
     private static async Task<string> GenerateCode(
-        string filename,
+        string content,
         RefitGeneratorSettings? settings = null)
     {
-        var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.SwaggerIllegalPathsJsonV3, filename);
+        var swaggerFile = await TestFile.CreateSwaggerFile(content, Guid.NewGuid().ToString());
         if (settings is null)
         {
             settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
