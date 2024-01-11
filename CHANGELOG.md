@@ -6,11 +6,13 @@
 
 **Implemented enhancements:**
 
+- Add return type override setting. [\#286](https://github.com/christianhelle/refitter/pull/286) ([DJ4ddi](https://github.com/DJ4ddi))
 - Fixed operation name generation names when it has illegal symbols [\#283](https://github.com/christianhelle/refitter/pull/283) ([yadanilov19](https://github.com/yadanilov19))
 - Provide more extensive method documentation. [\#281](https://github.com/christianhelle/refitter/pull/281) ([DJ4ddi](https://github.com/DJ4ddi))
 
 **Merged pull requests:**
 
+- Align file format and output examples in docs [\#285](https://github.com/christianhelle/refitter/pull/285) ([christianhelle](https://github.com/christianhelle))
 - docs: add yadanilov19 as a contributor for code [\#284](https://github.com/christianhelle/refitter/pull/284) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add DJ4ddi as a contributor for ideas [\#282](https://github.com/christianhelle/refitter/pull/282) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
