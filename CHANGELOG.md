@@ -6,10 +6,12 @@
 
 **Implemented enhancements:**
 
+- Fixed operation name generation names when it has illegal symbols [\#283](https://github.com/christianhelle/refitter/pull/283) ([yadanilov19](https://github.com/yadanilov19))
 - Provide more extensive method documentation. [\#281](https://github.com/christianhelle/refitter/pull/281) ([DJ4ddi](https://github.com/DJ4ddi))
 
 **Merged pull requests:**
 
+- docs: add yadanilov19 as a contributor for code [\#284](https://github.com/christianhelle/refitter/pull/284) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add DJ4ddi as a contributor for ideas [\#282](https://github.com/christianhelle/refitter/pull/282) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
 ## [0.9.3.42-preview](https://github.com/christianhelle/refitter/tree/0.9.3.42-preview) (2024-01-10)
