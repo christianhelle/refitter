@@ -138,10 +138,17 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings
         {
             ReturnIApiResponse = false,
-            ResponseTypeOverride = { ["getPetById"] = "IApiResponse<Pet>" },
+            ResponseTypeOverride =
+            {
+                ["getPetById"] = "IApiResponse<Pet>", // Wrap existing type
+                ["deletePet"] = "Pet", // Add type where there was none
+                ["addPet"] = "void", // Remove type
+            },
         };
         var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("Task<IApiResponse<Pet>>", Exactly.Once());
+        generateCode.Should().Contain("Task<IApiResponse<Pet>> GetPetById");
+        generateCode.Should().Contain("Task<Pet> DeletePet");
+        generateCode.Should().Contain("Task AddPet");
     }
 
     [Theory]
