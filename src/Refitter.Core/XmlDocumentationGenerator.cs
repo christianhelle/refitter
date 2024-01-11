@@ -80,7 +80,7 @@ public class XmlDocumentationGenerator
                 // Document the result with a fallback description.
                 var description = method.ResultDescription;
                 if (string.IsNullOrWhiteSpace(description))
-                    description = "A <see cref=\"Task\"> representing the result of the request.";
+                    description = "A <see cref=\"Task\"/> representing the result of the request.";
                 this.AppendXmlCommentBlock("returns", description, code);
             }
             else
@@ -88,7 +88,7 @@ public class XmlDocumentationGenerator
                 // Document the returned task even when there is no result.
                 this.AppendXmlCommentBlock(
                     "returns",
-                    "A <see cref=\"Task\"> that completes when the request is finished.",
+                    "A <see cref=\"Task\"/> that completes when the request is finished.",
                     code);
             }
 
@@ -164,7 +164,7 @@ public class XmlDocumentationGenerator
     private string BuildApiResponseDescription(IEnumerable<CSharpResponseModel> responses)
     {
         return this.BuildResponseDescription(
-            "A <see cref=\"Task\"> representing the <see cref=\"IApiResponse\"> instance containing the result",
+            "A <see cref=\"Task\"/> representing the <see cref=\"IApiResponse\"/> instance containing the result",
             responses);
     }
 
