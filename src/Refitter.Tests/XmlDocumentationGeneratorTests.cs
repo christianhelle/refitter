@@ -98,6 +98,32 @@ namespace Refitter.Tests
         }
 
         [Fact]
+        public void Can_Generate_Method_Returns_With_Empty_Result()
+        {
+            var docs = new StringBuilder();
+            var method = CreateOperationModel(new OpenApiOperation {
+                Responses =
+                {
+                    ["200"] = new OpenApiResponse { Content = { [""] = new OpenApiMediaType() } },
+                },
+                Produces = ["application/json"],
+            });
+            this._generator.AppendMethodDocumentation(method, docs);
+            docs.ToString().Should().Contain("/// <returns>")
+                .And.Contain("Task");
+        }
+
+        [Fact]
+        public void Can_Generate_Method_Returns_Without_Result()
+        {
+            var docs = new StringBuilder();
+            var method = CreateOperationModel(new OpenApiOperation());
+            this._generator.AppendMethodDocumentation(method, docs);
+            docs.ToString().Should().Contain("/// <returns>")
+                .And.Contain("Task");
+        }
+
+        [Fact]
         public void Can_Generate_Method_Throws()
         {
             var docs = new StringBuilder();

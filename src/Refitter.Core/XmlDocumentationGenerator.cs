@@ -75,8 +75,22 @@ public class XmlDocumentationGenerator
         }
         else
         {
-            if (method.HasResult && !string.IsNullOrWhiteSpace(method.ResultDescription))
-                this.AppendXmlCommentBlock("returns", method.ResultDescription, code);
+            if (method.HasResult)
+            {
+                // Document the result with a fallback description.
+                var description = method.ResultDescription;
+                if (string.IsNullOrWhiteSpace(description))
+                    description = "A <see cref=\"Task\"> representing the result of the request.";
+                this.AppendXmlCommentBlock("returns", description, code);
+            }
+            else
+            {
+                // Document the returned task even when there is no result.
+                this.AppendXmlCommentBlock(
+                    "returns",
+                    "A <see cref=\"Task\"> that completes when the request is finished.",
+                    code);
+            }
 
             this.AppendXmlCommentBlock(
                 "throws",
@@ -113,6 +127,7 @@ public class XmlDocumentationGenerator
         var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
         if (lines.Length > 1)
         {
+            // When working with multiple lines, place the content on a separate line with normalized linebreaks.
             code.AppendLine();
             foreach (var line in content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
                 code.AppendLine($"{indent}/// {line.Trim()}");
@@ -121,6 +136,7 @@ public class XmlDocumentationGenerator
         }
         else
         {
+            // When the content only has a single line, place it on the same line as the tag.
             code.AppendLine($"{content}</{tagName}>");
         }
     }
@@ -148,7 +164,7 @@ public class XmlDocumentationGenerator
     private string BuildApiResponseDescription(IEnumerable<CSharpResponseModel> responses)
     {
         return this.BuildResponseDescription(
-            "An <see cref=\"IApiResponse\"> instance containing the result",
+            "A <see cref=\"Task\"> representing the <see cref=\"IApiResponse\"> instance containing the result",
             responses);
     }
 
