@@ -184,7 +184,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     /// <returns>True if the type is an ApiResponse Task or similar, false otherwise.</returns>
     protected static bool IsApiResponseType(string typeName)
     {
-        return Regex.IsMatch(typeName, "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>");
+        return Regex.IsMatch(
+            typeName,
+            "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(1));
     }
 
     private string GetConfiguredReturnType(string returnTypeParameter)
