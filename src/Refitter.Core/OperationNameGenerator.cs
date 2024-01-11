@@ -67,13 +67,13 @@ internal class OperationNameGenerator : IOperationNameGenerator
         OpenApiOperation operation) =>
         defaultGenerator
             .GetOperationName(document, path, httpMethod, operation)
-            .Sanitize()
-            .CapitalizeFirstCharacter()
             .ConvertKebabCaseToPascalCase()
             .ConvertSnakeCaseToPascalCase()
             .ConvertRouteToCamelCase()
             .ConvertSpacesToPascalCase()
-            .ConvertColonsToPascalCase();
+            .ConvertColonsToPascalCase()
+            .Sanitize()
+            .CapitalizeFirstCharacter();
 
     private bool CheckForDuplicateOperationIds(
         OpenApiDocument document)
