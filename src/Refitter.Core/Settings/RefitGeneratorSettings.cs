@@ -37,9 +37,10 @@ public class RefitGeneratorSettings
     public bool GenerateXmlDocCodeComments { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the ApiException should be documented with all specified error codes.
+    /// Gets or sets a value indicating whether <c>ApiException</c> and <c>IApiResponse</c> should be documented with
+    /// the relevant status codes specified in the OpenAPI document.
     /// </summary>
-    public bool GenerateExceptionStatusComments { get; set; } = true;
+    public bool GenerateStatusCodeComments { get; set; } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether to add auto-generated header.

@@ -128,7 +128,7 @@ public class XmlDocumentationGenerator
     /// <summary>
     /// Generates a human readable error description for the given endpoint responses. This includes available
     /// documentation for response codes below 200 or above 299 if the
-    /// <see cref="RefitGeneratorSettings.GenerateExceptionStatusComments"/> setting is enabled.
+    /// <see cref="RefitGeneratorSettings.GenerateStatusCodeComments"/> setting is enabled.
     /// </summary>
     /// <param name="responses">The responses to document.</param>
     /// <returns>A string detailing the error codes and their description.</returns>
@@ -141,7 +141,7 @@ public class XmlDocumentationGenerator
 
     /// <summary>
     /// Generates a human readable result description for the given endpoint responses. This includes all documented
-    /// response codes if the <see cref="RefitGeneratorSettings.GenerateExceptionStatusComments"/> setting is enabled.
+    /// response codes if the <see cref="RefitGeneratorSettings.GenerateStatusCodeComments"/> setting is enabled.
     /// </summary>
     /// <param name="responses">The responses to document.</param>
     /// <returns>A string detailing the response codes and their description.</returns>
@@ -162,7 +162,7 @@ public class XmlDocumentationGenerator
     {
         var description = new StringBuilder(text);
         var responseList = responses.ToList();
-        if (!this._settings.GenerateExceptionStatusComments || !responseList.Any())
+        if (!this._settings.GenerateStatusCodeComments || !responseList.Any())
             return description.Append(".").ToString();
 
         description.Append(":");
