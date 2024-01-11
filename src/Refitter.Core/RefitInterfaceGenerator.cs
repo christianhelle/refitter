@@ -112,8 +112,6 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             .OperationNameGenerator
             .GetOperationName(document, path, verb, operation);
 
-        operationName = IdentifierUtils.Sanitize(operationName);
-
         if (capitalizeFirstCharacter)
             operationName = operationName.CapitalizeFirstCharacter();
 

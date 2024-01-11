@@ -37,7 +37,7 @@ internal static class IdentifierUtils
     /// <summary>
     /// Removes invalid character from an identifier string
     /// </summary>
-    public static string Sanitize(string value)
+    public static string Sanitize(this string value)
     {
         return string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries))
                 .Trim(['_']);
