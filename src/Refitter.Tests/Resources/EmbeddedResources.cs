@@ -13,6 +13,7 @@ public static class EmbeddedResources
         {
             using var stream = GetStream("V2.SwaggerPetstore.json");
             using var reader = new StreamReader(stream);
+
             return reader.ReadToEnd();
         }
     }
@@ -23,6 +24,7 @@ public static class EmbeddedResources
         {
             using var stream = GetStream("V3.SwaggerPetstore.json");
             using var reader = new StreamReader(stream);
+
             return reader.ReadToEnd();
         }
     }
@@ -33,6 +35,7 @@ public static class EmbeddedResources
         {
             using var stream = GetStream("V2.SwaggerPetstore.yaml");
             using var reader = new StreamReader(stream);
+
             return reader.ReadToEnd();
         }
     }
@@ -43,6 +46,7 @@ public static class EmbeddedResources
         {
             using var stream = GetStream("V3.SwaggerPetstore.yaml");
             using var reader = new StreamReader(stream);
+
             return reader.ReadToEnd();
         }
     }
@@ -54,6 +58,7 @@ public static class EmbeddedResources
         {
             using var stream = GetStream("V2.SwaggerPetstoreWithDifferentHeaders.json");
             using var reader = new StreamReader(stream);
+
             return reader.ReadToEnd();
         }
     }
@@ -64,6 +69,7 @@ public static class EmbeddedResources
         {
             using var stream = GetStream("V3.SwaggerPetstoreWithDifferentHeaders.json");
             using var reader = new StreamReader(stream);
+
             return reader.ReadToEnd();
         }
     }
@@ -74,6 +80,7 @@ public static class EmbeddedResources
         {
             using var stream = GetStream("V2.SwaggerPetstoreWithDifferentHeaders.yaml");
             using var reader = new StreamReader(stream);
+
             return reader.ReadToEnd();
         }
     }
@@ -84,11 +91,32 @@ public static class EmbeddedResources
         {
             using var stream = GetStream("V3.SwaggerPetstoreWithDifferentHeaders.yaml");
             using var reader = new StreamReader(stream);
+
             return reader.ReadToEnd();
         }
     }
 
+    public static string SwaggerIllegalPathsJsonV3
+    {
+        get
+        {
+            using var stream = GetStream("V3.SwaggerIllegalPaths.json");
+            using var reader = new StreamReader(stream);
 
+            return reader.ReadToEnd();
+        }
+    }
+
+    public static string SwaggerIllegalSymbolsInTitleJsonV3
+    {
+        get
+        {
+            using var stream = GetStream("V3.SwaggerIllegalTitle.json");
+            using var reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
+        }
+    }
 
     public static string GetSwaggerPetstore(SampleOpenSpecifications version)
     {
@@ -98,10 +126,14 @@ public static class EmbeddedResources
             SampleOpenSpecifications.SwaggerPetstoreJsonV3 => SwaggerPetstoreJsonV3,
             SampleOpenSpecifications.SwaggerPetstoreYamlV2 => SwaggerPetstoreYamlV2,
             SampleOpenSpecifications.SwaggerPetstoreYamlV3 => SwaggerPetstoreYamlV3,
-            SampleOpenSpecifications.SwaggerPetstoreJsonV2WithDifferentHeaders => SwaggerPetstoreJsonV2WithDifferentHeaders,
-            SampleOpenSpecifications.SwaggerPetstoreJsonV3WithDifferentHeaders => SwaggerPetstoreJsonV3WithDifferentHeaders,
-            SampleOpenSpecifications.SwaggerPetstoreYamlV2WithDifferentHeaders => SwaggerPetstoreYamlV2WithDifferentHeaders,
-            SampleOpenSpecifications.SwaggerPetstoreYamlV3WithDifferentHeaders => SwaggerPetstoreYamlV3WithDifferentHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreJsonV2WithDifferentHeaders =>
+                SwaggerPetstoreJsonV2WithDifferentHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreJsonV3WithDifferentHeaders =>
+                SwaggerPetstoreJsonV3WithDifferentHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreYamlV2WithDifferentHeaders =>
+                SwaggerPetstoreYamlV2WithDifferentHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreYamlV3WithDifferentHeaders =>
+                SwaggerPetstoreYamlV3WithDifferentHeaders,
             _ => throw new ArgumentOutOfRangeException(nameof(version), version, null)
         };
     }
