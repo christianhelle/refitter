@@ -14,19 +14,27 @@ internal static class IdentifierUtils
         }
 
         var counter = 2;
-        while (knownIdentifiers.Contains(string.IsNullOrEmpty(parent) ? $"{name}{counter}{suffix}" : $"{parent}.{name}{counter}{suffix}"))
+        while (knownIdentifiers.Contains(string.IsNullOrEmpty(parent)
+                   ? $"{name}{counter}{suffix}"
+                   : $"{parent}.{name}{counter}{suffix}"))
             counter++;
 
         return $"{name}{counter}{suffix}";
     }
+
+    private static char[] IllegalSymbols =
+        [
+            ' ', '-', '.', '!', '@', '"',
+            '\'', '\n', '\t', '#', '$', '%',
+            '^', '&', '*', '(', ')', ',', ':',
+            ';', '[', ']', '}', '{'
+        ];
 
     /// <summary>
     /// Removes invalid character from an identifier string
     /// </summary>
     public static string Sanitize(string value)
     {
-        return value.Replace(" ", string.Empty)
-            .Replace("-", string.Empty)
-            .Replace(".", string.Empty);
+        return string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries));
     }
 }
