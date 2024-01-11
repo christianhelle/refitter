@@ -112,7 +112,7 @@ namespace Refitter.Tests
             this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
             {
                 GenerateXmlDocCodeComments = true,
-                GenerateExceptionStatusComments = true,
+                GenerateStatusCodeComments = true,
             });
             var docs = new StringBuilder();
             var method = CreateOperationModel(new OpenApiOperation
@@ -130,7 +130,7 @@ namespace Refitter.Tests
             this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
             {
                 GenerateXmlDocCodeComments = true,
-                GenerateExceptionStatusComments = false,
+                GenerateStatusCodeComments = false,
             });
             var docs = new StringBuilder();
             var method = CreateOperationModel(new OpenApiOperation
