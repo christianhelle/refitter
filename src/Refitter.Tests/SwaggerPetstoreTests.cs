@@ -133,6 +133,29 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_Type_Override(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            ReturnIApiResponse = false,
+            ResponseTypeOverride =
+            {
+                ["getPetById"] = "IApiResponse<Pet>", // Wrap existing type
+                ["deletePet"] = "Pet", // Add type where there was none
+                ["addPet"] = "void", // Remove type
+            },
+        };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("Task<IApiResponse<Pet>> GetPetById");
+        generateCode.Should().Contain("Task<Pet> DeletePet");
+        generateCode.Should().Contain("Task AddPet");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Internal_Contract_Types(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();

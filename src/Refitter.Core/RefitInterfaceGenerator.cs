@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
@@ -61,7 +62,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
                 var parametersString = string.Join(", ", parameters);
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, code);
+                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), code);
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);
@@ -77,6 +78,9 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
     protected string GetTypeName(OpenApiOperation operation)
     {
+        if (settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
+            return type is null or "void" ? "Task" : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(type)}>";
+
         var returnTypeParameter = 
             (new[] { "200", "201", "203", "206" })
                 .Where(operation.Responses.ContainsKey)
@@ -171,6 +175,20 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         return settings.ReturnIApiResponse
             ? "Task<IApiResponse>"
             : "Task";
+    }
+
+    /// <summary>
+    /// Checks if the given return type is derived from <c>ApiResponse</c> or its interface.
+    /// </summary>
+    /// <param name="typeName">The name of the type to check.</param>
+    /// <returns>True if the type is an ApiResponse Task or similar, false otherwise.</returns>
+    protected static bool IsApiResponseType(string typeName)
+    {
+        return Regex.IsMatch(
+            typeName,
+            "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(1));
     }
 
     private string GetConfiguredReturnType(string returnTypeParameter)

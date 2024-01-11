@@ -54,7 +54,7 @@ namespace Refitter.Tests
         {
             var docs = new StringBuilder();
             var method = CreateOperationModel(new OpenApiOperation { Summary = "TestSummary", });
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, false, docs);
             docs.ToString().Trim().Should().StartWith("/// <summary>TestSummary</summary>");
         }
 
@@ -63,7 +63,7 @@ namespace Refitter.Tests
         {
             var docs = new StringBuilder();
             var method = CreateOperationModel(new OpenApiOperation { Description = "TestDescription", });
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, false, docs);
             docs.ToString().Should().Contain("/// <remarks>TestDescription</remarks>");
         }
 
@@ -74,7 +74,7 @@ namespace Refitter.Tests
             var method = CreateOperationModel(new OpenApiOperation {
                 Parameters = { new OpenApiParameter { OriginalName = "testParam", Description = "TestParameter" } },
             });
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, false, docs);
             docs.ToString().Should().Contain("/// <param name=\"testParam\">TestParameter</param>");
         }
 
@@ -93,7 +93,7 @@ namespace Refitter.Tests
                 },
                 Produces = ["application/json"],
             });
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, false, docs);
             docs.ToString().Should().Contain("/// <returns>TestResponse</returns>");
         }
 
@@ -108,7 +108,7 @@ namespace Refitter.Tests
                 },
                 Produces = ["application/json"],
             });
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, false, docs);
             docs.ToString().Should().Contain("/// <returns>")
                 .And.Contain("Task");
         }
@@ -118,7 +118,7 @@ namespace Refitter.Tests
         {
             var docs = new StringBuilder();
             var method = CreateOperationModel(new OpenApiOperation());
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, false, docs);
             docs.ToString().Should().Contain("/// <returns>")
                 .And.Contain("Task");
         }
@@ -128,7 +128,7 @@ namespace Refitter.Tests
         {
             var docs = new StringBuilder();
             var method = CreateOperationModel(new OpenApiOperation());
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, false, docs);
             docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">");
         }
 
@@ -145,7 +145,7 @@ namespace Refitter.Tests
             {
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, false, docs);
             docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">")
                 .And.Contain("/// 400: TestResponse");
         }
@@ -163,7 +163,7 @@ namespace Refitter.Tests
             {
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, false, docs);
             docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">")
                 .And.NotContain("/// 400: TestResponse");
         }
@@ -181,7 +181,7 @@ namespace Refitter.Tests
             {
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
-            this._generator.AppendMethodDocumentation(method, docs);
+            this._generator.AppendMethodDocumentation(method, true, docs);
             docs.ToString().Should().NotContain("/// <throws cref=\"ApiException\">")
                 .And.Contain("/// <returns>")
                 .And.Contain("/// 400: TestResponse");
