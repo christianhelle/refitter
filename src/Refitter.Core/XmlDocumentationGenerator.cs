@@ -46,8 +46,9 @@ public class XmlDocumentationGenerator
     /// Appends XML docs for the given method to the given code builder.
     /// </summary>
     /// <param name="method">The NSwag model of the method's OpenAPI definition.</param>
+    /// <param name="hasApiResponse">Indicates whether the method returns an <c>ApiResponse</c>.</param>
     /// <param name="code">The builder to append the documentation to.</param>
-    public void AppendMethodDocumentation(CSharpOperationModel method, StringBuilder code)
+    public void AppendMethodDocumentation(CSharpOperationModel method, bool hasApiResponse, StringBuilder code)
     {
         if (!_settings.GenerateXmlDocCodeComments)
             return;
@@ -56,9 +57,7 @@ public class XmlDocumentationGenerator
             this.AppendXmlCommentBlock("summary", method.Summary, code);
 
         if (!string.IsNullOrWhiteSpace(method.Description))
-        {
             this.AppendXmlCommentBlock("remarks", method.Description, code);
-        }
 
         foreach (var parameter in method.Parameters)
         {
@@ -69,7 +68,7 @@ public class XmlDocumentationGenerator
                 { ["name"] = parameter.VariableName });
         }
 
-        if (_settings.ReturnIApiResponse)
+        if (hasApiResponse)
         {
             this.AppendXmlCommentBlock("returns", this.BuildApiResponseDescription(method.Responses), code);
         }

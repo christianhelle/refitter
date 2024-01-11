@@ -49,7 +49,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
                 var parametersString = string.Join(", ", parameters);
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, code);
+                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), code);
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);

@@ -58,6 +58,12 @@ public class RefitGeneratorSettings
     public bool ReturnIApiResponse { get; set; }
 
     /// <summary>
+    /// Gets or sets a dictionary of operation ids and a specific response type that they should use. The type is
+    /// wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).
+    /// </summary>
+    public Dictionary<string, string> ResponseTypeOverride { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets a value indicating whether to generate operation headers.
     /// </summary>
     public bool GenerateOperationHeaders { get; set; } = true;
