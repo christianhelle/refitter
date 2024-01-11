@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.3.42-preview...HEAD)
+
+**Implemented enhancements:**
+
+- Provide more extensive method documentation. [\#281](https://github.com/christianhelle/refitter/pull/281) ([DJ4ddi](https://github.com/DJ4ddi))
+
+**Merged pull requests:**
+
+- docs: add DJ4ddi as a contributor for ideas [\#282](https://github.com/christianhelle/refitter/pull/282) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
+## [0.9.3.42-preview](https://github.com/christianhelle/refitter/tree/0.9.3.42-preview) (2024-01-10)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.2...0.9.3.42-preview)
 
 **Implemented enhancements:**
 
