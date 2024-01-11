@@ -22,19 +22,24 @@ internal static class IdentifierUtils
         return $"{name}{counter}{suffix}";
     }
 
-    private static char[] IllegalSymbols =
-        [
-            ' ', '-', '.', '!', '@', '"',
-            '\'', '\n', '\t', '#', '$', '%',
-            '^', '&', '*', '(', ')', ',', ':',
-            ';', '[', ']', '}', '{'
-        ];
+    private static readonly char[] IllegalSymbols =
+    [
+        ' ', '-', '.',
+        '!', '@',
+        '"', '\'',
+        '\n', '\t',
+        '#', '$', '%', '^', '&', '*', '+',
+        ',', ':', ';',
+        '(', ')', '[', ']', '}', '{',
+        '|', '/', '\\'
+    ];
 
     /// <summary>
     /// Removes invalid character from an identifier string
     /// </summary>
     public static string Sanitize(string value)
     {
-        return string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries));
+        return string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries))
+                .Trim(['_']);
     }
 }
