@@ -69,13 +69,21 @@ public class XmlDocumentationGenerator
                 { ["name"] = parameter.VariableName });
         }
 
-        if (method.HasResult && !string.IsNullOrWhiteSpace(method.ResultDescription))
+        if (_settings.ReturnIApiResponse)
         {
-            this.AppendXmlCommentBlock("returns", method.ResultDescription, code);
+            this.AppendXmlCommentBlock("returns", this.BuildApiResponseDescription(method.Responses), code);
         }
+        else
+        {
+            if (method.HasResult && !string.IsNullOrWhiteSpace(method.ResultDescription))
+                this.AppendXmlCommentBlock("returns", method.ResultDescription, code);
 
-        this.AppendXmlCommentBlock("throws", this.BuildErrorDescription(method.Responses), code, new Dictionary<string, string>
-            { ["cref"] = "ApiException" });
+            this.AppendXmlCommentBlock(
+                "throws",
+                this.BuildErrorDescription(method.Responses),
+                code,
+                new Dictionary<string, string> { ["cref"] = "ApiException" });
+        }
     }
 
     /// <summary>
@@ -115,31 +123,56 @@ public class XmlDocumentationGenerator
         {
             code.AppendLine($"{content}</{tagName}>");
         }
-
-
     }
 
     /// <summary>
-    /// Generates a human readable description for the given endpoint responses. This includes available documentation
-    /// for response codes below 200 or above 299.
+    /// Generates a human readable error description for the given endpoint responses. This includes available
+    /// documentation for response codes below 200 or above 299 if the
+    /// <see cref="RefitGeneratorSettings.GenerateExceptionStatusComments"/> setting is enabled.
     /// </summary>
     /// <param name="responses">The responses to document.</param>
-    /// <returns>A string detailing the response codes and their description (if available).</returns>
+    /// <returns>A string detailing the error codes and their description.</returns>
     private string BuildErrorDescription(IEnumerable<CSharpResponseModel> responses)
     {
-        var errorDescription = new StringBuilder("Thrown when the request returns a non-success status code");
-        var errorResponses = responses.Where(response => !HttpUtilities.IsSuccessStatusCode(response.StatusCode)).ToList();
-        if (!this._settings.GenerateExceptionStatusComments || !errorResponses.Any())
-            return errorDescription.Append(".").ToString();
+        return this.BuildResponseDescription(
+            "Thrown when the request returns a non-success status code",
+            responses.Where(response => !HttpUtilities.IsSuccessStatusCode(response.StatusCode)));
+    }
 
-        errorDescription.Append(":");
-        foreach (var response in errorResponses)
+    /// <summary>
+    /// Generates a human readable result description for the given endpoint responses. This includes all documented
+    /// response codes if the <see cref="RefitGeneratorSettings.GenerateExceptionStatusComments"/> setting is enabled.
+    /// </summary>
+    /// <param name="responses">The responses to document.</param>
+    /// <returns>A string detailing the response codes and their description.</returns>
+    private string BuildApiResponseDescription(IEnumerable<CSharpResponseModel> responses)
+    {
+        return this.BuildResponseDescription(
+            "An <see cref=\"IApiResponse\"> instance containing the result",
+            responses);
+    }
+
+    /// <summary>
+    /// Generates a description for the given responses.
+    /// </summary>
+    /// <param name="text">The text to prepend to the responses.</param>
+    /// <param name="responses">The responses to document.</param>
+    /// <returns>A string containing the given text and response descriptions.</returns>
+    private string BuildResponseDescription(string text, IEnumerable<CSharpResponseModel> responses)
+    {
+        var description = new StringBuilder(text);
+        var responseList = responses.ToList();
+        if (!this._settings.GenerateExceptionStatusComments || !responseList.Any())
+            return description.Append(".").ToString();
+
+        description.Append(":");
+        foreach (var response in responseList)
         {
-            errorDescription.AppendLine().Append(response.StatusCode);
+            description.AppendLine().Append(response.StatusCode);
             if (!string.IsNullOrWhiteSpace(response.ExceptionDescription))
-                errorDescription.Append(": ").Append(response.ExceptionDescription);
+                description.Append(": ").Append(response.ExceptionDescription);
         }
 
-        return errorDescription.ToString();
+        return description.ToString();
     }
 }

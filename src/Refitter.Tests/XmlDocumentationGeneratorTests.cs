@@ -141,5 +141,24 @@ namespace Refitter.Tests
             docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">")
                 .And.NotContain("/// 400: TestResponse");
         }
+
+        [Fact]
+        public void Can_Generate_Method_With_IApiResponse()
+        {
+            this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+            {
+                GenerateXmlDocCodeComments = true,
+                ReturnIApiResponse = true,
+            });
+            var docs = new StringBuilder();
+            var method = CreateOperationModel(new OpenApiOperation
+            {
+                Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
+            });
+            this._generator.AppendMethodDocumentation(method, docs);
+            docs.ToString().Should().NotContain("/// <throws cref=\"ApiException\">")
+                .And.Contain("/// <returns>")
+                .And.Contain("/// 400: TestResponse");
+        }
     }
 }
