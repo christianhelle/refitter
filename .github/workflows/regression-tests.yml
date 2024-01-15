@@ -14,6 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        framework: [net6.0, net8.0]
         format: [json, yaml]
         version: [v2.0, v3.0]
         os: [macos-latest, windows-latest, ubuntu-latest]
@@ -37,4 +38,4 @@ jobs:
       version: ${{ matrix.version }}
       openapi: ${{ matrix.openapi }}
       os: ${{ matrix.os }}
-      command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
+      command: dotnet run --project ../src/Refitter/Refitter.csproj --framework ${{ matrix.framework }}
