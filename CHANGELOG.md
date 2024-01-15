@@ -2,11 +2,16 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.4...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.4.43-preview...HEAD)
 
 **Merged pull requests:**
 
+- Update dependency xunit to v2.6.6 [\#291](https://github.com/christianhelle/refitter/pull/291) ([renovate[bot]](https://github.com/apps/renovate))
 - Update nswag monorepo to v14.0.1 [\#287](https://github.com/christianhelle/refitter/pull/287) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [0.9.4.43-preview](https://github.com/christianhelle/refitter/tree/0.9.4.43-preview) (2024-01-15)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.4...0.9.4.43-preview)
 
 ## [0.9.4](https://github.com/christianhelle/refitter/tree/0.9.4) (2024-01-12)
 
