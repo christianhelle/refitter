@@ -94,4 +94,4 @@ The settings file uses the [.refitter file format](refitter-file-format.md)
 
 ## System requirements
 
-.NET 8.0 (LTS)
+Refitter supports .NET versions with current long-term support **(6.0 and 8.0)**

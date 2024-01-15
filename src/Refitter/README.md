@@ -1040,7 +1040,7 @@ Returns a response that looks something like this:
 ```
 
 ## System requirements
-.NET 8.0 (LTS)
+Refitter supports .NET versions with current long-term support **(6.0 and 8.0)**
 
 #
 
