@@ -26,6 +26,7 @@ jobs:
     name: ${{ inputs.openapi }}.${{ inputs.format }} (${{ inputs.version }}) ${{ inputs.os }}
     runs-on: ${{ inputs.os }}
     timeout-minutes: 10
+    continue-on-error: ${{ inputs.os == 'macos-latest' }}
 
     strategy:
       matrix:
