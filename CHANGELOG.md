@@ -2,43 +2,34 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.4.43-preview...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.4...HEAD)
+
+**Implemented enhancements:**
+
+- Add support for old core frameworks versions from .net6 [\#290](https://github.com/christianhelle/refitter/issues/290)
+- Add support for multiple target frameworks [\#292](https://github.com/christianhelle/refitter/pull/292) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
 - Update dependency xunit to v2.6.6 [\#291](https://github.com/christianhelle/refitter/pull/291) ([renovate[bot]](https://github.com/apps/renovate))
 - Update nswag monorepo to v14.0.1 [\#287](https://github.com/christianhelle/refitter/pull/287) ([renovate[bot]](https://github.com/apps/renovate))
 
-## [0.9.4.43-preview](https://github.com/christianhelle/refitter/tree/0.9.4.43-preview) (2024-01-15)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.4...0.9.4.43-preview)
-
 ## [0.9.4](https://github.com/christianhelle/refitter/tree/0.9.4) (2024-01-12)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.3.42-preview...0.9.4)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.2...0.9.4)
 
 **Implemented enhancements:**
 
 - Add return type override setting. [\#286](https://github.com/christianhelle/refitter/pull/286) ([DJ4ddi](https://github.com/DJ4ddi))
 - Fixed operation name generation names when it has illegal symbols [\#283](https://github.com/christianhelle/refitter/pull/283) ([yadanilov19](https://github.com/yadanilov19))
 - Provide more extensive method documentation. [\#281](https://github.com/christianhelle/refitter/pull/281) ([DJ4ddi](https://github.com/DJ4ddi))
+- Fix type accessibility deserialization. [\#279](https://github.com/christianhelle/refitter/pull/279) ([DJ4ddi](https://github.com/DJ4ddi))
 
 **Merged pull requests:**
 
 - Align file format and output examples in docs [\#285](https://github.com/christianhelle/refitter/pull/285) ([christianhelle](https://github.com/christianhelle))
 - docs: add yadanilov19 as a contributor for code [\#284](https://github.com/christianhelle/refitter/pull/284) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add DJ4ddi as a contributor for ideas [\#282](https://github.com/christianhelle/refitter/pull/282) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-
-## [0.9.3.42-preview](https://github.com/christianhelle/refitter/tree/0.9.3.42-preview) (2024-01-10)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.2...0.9.3.42-preview)
-
-**Implemented enhancements:**
-
-- Fix type accessibility deserialization. [\#279](https://github.com/christianhelle/refitter/pull/279) ([DJ4ddi](https://github.com/DJ4ddi))
-
-**Merged pull requests:**
-
 - docs: add DJ4ddi as a contributor for code [\#280](https://github.com/christianhelle/refitter/pull/280) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
 ## [0.9.2](https://github.com/christianhelle/refitter/tree/0.9.2) (2024-01-09)
