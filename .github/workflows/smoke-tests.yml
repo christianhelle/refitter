@@ -37,6 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        framework: [net6.0, net8.0]
         format: [json, yaml]
         version: [v2.0, v3.0]
         os: [ubuntu-latest]
@@ -62,12 +63,13 @@ jobs:
       version: ${{ matrix.version }}
       openapi: ${{ matrix.openapi }}
       os: ${{ matrix.os }}
-      command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
+      command: dotnet run --project ../src/Refitter/Refitter.csproj --framework ${{ matrix.framework }}
   
   url:
     strategy:
       fail-fast: false
       matrix:
+        framework: [net6.0, net8.0]
         os: [ubuntu-latest]
         openapi_url: [
           "https://petstore3.swagger.io/api/v3/openapi.json", 
@@ -78,4 +80,4 @@ jobs:
     with:
       os: ${{ matrix.os }}
       openapi: ${{ matrix.openapi_url }}
-      command: 'dotnet run --project ../src/Refitter/Refitter.csproj'
+      command: dotnet run --project ../src/Refitter/Refitter.csproj --framework ${{ matrix.framework }}
