@@ -5,8 +5,12 @@ on:
   push:
     paths-ignore:
       - "**/*"
-      - '!src/**/*.cs'
-      - '!src/**/*.csproj'
+      - '!src/Refitter/**/*.cs'
+      - '!src/Refitter.Core/**/*.cs'
+      - '!src/Refitter.SourceGenerator/**/*.cs'
+      - '!src/Refitter/**/*.csproj'
+      - '!src/Refitter.Core/**/*.csproj'
+      - '!src/Refitter.SourceGenerator/**/*.csproj'
       - "!.github/workflows/template.yml"
       - "!.github/workflows/template-url.yml"
       - "!.github/workflows/smoke-tests.yml"
@@ -15,8 +19,12 @@ on:
   pull_request:
     paths-ignore:
       - "**/*"
-      - '!src/**/*.cs'
-      - '!src/**/*.csproj'
+      - '!src/Refitter/**/*.cs'
+      - '!src/Refitter.Core/**/*.cs'
+      - '!src/Refitter.SourceGenerator/**/*.cs'
+      - '!src/Refitter/**/*.csproj'
+      - '!src/Refitter.Core/**/*.csproj'
+      - '!src/Refitter.SourceGenerator/**/*.csproj'
       - "!.github/workflows/template.yml"
       - "!.github/workflows/template-url.yml"
       - "!.github/workflows/smoke-tests.yml"
