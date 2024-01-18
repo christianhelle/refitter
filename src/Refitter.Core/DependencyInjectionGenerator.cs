@@ -16,8 +16,8 @@ internal static class DependencyInjectionGenerator
         var code = new StringBuilder();
 
         var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
-            ? "public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Uri baseUrl, Action<IHttpClientBuilder>? builder = default)"
-            : "public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default)";
+            ? $"public static IServiceCollection {iocSettings.ExtensionMethodName}(this IServiceCollection services, Uri baseUrl, Action<IHttpClientBuilder>? builder = default)"
+            : $"public static IServiceCollection {iocSettings.ExtensionMethodName}(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default)";
         
         var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"

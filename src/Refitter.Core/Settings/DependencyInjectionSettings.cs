@@ -31,4 +31,9 @@ public class DependencyInjectionSettings
     /// The median delay to target before the first retry in seconds. Default is 1 second
     /// </summary>
     public double FirstBackoffRetryInSeconds { get; set; } = 1.0;
+
+    /// <summary>
+    /// Name of IServiceCollection Extension Method. Default is ConfigureRefitClients
+    /// </summary>
+    public string ExtensionMethodName { get; set; } = "ConfigureRefitClients";
 }
