@@ -1172,6 +1172,7 @@ Refitter supports .NET versions with current long-term support **(6.0 and 8.0)**
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/direncancatalkaya"><img src="https://avatars.githubusercontent.com/u/57223732?v=4?s=100" width="100px;" alt="direncancatalkaya"/><br /><sub><b>direncancatalkaya</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=direncancatalkaya" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/robpalm"><img src="https://avatars.githubusercontent.com/u/14939530?v=4?s=100" width="100px;" alt="Robert Palmqvist"/><br /><sub><b>Robert Palmqvist</b></sub></a><br /><a href="#ideas-robpalm" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>

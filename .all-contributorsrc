@@ -337,6 +337,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "robpalm",
+      "name": "Robert Palmqvist",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14939530?v=4",
+      "profile": "https://github.com/robpalm",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
