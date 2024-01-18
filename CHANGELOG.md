@@ -6,11 +6,14 @@
 
 **Implemented enhancements:**
 
+- More than one generated Client Api will result in an Extension Method Conflict for ConfigureRefitClients  [\#294](https://github.com/christianhelle/refitter/issues/294)
+- Added Optional Setting to name the IServiceCollection Extension Method [\#298](https://github.com/christianhelle/refitter/pull/298) ([robpalm](https://github.com/robpalm))
 - fix: AliasAs attribute generation for StreamPart type [\#295](https://github.com/christianhelle/refitter/pull/295) ([direncancatalkaya](https://github.com/direncancatalkaya))
 
 **Merged pull requests:**
 
 - docs: add direncancatalkaya as a contributor for code [\#297](https://github.com/christianhelle/refitter/pull/297) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add robpalm as a contributor for ideas [\#296](https://github.com/christianhelle/refitter/pull/296) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update nswag monorepo to v14.0.2 [\#293](https://github.com/christianhelle/refitter/pull/293) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [0.9.5](https://github.com/christianhelle/refitter/tree/0.9.5) (2024-01-15)
