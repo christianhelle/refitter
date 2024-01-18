@@ -18,12 +18,14 @@ internal static class ParameterExtractor
 
         var queryParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p => $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetQueryParameterType(p, settings)} {p.VariableName}")
+            .Select(p =>
+                $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetQueryParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
-            .Select(p => $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
+            .Select(p =>
+                $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var headerParameters = new List<string>();
@@ -32,13 +34,21 @@ internal static class ParameterExtractor
         {
             headerParameters = operationModel.Parameters
                 .Where(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader)
-                .Select(p => $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {p.VariableName}")
+                .Select(p =>
+                    $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {p.VariableName}")
                 .ToList();
         }
 
         var binaryBodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter || p.IsFile)
-            .Select(p => $"{GetAliasAsAttribute(p)}StreamPart {p.VariableName}")
+            .Select(p =>
+            {
+                var generatedAliasAsAttribute = string.IsNullOrWhiteSpace(GetAliasAsAttribute(p))
+                    ? string.Empty
+                    : $"[{GetAliasAsAttribute(p)}]";
+                
+                return $"{generatedAliasAsAttribute} StreamPart {p.VariableName}";
+            })
             .ToList();
 
         var parameters = new List<string>();
@@ -62,7 +72,7 @@ internal static class ParameterExtractor
     {
         if (!settings.OptionalParameters)
             return parameters;
-        
+
         parameters = parameters.OrderBy(c => c.Contains("?")).ToList();
         for (int index = 0; index < parameters.Count; index++)
         {
@@ -121,7 +131,7 @@ internal static class ParameterExtractor
     {
         var type = GetParameterType(parameterModel, settings);
 
-        if (parameterModel.IsQuery && 
+        if (parameterModel.IsQuery &&
             parameterModel.Type.Equals("object", StringComparison.OrdinalIgnoreCase))
             type = "string";
 
