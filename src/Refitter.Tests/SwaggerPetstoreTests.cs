@@ -576,6 +576,7 @@ public class SwaggerPetstoreTests
             GenerateOptionalPropertiesAsNullable = true
         };
         var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("Task<Pet>");
         generateCode.Should().NotContain("Task<Pet?>");
     }
 
@@ -594,6 +595,7 @@ public class SwaggerPetstoreTests
             GenerateOptionalPropertiesAsNullable = true
         };
         var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("Task<IApiResponse<Pet>>");
         generateCode.Should().NotContain("Task<IApiResponse<Pet?>>");
     }
 }
