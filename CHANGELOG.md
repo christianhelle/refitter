@@ -7,11 +7,18 @@
 **Implemented enhancements:**
 
 - More than one generated Client Api will result in an Extension Method Conflict for ConfigureRefitClients  [\#294](https://github.com/christianhelle/refitter/issues/294)
+- Fix response type always nullable under `generateNullableReferenceTypes` [\#304](https://github.com/christianhelle/refitter/pull/304) ([christianhelle](https://github.com/christianhelle))
 - Added Optional Setting to name the IServiceCollection Extension Method [\#298](https://github.com/christianhelle/refitter/pull/298) ([robpalm](https://github.com/robpalm))
 - fix: AliasAs attribute generation for StreamPart type [\#295](https://github.com/christianhelle/refitter/pull/295) ([direncancatalkaya](https://github.com/direncancatalkaya))
 
+**Fixed bugs:**
+
+- Response is always nullable under `generateNullableReferenceTypes` [\#302](https://github.com/christianhelle/refitter/issues/302)
+
 **Merged pull requests:**
 
+- docs: add jods4 as a contributor for bug [\#303](https://github.com/christianhelle/refitter/pull/303) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add robpalm as a contributor for code [\#301](https://github.com/christianhelle/refitter/pull/301) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add direncancatalkaya as a contributor for code [\#297](https://github.com/christianhelle/refitter/pull/297) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add robpalm as a contributor for ideas [\#296](https://github.com/christianhelle/refitter/pull/296) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update nswag monorepo to v14.0.2 [\#293](https://github.com/christianhelle/refitter/pull/293) ([renovate[bot]](https://github.com/apps/renovate))
