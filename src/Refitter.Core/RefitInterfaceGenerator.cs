@@ -93,7 +93,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     private string GetTypeName(string code, OpenApiOperation operation)
     {
         var schema = operation.Responses[code].ActualResponse.Schema;
-        var typeName = generator.GetTypeName(schema, true, null);
+        var typeName = generator.GetTypeName(schema, false, null);
 
         if (!string.IsNullOrWhiteSpace(settings.CodeGeneratorSettings?.ArrayType) &&
             schema?.Type == NJsonSchema.JsonObjectType.Array)
