@@ -561,4 +561,39 @@ public class SwaggerPetstoreTests
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotContain("Dictionary<string, object> AdditionalProperties");
     }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_NonNullable_Return_Types(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings
+        {
+            GenerateNullableReferenceTypes = true,
+            GenerateOptionalPropertiesAsNullable = true
+        };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotContain("Task<Pet?>");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_NonNullable_Return_Types_In_ApiResponse(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.ReturnIApiResponse = true;
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings
+        {
+            GenerateNullableReferenceTypes = true,
+            GenerateOptionalPropertiesAsNullable = true
+        };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotContain("Task<IApiResponse<Pet?>>");
+    }
 }
