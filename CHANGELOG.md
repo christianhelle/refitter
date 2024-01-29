@@ -17,6 +17,7 @@
 
 **Merged pull requests:**
 
+- Bump ghcr.io/devcontainers/features/dotnet from 1.1.4 to 2.0.3 [\#305](https://github.com/christianhelle/refitter/pull/305) ([dependabot[bot]](https://github.com/apps/dependabot))
 - docs: add jods4 as a contributor for bug [\#303](https://github.com/christianhelle/refitter/pull/303) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add robpalm as a contributor for code [\#301](https://github.com/christianhelle/refitter/pull/301) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add direncancatalkaya as a contributor for code [\#297](https://github.com/christianhelle/refitter/pull/297) ([allcontributors[bot]](https://github.com/apps/allcontributors))
