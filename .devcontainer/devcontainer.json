@@ -6,7 +6,7 @@
 	"image": "mcr.microsoft.com/devcontainers/dotnet:0-6.0",
 	"features": {
 		"ghcr.io/devcontainers/features/powershell:1": {},
-		"ghcr.io/devcontainers/features/dotnet:1": {}
+		"ghcr.io/devcontainers/features/dotnet:2": {}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
