@@ -139,7 +139,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// 200: successful operation
         /// </returns>
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata, StreamPart body);
+        Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata,  StreamPart body);
     }
 
     /// <summary>Returns pet inventories by status</summary>
