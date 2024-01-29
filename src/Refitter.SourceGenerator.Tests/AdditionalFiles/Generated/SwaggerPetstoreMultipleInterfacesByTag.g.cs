@@ -104,7 +104,7 @@ namespace Refitter.Tests.AdditionalFiles.ByTag
         /// 200: successful operation
         /// </returns>
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> UploadFile(long petId, [Query] string additionalMetadata, StreamPart body);
+        Task<ApiResponse> UploadFile(long petId, [Query] string additionalMetadata,  StreamPart body);
     }
 
     /// <summary>Returns pet inventories by status</summary>
