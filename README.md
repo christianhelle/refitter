@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-37-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-38-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1173,6 +1173,7 @@ Refitter supports .NET versions with current long-term support **(6.0 and 8.0)**
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/direncancatalkaya"><img src="https://avatars.githubusercontent.com/u/57223732?v=4?s=100" width="100px;" alt="direncancatalkaya"/><br /><sub><b>direncancatalkaya</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=direncancatalkaya" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/robpalm"><img src="https://avatars.githubusercontent.com/u/14939530?v=4?s=100" width="100px;" alt="Robert Palmqvist"/><br /><sub><b>Robert Palmqvist</b></sub></a><br /><a href="#ideas-robpalm" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=robpalm" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/TimothyMakkison"><img src="https://avatars.githubusercontent.com/u/49349513?v=4?s=100" width="100px;" alt="Tim M"/><br /><sub><b>Tim M</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=TimothyMakkison" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
