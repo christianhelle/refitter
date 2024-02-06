@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency microsoft.net.test.sdk to v17.9.0 [\#311](https://github.com/christianhelle/refitter/pull/311) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update nswag monorepo to v14.0.3 [\#309](https://github.com/christianhelle/refitter/pull/309) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update codecov/codecov-action action to v4 [\#308](https://github.com/christianhelle/refitter/pull/308) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add TimothyMakkison as a contributor for doc [\#307](https://github.com/christianhelle/refitter/pull/307) ([allcontributors[bot]](https://github.com/apps/allcontributors))
