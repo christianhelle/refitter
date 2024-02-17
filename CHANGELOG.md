@@ -6,6 +6,8 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update xunit-dotnet monorepo [\#315](https://github.com/christianhelle/refitter/pull/315) ([renovate[bot]](https://github.com/apps/renovate))
+- JSON schema [\#314](https://github.com/christianhelle/refitter/pull/314) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.2 [\#313](https://github.com/christianhelle/refitter/pull/313) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [0.9.7](https://github.com/christianhelle/refitter/tree/0.9.7) (2024-02-07)
