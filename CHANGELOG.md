@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump coverlet.collector from 6.0.0 to 6.0.1 [\#319](https://github.com/christianhelle/refitter/pull/319) ([dependabot[bot]](https://github.com/apps/dependabot))
 - chore\(deps\): update xunit-dotnet monorepo [\#315](https://github.com/christianhelle/refitter/pull/315) ([renovate[bot]](https://github.com/apps/renovate))
 - JSON schema [\#314](https://github.com/christianhelle/refitter/pull/314) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.2 [\#313](https://github.com/christianhelle/refitter/pull/313) ([renovate[bot]](https://github.com/apps/renovate))
