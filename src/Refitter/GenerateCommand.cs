@@ -32,6 +32,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             AddAcceptHeaders = !settings.NoAcceptHeaders,
             GenerateContracts = !settings.InterfaceOnly,
             ReturnIApiResponse = settings.ReturnIApiResponse,
+            ReturnIObservable = settings.ReturnIObservable,
             UseCancellationTokens = settings.UseCancellationTokens,
             GenerateOperationHeaders = !settings.NoOperationHeaders,
             UseIsoDateFormat = settings.UseIsoDateFormat,
@@ -70,7 +71,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             if (!settings.SkipValidation)
                 await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath);
-            
+
             var code = generator.Generate().ReplaceLineEndings();
             AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
 
@@ -99,7 +100,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 AnsiConsole.MarkupLine($"[red]Exception:{Crlf}{exception.GetType()}[/]");
                 AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");
             }
-            
+
             AnsiConsole.MarkupLine("[yellow]#############################################################################[/]");
             AnsiConsole.MarkupLine("[yellow]#  Consider reporting the problem if you are unable to resolve it yourself  #[/]");
             AnsiConsole.MarkupLine("[yellow]#  https://github.com/christianhelle/refitter/issues                        #[/]");

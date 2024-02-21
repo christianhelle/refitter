@@ -79,9 +79,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     protected string GetTypeName(OpenApiOperation operation)
     {
         if (settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
-            return type is null or "void" ? "Task" : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(type)}>";
+        {
+            return type is null or "void" ? GetAsyncOperationType(true) : $"{GetAsyncOperationType(false)}<{WellKnownNamesspaces.TrimImportedNamespaces(type)}>";
+        }
 
-        var returnTypeParameter = 
+        var returnTypeParameter =
             (new[] { "200", "201", "203", "206" })
                 .Where(operation.Responses.ContainsKey)
                 .Select(code => GetTypeName(code, operation))
@@ -172,9 +174,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
     private string GetDefaultReturnType()
     {
+        var asyncType = GetAsyncOperationType(true);
         return settings.ReturnIApiResponse
-            ? "Task<IApiResponse>"
-            : "Task";
+            ? $"{asyncType}<IApiResponse>"
+            : asyncType;
     }
 
     /// <summary>
@@ -193,10 +196,16 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
     private string GetConfiguredReturnType(string returnTypeParameter)
     {
+        var asyncType = GetAsyncOperationType(false);
         return settings.ReturnIApiResponse
-            ? $"Task<IApiResponse<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>>"
-            : $"Task<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
+            ? $"{asyncType}<IApiResponse<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>>"
+            : $"{asyncType}<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
     }
+
+    private string GetAsyncOperationType(bool withVoidReturnType) =>
+        settings.ReturnIObservable
+            ? "IObservable" + (withVoidReturnType ? "<Unit>" : string.Empty)
+            : "Task";
 
     protected void GenerateObsoleteAttribute(OpenApiOperation operation, StringBuilder code)
     {
