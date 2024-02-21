@@ -357,6 +357,16 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "janfolbrecht",
+      "name": "janfolbrecht",
+      "avatar_url": "https://avatars.githubusercontent.com/u/42186604?v=4",
+      "profile": "https://github.com/janfolbrecht",
+      "contributions": [
+        "ideas",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
