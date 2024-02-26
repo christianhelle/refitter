@@ -10,7 +10,7 @@
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <Authors>Christian Resma Helle</Authors>
     <Company>Christian Resma Helle</Company>
-    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/christianhelle/refitter</PackageProjectUrl>
     <RepositoryUrl>https://github.com/christianhelle/refitter</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
