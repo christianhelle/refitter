@@ -1,5 +1,6 @@
+global using System;
+
 using Refit;
-using System;
 using System.Threading.Tasks;
 
 namespace MyNamespace;
