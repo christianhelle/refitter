@@ -421,12 +421,7 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.ReturnIObservable = true;
         var generateCode = await GenerateCode(version, filename, settings);
-        //cannot build without it because System.Reactive package has to be installed first
-        generateCode += @"
-namespace System.Reactive
-{
-    public class Unit{}
-}";
+
         BuildHelper
             .BuildCSharp(generateCode)
             .Should()
