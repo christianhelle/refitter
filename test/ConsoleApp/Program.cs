@@ -11,6 +11,7 @@ internal class Program
     {
         // await TestPetstoreUsingDirectTypes();
         // await TestPetstoreUsingApiResponse();
+        // await TestPetstoreObservableTypes();
         await Task.Delay(0);
     }
 
@@ -46,5 +47,22 @@ internal class Program
     //     Console.WriteLine("Found " + taggedPets.Count + " tagged pet(s)");
 
     //     Console.WriteLine();
+    // }
+
+    // private static async Task TestPetstoreObservableTypes()
+    // {
+    //     var tcs = new TaskCompletionSource<bool>();
+
+    //     RestService
+    //         .For<Petstore.UsingIObservable.ISwaggerPetstore>("https://petstore3.swagger.io/api/v3")
+    //         .GetPetById(1)
+    //         .Subscribe(pet =>
+    //         {
+    //             Console.WriteLine($"Name: {pet.Name}");
+    //             Console.WriteLine($"Status: {pet.Status}");
+    //             tcs.SetResult(true);
+    //         });
+
+    //     await tcs.Task;
     // }
 }
