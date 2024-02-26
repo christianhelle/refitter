@@ -21,5 +21,6 @@
         <PackageReference Include="Polly" Version="7.2.3" />
         <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
         <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+        <PackageReference Include="System.Reactive" Version="6.0.0" />
     </ItemGroup>
 </Project>
