@@ -4,9 +4,16 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.7...HEAD)
 
+**Implemented enhancements:**
+
+- Generating IObservable type response [\#322](https://github.com/christianhelle/refitter/pull/322) ([janfolbrecht](https://github.com/janfolbrecht))
+
 **Merged pull requests:**
 
+- docs: add janfolbrecht as a contributor for ideas, and code [\#324](https://github.com/christianhelle/refitter/pull/324) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Revert "chore\(deps\): update actions/upload-artifact action to v4" [\#323](https://github.com/christianhelle/refitter/pull/323) ([christianhelle](https://github.com/christianhelle))
 - Bump coverlet.collector from 6.0.0 to 6.0.1 [\#319](https://github.com/christianhelle/refitter/pull/319) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): update actions/upload-artifact action to v4 [\#318](https://github.com/christianhelle/refitter/pull/318) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update xunit-dotnet monorepo [\#315](https://github.com/christianhelle/refitter/pull/315) ([renovate[bot]](https://github.com/apps/renovate))
 - JSON schema [\#314](https://github.com/christianhelle/refitter/pull/314) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.2 [\#313](https://github.com/christianhelle/refitter/pull/313) ([renovate[bot]](https://github.com/apps/renovate))
