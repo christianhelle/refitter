@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- IObservable\<T\> improvements [\#326](https://github.com/christianhelle/refitter/pull/326) ([christianhelle](https://github.com/christianhelle))
 - Generating IObservable type response [\#322](https://github.com/christianhelle/refitter/pull/322) ([janfolbrecht](https://github.com/janfolbrecht))
 
 **Merged pull requests:**
