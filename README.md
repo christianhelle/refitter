@@ -71,6 +71,7 @@ OPTIONS:
         --no-accept-headers                                      Don't add <Accept> header to output file                                                                                                  
         --interface-only                                         Don't generate contract types                                                                                                             
         --use-api-response                                       Return Task<IApiResponse<T>> instead of Task<T>                                                                                           
+        --use-observable-response                                Return IObservable instead of Task                                                                                                        
         --internal                                               Set the accessibility of the generated types to 'internal'                                                                                
         --cancellation-tokens                                    Use cancellation tokens                                                                                                                   
         --no-operation-headers                                   Don't generate operation headers                                                                                                          
