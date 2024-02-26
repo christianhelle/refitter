@@ -15,7 +15,7 @@ dotnet tool install --global Refitter
 $ refitter --help
 ```
 
-```shell
+```text
 USAGE:
     refitter [URL or input file] [OPTIONS]
 
