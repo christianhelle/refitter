@@ -50,6 +50,11 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool ReturnIApiResponse { get; set; }
 
+    [Description("Return IObservable instead of Task")]
+    [CommandOption("--use-observable-response")]
+    [DefaultValue(false)]
+    public bool ReturnIObservable { get; set; }
+
     [Description("Set the accessibility of the generated types to 'internal'")]
     [CommandOption("--internal")]
     [DefaultValue(false)]
@@ -109,7 +114,7 @@ public sealed class Settings : CommandSettings
     [CommandOption("--operation-name-template")]
     [DefaultValue(null)]
     public string? OperationNameTemplate { get; internal set; }
-    
+
     [Description("Generate nullable parameters as optional parameters")]
     [CommandOption("--optional-nullable-parameters")]
     [DefaultValue(false)]
@@ -119,7 +124,7 @@ public sealed class Settings : CommandSettings
     [CommandOption("--trim-unused-schema")]
     [DefaultValue(false)]
     public bool TrimUnusedSchema { get; set; }
-    
+
     [Description("Force to keep matching schema, uses regular expressions. Use together with \"--trim-unused-schema\". Can be set multiple times.")]
     [CommandOption("--keep-schema")]
     [DefaultValue(new string[0])]
@@ -134,7 +139,7 @@ public sealed class Settings : CommandSettings
     [CommandOption("--skip-default-additional-properties")]
     [DefaultValue(false)]
     public bool SkipDefaultAdditionalProperties { get; set; }
-    
+
     [Description("""
                  The NSwag IOperationNameGenerator implementation to use. 
                  May be one of: 

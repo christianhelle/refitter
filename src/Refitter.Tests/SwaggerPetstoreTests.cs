@@ -416,6 +416,25 @@ public class SwaggerPetstoreTests
 
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    public async Task Can_Build_Generated_Code_With_IObservableResponse(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.ReturnIObservable = true;
+        var generateCode = await GenerateCode(version, filename, settings);
+        //cannot build without it because System.Reactive package has to be installed first
+        generateCode += @"
+namespace System.Reactive
+{
+    public class Unit{}
+}";
+        BuildHelper
+            .BuildCSharp(generateCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
 #if !DEBUG
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]

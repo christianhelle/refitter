@@ -58,6 +58,11 @@ public class RefitGeneratorSettings
     public bool ReturnIApiResponse { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether to return IObservable or Task
+    /// </summary>
+    public bool ReturnIObservable { get; set; }
+
+    /// <summary>
     /// Gets or sets a dictionary of operation ids and a specific response type that they should use. The type is
     /// wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).
     /// </summary>
@@ -143,13 +148,13 @@ public class RefitGeneratorSettings
     /// Gets or sets the settings describing how to generate types using NSwag
     /// </summary>
     public CodeGeneratorSettings? CodeGeneratorSettings { get; set; }
-    
+
     /// <summary>
     /// Set to <c>true</c> to apply tree-shaking to the OpenApi schema.
     /// This works in conjunction with <see cref="IncludeTags"/> and <see cref="IncludePathMatches"/>.
     /// </summary>
     public bool TrimUnusedSchema { get; set; }
-    
+
     /// <summary>
     /// Array of regular expressions that determine if a schema needs to be kept.
     /// This works in conjunction with <see cref="TrimUnusedSchema"/>.
