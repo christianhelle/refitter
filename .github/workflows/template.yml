@@ -37,7 +37,8 @@ jobs:
           "--use-iso-date-format",
           "--match-path ^/pet/.*",
           "--tag pet",
-          "--no-deprecated-operations"
+          "--no-deprecated-operations",
+          "--use-observable-response"
         ]
 
     steps:
