@@ -2,15 +2,25 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.7...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.8...HEAD)
 
 **Implemented enhancements:**
 
+- Suggest using --skip-validation CLI tool argument validation error [\#329](https://github.com/christianhelle/refitter/pull/329) ([christianhelle](https://github.com/christianhelle))
+
+## [0.9.8](https://github.com/christianhelle/refitter/tree/0.9.8) (2024-02-27)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.7...0.9.8)
+
+**Implemented enhancements:**
+
+- Support for OpenAPI version 3.1.0 [\#328](https://github.com/christianhelle/refitter/issues/328)
 - IObservable\<T\> improvements [\#326](https://github.com/christianhelle/refitter/pull/326) ([christianhelle](https://github.com/christianhelle))
 - Generating IObservable type response [\#322](https://github.com/christianhelle/refitter/pull/322) ([janfolbrecht](https://github.com/janfolbrecht))
 
 **Merged pull requests:**
 
+- Change license to MIT [\#327](https://github.com/christianhelle/refitter/pull/327) ([christianhelle](https://github.com/christianhelle))
 - docs: add janfolbrecht as a contributor for ideas, and code [\#324](https://github.com/christianhelle/refitter/pull/324) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Revert "chore\(deps\): update actions/upload-artifact action to v4" [\#323](https://github.com/christianhelle/refitter/pull/323) ([christianhelle](https://github.com/christianhelle))
 - Bump coverlet.collector from 6.0.0 to 6.0.1 [\#319](https://github.com/christianhelle/refitter/pull/319) ([dependabot[bot]](https://github.com/apps/dependabot))
