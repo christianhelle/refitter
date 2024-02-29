@@ -1,6 +1,7 @@
 using System.Diagnostics;
 
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Readers.Exceptions;
 
 using Refitter.Core;
 using Refitter.Validation;
@@ -94,11 +95,20 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
         catch (Exception exception)
         {
+            AnsiConsole.WriteLine();
+            if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
+            {
+                AnsiConsole.MarkupLine($"[red]Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Try using the --skip-validation argument.[/]");                
+                AnsiConsole.WriteLine();
+            }
+
             if (exception is not OpenApiValidationException)
             {
-                AnsiConsole.MarkupLine($"[red]Error:{Crlf}{exception.Message}[/]");
-                AnsiConsole.MarkupLine($"[red]Exception:{Crlf}{exception.GetType()}[/]");
-                AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");
+                AnsiConsole.MarkupLine($"[red]Error: {exception.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Exception: {exception.GetType()}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");               
+                AnsiConsole.WriteLine();
             }
 
             AnsiConsole.MarkupLine("[yellow]#############################################################################[/]");
