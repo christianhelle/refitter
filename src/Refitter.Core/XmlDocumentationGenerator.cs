@@ -92,7 +92,7 @@ public class XmlDocumentationGenerator
             }
 
             this.AppendXmlCommentBlock(
-                "throws",
+                "exception",
                 this.BuildErrorDescription(method.Responses),
                 code,
                 new Dictionary<string, string> { ["cref"] = "ApiException" });
