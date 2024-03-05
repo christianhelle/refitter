@@ -177,16 +177,38 @@ public class XmlDocumentationGenerator
     {
         var description = new StringBuilder(text);
         var responseList = responses.ToList();
+
         if (!this._settings.GenerateStatusCodeComments || !responseList.Any())
             return description.Append(".").ToString();
 
-        description.Append(":");
+        description.AppendLine(":")
+            .AppendLine("<list type=\"table\">")
+            .AppendLine("<listheader>")
+            .AppendLine("<term>Status</term>")
+            .AppendLine("<description>Description</description>")
+            .AppendLine("</listheader>");
+
         foreach (var response in responseList)
         {
-            description.AppendLine().Append(response.StatusCode);
+            description
+                .AppendLine("<item>")
+                .Append("<term>")
+                .Append(response.StatusCode)
+                .AppendLine("</term>");
+
             if (!string.IsNullOrWhiteSpace(response.ExceptionDescription))
-                description.Append(": ").Append(response.ExceptionDescription);
+            {
+                description
+                    .Append("<description>")
+                    .Append(response.ExceptionDescription)
+                    .AppendLine("</description>");
+            }
+
+            description.AppendLine("</item>");
         }
+
+        description
+            .Append("</list>");
 
         return description.ToString();
     }
