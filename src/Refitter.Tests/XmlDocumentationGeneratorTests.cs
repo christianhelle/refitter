@@ -129,7 +129,7 @@ namespace Refitter.Tests
             var docs = new StringBuilder();
             var method = CreateOperationModel(new OpenApiOperation());
             this._generator.AppendMethodDocumentation(method, false, docs);
-            docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">");
+            docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">");
         }
 
         [Fact]
@@ -146,8 +146,8 @@ namespace Refitter.Tests
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
             this._generator.AppendMethodDocumentation(method, false, docs);
-            docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">")
-                .And.Contain("/// 400: TestResponse");
+            docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">")
+                .And.Contain("<term>400</term>");
         }
 
         [Fact]
@@ -164,8 +164,8 @@ namespace Refitter.Tests
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
             this._generator.AppendMethodDocumentation(method, false, docs);
-            docs.ToString().Should().Contain("/// <throws cref=\"ApiException\">")
-                .And.NotContain("/// 400: TestResponse");
+            docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">")
+                .And.NotContain("<term>400</term>");
         }
 
         [Fact]
@@ -182,9 +182,9 @@ namespace Refitter.Tests
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
             this._generator.AppendMethodDocumentation(method, true, docs);
-            docs.ToString().Should().NotContain("/// <throws cref=\"ApiException\">")
+            docs.ToString().Should().NotContain("/// <exception cref=\"ApiException\">")
                 .And.Contain("/// <returns>")
-                .And.Contain("/// 400: TestResponse");
+                .And.Contain("<term>400</term>");
         }
     }
 }
