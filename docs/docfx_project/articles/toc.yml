@@ -12,3 +12,6 @@
 
 - name: Examples
   href: examples.md
+
+- name: XML Code Documentation
+  href: xml-code-docs.md
