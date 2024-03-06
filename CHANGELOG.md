@@ -6,7 +6,12 @@
 
 **Implemented enhancements:**
 
+- Tweak xml docs [\#332](https://github.com/christianhelle/refitter/pull/332) ([osc-nseguin](https://github.com/osc-nseguin))
 - Suggest using --skip-validation CLI tool argument validation error [\#329](https://github.com/christianhelle/refitter/pull/329) ([christianhelle](https://github.com/christianhelle))
+
+**Merged pull requests:**
+
+- docs: add osc-nseguin as a contributor for code [\#333](https://github.com/christianhelle/refitter/pull/333) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
 ## [0.9.8](https://github.com/christianhelle/refitter/tree/0.9.8) (2024-02-27)
 
