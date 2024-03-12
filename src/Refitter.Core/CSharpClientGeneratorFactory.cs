@@ -56,12 +56,6 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         var defaultInstance = new CodeGeneratorSettings();
         foreach (var property in source.GetType().GetProperties())
         {
-            if (property.PropertyType != typeof(string) &&
-                property.PropertyType != typeof(bool))
-            {
-                continue;
-            }
-
             var value = property.GetValue(source);
             if (value == null)
             {
@@ -74,7 +68,8 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             }
 
             var settingsProperty = destination.GetType().GetProperty(property.Name);
-            if (settingsProperty == null)
+            if (settingsProperty == null ||
+                !settingsProperty.PropertyType.IsAssignableFrom(property.PropertyType))
             {
                 continue;
             }
