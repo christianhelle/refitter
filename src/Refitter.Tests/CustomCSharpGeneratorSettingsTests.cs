@@ -115,6 +115,26 @@ public class CustomCSharpGeneratorSettingsTests
         generateCode.Should().Contain("System.Collection.Generic.IList<");
     }
 
+    [Theory]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_With_ExcludedTypeNames(
+        SampleOpenSpecifications version,
+        string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings();
+        settings.CodeGeneratorSettings.ExcludedTypeNames = new[]
+        {
+            "User"
+        };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotBeNullOrWhiteSpace();
+        generateCode.Should().NotContain("class User");
+    }
+
     private static async Task<string> GenerateCode(
         SampleOpenSpecifications version,
         string filename,
