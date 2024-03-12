@@ -2,7 +2,24 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.8...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.9...HEAD)
+
+**Implemented enhancements:**
+
+- Fix code generator settings that are not of type string/bool [\#335](https://github.com/christianhelle/refitter/pull/335) ([david-brink-talogy](https://github.com/david-brink-talogy))
+
+**Fixed bugs:**
+
+- Non string/boolean CodeGeneratorSettings are not honored [\#334](https://github.com/christianhelle/refitter/issues/334)
+
+**Merged pull requests:**
+
+- docs: add david-brink-talogy as a contributor for code [\#338](https://github.com/christianhelle/refitter/pull/338) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add david-brink-talogy as a contributor for bug [\#336](https://github.com/christianhelle/refitter/pull/336) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
+## [0.9.9](https://github.com/christianhelle/refitter/tree/0.9.9) (2024-03-06)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.8...0.9.9)
 
 **Implemented enhancements:**
 
