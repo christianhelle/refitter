@@ -376,6 +376,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "david-brink-talogy",
+      "name": "David Brink",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43828739?v=4",
+      "profile": "https://github.com/david-brink-talogy",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
