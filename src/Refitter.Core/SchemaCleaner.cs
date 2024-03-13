@@ -151,7 +151,6 @@ public class SchemaCleaner
 
         static IEnumerable<JsonSchema?> EnumerateInternal(JsonSchema schema)
         {
-            // schema = schema.ActualSchema;
             yield return schema.AdditionalItemsSchema;
             yield return schema.AdditionalPropertiesSchema;
             if (schema.AllInheritedSchemas != null)
