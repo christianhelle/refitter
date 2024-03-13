@@ -13,7 +13,7 @@ class TelemetryDelegatingHandler : DelegatingHandler
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Outbound HTTP Request - " + request.Method + " " + request.RequestUri);
+        logger.LogInformation("Outbound HTTP Request - {Method} {Uri}", request.Method, request.RequestUri);
         return base.SendAsync(request, cancellationToken);
     }
 }

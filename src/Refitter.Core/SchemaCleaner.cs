@@ -30,7 +30,7 @@ public class SchemaCleaner
         }
     }
 
-    HashSet<string> FindUsedSchema(OpenApiDocument doc)
+    private HashSet<string> FindUsedSchema(OpenApiDocument doc)
     {
         var toProcess = new Stack<JsonSchema>();
         var schemaIdLookup = document.Components.Schemas
@@ -39,23 +39,22 @@ public class SchemaCleaner
 
         var keepSchemaRegexes = keepSchemaPatterns
             .Select(x => new Regex(x, RegexOptions.Compiled))
-            .ToArray();
+            .ToList();
 
         if (doc.Components?.Schemas != null)
         {
             foreach (var kvp in doc.Components.Schemas)
             {
                 var schema = kvp.Key;
-                if (keepSchemaRegexes.Any(x => x.IsMatch(schema)))
+                if (keepSchemaRegexes.Exists(x => x.IsMatch(schema)))
                 {
                     TryPush(kvp.Value, toProcess);
                 }
             }
         }
 
-        foreach (var kvp in doc.Paths)
+        foreach (var pathItem in doc.Paths.Select(kvp => kvp.Value))
         {
-            var pathItem = kvp.Value;
             foreach (JsonSchema? schema in GetSchemaForPath(pathItem))
             {
                 TryPush(schema, toProcess);
@@ -73,13 +72,10 @@ public class SchemaCleaner
             }
 
             // NOTE: NSwag schema stuff seems weird, with all their "Actual..."
-            if (schemaIdLookup.TryGetValue(schema.ActualSchema, out var refId))
+            if (schemaIdLookup.TryGetValue(schema.ActualSchema, out var refId) && !seenIds.Add(refId))
             {
-                if (!seenIds.Add(refId))
-                {
-                    // prevent recursion
-                    continue;
-                }
+                // prevent recursion
+                continue;
             }
 
             foreach (var subSchema in EnumerateSchema(schema.ActualSchema))
@@ -91,7 +87,7 @@ public class SchemaCleaner
         return seenIds;
     }
 
-    IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
+    private IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
     {
         foreach (var p in pathItem.Parameters)
         {
@@ -103,9 +99,8 @@ public class SchemaCleaner
             if (op.RequestBody != null)
             {
                 var body = op.RequestBody;
-                foreach (var kvpBody in body.Content)
+                foreach (var content in body.Content.Select(kvpBody => kvpBody.Value))
                 {
-                    var content = kvpBody.Value;
                     yield return content.Schema;
                 }
             }
@@ -140,7 +135,7 @@ public class SchemaCleaner
         stack.Push(schema);
     }
 
-    IEnumerable<JsonSchema> EnumerateSchema(JsonSchema? schema)
+    private IEnumerable<JsonSchema> EnumerateSchema(JsonSchema? schema)
     {
         if (schema is null)
         {
@@ -153,7 +148,6 @@ public class SchemaCleaner
 
         static IEnumerable<JsonSchema?> EnumerateInternal(JsonSchema schema)
         {
-            // schema = schema.ActualSchema;
             yield return schema.AdditionalItemsSchema;
             yield return schema.AdditionalPropertiesSchema;
             if (schema.AllInheritedSchemas != null)
@@ -190,15 +184,13 @@ public class SchemaCleaner
                 yield return subSchema;
             }
 
-            foreach (var kvp in schema.Properties)
+            foreach (var subSchema in schema.Properties.Select(kvp => kvp.Value))
             {
-                var subSchema = kvp.Value;
                 yield return subSchema;
             }
 
-            foreach (var kvp in schema.Definitions)
+            foreach (var subSchema in schema.Definitions.Select(kvp => kvp.Value))
             {
-                var subSchema = kvp.Value;
                 yield return subSchema;
             }
         }

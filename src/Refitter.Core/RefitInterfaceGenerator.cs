@@ -202,10 +202,13 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             : $"{asyncType}<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
     }
 
-    private string GetAsyncOperationType(bool withVoidReturnType) =>
-        settings.ReturnIObservable
-            ? "IObservable" + (withVoidReturnType ? "<Unit>" : string.Empty)
+    private string GetAsyncOperationType(bool withVoidReturnType)
+    {
+        var type = withVoidReturnType ? "<Unit>" : string.Empty;
+        return settings.ReturnIObservable
+            ? "IObservable" + type
             : "Task";
+    }
 
     protected void GenerateObsoleteAttribute(OpenApiOperation operation, StringBuilder code)
     {
