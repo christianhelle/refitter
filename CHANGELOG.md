@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Resolve SonarCloud discovered issues [\#340](https://github.com/christianhelle/refitter/pull/340) ([christianhelle](https://github.com/christianhelle))
 - Fix code generator settings that are not of type string/bool [\#335](https://github.com/christianhelle/refitter/pull/335) ([david-brink-talogy](https://github.com/david-brink-talogy))
 
 **Fixed bugs:**
