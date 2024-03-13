@@ -14,6 +14,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency coverlet.collector to v6.0.2 [\#339](https://github.com/christianhelle/refitter/pull/339) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add david-brink-talogy as a contributor for code [\#338](https://github.com/christianhelle/refitter/pull/338) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.3 [\#337](https://github.com/christianhelle/refitter/pull/337) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add david-brink-talogy as a contributor for bug [\#336](https://github.com/christianhelle/refitter/pull/336) ([allcontributors[bot]](https://github.com/apps/allcontributors))
