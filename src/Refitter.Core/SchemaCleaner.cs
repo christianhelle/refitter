@@ -187,15 +187,13 @@ public class SchemaCleaner
                 yield return subSchema;
             }
 
-            foreach (var kvp in schema.Properties)
+            foreach (var subSchema in schema.Properties.Select(kvp => kvp.Value))
             {
-                var subSchema = kvp.Value;
                 yield return subSchema;
             }
 
-            foreach (var kvp in schema.Definitions)
+            foreach (var subSchema in schema.Definitions.Select(kvp => kvp.Value))
             {
-                var subSchema = kvp.Value;
                 yield return subSchema;
             }
         }
