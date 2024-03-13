@@ -18,12 +18,27 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <remarks>Update an existing pet by Id</remarks>
         /// <param name="body">Update an existent pet in the store</param>
         /// <returns>Successful operation</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid ID supplied
-        /// 404: Pet not found
-        /// 405: Validation exception
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid ID supplied</description>
+        /// </item>
+        /// <item>
+        /// <term>404</term>
+        /// <description>Pet not found</description>
+        /// </item>
+        /// <item>
+        /// <term>405</term>
+        /// <description>Validation exception</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Headers("Accept: application/xml, application/json")]
         [Put("/pet")]
         Task<Pet> UpdatePet([Body] Pet body);
@@ -32,10 +47,19 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <remarks>Add a new pet to the store</remarks>
         /// <param name="body">Create a new pet in the store</param>
         /// <returns>Successful operation</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 405: Invalid input
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>405</term>
+        /// <description>Invalid input</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Headers("Accept: application/xml, application/json")]
         [Post("/pet")]
         Task<Pet> AddPet([Body] Pet body);
@@ -44,10 +68,19 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <remarks>Multiple status values can be provided with comma separated strings</remarks>
         /// <param name="status">Status values that need to be considered for filter</param>
         /// <returns>successful operation</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid status value
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid status value</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Headers("Accept: application/json")]
         [Get("/pet/findByStatus")]
         Task<ICollection<Pet>> FindPetsByStatus([Query] Status? status = default);
@@ -56,10 +89,19 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <remarks>Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.</remarks>
         /// <param name="tags">Tags to filter by</param>
         /// <returns>successful operation</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid tag value
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid tag value</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Headers("Accept: application/json")]
         [Get("/pet/findByTags")]
         Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string>? tags = default);
@@ -68,11 +110,23 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <remarks>Returns a single pet</remarks>
         /// <param name="petId">ID of pet to return</param>
         /// <returns>successful operation</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid ID supplied
-        /// 404: Pet not found
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid ID supplied</description>
+        /// </item>
+        /// <item>
+        /// <term>404</term>
+        /// <description>Pet not found</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Headers("Accept: application/xml, application/json")]
         [Get("/pet/{petId}")]
         Task<Pet> GetPetById(long petId);
@@ -82,20 +136,38 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <param name="name">Name of pet that needs to be updated</param>
         /// <param name="status">Status of pet that needs to be updated</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 405: Invalid input
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>405</term>
+        /// <description>Invalid input</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Post("/pet/{petId}")]
         Task UpdatePetWithForm(long petId, [Query] string? name = default, [Query] string? status = default);
 
         /// <summary>Deletes a pet</summary>
         /// <param name="petId">Pet id to delete</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid pet value
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid pet value</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Delete("/pet/{petId}")]
         Task DeletePet(long petId, [Header("api_key")] string? api_key = default);
 
@@ -104,7 +176,16 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <param name="additionalMetadata">Additional Metadata</param>
         /// <returns>
         /// A <see cref="Task"/> representing the <see cref="IApiResponse"/> instance containing the result:
-        /// 200: successful operation
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>200</term>
+        /// <description>successful operation</description>
+        /// </item>
+        /// </list>
         /// </returns>
         [Headers("Accept: application/json")]
         [Post("/pet/{petId}/uploadImage")]
@@ -113,7 +194,7 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <summary>Returns pet inventories by status</summary>
         /// <remarks>Returns a map of status codes to quantities</remarks>
         /// <returns>successful operation</returns>
-        /// <throws cref="ApiException">Thrown when the request returns a non-success status code.</throws>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Headers("Accept: application/json")]
         [Get("/store/inventory")]
         Task<IDictionary<string, int>> GetInventory();
@@ -121,10 +202,19 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <summary>Place an order for a pet</summary>
         /// <remarks>Place a new order in the store</remarks>
         /// <returns>successful operation</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 405: Invalid input
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>405</term>
+        /// <description>Invalid input</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Headers("Accept: application/json")]
         [Post("/store/order")]
         Task<Order> PlaceOrder([Body] Order? body = default);
@@ -133,11 +223,23 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <remarks>For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions</remarks>
         /// <param name="orderId">ID of order that needs to be fetched</param>
         /// <returns>successful operation</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid ID supplied
-        /// 404: Order not found
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid ID supplied</description>
+        /// </item>
+        /// <item>
+        /// <term>404</term>
+        /// <description>Order not found</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Headers("Accept: application/json")]
         [Get("/store/order/{orderId}")]
         Task<Order> GetOrderById(long orderId);
@@ -146,11 +248,23 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <remarks>For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors</remarks>
         /// <param name="orderId">ID of the order that needs to be deleted</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid ID supplied
-        /// 404: Order not found
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid ID supplied</description>
+        /// </item>
+        /// <item>
+        /// <term>404</term>
+        /// <description>Order not found</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Delete("/store/order/{orderId}")]
         Task DeleteOrder(long orderId);
 
@@ -158,7 +272,7 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <remarks>This can only be done by the logged in user.</remarks>
         /// <param name="body">Created user object</param>
         /// <returns>successful operation</returns>
-        /// <throws cref="ApiException">Thrown when the request returns a non-success status code.</throws>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Headers("Accept: application/json, application/xml")]
         [Post("/user")]
         Task CreateUser([Body] User? body = default);
@@ -166,7 +280,7 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <summary>Creates list of users with given input array</summary>
         /// <remarks>Creates list of users with given input array</remarks>
         /// <returns>Successful operation</returns>
-        /// <throws cref="ApiException">Thrown when the request returns a non-success status code.</throws>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Headers("Accept: application/xml, application/json")]
         [Post("/user/createWithList")]
         Task<User> CreateUsersWithListInput([Body] IEnumerable<User>? body = default);
@@ -175,28 +289,49 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <param name="username">The user name for login</param>
         /// <param name="password">The password for login in clear text</param>
         /// <returns>successful operation</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid username/password supplied
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid username/password supplied</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Headers("Accept: application/json")]
         [Get("/user/login")]
         Task<string> LoginUser([Query] string? username = default, [Query] string? password = default);
 
         /// <summary>Logs out current logged in user session</summary>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
-        /// <throws cref="ApiException">Thrown when the request returns a non-success status code.</throws>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Get("/user/logout")]
         Task LogoutUser();
 
         /// <summary>Get user by user name</summary>
         /// <param name="username">The name that needs to be fetched. Use user1 for testing.</param>
         /// <returns>successful operation</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid username supplied
-        /// 404: User not found
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid username supplied</description>
+        /// </item>
+        /// <item>
+        /// <term>404</term>
+        /// <description>User not found</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Headers("Accept: application/json")]
         [Get("/user/{username}")]
         Task<User> GetUserByName(string username);
@@ -206,7 +341,7 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <param name="username">name that need to be deleted</param>
         /// <param name="body">Update an existent user in the store</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
-        /// <throws cref="ApiException">Thrown when the request returns a non-success status code.</throws>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Put("/user/{username}")]
         Task UpdateUser(string username, [Body] User? body = default);
 
@@ -214,11 +349,23 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// <remarks>This can only be done by the logged in user.</remarks>
         /// <param name="username">The name that needs to be deleted</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
-        /// <throws cref="ApiException">
+        /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
-        /// 400: Invalid username supplied
-        /// 404: User not found
-        /// </throws>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Invalid username supplied</description>
+        /// </item>
+        /// <item>
+        /// <term>404</term>
+        /// <description>User not found</description>
+        /// </item>
+        /// </list>
+        /// </exception>
         [Delete("/user/{username}")]
         Task DeleteUser(string username);
 
