@@ -102,9 +102,8 @@ public class SchemaCleaner
             if (op.RequestBody != null)
             {
                 var body = op.RequestBody;
-                foreach (var kvpBody in body.Content)
+                foreach (var content in body.Content.Select(kvpBody => kvpBody.Value))
                 {
-                    var content = kvpBody.Value;
                     yield return content.Schema;
                 }
             }
