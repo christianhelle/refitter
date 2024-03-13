@@ -39,7 +39,8 @@ internal static class IdentifierUtils
     /// </summary>
     public static string Sanitize(this string value)
     {
+        const char dash = '-';
         return string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries))
-                .Trim(['_']);
+                .Trim(dash);
     }
 }
