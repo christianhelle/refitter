@@ -53,9 +53,8 @@ public class SchemaCleaner
             }
         }
 
-        foreach (var kvp in doc.Paths)
+        foreach (var pathItem in doc.Paths.Select(kvp => kvp.Value))
         {
-            var pathItem = kvp.Value;
             foreach (JsonSchema? schema in GetSchemaForPath(pathItem))
             {
                 TryPush(schema, toProcess);
