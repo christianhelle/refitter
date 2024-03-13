@@ -30,7 +30,7 @@ public class SchemaCleaner
         }
     }
 
-    HashSet<string> FindUsedSchema(OpenApiDocument doc)
+    private HashSet<string> FindUsedSchema(OpenApiDocument doc)
     {
         var toProcess = new Stack<JsonSchema>();
         var schemaIdLookup = document.Components.Schemas
@@ -91,7 +91,7 @@ public class SchemaCleaner
         return seenIds;
     }
 
-    IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
+    private IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
     {
         foreach (var p in pathItem.Parameters)
         {
@@ -140,7 +140,7 @@ public class SchemaCleaner
         stack.Push(schema);
     }
 
-    IEnumerable<JsonSchema> EnumerateSchema(JsonSchema? schema)
+    private IEnumerable<JsonSchema> EnumerateSchema(JsonSchema? schema)
     {
         if (schema is null)
         {
