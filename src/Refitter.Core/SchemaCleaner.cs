@@ -72,13 +72,10 @@ public class SchemaCleaner
             }
 
             // NOTE: NSwag schema stuff seems weird, with all their "Actual..."
-            if (schemaIdLookup.TryGetValue(schema.ActualSchema, out var refId))
+            if (schemaIdLookup.TryGetValue(schema.ActualSchema, out var refId) && !seenIds.Add(refId))
             {
-                if (!seenIds.Add(refId))
-                {
-                    // prevent recursion
-                    continue;
-                }
+                // prevent recursion
+                continue;
             }
 
             foreach (var subSchema in EnumerateSchema(schema.ActualSchema))
