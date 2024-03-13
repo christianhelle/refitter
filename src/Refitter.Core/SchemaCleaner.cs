@@ -39,14 +39,14 @@ public class SchemaCleaner
 
         var keepSchemaRegexes = keepSchemaPatterns
             .Select(x => new Regex(x, RegexOptions.Compiled))
-            .ToArray();
+            .ToList();
 
         if (doc.Components?.Schemas != null)
         {
             foreach (var kvp in doc.Components.Schemas)
             {
                 var schema = kvp.Key;
-                if (keepSchemaRegexes.Any(x => x.IsMatch(schema)))
+                if (keepSchemaRegexes.Exists(x => x.IsMatch(schema)))
                 {
                     TryPush(kvp.Value, toProcess);
                 }
