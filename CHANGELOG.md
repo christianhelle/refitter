@@ -15,6 +15,8 @@
 
 **Merged pull requests:**
 
+- Update nswag monorepo to v14.0.4 [\#344](https://github.com/christianhelle/refitter/pull/344) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency SonarAnalyzer.CSharp to v9.22.0.87781 [\#343](https://github.com/christianhelle/refitter/pull/343) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Microsoft.CodeAnalysis.CSharp to v4.9.2 [\#341](https://github.com/christianhelle/refitter/pull/341) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency coverlet.collector to v6.0.2 [\#339](https://github.com/christianhelle/refitter/pull/339) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add david-brink-talogy as a contributor for code [\#338](https://github.com/christianhelle/refitter/pull/338) ([allcontributors[bot]](https://github.com/apps/allcontributors))
