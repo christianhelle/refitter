@@ -38,7 +38,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.22.0.87781" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.23.0.88079" />
   </ItemGroup>
 
 </Project>
