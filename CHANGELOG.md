@@ -15,6 +15,9 @@
 
 **Merged pull requests:**
 
+- Update nswag monorepo to v14.0.7 [\#347](https://github.com/christianhelle/refitter/pull/347) ([renovate[bot]](https://github.com/apps/renovate))
+- Bump SonarAnalyzer.CSharp from 9.22.0.87781 to 9.23.0.88079 [\#346](https://github.com/christianhelle/refitter/pull/346) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update dependency SonarAnalyzer.CSharp to v9.23.0.88079 [\#345](https://github.com/christianhelle/refitter/pull/345) ([renovate[bot]](https://github.com/apps/renovate))
 - Update nswag monorepo to v14.0.4 [\#344](https://github.com/christianhelle/refitter/pull/344) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency SonarAnalyzer.CSharp to v9.22.0.87781 [\#343](https://github.com/christianhelle/refitter/pull/343) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Microsoft.CodeAnalysis.CSharp to v4.9.2 [\#341](https://github.com/christianhelle/refitter/pull/341) ([renovate[bot]](https://github.com/apps/renovate))
