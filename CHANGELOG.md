@@ -15,6 +15,7 @@
 
 **Merged pull requests:**
 
+- Update dependency Exceptionless to v6.0.4 [\#351](https://github.com/christianhelle/refitter/pull/351) ([renovate[bot]](https://github.com/apps/renovate))
 - Update nswag monorepo to v14.0.7 [\#347](https://github.com/christianhelle/refitter/pull/347) ([renovate[bot]](https://github.com/apps/renovate))
 - Bump SonarAnalyzer.CSharp from 9.22.0.87781 to 9.23.0.88079 [\#346](https://github.com/christianhelle/refitter/pull/346) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Update dependency SonarAnalyzer.CSharp to v9.23.0.88079 [\#345](https://github.com/christianhelle/refitter/pull/345) ([renovate[bot]](https://github.com/apps/renovate))
