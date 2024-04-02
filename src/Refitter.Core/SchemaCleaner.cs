@@ -148,6 +148,8 @@ public class SchemaCleaner
 
         static IEnumerable<JsonSchema?> EnumerateInternal(JsonSchema schema)
         {
+            schema = schema.ActualSchema;
+            
             yield return schema.AdditionalItemsSchema;
             yield return schema.AdditionalPropertiesSchema;
             if (schema.AllInheritedSchemas != null)
@@ -157,7 +159,12 @@ public class SchemaCleaner
                     yield return s;
                 }
             }
-
+            
+            if (schema.Item != null)
+            {
+                yield return schema.Item;
+            }
+            
             if (schema.Items != null)
             {
                 foreach (JsonSchema s in schema.Items)
@@ -184,7 +191,7 @@ public class SchemaCleaner
                 yield return subSchema;
             }
 
-            foreach (var subSchema in schema.Properties.Select(kvp => kvp.Value))
+            foreach (var subSchema in schema.ActualProperties.Select(kvp => kvp.Value))
             {
                 yield return subSchema;
             }
