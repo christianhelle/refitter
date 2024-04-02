@@ -39,7 +39,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Warehouse'
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/WarehouseResponse'
         '400':
           description: Bad Request
           content:
@@ -131,6 +133,15 @@ components:
           type: string
           nullable: true
       additionalProperties: false
+    WarehouseResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SomeComponent'
+      properties:
+        info:
+          type: string
+          nullable: true
+      additionalProperties: false
     UserComponent:
       type: object
       allOf:
@@ -189,11 +200,17 @@ components:
     {
         string generateCode = await GenerateCode();
         generateCode.Should().Contain("class Warehouse");
+        generateCode.Should().Contain("class WarehouseResponse");
         generateCode.Should().Contain("class SomeComponent");
         generateCode.Should().Contain("class Component");
         generateCode.Should().Contain("class ProblemDetails");
 
-        generateCode.Should().Contain("Task<Warehouse> CreateWarehouse([Query] string token, [Body] Warehouse ");
+        // Schema is manipulated to return ARRAY of WarehouseResponse
+        // previously (<= 0.9.9.0) this wasn't accomodated.
+        //
+        // For whatever reason NSwag OpenApi-Schema doesn't contain Schema for "Items"
+        // Instead it's inside "Item"
+        generateCode.Should().Contain("Task<ICollection<WarehouseResponse>> CreateWarehouse([Query] string token, [Body] Warehouse ");
 
         generateCode.Should().NotContain("class UserComponent");
     }
@@ -214,7 +231,7 @@ components:
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
-            TrimUnusedSchema = true,
+            TrimUnusedSchema = true
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
