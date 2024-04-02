@@ -6,11 +6,13 @@
 
 **Implemented enhancements:**
 
+- fixes \#352: Collection-Type item schema was not kept [\#353](https://github.com/christianhelle/refitter/pull/353) ([kirides](https://github.com/kirides))
 - Resolve SonarCloud discovered issues [\#340](https://github.com/christianhelle/refitter/pull/340) ([christianhelle](https://github.com/christianhelle))
 - Fix code generator settings that are not of type string/bool [\#335](https://github.com/christianhelle/refitter/pull/335) ([david-brink-talogy](https://github.com/david-brink-talogy))
 
 **Fixed bugs:**
 
+- `remove-unused-schema` not working for collection-type responses [\#352](https://github.com/christianhelle/refitter/issues/352)
 - Non string/boolean CodeGeneratorSettings are not honored [\#334](https://github.com/christianhelle/refitter/issues/334)
 
 **Merged pull requests:**
