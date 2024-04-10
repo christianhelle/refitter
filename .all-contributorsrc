@@ -386,6 +386,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "dammitjanet",
+      "name": "Stu Wilson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/952723?v=4",
+      "profile": "https://github.com/dammitjanet",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
