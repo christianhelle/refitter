@@ -17,6 +17,8 @@
 
 **Merged pull requests:**
 
+- Bump Microsoft.Extensions.Http.Polly from 8.0.3 to 8.0.4 [\#358](https://github.com/christianhelle/refitter/pull/358) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update peaceiris/actions-gh-pages action to v4 [\#356](https://github.com/christianhelle/refitter/pull/356) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Atc.Test to v1.0.89 [\#355](https://github.com/christianhelle/refitter/pull/355) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency SonarAnalyzer.CSharp to v9.23.1.88495 [\#354](https://github.com/christianhelle/refitter/pull/354) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Exceptionless to v6.0.4 [\#351](https://github.com/christianhelle/refitter/pull/351) ([renovate[bot]](https://github.com/apps/renovate))
