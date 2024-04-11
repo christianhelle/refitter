@@ -36,6 +36,10 @@ The following is an example `.refitter` file
     "Namespace1",
     "Namespace2"
   ],
+  "excludeNamespaces": [ // Optional. Exclude namespaces that match the provided regular expressions
+    "^Namespace[.].*",
+    "^Namespace$"
+  ],
   "includeTags": [ // Optional. OpenAPI Tag to include when generating code
     "Pet",
     "Store",
@@ -119,6 +123,7 @@ The following is an example `.refitter` file
 - `outputFolder` - a string describing a relative path to a desired output folder. Default is `./Generated`
 - `outputFilename` - Output filename. Default is `Output.cs` when used from the CLI tool, otherwise its the .refitter filename. So `Petstore.refitter` becomes `Petstore.cs`.
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
+- `excludeNamespaces` - A collection of regular expressions to exclude namespaces from the generated file. A use case for this is when your project has global usings where these namepsaces would be redundant. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
@@ -262,6 +267,13 @@ The following is an example `.refitter` file
                 "type": "string"
             },
             "description": "Additional namespaces to include in the generated code."
+        },
+        "excludeNamespaces": {
+          "type": "array",
+          "items": {
+              "type": "string"
+          },
+          "description": "Exclude namespaces that match the provided regular expressions."
         },
         "includeTags": {
             "type": "array",

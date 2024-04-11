@@ -41,6 +41,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 ? TypeAccessibility.Internal
                 : TypeAccessibility.Public,
             AdditionalNamespaces = settings.AdditionalNamespaces!,
+            ExcludeNamespaces = settings.ExcludeNamespaces ?? Array.Empty<string>(),
             MultipleInterfaces = settings.MultipleInterfaces,
             IncludePathMatches = settings.MatchPaths ?? Array.Empty<string>(),
             IncludeTags = settings.Tags ?? Array.Empty<string>(),

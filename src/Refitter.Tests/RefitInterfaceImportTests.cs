@@ -21,4 +21,24 @@ public class RefitInterfaceImportTests
         var refitInterfaceImport = RefitInterfaceImports.GetImportedNamespaces(settings);
         refitInterfaceImport.Should().NotContain("System.Threading");
     }
+
+    [Fact]
+    public void Should_NotContain_Any_System_Excluded()
+    {
+        var settings = new RefitGeneratorSettings { UseCancellationTokens = true, ReturnIObservable = false, ExcludeNamespaces = new string[] { "^System[.].*" } };
+        var refitInterfaceImport = RefitInterfaceImports.GetImportedNamespaces(settings);
+        refitInterfaceImport.Should().NotContain("System.Collections.Generic");
+        refitInterfaceImport.Should().NotContain("System.Text.Json.Serialization");
+        refitInterfaceImport.Should().NotContain("System.Threading");
+        refitInterfaceImport.Should().NotContain("System.Threading.Tasks");
+    }
+
+    [Fact]
+    public void Should_NotContain_SystemThreading_Excluded()
+    {
+        var settings = new RefitGeneratorSettings { UseCancellationTokens = true, ReturnIObservable = false,  ExcludeNamespaces = new string[] { "System.Threading$" } };
+        var refitInterfaceImport = RefitInterfaceImports.GetImportedNamespaces(settings);
+        refitInterfaceImport.Should().NotContain("System.Threading");
+        refitInterfaceImport.Should().Contain("System.Threading.Tasks");
+    }
 }

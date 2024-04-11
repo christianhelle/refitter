@@ -80,6 +80,11 @@ public sealed class Settings : CommandSettings
     [DefaultValue(new string[0])]
     public string[]? AdditionalNamespaces { get; set; }
 
+    [Description("Exclude namespace on generated types")]
+    [CommandOption("--exclude-namespace")]
+    [DefaultValue(new string[0])]
+    public string[]? ExcludeNamespaces { get; set; }
+
     [Description("Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)")]
     [CommandOption("--use-iso-date-format")]
     [DefaultValue(false)]

@@ -87,11 +87,18 @@
             "description": "The output filename for the generated code."
         },
         "additionalNamespaces": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            },
-            "description": "Additional namespaces to include in the generated code."
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional namespaces to include in the generated code."
+        },
+        "excludeNamespaces": {
+          "type": "array",
+          "items": {
+              "type": "string"
+          },
+          "description": "Exclude namespaces that match the provided regular expressions."
         },
         "includeTags": {
             "type": "array",
