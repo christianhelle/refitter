@@ -1,10 +1,12 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace Refitter.Core;
 
 internal static class RefitInterfaceImports
 {
-    private static string[] defaultNamespases = new[]
+    private static readonly string[] defaultNamespases = new[]
     {
         "Refit",
         "System.Collections.Generic",
@@ -26,6 +28,18 @@ internal static class RefitInterfaceImports
         {
             namespaces.Add("System.Threading.Tasks");
         }
+
+        if (settings.ExcludeNamespaces.Length != 0)
+        {
+            var exclusionNamespacesRegexes = settings.ExcludeNamespaces
+                .Where(n => !string.IsNullOrWhiteSpace(n))
+                .Select(x => new Regex(x, RegexOptions.Compiled))
+                .ToList();
+            
+            var excludedNamespaces = exclusionNamespacesRegexes.SelectMany(k => namespaces.Where(x => k.IsMatch(x)));
+            namespaces = namespaces.Except(excludedNamespaces).ToList();
+        }
+
         return namespaces.ToArray();
     }
 

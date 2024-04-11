@@ -96,6 +96,11 @@ public class RefitGeneratorSettings
     public string[] AdditionalNamespaces { get; set; } = Array.Empty<string>();
 
     /// <summary>
+    /// Exclude namespaces on generated types
+    /// </summary>
+    public string[] ExcludeNamespaces { get; set; } = Array.Empty<string>();
+
+    /// <summary>
     /// Set to <c>true</c> to Generate a Refit interface for each endpoint
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumConverter))]
