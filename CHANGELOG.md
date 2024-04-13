@@ -6,17 +6,24 @@
 
 **Implemented enhancements:**
 
+- Add the facility to exclude namespaces from generated code [\#362](https://github.com/christianhelle/refitter/issues/362)
+- \#362 add facility to exclude namespaces from generated output file\(s\) [\#365](https://github.com/christianhelle/refitter/pull/365) ([dammitjanet](https://github.com/dammitjanet))
 - fixes \#352: Collection-Type item schema was not kept [\#353](https://github.com/christianhelle/refitter/pull/353) ([kirides](https://github.com/kirides))
 - Resolve SonarCloud discovered issues [\#340](https://github.com/christianhelle/refitter/pull/340) ([christianhelle](https://github.com/christianhelle))
 - Fix code generator settings that are not of type string/bool [\#335](https://github.com/christianhelle/refitter/pull/335) ([david-brink-talogy](https://github.com/david-brink-talogy))
 
 **Fixed bugs:**
 
+- Asana API "cannot derive from sealed type" [\#359](https://github.com/christianhelle/refitter/issues/359)
 - `remove-unused-schema` not working for collection-type responses [\#352](https://github.com/christianhelle/refitter/issues/352)
 - Non string/boolean CodeGeneratorSettings are not honored [\#334](https://github.com/christianhelle/refitter/issues/334)
 
 **Merged pull requests:**
 
+- chore\(deps\): update xunit-dotnet monorepo [\#368](https://github.com/christianhelle/refitter/pull/368) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency sonaranalyzer.csharp to v9.23.2.88755 [\#367](https://github.com/christianhelle/refitter/pull/367) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add dammitjanet as a contributor for code [\#366](https://github.com/christianhelle/refitter/pull/366) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add dammitjanet as a contributor for ideas [\#363](https://github.com/christianhelle/refitter/pull/363) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump Microsoft.Extensions.Http.Polly from 8.0.3 to 8.0.4 [\#358](https://github.com/christianhelle/refitter/pull/358) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Update peaceiris/actions-gh-pages action to v4 [\#356](https://github.com/christianhelle/refitter/pull/356) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Atc.Test to v1.0.89 [\#355](https://github.com/christianhelle/refitter/pull/355) ([renovate[bot]](https://github.com/apps/renovate))
