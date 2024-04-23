@@ -107,13 +107,14 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             {
                 AnsiConsole.MarkupLine($"[red]Error: {exception.Message}[/]");
                 AnsiConsole.MarkupLine($"[red]Exception: {exception.GetType()}[/]");
-                AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");               
+                AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");
                 AnsiConsole.WriteLine();
             }
 
             if (!settings.SkipValidation)
             {
-                AnsiConsole.MarkupLine($"[yellow]Try using the --skip-validation argument.[/]");
+                AnsiConsole.MarkupLine("[yellow]Try using the --skip-validation argument.[/]");
+                AnsiConsole.WriteLine();
             }
 
             AnsiConsole.MarkupLine("[yellow]#############################################################################[/]");
