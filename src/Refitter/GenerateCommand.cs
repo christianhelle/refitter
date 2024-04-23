@@ -100,7 +100,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
             {
                 AnsiConsole.MarkupLine($"[red]Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]");
-                AnsiConsole.MarkupLine($"[yellow]Try using the --skip-validation argument.[/]");                
                 AnsiConsole.WriteLine();
             }
 
@@ -110,6 +109,11 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 AnsiConsole.MarkupLine($"[red]Exception: {exception.GetType()}[/]");
                 AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");               
                 AnsiConsole.WriteLine();
+            }
+
+            if (!settings.SkipValidation)
+            {
+                AnsiConsole.MarkupLine($"[yellow]Try using the --skip-validation argument.[/]");
             }
 
             AnsiConsole.MarkupLine("[yellow]#############################################################################[/]");
