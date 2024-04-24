@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - Add the facility to exclude namespaces from generated code [\#362](https://github.com/christianhelle/refitter/issues/362)
+- Fix missing OpenAPI validation result output [\#374](https://github.com/christianhelle/refitter/pull/374) ([christianhelle](https://github.com/christianhelle))
 - \#362 add facility to exclude namespaces from generated output file\(s\) [\#365](https://github.com/christianhelle/refitter/pull/365) ([dammitjanet](https://github.com/dammitjanet))
 - fixes \#352: Collection-Type item schema was not kept [\#353](https://github.com/christianhelle/refitter/pull/353) ([kirides](https://github.com/kirides))
 - Resolve SonarCloud discovered issues [\#340](https://github.com/christianhelle/refitter/pull/340) ([christianhelle](https://github.com/christianhelle))
@@ -14,6 +15,7 @@
 
 **Fixed bugs:**
 
+- Refit Fails on Jira OpenAPI specs [\#371](https://github.com/christianhelle/refitter/issues/371)
 - Asana API "cannot derive from sealed type" [\#359](https://github.com/christianhelle/refitter/issues/359)
 - `remove-unused-schema` not working for collection-type responses [\#352](https://github.com/christianhelle/refitter/issues/352)
 - Non string/boolean CodeGeneratorSettings are not honored [\#334](https://github.com/christianhelle/refitter/issues/334)
