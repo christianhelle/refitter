@@ -100,7 +100,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
             {
                 AnsiConsole.MarkupLine($"[red]Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]");
-                AnsiConsole.MarkupLine($"[yellow]Try using the --skip-validation argument.[/]");                
                 AnsiConsole.WriteLine();
             }
 
@@ -108,7 +107,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             {
                 AnsiConsole.MarkupLine($"[red]Error: {exception.Message}[/]");
                 AnsiConsole.MarkupLine($"[red]Exception: {exception.GetType()}[/]");
-                AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");               
+                AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");
+                AnsiConsole.WriteLine();
+            }
+
+            if (!settings.SkipValidation)
+            {
+                AnsiConsole.MarkupLine("[yellow]Try using the --skip-validation argument.[/]");
                 AnsiConsole.WriteLine();
             }
 
@@ -185,7 +190,17 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
         catch
         {
-            // ignored
+            var originalColor = Console.ForegroundColor;
+            Console.ForegroundColor = color switch
+            {
+                "red" => ConsoleColor.Red,
+                "yellow" => ConsoleColor.Yellow,
+                _ => originalColor
+            };
+
+            Console.WriteLine($"{label}:{Crlf}{error}{Crlf}");
+
+            Console.ForegroundColor = originalColor;
         }
     }
 }
