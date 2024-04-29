@@ -22,6 +22,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update xunit-dotnet monorepo to v2.8.0 [\#379](https://github.com/christianhelle/refitter/pull/379) ([renovate[bot]](https://github.com/apps/renovate))
 - Bump Spectre.Console.Cli from 0.49.0 to 0.49.1 [\#378](https://github.com/christianhelle/refitter/pull/378) ([dependabot[bot]](https://github.com/apps/dependabot))
 - chore\(deps\): update dependency spectre.console.cli to v0.49.0 [\#373](https://github.com/christianhelle/refitter/pull/373) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency sonaranalyzer.csharp to v9.24.0.89429 [\#372](https://github.com/christianhelle/refitter/pull/372) ([renovate[bot]](https://github.com/apps/renovate))
