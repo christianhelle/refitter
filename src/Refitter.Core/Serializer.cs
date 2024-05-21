@@ -13,7 +13,8 @@ public static class Serializer
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true
     };
 
     /// <summary>
@@ -21,15 +22,17 @@ public static class Serializer
     /// </summary>
     /// <typeparam name="T">The type to deserialize the JSON string to.</typeparam>
     /// <param name="json">The JSON string to deserialize.</param>
+    /// <param name="options">Optional custom serialization options</param>
     /// <returns>The deserialized object of type T.</returns>
-    public static T Deserialize<T>(string json) => 
-        JsonSerializer.Deserialize<T>(json, JsonSerializerOptions)!;
+    public static T Deserialize<T>(string json, JsonSerializerOptions? options = null) => 
+        JsonSerializer.Deserialize<T>(json, options ?? JsonSerializerOptions)!;
 
     /// <summary>
     /// Serializes the specified object to a JSON string.
     /// </summary>
     /// <param name="any">The object to serialize.</param>
+    /// <param name="options">Optional custom serialization options</param>
     /// <returns>The JSON string representation of the object.</returns>
-    public static string Serialize(object any) => 
-        JsonSerializer.Serialize(any, JsonSerializerOptions);
+    public static string Serialize(object any, JsonSerializerOptions? options = null) => 
+        JsonSerializer.Serialize(any, options ?? JsonSerializerOptions);
 }
