@@ -4,6 +4,11 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.0...HEAD)
 
+**Implemented enhancements:**
+
+- Serializer improvements [\#383](https://github.com/christianhelle/refitter/issues/383)
+- Update Serializer to write indented JSON [\#384](https://github.com/christianhelle/refitter/pull/384) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.5 [\#382](https://github.com/christianhelle/refitter/pull/382) ([renovate[bot]](https://github.com/apps/renovate))
