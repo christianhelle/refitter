@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-42-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-43-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1753,6 +1753,9 @@ Refitter supports .NET versions with current long-term support **(6.0 and 8.0)**
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/osc-nseguin"><img src="https://avatars.githubusercontent.com/u/133910309?v=4?s=100" width="100px;" alt="Nick Seguin"/><br /><sub><b>Nick Seguin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=osc-nseguin" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/david-brink-talogy"><img src="https://avatars.githubusercontent.com/u/43828739?v=4?s=100" width="100px;" alt="David Brink"/><br /><sub><b>David Brink</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adavid-brink-talogy" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=david-brink-talogy" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/dammitjanet"><img src="https://avatars.githubusercontent.com/u/952723?v=4?s=100" width="100px;" alt="Stu Wilson"/><br /><sub><b>Stu Wilson</b></sub></a><br /><a href="#ideas-dammitjanet" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=dammitjanet" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/sharpzilla"><img src="https://avatars.githubusercontent.com/u/16763634?v=4?s=100" width="100px;" alt="sharpzilla"/><br /><sub><b>sharpzilla</b></sub></a><br /><a href="#ideas-sharpzilla" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
