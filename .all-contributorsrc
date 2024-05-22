@@ -396,6 +396,15 @@
         "ideas",
         "code"
       ]
+    },
+    {
+      "login": "sharpzilla",
+      "name": "sharpzilla",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16763634?v=4",
+      "profile": "https://github.com/sharpzilla",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
