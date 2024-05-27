@@ -11,6 +11,9 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update xunit-dotnet monorepo to v2.8.1 [\#390](https://github.com/christianhelle/refitter/pull/390) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency sonaranalyzer.csharp to v9.25.1.91650 [\#389](https://github.com/christianhelle/refitter/pull/389) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add sharpzilla as a contributor for ideas [\#387](https://github.com/christianhelle/refitter/pull/387) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.5 [\#382](https://github.com/christianhelle/refitter/pull/382) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update mcr.microsoft.com/devcontainers/dotnet docker tag to v1 [\#381](https://github.com/christianhelle/refitter/pull/381) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency sonaranalyzer.csharp to v9.25.0.90414 [\#380](https://github.com/christianhelle/refitter/pull/380) ([renovate[bot]](https://github.com/apps/renovate))
