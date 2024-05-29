@@ -11,6 +11,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.6 [\#391](https://github.com/christianhelle/refitter/pull/391) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update xunit-dotnet monorepo to v2.8.1 [\#390](https://github.com/christianhelle/refitter/pull/390) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency sonaranalyzer.csharp to v9.25.1.91650 [\#389](https://github.com/christianhelle/refitter/pull/389) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.net.test.sdk to v17.10.0 [\#388](https://github.com/christianhelle/refitter/pull/388) ([renovate[bot]](https://github.com/apps/renovate))
