@@ -405,6 +405,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "Jappinen",
+      "name": "Tatu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/44408497?v=4",
+      "profile": "https://github.com/Jappinen",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
