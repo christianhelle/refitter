@@ -7,10 +7,13 @@
 **Implemented enhancements:**
 
 - Serializer improvements [\#383](https://github.com/christianhelle/refitter/issues/383)
+- Remove SonarAnalyzer.CSharp dependency [\#394](https://github.com/christianhelle/refitter/pull/394) ([christianhelle](https://github.com/christianhelle))
 - Update Serializer to write indented JSON [\#384](https://github.com/christianhelle/refitter/pull/384) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
+- docs: add Jappinen as a contributor for bug [\#395](https://github.com/christianhelle/refitter/pull/395) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency sonaranalyzer.csharp to v9.26.0.92422 [\#392](https://github.com/christianhelle/refitter/pull/392) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.6 [\#391](https://github.com/christianhelle/refitter/pull/391) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update xunit-dotnet monorepo to v2.8.1 [\#390](https://github.com/christianhelle/refitter/pull/390) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency sonaranalyzer.csharp to v9.25.1.91650 [\#389](https://github.com/christianhelle/refitter/pull/389) ([renovate[bot]](https://github.com/apps/renovate))
@@ -22,11 +25,7 @@
 
 ## [1.0.0](https://github.com/christianhelle/refitter/tree/1.0.0) (2024-05-03)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.9.44-preview...1.0.0)
-
-## [0.9.9.44-preview](https://github.com/christianhelle/refitter/tree/0.9.9.44-preview) (2024-04-29)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.9...0.9.9.44-preview)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/0.9.9...1.0.0)
 
 **Implemented enhancements:**
 
