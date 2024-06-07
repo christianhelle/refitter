@@ -37,8 +37,4 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.26.0.92422" />
-  </ItemGroup>
-
 </Project>
