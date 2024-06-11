@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.1...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency microsoft.codeanalysis.csharp to v4.10.0 [\#396](https://github.com/christianhelle/refitter/pull/396) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.0.1](https://github.com/christianhelle/refitter/tree/1.0.1) (2024-06-07)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.0...1.0.1)
 
 **Implemented enhancements:**
 
