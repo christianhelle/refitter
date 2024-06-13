@@ -1691,7 +1691,7 @@ Returns a response that looks something like this:
 ```
 
 ## System requirements
-Refitter supports .NET version **8.0**
+.NET 8.0
 
 ## Contributors
 
