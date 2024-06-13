@@ -95,4 +95,4 @@ The settings file uses the [.refitter file format](refitter-file-format.md)
 
 ## System requirements
 
-Refitter supports .NET versions with current long-term support **(6.0 and 8.0)**
+Refitter supports .NET version **8.0**
