@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update nswag monorepo to v14.0.8 [\#397](https://github.com/christianhelle/refitter/pull/397) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.codeanalysis.csharp to v4.10.0 [\#396](https://github.com/christianhelle/refitter/pull/396) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.0.1](https://github.com/christianhelle/refitter/tree/1.0.1) (2024-06-07)
