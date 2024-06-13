@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        framework: [net6.0, net8.0]
+        framework: [net8.0]
         format: [json, yaml]
         version: [v2.0, v3.0]
         os: [ubuntu-latest]
@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        framework: [net6.0, net8.0]
+        framework: [net8.0]
         os: [ubuntu-latest]
         openapi_url: [
           "https://petstore3.swagger.io/api/v3/openapi.json", 
