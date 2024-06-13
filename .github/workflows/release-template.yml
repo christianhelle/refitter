@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Sets environment variables - branch-name
-        uses: nelonoel/branch-name@v1.0.1
+        uses: nelonoel/branch-name@v1.0.2
       - name: Sets environment variables - Nerdbank.GitVersioning
         uses: dotnet/nbgv@master
         with:
