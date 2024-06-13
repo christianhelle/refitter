@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0; net8.0</TargetFrameworks>
     <Title>Refitter</Title>
     <PackageId>Refitter</PackageId>
     <AssemblyName>refitter</AssemblyName>
@@ -10,6 +9,7 @@
     <Product>Refit API Client Code Generator</Product>
     <Description>Refitter is a CLI tool for generating a C# REST API Client using the Refit library.</Description>
     <PackAsTool>true</PackAsTool>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
