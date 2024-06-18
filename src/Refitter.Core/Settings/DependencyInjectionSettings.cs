@@ -20,7 +20,13 @@ public class DependencyInjectionSettings
     /// <summary>
     /// Set this to true to use Polly for transient fault handling.
     /// </summary>
+    [Obsolete("Use HandleTransientErrors instead")]
     public bool UsePolly { get; set; }
+    
+    /// <summary>
+    /// Set this to true to implement transient fault handling.
+    /// </summary>
+    public TransientErrorHandler HandleTransientErrors { get; set; } = TransientErrorHandler.None;
 
     /// <summary>
     /// Default max retry count for Polly. Default is 6.
