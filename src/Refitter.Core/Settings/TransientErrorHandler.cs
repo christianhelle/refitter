@@ -16,5 +16,5 @@ public enum TransientErrorHandler
     /// <summary>
     /// Use Microsoft.Extensions.Http.Resilience for transient fault handling
     /// </summary>
-    MicrosoftHttpResilience
+    HttpResilience
 }

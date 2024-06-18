@@ -81,7 +81,7 @@ internal static class DependencyInjectionGenerator
                                                       {{iocSettings.PollyMaxRetryCount}})))
                       """);
             } 
-            else if (iocSettings.HandleTransientErrors == TransientErrorHandler.MicrosoftHttpResilience)
+            else if (iocSettings.HandleTransientErrors == TransientErrorHandler.HttpResilience)
             {
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 code.AppendLine();
