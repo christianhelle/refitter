@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Refitter.Tests;
 
-public class DependencyInjectionGeneratorTests
+public class DependencyInjectionGeneratorWithPollyTests
 {
     private readonly RefitGeneratorSettings settings = new()
     {
