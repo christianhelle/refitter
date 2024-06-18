@@ -18,7 +18,7 @@ public class DependencyInjectionGeneratorTests
                 "AuthorizationMessageHandler",
                 "DiagnosticMessageHandler"
             },
-            UsePolly = true,
+            HandleTransientErrors = TransientErrorHandler.Polly,
             PollyMaxRetryCount = 3,
             FirstBackoffRetryInSeconds = 0.5,
         }
@@ -73,7 +73,7 @@ public class DependencyInjectionGeneratorTests
     [Fact]
     public void Can_Generate_Without_Polly()
     {
-        settings.DependencyInjectionSettings!.UsePolly = false;
+        settings.DependencyInjectionSettings!.HandleTransientErrors = TransientErrorHandler.None;
         string code = DependencyInjectionGenerator.Generate(
             settings,
             new[]

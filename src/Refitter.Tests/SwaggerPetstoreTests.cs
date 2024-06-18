@@ -299,7 +299,7 @@ public class SwaggerPetstoreTests
         settings.DependencyInjectionSettings = new DependencyInjectionSettings
         {
             BaseUrl = "https://petstore3.swagger.io/api/v3",
-            UsePolly = true
+            HandleTransientErrors = TransientErrorHandler.Polly
         };
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().Contain("ConfigureRefitClients");
@@ -316,7 +316,7 @@ public class SwaggerPetstoreTests
         settings.DependencyInjectionSettings = new DependencyInjectionSettings
         {
             BaseUrl = "https://petstore3.swagger.io/api/v3",
-            UsePolly = true
+            HandleTransientErrors = TransientErrorHandler.Polly
         };
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().Contain("using Polly");
@@ -333,7 +333,7 @@ public class SwaggerPetstoreTests
         settings.DependencyInjectionSettings = new DependencyInjectionSettings
         {
             BaseUrl = "https://petstore3.swagger.io/api/v3",
-            UsePolly = false
+            HandleTransientErrors = TransientErrorHandler.None
         };
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().NotContain("using Polly");
