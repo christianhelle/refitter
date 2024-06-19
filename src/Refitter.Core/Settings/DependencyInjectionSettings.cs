@@ -29,9 +29,9 @@ public class DependencyInjectionSettings
     public TransientErrorHandler HandleTransientErrors { get; set; } = TransientErrorHandler.None;
 
     /// <summary>
-    /// Default max retry count for Polly. Default is 6.
+    /// Default max retry count for transient error handling. Default is 6.
     /// </summary>
-    public int PollyMaxRetryCount { get; set; } = 6;
+    public int MaxRetryCount { get; set; } = 6;
 
     /// <summary>
     /// The median delay to target before the first retry in seconds. Default is 1 second
