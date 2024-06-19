@@ -1,4 +1,6 @@
-﻿namespace Refitter.Core;
+﻿using System.Text.Json.Serialization;
+
+namespace Refitter.Core;
 
 /// <summary>
 /// Dependency Injection settings describing how the Refit client should be configured.
@@ -26,7 +28,8 @@ public class DependencyInjectionSettings
     /// <summary>
     /// Set this to true to implement transient fault handling.
     /// </summary>
-    public TransientErrorHandler HandleTransientErrors { get; set; } = TransientErrorHandler.None;
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public TransientErrorHandler TransientErrorHandler { get; set; }
 
     /// <summary>
     /// Default max retry count for transient error handling. Default is 6.
