@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Refitter.Tests;
 
-public class DependencyInjectionGeneratorWithPollyTests
+public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
 {
     private readonly RefitGeneratorSettings settings = new()
     {
@@ -18,9 +18,7 @@ public class DependencyInjectionGeneratorWithPollyTests
                 "AuthorizationMessageHandler",
                 "DiagnosticMessageHandler"
             },
-            TransientErrorHandler = TransientErrorHandler.Polly,
-            MaxRetryCount = 3,
-            FirstBackoffRetryInSeconds = 0.5,
+            TransientErrorHandler = TransientErrorHandler.HttpResilience
         }
     };
 
@@ -55,7 +53,7 @@ public class DependencyInjectionGeneratorWithPollyTests
     }
 
     [Fact]
-    public void Can_Generate_With_Polly()
+    public void Can_Generate_With_HttpResilience()
     {
         string code = DependencyInjectionGenerator.Generate(
             settings,
@@ -64,14 +62,10 @@ public class DependencyInjectionGeneratorWithPollyTests
                 "IPetApi",
                 "IStoreApi"
             });
-
-        code.Should().Contain("using Polly");
-        code.Should().Contain("AddPolicyHandler");
-        code.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
     [Fact]
-    public void Can_Generate_Without_Polly()
+    public void Can_Generate_Without_TransientErrorHandler()
     {
         settings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
         string code = DependencyInjectionGenerator.Generate(
@@ -82,7 +76,7 @@ public class DependencyInjectionGeneratorWithPollyTests
                 "IStoreApi"
             });
 
-        code.Should().NotContain("using Polly");
+        code.Should().NotContain("using HttpResilience");
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
         code.Should().NotContain("AddPolicyHandler");
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");

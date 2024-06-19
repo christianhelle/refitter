@@ -1,0 +1,15 @@
+{
+  "openApiPath": "../Resources/V3/SwaggerPetstore.json",
+  "namespace": "Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience",
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstoreInterfaceWithHttpResilience",
+    "filename": "SwaggerPetstoreInterfaceWithHttpResilience"
+  },
+  "dependencyInjectionSettings": {
+    "baseUrl": "https://petstore3.swagger.io/api/v3",
+    "transientErrorHandler": "HttpResilience",
+     "maxRetryCount": 3,
+     "firstBackoffRetryInSeconds": 0.5
+  }
+}
