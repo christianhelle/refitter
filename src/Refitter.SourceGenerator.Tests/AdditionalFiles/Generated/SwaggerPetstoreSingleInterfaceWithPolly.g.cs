@@ -728,10 +728,10 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
 namespace Refitter.Tests.AdditionalFiles.SingeInterface
 {
     using System;
-    using Microsoft.Extensions.DependencyInjection;
-    using Polly;
-    using Polly.Contrib.WaitAndRetry;
-    using Polly.Extensions.Http;
+   using Microsoft.Extensions.DependencyInjection;
+   using Polly;
+   using Polly.Contrib.WaitAndRetry;
+   using Polly.Extensions.Http;
 
     public static partial class IServiceCollectionExtensions
     {
@@ -741,7 +741,9 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
                 .AddRefitClient<ISwaggerPetstoreInterface>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"))
                 .AddHttpMessageHandler<EmptyMessageHandler>()
-                .AddHttpMessageHandler<AnotherEmptyMessageHandler>()
+                .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
+            clientBuilderISwaggerPetstoreInterface
                 .AddPolicyHandler(
                     HttpPolicyExtensions
                         .HandleTransientHttpError()
@@ -749,6 +751,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
                             Backoff.DecorrelatedJitterBackoffV2(
                                 TimeSpan.FromSeconds(0.5),
                                 3)));
+
             builder?.Invoke(clientBuilderISwaggerPetstoreInterface);
 
             return services;

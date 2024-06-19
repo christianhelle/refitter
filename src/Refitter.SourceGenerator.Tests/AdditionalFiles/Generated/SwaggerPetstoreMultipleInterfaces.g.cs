@@ -471,6 +471,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIUpdatePetEndpoint);
 
             var clientBuilderIAddPetEndpoint = services
@@ -478,6 +479,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIAddPetEndpoint);
 
             var clientBuilderIFindPetsByStatusEndpoint = services
@@ -485,6 +487,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIFindPetsByStatusEndpoint);
 
             var clientBuilderIFindPetsByTagsEndpoint = services
@@ -492,6 +495,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIFindPetsByTagsEndpoint);
 
             var clientBuilderIGetPetByIdEndpoint = services
@@ -499,6 +503,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIGetPetByIdEndpoint);
 
             var clientBuilderIUpdatePetWithFormEndpoint = services
@@ -506,6 +511,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIUpdatePetWithFormEndpoint);
 
             var clientBuilderIDeletePetEndpoint = services
@@ -513,6 +519,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIDeletePetEndpoint);
 
             var clientBuilderIUploadFileEndpoint = services
@@ -520,6 +527,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIUploadFileEndpoint);
 
             var clientBuilderIGetInventoryEndpoint = services
@@ -527,6 +535,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIGetInventoryEndpoint);
 
             var clientBuilderIPlaceOrderEndpoint = services
@@ -534,6 +543,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIPlaceOrderEndpoint);
 
             var clientBuilderIGetOrderByIdEndpoint = services
@@ -541,6 +551,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIGetOrderByIdEndpoint);
 
             var clientBuilderIDeleteOrderEndpoint = services
@@ -548,6 +559,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIDeleteOrderEndpoint);
 
             var clientBuilderICreateUserEndpoint = services
@@ -555,6 +567,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderICreateUserEndpoint);
 
             var clientBuilderICreateUsersWithListInputEndpoint = services
@@ -562,6 +575,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderICreateUsersWithListInputEndpoint);
 
             var clientBuilderILoginUserEndpoint = services
@@ -569,6 +583,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderILoginUserEndpoint);
 
             var clientBuilderILogoutUserEndpoint = services
@@ -576,6 +591,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderILogoutUserEndpoint);
 
             var clientBuilderIGetUserByNameEndpoint = services
@@ -583,6 +599,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIGetUserByNameEndpoint);
 
             var clientBuilderIUpdateUserEndpoint = services
@@ -590,6 +607,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIUpdateUserEndpoint);
 
             var clientBuilderIDeleteUserEndpoint = services
@@ -597,6 +615,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
                 .ConfigureHttpClient(c => c.BaseAddress = baseUrl)
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
+
             builder?.Invoke(clientBuilderIDeleteUserEndpoint);
 
             return services;

@@ -737,7 +737,9 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
         {
             var clientBuilderISwaggerPetstoreInterfaceWithHttpResilience = services
                 .AddRefitClient<ISwaggerPetstoreInterfaceWithHttpResilience>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"))
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"));
+
+            clientBuilderISwaggerPetstoreInterfaceWithHttpResilience
                 .AddStandardResilienceHandler(config =>
                 {
                     config.Retry = new HttpRetryStrategyOptions
@@ -746,7 +748,8 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
                         MaxRetryAttempts = 3,
                         Delay = TimeSpan.FromSeconds(0.5)
                     };
-                });;
+                });
+
             builder?.Invoke(clientBuilderISwaggerPetstoreInterfaceWithHttpResilience);
 
             return services;
