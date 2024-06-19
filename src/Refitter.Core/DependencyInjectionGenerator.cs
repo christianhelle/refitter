@@ -23,18 +23,25 @@ internal static class DependencyInjectionGenerator
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
             : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
         
-        var usings = iocSettings.HandleTransientErrors == TransientErrorHandler.Polly
-            ? """
-              using System;
-                  using Microsoft.Extensions.DependencyInjection;
-                  using Polly;
-                  using Polly.Contrib.WaitAndRetry;
-                  using Polly.Extensions.Http;
-              """
-            : """
-              using System;
-                  using Microsoft.Extensions.DependencyInjection;
-              """;
+        var usings = iocSettings.TransientErrorHandler switch
+        {
+            TransientErrorHandler.Polly => """
+                                           using System;
+                                               using Microsoft.Extensions.DependencyInjection;
+                                               using Polly;
+                                               using Polly.Contrib.WaitAndRetry;
+                                               using Polly.Extensions.Http;
+                                           """,
+            TransientErrorHandler.HttpResilience => """
+                 using System;
+                     using Microsoft.Extensions.DependencyInjection;
+                     using Microsoft.Extensions.Http.Resilience;
+                 """,
+            _ => """
+                 using System;
+                     using Microsoft.Extensions.DependencyInjection;
+                 """
+        };
 
         code.AppendLine();
         code.AppendLine();
@@ -66,7 +73,7 @@ internal static class DependencyInjectionGenerator
                 code.Append($"                .AddHttpMessageHandler<{httpMessageHandler}>()");
             }
 
-            if (iocSettings.HandleTransientErrors == TransientErrorHandler.Polly)
+            if (iocSettings.TransientErrorHandler == TransientErrorHandler.Polly)
             {
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 code.AppendLine();
@@ -78,17 +85,24 @@ internal static class DependencyInjectionGenerator
                                               .WaitAndRetryAsync(
                                                   Backoff.DecorrelatedJitterBackoffV2(
                                                       TimeSpan.FromSeconds({{durationString}}),
-                                                      {{iocSettings.PollyMaxRetryCount}})))
+                                                      {{iocSettings.MaxRetryCount}})))
                       """);
             } 
-            else if (iocSettings.HandleTransientErrors == TransientErrorHandler.HttpResilience)
+            else if (iocSettings.TransientErrorHandler == TransientErrorHandler.HttpResilience)
             {
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 code.AppendLine();
                 code.Append(
                     $$"""
-                                      .AddStandardResilienceHandler()
-                                      .Configure(o => o.CircuitBreaker.MinimumThroughput = 10)
+                                      .AddStandardResilienceHandler(config =>
+                                      {
+                                          config.Retry = new HttpRetryStrategyOptions
+                                          {
+                                              UseJitter = true,
+                                              MaxRetryAttempts = {{iocSettings.MaxRetryCount}},
+                                              Delay = TimeSpan.FromSeconds({{durationString}})
+                                          };
+                                      });
                       """);
             }
 
