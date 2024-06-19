@@ -163,7 +163,7 @@
                     "type": "boolean",
                     "description": "Indicates whether to use Polly for the dependency injection settings."
                 },
-                "pollyMaxRetryCount": {
+                "maxRetryCount": {
                     "type": "integer",
                     "description": "The maximum retry count for Polly in the dependency injection settings."
                 },
