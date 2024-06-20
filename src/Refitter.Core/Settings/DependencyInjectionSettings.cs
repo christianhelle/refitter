@@ -26,7 +26,11 @@ public class DependencyInjectionSettings
     public bool UsePolly { get; set; }
     
     /// <summary>
-    /// Set this to true to implement transient fault handling.
+    /// Library to use for transient error handling
+    /// Options:
+    /// - None
+    /// - Polly - Polly Framework and HTTP Extensions
+    /// - HttpResilience - Microsoft HTTP Resilience Library
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TransientErrorHandler TransientErrorHandler { get; set; }
