@@ -9,7 +9,7 @@
   },
   "dependencyInjectionSettings": {
     "baseUrl": "https://petstore3.swagger.io/api/v3",
-    "usePolly": true,
+    "transientErrorHandler": "HttpResilience",
     "maxRetryCount": 3,
     "firstBackoffRetryInSeconds": 0.5
   },
