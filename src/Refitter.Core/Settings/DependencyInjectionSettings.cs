@@ -22,7 +22,7 @@ public class DependencyInjectionSettings
     /// <summary>
     /// Set this to true to use Polly for transient fault handling.
     /// </summary>
-    [Obsolete("Use HandleTransientErrors instead", true)]
+    [Obsolete("Use TransientErrorHandler instead")]
     public bool UsePolly { get; set; }
     
     /// <summary>
