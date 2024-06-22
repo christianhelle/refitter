@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.2...HEAD)
+
+**Implemented enhancements:**
+
+- Polly.Extensions.Http deprecated in favour of Microsoft.Extensions.Http.Resilience [\#398](https://github.com/christianhelle/refitter/issues/398)
+- Add support for Microsoft HTTP Resilience library [\#400](https://github.com/christianhelle/refitter/pull/400) ([christianhelle](https://github.com/christianhelle))
+
+## [1.0.2](https://github.com/christianhelle/refitter/tree/1.0.2) (2024-06-13)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.1...1.0.2)
 
 **Merged pull requests:**
 
