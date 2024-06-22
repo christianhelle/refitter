@@ -86,7 +86,7 @@ paths:
             DependencyInjectionSettings = new DependencyInjectionSettings
             {
                 BaseUrl = "https://example.com/api/v1",
-                UsePolly = true
+                TransientErrorHandler = TransientErrorHandler.Polly
             }
         };
 

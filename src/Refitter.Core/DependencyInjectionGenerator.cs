@@ -22,19 +22,28 @@ internal static class DependencyInjectionGenerator
         var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
             : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
-        
-        var usings = iocSettings.UsePolly
-            ? """
-              using System;
-                  using Microsoft.Extensions.DependencyInjection;
-                  using Polly;
-                  using Polly.Contrib.WaitAndRetry;
-                  using Polly.Extensions.Http;
-              """
-            : """
-              using System;
-                  using Microsoft.Extensions.DependencyInjection;
-              """;
+
+        var usings = iocSettings.TransientErrorHandler switch
+        {
+            TransientErrorHandler.Polly =>
+                """
+                using System;
+                   using Microsoft.Extensions.DependencyInjection;
+                   using Polly;
+                   using Polly.Contrib.WaitAndRetry;
+                   using Polly.Extensions.Http;
+                """,
+            TransientErrorHandler.HttpResilience =>
+                """
+                using System;
+                    using Microsoft.Extensions.DependencyInjection;
+                    using Microsoft.Extensions.Http.Resilience;
+                """,
+            _ => """
+                 using System;
+                     using Microsoft.Extensions.DependencyInjection;
+                 """
+        };
 
         code.AppendLine();
         code.AppendLine();
@@ -65,28 +74,47 @@ internal static class DependencyInjectionGenerator
                 code.AppendLine();
                 code.Append($"                .AddHttpMessageHandler<{httpMessageHandler}>()");
             }
+            
+            code.Append(";");
+            code.AppendLine();
 
-            if (iocSettings.UsePolly)
+            if (iocSettings.TransientErrorHandler == TransientErrorHandler.Polly)
             {
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 code.AppendLine();
-                code.Append(
+                code.AppendLine(
                     $$"""
+                                  {{clientBuilderName}}
                                       .AddPolicyHandler(
                                           HttpPolicyExtensions
                                               .HandleTransientHttpError()
                                               .WaitAndRetryAsync(
                                                   Backoff.DecorrelatedJitterBackoffV2(
                                                       TimeSpan.FromSeconds({{durationString}}),
-                                                      {{iocSettings.PollyMaxRetryCount}})))
+                                                      {{iocSettings.MaxRetryCount}})));
+                      """);
+            } 
+            else if (iocSettings.TransientErrorHandler == TransientErrorHandler.HttpResilience)
+            {
+                var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
+                code.AppendLine();
+                code.AppendLine(
+                    $$"""
+                                  {{clientBuilderName}}
+                                      .AddStandardResilienceHandler(config =>
+                                      {
+                                          config.Retry = new HttpRetryStrategyOptions
+                                          {
+                                              UseJitter = true,
+                                              MaxRetryAttempts = {{iocSettings.MaxRetryCount}},
+                                              Delay = TimeSpan.FromSeconds({{durationString}})
+                                          };
+                                      });
                       """);
             }
 
-            code.Append(";");
             code.AppendLine();
-            code.Append($"            builder?.Invoke({clientBuilderName});");
-
-            code.AppendLine();
+            code.AppendLine($"            builder?.Invoke({clientBuilderName});");
             code.AppendLine();
         }
         

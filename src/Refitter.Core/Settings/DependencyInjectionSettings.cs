@@ -1,4 +1,6 @@
-﻿namespace Refitter.Core;
+﻿using System.Text.Json.Serialization;
+
+namespace Refitter.Core;
 
 /// <summary>
 /// Dependency Injection settings describing how the Refit client should be configured.
@@ -20,12 +22,23 @@ public class DependencyInjectionSettings
     /// <summary>
     /// Set this to true to use Polly for transient fault handling.
     /// </summary>
+    [Obsolete("Use TransientErrorHandler instead")]
     public bool UsePolly { get; set; }
+    
+    /// <summary>
+    /// Library to use for transient error handling
+    /// Options:
+    /// - None
+    /// - Polly - Polly Framework and HTTP Extensions
+    /// - HttpResilience - Microsoft HTTP Resilience Library
+    /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public TransientErrorHandler TransientErrorHandler { get; set; }
 
     /// <summary>
-    /// Default max retry count for Polly. Default is 6.
+    /// Default max retry count for transient error handling. Default is 6.
     /// </summary>
-    public int PollyMaxRetryCount { get; set; } = 6;
+    public int MaxRetryCount { get; set; } = 6;
 
     /// <summary>
     /// The median delay to target before the first retry in seconds. Default is 1 second

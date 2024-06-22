@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Refitter.Tests.AdditionalFiles.SingeInterface
+namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
 {
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
-    public partial interface ISwaggerPetstoreInterface
+    public partial interface ISwaggerPetstoreInterfaceWithHttpResilience
     {
         /// <summary>Update an existing pet</summary>
         /// <remarks>Update an existing pet by Id</remarks>
@@ -392,7 +392,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
 #pragma warning disable 8625 // Disable "CS8625 Cannot convert null literal to non-nullable reference type"
 #pragma warning disable CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
 
-namespace Refitter.Tests.AdditionalFiles.SingeInterface
+namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
 {
     using System = global::System;
 
@@ -725,31 +725,32 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
 
 
 #nullable enable
-namespace Refitter.Tests.AdditionalFiles.SingeInterface
+namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
 {
     using System;
     using Microsoft.Extensions.DependencyInjection;
-    using Polly;
-    using Polly.Contrib.WaitAndRetry;
-    using Polly.Extensions.Http;
+    using Microsoft.Extensions.Http.Resilience;
 
     public static partial class IServiceCollectionExtensions
     {
         public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default)
         {
-            var clientBuilderISwaggerPetstoreInterface = services
-                .AddRefitClient<ISwaggerPetstoreInterface>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"))
-                .AddHttpMessageHandler<EmptyMessageHandler>()
-                .AddHttpMessageHandler<AnotherEmptyMessageHandler>()
-                .AddPolicyHandler(
-                    HttpPolicyExtensions
-                        .HandleTransientHttpError()
-                        .WaitAndRetryAsync(
-                            Backoff.DecorrelatedJitterBackoffV2(
-                                TimeSpan.FromSeconds(0.5),
-                                3)));
-            builder?.Invoke(clientBuilderISwaggerPetstoreInterface);
+            var clientBuilderISwaggerPetstoreInterfaceWithHttpResilience = services
+                .AddRefitClient<ISwaggerPetstoreInterfaceWithHttpResilience>()
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"));
+
+            clientBuilderISwaggerPetstoreInterfaceWithHttpResilience
+                .AddStandardResilienceHandler(config =>
+                {
+                    config.Retry = new HttpRetryStrategyOptions
+                    {
+                        UseJitter = true,
+                        MaxRetryAttempts = 3,
+                        Delay = TimeSpan.FromSeconds(0.5)
+                    };
+                });
+
+            builder?.Invoke(clientBuilderISwaggerPetstoreInterfaceWithHttpResilience);
 
             return services;
         }

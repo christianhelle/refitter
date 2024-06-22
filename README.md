@@ -191,7 +191,7 @@ The following is an example `.refitter` file
         "TelemetryMessageHandler" 
     ],
     "usePolly": true, // Optional. Set this to true, to configure Polly with a retry policy that uses a jittered backoff. Default=false
-    "pollyMaxRetryCount": 3, // Optional. Default=6
+    "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
   },
   "codeGeneratorSettings": { // Optional. Default settings are the values set in this example
@@ -263,7 +263,7 @@ The following is an example `.refitter` file
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
   - `usePolly` - Set this to true to configure the HttpClient to use Polly using a retry policy with a jittered backoff
-  - `pollyMaxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
+  - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
   - `requiredPropertiesMustBeDefined` - Default is true,

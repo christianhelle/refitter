@@ -51,6 +51,18 @@ public static class SettingsValidator
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings)
     {
+        if (refitGeneratorSettings.DependencyInjectionSettings is not null)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (refitGeneratorSettings.DependencyInjectionSettings.UsePolly)
+#pragma warning restore CS0618 // Type or member is obsolete
+            {
+                return ValidationResult.Error(
+                    "The 'usePolly' property in the settings file is deprecated. " +
+                    "Use 'transientErrorHandler' instead");
+            }
+        }
+        
         if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
         {
             return GetValidationErrorForOpenApiPath();
