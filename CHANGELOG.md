@@ -9,6 +9,10 @@
 - Polly.Extensions.Http deprecated in favour of Microsoft.Extensions.Http.Resilience [\#398](https://github.com/christianhelle/refitter/issues/398)
 - Add support for Microsoft HTTP Resilience library [\#400](https://github.com/christianhelle/refitter/pull/400) ([christianhelle](https://github.com/christianhelle))
 
+**Merged pull requests:**
+
+- chore\(deps\): update refit monorepo to v7.1.0 [\#399](https://github.com/christianhelle/refitter/pull/399) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [1.0.2](https://github.com/christianhelle/refitter/tree/1.0.2) (2024-06-13)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.1...1.0.2)
