@@ -11,6 +11,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update refit monorepo to v7.1.1 [\#402](https://github.com/christianhelle/refitter/pull/402) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update refit monorepo to v7.1.0 [\#399](https://github.com/christianhelle/refitter/pull/399) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.0.2](https://github.com/christianhelle/refitter/tree/1.0.2) (2024-06-13)
