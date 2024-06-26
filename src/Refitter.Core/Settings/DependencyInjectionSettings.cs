@@ -42,6 +42,17 @@ public class DependencyInjectionSettings
 
     /// <summary>
     /// Default max retry count for transient error handling. Default is 6.
+    /// This is deprecated. Use MaxRetryCount instead.
+    /// </summary>
+    [Obsolete("Use MaxRetryCount instead")]
+    public int PollyMaxRetryCount
+    {
+        get => MaxRetryCount;
+        set => MaxRetryCount = value;
+    }
+
+    /// <summary>
+    /// Default max retry count for transient error handling. Default is 6.
     /// </summary>
     public int MaxRetryCount { get; set; } = 6;
 
