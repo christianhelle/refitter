@@ -68,6 +68,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
                 refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
                 refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
+
+                ShowDeprecationWarning(refitGeneratorSettings);
             }
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
@@ -117,14 +119,30 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 AnsiConsole.WriteLine();
             }
 
-            AnsiConsole.MarkupLine("[yellow]#############################################################################[/]");
-            AnsiConsole.MarkupLine("[yellow]#  Consider reporting the problem if you are unable to resolve it yourself  #[/]");
-            AnsiConsole.MarkupLine("[yellow]#  https://github.com/christianhelle/refitter/issues                        #[/]");
-            AnsiConsole.MarkupLine("[yellow]#############################################################################[/]");
+            AnsiConsole.MarkupLine("[yellow]####################################################################[/]");
+            AnsiConsole.MarkupLine("[yellow]#  Consider reporting the problem if you are unable to resolve it  #[/]");
+            AnsiConsole.MarkupLine("[yellow]#  https://github.com/christianhelle/refitter/issues               #[/]");
+            AnsiConsole.MarkupLine("[yellow]####################################################################[/]");
             AnsiConsole.WriteLine();
 
             await Analytics.LogError(exception, settings);
             return exception.HResult;
+        }
+    }
+
+    private static void ShowDeprecationWarning(RefitGeneratorSettings refitGeneratorSettings)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (refitGeneratorSettings.DependencyInjectionSettings?.UsePolly is true)
+#pragma warning restore CS0618 // Type or member is obsolete
+        {
+            AnsiConsole.MarkupLine("[yellow]###############################################################[/]");
+            AnsiConsole.MarkupLine("[yellow]#  The 'usePolly' property in the settings file is deprecated #[/]");
+            AnsiConsole.MarkupLine("[yellow]#  and will be removed in the near future.                    #[/]");
+            AnsiConsole.MarkupLine("[yellow]#                                                             #[/]");
+            AnsiConsole.MarkupLine("[yellow]#  Use 'transientErrorHandler: Polly' instead                 #[/]");
+            AnsiConsole.MarkupLine("[yellow]###############################################################[/]");
+            AnsiConsole.WriteLine();
         }
     }
 
