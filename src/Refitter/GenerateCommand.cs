@@ -68,8 +68,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
                 refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
                 refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
-
-                ShowDeprecationWarning(refitGeneratorSettings);
             }
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
@@ -93,7 +91,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             if (!settings.NoBanner)
                 DonationBanner();
-
+            
+            ShowDeprecationWarning(refitGeneratorSettings);
             return 0;
         }
         catch (Exception exception)
