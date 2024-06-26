@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.0.45-preview...HEAD)
+
+**Implemented enhancements:**
+
+- UsePolly deprecation warning banner [\#403](https://github.com/christianhelle/refitter/pull/403) ([christianhelle](https://github.com/christianhelle))
+
+## [1.1.0.45-preview](https://github.com/christianhelle/refitter/tree/1.1.0.45-preview) (2024-06-25)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.2...1.1.0.45-preview)
 
 **Implemented enhancements:**
 
