@@ -21,9 +21,14 @@ public class DependencyInjectionSettings
 
     /// <summary>
     /// Set this to true to use Polly for transient fault handling.
+    /// This is deprecated. Use TransientErrorHandler instead.
     /// </summary>
     [Obsolete("Use TransientErrorHandler instead")]
-    public bool UsePolly { get; set; }
+    public bool UsePolly
+    {
+        get => TransientErrorHandler == TransientErrorHandler.Polly;
+        set => TransientErrorHandler = value ? TransientErrorHandler.Polly : TransientErrorHandler.None;
+    }
     
     /// <summary>
     /// Library to use for transient error handling
@@ -34,6 +39,17 @@ public class DependencyInjectionSettings
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TransientErrorHandler TransientErrorHandler { get; set; }
+
+    /// <summary>
+    /// Default max retry count for transient error handling. Default is 6.
+    /// This is deprecated. Use MaxRetryCount instead.
+    /// </summary>
+    [Obsolete("Use MaxRetryCount instead")]
+    public int PollyMaxRetryCount
+    {
+        get => MaxRetryCount;
+        set => MaxRetryCount = value;
+    }
 
     /// <summary>
     /// Default max retry count for transient error handling. Default is 6.
