@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-44-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-45-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1757,6 +1757,7 @@ Returns a response that looks something like this:
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sharpzilla"><img src="https://avatars.githubusercontent.com/u/16763634?v=4?s=100" width="100px;" alt="sharpzilla"/><br /><sub><b>sharpzilla</b></sub></a><br /><a href="#ideas-sharpzilla" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Jappinen"><img src="https://avatars.githubusercontent.com/u/44408497?v=4?s=100" width="100px;" alt="Tatu"/><br /><sub><b>Tatu</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AJappinen" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.respawnsive.com"><img src="https://avatars.githubusercontent.com/u/4272307?v=4?s=100" width="100px;" alt="Jérémy BRUN-PICARD"/><br /><sub><b>Jérémy BRUN-PICARD</b></sub></a><br /><a href="#ideas-JeremyBP" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
