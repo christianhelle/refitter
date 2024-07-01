@@ -63,7 +63,7 @@ The following is an example `.refitter` file
         "TelemetryMessageHandler" 
     ],
     "usePolly": true, // DEPRECATED - Use "transientErrorHandler": "None|Polly|HttpResilience" instead
-    "transientErrorHandler": "HttpResilience", // Optional. Set this to true, to configure transient error handling with a retry policy that uses a jittered backoff. May be one of None, Polly, HttpResilience
+    "transientErrorHandler": "HttpResilience", // Optional. Set this to configure transient error handling with a retry policy that uses a jittered backoff. May be one of None, Polly, HttpResilience
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
   },
@@ -137,7 +137,8 @@ The following is an example `.refitter` file
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
-  - `usePolly` - Set this to true to configure the HttpClient to use Polly using a retry policy with a jittered backoff
+  - `usePolly` - (DEPRECATED) Set this to true to configure the HttpClient to use Polly using a retry policy with a jittered backoff
+  - `transientErrorHandler`: Set this to configure transient error handling with a retry policy that uses a jittered backoff. See https://refitter.github.io/api/Refitter.Core.TransientErrorHandler.html
   - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts

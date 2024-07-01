@@ -191,7 +191,7 @@ The following is an example `.refitter` file
         "TelemetryMessageHandler" 
     ],
     "usePolly": true, // DEPRECATED - Use "transientErrorHandler": "None|Polly|HttpResilience" instead
-    "transientErrorHandler": "HttpResilience", // Optional. Set this to true, to configure transient error handling with a retry policy that uses a jittered backoff. May be one of None, Polly, HttpResilience
+    "transientErrorHandler": "HttpResilience", // Optional. Set this to configure transient error handling with a retry policy that uses a jittered backoff. May be one of None, Polly, HttpResilience
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
   },
