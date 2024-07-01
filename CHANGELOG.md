@@ -2,11 +2,23 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.0.45-preview...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.1-preview.46...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update refit monorepo to v7.1.2 [\#406](https://github.com/christianhelle/refitter/pull/406) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.1.1-preview.46](https://github.com/christianhelle/refitter/tree/1.1.1-preview.46) (2024-06-28)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.0.45-preview...1.1.1-preview.46)
 
 **Implemented enhancements:**
 
 - UsePolly deprecation warning banner [\#403](https://github.com/christianhelle/refitter/pull/403) ([christianhelle](https://github.com/christianhelle))
+
+**Merged pull requests:**
+
+- docs: add JeremyBP as a contributor for ideas [\#405](https://github.com/christianhelle/refitter/pull/405) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
 ## [1.1.0.45-preview](https://github.com/christianhelle/refitter/tree/1.1.0.45-preview) (2024-06-25)
 
