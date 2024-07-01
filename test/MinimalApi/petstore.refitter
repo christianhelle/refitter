@@ -5,7 +5,7 @@
   "dependencyInjectionSettings": {
     "baseUrl": "https://petstore3.swagger.io/api/v3",
     "httpMessageHandlers": [ "TelemetryDelegatingHandler" ],
-    "usePolly": true,
+    "transientErrorHandler": "Polly",
     "maxRetryCount": 3,
     "firstBackoffRetryInSeconds": 0.5
   }
