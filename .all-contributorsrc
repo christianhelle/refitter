@@ -423,6 +423,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "ebarnard",
+      "name": "Ed Barnard",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1059683?v=4",
+      "profile": "https://github.com/ebarnard",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
