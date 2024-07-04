@@ -7,11 +7,13 @@
 **Implemented enhancements:**
 
 - Polly.Extensions.Http deprecated in favour of Microsoft.Extensions.Http.Resilience [\#398](https://github.com/christianhelle/refitter/issues/398)
+- Add support for generating immutable records [\#409](https://github.com/christianhelle/refitter/pull/409) ([christianhelle](https://github.com/christianhelle))
 - UsePolly deprecation warning banner [\#403](https://github.com/christianhelle/refitter/pull/403) ([christianhelle](https://github.com/christianhelle))
 - Add support for Microsoft HTTP Resilience library [\#400](https://github.com/christianhelle/refitter/pull/400) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
+- docs: add ebarnard as a contributor for ideas [\#408](https://github.com/christianhelle/refitter/pull/408) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update refit monorepo to v7.1.2 [\#406](https://github.com/christianhelle/refitter/pull/406) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add JeremyBP as a contributor for ideas [\#405](https://github.com/christianhelle/refitter/pull/405) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update refit monorepo to v7.1.1 [\#402](https://github.com/christianhelle/refitter/pull/402) ([renovate[bot]](https://github.com/apps/renovate))
@@ -23,7 +25,7 @@
 
 **Merged pull requests:**
 
-- chore\(deps\): update nswag monorepo to v14.0.8 [\#397](https://github.com/christianhelle/refitter/pull/397) ([renovate[bot]](https://github.com/apps/renovate))
+- NSwag v14.0.8 [\#397](https://github.com/christianhelle/refitter/pull/397) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.codeanalysis.csharp to v4.10.0 [\#396](https://github.com/christianhelle/refitter/pull/396) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.0.1](https://github.com/christianhelle/refitter/tree/1.0.1) (2024-06-07)
