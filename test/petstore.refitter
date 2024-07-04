@@ -19,5 +19,5 @@
     "arrayType": "System.Collections.Generic.IList"
   },
   "operationNameGenerator": "default",
-  "typeAccessibility": "internal"
+  "typeAccessibility": "public"
 }
