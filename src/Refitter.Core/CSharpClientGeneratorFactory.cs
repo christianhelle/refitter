@@ -25,15 +25,15 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                 GenerateDtoTypes = true,
                 GenerateClientInterfaces = false,
                 GenerateExceptionClasses = false,
-                CodeGeneratorSettings =
-                {
-                    PropertyNameGenerator = new CustomCSharpPropertyNameGenerator(),
-                },
+                CodeGeneratorSettings = { PropertyNameGenerator = new CustomCSharpPropertyNameGenerator(), },
                 CSharpGeneratorSettings =
                 {
                     Namespace = settings.Namespace,
                     JsonLibrary = CSharpJsonLibrary.SystemTextJson,
                     TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant(),
+                    ClassStyle = settings.CodeGeneratorSettings?.GenerateNativeRecords is true
+                        ? CSharpClassStyle.Record
+                        : CSharpClassStyle.Poco,
                 }
             });
 

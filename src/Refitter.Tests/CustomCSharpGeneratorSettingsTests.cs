@@ -135,6 +135,22 @@ public class CustomCSharpGeneratorSettingsTests
         generateCode.Should().NotContain("class User");
     }
 
+    [Theory]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineAutoNSubstituteData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_With_Immutable_Records(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.ReturnIApiResponse = true;
+        settings.CodeGeneratorSettings = new CodeGeneratorSettings { GenerateNativeRecords = true, };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("record Pet");
+        generateCode.Should().Contain("Pet(");
+        generateCode.Should().Contain("[JsonConstructor]");
+    }
+
     private static async Task<string> GenerateCode(
         SampleOpenSpecifications version,
         string filename,
