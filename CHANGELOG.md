@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.1...HEAD)
+
+**Implemented enhancements:**
+
+- Support generating immutable records [\#407](https://github.com/christianhelle/refitter/issues/407)
+
+**Merged pull requests:**
+
+- chore\(deps\): update xunit-dotnet monorepo [\#410](https://github.com/christianhelle/refitter/pull/410) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.1.1](https://github.com/christianhelle/refitter/tree/1.1.1) (2024-07-04)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.0.2...1.1.1)
 
 **Implemented enhancements:**
 
