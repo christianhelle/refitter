@@ -733,10 +733,10 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
 
     public static partial class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default)
+        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default, RefitSettings? settings = default)
         {
             var clientBuilderISwaggerPetstoreInterfaceWithHttpResilience = services
-                .AddRefitClient<ISwaggerPetstoreInterfaceWithHttpResilience>()
+                .AddRefitClient<ISwaggerPetstoreInterfaceWithHttpResilience>(settings)
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"));
 
             clientBuilderISwaggerPetstoreInterfaceWithHttpResilience

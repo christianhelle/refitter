@@ -735,10 +735,10 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
 
     public static partial class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default)
+        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default, RefitSettings? settings = default)
         {
             var clientBuilderISwaggerPetstoreInterface = services
-                .AddRefitClient<ISwaggerPetstoreInterface>()
+                .AddRefitClient<ISwaggerPetstoreInterface>(settings)
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"))
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();
