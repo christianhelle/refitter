@@ -7,9 +7,11 @@
 **Implemented enhancements:**
 
 - Support generating immutable records [\#407](https://github.com/christianhelle/refitter/issues/407)
+- Add optional RefitterSettings in generated IoC registration code [\#413](https://github.com/christianhelle/refitter/pull/413) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
+- Add Dependency Injection section to docs [\#414](https://github.com/christianhelle/refitter/pull/414) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency microsoft.extensions.http.resilience to v8.7.0 [\#412](https://github.com/christianhelle/refitter/pull/412) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.7 [\#411](https://github.com/christianhelle/refitter/pull/411) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update xunit-dotnet monorepo [\#410](https://github.com/christianhelle/refitter/pull/410) ([renovate[bot]](https://github.com/apps/renovate))
