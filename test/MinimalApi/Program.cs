@@ -1,4 +1,5 @@
 using Petstore;
+using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -6,7 +7,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging(logging => logging.AddDebug());
 builder.Services.AddTransient<TelemetryDelegatingHandler>();
-builder.Services.ConfigureRefitClients();
+builder.Services.ConfigureRefitClients(
+    settings: new RefitSettings { });
 
 var app = builder.Build();
 app.MapGet(
