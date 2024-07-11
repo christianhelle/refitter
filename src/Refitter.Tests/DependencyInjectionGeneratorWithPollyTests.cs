@@ -35,8 +35,8 @@ public class DependencyInjectionGeneratorWithPollyTests
                 "IStoreApi"
             });
 
-        code.Should().Contain("AddRefitClient<IPetApi>()");
-        code.Should().Contain("AddRefitClient<IStoreApi>()");
+        code.Should().Contain("AddRefitClient<IPetApi>(settings)");
+        code.Should().Contain("AddRefitClient<IStoreApi>(settings)");
     }
 
     [Fact]
