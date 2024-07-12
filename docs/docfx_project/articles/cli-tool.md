@@ -58,6 +58,7 @@ OPTIONS:
         --no-operation-headers                                   Don't generate operation headers                                                                                                          
         --no-logging                                             Don't log errors or collect telemetry                                                                                                     
         --additional-namespace                                   Add additional namespace to generated types                                                                                               
+        --exclude-namespace                                      Exclude namespace on generated types                                                                                                      
         --use-iso-date-format                                    Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)                             
         --multiple-interfaces                                    Generate a Refit interface for each endpoint. May be one of ByEndpoint, ByTag                                                             
         --match-path                                             Only include Paths that match the provided regular expression. May be set multiple times                                                  
@@ -81,6 +82,7 @@ OPTIONS:
                                                                  - SingleClientFromOperationId                                                                                                             
                                                                  - SingleClientFromPathSegments                                                                                                            
                                                                  See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html for more information                                    
+        --immutable-records                                      Generate contracts as immutable records instead of classes                                                                                
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
