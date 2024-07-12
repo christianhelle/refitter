@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.2-preview.49...HEAD)
+
+**Implemented enhancements:**
+
+- Introduce --immutable-records CLI tool argument [\#415](https://github.com/christianhelle/refitter/pull/415) ([christianhelle](https://github.com/christianhelle))
+
+## [1.1.2-preview.49](https://github.com/christianhelle/refitter/tree/1.1.2-preview.49) (2024-07-11)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.1...1.1.2-preview.49)
 
 **Implemented enhancements:**
 
