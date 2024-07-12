@@ -27,7 +27,11 @@ function GenerateAndBuild {
         
         [Parameter(Mandatory=$false)]
         [string]
-        $args
+        $args,
+
+        [Parameter(Mandatory=$false)]
+        [bool]
+        $netCore = $false
     )
     
     Get-ChildItem '*.generated.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName }
@@ -52,8 +56,13 @@ function GenerateAndBuild {
     }
 
     Write-Host "`r`nBuilding ConsoleApp`r`n"
+    $solution = "./ConsoleApp/ConsoleApp.sln"
+    if ($netCore) {
+        $solution = "./ConsoleApp/ConsoleApp.Core.sln"
+    }
+
     $process = Start-Process "dotnet" `
-        -Args "build -p:TreatWarningsAsErrors=true ./ConsoleApp/ConsoleApp.sln" `
+        -Args "build -p:TreatWarningsAsErrors=true $solution" `
         -NoNewWindow `
         -PassThru
     $process | Wait-Process
@@ -109,6 +118,7 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
+                    GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--immutable-records" -netCore $true
                     GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens"
                     GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal"
                     GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response"

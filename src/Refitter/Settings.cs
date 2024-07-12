@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 using Refitter.Core;
 
@@ -161,4 +160,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--operation-name-generator")]
     [DefaultValue(OperationNameGeneratorTypes.Default)]
     public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
+
+    [Description("Generate contracts as immutable records instead of classes")]
+    [CommandOption("--immutable-records")]
+    [DefaultValue(false)]
+    public bool ImmutableRecords { get; set; }
 }

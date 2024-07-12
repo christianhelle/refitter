@@ -612,4 +612,16 @@ public class SwaggerPetstoreTests
         generateCode.Should().Contain("Task<IApiResponse<Pet>>");
         generateCode.Should().NotContain("Task<IApiResponse<Pet?>>");
     }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_ImmutableRecords(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings { ImmutableRecords = true };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("record Pet");
+    }
 }

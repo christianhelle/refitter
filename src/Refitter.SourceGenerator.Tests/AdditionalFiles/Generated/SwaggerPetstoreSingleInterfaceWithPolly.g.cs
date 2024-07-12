@@ -735,7 +735,10 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
 
     public static partial class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default, RefitSettings? settings = default)
+        public static IServiceCollection ConfigureRefitClients(
+            this IServiceCollection services, 
+            Action<IHttpClientBuilder>? builder = default, 
+            RefitSettings? settings = default)
         {
             var clientBuilderISwaggerPetstoreInterface = services
                 .AddRefitClient<ISwaggerPetstoreInterface>(settings)
