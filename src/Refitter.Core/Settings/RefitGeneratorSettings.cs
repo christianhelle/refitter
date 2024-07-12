@@ -178,7 +178,7 @@ public class RefitGeneratorSettings
     public bool GenerateDefaultAdditionalProperties { get; set; } = true;
 
     /// <summary>
-    /// Set to <c>true</c> to generate contracts as immutable records
+    /// Set to <c>true</c> to generate contracts as immutable records instead of classes
     /// </summary>
     public bool ImmutableRecords { get; set; }
 }

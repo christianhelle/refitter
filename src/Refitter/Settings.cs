@@ -161,7 +161,7 @@ public sealed class Settings : CommandSettings
     [DefaultValue(OperationNameGeneratorTypes.Default)]
     public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
 
-    [Description("Generate immutable records")]
+    [Description("Generate contracts as immutable records instead of classes")]
     [CommandOption("--immutable-records")]
     [DefaultValue(false)]
     public bool ImmutableRecords { get; set; }
