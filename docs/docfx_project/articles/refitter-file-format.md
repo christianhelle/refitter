@@ -324,6 +324,10 @@ The following is an example `.refitter` file
             "type": "string",
             "description": "The generator used to generate operation names."
         },
+        "immutableRecords": {
+            "type": "boolean",
+            "description": "Set to true to generate contracts as immutable records instead of classes"
+        },
         "dependencyInjectionSettings": {
             "type": "object",
             "properties": {
