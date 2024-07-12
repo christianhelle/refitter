@@ -464,7 +464,11 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
 
     public static partial class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureRefitClients(this IServiceCollection services, Uri baseUrl, Action<IHttpClientBuilder>? builder = default, RefitSettings? settings = default)
+        public static IServiceCollection ConfigureRefitClients(
+            this IServiceCollection services, 
+            Uri baseUrl, 
+            Action<IHttpClientBuilder>? builder = default, 
+            RefitSettings? settings = default)
         {
             var clientBuilderIUpdatePetEndpoint = services
                 .AddRefitClient<IUpdatePetEndpoint>(settings)
