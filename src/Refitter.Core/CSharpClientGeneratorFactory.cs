@@ -31,9 +31,14 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                     Namespace = settings.Namespace,
                     JsonLibrary = CSharpJsonLibrary.SystemTextJson,
                     TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant(),
-                    ClassStyle = settings.CodeGeneratorSettings?.GenerateNativeRecords is true
+                    ClassStyle =
+                        settings.ImmutableRecords ||
+                        settings.CodeGeneratorSettings?.GenerateNativeRecords is true
                         ? CSharpClassStyle.Record
                         : CSharpClassStyle.Poco,
+                    GenerateNativeRecords =
+                        settings.ImmutableRecords ||
+                        settings.CodeGeneratorSettings?.GenerateNativeRecords is true,
                 }
             });
 
