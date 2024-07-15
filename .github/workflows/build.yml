@@ -28,7 +28,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:    
     - name: 🛒 Checkout repository
-      uses: actions/checkout@v4        
+      uses: actions/checkout@v4
+    - name: 🛠️ Prepare
+      continue-on-error: true
+      run: |
+        rm -rf src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
+        dotnet build src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
     - name: 🛠️ Build
       run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
     - name: 🧪 Test
