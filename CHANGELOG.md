@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Update dependency Microsoft.CodeAnalysis.CSharp to v4.10.0 [\#416](https://github.com/christianhelle/refitter/pull/416) ([renovate[bot]](https://github.com/apps/renovate))
 - Introduce --immutable-records CLI tool argument [\#415](https://github.com/christianhelle/refitter/pull/415) ([christianhelle](https://github.com/christianhelle))
 
 ## [1.1.2-preview.49](https://github.com/christianhelle/refitter/tree/1.1.2-preview.49) (2024-07-11)
