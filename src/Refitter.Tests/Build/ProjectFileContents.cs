@@ -20,6 +20,7 @@ public static class ProjectFileContents
     <PackageReference Include=""Polly.Extensions.Http"" Version=""3.0.0"" />
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""6.3.2"" />
     <PackageReference Include=""System.Reactive"" Version=""6.0.0"" />
+    <PackageReference Include=""Apizr.Extensions.Microsoft.DependencyInjection"" Version=""5.0.1"" />
   </ItemGroup>
 </Project>";
 }

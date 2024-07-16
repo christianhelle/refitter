@@ -60,7 +60,9 @@ internal static class ParameterExtractor
 
         parameters = ReOrderNullableParameters(parameters, settings);
 
-        if (settings.UseCancellationTokens)
+        if (settings.UseApizr)
+            parameters.Add("[RequestOptions] IApizrRequestOptions options");
+        else if (settings.UseCancellationTokens)
             parameters.Add("CancellationToken cancellationToken = default");
 
         return parameters;
@@ -70,7 +72,7 @@ internal static class ParameterExtractor
         List<string> parameters,
         RefitGeneratorSettings settings)
     {
-        if (!settings.OptionalParameters)
+        if (!settings.OptionalParameters || settings.UseApizr)
             return parameters;
 
         parameters = parameters.OrderBy(c => c.Contains("?")).ToList();
