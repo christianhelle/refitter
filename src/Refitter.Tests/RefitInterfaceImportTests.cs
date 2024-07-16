@@ -41,4 +41,21 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().NotContain("System.Threading");
         refitInterfaceImport.Should().Contain("System.Threading.Tasks");
     }
+
+    [Fact]
+    public void Should_Contain_ApizrConfiguringRequest()
+    {
+        var settings = new RefitGeneratorSettings { UseApizr = true };
+        var refitInterfaceImport = RefitInterfaceImports.GetImportedNamespaces(settings);
+        refitInterfaceImport.Should().Contain("Apizr.Configuring.Request");
+    }
+
+    [Fact]
+    public void Should_Contain_ApizrConfiguringRequest_And_NotContain_SystemThreading()
+    {
+        var settings = new RefitGeneratorSettings { UseApizr = true, UseCancellationTokens = true };
+        var refitInterfaceImport = RefitInterfaceImports.GetImportedNamespaces(settings);
+        refitInterfaceImport.Should().Contain("Apizr.Configuring.Request");
+        refitInterfaceImport.Should().NotContain("System.Threading");
+    }
 }

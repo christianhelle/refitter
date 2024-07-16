@@ -181,4 +181,12 @@ public class RefitGeneratorSettings
     /// Set to <c>true</c> to generate contracts as immutable records instead of classes
     /// </summary>
     public bool ImmutableRecords { get; set; }
+
+    /// <summary>
+    /// "Use Apizr by:"
+    /// - including request options parameter"
+    /// - overloading methods with optional parameters if any"
+    /// - adjusting dependency injection settings if any"
+    /// </summary>
+    public bool UseApizr { get; set; }
 }

@@ -53,6 +53,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             OperationNameGenerator = settings.OperationNameGenerator,
             GenerateDefaultAdditionalProperties = !settings.SkipDefaultAdditionalProperties,
             ImmutableRecords = settings.ImmutableRecords,
+            UseApizr = settings.UseApizr
         };
 
         try
