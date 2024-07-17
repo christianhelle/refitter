@@ -2,32 +2,18 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.2-preview.50...HEAD)
-
-**Merged pull requests:**
-
-- Update nswag monorepo to v14.1.0 [\#418](https://github.com/christianhelle/refitter/pull/418) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.1.2-preview.50](https://github.com/christianhelle/refitter/tree/1.1.2-preview.50) (2024-07-15)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.2-preview.49...1.1.2-preview.50)
-
-**Implemented enhancements:**
-
-- Update dependency Microsoft.CodeAnalysis.CSharp to v4.10.0 [\#416](https://github.com/christianhelle/refitter/pull/416) ([renovate[bot]](https://github.com/apps/renovate))
-- Introduce --immutable-records CLI tool argument [\#415](https://github.com/christianhelle/refitter/pull/415) ([christianhelle](https://github.com/christianhelle))
-
-## [1.1.2-preview.49](https://github.com/christianhelle/refitter/tree/1.1.2-preview.49) (2024-07-11)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.1...1.1.2-preview.49)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.1...HEAD)
 
 **Implemented enhancements:**
 
 - Support generating immutable records [\#407](https://github.com/christianhelle/refitter/issues/407)
+- Update dependency Microsoft.CodeAnalysis.CSharp to v4.10.0 [\#416](https://github.com/christianhelle/refitter/pull/416) ([renovate[bot]](https://github.com/apps/renovate))
+- Introduce --immutable-records CLI tool argument [\#415](https://github.com/christianhelle/refitter/pull/415) ([christianhelle](https://github.com/christianhelle))
 - Add optional RefitterSettings in generated IoC registration code [\#413](https://github.com/christianhelle/refitter/pull/413) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
+- Update nswag monorepo to v14.1.0 [\#418](https://github.com/christianhelle/refitter/pull/418) ([renovate[bot]](https://github.com/apps/renovate))
 - Add Dependency Injection section to docs [\#414](https://github.com/christianhelle/refitter/pull/414) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency microsoft.extensions.http.resilience to v8.7.0 [\#412](https://github.com/christianhelle/refitter/pull/412) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.7 [\#411](https://github.com/christianhelle/refitter/pull/411) ([renovate[bot]](https://github.com/apps/renovate))
