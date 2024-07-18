@@ -86,7 +86,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 Directory.CreateDirectory(directory);
 
             await File.WriteAllTextAsync(outputPath, code);
-            await Analytics.LogFeatureUsage(settings);
+            await Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
 
             AnsiConsole.MarkupLine($"[green]Duration: {stopwatch.Elapsed}{Crlf}[/]");
 
