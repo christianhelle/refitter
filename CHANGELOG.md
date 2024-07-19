@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.2...HEAD)
 
+**Implemented enhancements:**
+
+- Improve telemetry for --settings-file usage [\#419](https://github.com/christianhelle/refitter/pull/419) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - Revert Microsoft.CodeAnalysis.CSharp to v4.8.0 and update SourceGenerator smoke test project to use v1.1.1 [\#421](https://github.com/christianhelle/refitter/pull/421) ([christianhelle](https://github.com/christianhelle))
