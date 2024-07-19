@@ -1,8 +1,12 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [1.1.3-preview.51](https://github.com/christianhelle/refitter/tree/1.1.3-preview.51) (2024-07-19)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...1.1.3-preview.51)
+
+## [1.1.3](https://github.com/christianhelle/refitter/tree/1.1.3) (2024-07-19)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.2...1.1.3)
 
 **Implemented enhancements:**
 
@@ -10,7 +14,7 @@
 
 **Merged pull requests:**
 
-- Revert Microsoft.CodeAnalysis.CSharp to v4.8.0 and update SourceGenerator smoke test project to use v1.1.1 [\#421](https://github.com/christianhelle/refitter/pull/421) ([christianhelle](https://github.com/christianhelle))
+- Revert Microsoft.CodeAnalysis.CSharp to v4.8.0 [\#421](https://github.com/christianhelle/refitter/pull/421) ([christianhelle](https://github.com/christianhelle))
 
 ## [1.1.2](https://github.com/christianhelle/refitter/tree/1.1.2) (2024-07-17)
 
