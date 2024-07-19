@@ -21,8 +21,11 @@ public static class Analytics
         ExceptionlessClient.Default.Configuration.SetVersion(typeof(GenerateCommand).Assembly.GetName().Version!);
         ExceptionlessClient.Default.Startup("pRql7vmgecZ0Iph6MU5TJE5XsZeesdTe0yx7TN4f");
     }
-    
-    public static Task LogFeatureUsage(Settings settings)
+
+    public static Task LogFeatureUsage(
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings
+    )
     {
         if (settings.NoLogging)
             return Task.CompletedTask;
@@ -47,6 +50,14 @@ public static class Analytics
                         ExceptionlessClient.Default
                             .CreateFeatureUsage(attribute.LongNames.FirstOrDefault() ?? property.Name)
                             .Submit());
+        }
+
+        if (settings.SettingsFilePath is not null)
+        {
+            ExceptionlessClient
+                .Default.CreateFeatureUsage("settings-file")
+                .AddObject(refitGeneratorSettings, ignoreSerializationErrors: true)
+                .Submit();
         }
 
         return ExceptionlessClient.Default.ProcessQueueAsync();
