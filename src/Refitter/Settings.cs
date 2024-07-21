@@ -189,4 +189,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--use-dynamic-querystring-parameters")]
     [DefaultValue(false)]
     public bool UseDynamicQuerystringParameters { get; set; }
+
+    [Description("Generate multiple files")]
+    [CommandOption("--multiple-files")]
+    [DefaultValue(false)]
+    public bool GenerateMultipleFiles { get; set; }
 }
