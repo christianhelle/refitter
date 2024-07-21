@@ -1,9 +1,5 @@
 # Changelog
 
-## [1.1.3-preview.51](https://github.com/christianhelle/refitter/tree/1.1.3-preview.51) (2024-07-19)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...1.1.3-preview.51)
-
 ## [1.1.3](https://github.com/christianhelle/refitter/tree/1.1.3) (2024-07-19)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.2...1.1.3)
