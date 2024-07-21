@@ -181,4 +181,9 @@ public class RefitGeneratorSettings
     /// Set to <c>true</c> to generate contracts as immutable records instead of classes
     /// </summary>
     public bool ImmutableRecords { get; set; }
+
+    /// <summary>
+    /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
+    /// </summary>
+    public bool GenerateMultipleFiles { get; set; }
 }
