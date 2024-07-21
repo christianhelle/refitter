@@ -176,4 +176,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--use-apizr")]
     [DefaultValue(false)]
     public bool UseApizr { get; set; }
+
+    [Description("Generate multiple files")]
+    [CommandOption("--multiple-files")]
+    [DefaultValue(false)]
+    public bool GenerateMultipleFiles { get; set; }
 }
