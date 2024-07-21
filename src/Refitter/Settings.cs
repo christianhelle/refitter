@@ -165,4 +165,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--immutable-records")]
     [DefaultValue(false)]
     public bool ImmutableRecords { get; set; }
+
+    [Description("Generate multiple files")]
+    [CommandOption("--multiple-files")]
+    [DefaultValue(false)]
+    public bool GenerateMultipleFiles { get; set; }
 }
