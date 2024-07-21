@@ -367,3 +367,16 @@ tab_width = 4
 indent_size = 4
 end_of_line = crlf
 
+[*]
+# Non-configurable behaviors
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# Configurable behaviors
+# end_of_line = lf - there is no 'auto' with a .editorconfig
+indent_style = space
+indent_size = 4
+max_line_length = 120
