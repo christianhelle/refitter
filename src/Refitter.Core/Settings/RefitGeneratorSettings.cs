@@ -186,4 +186,8 @@ public class RefitGeneratorSettings
     /// Get ot set the settings describing how to configure Apizr
     /// </summary>
     public ApizrSettings? ApizrSettings { get; set; }
+
+    /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
+    /// </summary>
+    public bool GenerateMultipleFiles { get; set; }
 }
