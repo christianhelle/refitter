@@ -148,6 +148,45 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .TrimEnd();
     }
 
+    public GeneratorOutput GenerateMultipleFiles()
+    {
+        var factory = new CSharpClientGeneratorFactory(settings, document);
+        var generator = factory.Create();
+        var docGenerator = new XmlDocumentationGenerator(settings);
+        var contracts = RefitInterfaceImports
+            .GetImportedNamespaces(settings)
+            .Aggregate(generator.GenerateFile(), (current, import) => current.Replace($"{import}.", string.Empty));
+
+        var generatedFiles = new List<GeneratedCode>();
+        if (settings.GenerateContracts)
+        {
+            generatedFiles.Add(new GeneratedCode("Contracts.cs", contracts));
+        }
+
+        IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
+        {
+            MultipleInterfaces.ByEndpoint
+                => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
+            MultipleInterfaces.ByTag
+                => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
+            _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
+        };
+
+        var interfaces = GenerateClient(interfaceGenerator);
+        generatedFiles.Add(new GeneratedCode("RefitInterfaces.cs", interfaces.SourceCode));
+
+        if (settings.DependencyInjectionSettings is not null)
+        {
+            var code = DependencyInjectionGenerator.Generate(settings, interfaces.InterfaceNames);
+            if (code is not null)
+            {
+                generatedFiles.Add(new GeneratedCode("DependencyInjection.cs", code));
+            }
+        }
+
+        return new GeneratorOutput(generatedFiles);
+    }
+
     /// <summary>
     /// Generates the client code based on the specified interface generator.
     /// </summary>
