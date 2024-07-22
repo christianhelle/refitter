@@ -35,6 +35,7 @@ function GenerateAndBuild {
     )
     
     Get-ChildItem '*.generated.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName }
+    Remove-Item -Path './GeneratedCode/SwaggerPetstoreDirect.cs' -Force
 
     if ($args.Contains("settings-file")) {        
         Write-Host "refitter --no-logging $args"
@@ -118,7 +119,7 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--immutable-records" -netCore $true
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -outputPath "MultipleFiles$outputPath" -args "--multiple-files"
                     GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens"
                     GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal"
                     GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response"
@@ -128,6 +129,7 @@ function RunTests {
                     GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfaces" -outputPath "MultipleInterfacesWithCustomName$outputPath" -args "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync"
                     GenerateAndBuild -format $format -namespace "$namespace.TagFiltered" -outputPath "TagFiltered$outputPath" -args "--tag pet --tag user --tag store"
                     GenerateAndBuild -format $format -namespace "$namespace.MatchPathFiltered" -outputPath "MatchPathFiltered$outputPath" -args "--match-path ^/pet/.*"
+                    GenerateAndBuild -format $format -namespace "$namespace.ImmutableRecords" -outputPath "ImmutableRecords$outputPath" -args "--immutable-records" -netCore $true
                 }
             }
         }
