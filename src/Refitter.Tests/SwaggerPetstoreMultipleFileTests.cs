@@ -18,14 +18,35 @@ public class SwaggerPetstoreMultipleFileTests
         await GenerateCode(
             version,
             filename,
-            assert: c =>
+            assert: generatorOutput =>
             {
-                c.Files.Should().NotBeNullOrEmpty();
-                c.Files.Should().HaveCountGreaterOrEqualTo(2);
-                foreach ((_, string content) in c.Files)
+                generatorOutput.Files.Should().NotBeNullOrEmpty();
+                generatorOutput.Files.Should().HaveCountGreaterOrEqualTo(2);
+                foreach ((_, string content) in generatorOutput.Files)
                 {
                     content.Should().NotBeNullOrWhiteSpace();
                 }
+            });
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+#if !DEBUG
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+#endif
+    public async Task Can_Build_Generate_Code(SampleOpenSpecifications version, string filename)
+    {
+        await GenerateCode(
+            version,
+            filename,
+            assert: generatorOutput =>
+            {
+                BuildHelper
+                    .BuildCSharp(generatorOutput.Files.Select(code => code.Content).ToArray())
+                    .Should()
+                    .BeTrue();
             });
     }
 
