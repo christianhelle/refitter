@@ -55,16 +55,21 @@ internal static class ApizrRegistrationGenerator
                     using Microsoft.Extensions.Http.Resilience;
                     using Apizr;
                 """,
-            _ when isDependencyInjectionExtension => """
-                 using System;
+            _ when isDependencyInjectionExtension => 
+                """
+                using System;
                     using Microsoft.Extensions.DependencyInjection;
                     using Apizr;
-                 """,
-            _ => """
-                 using System;
+                """,
+            _ => 
+                """
+                using System;
                     using Apizr;
-                 """
+                """
         };
+
+        var usingsBuilder = new StringBuilder(usings);
+        usingsBuilder.AppendLine();
 
         code.AppendLine();
         code.AppendLine();
@@ -73,59 +78,78 @@ internal static class ApizrRegistrationGenerator
 
         if (isDependencyInjectionExtension)
         {
+            var hasBaseUrl = !string.IsNullOrWhiteSpace(iocSettings!.BaseUrl);
+            if (hasBaseUrl)
+            {
+                usingsBuilder.AppendLine(
+                $$"""
+                    using Apizr.Configuring;
+                """);
+            }
+
             #region Registry
 
             if (hasManyApis)
             {
+                usingsBuilder.AppendLine(
+                $$"""
+                    using Apizr.Extending.Configuring.Common;
+                """);
+
                 code.AppendLine(
                 $$"""
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
-                    {{usings}}
-                    using Apizr.Extending.Configuring.Common;
+                    {{usingsBuilder}}
                   
                     public static partial class IServiceCollectionExtensions
                     {
                         public static IServiceCollection {{methodName}}(
                             this IServiceCollection services,
                 """);
-                if (string.IsNullOrEmpty(iocSettings!.BaseUrl))
-                {
-                    code.AppendLine(
+
+                code.AppendLine(hasBaseUrl ?
+                $$"""
+                            Action<IApizrExtendedCommonOptionsBuilder>? optionsBuilder = null)
+                        {
+                """ :
                 $$"""
                             Action<IApizrExtendedCommonOptionsBuilder> optionsBuilder)
                         {
                 """);
-                }
-                else
+
+                code.AppendLine(
+                $$"""         
+                            optionsBuilder ??= _ => { }; // Default empty options if null
+                            optionsBuilder += options => options
+                """);
+
+                if (hasBaseUrl)
                 {
-                    code.AppendLine(
-                $$"""
-                            Action<IApizrExtendedCommonOptionsBuilder> optionsBuilder = null)
-                        {
-                            if(optionsBuilder == null)
-                                optionsBuilder = options => options.WithBaseAddress({{iocSettings.BaseUrl}});
-                            else
-                                optionsBuilder += options => options.WithBaseAddress({{iocSettings.BaseUrl}}, ApizrDuplicateStrategy.Ignore);
+                    code.Append(
+                $$"""               
+                                .WithBaseAddress("{{iocSettings.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
                 """);
                 }
 
+                code.Append(";");
                 code.AppendLine();
-                code.AppendLine(
+                code.AppendLine();
+                code.Append(
                 $"""
-                            services.AddApizr(
+                            return services.AddApizr(
                                 registry => registry
                 """);
-                for (var i = 0; i < interfaceNames.Length; i++)
+                foreach (var interfaceName in interfaceNames)
                 {
-                    var lineBreak = i == interfaceNames.Length - 1 ? "," : string.Empty;
-                    code.AppendLine(
-                $"""
-                                    .AddManagerFor<{interfaceNames[i]}>(){lineBreak}
-                """);
+                    code.AppendLine();
+                    code.Append(
+                $"                  .AddManagerFor<{interfaceName}>()");
                 }
 
+                code.Append(",");
+                code.AppendLine();
                 code.AppendLine(
                 $"""
                                 optionsBuilder);
@@ -135,11 +159,6 @@ internal static class ApizrRegistrationGenerator
 #pragma warning disable RS1035
                 code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
 #pragma warning restore RS1035
-                code.AppendLine();
-                code.AppendLine(
-                $"""
-                            return services;
-                """);
             }
 
             #endregion
@@ -148,55 +167,59 @@ internal static class ApizrRegistrationGenerator
 
             else
             {
+                usingsBuilder.AppendLine(
+                $$"""
+                    using Apizr.Extending.Configuring.Manager;
+                """);
+
                 code.AppendLine(
                 $$"""
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
-                    {{usings}}
-                    using Apizr.Extending.Configuring.Manager;
+                    {{usingsBuilder}}
 
                     public static partial class IServiceCollectionExtensions
                     {
                         public static IServiceCollection {{methodName}}(
                             this IServiceCollection services,
                 """);
-                if (string.IsNullOrEmpty(iocSettings!.BaseUrl))
-                {
-                    code.AppendLine(
+
+                code.AppendLine(hasBaseUrl ? 
+                $$"""
+                            Action<IApizrExtendedManagerOptionsBuilder>? optionsBuilder = null)
+                        {
+                """ : 
                 $$"""
                             Action<IApizrExtendedManagerOptionsBuilder> optionsBuilder)
                         {
                 """);
-                }
-                else
+
+                code.AppendLine(
+                $$"""         
+                            optionsBuilder ??= _ => { }; // Default empty options if null
+                            optionsBuilder += options => options
+                """);
+
+                if (hasBaseUrl)
                 {
-                    code.AppendLine(
-                $$"""
-                            Action<IApizrExtendedManagerOptionsBuilder> optionsBuilder = null)
-                        {
-                            if(optionsBuilder == null)
-                                optionsBuilder = options => options.WithBaseAddress({{iocSettings.BaseUrl}});
-                            else
-                                optionsBuilder += options => options.WithBaseAddress({{iocSettings.BaseUrl}}, ApizrDuplicateStrategy.Ignore);
+                    code.Append(
+                $$"""               
+                                .WithBaseAddress("{{iocSettings.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
                 """);
                 }
 
+                code.Append(";");
+                code.AppendLine();
                 code.AppendLine();
                 code.AppendLine(
                 $$"""               
-                            services.AddApizrManagerFor<{{interfaceNames[0]}}>(optionsBuilder);
+                            return services.AddApizrManagerFor<{{interfaceNames[0]}}>(optionsBuilder);
                 """);
 
-                code.AppendLine();
 #pragma warning disable RS1035
                 code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
 #pragma warning restore RS1035
-                code.AppendLine();
-                code.AppendLine(
-                $$"""
-                            return services;
-                """);
             } 
 
             #endregion
@@ -212,49 +235,58 @@ internal static class ApizrRegistrationGenerator
 
             if (hasManyApis)
             {
+                usingsBuilder.AppendLine(
+                $$"""
+                    using Apizr.Configuring.Registry;
+                """);
+
                 code.AppendLine(
                 $$"""
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
-                    {{usings}}
-                    using Apizr.Configuring.Registry;
+                    {{usingsBuilder}}
                   
                     public static partial class ApizrRegistration
                     {
                         public static IApizrRegistry {{methodName}}(Action<IApizrCommonOptionsBuilder> optionsBuilder)
                         {
-                            if(optionsBuilder == null)
-                                optionsBuilder = options => options.WithBaseAddress("");
-                            else
-                                optionsBuilder += options => options.WithBaseAddress("");
-                                
-                            var apizrRegistry = ApizrBuilder.Current.CreateRegistry(
-                                registry => registry
+                            optionsBuilder ??= _ => { }; // Default empty options if null
+                            optionsBuilder += options => options
                 """);
-                for (var i = 0; i < interfaceNames.Length; i++)
+                if (true) // todo: add conditional logic
                 {
-                    var lineBreak = i == interfaceNames.Length - 1 ? "," : string.Empty;
-                    code.AppendLine(
-                $"""
-                                    .AddManagerFor<{interfaceNames[i]}>(){lineBreak}
+                    code.Append(
+                $$"""               
+                                .WithBaseAddress("https://test.com", ApizrDuplicateStrategy.Ignore)
                 """);
                 }
 
+                code.Append(";");
+                code.AppendLine();
+                code.AppendLine();
+                code.Append(
+                $"""
+                            return ApizrBuilder.Current.CreateRegistry(
+                                registry => registry
+                """);
+                foreach (var interfaceName in interfaceNames)
+                {
+                    code.AppendLine();
+                    code.Append(
+                $"                  .AddManagerFor<{interfaceName}>()");
+                }
+
+                code.Append(",");
+                code.AppendLine();
                 code.AppendLine(
                 $"""
                                 optionsBuilder);
                 """);
 
-                code.AppendLine();
 #pragma warning disable RS1035
                 code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
 #pragma warning restore RS1035
-                code.AppendLine();
-                code.AppendLine(
-                $"""
-                            return apizrRegistry;
-                """);
             }
 
             #endregion
@@ -263,42 +295,52 @@ internal static class ApizrRegistrationGenerator
 
             else
             {
+                usingsBuilder.AppendLine(
+                $$"""
+                    using Apizr.Configuring.Manager;
+                """);
+
                 code.AppendLine(
                 $$"""
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
-                    {{usings}}
-                    Apizr.Configuring.Manager;
+                    {{usingsBuilder}}
                       
                     public static partial class ApizrRegistration
                     {
                         public static IApizrManager<{{interfaceNames[0]}}> {{methodName}}(Action<IApizrManagerOptionsBuilder> optionsBuilder)
                         {
-                            if(optionsBuilder == null)
-                                optionsBuilder = options => options.WithBaseAddress("");
-                            else
-                                optionsBuilder += options => options.WithBaseAddress("");
-                                
-                            var apizrManager = ApizrBuilder.Current.CreateManagerFor<{{interfaceNames[0]}}>(optionsBuilder);
+                            optionsBuilder ??= _ => { }; // Default empty options if null
+                            optionsBuilder += options => options
+                """);
+                if (true) // todo: add conditional logic
+                {
+                    code.Append(
+                $$"""               
+                                .WithBaseAddress("https://test.com", ApizrDuplicateStrategy.Ignore)
+                """);
+                }
+
+                code.Append(";");
+                code.AppendLine();
+                code.AppendLine();
+                code.Append(
+                $"""
+                            return ApizrBuilder.Current.CreateManagerFor<{interfaceNames[0]}>(optionsBuilder);  
                 """);
 
-                code.AppendLine();
 #pragma warning disable RS1035
                 code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
 #pragma warning restore RS1035
-                code.AppendLine();
-                code.AppendLine(
-                $"""
-                            return apizrManager;
-                """);
             } 
 
             #endregion
-        } 
+        }
 
         #endregion
 
+        code.AppendLine();
         code.AppendLine(
                 $$"""
                         }
