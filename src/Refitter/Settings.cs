@@ -24,7 +24,7 @@ public sealed class Settings : CommandSettings
     [DefaultValue("GeneratedCode")]
     public string? Namespace { get; set; }
 
-    [Description("Path to Output file")]
+    [Description("Path to Output file or folder (if multiple files are generated)")]
     [CommandOption("-o|--output")]
     [DefaultValue(DefaultOutputPath)]
     public string? OutputPath { get; set; }
