@@ -16,6 +16,7 @@ internal static class ApizrRegistrationGenerator
         var hasManyApis = interfaceNames.Length > 1;
         var iocSettings = settings.DependencyInjectionSettings;
         var isDependencyInjectionExtension = iocSettings != null;
+        var hasBaseUrl = !string.IsNullOrWhiteSpace(iocSettings?.BaseUrl);
         string? methodName = iocSettings?.ExtensionMethodName;
         if (string.IsNullOrWhiteSpace(methodName) || (settings.UseApizr && methodName == DependencyInjectionSettings.DefaultExtensionMethodName))
         {
@@ -68,8 +69,26 @@ internal static class ApizrRegistrationGenerator
                 """
         };
 
-        var usingsBuilder = new StringBuilder(usings);
-        usingsBuilder.AppendLine();
+        var usingsCodeBuilder = new StringBuilder(usings);
+        usingsCodeBuilder.AppendLine();
+
+        var optionsCode =
+            $$"""
+            optionsBuilder ??= _ => { }; // Default empty options if null
+                        optionsBuilder += options => options
+            """;
+        var optionsCodeBuilder = new StringBuilder(optionsCode);
+        optionsCodeBuilder.AppendLine();
+
+        if (hasBaseUrl)
+        {
+            optionsCodeBuilder.Append(
+            $$"""               
+                            .WithBaseAddress("{{iocSettings!.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
+            """);
+        }
+
+        optionsCodeBuilder.Append(";");
 
         code.AppendLine();
         code.AppendLine();
@@ -78,10 +97,9 @@ internal static class ApizrRegistrationGenerator
 
         if (isDependencyInjectionExtension)
         {
-            var hasBaseUrl = !string.IsNullOrWhiteSpace(iocSettings!.BaseUrl);
             if (hasBaseUrl)
             {
-                usingsBuilder.AppendLine(
+                usingsCodeBuilder.AppendLine(
                 $$"""
                     using Apizr.Configuring;
                 """);
@@ -91,7 +109,7 @@ internal static class ApizrRegistrationGenerator
 
             if (hasManyApis)
             {
-                usingsBuilder.AppendLine(
+                usingsCodeBuilder.AppendLine(
                 $$"""
                     using Apizr.Extending.Configuring.Common;
                 """);
@@ -101,7 +119,7 @@ internal static class ApizrRegistrationGenerator
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
-                    {{usingsBuilder}}
+                    {{usingsCodeBuilder}}
                   
                     public static partial class IServiceCollectionExtensions
                     {
@@ -119,25 +137,10 @@ internal static class ApizrRegistrationGenerator
                         {
                 """);
 
-                code.AppendLine(
-                $$"""         
-                            optionsBuilder ??= _ => { }; // Default empty options if null
-                            optionsBuilder += options => options
-                """);
-
-                if (hasBaseUrl)
-                {
-                    code.Append(
-                $$"""               
-                                .WithBaseAddress("{{iocSettings.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
-                """);
-                }
-
-                code.Append(";");
-                code.AppendLine();
-                code.AppendLine();
                 code.Append(
-                $"""
+                $$"""
+                            {{optionsCodeBuilder}}
+                            
                             return services.AddApizr(
                                 registry => registry
                 """);
@@ -167,7 +170,7 @@ internal static class ApizrRegistrationGenerator
 
             else
             {
-                usingsBuilder.AppendLine(
+                usingsCodeBuilder.AppendLine(
                 $$"""
                     using Apizr.Extending.Configuring.Manager;
                 """);
@@ -177,7 +180,7 @@ internal static class ApizrRegistrationGenerator
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
-                    {{usingsBuilder}}
+                    {{usingsCodeBuilder}}
 
                     public static partial class IServiceCollectionExtensions
                     {
@@ -196,24 +199,9 @@ internal static class ApizrRegistrationGenerator
                 """);
 
                 code.AppendLine(
-                $$"""         
-                            optionsBuilder ??= _ => { }; // Default empty options if null
-                            optionsBuilder += options => options
-                """);
-
-                if (hasBaseUrl)
-                {
-                    code.Append(
-                $$"""               
-                                .WithBaseAddress("{{iocSettings.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
-                """);
-                }
-
-                code.Append(";");
-                code.AppendLine();
-                code.AppendLine();
-                code.AppendLine(
-                $$"""               
+                $$"""
+                            {{optionsCodeBuilder}}
+                                 
                             return services.AddApizrManagerFor<{{interfaceNames[0]}}>(optionsBuilder);
                 """);
 
@@ -235,38 +223,25 @@ internal static class ApizrRegistrationGenerator
 
             if (hasManyApis)
             {
-                usingsBuilder.AppendLine(
+                usingsCodeBuilder.AppendLine(
                 $$"""
                     using Apizr.Configuring.Registry;
                 """);
 
-                code.AppendLine(
+                code.AppendLine();
+                code.Append(
                 $$"""
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
-                    {{usingsBuilder}}
+                    {{usingsCodeBuilder}}
                   
                     public static partial class ApizrRegistration
                     {
                         public static IApizrRegistry {{methodName}}(Action<IApizrCommonOptionsBuilder> optionsBuilder)
                         {
-                            optionsBuilder ??= _ => { }; // Default empty options if null
-                            optionsBuilder += options => options
-                """);
-                if (true) // todo: add conditional logic
-                {
-                    code.Append(
-                $$"""               
-                                .WithBaseAddress("https://test.com", ApizrDuplicateStrategy.Ignore)
-                """);
-                }
-
-                code.Append(";");
-                code.AppendLine();
-                code.AppendLine();
-                code.Append(
-                $"""
+                            {{optionsCodeBuilder}}
+                            
                             return ApizrBuilder.Current.CreateRegistry(
                                 registry => registry
                 """);
@@ -295,7 +270,7 @@ internal static class ApizrRegistrationGenerator
 
             else
             {
-                usingsBuilder.AppendLine(
+                usingsCodeBuilder.AppendLine(
                 $$"""
                     using Apizr.Configuring.Manager;
                 """);
@@ -305,28 +280,14 @@ internal static class ApizrRegistrationGenerator
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
-                    {{usingsBuilder}}
+                    {{usingsCodeBuilder}}
                       
                     public static partial class ApizrRegistration
                     {
                         public static IApizrManager<{{interfaceNames[0]}}> {{methodName}}(Action<IApizrManagerOptionsBuilder> optionsBuilder)
                         {
-                            optionsBuilder ??= _ => { }; // Default empty options if null
-                            optionsBuilder += options => options
-                """);
-                if (true) // todo: add conditional logic
-                {
-                    code.Append(
-                $$"""               
-                                .WithBaseAddress("https://test.com", ApizrDuplicateStrategy.Ignore)
-                """);
-                }
-
-                code.Append(";");
-                code.AppendLine();
-                code.AppendLine();
-                code.Append(
-                $"""
+                            {{optionsCodeBuilder}}
+                            
                             return ApizrBuilder.Current.CreateManagerFor<{interfaceNames[0]}>(optionsBuilder);  
                 """);
 
