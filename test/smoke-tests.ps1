@@ -34,7 +34,7 @@ function GenerateAndBuild {
         $netCore = $false
     )
     
-    Get-ChildItem '*.generated.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName }
+    Get-ChildItem '*.generated.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName -Force }
     Remove-Item -Path './GeneratedCode/SwaggerPetstoreDirect.cs' -Force
 
     if ($args.Contains("settings-file")) {        
