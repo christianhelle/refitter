@@ -21,6 +21,7 @@ public class SwaggerPetstoreMultipleFileTests
             assert: c =>
             {
                 c.Files.Should().NotBeNullOrEmpty();
+                c.Files.Should().HaveCountGreaterOrEqualTo(2);
                 foreach ((_, string content) in c.Files)
                 {
                     content.Should().NotBeNullOrWhiteSpace();
