@@ -157,12 +157,6 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .GetImportedNamespaces(settings)
             .Aggregate(generator.GenerateFile(), (current, import) => current.Replace($"{import}.", string.Empty));
 
-        var generatedFiles = new List<GeneratedCode>();
-        if (settings.GenerateContracts)
-        {
-            generatedFiles.Add(new GeneratedCode("Contracts.cs", contracts));
-        }
-
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
             MultipleInterfaces.ByEndpoint
@@ -172,16 +166,20 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
         };
 
+        var generatedFiles = new List<GeneratedCode>();
+
         var interfaces = GenerateClient(interfaceGenerator);
         generatedFiles.Add(new GeneratedCode("RefitInterfaces.cs", interfaces.SourceCode));
+
+        if (settings.GenerateContracts)
+        {
+            generatedFiles.Add(new GeneratedCode("Contracts.cs", contracts));
+        }
 
         if (settings.DependencyInjectionSettings is not null)
         {
             var code = DependencyInjectionGenerator.Generate(settings, interfaces.InterfaceNames);
-            if (code is not null)
-            {
-                generatedFiles.Add(new GeneratedCode("DependencyInjection.cs", code));
-            }
+            generatedFiles.Add(new GeneratedCode("DependencyInjection.cs", code));
         }
 
         return new GeneratorOutput(generatedFiles);
