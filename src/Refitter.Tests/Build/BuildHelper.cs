@@ -5,13 +5,17 @@ namespace Refitter.Tests.Build;
 
 public static class BuildHelper
 {
-    public static bool BuildCSharp(string generatedCode)
+    public static bool BuildCSharp(params string[] generatedCode)
     {
         var path = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(path);
         var projectFile = Path.Combine(path, "Project.csproj");
         File.WriteAllText(projectFile, ProjectFileContents.Net80App);
-        File.WriteAllText(Path.Combine(path, "Generated.cs"), generatedCode);
+
+        for (int i = 0; i < generatedCode.Length; i++)
+        {
+            File.WriteAllText(Path.Combine(path, $"Generated_{i}.cs"), generatedCode[i]);
+        }
 
         var processStartInfo = new ProcessStartInfo(GetDotNetCli(), $"build \"{projectFile}\"");
         processStartInfo.RedirectStandardOutput = true;
@@ -21,10 +25,10 @@ public static class BuildHelper
 
         var process = new Process();
         process.StartInfo = processStartInfo;
-        
+
         var output = new StringBuilder();
         process.OutputDataReceived += (_, args) => output.AppendLine(args.Data);
-        
+
         var errors = new StringBuilder();
         process.ErrorDataReceived += (_, args) => errors.AppendLine(args.Data);
 
