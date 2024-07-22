@@ -34,8 +34,7 @@ function GenerateAndBuild {
         $netCore = $false
     )
     
-    Get-ChildItem '*.generated.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName -Force }
-    Remove-Item -Path './GeneratedCode/SwaggerPetstoreDirect.cs' -Force
+    Get-ChildItem './GeneratedCode/*.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName -Force }
 
     if ($args.Contains("settings-file")) {        
         Write-Host "refitter --no-logging $args"
