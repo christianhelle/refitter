@@ -153,9 +153,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var factory = new CSharpClientGeneratorFactory(settings, document);
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
-        var contracts = RefitInterfaceImports
-            .GetImportedNamespaces(settings)
-            .Aggregate(generator.GenerateFile(), (current, import) => current.Replace($"{import}.", string.Empty));
+        var contracts = generator.GenerateFile();
 
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
