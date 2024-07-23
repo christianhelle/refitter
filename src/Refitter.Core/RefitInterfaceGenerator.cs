@@ -71,7 +71,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
                     .AppendLine();
 
-                if (settings is {OptionalParameters: true, UseApizr: true})
+                if (settings is {OptionalParameters: true, ApizrSettings: { WithRequestOptions: true }})
                 {
                     var optionalParameterIndices = parameters
                         .Select((parameter, index) => (parameter, index))

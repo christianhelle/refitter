@@ -111,7 +111,10 @@ paths:
             OpenApiPath = swaggerFile,
             UseCancellationTokens = true,
             OptionalParameters = true,
-            UseApizr = true
+            ApizrSettings = new ApizrSettings
+            {
+                WithRequestOptions = true
+            }
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);

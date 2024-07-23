@@ -183,10 +183,7 @@ public class RefitGeneratorSettings
     public bool ImmutableRecords { get; set; }
 
     /// <summary>
-    /// "Use Apizr by:"
-    /// - including request options parameter"
-    /// - overloading methods with optional parameters if any"
-    /// - adjusting dependency injection settings if any"
+    /// Get ot set the settings describing how to configure Apizr
     /// </summary>
-    public bool UseApizr { get; set; }
+    public ApizrSettings? ApizrSettings { get; set; }
 }
