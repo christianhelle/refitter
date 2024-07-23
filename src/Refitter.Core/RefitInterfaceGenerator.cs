@@ -1,6 +1,5 @@
 using System.Text;
 using System.Text.RegularExpressions;
-
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 
@@ -19,7 +18,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
-        XmlDocumentationGenerator docGenerator)
+        XmlDocumentationGenerator docGenerator
+    )
     {
         this.settings = settings;
         this.document = document;
@@ -28,16 +28,20 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
-    public virtual RefitGeneratedCode GenerateCode()
+    public virtual IEnumerable<RefitGeneratedCode> GenerateCode()
     {
-        return new RefitGeneratedCode(
-            $$"""
-              {{GenerateInterfaceDeclaration(out var interfaceName)}}
-              {{Separator}}{
-              {{GenerateInterfaceBody()}}
-              {{Separator}}}
-              """,
-            interfaceName);
+        return new[]
+        {
+            new RefitGeneratedCode(
+                $$"""
+                {{GenerateInterfaceDeclaration(out var interfaceName)}}
+                {{Separator}}{
+                {{GenerateInterfaceBody()}}
+                {{Separator}}}
+                """,
+                interfaceName
+            )
+        };
     }
 
     private string GenerateInterfaceBody()
@@ -80,14 +84,15 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     {
         if (settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
         {
-            return type is null or "void" ? GetAsyncOperationType(true) : $"{GetAsyncOperationType(false)}<{WellKnownNamesspaces.TrimImportedNamespaces(type)}>";
+            return type is null or "void"
+                ? GetAsyncOperationType(true)
+                : $"{GetAsyncOperationType(false)}<{WellKnownNamesspaces.TrimImportedNamespaces(type)}>";
         }
 
-        var returnTypeParameter =
-            (new[] { "200", "201", "203", "206" })
-                .Where(operation.Responses.ContainsKey)
-                .Select(code => GetTypeName(code, operation))
-                .FirstOrDefault();
+        var returnTypeParameter = (new[] { "200", "201", "203", "206" })
+            .Where(operation.Responses.ContainsKey)
+            .Select(code => GetTypeName(code, operation))
+            .FirstOrDefault();
 
         return GetReturnType(returnTypeParameter);
     }
@@ -97,8 +102,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         var schema = operation.Responses[code].ActualResponse.Schema;
         var typeName = generator.GetTypeName(schema, false, null);
 
-        if (!string.IsNullOrWhiteSpace(settings.CodeGeneratorSettings?.ArrayType) &&
-            schema?.Type == NJsonSchema.JsonObjectType.Array)
+        if (
+            !string.IsNullOrWhiteSpace(settings.CodeGeneratorSettings?.ArrayType)
+            && schema?.Type == NJsonSchema.JsonObjectType.Array
+        )
         {
             typeName = typeName
                 .Replace("ICollection", settings.CodeGeneratorSettings!.ArrayType)
@@ -112,22 +119,24 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         string path,
         string verb,
         OpenApiOperation operation,
-        bool capitalizeFirstCharacter = false)
+        bool capitalizeFirstCharacter = false
+    )
     {
         const string operationNamePlaceholder = "{operationName}";
 
-        var operationName = generator
-            .BaseSettings
-            .OperationNameGenerator
-            .GetOperationName(document, path, verb, operation);
+        var operationName = generator.BaseSettings.OperationNameGenerator.GetOperationName(
+            document,
+            path,
+            verb,
+            operation
+        );
 
         if (capitalizeFirstCharacter)
             operationName = operationName.CapitalizeFirstCharacter();
 
         if (settings.OperationNameTemplate?.Contains(operationNamePlaceholder) ?? false)
         {
-            operationName = settings.OperationNameTemplate!
-                .Replace(operationNamePlaceholder, operationName);
+            operationName = settings.OperationNameTemplate!.Replace(operationNamePlaceholder, operationName);
         }
 
         return operationName;
@@ -144,7 +153,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     protected void GenerateAcceptHeaders(
         KeyValuePair<string, OpenApiOperation> operations,
         OpenApiOperation operation,
-        StringBuilder code)
+        StringBuilder code
+    )
     {
         if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
         {
@@ -152,15 +162,13 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             var contentTypes = operations.Value.Responses.Select(pair => operation.Responses[pair.Key].Content.Keys);
 
             //remove duplicates
-            var uniqueContentTypes = contentTypes
-                .GroupBy(x => x)
-                .SelectMany(y => y.First())
-                .Distinct()
-                .ToList();
+            var uniqueContentTypes = contentTypes.GroupBy(x => x).SelectMany(y => y.First()).Distinct().ToList();
 
             if (uniqueContentTypes.Any())
             {
-                code.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
+                code.AppendLine(
+                    $"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]"
+                );
             }
         }
     }
@@ -175,9 +183,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     private string GetDefaultReturnType()
     {
         var asyncType = GetAsyncOperationType(true);
-        return settings.ReturnIApiResponse
-            ? $"{asyncType}<IApiResponse>"
-            : asyncType;
+        return settings.ReturnIApiResponse ? $"{asyncType}<IApiResponse>" : asyncType;
     }
 
     /// <summary>
@@ -191,7 +197,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             typeName,
             "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>",
             RegexOptions.None,
-            TimeSpan.FromSeconds(1));
+            TimeSpan.FromSeconds(1)
+        );
     }
 
     private string GetConfiguredReturnType(string returnTypeParameter)
@@ -205,9 +212,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     private string GetAsyncOperationType(bool withVoidReturnType)
     {
         var type = withVoidReturnType ? "<Unit>" : string.Empty;
-        return settings.ReturnIObservable
-            ? "IObservable" + type
-            : "Task";
+        return settings.ReturnIObservable ? "IObservable" + type : "Task";
     }
 
     protected void GenerateObsoleteAttribute(OpenApiOperation operation, StringBuilder code)
@@ -227,13 +232,14 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         interfaceName = $"I{title.CapitalizeFirstCharacter()}";
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         return $"""
-                {Separator}{GetGeneratedCodeAttribute()}
-                {Separator}{modifier} partial interface I{title.CapitalizeFirstCharacter()}
-                """;
+            {Separator}{GetGeneratedCodeAttribute()}
+            {Separator}{modifier} partial interface I{title.CapitalizeFirstCharacter()}
+            """;
     }
 
     protected string GetGeneratedCodeAttribute() =>
         $"""
-         [System.CodeDom.Compiler.GeneratedCode("Refitter", "{GetType().Assembly.GetName().Version}")]
-         """;
+            [System.CodeDom.Compiler.GeneratedCode("Refitter", "{GetType().Assembly.GetName().Version}")]
+            """;
 }
+

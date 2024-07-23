@@ -1,8 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
-
 using Microsoft.CodeAnalysis;
-
 using Refitter.Core;
 
 namespace Refitter.SourceGenerator;
@@ -14,8 +12,9 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var sourceFiles = context
-            .AdditionalTextsProvider
-            .Where(text => text.Path.EndsWith(".refitter", StringComparison.InvariantCultureIgnoreCase))
+            .AdditionalTextsProvider.Where(text =>
+                text.Path.EndsWith(".refitter", StringComparison.InvariantCultureIgnoreCase)
+            )
             .Select(GenerateCode);
 
         context.RegisterImplementationSourceOutput(sourceFiles, ProcessResults);
@@ -36,17 +35,19 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                     "Refitter generated code successfully",
                     "Refitter",
                     DiagnosticSeverity.Info,
-                    true),
-                Location.None));
+                    true
+                ),
+                Location.None
+            )
+        );
     }
 
     [SuppressMessage(
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
-        Justification = "By design")]
-    private static List<Diagnostic> GenerateCode(
-        AdditionalText file,
-        CancellationToken cancellationToken = default)
+        Justification = "By design"
+    )]
+    private static List<Diagnostic> GenerateCode(AdditionalText file, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var diagnostics = new List<Diagnostic>
@@ -58,8 +59,10 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                     $"Found .refitter File: {file.Path}",
                     "Refitter",
                     DiagnosticSeverity.Info,
-                    true),
-                Location.None)
+                    true
+                ),
+                Location.None
+            )
         };
 
         try
@@ -75,8 +78,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                         json,
                         "Refitter",
                         DiagnosticSeverity.Info,
-                        true),
-                    Location.None));
+                        true
+                    ),
+                    Location.None
+                )
+            );
 
             var settings = TryDeserialize(json);
             if (settings is null)
@@ -85,13 +91,15 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            if (!settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
-                !File.Exists(settings.OpenApiPath))
+            if (
+                !settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+                && !File.Exists(settings.OpenApiPath)
+            )
             {
-                settings.OpenApiPath = Path.Combine(
-                    Path.GetDirectoryName(file.Path)!,
-                    settings.OpenApiPath);
+                settings.OpenApiPath = Path.Combine(Path.GetDirectoryName(file.Path)!, settings.OpenApiPath);
             }
+
+            settings.GenerateMultipleFiles = false;
 
             cancellationToken.ThrowIfCancellationRequested();
             var generator = RefitGenerator.CreateAsync(settings).GetAwaiter().GetResult();
@@ -113,10 +121,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                     Directory.CreateDirectory(folder);
                 }
 
-                File.WriteAllText(
-                    output,
-                    refit,
-                    Encoding.UTF8);
+                File.WriteAllText(output, refit, Encoding.UTF8);
 
                 return diagnostics;
             }
@@ -130,8 +135,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                             $"Refitter failed to write generated code: {e}",
                             "Refitter",
                             DiagnosticSeverity.Error,
-                            true),
-                        Location.None));
+                            true
+                        ),
+                        Location.None
+                    )
+                );
             }
 
             return diagnostics;
@@ -146,8 +154,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                         $"Refitter failed to generate code: {e}",
                         "Refitter",
                         DiagnosticSeverity.Error,
-                        true),
-                    Location.None));
+                        true
+                    ),
+                    Location.None
+                )
+            );
 
             return diagnostics;
         }

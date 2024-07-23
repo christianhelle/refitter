@@ -1,7 +1,6 @@
-﻿using NSwag;
-
 using System.Text;
 using System.Text.RegularExpressions;
+using NSwag;
 
 namespace Refitter.Core;
 
@@ -28,23 +27,17 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private static async Task<OpenApiDocument> GetOpenApiDocument(RefitGeneratorSettings settings)
     {
-        var specialCharacters = new[]
-        {
-            ":"
-        };
+        var specialCharacters = new[] { ":" };
 
         return specialCharacters.Aggregate(
             await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath),
-            SanitizePath);
+            SanitizePath
+        );
     }
 
-    private static OpenApiDocument SanitizePath(
-        OpenApiDocument openApiDocument,
-        string stringToRemove)
+    private static OpenApiDocument SanitizePath(OpenApiDocument openApiDocument, string stringToRemove)
     {
-        var paths = openApiDocument.Paths.Keys
-            .Where(pathKey => pathKey.Contains(stringToRemove))
-            .ToArray();
+        var paths = openApiDocument.Paths.Keys.Where(pathKey => pathKey.Contains(stringToRemove)).ToArray();
 
         foreach (var path in paths)
         {
@@ -56,7 +49,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         return openApiDocument;
     }
 
-    private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches)
+    private static void ProcessContractFilter(
+        OpenApiDocument openApiDocument,
+        bool removeUnusedSchema,
+        string[] includeSchemaMatches
+    )
     {
         if (!removeUnusedSchema)
         {
@@ -72,13 +69,15 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         {
             return;
         }
-        var clonedPaths = document.Paths.Where(pair => pair.Value != null)
+        var clonedPaths = document
+            .Paths.Where(pair => pair.Value != null)
             // as we modify the document.Paths
             // we have to enumerate on a snapshot of the items
             .ToArray();
         foreach (var path in clonedPaths)
         {
-            var methods = path.Value.Where(pair => pair.Value != null)
+            var methods = path
+                .Value.Where(pair => pair.Value != null)
                 // same reason as with document.Paths
                 .ToArray();
             foreach (var method in methods)
@@ -96,8 +95,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
     }
 
-    private static void ProcessPathFilters(OpenApiDocument document,
-        string[] pathMatchExpressions)
+    private static void ProcessPathFilters(OpenApiDocument document, string[] pathMatchExpressions)
     {
         if (pathMatchExpressions.Length == 0)
         {
@@ -106,8 +104,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         // compile all expressions here once, as we will use them more than once
         var regexes = pathMatchExpressions.Select(x => new Regex(x, RegexOptions.Compiled)).ToList();
-        var paths = document.Paths.Keys
-            .Where(pathKey => regexes.TrueForAll(regex => !regex.IsMatch(pathKey)))
+        var paths = document
+            .Paths.Keys.Where(pathKey => regexes.TrueForAll(regex => !regex.IsMatch(pathKey)))
             .ToArray();
 
         foreach (string pathKey in paths)
@@ -127,18 +125,18 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = RefitInterfaceImports
             .GetImportedNamespaces(settings)
-            .Aggregate(
-                generator.GenerateFile(),
-                (current, import) => current.Replace($"{import}.", string.Empty));
+            .Aggregate(generator.GenerateFile(), (current, import) => current.Replace($"{import}.", string.Empty));
 
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
-            MultipleInterfaces.ByEndpoint => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
-            MultipleInterfaces.ByTag => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
+            MultipleInterfaces.ByEndpoint
+                => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
+            MultipleInterfaces.ByTag
+                => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
             _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
         };
 
-        var generatedCode = GenerateClient(interfaceGenerator);
+        var generatedCode = GenerateClient(interfaceGenerator).First();
         return new StringBuilder()
             .AppendLine(generatedCode.SourceCode)
             .AppendLine()
@@ -166,8 +164,16 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         var generatedFiles = new List<GeneratedCode>();
 
-        var interfaces = GenerateClient(interfaceGenerator);
-        generatedFiles.Add(new GeneratedCode("RefitInterfaces.cs", interfaces.SourceCode));
+        var interfaces = GenerateClient(interfaceGenerator).ToArray();
+        foreach (var refitInterface in interfaces)
+        {
+            if (interfaces.Length == 1)
+                generatedFiles.Add(new GeneratedCode("RefitInterfaces.cs", refitInterface.SourceCode));
+            else
+                generatedFiles.Add(
+                    new GeneratedCode($"{refitInterface.InterfaceNames.Single()}.cs", refitInterface.SourceCode)
+                );
+        }
 
         if (settings.GenerateContracts)
         {
@@ -176,7 +182,10 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         if (settings.DependencyInjectionSettings is not null)
         {
-            var code = DependencyInjectionGenerator.Generate(settings, interfaces.InterfaceNames);
+            var code = DependencyInjectionGenerator.Generate(
+                settings,
+                interfaces.SelectMany(i => i.InterfaceNames).ToArray()
+            );
             generatedFiles.Add(new GeneratedCode("DependencyInjection.cs", code));
         }
 
@@ -188,39 +197,44 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     /// </summary>
     /// <param name="interfaceGenerator">The interface generator used to generate the client code.</param>
     /// <returns>The generated client code as a string.</returns>
-    private RefitGeneratedCode GenerateClient(IRefitInterfaceGenerator interfaceGenerator)
+    private IEnumerable<RefitGeneratedCode> GenerateClient(IRefitInterfaceGenerator interfaceGenerator)
     {
-        var code = new StringBuilder();
-        GenerateAutoGeneratedHeader(code);
-
-        code.AppendLine()
-            .AppendLine(RefitInterfaceImports.GenerateNamespaceImports(settings))
-            .AppendLine();
-
-        if (settings.AdditionalNamespaces.Any())
+        var refitInterfaces = interfaceGenerator.GenerateCode().ToArray();
+        for (int i = 0; i < refitInterfaces.Length; i++)
         {
-            foreach (var ns in settings.AdditionalNamespaces)
+            var refitInterface = refitInterfaces[i];
+            var code = new StringBuilder();
+            GenerateAutoGeneratedHeader(code);
+
+            code.AppendLine().AppendLine(RefitInterfaceImports.GenerateNamespaceImports(settings)).AppendLine();
+
+            if (settings.AdditionalNamespaces.Any())
             {
-                code.AppendLine($"using {ns};");
+                foreach (var ns in settings.AdditionalNamespaces)
+                {
+                    code.AppendLine($"using {ns};");
+                }
+
+                code.AppendLine();
             }
 
-            code.AppendLine();
+            if (settings.OptionalParameters)
+            {
+                code.AppendLine("#nullable enable");
+            }
+            code.AppendLine(
+                $$"""
+                namespace {{settings.Namespace}}
+                {
+                {{refitInterface.SourceCode}}
+                }
+                """
+            );
+
+            refitInterfaces[i] = refitInterface with { SourceCode = code.ToString() };
         }
 
-        if (settings.OptionalParameters)
-        {
-            code.AppendLine("#nullable enable");
-        }
-
-        var refitInterfaces = interfaceGenerator.GenerateCode();
-        code.AppendLine($$"""
-                          namespace {{settings.Namespace}}
-                          {
-                          {{refitInterfaces}}
-                          }
-                          """);
-
-        return new RefitGeneratedCode(code.ToString(), refitInterfaces.InterfaceNames);
+        return refitInterfaces;
     }
 
     /// <summary>
@@ -232,11 +246,13 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         if (!settings.AddAutoGeneratedHeader)
             return;
 
-        code.AppendLine("""
+        code.AppendLine(
+            """
             // <auto-generated>
             //     This code was generated by Refitter.
             // </auto-generated>
 
-            """);
+            """
+        );
     }
 }

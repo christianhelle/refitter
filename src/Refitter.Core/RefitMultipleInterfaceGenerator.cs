@@ -1,5 +1,4 @@
 using System.Text;
-
 using NSwag;
 
 namespace Refitter.Core;
@@ -12,20 +11,19 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
-        XmlDocumentationGenerator docGenerator)
-        : base(settings, document, generator, docGenerator)
-    {
-    }
+        XmlDocumentationGenerator docGenerator
+    )
+        : base(settings, document, generator, docGenerator) { }
 
-    public override RefitGeneratedCode GenerateCode()
+    public override IEnumerable<RefitGeneratedCode> GenerateCode()
     {
-        var code = new StringBuilder();
-        var interfaceNames = new List<string>();
-        
+        var interfaces = new List<RefitGeneratedCode>();
+
         foreach (var kv in document.Paths)
         {
             foreach (var operations in kv.Value)
             {
+                var code = new StringBuilder();
                 var operation = operations.Value;
 
                 if (!settings.GenerateDeprecatedOperations && operation.IsDeprecated)
@@ -37,13 +35,14 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
                 this.docGenerator.AppendInterfaceDocumentation(operation, code);
-                
+
                 var interfaceName = GetInterfaceName(kv, verb, operation);
-                interfaceNames.Add(interfaceName);
-                code.AppendLine($$"""
-                                  {{GenerateInterfaceDeclaration(interfaceName)}}
-                                  {{Separator}}{
-                                  """);
+                code.AppendLine(
+                    $$"""
+                    {{GenerateInterfaceDeclaration(interfaceName)}}
+                    {{Separator}}{
+                    """
+                );
 
                 var operationModel = generator.CreateOperationModel(operation);
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
@@ -59,24 +58,24 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                     .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
                     .AppendLine($"{Separator}}}")
                     .AppendLine();
+
+                interfaces.Add(new RefitGeneratedCode(code.ToString(), interfaceName));
             }
         }
 
-        return new RefitGeneratedCode(code.ToString(), interfaceNames.ToArray());
+        return interfaces;
     }
 
-    private string GetInterfaceName(
-        KeyValuePair<string, OpenApiPathItem> kv,
-        string verb,
-        OpenApiOperation operation)
+    private string GetInterfaceName(KeyValuePair<string, OpenApiPathItem> kv, string verb, OpenApiOperation operation)
     {
         var name = IdentifierUtils.Counted(
             knownIdentifiers,
-            "I" + generator
-                .BaseSettings
-                .OperationNameGenerator
-                .GetOperationName(document, kv.Key, verb, operation).CapitalizeFirstCharacter(),
-            suffix: "Endpoint");
+            "I"
+                + generator
+                    .BaseSettings.OperationNameGenerator.GetOperationName(document, kv.Key, verb, operation)
+                    .CapitalizeFirstCharacter(),
+            suffix: "Endpoint"
+        );
         knownIdentifiers.Add(name);
         return name;
     }
@@ -85,8 +84,8 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
     {
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         return $"""
-                {Separator}{GetGeneratedCodeAttribute()}
-                {Separator}{modifier} partial interface {name}
-                """;
+            {Separator}{GetGeneratedCodeAttribute()}
+            {Separator}{modifier} partial interface {name}
+            """;
     }
 }

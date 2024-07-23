@@ -16,15 +16,15 @@ function GenerateAndBuild {
         [Parameter(Mandatory=$true)]
         [string]
         $format,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         $namespace,
-        
+
         [Parameter(Mandatory=$false)]
         [string]
         $outputPath,
-        
+
         [Parameter(Mandatory=$false)]
         [string]
         $args,
@@ -33,16 +33,16 @@ function GenerateAndBuild {
         [bool]
         $netCore = $false
     )
-    
+
     Get-ChildItem './GeneratedCode/*.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName -Force }
 
-    if ($args.Contains("settings-file")) {        
+    if ($args.Contains("settings-file")) {
         Write-Host "refitter --no-logging $args"
         $process = Start-Process "./bin/refitter" `
             -Args "--no-logging $args" `
             -NoNewWindow `
             -PassThru
-    } else {        
+    } else {
         Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
         $process = Start-Process "./bin/refitter" `
             -Args "./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
@@ -77,13 +77,13 @@ function RunTests {
         [ValidateSet("dotnet-run", "refitter")]
         [string]
         $Method,
-        
+
         [Parameter(Mandatory=$false)]
         [bool]
         $Parallel = $false
     )
 
-    $filenames = @(        
+    $filenames = @(
         "bot.paths",
         "petstore",
         "petstore-expanded",
@@ -98,15 +98,15 @@ function RunTests {
         "hubspot-events",
         "hubspot-webhooks"
     )
-    
+
     Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin -f net8.0"
     Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
-    
+
     GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.cs" -args "--settings-file ./petstore.refitter"
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
-        "json", "yaml" | ForEach-Object {            
+        "json", "yaml" | ForEach-Object {
             $format = $_
             $filenames | ForEach-Object {
                 $filename = "./OpenAPI/$version/$_.$format"
@@ -118,8 +118,9 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -args "--multiple-files"
-                    GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens"
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -args "--multiple-files --multiple-interfaces ByTag "
+Exit(0)
+GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens"
                     GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal"
                     GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response"
                     GenerateAndBuild -format $format -namespace "$namespace.UsingIObservable" -outputPath "IObservable$outputPath" -args "--use-observable-response"
@@ -132,12 +133,12 @@ function RunTests {
                 }
             }
         }
-    }        
-    
+    }
+
     "https://petstore3.swagger.io/api/v3/openapi.json", "https://petstore3.swagger.io/api/v3/openapi.yaml" | ForEach-Object {
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.generated.cs"
-        
+
         Get-ChildItem '*.generated.cs' -Recurse | foreach { Remove-Item -Path $_.FullName }
 
         Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
@@ -149,7 +150,7 @@ function RunTests {
         if ($process.ExitCode -ne 0) {
             throw "Refitter failed"
         }
-        
+
         Write-Host "`r`nBuilding ConsoleApp`r`n"
         $process = Start-Process "dotnet" `
             -Args "build -p:TreatWarningsAsErrors=true ./ConsoleApp/ConsoleApp.sln" `

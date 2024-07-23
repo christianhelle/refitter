@@ -2,5 +2,5 @@ namespace Refitter.Core;
 
 internal interface IRefitInterfaceGenerator
 {
-    RefitGeneratedCode GenerateCode();
+    IEnumerable<RefitGeneratedCode> GenerateCode();
 }

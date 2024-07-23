@@ -1,5 +1,4 @@
-﻿using System.Text;
-
+using System.Text;
 using NSwag;
 
 namespace Refitter.Core;
@@ -12,25 +11,24 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
-        XmlDocumentationGenerator docGenerator)
-        : base(settings, document, generator, docGenerator)
-    {
-    }
+        XmlDocumentationGenerator docGenerator
+    )
+        : base(settings, document, generator, docGenerator) { }
 
-    public override RefitGeneratedCode GenerateCode()
+    public override IEnumerable<RefitGeneratedCode> GenerateCode()
     {
         var ungroupedTitle = settings.Naming.UseOpenApiTitle
             ? IdentifierUtils.Sanitize(document.Info?.Title ?? "ApiClient")
             : settings.Naming.InterfaceName;
         ungroupedTitle = ungroupedTitle.CapitalizeFirstCharacter();
 
-        var byGroup = document.Paths
-            .SelectMany(x => x.Value, (k, v) => (PathItem: k, Operation: v))
+        var byGroup = document
+            .Paths.SelectMany(x => x.Value, (k, v) => (PathItem: k, Operation: v))
             .GroupBy(x => GetGroupName(x.Operation.Value, ungroupedTitle), (k, v) => new { Key = k, Combined = v });
 
         Dictionary<string, StringBuilder> interfacesByGroup = new();
-        var interfaceNames = new List<string>();
-        
+        var interfaces = new List<RefitGeneratedCode>();
+
         foreach (var kv in byGroup)
         {
             foreach (var op in kv.Combined)
@@ -53,11 +51,12 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                     this.docGenerator.AppendInterfaceDocumentation(operation, sb);
 
                     interfaceName = GetInterfaceName(kv.Key);
-                    interfaceNames.Add(interfaceName);
-                    sb.AppendLine($$"""
-                                    {{GenerateInterfaceDeclaration(interfaceName)}}
-                                    {{Separator}}{
-                                    """);
+                    sb.AppendLine(
+                        $$"""
+                        {{GenerateInterfaceDeclaration(interfaceName)}}
+                        {{Separator}}{
+                        """
+                    );
                 }
 
                 var operationModel = generator.CreateOperationModel(operation);
@@ -72,32 +71,20 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 var opName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
                 sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {opName}({parametersString});")
-                    .AppendLine();
+                    .AppendLine($"{Separator}}}");
+
+                interfaces.Add(new RefitGeneratedCode(sb.ToString(), interfaceName));
             }
         }
 
-        var code = new StringBuilder();
-        foreach (var value in interfacesByGroup.Select(kv => kv.Value))
-        {
-            while (char.IsWhiteSpace(value[value.Length - 1]))
-            {
-                value.Length--;
-            }
-
-            code.AppendLine(value.ToString());
-            code.AppendLine($"{Separator}}}");
-            code.AppendLine();
-        }
-
-        return new RefitGeneratedCode(code.ToString(), interfaceNames.ToArray());
+        return interfaces;
     }
 
     private string GetGroupName(OpenApiOperation operation, string ungroupedTitle)
     {
         if (operation.Tags.FirstOrDefault() is string group && !string.IsNullOrWhiteSpace(group))
         {
-            return IdentifierUtils.Sanitize(group)
-                .CapitalizeFirstCharacter();
+            return IdentifierUtils.Sanitize(group).CapitalizeFirstCharacter();
         }
 
         return ungroupedTitle;
@@ -109,19 +96,19 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             knownIdentifiers,
             $"I{name.CapitalizeFirstCharacter()}",
             suffix: "Api"
-            );
+        );
 
         knownIdentifiers.Add(generatedName);
         return generatedName;
     }
 
-    private string GetOperationName(
-        string interfaceName,
-        string name,
-        string verb,
-        OpenApiOperation operation)
+    private string GetOperationName(string interfaceName, string name, string verb, OpenApiOperation operation)
     {
-        var generatedName = IdentifierUtils.Counted(knownIdentifiers, GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true), parent: interfaceName);
+        var generatedName = IdentifierUtils.Counted(
+            knownIdentifiers,
+            GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true),
+            parent: interfaceName
+        );
         knownIdentifiers.Add($"{interfaceName}.{generatedName}");
         return generatedName;
     }
@@ -130,8 +117,8 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
     {
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         return $"""
-                {Separator}{GetGeneratedCodeAttribute()}
-                {Separator}{modifier} partial interface {name}
-                """;
+            {Separator}{GetGeneratedCodeAttribute()}
+            {Separator}{modifier} partial interface {name}
+            """;
     }
 }
