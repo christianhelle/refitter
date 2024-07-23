@@ -143,7 +143,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .AppendLine(generatedCode.SourceCode)
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
-            .AppendLine(settings.UseApizr
+            .AppendLine(settings.ApizrSettings != null
                 ? ApizrRegistrationGenerator.Generate(settings, generatedCode.InterfaceNames, document.Info?.Title)
                 : DependencyInjectionGenerator.Generate(settings, generatedCode.InterfaceNames))
             .ToString()

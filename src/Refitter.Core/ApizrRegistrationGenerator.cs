@@ -10,7 +10,7 @@ internal static class ApizrRegistrationGenerator
         string[] interfaceNames,
         string? title = null)
     {
-        if (!interfaceNames.Any())
+        if (!interfaceNames.Any() || !settings.ApizrSettings!.WithRegistrationHelper)
             return string.Empty;
 
         var hasManyApis = interfaceNames.Length > 1;
@@ -18,7 +18,7 @@ internal static class ApizrRegistrationGenerator
         var isDependencyInjectionExtension = iocSettings != null;
         var hasBaseUrl = !string.IsNullOrWhiteSpace(iocSettings?.BaseUrl);
         string? methodName = iocSettings?.ExtensionMethodName;
-        if (string.IsNullOrWhiteSpace(methodName) || (settings.UseApizr && methodName == DependencyInjectionSettings.DefaultExtensionMethodName))
+        if (string.IsNullOrWhiteSpace(methodName) || methodName == DependencyInjectionSettings.DefaultExtensionMethodName)
         {
             var formatedTitle = !string.IsNullOrWhiteSpace(title) ? title!
                 .ConvertKebabCaseToPascalCase()
@@ -36,8 +36,7 @@ internal static class ApizrRegistrationGenerator
                 methodName = hasManyApis ? $"Build{formatedTitle}ApizrManagers" : $"Build{formatedTitle}ApizrManager";
         }
 
-        var code = new StringBuilder();
-
+        // Usings
         var usings = iocSettings?.TransientErrorHandler switch
         {
             TransientErrorHandler.Polly =>
@@ -72,6 +71,7 @@ internal static class ApizrRegistrationGenerator
         var usingsCodeBuilder = new StringBuilder(usings);
         usingsCodeBuilder.AppendLine();
 
+        // Options
         var optionsCode =
             $$"""
             optionsBuilder ??= _ => { }; // Default empty options if null
@@ -90,6 +90,8 @@ internal static class ApizrRegistrationGenerator
 
         optionsCodeBuilder.Append(";");
 
+        // Code
+        var code = new StringBuilder();
         code.AppendLine();
         code.AppendLine();
 

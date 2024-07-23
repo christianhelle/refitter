@@ -20,13 +20,21 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
             ],
             TransientErrorHandler = TransientErrorHandler.HttpResilience
         },
-        UseApizr = true
+        ApizrSettings = new ApizrSettings
+        {
+            WithRequestOptions = true,
+            WithRegistrationHelper = true
+        }
     };
 
 
     private readonly RefitGeneratorSettings _staticSettings = new()
     {
-        UseApizr = true
+        ApizrSettings = new ApizrSettings
+        {
+            WithRequestOptions = true,
+            WithRegistrationHelper = true
+        }
     };
 
     #region Extended

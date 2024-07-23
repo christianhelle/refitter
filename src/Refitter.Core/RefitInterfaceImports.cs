@@ -15,7 +15,7 @@ internal static class RefitInterfaceImports
     public static string[] GetImportedNamespaces(RefitGeneratorSettings settings)
     {
         var namespaces = new List<string>(defaultNamespases);
-        if (settings.UseApizr)
+        if (settings.ApizrSettings?.WithRequestOptions == true)
         {
             namespaces.Add("Apizr.Configuring.Request");
         }
