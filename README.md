@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-46-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-47-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1892,6 +1892,7 @@ Personally, they I use Refitter is to generate an interface per endpoint, so whe
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Jappinen"><img src="https://avatars.githubusercontent.com/u/44408497?v=4?s=100" width="100px;" alt="Tatu"/><br /><sub><b>Tatu</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AJappinen" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.respawnsive.com"><img src="https://avatars.githubusercontent.com/u/4272307?v=4?s=100" width="100px;" alt="Jérémy BRUN-PICARD"/><br /><sub><b>Jérémy BRUN-PICARD</b></sub></a><br /><a href="#ideas-JeremyBP" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ebarnard"><img src="https://avatars.githubusercontent.com/u/1059683?v=4?s=100" width="100px;" alt="Ed Barnard"/><br /><sub><b>Ed Barnard</b></sub></a><br /><a href="#ideas-ebarnard" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/bastiennoel93"><img src="https://avatars.githubusercontent.com/u/18250350?v=4?s=100" width="100px;" alt="bastien.noel"/><br /><sub><b>bastien.noel</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abastiennoel93" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
