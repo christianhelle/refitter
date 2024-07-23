@@ -432,6 +432,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "bastiennoel93",
+      "name": "bastien.noel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18250350?v=4",
+      "profile": "https://github.com/bastiennoel93",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
