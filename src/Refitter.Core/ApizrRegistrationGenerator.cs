@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using System.Text;
 
+using Refitter.Core.Settings;
+
 namespace Refitter.Core;
 
 internal static class ApizrRegistrationGenerator
@@ -39,24 +41,16 @@ internal static class ApizrRegistrationGenerator
         var optionsCode =
                 $$"""
                 optionsBuilder ??= _ => { }; // Default empty options if null
-                          optionsBuilder += options => options
+                            optionsBuilder += options => options
                 """;
         var optionsCodeBuilder = new StringBuilder(optionsCode);
-        optionsCodeBuilder.AppendLine();
 
         if (hasBaseUrl)
         {
+            optionsCodeBuilder.AppendLine();
             optionsCodeBuilder.Append(
                 $$"""               
-                            .WithBaseAddress("{{iocSettings!.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
-                """);
-        }
-
-        if (hasBaseUrl)
-        {
-            optionsCodeBuilder.Append(
-                $$"""               
-                            .WithBaseAddress("{{iocSettings!.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
+                                .WithBaseAddress("{{iocSettings!.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
                 """);
         }
         
@@ -69,83 +63,76 @@ internal static class ApizrRegistrationGenerator
                     using Polly;
                     using Polly.Contrib.WaitAndRetry;
                     using Polly.Extensions.Http;
-                    using Apizr; // Install-Package Apizr
                 """,
             TransientErrorHandler.HttpResilience =>
                 """
                 using System;
                     using Microsoft.Extensions.DependencyInjection;
                     using Microsoft.Extensions.Http.Resilience;
-                    using Apizr; // Install-Package Apizr
                 """,
             _ when isDependencyInjectionExtension =>
                 """
                 using System;
                     using Microsoft.Extensions.DependencyInjection;
-                    using Apizr; // Install-Package Apizr
                 """,
             _ =>
                 """
                 using System;
-                    using Apizr; // Install-Package Apizr
                 """
         };
 
+        var apizrPackages = new List<ApizrPackage>();
         var usingsCodeBuilder = new StringBuilder(usings);
         usingsCodeBuilder.AppendLine();
 
         switch (settings.ApizrSettings.WithCacheProvider)
         {
             case CacheProviderType.Akavache:
+                apizrPackages.Add(ApizrPackage.Apizr_Integrations_Akavache);
                 usingsCodeBuilder.AppendLine(
                 $$"""
-                    using Akavache; // Install-Package Apizr.Integrations.Akavache
+                    using Akavache;
                 """);
-                optionsCodeBuilder.AppendLine(
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(
                 $$"""               
-                            .WithAkavacheCacheHandler()
+                                .WithAkavacheCacheHandler()
                 """);
                 break;
             case CacheProviderType.MonkeyCache:
+                apizrPackages.Add(ApizrPackage.Apizr_Integrations_MonkeyCache);
                 usingsCodeBuilder.AppendLine(
                 $$"""
-                    using MonkeyCache; // Install-Package Apizr.Integrations.MonkeyCache
+                    using MonkeyCache;
                 """);
-                optionsCodeBuilder.AppendLine(
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(
                 $$"""               
-                            .WithCacheHandler(new MonkeyCacheHandler(Barrel.Current)) // Write somewhere else: Barrel.ApplicationId = "YOUR_APPLICATION_NAME";
+                                .WithCacheHandler(new MonkeyCacheHandler(Barrel.Current))
                 """);
                 break;
             case CacheProviderType.InMemory:
-                usingsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+                apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_Caching);
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(
                 $$"""
-                    // Install-Package Apizr.Extensions.Microsoft.Caching and Microsoft.Extensions.Caching.Memory
-                """ :
-                $$"""
-                    // You have to set DependencyInjectionSettings to use in memory cache provider
-                """);
-                optionsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
-                $$"""
-                            .WithInMemoryCacheHandler()
-                """ :
-                $$"""
-                            // You have to set DependencyInjectionSettings to use in memory cache provider
+                                .WithInMemoryCacheHandler()
                 """);
                 break;
-            case CacheProviderType.Distributed:
-                usingsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+            case CacheProviderType.DistributedAsString:
+                apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_Caching);
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(
                 $$"""
-                    // Install-Package Apizr.Extensions.Microsoft.Caching and any Microsoft Distributed Caching compliant package
-                """ :
-                $$"""
-                    // You have to set DependencyInjectionSettings to use distributed cache provider
+                                .WithDistributedCacheHandler<string>()
                 """);
-                optionsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+                break;
+            case CacheProviderType.DistributedAsByteArray:
+                apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_Caching);
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(
                 $$"""
-                            .WithDistributedCacheHandler<string>() // Replace string with byte[] if needed
-                """ :
-                $$"""
-                            // You have to set DependencyInjectionSettings to use distributed cache provider
+                                .WithDistributedCacheHandler<byte[]>()
                 """);
                 break;
         }
@@ -153,82 +140,76 @@ internal static class ApizrRegistrationGenerator
         switch (settings.ApizrSettings.WithMappingProvider)
         {
             case MappingProviderType.AutoMapper:
+                apizrPackages.Add(ApizrPackage.Apizr_Integrations_AutoMapper);
                 usingsCodeBuilder.AppendLine(
                 $$"""
-                    using AutoMapper; // Install-Package Apizr.Integrations.AutoMapper
+                    using AutoMapper;
                 """);
-                optionsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(isDependencyInjectionExtension ?
                 $$"""
-                            .WithAutoMapperMappingHandler() // Don't forget to register AutoMapper itself too
+                                .WithAutoMapperMappingHandler()
                 """ :
                 $$"""               
-                            .WithAutoMapperMappingHandler(Your_MapperConfiguration) // Replace Your_MapperConfiguration with your own AutoMapper's MapperConfiguration instance
+                                .WithAutoMapperMappingHandler(new MapperConfiguration(config => { /* YOUR_MAPPINGS_HERE */ }))
                 """);
                 break;
             case MappingProviderType.Mapster:
+                apizrPackages.Add(ApizrPackage.Apizr_Integrations_Mapster);
                 usingsCodeBuilder.AppendLine(
                 $$"""
-                    using Mapster; // Install-Package Apizr.Integrations.Mapster
+                    using Mapster;
                 """);
                 if(isDependencyInjectionExtension)
                     usingsCodeBuilder.AppendLine(
                 $$"""
                     using MapsterMapper;
                 """);
-                optionsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(isDependencyInjectionExtension ?
                 $$"""
-                            .WithMapsterMappingHandler() // Don't forget to register Mapster itself too
+                                .WithMapsterMappingHandler()
                 """ :
                 $$"""               
-                            .WithMapsterMappingHandler(new Mapper())
+                                .WithMapsterMappingHandler(new Mapper())
                 """);
                 break;
         }
 
         if(settings.ApizrSettings.WithPriority)
         {
-            usingsCodeBuilder.AppendLine(
-                $$"""
-                    // Install-Package Apizr.Integrations.Fusillade
-                """);
-            optionsCodeBuilder.AppendLine(
-                $$"""               
-                            .WithPriority()
+            apizrPackages.Add(ApizrPackage.Apizr_Integrations_Fusillade);
+            optionsCodeBuilder.AppendLine();
+            optionsCodeBuilder.Append(
+            $$"""               
+                                .WithPriority()
                 """);
         }
 
         if (settings.ApizrSettings.WithOptionalMediation)
         {
-            usingsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+            apizrPackages.Add(ApizrPackage.Apizr_Integrations_Optional);
+            usingsCodeBuilder.AppendLine(
                 $$"""
-                    using MediatR; // Install-Package Apizr.Integrations.Optional
-                """ :
-                $$"""
-                    // You have to set DependencyInjectionSettings to use MediatR with optional result
+                    using MediatR;
                 """);
-            optionsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+            optionsCodeBuilder.AppendLine();
+            optionsCodeBuilder.Append(
                 $$"""
-                            .WithOptionalMediation() // Don't forget to register MediatR itself too
-                """ :
-                $$"""
-                            // You have to set DependencyInjectionSettings to use MediatR with optional result
+                                .WithOptionalMediation()
                 """);
         }
         else if (settings.ApizrSettings.WithMediation)
         {
-            usingsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+            apizrPackages.Add(ApizrPackage.Apizr_Integrations_MediatR);
+            usingsCodeBuilder.AppendLine(
                 $$"""
-                    using MediatR; // Install-Package Apizr.Integrations.MediatR
-                """ :
-                $$"""
-                    // You have to set DependencyInjectionSettings to use MediatR
+                    using MediatR;
                 """);
-            optionsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+            optionsCodeBuilder.AppendLine();
+            optionsCodeBuilder.Append(
                 $$"""
-                            .WithMediation() // Don't forget to register MediatR itself too
-                """ :
-                $$"""
-                            // You have to set DependencyInjectionSettings to use MediatR
+                                .WithMediation()
                 """);
         }
 
@@ -236,67 +217,91 @@ internal static class ApizrRegistrationGenerator
         {
             if (settings.ApizrSettings.WithOptionalMediation)
             {
-                usingsCodeBuilder.AppendLine(isDependencyInjectionExtension ? 
+                apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer_Optional);
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(
                 $$"""
-                    // Install-Package Apizr.Integrations.FileTransfer.Optional
-                """ : 
-                $$"""
-                    // You have to set DependencyInjectionSettings to use file transfer with optional mediation
-                """);
-                optionsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
-                $$"""
-                            .WithFileTransferOptionalMediation() // Don't forget to register MediatR itself too
-                """ :
-                $$"""
-                            // You have to set DependencyInjectionSettings to use file transfer with optional mediation
+                                .WithFileTransferOptionalMediation()
                 """);
             }
             else if (settings.ApizrSettings.WithMediation)
             {
-
-                usingsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
+                apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer_MediatR);
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(
                 $$"""
-                    // Install-Package Apizr.Integrations.FileTransfer.MediatR
-                """ :
-                $$"""
-                    // You have to set DependencyInjectionSettings to use file transfer with mediation
-                """);
-                optionsCodeBuilder.AppendLine(isDependencyInjectionExtension ?
-                $$"""
-                            .WithFileTransferMediation() // Don't forget to register MediatR itself too
-                """ :
-                $$"""
-                            // You have to set DependencyInjectionSettings to use file transfer with mediation
+                                .WithFileTransferMediation()
                 """);
             }
             else if (isDependencyInjectionExtension)
             {
-                usingsCodeBuilder.AppendLine(
+                apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_FileTransfer);
+            }
+            else
+            {
+                apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer);
+            }
+        }
+
+        apizrPackages.Add(ApizrPackage.Apizr);
+        usingsCodeBuilder.AppendLine(
                 $$"""
-                    // Install-Package Apizr.Extensions.Microsoft.FileTransfer
+                    using Apizr;
                 """);
-                usingsCodeBuilder.AppendLine(
+
+        if (optionsCodeBuilder.ToString().Contains(".With"))
+            optionsCodeBuilder.Append(";");
+        else
+            optionsCodeBuilder.Clear();
+
+        var packageCodeBuilder = new StringBuilder();
+        var packages = apizrPackages.OrderByDescending(p => p).ToList();
+        if (packages.Count > 0)
+        {
+            if (!isDependencyInjectionExtension && (settings.ApizrSettings.WithOptionalMediation ||
+                                                    settings.ApizrSettings.WithMediation ||
+                                                    settings.ApizrSettings.WithCacheProvider == CacheProviderType.InMemory ||
+                                                    settings.ApizrSettings.WithCacheProvider == CacheProviderType.DistributedAsString ||
+                                                    settings.ApizrSettings.WithCacheProvider == CacheProviderType.DistributedAsByteArray))
+            {
+                packageCodeBuilder.AppendLine(
                 $$"""
-                    // Please register your file transfer manager with options builder while calling {{methodName}}
+                // /!\ ERROR =========
+                    // Your configuration asked for some Apizr extended features but you did not configure the DependencyInjectionSettings.
+                    // Please either set DependencyInjectionSettings property to get the extended features working 
+                    // or disable Apizr extended features to get a static builder instead. 
+                    // Then try to generate again.
+                    // ===================
+                    //
+                    // Please make sure to complete the following steps resulting from your configuration:
                 """);
             }
             else
             {
-                usingsCodeBuilder.AppendLine(
+                packageCodeBuilder.AppendLine(
                 $$"""
-                    // Install-Package Apizr.Integrations.FileTransfer
+                // Please make sure to complete the following steps resulting from your configuration:
                 """);
-                usingsCodeBuilder.AppendLine(
+            }
+            for (int i = 0; i < packages.Count; i++)
+            {
+                if (i == 0 || !packages[i - 1].HasFlag(packages[i]))
+                {
+                    packageCodeBuilder.AppendLine(
                 $$"""
-                    // Please register your file transfer manager with options builder while calling {{methodName}}
+                    // - {{packages[i].ToDescription()}}
+                """);
+                }
+            }
+
+            if (settings.ApizrSettings.WithFileTransfer)
+            {
+                packageCodeBuilder.AppendLine(
+                $$"""
+                    // - Add your file transfer manager while calling {{methodName}} method thanks to its options builder parameter
                 """);
             }
         }
-
-        if(optionsCodeBuilder.ToString().Contains(".With"))
-            optionsCodeBuilder.Append(";");
-        else
-            optionsCodeBuilder.Clear();
 
         // Code
         var code = new StringBuilder();
@@ -321,7 +326,7 @@ internal static class ApizrRegistrationGenerator
             {
                 usingsCodeBuilder.AppendLine(
                 $$"""
-                    using Apizr.Extending.Configuring.Common; // Install-Package Apizr.Extensions.Microsoft.DependencyInjection
+                    using Apizr.Extending.Configuring.Common;
                 """);
 
                 code.AppendLine(
@@ -329,10 +334,17 @@ internal static class ApizrRegistrationGenerator
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
+                    {{packageCodeBuilder}}
                     {{usingsCodeBuilder}}
                   
                     public static partial class IServiceCollectionExtensions
                     {
+                        /// <summary>
+                        /// Register all your Apizr managed apis with common shared options.
+                        /// You may call WithConfiguration option to adjust settings to your need.
+                        /// </summary>
+                        /// <param name="optionsBuilder">Adjust common shared options</param>
+                        /// <returns></returns>
                         public static IServiceCollection {{methodName}}(
                             this IServiceCollection services,
                 """);
@@ -382,7 +394,7 @@ internal static class ApizrRegistrationGenerator
             {
                 usingsCodeBuilder.AppendLine(
                 $$"""
-                    using Apizr.Extending.Configuring.Manager; // Install-Package Apizr.Extensions.Microsoft.DependencyInjection
+                    using Apizr.Extending.Configuring.Manager;
                 """);
 
                 code.AppendLine(
@@ -390,10 +402,17 @@ internal static class ApizrRegistrationGenerator
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
+                    {{packageCodeBuilder}}
                     {{usingsCodeBuilder}}
 
                     public static partial class IServiceCollectionExtensions
                     {
+                        /// <summary>
+                        /// Register your Apizr managed api with common shared options.
+                        /// You may call WithConfiguration option to adjust settings to your need.
+                        /// </summary>
+                        /// <param name="optionsBuilder">Adjust common shared options</param>
+                        /// <returns></returns>
                         public static IServiceCollection {{methodName}}(
                             this IServiceCollection services,
                 """);
@@ -444,10 +463,17 @@ internal static class ApizrRegistrationGenerator
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
+                    {{packageCodeBuilder}}
                     {{usingsCodeBuilder}}
                   
                     public static partial class ApizrRegistration
                     {
+                        /// <summary>
+                        /// Build a registry with your Apizr managed apis and common shared options.
+                        /// You may call WithConfiguration option to adjust settings to your need.
+                        /// </summary>
+                        /// <param name="optionsBuilder">Adjust common shared options</param>
+                        /// <returns></returns>
                         public static IApizrRegistry {{methodName}}(Action<IApizrCommonOptionsBuilder> optionsBuilder)
                         {
                             {{optionsCodeBuilder}}
@@ -490,15 +516,22 @@ internal static class ApizrRegistrationGenerator
                 #nullable enable
                 namespace {{settings.Namespace}}
                 {
+                    {{packageCodeBuilder}}
                     {{usingsCodeBuilder}}
                       
                     public static partial class ApizrRegistration
                     {
+                        /// <summary>
+                        /// Build your Apizr managed api with common shared options.
+                        /// You may call WithConfiguration option to adjust settings to your need.
+                        /// </summary>
+                        /// <param name="optionsBuilder">Adjust common shared options</param>
+                        /// <returns></returns>
                         public static IApizrManager<{{interfaceNames[0]}}> {{methodName}}(Action<IApizrManagerOptionsBuilder> optionsBuilder)
                         {
                             {{optionsCodeBuilder}}
                             
-                            return ApizrBuilder.Current.CreateManagerFor<{interfaceNames[0]}>(optionsBuilder);  
+                            return ApizrBuilder.Current.CreateManagerFor<{{interfaceNames[0]}}>(optionsBuilder);  
                 """);
 
 #pragma warning disable RS1035

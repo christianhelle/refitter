@@ -6,6 +6,7 @@
         Akavache,
         MonkeyCache,
         InMemory,
-        Distributed
+        DistributedAsString,
+        DistributedAsByteArray,
     }
 }
