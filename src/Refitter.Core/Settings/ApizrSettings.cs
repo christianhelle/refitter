@@ -46,8 +46,23 @@ namespace Refitter.Core
         public MappingProviderType WithMappingProvider { get; set; }
 
         /// <summary>
-        /// Set it to true to handle request priority (default: false)
+        /// Set it to true to handle request with priority (default: false)
         /// </summary>
-        public bool WithPriority { get; set; }
+        public bool WithPriority { get; set; } = false;
+
+        /// <summary>
+        /// Set it to true to handle request with MediatR (default: false)
+        /// </summary>
+        public bool WithMediation { get; set; } = false;
+
+        /// <summary>
+        /// Set it to true to handle request with MediatR and Optional result (default: false)
+        /// </summary>
+        public bool WithOptionalMediation { get; set; } = false;
+
+        /// <summary>
+        /// Set it to true to manage file transfers (default: false)
+        /// </summary>
+        public bool WithFileTransfer { get; set; } = false;
     }
 }

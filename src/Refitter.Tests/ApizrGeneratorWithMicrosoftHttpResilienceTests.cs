@@ -23,7 +23,12 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
         ApizrSettings = new ApizrSettings
         {
             WithRequestOptions = true,
-            WithRegistrationHelper = true
+            WithRegistrationHelper = true,
+            WithCacheProvider = CacheProviderType.InMemory,
+            WithPriority = true,
+            WithMediation = true,
+            WithOptionalMediation = true,
+            WithMappingProvider = MappingProviderType.AutoMapper
         }
     };
 
