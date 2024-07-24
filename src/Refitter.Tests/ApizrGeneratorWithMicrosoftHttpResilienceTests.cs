@@ -82,21 +82,21 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
     [Fact]
     public void Can_Generate_With_HttpMessageHandlers()
     {
-        string code = DependencyInjectionGenerator.Generate(
+        string code = ApizrRegistrationGenerator.Generate(
             _extendedSettings,
             [
                 "IPetApi",
                 "IStoreApi"
             ]);
 
-        code.Should().Contain("AddHttpMessageHandler<AuthorizationMessageHandler>()");
-        code.Should().Contain("AddHttpMessageHandler<DiagnosticMessageHandler>()");
+        code.Should().Contain("WithDelegatingHandler<AuthorizationMessageHandler>()");
+        code.Should().Contain("WithDelegatingHandler<DiagnosticMessageHandler>()");
     }
 
     [Fact]
     public void Can_Generate_With_HttpResilience()
     {
-        string code = DependencyInjectionGenerator.Generate(
+        string code = ApizrRegistrationGenerator.Generate(
             _extendedSettings,
             [
                 "IPetApi",
@@ -108,7 +108,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
     public void Can_Generate_Without_TransientErrorHandler()
     {
         _extendedSettings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
-        string code = DependencyInjectionGenerator.Generate(
+        string code = ApizrRegistrationGenerator.Generate(
             _extendedSettings,
             [
                 "IPetApi",
@@ -125,7 +125,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
     public void Can_Generate_Without_BaseUrl()
     {
         _extendedSettings.DependencyInjectionSettings!.BaseUrl = null;
-        string code = DependencyInjectionGenerator.Generate(
+        string code = ApizrRegistrationGenerator.Generate(
             _extendedSettings,
             [
                 "IPetApi",
