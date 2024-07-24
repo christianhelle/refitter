@@ -85,6 +85,18 @@ internal static class ApizrRegistrationGenerator
         var usingsCodeBuilder = new StringBuilder(usings);
         usingsCodeBuilder.AppendLine();
 
+        if (iocSettings?.HttpMessageHandlers.Length > 0)
+        {
+            foreach (string httpMessageHandler in iocSettings.HttpMessageHandlers)
+            {
+                optionsCodeBuilder.AppendLine();
+                optionsCodeBuilder.Append(
+                $$"""               
+                                .WithDelegatingHandler<{{httpMessageHandler}}>()
+                """);
+            }
+        }
+
         switch (settings.ApizrSettings.WithCacheProvider)
         {
             case CacheProviderType.Akavache:
