@@ -53,7 +53,7 @@ internal static class ApizrRegistrationGenerator
                                 .WithBaseAddress("{{iocSettings!.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
                 """);
         }
-        
+
         var usings = iocSettings?.TransientErrorHandler switch
         {
             TransientErrorHandler.Polly =>
@@ -111,7 +111,7 @@ internal static class ApizrRegistrationGenerator
                                 .WithCacheHandler(new MonkeyCacheHandler(Barrel.Current))
                 """);
                 break;
-            case CacheProviderType.InMemory:
+            case CacheProviderType.InMemory when isDependencyInjectionExtension:
                 apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_Caching);
                 optionsCodeBuilder.AppendLine();
                 optionsCodeBuilder.Append(
@@ -119,7 +119,7 @@ internal static class ApizrRegistrationGenerator
                                 .WithInMemoryCacheHandler()
                 """);
                 break;
-            case CacheProviderType.DistributedAsString:
+            case CacheProviderType.DistributedAsString when isDependencyInjectionExtension:
                 apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_Caching);
                 optionsCodeBuilder.AppendLine();
                 optionsCodeBuilder.Append(
@@ -127,7 +127,7 @@ internal static class ApizrRegistrationGenerator
                                 .WithDistributedCacheHandler<string>()
                 """);
                 break;
-            case CacheProviderType.DistributedAsByteArray:
+            case CacheProviderType.DistributedAsByteArray when isDependencyInjectionExtension:
                 apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_Caching);
                 optionsCodeBuilder.AppendLine();
                 optionsCodeBuilder.Append(
@@ -186,7 +186,7 @@ internal static class ApizrRegistrationGenerator
                 """);
         }
 
-        if (settings.ApizrSettings.WithOptionalMediation)
+        if (settings.ApizrSettings.WithOptionalMediation && isDependencyInjectionExtension)
         {
             apizrPackages.Add(ApizrPackage.Apizr_Integrations_Optional);
             usingsCodeBuilder.AppendLine(
@@ -199,7 +199,7 @@ internal static class ApizrRegistrationGenerator
                                 .WithOptionalMediation()
                 """);
         }
-        else if (settings.ApizrSettings.WithMediation)
+        else if (settings.ApizrSettings.WithMediation && isDependencyInjectionExtension)
         {
             apizrPackages.Add(ApizrPackage.Apizr_Integrations_MediatR);
             usingsCodeBuilder.AppendLine(
@@ -215,27 +215,30 @@ internal static class ApizrRegistrationGenerator
 
         if (settings.ApizrSettings.WithFileTransfer)
         {
-            if (settings.ApizrSettings.WithOptionalMediation)
+            if (isDependencyInjectionExtension)
             {
-                apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer_Optional);
-                optionsCodeBuilder.AppendLine();
-                optionsCodeBuilder.Append(
+                if (settings.ApizrSettings.WithOptionalMediation)
+                {
+                    apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer_Optional);
+                    optionsCodeBuilder.AppendLine();
+                    optionsCodeBuilder.Append(
                 $$"""
                                 .WithFileTransferOptionalMediation()
                 """);
-            }
-            else if (settings.ApizrSettings.WithMediation)
-            {
-                apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer_MediatR);
-                optionsCodeBuilder.AppendLine();
-                optionsCodeBuilder.Append(
+                }
+                else if (settings.ApizrSettings.WithMediation)
+                {
+                    apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer_MediatR);
+                    optionsCodeBuilder.AppendLine();
+                    optionsCodeBuilder.Append(
                 $$"""
                                 .WithFileTransferMediation()
                 """);
-            }
-            else if (isDependencyInjectionExtension)
-            {
-                apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_FileTransfer);
+                }
+                else
+                {
+                    apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_FileTransfer);
+                }
             }
             else
             {
@@ -264,11 +267,12 @@ internal static class ApizrRegistrationGenerator
                                                     settings.ApizrSettings.WithCacheProvider == CacheProviderType.DistributedAsString ||
                                                     settings.ApizrSettings.WithCacheProvider == CacheProviderType.DistributedAsByteArray))
             {
+                // ERROR: Asking for Apizr extended features without DependencyInjectionSettings set
                 packageCodeBuilder.AppendLine(
                 $$"""
                 // /!\ ERROR =========
                     // Your configuration asked for some Apizr extended features but you did not configure the DependencyInjectionSettings.
-                    // Please either set DependencyInjectionSettings property to get the extended features working 
+                    // Please either set DependencyInjectionSettings property to get the extended features enabled 
                     // or disable Apizr extended features to get a static builder instead. 
                     // Then try to generate again.
                     // ===================
