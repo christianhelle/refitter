@@ -6,19 +6,21 @@ using Xunit;
 
 namespace Refitter.Tests;
 
-public class ApizrGeneratorWithMicrosoftHttpResilienceTests
+public class ApizrGeneratorWithPollyTests
 {
     private readonly RefitGeneratorSettings _extendedSettings = new()
     {
         DependencyInjectionSettings = new DependencyInjectionSettings
         {
             BaseUrl = "https://petstore3.swagger.io/api/v3",
-            HttpMessageHandlers =
-            [
+            HttpMessageHandlers = new[]
+            {
                 "AuthorizationMessageHandler",
                 "DiagnosticMessageHandler"
-            ],
-            TransientErrorHandler = TransientErrorHandler.HttpResilience
+            },
+            TransientErrorHandler = TransientErrorHandler.Polly,
+            MaxRetryCount = 3,
+            FirstBackoffRetryInSeconds = 0.5,
         },
         ApizrSettings = new ApizrSettings
         {
@@ -32,24 +34,6 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
             WithFileTransfer = true
         }
     };
-
-
-    private readonly RefitGeneratorSettings _staticSettings = new()
-    {
-        ApizrSettings = new ApizrSettings
-        {
-            WithRequestOptions = true,
-            WithRegistrationHelper = true,
-            WithCacheProvider = CacheProviderType.InMemory,
-            WithPriority = true,
-            WithMediation = true,
-            WithOptionalMediation = true,
-            WithMappingProvider = MappingProviderType.AutoMapper,
-            WithFileTransfer = true
-        }
-    };
-
-    #region Extended
 
     [Fact]
     public void Can_Generate_Extended_Registration_For_Single_Interface()
@@ -84,38 +68,45 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
     {
         string code = ApizrRegistrationGenerator.Generate(
             _extendedSettings,
-            [
+            new[]
+            {
                 "IPetApi",
                 "IStoreApi"
-            ]);
+            });
 
         code.Should().Contain("WithDelegatingHandler<AuthorizationMessageHandler>()");
         code.Should().Contain("WithDelegatingHandler<DiagnosticMessageHandler>()");
     }
 
     [Fact]
-    public void Can_Generate_With_HttpResilience()
+    public void Can_Generate_With_Polly()
     {
         string code = ApizrRegistrationGenerator.Generate(
             _extendedSettings,
-            [
+            new[]
+            {
                 "IPetApi",
                 "IStoreApi"
-            ]);
+            });
+
+        code.Should().Contain("using Polly");
+        code.Should().Contain("AddPolicyHandler");
+        code.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
     [Fact]
-    public void Can_Generate_Without_TransientErrorHandler()
+    public void Can_Generate_Without_Polly()
     {
         _extendedSettings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
         string code = ApizrRegistrationGenerator.Generate(
             _extendedSettings,
-            [
+            new[]
+            {
                 "IPetApi",
                 "IStoreApi"
-            ]);
+            });
 
-        code.Should().NotContain("using HttpResilience");
+        code.Should().NotContain("using Polly");
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
         code.Should().NotContain("AddPolicyHandler");
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
@@ -127,45 +118,12 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
         _extendedSettings.DependencyInjectionSettings!.BaseUrl = null;
         string code = ApizrRegistrationGenerator.Generate(
             _extendedSettings,
-            [
+            new[]
+            {
                 "IPetApi",
                 "IStoreApi"
-            ]);
+            });
 
         code.Should().Contain("> optionsBuilder)");
     }
-
-    #endregion
-
-    #region Static
-
-
-    [Fact]
-    public void Can_Generate_Static_Registration_For_Single_Interface()
-    {
-        string code = ApizrRegistrationGenerator.Generate(
-            _staticSettings,
-            [
-                "IPetApi"
-            ],
-            "Pet");
-
-        code.Should().Contain("CreateManagerFor<IPetApi>(optionsBuilder)");
-    }
-
-    [Fact]
-    public void Can_Generate_Static_Registration_For_Multiple_Interfaces()
-    {
-        string code = ApizrRegistrationGenerator.Generate(
-            _staticSettings,
-            [
-                "IPetApi",
-                "IStoreApi"
-            ],
-            "PetStore");
-
-        code.Should().Contain("AddManagerFor<IPetApi>()");
-        code.Should().Contain("AddManagerFor<IStoreApi>()");
-    }
-    #endregion
 }
