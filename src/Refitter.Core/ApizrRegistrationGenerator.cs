@@ -97,6 +97,41 @@ internal static class ApizrRegistrationGenerator
             }
         }
 
+        if (iocSettings?.TransientErrorHandler == TransientErrorHandler.Polly)
+        {
+            var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
+            optionsCodeBuilder.AppendLine();
+            optionsCodeBuilder.Append(
+                $$"""
+                                .ConfigureHttpClientBuilder(builder => builder
+                                    .AddPolicyHandler(
+                                        HttpPolicyExtensions
+                                            .HandleTransientHttpError()
+                                            .WaitAndRetryAsync(
+                                                Backoff.DecorrelatedJitterBackoffV2(
+                                                    TimeSpan.FromSeconds({{durationString}}),
+                                                    {{iocSettings.MaxRetryCount}}))))
+                """);
+        }
+        else if (iocSettings?.TransientErrorHandler == TransientErrorHandler.HttpResilience)
+        {
+            var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
+            optionsCodeBuilder.AppendLine();
+            optionsCodeBuilder.Append(
+                $$"""
+                                .ConfigureHttpClientBuilder(builder => builder
+                                    .AddStandardResilienceHandler(config =>
+                                    {
+                                        config.Retry = new HttpRetryStrategyOptions
+                                        {
+                                            UseJitter = true,
+                                            MaxRetryAttempts = {{iocSettings.MaxRetryCount}},
+                                            Delay = TimeSpan.FromSeconds({{durationString}})
+                                        };
+                                    }))
+                """);
+        }
+
         switch (settings.ApizrSettings.WithCacheProvider)
         {
             case CacheProviderType.Akavache:
