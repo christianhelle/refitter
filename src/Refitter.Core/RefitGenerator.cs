@@ -139,12 +139,15 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         };
 
         var generatedCode = GenerateClient(interfaceGenerator);
+        var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
+            ? document.Info!.Title.Sanitize()
+            : settings.Naming.InterfaceName;
         return new StringBuilder()
             .AppendLine(generatedCode.SourceCode)
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
             .AppendLine(settings.ApizrSettings != null
-                ? ApizrRegistrationGenerator.Generate(settings, generatedCode.InterfaceNames, document.Info?.Title)
+                ? ApizrRegistrationGenerator.Generate(settings, generatedCode.InterfaceNames, title)
                 : DependencyInjectionGenerator.Generate(settings, generatedCode.InterfaceNames))
             .ToString()
             .TrimEnd();

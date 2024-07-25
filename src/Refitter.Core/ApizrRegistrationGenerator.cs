@@ -24,6 +24,7 @@ internal static class ApizrRegistrationGenerator
         if (string.IsNullOrWhiteSpace(methodName) || methodName == DependencyInjectionSettings.DefaultExtensionMethodName)
         {
             var formatedTitle = !string.IsNullOrWhiteSpace(title) ? title!
+                .Replace(NamingSettings.DefaultInterfaceName, string.Empty)
                 .Replace("Swagger", string.Empty)
                 .Replace("OpenAPI", string.Empty)
                 .ConvertKebabCaseToPascalCase()
