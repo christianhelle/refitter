@@ -62,6 +62,8 @@ public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
                 "IPetApi",
                 "IStoreApi"
             });
+
+        code.Should().Contain("AddStandardResilienceHandler");
     }
 
     [Fact]

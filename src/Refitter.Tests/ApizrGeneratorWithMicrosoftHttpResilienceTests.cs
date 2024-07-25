@@ -102,6 +102,8 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
                 "IPetApi",
                 "IStoreApi"
             ]);
+
+        code.Should().Contain("AddStandardResilienceHandler");
     }
 
     [Fact]
