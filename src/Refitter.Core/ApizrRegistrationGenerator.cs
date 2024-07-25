@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using Refitter.Core.Settings;
 
@@ -23,13 +24,15 @@ internal static class ApizrRegistrationGenerator
         if (string.IsNullOrWhiteSpace(methodName) || methodName == DependencyInjectionSettings.DefaultExtensionMethodName)
         {
             var formatedTitle = !string.IsNullOrWhiteSpace(title) ? title!
+                .ReplaceIgnoreCase("swagger", string.Empty)
+                .ReplaceIgnoreCase("openapi", string.Empty)
                 .ConvertKebabCaseToPascalCase()
                 .ConvertSnakeCaseToPascalCase()
                 .ConvertRouteToCamelCase()
                 .ConvertSpacesToPascalCase()
                 .ConvertColonsToPascalCase()
                 .Sanitize()
-                .CapitalizeFirstCharacter() 
+                .CapitalizeFirstCharacter()
                 : string.Empty;
 
             if(isDependencyInjectionExtension)
@@ -81,7 +84,7 @@ internal static class ApizrRegistrationGenerator
                 """
         };
 
-        var apizrPackages = new List<ApizrPackage>();
+        var apizrPackages = new List<ApizrPackages>();
         var usingsCodeBuilder = new StringBuilder(usings);
         usingsCodeBuilder.AppendLine();
 
@@ -135,7 +138,7 @@ internal static class ApizrRegistrationGenerator
         switch (settings.ApizrSettings.WithCacheProvider)
         {
             case CacheProviderType.Akavache:
-                apizrPackages.Add(ApizrPackage.Apizr_Integrations_Akavache);
+                apizrPackages.Add(ApizrPackages.Apizr_Integrations_Akavache);
                 usingsCodeBuilder.AppendLine(
                 $$"""
                     using Akavache;
@@ -147,7 +150,7 @@ internal static class ApizrRegistrationGenerator
                 """);
                 break;
             case CacheProviderType.MonkeyCache:
-                apizrPackages.Add(ApizrPackage.Apizr_Integrations_MonkeyCache);
+                apizrPackages.Add(ApizrPackages.Apizr_Integrations_MonkeyCache);
                 usingsCodeBuilder.AppendLine(
                 $$"""
                     using MonkeyCache;
@@ -159,7 +162,7 @@ internal static class ApizrRegistrationGenerator
                 """);
                 break;
             case CacheProviderType.InMemory when isDependencyInjectionExtension:
-                apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_Caching);
+                apizrPackages.Add(ApizrPackages.Apizr_Extensions_Microsoft_Caching);
                 optionsCodeBuilder.AppendLine();
                 optionsCodeBuilder.Append(
                 $$"""
@@ -167,7 +170,7 @@ internal static class ApizrRegistrationGenerator
                 """);
                 break;
             case CacheProviderType.DistributedAsString when isDependencyInjectionExtension:
-                apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_Caching);
+                apizrPackages.Add(ApizrPackages.Apizr_Extensions_Microsoft_Caching);
                 optionsCodeBuilder.AppendLine();
                 optionsCodeBuilder.Append(
                 $$"""
@@ -175,7 +178,7 @@ internal static class ApizrRegistrationGenerator
                 """);
                 break;
             case CacheProviderType.DistributedAsByteArray when isDependencyInjectionExtension:
-                apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_Caching);
+                apizrPackages.Add(ApizrPackages.Apizr_Extensions_Microsoft_Caching);
                 optionsCodeBuilder.AppendLine();
                 optionsCodeBuilder.Append(
                 $$"""
@@ -187,7 +190,7 @@ internal static class ApizrRegistrationGenerator
         switch (settings.ApizrSettings.WithMappingProvider)
         {
             case MappingProviderType.AutoMapper:
-                apizrPackages.Add(ApizrPackage.Apizr_Integrations_AutoMapper);
+                apizrPackages.Add(ApizrPackages.Apizr_Integrations_AutoMapper);
                 usingsCodeBuilder.AppendLine(
                 $$"""
                     using AutoMapper;
@@ -202,7 +205,7 @@ internal static class ApizrRegistrationGenerator
                 """);
                 break;
             case MappingProviderType.Mapster:
-                apizrPackages.Add(ApizrPackage.Apizr_Integrations_Mapster);
+                apizrPackages.Add(ApizrPackages.Apizr_Integrations_Mapster);
                 usingsCodeBuilder.AppendLine(
                 $$"""
                     using Mapster;
@@ -225,7 +228,7 @@ internal static class ApizrRegistrationGenerator
 
         if(settings.ApizrSettings.WithPriority)
         {
-            apizrPackages.Add(ApizrPackage.Apizr_Integrations_Fusillade);
+            apizrPackages.Add(ApizrPackages.Apizr_Integrations_Fusillade);
             optionsCodeBuilder.AppendLine();
             optionsCodeBuilder.Append(
             $$"""               
@@ -235,7 +238,7 @@ internal static class ApizrRegistrationGenerator
 
         if (settings.ApizrSettings.WithOptionalMediation && isDependencyInjectionExtension)
         {
-            apizrPackages.Add(ApizrPackage.Apizr_Integrations_Optional);
+            apizrPackages.Add(ApizrPackages.Apizr_Integrations_Optional);
             usingsCodeBuilder.AppendLine(
                 $$"""
                     using MediatR;
@@ -248,7 +251,7 @@ internal static class ApizrRegistrationGenerator
         }
         else if (settings.ApizrSettings.WithMediation && isDependencyInjectionExtension)
         {
-            apizrPackages.Add(ApizrPackage.Apizr_Integrations_MediatR);
+            apizrPackages.Add(ApizrPackages.Apizr_Integrations_MediatR);
             usingsCodeBuilder.AppendLine(
                 $$"""
                     using MediatR;
@@ -266,7 +269,7 @@ internal static class ApizrRegistrationGenerator
             {
                 if (settings.ApizrSettings.WithOptionalMediation)
                 {
-                    apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer_Optional);
+                    apizrPackages.Add(ApizrPackages.Apizr_Integrations_FileTransfer_Optional);
                     optionsCodeBuilder.AppendLine();
                     optionsCodeBuilder.Append(
                 $$"""
@@ -275,7 +278,7 @@ internal static class ApizrRegistrationGenerator
                 }
                 else if (settings.ApizrSettings.WithMediation)
                 {
-                    apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer_MediatR);
+                    apizrPackages.Add(ApizrPackages.Apizr_Integrations_FileTransfer_MediatR);
                     optionsCodeBuilder.AppendLine();
                     optionsCodeBuilder.Append(
                 $$"""
@@ -284,16 +287,16 @@ internal static class ApizrRegistrationGenerator
                 }
                 else
                 {
-                    apizrPackages.Add(ApizrPackage.Apizr_Extensions_Microsoft_FileTransfer);
+                    apizrPackages.Add(ApizrPackages.Apizr_Extensions_Microsoft_FileTransfer);
                 }
             }
             else
             {
-                apizrPackages.Add(ApizrPackage.Apizr_Integrations_FileTransfer);
+                apizrPackages.Add(ApizrPackages.Apizr_Integrations_FileTransfer);
             }
         }
 
-        apizrPackages.Add(ApizrPackage.Apizr);
+        apizrPackages.Add(ApizrPackages.Apizr);
         usingsCodeBuilder.AppendLine(
                 $$"""
                     using Apizr;
@@ -610,5 +613,10 @@ internal static class ApizrRegistrationGenerator
                 """);
         code.AppendLine();
         return code.ToString();
+    }
+
+    public static string ReplaceIgnoreCase(this string str, string from, string to)
+    {
+        return Regex.Replace(str, Regex.Escape(from), to.Replace("$", "$$"), RegexOptions.IgnoreCase);
     }
 }

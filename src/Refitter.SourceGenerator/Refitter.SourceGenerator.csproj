@@ -29,10 +29,4 @@
     <Compile Include="../Refitter.Core/Settings/*.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="..\Refitter.Core\ApizrDependencyInjectionGenerator.cs" />
-    <Compile Remove="..\Refitter.Core\Class1.cs" />
-    <Compile Remove="..\Refitter.Core\DependencyInjectionGenerator - Copy.cs" />
-  </ItemGroup>
-
 </Project>

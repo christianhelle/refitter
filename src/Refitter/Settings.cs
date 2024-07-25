@@ -165,12 +165,4 @@ public sealed class Settings : CommandSettings
     [CommandOption("--immutable-records")]
     [DefaultValue(false)]
     public bool ImmutableRecords { get; set; }
-
-    [Description("Use Apizr by:" +
-                 "- including request options parameter" +
-                 "- overloading methods with optional parameters if any" +
-                 "- adjusting dependency injection settings if any")]
-    [CommandOption("--use-apizr")]
-    [DefaultValue(false)]
-    public bool UseApizr { get; set; }
 }

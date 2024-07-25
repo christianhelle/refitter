@@ -6,7 +6,7 @@ using System.Text;
 namespace Refitter.Core.Settings
 {
     [Flags]
-    public enum ApizrPackage
+    public enum ApizrPackages
     {
         [Description("Install-Package Apizr")]
         Apizr = 1,

@@ -64,7 +64,7 @@ public class DependencyInjectionSettings
     public double FirstBackoffRetryInSeconds { get; set; } = 1.0;
 
     /// <summary>
-    /// Name of IServiceCollection Extension Method. Default is ConfigureRefitClients, otherwise ConfigureApizrManagers if UseApizr is true
+    /// Name of IServiceCollection Extension Method. Default is ConfigureRefitClients, or ConfigureApizrManagers if ApizrSettings property is set
     /// </summary>
     public string ExtensionMethodName { get; set; } = DefaultExtensionMethodName;
 }

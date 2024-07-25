@@ -340,6 +340,96 @@ public class SwaggerPetstoreTests
     }
 
     [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_Apizr_Setup(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings 
+        {
+            DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://petstore3.swagger.io/api/v3",
+                TransientErrorHandler = TransientErrorHandler.Polly
+            },
+            ApizrSettings = new ApizrSettings
+            {
+                WithRequestOptions = true,
+                WithRegistrationHelper = true,
+                WithCacheProvider = CacheProviderType.InMemory,
+                WithPriority = true,
+                WithMediation = true,
+                WithOptionalMediation = true,
+                WithMappingProvider = MappingProviderType.AutoMapper,
+                WithFileTransfer = true
+            }
+        };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("AddApizrManagerFor");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_Apizr_Setup_With_Polly(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings 
+        {
+            DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://petstore3.swagger.io/api/v3",
+                TransientErrorHandler = TransientErrorHandler.Polly
+            },
+            ApizrSettings = new ApizrSettings
+            {
+                WithRequestOptions = true,
+                WithRegistrationHelper = true,
+                WithCacheProvider = CacheProviderType.InMemory,
+                WithPriority = true,
+                WithMediation = true,
+                WithOptionalMediation = true,
+                WithMappingProvider = MappingProviderType.AutoMapper,
+                WithFileTransfer = true
+            }
+        };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("using Polly");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_Apizr_Setup_Without_Polly(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings 
+        {
+            DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://petstore3.swagger.io/api/v3",
+                TransientErrorHandler = TransientErrorHandler.None
+            },
+            ApizrSettings = new ApizrSettings
+            {
+                WithRequestOptions = true,
+                WithRegistrationHelper = true,
+                WithCacheProvider = CacheProviderType.InMemory,
+                WithPriority = true,
+                WithMediation = true,
+                WithOptionalMediation = true,
+                WithMappingProvider = MappingProviderType.AutoMapper,
+                WithFileTransfer = true
+            }
+        };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().NotContain("using Polly");
+    }
+
+    [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.Unset)]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.Unset)]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.Unset)]
