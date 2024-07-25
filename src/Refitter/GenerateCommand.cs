@@ -52,7 +52,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             KeepSchemaPatterns = settings.KeepSchemaPatterns ?? Array.Empty<string>(),
             OperationNameGenerator = settings.OperationNameGenerator,
             GenerateDefaultAdditionalProperties = !settings.SkipDefaultAdditionalProperties,
-            ImmutableRecords = settings.ImmutableRecords,
+            ImmutableRecords = settings.ImmutableRecords
         };
 
         try

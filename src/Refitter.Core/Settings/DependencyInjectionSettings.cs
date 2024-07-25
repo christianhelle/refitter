@@ -8,6 +8,8 @@ namespace Refitter.Core;
 /// </summary>
 public class DependencyInjectionSettings
 {
+    public const string DefaultExtensionMethodName = "ConfigureRefitClients";
+
     /// <summary>
     /// Base Address for the HttpClient
     /// </summary>
@@ -62,7 +64,7 @@ public class DependencyInjectionSettings
     public double FirstBackoffRetryInSeconds { get; set; } = 1.0;
 
     /// <summary>
-    /// Name of IServiceCollection Extension Method. Default is ConfigureRefitClients
+    /// Name of IServiceCollection Extension Method. Default is ConfigureRefitClients, or ConfigureApizrManagers if ApizrSettings property is set
     /// </summary>
-    public string ExtensionMethodName { get; set; } = "ConfigureRefitClients";
+    public string ExtensionMethodName { get; set; } = DefaultExtensionMethodName;
 }

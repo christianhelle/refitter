@@ -8,6 +8,8 @@ namespace Refitter.Core;
 [ExcludeFromCodeCoverage]
 public class NamingSettings
 {
+    public const string DefaultInterfaceName = "ApiClient";
+
     /// <summary>
     /// Gets or sets a value indicating whether the OpenApi title should be used. Default is true.
     /// </summary>
@@ -16,5 +18,5 @@ public class NamingSettings
     /// <summary>
     /// Gets or sets the name of the Interface. Default is "ApiClient".
     /// </summary>
-    public string InterfaceName { get; set; } = "ApiClient";
+    public string InterfaceName { get; set; } = DefaultInterfaceName;
 }

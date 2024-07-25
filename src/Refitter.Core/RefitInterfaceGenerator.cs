@@ -59,7 +59,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var name = GenerateOperationName(kv.Key, verb, operation);
 
                 var operationModel = generator.CreateOperationModel(operation);
-                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
+                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings).ToList();
                 var parametersString = string.Join(", ", parameters);
 
                 this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), code);
@@ -70,6 +70,36 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
                     .AppendLine();
+
+                if (settings is {OptionalParameters: true, ApizrSettings: { WithRequestOptions: true }})
+                {
+                    var optionalParameterIndices = parameters
+                        .Select((parameter, index) => (parameter, index))
+                        .Where(x => x.parameter.Contains("?"))
+                        .Select(x => x.index)
+                        .ToList();
+                    if (optionalParameterIndices.Count > 0)
+                    {
+                        var operationParametersToRemove = operationModel.Parameters.Where((_, index) => optionalParameterIndices.Contains(index)).ToList();
+                        foreach (var operationParameterToRemove in operationParametersToRemove) 
+                            operationModel.Parameters.Remove(operationParameterToRemove);
+
+                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), code);
+                        GenerateObsoleteAttribute(operation, code);
+                        GenerateForMultipartFormData(operationModel, code);
+                        GenerateAcceptHeaders(operations, operation, code);
+
+                        var parametersToRemove = parameters.Where((_, index) => optionalParameterIndices.Contains(index)).ToList();
+                        foreach (string parameterToRemove in parametersToRemove) 
+                            parameters.Remove(parameterToRemove);
+
+                        parametersString = string.Join(", ", parameters);
+
+                        code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
+                            .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
+                            .AppendLine();
+                    } 
+                }
             }
         }
 

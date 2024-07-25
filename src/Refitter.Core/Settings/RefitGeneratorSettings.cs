@@ -181,4 +181,9 @@ public class RefitGeneratorSettings
     /// Set to <c>true</c> to generate contracts as immutable records instead of classes
     /// </summary>
     public bool ImmutableRecords { get; set; }
+
+    /// <summary>
+    /// Get ot set the settings describing how to configure Apizr
+    /// </summary>
+    public ApizrSettings? ApizrSettings { get; set; }
 }
