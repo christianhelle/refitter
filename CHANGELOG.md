@@ -1,5 +1,19 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...HEAD)
+
+**Implemented enhancements:**
+
+- Add the possibility to generate all the Apizr goodness [\#428](https://github.com/christianhelle/refitter/pull/428) ([JeremyBP](https://github.com/JeremyBP))
+
+**Merged pull requests:**
+
+- docs: add JeremyBP as a contributor for code [\#429](https://github.com/christianhelle/refitter/pull/429) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add MeikelLP as a contributor for ideas [\#426](https://github.com/christianhelle/refitter/pull/426) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add bastiennoel93 as a contributor for bug [\#425](https://github.com/christianhelle/refitter/pull/425) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
 ## [1.1.3](https://github.com/christianhelle/refitter/tree/1.1.3) (2024-07-19)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.2...1.1.3)
