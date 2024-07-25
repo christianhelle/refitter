@@ -24,8 +24,8 @@ internal static class ApizrRegistrationGenerator
         if (string.IsNullOrWhiteSpace(methodName) || methodName == DependencyInjectionSettings.DefaultExtensionMethodName)
         {
             var formatedTitle = !string.IsNullOrWhiteSpace(title) ? title!
-                .ReplaceIgnoreCase("swagger", string.Empty)
-                .ReplaceIgnoreCase("openapi", string.Empty)
+                .Replace("Swagger", string.Empty)
+                .Replace("OpenAPI", string.Empty)
                 .ConvertKebabCaseToPascalCase()
                 .ConvertSnakeCaseToPascalCase()
                 .ConvertRouteToCamelCase()
@@ -613,10 +613,5 @@ internal static class ApizrRegistrationGenerator
                 """);
         code.AppendLine();
         return code.ToString();
-    }
-
-    public static string ReplaceIgnoreCase(this string str, string from, string to)
-    {
-        return Regex.Replace(str, Regex.Escape(from), to.Replace("$", "$$"), RegexOptions.IgnoreCase);
     }
 }
