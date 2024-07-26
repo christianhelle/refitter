@@ -165,4 +165,14 @@ public sealed class Settings : CommandSettings
     [CommandOption("--immutable-records")]
     [DefaultValue(false)]
     public bool ImmutableRecords { get; set; }
+
+    [Description("""
+                 Set to true to use Apizr by:
+                 - Adding a final IApizrRequestOptions options parameter to all generated methods
+                 - Using method overloads with dynamic querystring parameters instead of multiple optional parameters
+                 See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr.
+                 """)]
+    [CommandOption("--use-apizr")]
+    [DefaultValue(false)]
+    public bool UseApizr { get; set; }
 }
