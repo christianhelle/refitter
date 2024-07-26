@@ -169,7 +169,7 @@ public sealed class Settings : CommandSettings
     [Description("""
                  Set to true to use Apizr by:
                  - Adding a final IApizrRequestOptions options parameter to all generated methods
-                 - Using method overloads with dynamic querystring parameters instead of multiple optional parameters
+                 - Using method overloads instead of optional parameters
                  See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr.
                  """)]
     [CommandOption("--use-apizr")]
