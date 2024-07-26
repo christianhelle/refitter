@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- \[Apizr\] Including an xml doc param for ApizrRequestOptions parameter [\#431](https://github.com/christianhelle/refitter/pull/431) ([JeremyBP](https://github.com/JeremyBP))
 - \[Apizr\] Generate Apizr formatted Refit interface without .refitter settings file [\#430](https://github.com/christianhelle/refitter/pull/430) ([JeremyBP](https://github.com/JeremyBP))
 - Add the possibility to generate all the Apizr goodness [\#428](https://github.com/christianhelle/refitter/pull/428) ([JeremyBP](https://github.com/JeremyBP))
 
