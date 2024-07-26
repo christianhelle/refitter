@@ -61,8 +61,9 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var operationModel = generator.CreateOperationModel(operation);
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings).ToList();
                 var parametersString = string.Join(", ", parameters);
+                var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), code);
+                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasApizrRequestOptionsParameter, code);
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);
@@ -84,7 +85,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                         foreach (var operationParameterToRemove in operationParametersToRemove) 
                             operationModel.Parameters.Remove(operationParameterToRemove);
 
-                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), code);
+                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), true, code);
                         GenerateObsoleteAttribute(operation, code);
                         GenerateForMultipartFormData(operationModel, code);
                         GenerateAcceptHeaders(operations, operation, code);
