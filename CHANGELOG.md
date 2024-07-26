@@ -6,11 +6,11 @@
 
 **Implemented enhancements:**
 
+- \[Apizr\] Generate Apizr formatted Refit interface without .refitter settings file [\#430](https://github.com/christianhelle/refitter/pull/430) ([JeremyBP](https://github.com/JeremyBP))
 - Add the possibility to generate all the Apizr goodness [\#428](https://github.com/christianhelle/refitter/pull/428) ([JeremyBP](https://github.com/JeremyBP))
 
 **Merged pull requests:**
 
-- \[Apizr\] Generate Apizr formatted Refit interface without .refitter settings file [\#430](https://github.com/christianhelle/refitter/pull/430) ([JeremyBP](https://github.com/JeremyBP))
 - docs: add JeremyBP as a contributor for code [\#429](https://github.com/christianhelle/refitter/pull/429) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add MeikelLP as a contributor for ideas [\#426](https://github.com/christianhelle/refitter/pull/426) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add bastiennoel93 as a contributor for bug [\#425](https://github.com/christianhelle/refitter/pull/425) ([allcontributors[bot]](https://github.com/apps/allcontributors))
