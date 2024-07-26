@@ -61,8 +61,9 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var operationModel = generator.CreateOperationModel(operation);
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings).ToList();
                 var parametersString = string.Join(", ", parameters);
+                var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), settings.ApizrSettings?.WithRequestOptions == true, code);
+                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasApizrRequestOptionsParameter, code);
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);
