@@ -37,6 +37,7 @@ EXAMPLES:
     refitter ./openapi.json --no-deprecated-operations
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
+    refitter ./openapi.json --use-apizr
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -82,7 +83,12 @@ OPTIONS:
                                                                  - SingleClientFromOperationId                                                                                                             
                                                                  - SingleClientFromPathSegments                                                                                                            
                                                                  See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html for more information                                    
-        --immutable-records                                      Generate contracts as immutable records instead of classes                                                                                
+        --immutable-records                                      Generate contracts as immutable records instead of classes    
+        --use-apizr                                              Set to true to use Apizr by:
+                                                                 - Adding a final IApizrRequestOptions options parameter to all generated methods
+                                                                 - Providing cancellation tokens by Apizr request options instead of a dedicated parameter
+                                                                 - Using method overloads instead of optional parameters
+                                                                 See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                                                        
 ```
 
 To generate code from an OpenAPI specifications file, run the following:

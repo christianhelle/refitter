@@ -1,5 +1,7 @@
 # Refitter
-Refitter is a CLI tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications
+Refitter is a CLI tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. 
+Refitter can generate the Refit interface from OpenAPI specifications. 
+Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
 
 ## Installation:
 
@@ -40,6 +42,7 @@ EXAMPLES:
     refitter ./openapi.json --no-deprecated-operations
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
+    refitter ./openapi.json --use-apizr
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -85,7 +88,12 @@ OPTIONS:
                                                                  - SingleClientFromOperationId                                                                                                             
                                                                  - SingleClientFromPathSegments                                                                                                            
                                                                  See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html for more information                                    
-        --immutable-records                                      Generate contracts as immutable records instead of classes                                                                                
+        --immutable-records                                      Generate contracts as immutable records instead of classes 
+        --use-apizr                                              Set to true to use Apizr by:
+                                                                 - Adding a final IApizrRequestOptions options parameter to all generated methods
+                                                                 - Providing cancellation tokens by Apizr request options instead of a dedicated parameter
+                                                                 - Using method overloads instead of optional parameters
+                                                                 See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                                                               
 ```
 
 ### .Refitter File format
@@ -154,6 +162,16 @@ The following is an example `.refitter` file
     "transientErrorHandler": "Polly", // Optional. Value=None|Polly|HttpResilience
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
+  },
+  "apizrSettings": { // Optional
+    "withRequestOptions": true, // Optional. Default=true
+    "withRegistrationHelper": true, // Optional. Default=false
+    "withCacheProvider": "InMemory", // Optional. Values=None|Akavache|MonkeyCache|InMemory|DistributedAsString|DistributedAsByteArray. Default=None
+    "withPriority": true, // Optional. Default=false
+    "withMediation": true, // Optional. Default=false
+    "withOptionalMediation": true, // Optional. Default=false
+    "withMappingProvider": "AutoMapper", // Optional. Values=None|AutoMapper|Mapster. Default=None
+    "withFileTransfer": true // Optional. Default=false
   },
   "codeGeneratorSettings": { // Optional. Default settings are the values set in this example
     "requiredPropertiesMustBeDefined": true,
@@ -227,6 +245,15 @@ The following is an example `.refitter` file
   - `transientErrorHandler` - This is the transient error handler to use. Possible values are `None`, `Polly`, and `HttpResilience`. Default is `None`
   - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
+- `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See https://www.apizr.net for more information
+  - `withRequestOptions` - Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter
+  - `withRegistrationHelper` - Tells if Refitter should generate Apizr registration helpers (extended with dependencyInjectionSettings set, otherwise static)
+  - `withCacheProvider` - Set the cache provider to be used
+  - `withPriority` - Tells if Apizr should handle request priority
+  - `withMediation` - Tells if Apizr should handle request mediation (extended only)
+  - `withOptionalMediation` - Tells if Apizr should handle optional request mediation (extended only)
+  - `withMappingProvider` - Set the mapping provider to be used
+  - `withFileTransfer` - Tells if Apizr should handle file transfer
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
   - `requiredPropertiesMustBeDefined` - Default is true,
   - `generateDataAnnotations` - Default is true,
@@ -1343,6 +1370,272 @@ public static IServiceCollection ConfigureRefitClients(
 ```
 
 Personally, they I use Refitter is to generate an interface per endpoint, so when generating code for a large and complex API, I might have several interfaces.
+
+## Apizr
+
+[Apizr](https://www.apizr.net) is a Refit client manager that provides a set of features to enhance requesting experience with resilience, caching, priority, mediation, mapping, logging, authentication, file transfer capabilities and many more...
+
+### Generating the interfaces
+
+Refitter supports generating Apizr formatted Refit interfaces that can be managed then by Apizr.
+
+You can enable Apizr formatted Refit interface generation either:
+- With the `--use-apizr` command line argument
+- By setting the `apizrSettings` section in the `.refitter` settings file
+
+Note that `--use-apizr` uses default Apizr settings with `withRequestOptions` set to `true` as recommended, while the `.refitter` settings file allows you to configure it deeper.
+
+In both cases, it will format the generated Refit interfaces to be Apizr ready by:
+- Adding a final IApizrRequestOptions options parameter to all generated methods (if `withRequestOptions` is set to `true`)
+- Providing cancellation tokens by Apizr request options instead of a dedicated parameter (if `withRequestOptions` is set to `true`)
+- Using method overloads instead of optional parameters
+
+From here, you're definitly free to use the formatted interface with Apizr by registering, configuring and using it following the [Apizr documentation](https://www.apizr.net). But Refitter can go further by generating some helpers to make the configuration easier.
+
+### Generating the helpers
+
+Refitter supports generating Apizr bootstrapping code that allows the user to conveniently configure all generated Apizr formatted Refit interfaces by calling a single method.
+It could be either an extension method to `IServiceCollection` if DependencyInjectionSettings are set, or a static builder method if not.
+
+### [Extended](#tab/tabid-extended)
+
+To enable Apizr registration code generation for `IServiceCollection`, you need at least to set the `withRegistrationHelper` property to `true` and configure the `DependencyInjectionSettings` section in the `.refitter` settings file.
+This is what the `.refitter` settings file may look like, depending on you configuration:
+
+```json
+{
+  "openApiPath": "../OpenAPI/v3.0/petstore.json",
+  "namespace": "Petstore",
+  "dependencyInjectionSettings": {
+    "baseUrl": "https://petstore3.swagger.io/api/v3",
+    "httpMessageHandlers": [ "MyDelegatingHandler" ],
+    "transientErrorHandler": "HttpResilience",
+    "maxRetryCount": 3,
+    "firstBackoffRetryInSeconds": 0.5
+  },
+  "apizrSettings": {
+    "withRequestOptions": true, // Recommended to include an Apizr request options parameter to Refit interface methods
+    "withRegistrationHelper": true, // Mandatory to actually generate the Apizr registration extended method
+    "withCacheProvider": "InMemory", // Optional, default is None
+    "withPriority": true, // Optional, default is false
+    "withMediation": true, // Optional, default is false
+    "withOptionalMediation": true, // Optional, default is false
+    "withMappingProvider": "AutoMapper", // Optional, default is None
+    "withFileTransfer": true // Optional, default is false
+  }
+}
+```
+
+which will generate an extension method to `IServiceCollection` called `ConfigurePetstoreApiApizrManager()`. The generated extension method depends on [`Apizr.Extensions.Microsoft.DependencyInjection`](https://www.nuget.org/packages/Apizr.Extensions.Microsoft.DependencyInjection) library and looks like this:
+
+```cs
+public static IServiceCollection ConfigurePetstoreApiApizrManager(
+    this IServiceCollection services,
+    Action<IApizrExtendedManagerOptionsBuilder>? optionsBuilder = null)
+{
+    optionsBuilder ??= _ => { }; // Default empty options if null
+    optionsBuilder += options => options
+        .WithBaseAddress("https://petstore3.swagger.io/api/v3", ApizrDuplicateStrategy.Ignore)
+        .WithDelegatingHandler<MyDelegatingHandler>()
+        .ConfigureHttpClientBuilder(builder => builder
+            .AddStandardResilienceHandler(config =>
+            {
+                config.Retry = new HttpRetryStrategyOptions
+                {
+                    UseJitter = true,
+                    MaxRetryAttempts = 3,
+                    Delay = TimeSpan.FromSeconds(0.5)
+                };
+            }))
+        .WithInMemoryCacheHandler()
+        .WithAutoMapperMappingHandler()
+        .WithPriority()
+        .WithOptionalMediation()
+        .WithFileTransferOptionalMediation();
+                 
+    return services.AddApizrManagerFor<IPetstoreApi>(optionsBuilder);
+}
+```
+
+This comes in handy especially when generating multiple interfaces, by tag or endpoint. For example, the following `.refitter` settings file
+
+```json
+{
+  "openApiPath": "../OpenAPI/v3.0/petstore.json",
+  "namespace": "Petstore",
+  "multipleInterfaces": "ByTag",
+  "naming": {    
+    "useOpenApiTitle": false,
+    "interfaceName": "Petstore"
+  },
+  "dependencyInjectionSettings": {
+    "baseUrl": "https://petstore3.swagger.io/api/v3",
+    "httpMessageHandlers": [ "MyDelegatingHandler" ],
+    "transientErrorHandler": "HttpResilience",
+    "maxRetryCount": 3,
+    "firstBackoffRetryInSeconds": 0.5
+  },
+  "apizrSettings": {
+    "withRequestOptions": true, // Recommended to include an Apizr request options parameter to Refit interface methods
+    "withRegistrationHelper": true, // Mandatory to actually generate the Apizr registration extended method
+    "withCacheProvider": "InMemory", // Optional, default is None
+    "withPriority": true, // Optional, default is false
+    "withMediation": true, // Optional, default is false
+    "withOptionalMediation": true, // Optional, default is false
+    "withMappingProvider": "AutoMapper", // Optional, default is None
+    "withFileTransfer": true // Optional, default is false
+  }
+}
+```
+
+Will generate a single `ConfigurePetstoreApizrManagers()` extension method that may contain dependency injection configuration code for multiple interfaces like this
+
+```csharp
+public static IServiceCollection ConfigurePetstoreApizrManagers(
+    this IServiceCollection services,
+    Action<IApizrExtendedCommonOptionsBuilder>? optionsBuilder = null)
+{
+    optionsBuilder ??= _ => { }; // Default empty options if null
+    optionsBuilder += options => options
+        .WithBaseAddress("https://petstore3.swagger.io/api/v3", ApizrDuplicateStrategy.Ignore)
+        .WithDelegatingHandler<MyDelegatingHandler>()
+        .ConfigureHttpClientBuilder(builder => builder
+            .AddStandardResilienceHandler(config =>
+            {
+                config.Retry = new HttpRetryStrategyOptions
+                {
+                    UseJitter = true,
+                    MaxRetryAttempts = 3,
+                    Delay = TimeSpan.FromSeconds(0.5)
+                };
+            }))
+        .WithInMemoryCacheHandler()
+        .WithAutoMapperMappingHandler()
+        .WithPriority()
+        .WithOptionalMediation()
+        .WithFileTransferOptionalMediation();
+            
+    return services.AddApizr(
+        registry => registry
+            .AddManagerFor<IPetApi>()
+            .AddManagerFor<IStoreApi>()
+            .AddManagerFor<IUserApi>(),
+        optionsBuilder);
+
+}
+```
+
+Here, `IPetApi`, `IStoreApi` and `IUserApi` are the generated interfaces which share the same common configuration defined from the `.refitter` file.
+
+### [Static](#tab/tabid-static)
+
+To enable Apizr static builder code generation, you need at least to set the `withRegistrationHelper` property to `true` and leave the `DependencyInjectionSettings` section to null in the `.refitter` settings file.
+This is what the `.refitter` settings file may look like, depending on you configuration:
+
+```json
+{
+  "openApiPath": "../OpenAPI/v3.0/petstore.json",
+  "namespace": "Petstore",
+  "apizrSettings": {
+    "withRequestOptions": true, // Recommended to include an Apizr request options parameter to Refit interface methods
+    "withRegistrationHelper": true, // Mandatory to actually generate the Apizr registration extended method
+    "withCacheProvider": "Akavache", // Optional, default is None
+    "withPriority": true, // Optional, default is false
+    "withMappingProvider": "AutoMapper", // Optional, default is None
+    "withFileTransfer": true // Optional, default is false
+  }
+}
+```
+
+which will generate a static builder method called `BuildPetstore30ApizrManager()`. The generated builder method depends on [`Apizr`](https://www.nuget.org/packages/Apizr) library and looks like this:
+
+```cs
+public static IApizrManager<ISwaggerPetstoreOpenAPI30> BuildPetstore30ApizrManager(Action<IApizrManagerOptionsBuilder> optionsBuilder)
+{
+    optionsBuilder ??= _ => { }; // Default empty options if null
+    optionsBuilder += options => options
+        .WithAkavacheCacheHandler()
+        .WithAutoMapperMappingHandler(new MapperConfiguration(config => { /* YOUR_MAPPINGS_HERE */ }))
+        .WithPriority();
+            
+    return ApizrBuilder.Current.CreateManagerFor<ISwaggerPetstoreOpenAPI30>(optionsBuilder);  
+}
+```
+
+This comes in handy especially when generating multiple interfaces, by tag or endpoint. For example, the following `.refitter` settings file
+
+```json
+{
+  "openApiPath": "../OpenAPI/v3.0/petstore.json",
+  "namespace": "Petstore",
+  "multipleInterfaces": "ByTag",
+  "naming": {    
+    "useOpenApiTitle": false,
+    "interfaceName": "Petstore"
+  },
+  "dependencyInjectionSettings": {
+    "baseUrl": "https://petstore3.swagger.io/api/v3",
+    "httpMessageHandlers": [ "MyDelegatingHandler" ],
+    "transientErrorHandler": "HttpResilience",
+    "maxRetryCount": 3,
+    "firstBackoffRetryInSeconds": 0.5
+  },
+  "apizrSettings": {
+    "withRequestOptions": true, // Recommended to include an Apizr request options parameter to Refit interface methods
+    "withRegistrationHelper": true, // Mandatory to actually generate the Apizr registration extended method
+    "withCacheProvider": "InMemory", // Optional, default is None
+    "withPriority": true, // Optional, default is false
+    "withMediation": true, // Optional, default is false
+    "withOptionalMediation": true, // Optional, default is false
+    "withMappingProvider": "AutoMapper", // Optional, default is None
+    "withFileTransfer": true // Optional, default is false
+  }
+}
+```
+
+Will generate a single `BuildPetstoreApizrManagers()` builder method that may contain configuration code for multiple interfaces like this
+
+```csharp
+public static IApizrRegistry BuildPetstoreApizrManagers(Action<IApizrCommonOptionsBuilder> optionsBuilder)
+{
+    optionsBuilder ??= _ => { }; // Default empty options if null
+    optionsBuilder += options => options
+        .WithAkavacheCacheHandler()
+        .WithAutoMapperMappingHandler(new MapperConfiguration(config => { /* YOUR_MAPPINGS_HERE */ }))
+        .WithPriority();
+            
+    return ApizrBuilder.Current.CreateRegistry(
+        registry => registry
+            .AddManagerFor<IPetApi>()
+            .AddManagerFor<IStoreApi>()
+            .AddManagerFor<IUserApi>(),
+        optionsBuilder);
+}
+```
+
+Here, `IPetApi`, `IStoreApi` and `IUserApi` are the generated interfaces which share the same common configuration defined from the `.refitter` file.
+
+***
+
+### Customizing the configuration
+
+You may want to adjust apis configuration, for example, to add a custom header to requests. This can be done using the `Action<TApizrOptionsBuilder>` parameter while calling the generated method.
+To know how to make Apizr fit your needs, please refer to the [Apizr documentation](https://www.apizr.net).
+
+### Using the managers
+
+Once you called the generated method, you will get an `IApizrManager<T>` instance that you can use to make requests to the API. Here's an example of how to use it:
+
+```csharp
+var result = await petstoreManager.ExecuteAsync((api, opt) => api.GetPetById(1, opt), 
+    options => options // Whatever final request options you want to apply
+        .WithPriority(Priority.Background)
+        .WithHeaders(["HeaderKey1: HeaderValue1"])
+        .WithRequestTimeout("00:00:10")
+        .WithCancellation(cts.Token));
+```
+
+Please head to the [Apizr documentation](https://www.apizr.net) to get more.
 
 ## System requirements
 .NET 8.0
