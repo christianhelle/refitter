@@ -1280,7 +1280,7 @@ public partial interface IDeleteUserEndpoint
 }
 ```
 
-Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with [Apizr](https://www.apizr.net)
+Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with [Apizr](https://www.apizr.net) (v6+)
 
 **CLI Tool**
 

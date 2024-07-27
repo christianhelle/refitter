@@ -1,7 +1,7 @@
 # Refitter
 Refitter is a CLI tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. 
 Refitter can generate the Refit interface from OpenAPI specifications. 
-Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
+Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
 ## Installation:
 
@@ -1377,7 +1377,7 @@ Personally, they I use Refitter is to generate an interface per endpoint, so whe
 
 ### Generating the interfaces
 
-Refitter supports generating Apizr formatted Refit interfaces that can be managed then by Apizr.
+Refitter supports generating Apizr formatted Refit interfaces that can be managed then by Apizr (v6+).
 
 You can enable Apizr formatted Refit interface generation either:
 - With the `--use-apizr` command line argument
@@ -1394,7 +1394,7 @@ From here, you're definitly free to use the formatted interface with Apizr by re
 
 ### Generating the helpers
 
-Refitter supports generating Apizr bootstrapping code that allows the user to conveniently configure all generated Apizr formatted Refit interfaces by calling a single method.
+Refitter supports generating Apizr (v6+) bootstrapping code that allows the user to conveniently configure all generated Apizr formatted Refit interfaces by calling a single method.
 It could be either an extension method to `IServiceCollection` if DependencyInjectionSettings are set, or a static builder method if not.
 
 ### [Extended](#tab/tabid-extended)
