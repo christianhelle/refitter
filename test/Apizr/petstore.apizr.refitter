@@ -2,7 +2,7 @@
   "openApiPath": "https://petstore3.swagger.io/api/v3/openapi.json",
   "namespace": "Petstore.ApizrSample",
   "outputFolder": "GeneratedCode",
-  "outputFilename": "SwaggerPetstoreApizr.cs",
+  "outputFilename": "SwaggerPetstoreApizr.generated.cs",
   "naming": {    
     "useOpenApiTitle": false,
     "interfaceName": "SwaggerPetstoreApizr"

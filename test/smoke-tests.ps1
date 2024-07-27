@@ -31,7 +31,11 @@ function GenerateAndBuild {
 
         [Parameter(Mandatory=$false)]
         [bool]
-        $netCore = $false
+        $netCore = $false,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $csproj
     )
     
     Get-ChildItem '*.generated.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName }
@@ -55,10 +59,15 @@ function GenerateAndBuild {
         throw "Refitter failed"
     }
 
-    Write-Host "`r`nBuilding ConsoleApp`r`n"
-    $solution = "./ConsoleApp/ConsoleApp.sln"
-    if ($netCore) {
-        $solution = "./ConsoleApp/ConsoleApp.Core.sln"
+    if ($csproj -ne '') {
+      Write-Host "`r`nBuilding $csproj file`r`n"
+      $solution = $csproj
+    } else {
+      Write-Host "`r`nBuilding ConsoleApp`r`n"
+      $solution = "./ConsoleApp/ConsoleApp.sln"
+      if ($netCore) {
+          $solution = "./ConsoleApp/ConsoleApp.Core.sln"
+      }
     }
 
     $process = Start-Process "dotnet" `
@@ -102,7 +111,8 @@ function RunTests {
     Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin -f net8.0"
     Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
     
-    GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.cs" -args "--settings-file ./petstore.refitter"
+    GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter"
+    GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreApizr.generated.cs" -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj"
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
