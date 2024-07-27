@@ -6,12 +6,14 @@
 
 **Implemented enhancements:**
 
+- \[Apizr\] Docs updated about Apizr integration [\#432](https://github.com/christianhelle/refitter/pull/432) ([JeremyBP](https://github.com/JeremyBP))
 - \[Apizr\] Including an xml doc param for ApizrRequestOptions parameter [\#431](https://github.com/christianhelle/refitter/pull/431) ([JeremyBP](https://github.com/JeremyBP))
 - \[Apizr\] Generate Apizr formatted Refit interface without .refitter settings file [\#430](https://github.com/christianhelle/refitter/pull/430) ([JeremyBP](https://github.com/JeremyBP))
 - Add the possibility to generate all the Apizr goodness [\#428](https://github.com/christianhelle/refitter/pull/428) ([JeremyBP](https://github.com/JeremyBP))
 
 **Merged pull requests:**
 
+- docs: add JeremyBP as a contributor for doc [\#433](https://github.com/christianhelle/refitter/pull/433) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add JeremyBP as a contributor for code [\#429](https://github.com/christianhelle/refitter/pull/429) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add MeikelLP as a contributor for ideas [\#426](https://github.com/christianhelle/refitter/pull/426) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add bastiennoel93 as a contributor for bug [\#425](https://github.com/christianhelle/refitter/pull/425) ([allcontributors[bot]](https://github.com/apps/allcontributors))
