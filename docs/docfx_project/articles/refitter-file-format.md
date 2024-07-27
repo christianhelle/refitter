@@ -68,6 +68,16 @@ The following is an example `.refitter` file
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
   },
+  "apizrSettings": { // Optional
+    "withRequestOptions": true, // Optional. Default=true
+    "withRegistrationHelper": true, // Optional. Default=false
+    "withCacheProvider": "InMemory", // Optional. Values=None|Akavache|MonkeyCache|InMemory|DistributedAsString|DistributedAsByteArray. Default=None
+    "withPriority": true, // Optional. Default=false
+    "withMediation": true, // Optional. Default=false
+    "withOptionalMediation": true, // Optional. Default=false
+    "withMappingProvider": "AutoMapper", // Optional. Values=None|AutoMapper|Mapster. Default=None
+    "withFileTransfer": true // Optional. Default=false
+  },
   "codeGeneratorSettings": { // Optional. Default settings are the values set in this example
     "requiredPropertiesMustBeDefined": true,
     "generateDataAnnotations": true,
@@ -143,6 +153,15 @@ The following is an example `.refitter` file
   - `transientErrorHandler`: Set this to configure transient error handling with a retry policy that uses a jittered backoff. See https://refitter.github.io/api/Refitter.Core.TransientErrorHandler.html
   - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
+- `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See https://www.apizr.net for more information
+  - `withRequestOptions` - Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter
+  - `withRegistrationHelper` - Tells if Refitter should generate Apizr registration helpers (extended with dependencyInjectionSettings set, otherwise static)
+  - `withCacheProvider` - Set the cache provider to be used
+  - `withPriority` - Tells if Apizr should handle request priority
+  - `withMediation` - Tells if Apizr should handle request mediation (extended only)
+  - `withOptionalMediation` - Tells if Apizr should handle optional request mediation (extended only)
+  - `withMappingProvider` - Set the mapping provider to be used
+  - `withFileTransfer` - Tells if Apizr should handle file transfer
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
   - `requiredPropertiesMustBeDefined` - Default is true,
   - `generateDataAnnotations` - Default is true,
@@ -356,6 +375,57 @@ The following is an example `.refitter` file
                 }
             },
             "description": "Settings for dependency injection."
+        },
+        "apizrSettings": {
+            "type": "object",
+            "properties": {
+                "withRequestOptions": {
+                    "type": "boolean",
+                    "description": "Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter."
+                },
+                "withRegistrationHelper": {
+                    "type": "boolean",
+                    "description": "Tells if Refitter should generate Apizr registration helpers (extended with dependencyInjectionSettings set, otherwise static)."
+                },
+                "withCacheProvider": {
+                    "type": "string",
+                    "enum": [
+                        "None",
+                        "Akavache",
+                        "MonkeyCache",
+                        "InMemory",
+                        "DistributedAsString",
+                        "DistributedAsByteArray"
+                    ],
+                    "description": "Set the cache provider to be used."
+                },
+                "withPriority": {
+                    "type": "boolean",
+                    "description": "Tells if Apizr should handle request priority."
+                },
+                "withMediation": {
+                    "type": "boolean",
+                    "description": "Tells if Apizr should handle request mediation (extended only)."
+                },
+                "withOptionalMediation": {
+                    "type": "boolean",
+                    "description": "Tells if Apizr should handle optional request mediation (extended only)."
+                },
+                "withMappingProvider": {
+                    "type": "string",
+                    "enum": [
+                        "None",
+                        "AutoMapper",
+                        "Mapster"
+                    ],
+                    "description": "Set the mapping provider to be used."
+                },
+                "withFileTransfer": {
+                    "type": "boolean",
+                    "description": "Tells if Apizr should handle file transfer."
+                }
+            },
+            "description": "Settings for Apizr."
         },
         "codeGeneratorSettings": {
             "type": "object",
