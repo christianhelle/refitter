@@ -1,6 +1,6 @@
 ## Source Generator
 
-Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications
+Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
 
 The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `--outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code 
 
@@ -75,6 +75,16 @@ The following is an example `.refitter` file
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
   },
+  "apizrSettings": { // Optional
+    "withRequestOptions": true, // Optional. Default=true
+    "withRegistrationHelper": true, // Optional. Default=false
+    "withCacheProvider": "InMemory", // Optional. Values=None|Akavache|MonkeyCache|InMemory|DistributedAsString|DistributedAsByteArray. Default=None
+    "withPriority": true, // Optional. Default=false
+    "withMediation": true, // Optional. Default=false
+    "withOptionalMediation": true, // Optional. Default=false
+    "withMappingProvider": "AutoMapper", // Optional. Values=None|AutoMapper|Mapster. Default=None
+    "withFileTransfer": true // Optional. Default=false
+  },
   "codeGeneratorSettings": { // Optional. Default settings are the values set in this example
     "requiredPropertiesMustBeDefined": true,
     "generateDataAnnotations": true,
@@ -141,6 +151,15 @@ The following is an example `.refitter` file
   - `transientErrorHandler` - This is the transient error handler to use. Possible values are `None`, `Polly`, and `HttpResilience`. Default is `None` 
   - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
+- `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See https://www.apizr.net for more information
+  - `withRequestOptions` - Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter
+  - `withRegistrationHelper` - Tells if Refitter should generate Apizr registration helpers (extended with dependencyInjectionSettings set, otherwise static)
+  - `withCacheProvider` - Set the cache provider to be used
+  - `withPriority` - Tells if Apizr should handle request priority
+  - `withMediation` - Tells if Apizr should handle request mediation (extended only)
+  - `withOptionalMediation` - Tells if Apizr should handle optional request mediation (extended only)
+  - `withMappingProvider` - Set the mapping provider to be used
+  - `withFileTransfer` - Tells if Apizr should handle file transfer
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
   - `requiredPropertiesMustBeDefined` - Default is true,
   - `generateDataAnnotations` - Default is true,
