@@ -94,6 +94,6 @@ jobs:
       working-directory: test
 
     - name: 🛠️ Build
-      run: dotnet Build
+      run: dotnet build Sample.csproj
       working-directory: test/Apizr
 
