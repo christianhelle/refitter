@@ -81,3 +81,17 @@ jobs:
       os: ${{ matrix.os }}
       openapi: ${{ matrix.openapi_url }}
       command: dotnet run --project ../src/Refitter/Refitter.csproj --framework ${{ matrix.framework }}
+
+  apizr:
+    steps:
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🛠️ Generate code
+      run: dotnet run --project ../src/Refitter/Refitter.csproj --framework net8.0 -- --settings-file Apizr/petstore.apizr.refitter
+      working-directory: test
+
+    - name: 🛠️ Build
+      run: dotnet Build
+      working-directory: test/Apizr
+
