@@ -83,6 +83,8 @@ jobs:
       command: dotnet run --project ../src/Refitter/Refitter.csproj --framework ${{ matrix.framework }}
 
   apizr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v4
