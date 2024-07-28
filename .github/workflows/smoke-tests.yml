@@ -90,7 +90,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: 🛠️ Generate code
-      run: dotnet run --project ../../src/Refitter/Refitter.csproj --framework net8.0 -- --settings-file petstore.apizr.refitter
+      run: dotnet run --project ../../src/Refitter/Refitter.csproj --framework net8.0 -- --settings-file petstore.apizr.refitter --no-logging
       working-directory: test/Apizr
 
     - name: 🛠️ Build
