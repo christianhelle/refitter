@@ -1,0 +1,26 @@
+{
+  "openApiPath": "./../OpenAPI/v3.0/petstore.json",
+  "namespace": "Petstore.ApizrSample",
+  "outputFolder": "GeneratedCode",
+  "outputFilename": "SwaggerPetstoreApizr.generated.cs",
+  "naming": {    
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstoreApizr"
+  },
+  "dependencyInjectionSettings": {
+    "baseUrl": "https://petstore3.swagger.io/api/v3",
+    "transientErrorHandler": "HttpResilience",
+    "maxRetryCount": 3,
+    "firstBackoffRetryInSeconds": 0.5
+  },
+  "apizrSettings": {
+    "withRequestOptions": true,
+    "withRegistrationHelper": true,
+    "withCacheProvider": "InMemory",
+    "withPriority": true,
+    "withMediation": true,
+    "withOptionalMediation": true,
+    "withMappingProvider": "AutoMapper",
+    "withFileTransfer": true
+  }
+}

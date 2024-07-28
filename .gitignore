@@ -273,3 +273,4 @@ test/**/*Ingram-micro.cs
 test/**/*Hubspot*.cs
 *.lutconfig
 src/.tools
+test/GeneratedCode/*.generated.cs

@@ -13,7 +13,7 @@ jobs:
 
     name: ${{ inputs.os }}
     runs-on: ${{ inputs.os }}
-    timeout-minutes: 10
+    timeout-minutes: 5
 
     steps:
     - name: 🛒 Checkout repository
