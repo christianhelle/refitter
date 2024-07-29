@@ -185,8 +185,14 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         if (settings.DependencyInjectionSettings is not null)
         {
-            var code = DependencyInjectionGenerator.Generate(settings, interfaces.InterfaceNames);
-            generatedFiles.Add(new GeneratedCode("DependencyInjection.cs", code));
+            generatedFiles.Add(
+                new GeneratedCode(
+                    "DependencyInjection.cs",
+                    settings.ApizrSettings != null
+                        ? ApizrRegistrationGenerator.Generate(settings, interfaces.InterfaceNames)
+                        : DependencyInjectionGenerator.Generate(settings, interfaces.InterfaceNames)
+                )
+            );
         }
 
         return new GeneratorOutput(generatedFiles);
