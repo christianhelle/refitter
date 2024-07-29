@@ -1,6 +1,13 @@
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Text;
+using System.Xml.Linq;
+
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using NSwag.CodeGeneration.Models;
+
+using YamlDotNet.Serialization;
 
 namespace Refitter.Core;
 
@@ -9,18 +16,17 @@ internal static class ParameterExtractor
     public static IEnumerable<string> GetParameters(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
-        RefitGeneratorSettings settings)
+        RefitGeneratorSettings settings,
+        string operationName, 
+        out string? dynamicQuerystringParameters)
     {
         var routeParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Path)
             .Select(p => $"{JoinAttributes(GetAliasAsAttribute(p))}{p.Type} {p.VariableName}")
             .ToList();
 
-        var queryParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .Select(p =>
-                $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetQueryParameterType(p, settings)} {p.VariableName}")
-            .ToList();
+        var queryParameters =
+            GetQueryParameters(operationModel, settings, operationName, out dynamicQuerystringParameters);
 
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
@@ -142,4 +148,78 @@ internal static class ParameterExtractor
 
     private static string FindSupportedType(string typeName) =>
         typeName == "FileResponse" ? "StreamPart" : typeName;
+
+    private static List<string> GetQueryParameters(CSharpOperationModel operationModel, RefitGeneratorSettings settings, string operationName, out string? dynamicQuerystringParameters)
+    {
+        List<string>? parameters = null;
+        var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
+
+        if (settings.DynamicQuerystringParametersThreshold >= 2)
+        {
+            var operationParameters = operationModel.Parameters
+                .Where(p => p.Kind == OpenApiParameterKind.Query)
+                .ToList();
+
+            if (operationParameters.Count >= settings.DynamicQuerystringParametersThreshold)
+            {
+                var dynamicQuerystringParameterType = $"{operationName}QueryParams";
+
+                var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
+                var isRecord = settings.ImmutableRecords ||
+                               settings.CodeGeneratorSettings?.GenerateNativeRecords is true;
+                var classStyle = isRecord
+                    ? "record"
+                    : "class";
+                var setterStyle = isRecord
+                    ? "init"
+                    : "set";
+
+                var propertiesCodeBuilder = new StringBuilder();
+                var allNullable = true;
+                foreach (var operationParameter in operationParameters)
+                {
+                    var attributes = $"{JoinAttributes(GetQueryAttribute(operationParameter, settings), GetAliasAsAttribute(operationParameter))}";
+                    var propertyType = GetQueryParameterType(operationParameter, settings);
+                    allNullable = allNullable && propertyType.EndsWith("?");
+                    var propertyName = operationParameter.VariableName.CapitalizeFirstCharacter();
+                    propertiesCodeBuilder.AppendLine();
+                    propertiesCodeBuilder.Append(
+            $$"""
+                    /// <summary>
+                    /// {{operationParameter.Description ?? propertyName}}
+                    /// </summary>
+                    {{attributes}}
+                    {{modifier}} {{propertyType}} {{propertyName}} { get; {{setterStyle}}; }
+            """);
+                    propertiesCodeBuilder.AppendLine();
+                    operationModel.Parameters.Remove(operationParameter);
+                }
+
+                dynamicQuerystringParametersCodeBuilder.AppendLine();
+                dynamicQuerystringParametersCodeBuilder.Append(
+            $$"""               
+                {{modifier}} {{classStyle}} {{dynamicQuerystringParameterType}}
+                {
+                    {{propertiesCodeBuilder}}
+                }
+            """);
+
+                var dynamicQuerystringParameter = $"[Query] {dynamicQuerystringParameterType}";
+                if (allNullable)
+                    dynamicQuerystringParameter += "?";
+                dynamicQuerystringParameter += " queryParams";
+                parameters = [dynamicQuerystringParameter];
+            }
+        }
+
+        dynamicQuerystringParameters = dynamicQuerystringParametersCodeBuilder.ToString();
+
+        parameters ??= operationModel.Parameters
+            .Where(p => p.Kind == OpenApiParameterKind.Query)
+            .Select(p =>
+                $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetQueryParameterType(p, settings)} {p.VariableName}")
+            .ToList();
+
+        return parameters;
+    }
 }

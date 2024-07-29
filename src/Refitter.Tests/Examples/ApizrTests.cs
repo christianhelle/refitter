@@ -94,6 +94,13 @@ paths:
     }
 
     [Fact]
+    public async Task Generates_Dynamic_Querystring_Parameters()
+    {
+        string generateCode = await GenerateCode(2);
+        generateCode.Should().Contain("string id, [Query] UpdateJobDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
+    }
+
+    [Fact]
     public async Task Can_Build_Generated_Code()
     {
         string generateCode = await GenerateCode();
@@ -103,7 +110,7 @@ paths:
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(int dynamicQuerystringParametersThreshold = 0)
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
@@ -114,7 +121,9 @@ paths:
             ApizrSettings = new ApizrSettings
             {
                 WithRequestOptions = true
-            }
+            },
+            DynamicQuerystringParametersThreshold = dynamicQuerystringParametersThreshold,
+            ImmutableRecords = true
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);

@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
+using System.Xml.Linq;
 
 using NSwag;
 
@@ -30,7 +32,8 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
         Dictionary<string, StringBuilder> interfacesByGroup = new();
         var interfaceNames = new List<string>();
-        
+        var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
+
         foreach (var kv in byGroup)
         {
             foreach (var op in kv.Combined)
@@ -60,20 +63,39 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                                     """);
                 }
 
+                var opName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
                 var operationModel = generator.CreateOperationModel(operation);
-                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
+                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, opName, out var operationDynamicQuerystringParameters).ToList();
+
+                var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
+                if (hasDynamicQuerystringParameter)
+                    dynamicQuerystringParametersCodeBuilder.AppendLine(operationDynamicQuerystringParameters);
+
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasApizrRequestOptionsParameter, sb);
+                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, sb);
                 GenerateObsoleteAttribute(operation, sb);
                 GenerateForMultipartFormData(operationModel, sb);
                 GenerateAcceptHeaders(operations, operation, sb);
 
-                var opName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
                 sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {opName}({parametersString});")
                     .AppendLine();
+
+                if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
+                {
+                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, sb);
+                    GenerateObsoleteAttribute(operation, sb);
+                    GenerateForMultipartFormData(operationModel, sb);
+                    GenerateAcceptHeaders(operations, operation, sb);
+
+                    parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
+
+                    sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
+                        .AppendLine($"{Separator}{Separator}{returnType} {opName}({parametersString});")
+                        .AppendLine();
+                }
             }
         }
 
@@ -89,6 +111,9 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             code.AppendLine($"{Separator}}}");
             code.AppendLine();
         }
+
+        if (dynamicQuerystringParametersCodeBuilder.Length > 0) 
+            code.AppendLine(dynamicQuerystringParametersCodeBuilder.ToString());
 
         return new RefitGeneratedCode(code.ToString(), interfaceNames.ToArray());
     }
