@@ -53,7 +53,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             OperationNameGenerator = settings.OperationNameGenerator,
             GenerateDefaultAdditionalProperties = !settings.SkipDefaultAdditionalProperties,
             ImmutableRecords = settings.ImmutableRecords,
-            ApizrSettings = settings.UseApizr ? new ApizrSettings() : null
+            ApizrSettings = settings.UseApizr ? new ApizrSettings() : null,
+            DynamicQuerystringParametersThreshold = settings.DynamicQuerystringParametersThreshold
         };
 
         try

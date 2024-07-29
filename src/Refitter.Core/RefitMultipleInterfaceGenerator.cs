@@ -1,4 +1,5 @@
 using System.Text;
+using System.Xml.Linq;
 
 using NSwag;
 
@@ -21,7 +22,8 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
     {
         var code = new StringBuilder();
         var interfaceNames = new List<string>();
-        
+        var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
+
         foreach (var kv in document.Paths)
         {
             foreach (var operations in kv.Value)
@@ -35,6 +37,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
 
                 var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
+                var methodName = settings.OperationNameTemplate ?? "Execute";
 
                 this.docGenerator.AppendInterfaceDocumentation(operation, code);
                 
@@ -46,22 +49,43 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                                   """);
 
                 var operationModel = generator.CreateOperationModel(operation);
-                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings);
+                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, methodName, out var methodDynamicQuerystringParameters).ToList();
+
+                var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(methodDynamicQuerystringParameters);
+                if (hasDynamicQuerystringParameter)
+                    dynamicQuerystringParametersCodeBuilder.AppendLine(methodDynamicQuerystringParameters);
+
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasApizrRequestOptionsParameter, code);
+                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);
 
-                var methodName = settings.OperationNameTemplate ?? "Execute";
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
                     .AppendLine($"{Separator}}}")
                     .AppendLine();
+
+                if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
+                {
+                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
+                    GenerateObsoleteAttribute(operation, code);
+                    GenerateForMultipartFormData(operationModel, code);
+                    GenerateAcceptHeaders(operations, operation, code);
+
+                    parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
+
+                    code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
+                        .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
+                        .AppendLine();
+                }
             }
         }
+
+        if (dynamicQuerystringParametersCodeBuilder.Length > 0) 
+            code.AppendLine(dynamicQuerystringParametersCodeBuilder.ToString());
 
         return new RefitGeneratedCode(code.ToString(), interfaceNames.ToArray());
     }

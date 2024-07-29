@@ -34,15 +34,17 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             $$"""
               {{GenerateInterfaceDeclaration(out var interfaceName)}}
               {{Separator}}{
-              {{GenerateInterfaceBody()}}
-              {{Separator}}}
+              {{GenerateInterfaceBody(out var dynamicQuerystringParameters)}}
+              {{Separator}}}    
+              {{dynamicQuerystringParameters}}
               """,
             interfaceName);
     }
 
-    private string GenerateInterfaceBody()
+    private string GenerateInterfaceBody(out string? dynamicQuerystringParameters)
     {
         var code = new StringBuilder();
+        var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
         foreach (var kv in document.Paths)
         {
             foreach (var operations in kv.Value)
@@ -59,11 +61,16 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var name = GenerateOperationName(kv.Key, verb, operation);
 
                 var operationModel = generator.CreateOperationModel(operation);
-                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings).ToList();
+                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, name, out var operationDynamicQuerystringParameters).ToList();
+
+                var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
+                if (hasDynamicQuerystringParameter) 
+                    dynamicQuerystringParametersCodeBuilder.AppendLine(operationDynamicQuerystringParameters);
+
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasApizrRequestOptionsParameter, code);
+                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateAcceptHeaders(operations, operation, code);
@@ -72,37 +79,23 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
                     .AppendLine();
 
-                if (settings is {OptionalParameters: true, ApizrSettings: { WithRequestOptions: true }})
+                if (parametersString.Contains("?") && settings is {OptionalParameters: true, ApizrSettings: not null})
                 {
-                    var optionalParameterIndices = parameters
-                        .Select((parameter, index) => (parameter, index))
-                        .Where(x => x.parameter.Contains("?"))
-                        .Select(x => x.index)
-                        .ToList();
-                    if (optionalParameterIndices.Count > 0)
-                    {
-                        var operationParametersToRemove = operationModel.Parameters.Where((_, index) => optionalParameterIndices.Contains(index)).ToList();
-                        foreach (var operationParameterToRemove in operationParametersToRemove) 
-                            operationModel.Parameters.Remove(operationParameterToRemove);
+                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
+                    GenerateObsoleteAttribute(operation, code);
+                    GenerateForMultipartFormData(operationModel, code);
+                    GenerateAcceptHeaders(operations, operation, code);
 
-                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), true, code);
-                        GenerateObsoleteAttribute(operation, code);
-                        GenerateForMultipartFormData(operationModel, code);
-                        GenerateAcceptHeaders(operations, operation, code);
+                    parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
-                        var parametersToRemove = parameters.Where((_, index) => optionalParameterIndices.Contains(index)).ToList();
-                        foreach (string parameterToRemove in parametersToRemove) 
-                            parameters.Remove(parameterToRemove);
-
-                        parametersString = string.Join(", ", parameters);
-
-                        code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
-                            .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
-                            .AppendLine();
-                    } 
+                    code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
+                        .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
+                        .AppendLine();
                 }
             }
         }
+
+        dynamicQuerystringParameters = dynamicQuerystringParametersCodeBuilder.ToString();
 
         return code.ToString();
     }
