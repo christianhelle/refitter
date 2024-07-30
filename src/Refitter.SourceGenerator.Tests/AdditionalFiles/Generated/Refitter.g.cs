@@ -369,7 +369,8 @@ namespace Refitter.Tests.AdditionalFiles.NoFilename
         Task DeleteUser(string username);
 
 
-    }
+    }    
+
 }
 
 
