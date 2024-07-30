@@ -17,7 +17,7 @@ internal static class ParameterExtractor
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings,
-        string operationName, 
+        string dynamicQuerystringParameterType, 
         out string? dynamicQuerystringParameters)
     {
         var routeParameters = operationModel.Parameters
@@ -26,7 +26,7 @@ internal static class ParameterExtractor
             .ToList();
 
         var queryParameters =
-            GetQueryParameters(operationModel, settings, operationName, out dynamicQuerystringParameters);
+            GetQueryParameters(operationModel, settings, dynamicQuerystringParameterType, out dynamicQuerystringParameters);
 
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
@@ -149,7 +149,7 @@ internal static class ParameterExtractor
     private static string FindSupportedType(string typeName) =>
         typeName == "FileResponse" ? "StreamPart" : typeName;
 
-    private static List<string> GetQueryParameters(CSharpOperationModel operationModel, RefitGeneratorSettings settings, string operationName, out string? dynamicQuerystringParameters)
+    private static List<string> GetQueryParameters(CSharpOperationModel operationModel, RefitGeneratorSettings settings, string dynamicQuerystringParameterType, out string? dynamicQuerystringParameters)
     {
         List<string>? parameters = null;
         var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
@@ -162,8 +162,6 @@ internal static class ParameterExtractor
 
             if (operationParameters.Count >= settings.DynamicQuerystringParametersThreshold)
             {
-                var dynamicQuerystringParameterType = $"{operationName}QueryParams";
-
                 var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
                 var isRecord = settings.ImmutableRecords ||
                                settings.CodeGeneratorSettings?.GenerateNativeRecords is true;
@@ -183,11 +181,19 @@ internal static class ParameterExtractor
                     allNullable = allNullable && propertyType.EndsWith("?");
                     var propertyName = operationParameter.VariableName.CapitalizeFirstCharacter();
                     propertiesCodeBuilder.AppendLine();
-                    propertiesCodeBuilder.Append(
+                    if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
+                    {
+                        propertiesCodeBuilder.Append(
             $$"""
                     /// <summary>
-                    /// {{operationParameter.Description ?? propertyName}}
+                    /// {{operationParameter.Description}}
                     /// </summary>
+            """);
+                        propertiesCodeBuilder.AppendLine();
+                    }
+
+                    propertiesCodeBuilder.Append(
+            $$"""
                     {{attributes}}
                     {{modifier}} {{propertyType}} {{propertyName}} { get; {{setterStyle}}; }
             """);

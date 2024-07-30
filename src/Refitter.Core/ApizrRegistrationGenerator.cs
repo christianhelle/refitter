@@ -394,12 +394,23 @@ internal static class ApizrRegistrationGenerator
                   
                     public static partial class IServiceCollectionExtensions
                     {
+                """);
+
+                if (settings.GenerateXmlDocCodeComments)
+                {
+                    code.AppendLine(
+                $$"""
                         /// <summary>
                         /// Register all your Apizr managed apis with common shared options.
                         /// You may call WithConfiguration option to adjust settings to your need.
                         /// </summary>
                         /// <param name="optionsBuilder">Adjust common shared options</param>
                         /// <returns></returns>
+                """); 
+                }
+
+                code.AppendLine(
+                $$"""
                         public static IServiceCollection {{methodName}}(
                             this IServiceCollection services,
                 """);
@@ -414,19 +425,27 @@ internal static class ApizrRegistrationGenerator
                         {
                 """);
 
-                code.Append(
+                code.AppendLine(
                 $$"""
                             {{optionsCodeBuilder}}
                             
                             return services.AddApizr(
                                 registry => registry
                 """);
-                foreach (var interfaceName in interfaceNames)
+                for (int i = 0; i < interfaceNames.Length; i++)
                 {
-                    code.AppendLine();
+                    if(i > 0)
+                        code.AppendLine();
+
                     code.Append(
-                $"                  .AddManagerFor<{interfaceName}>()");
+                $"                  .AddManagerFor<{interfaceNames[i]}>()");
                 }
+                //foreach (var interfaceName in interfaceNames)
+                //{
+                //    code.AppendLine();
+                //    code.Append(
+                //$"                  .AddManagerFor<{interfaceName}>()");
+                //}
 
                 code.Append(",");
                 code.AppendLine();
@@ -462,12 +481,23 @@ internal static class ApizrRegistrationGenerator
 
                     public static partial class IServiceCollectionExtensions
                     {
+                """);
+
+                if (settings.GenerateXmlDocCodeComments)
+                {
+                    code.AppendLine(
+                $$"""
                         /// <summary>
                         /// Register your Apizr managed api with common shared options.
                         /// You may call WithConfiguration option to adjust settings to your need.
                         /// </summary>
                         /// <param name="optionsBuilder">Adjust common shared options</param>
                         /// <returns></returns>
+                """); 
+                }
+
+                code.AppendLine(
+                $$"""
                         public static IServiceCollection {{methodName}}(
                             this IServiceCollection services,
                 """);
@@ -512,8 +542,7 @@ internal static class ApizrRegistrationGenerator
                     using Apizr.Configuring.Registry;
                 """);
 
-                code.AppendLine();
-                code.Append(
+                code.AppendLine(
                 $$"""
                 #nullable enable
                 namespace {{settings.Namespace}}
@@ -523,24 +552,37 @@ internal static class ApizrRegistrationGenerator
                   
                     public static partial class ApizrRegistration
                     {
+                """);
+
+                if (settings.GenerateXmlDocCodeComments)
+                {
+                    code.AppendLine(
+                $$"""
                         /// <summary>
                         /// Build a registry with your Apizr managed apis and common shared options.
                         /// You may call WithConfiguration option to adjust settings to your need.
                         /// </summary>
                         /// <param name="optionsBuilder">Adjust common shared options</param>
                         /// <returns></returns>
+                """); 
+                }
+
+                code.AppendLine(
+                $$"""
                         public static IApizrRegistry {{methodName}}(Action<IApizrCommonOptionsBuilder> optionsBuilder)
                         {
                             {{optionsCodeBuilder}}
-                            
+                                  
                             return ApizrBuilder.Current.CreateRegistry(
                                 registry => registry
                 """);
-                foreach (var interfaceName in interfaceNames)
+                for (int i = 0; i < interfaceNames.Length; i++)
                 {
-                    code.AppendLine();
+                    if (i > 0)
+                        code.AppendLine();
+
                     code.Append(
-                $"                  .AddManagerFor<{interfaceName}>()");
+                $"                  .AddManagerFor<{interfaceNames[i]}>()");
                 }
 
                 code.Append(",");
@@ -576,16 +618,27 @@ internal static class ApizrRegistrationGenerator
                       
                     public static partial class ApizrRegistration
                     {
+                """);
+
+                if (settings.GenerateXmlDocCodeComments)
+                {
+                    code.AppendLine(
+                $$"""
                         /// <summary>
                         /// Build your Apizr managed api with common shared options.
                         /// You may call WithConfiguration option to adjust settings to your need.
                         /// </summary>
                         /// <param name="optionsBuilder">Adjust common shared options</param>
                         /// <returns></returns>
+                """); 
+                }
+
+                code.AppendLine(
+                $$"""
                         public static IApizrManager<{{interfaceNames[0]}}> {{methodName}}(Action<IApizrManagerOptionsBuilder> optionsBuilder)
                         {
                             {{optionsCodeBuilder}}
-                            
+                                  
                             return ApizrBuilder.Current.CreateManagerFor<{{interfaceNames[0]}}>(optionsBuilder);  
                 """);
 
