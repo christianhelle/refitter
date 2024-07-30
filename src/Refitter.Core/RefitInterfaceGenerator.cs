@@ -58,10 +58,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
                 var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
-                var name = GenerateOperationName(kv.Key, verb, operation);
+                var operationName = GenerateOperationName(kv.Key, verb, operation);
+                var dynamicQuerystringParameterType = operationName + "QueryParams";
 
                 var operationModel = generator.CreateOperationModel(operation);
-                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, name, out var operationDynamicQuerystringParameters).ToList();
+                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, dynamicQuerystringParameterType, out var operationDynamicQuerystringParameters).ToList();
 
                 var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
                 if (hasDynamicQuerystringParameter) 
@@ -76,7 +77,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 GenerateAcceptHeaders(operations, operation, code);
 
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
-                    .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
+                    .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                     .AppendLine();
 
                 if (parametersString.Contains("?") && settings is {OptionalParameters: true, ApizrSettings: not null})
@@ -89,7 +90,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
                     code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
-                        .AppendLine($"{Separator}{Separator}{returnType} {name}({parametersString});")
+                        .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                         .AppendLine();
                 }
             }

@@ -63,9 +63,10 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                                     """);
                 }
 
-                var opName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
+                var operationName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
+                var dynamicQuerystringParameterType = operationName + "QueryParams";
                 var operationModel = generator.CreateOperationModel(operation);
-                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, opName, out var operationDynamicQuerystringParameters).ToList();
+                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, dynamicQuerystringParameterType, out var operationDynamicQuerystringParameters).ToList();
 
                 var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
                 if (hasDynamicQuerystringParameter)
@@ -80,7 +81,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 GenerateAcceptHeaders(operations, operation, sb);
 
                 sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
-                    .AppendLine($"{Separator}{Separator}{returnType} {opName}({parametersString});")
+                    .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                     .AppendLine();
 
                 if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
@@ -93,7 +94,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                     parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
                     sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
-                        .AppendLine($"{Separator}{Separator}{returnType} {opName}({parametersString});")
+                        .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                         .AppendLine();
                 }
             }
