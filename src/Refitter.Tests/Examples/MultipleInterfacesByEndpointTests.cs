@@ -55,17 +55,6 @@ paths:
           description: 'Foo title'
           nullable: true
           schema:
-            type: 'string'
-        - in: 'query'
-          name: 'Description'
-          description: 'Foo description'
-          optional: true
-          schema:
-            type: 'string'
-        - in: 'query'
-          name: 'Contact'
-          description: 'Contact Person'
-          schema:
             type: 'string'       
       responses:
         '200':
@@ -154,7 +143,7 @@ paths:
     {
         string generateCode = await GenerateCode(2);
         generateCode.Should().Contain("GetFooDetailsQueryParams");
-        generateCode.Should().Contain("GetAllFoosQueryParams");
+        generateCode.Should().NotContain("GetAllFoosQueryParams");
         generateCode.Should().Contain("GetBarDetailsQueryParams");
     }
 
