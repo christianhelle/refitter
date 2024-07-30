@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0-preview.52...HEAD)
+
+**Merged pull requests:**
+
+- Update dependency OasReader to v1.6.16.15 [\#434](https://github.com/christianhelle/refitter/pull/434) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.2.0-preview.52](https://github.com/christianhelle/refitter/tree/1.2.0-preview.52) (2024-07-28)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...1.2.0-preview.52)
 
 **Implemented enhancements:**
 
