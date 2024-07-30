@@ -724,6 +724,11 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings { DynamicQuerystringParametersThreshold = 2 };
         var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("record Pet");
+        if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
+            generateCode.Should().Contain("long petId, [Query] UpdatePetWithFormQueryParams queryParams);")
+                .And.Contain("public class UpdatePetWithFormQueryParams");
+
+        generateCode.Should().Contain("[Query] LoginUserQueryParams queryParams);")
+            .And.Contain("public class LoginUserQueryParams");
     }
 }
