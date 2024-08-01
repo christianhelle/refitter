@@ -81,7 +81,7 @@ paths:
     [Fact]
     public async Task Generates_DynamicQuerystring_Param()
     {
-        string generateCode = await GenerateCode(2);
+        string generateCode = await GenerateCode(true);
         generateCode.Should().Contain("string id, [Query] UpdateJobDetailsQueryParams? queryParams = default, CancellationToken cancellationToken = default);");
     }
 
@@ -95,7 +95,7 @@ paths:
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode(int dynamicQuerystringParametersThreshold = 0)
+    private static async Task<string> GenerateCode(bool useDynamicQuerystringParameters = false)
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
@@ -103,7 +103,7 @@ paths:
             OpenApiPath = swaggerFile,
             UseCancellationTokens = true,
             OptionalParameters = true,
-            DynamicQuerystringParametersThreshold = dynamicQuerystringParametersThreshold,
+            UseDynamicQuerystringParameters = useDynamicQuerystringParameters,
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);

@@ -629,7 +629,7 @@ public class SwaggerPetstoreApizrTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_DynamicQuerystringParameter(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings { DynamicQuerystringParametersThreshold = 2 };
+        var settings = new ApizrGeneratorSettings { UseDynamicQuerystringParameters = true };
         var generateCode = await GenerateCode(version, filename, settings);
 
         if(version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)

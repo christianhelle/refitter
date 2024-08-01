@@ -253,7 +253,7 @@ Note that `--use-apizr` uses default Apizr settings with `withRequestOptions` se
 In both cases, it will format the generated Refit interfaces to be Apizr ready by:
 - Adding a final IApizrRequestOptions options parameter to all generated methods (if `withRequestOptions` is set to `true`)
 - Providing cancellation tokens by Apizr request options instead of a dedicated parameter (if `withRequestOptions` is set to `true`)
-- Using method overloads instead of optional parameters (note that setting `dynamicQuerystringParametersThreshold` to 2 improve overloading experience)
+- Using method overloads instead of optional parameters (note that setting `useDynamicQuerystringParameters` to true improve overloading experience)
 
 From here, you're definitly free to use the formatted interface with Apizr by registering, configuring and using it following the [Apizr documentation](https://www.apizr.net). But Refitter can go further by generating some helpers to make the configuration easier.
 
@@ -271,7 +271,7 @@ This is what the `.refitter` settings file may look like, depending on you confi
 {
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore",
-  "dynamicQuerystringParametersThreshold": 2,
+  "useDynamicQuerystringParameters": true,
   "dependencyInjectionSettings": {
     "baseUrl": "https://petstore3.swagger.io/api/v3",
     "httpMessageHandlers": [ "MyDelegatingHandler" ],
@@ -329,7 +329,7 @@ This comes in handy especially when generating multiple interfaces, by tag or en
 {
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore",
-  "dynamicQuerystringParametersThreshold": 2,
+  "useDynamicQuerystringParameters": true,
   "multipleInterfaces": "ByTag",
   "naming": {    
     "useOpenApiTitle": false,
@@ -403,7 +403,7 @@ This is what the `.refitter` settings file may look like, depending on you confi
 {
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore",
-  "dynamicQuerystringParametersThreshold": 2,
+  "useDynamicQuerystringParameters": true,
   "apizrSettings": {
     "withRequestOptions": true, // Recommended to include an Apizr request options parameter to Refit interface methods
     "withRegistrationHelper": true, // Mandatory to actually generate the Apizr registration extended method

@@ -65,7 +65,7 @@ The following is an example `.refitter` file
     "^/pet/.*",
     "^/store/.*"
   ],
-  "dynamicQuerystringParametersThreshold": 2, // Optional. Default=0 (none)
+  "useDynamicQuerystringParameters": true, // Optional. Default=false
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
@@ -146,7 +146,7 @@ The following is an example `.refitter` file
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
 - `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using `"multipleIinterfaces": "ByEndpoint"`, This is name of the Execute() method in the interface
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
-- `dynamicQuerystringParametersThreshold`: Set the threshold from which to generate a single complex query parameter merging all others. Default is 0 (no merging).
+- `useDynamicQuerystringParameters`: Set to `true` to merge multiple query parameters into a single complex one. Default is `false` (no merging).
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients. See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline

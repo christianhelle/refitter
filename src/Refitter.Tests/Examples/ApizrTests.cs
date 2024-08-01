@@ -154,7 +154,7 @@ paths:
     [Fact]
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
-        string generateCode = await GenerateCode(2);
+        string generateCode = await GenerateCode(true);
         generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
         generateCode.Should().Contain("public record GetFooDetailsQueryParams");
     }
@@ -162,7 +162,7 @@ paths:
     [Fact]
     public async Task Generates_Dynamic_Querystring_Parameters_ByTag()
     {
-        string generateCode = await GenerateCode(2, MultipleInterfaces.ByTag);
+        string generateCode = await GenerateCode(true, MultipleInterfaces.ByTag);
         generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
         generateCode.Should().Contain("public record GetFooDetailsQueryParams");
     }
@@ -170,7 +170,7 @@ paths:
     [Fact]
     public async Task Generates_Dynamic_Querystring_Parameters_ByEndpoint()
     {
-        string generateCode = await GenerateCode(2, MultipleInterfaces.ByEndpoint);
+        string generateCode = await GenerateCode(true, MultipleInterfaces.ByEndpoint);
         generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
         generateCode.Should().Contain("public record GetFooDetailsQueryParams");
     }
@@ -185,7 +185,7 @@ paths:
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode(int dynamicQuerystringParametersThreshold = 0, MultipleInterfaces multipleInterfaces = MultipleInterfaces.Unset)
+    private static async Task<string> GenerateCode(bool useDynamicQuerystringParameters = false, MultipleInterfaces multipleInterfaces = MultipleInterfaces.Unset)
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
@@ -197,7 +197,7 @@ paths:
             {
                 WithRequestOptions = true
             },
-            DynamicQuerystringParametersThreshold = dynamicQuerystringParametersThreshold,
+            UseDynamicQuerystringParameters = useDynamicQuerystringParameters,
             ImmutableRecords = true,
             MultipleInterfaces = multipleInterfaces
         };

@@ -722,7 +722,7 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_DynamicQuerystringParameters(SampleOpenSpecifications version, string filename)
     {
-        var settings = new RefitGeneratorSettings { DynamicQuerystringParametersThreshold = 2 };
+        var settings = new RefitGeneratorSettings { UseDynamicQuerystringParameters = true };
         var generateCode = await GenerateCode(version, filename, settings);
         if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
             generateCode.Should().Contain("long petId, [Query] UpdatePetWithFormQueryParams queryParams);")

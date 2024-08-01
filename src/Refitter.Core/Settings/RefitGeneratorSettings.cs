@@ -188,8 +188,8 @@ public class RefitGeneratorSettings
     public ApizrSettings? ApizrSettings { get; set; }
 
     /// <summary>
-    /// Set the threshold from which to generate a single complex query parameter merging all others. Default is <c>0</c> (no merging)
+    /// Set to <c>true</c> to generate a single complex query parameter merging all others. Default is <c>false</c> (no merging)
     /// See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
     /// </summary>
-    public int DynamicQuerystringParametersThreshold { get; set; }
+    public bool UseDynamicQuerystringParameters { get; set; }
 }

@@ -178,10 +178,10 @@ public sealed class Settings : CommandSettings
     public bool UseApizr { get; set; }
 
     [Description("""
-                 Set the threshold from which to generate a single complex query parameter merging all others. Default is 0 (no merging).
+                 Set to <c>true</c> to merge multiple query parameters into a single complex one. Default is <c>false</c> (no merging).
                  See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
                  """)]
-    [CommandOption("--dynamic-querystring-parameters-threshold")]
-    [DefaultValue(0)]
-    public int DynamicQuerystringParametersThreshold { get; set; }
+    [CommandOption("--use-dynamic-querystring-parameters")]
+    [DefaultValue(false)]
+    public bool UseDynamicQuerystringParameters { get; set; }
 }

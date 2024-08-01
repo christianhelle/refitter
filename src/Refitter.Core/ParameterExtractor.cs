@@ -154,13 +154,13 @@ internal static class ParameterExtractor
         List<string>? parameters = null;
         var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
 
-        if (settings.DynamicQuerystringParametersThreshold >= 2)
+        if (settings.UseDynamicQuerystringParameters)
         {
             var operationParameters = operationModel.Parameters
                 .Where(p => p.Kind == OpenApiParameterKind.Query)
                 .ToList();
 
-            if (operationParameters.Count >= settings.DynamicQuerystringParametersThreshold)
+            if (operationParameters.Count >= 2)
             {
                 var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
                 var isRecord = settings.ImmutableRecords ||

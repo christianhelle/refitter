@@ -38,7 +38,7 @@ EXAMPLES:
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
     refitter ./openapi.json --use-apizr
-    refitter ./openapi.json --dynamic-querystring-parameters-threshold 2
+    refitter ./openapi.json --use-dynamic-querystring-parameters
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -90,7 +90,7 @@ OPTIONS:
                                                                     - Providing cancellation tokens by Apizr request options instead of a dedicated parameter
                                                                     - Using method overloads instead of optional parameters
                                                                     See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                                                               
-        --dynamic-querystring-parameters-threshold  0               Set the threshold from which to generate a single complex query parameter merging all others. Default is 0 (no merging).
+        --use-dynamic-querystring-parameters                        Merge multiple query parameters into a single complex one.
                                                                     See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
 ```
 

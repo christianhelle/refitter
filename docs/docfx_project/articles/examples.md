@@ -1280,12 +1280,12 @@ public partial interface IDeleteUserEndpoint
 }
 ```
 
-Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with a dynamic querystring paremeters threshold set to 2
+Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with dynamic querystring paremeters
 
 **CLI Tool**
 
 ```bash
-$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --dynamic-querystring-parameters-threshold 2
+$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --use-dynamic-querystring-parameters
 ```
 
 **Output**

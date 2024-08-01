@@ -54,7 +54,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             GenerateDefaultAdditionalProperties = !settings.SkipDefaultAdditionalProperties,
             ImmutableRecords = settings.ImmutableRecords,
             ApizrSettings = settings.UseApizr ? new ApizrSettings() : null,
-            DynamicQuerystringParametersThreshold = settings.DynamicQuerystringParametersThreshold
+            UseDynamicQuerystringParameters = settings.UseDynamicQuerystringParameters
         };
 
         try

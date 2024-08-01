@@ -141,7 +141,7 @@ paths:
     [Fact]
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
-        string generateCode = await GenerateCode(2);
+        string generateCode = await GenerateCode(true);
         generateCode.Should().Contain("GetFooDetailsQueryParams");
         generateCode.Should().NotContain("GetAllFoosQueryParams");
         generateCode.Should().Contain("GetBarDetailsQueryParams");
@@ -157,14 +157,14 @@ paths:
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode(int dynamicQuerystringParametersThreshold = 0)
+    private static async Task<string> GenerateCode(bool useDynamicQuerystringParameters = false)
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
             MultipleInterfaces = MultipleInterfaces.ByEndpoint,
-            DynamicQuerystringParametersThreshold = dynamicQuerystringParametersThreshold,
+            UseDynamicQuerystringParameters = useDynamicQuerystringParameters,
             ImmutableRecords = true
         };
 

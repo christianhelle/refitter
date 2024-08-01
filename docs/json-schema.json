@@ -149,9 +149,9 @@
       "type": "boolean",
       "description": "Set to true to generate contracts as immutable records instead of classes"
     },
-    "dynamicQuerystringParametersThreshold": {
-      "type": "integer",
-      "description": "Set the threshold from which to generate a single complex query parameter merging all others."
+    "useDynamicQuerystringParameters": {
+      "type": "boolean",
+      "description": "Set to true to merge multiple query parameters into a single complex one."
     },
     "dependencyInjectionSettings": {
       "type": "object",

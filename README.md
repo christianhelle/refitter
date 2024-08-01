@@ -57,7 +57,7 @@ EXAMPLES:
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
     refitter ./openapi.json --use-apizr
-    refitter ./openapi.json --dynamic-querystring-parameters-threshold 2
+    refitter ./openapi.json --use-dynamic-querystring-parameters
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -109,7 +109,7 @@ OPTIONS:
                                                                     - Providing cancellation tokens by Apizr request options instead of a dedicated parameter
                                                                     - Using method overloads instead of optional parameters
                                                                     See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                                                               
-        --dynamic-querystring-parameters-threshold  0               Set the threshold from which to generate a single complex query parameter merging all others. Default is 0 (no merging).
+        --use-dynamic-querystring-parameters                        Merge multiple query parameters into a single complex one.
                                                                     See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
 ```
 
@@ -196,7 +196,7 @@ The following is an example `.refitter` file
   "generateDefaultAdditionalProperties": true, // Optional. default=true
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
-  "dynamicQuerystringParametersThreshold": 2, // Optional. Default=0 (none)
+  "useDynamicQuerystringParameters": true, // Optional. Default=false
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
@@ -284,7 +284,7 @@ The following is an example `.refitter` file
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
-- `dynamicQuerystringParametersThreshold`: Set the threshold from which to generate a single complex query parameter merging all others. Default is 0 (no merging). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+- `useDynamicQuerystringParameters`: Set to `true` to merge multiple query parameters into a single complex one. Default is `false` (no merging). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
@@ -1614,12 +1614,12 @@ public partial interface IDeleteUserEndpoint
 }
 ```
 
-Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with a dynamic querystring paremeters threshold set to 2
+Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with dynamic querystring paremeters
 
 **CLI Tool**
 
 ```bash
-$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --dynamic-querystring-parameters-threshold 2
+$ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --use-dynamic-querystring-parameters
 ```
 
 **Output**
@@ -2275,7 +2275,7 @@ Note that `--use-apizr` uses default Apizr settings with `withRequestOptions` se
 In both cases, it will format the generated Refit interfaces to be Apizr ready by:
 - Adding a final IApizrRequestOptions options parameter to all generated methods (if `withRequestOptions` is set to `true`)
 - Providing cancellation tokens by Apizr request options instead of a dedicated parameter (if `withRequestOptions` is set to `true`)
-- Using method overloads instead of optional parameters (note that setting `dynamicQuerystringParametersThreshold` to 2 improve overloading experience)
+- Using method overloads instead of optional parameters (note that setting `useDynamicQuerystringParameters` to `true` improve overloading experience)
 
 From here, you're definitly free to use the formatted interface with Apizr by registering, configuring and using it following the [Apizr documentation](https://www.apizr.net). But Refitter can go further by generating some helpers to make the configuration easier.
 
@@ -2293,7 +2293,7 @@ This is what the `.refitter` settings file may look like, depending on you confi
 {
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore",
-  "dynamicQuerystringParametersThreshold": 2,
+  "useDynamicQuerystringParameters": true,
   "dependencyInjectionSettings": {
     "baseUrl": "https://petstore3.swagger.io/api/v3",
     "httpMessageHandlers": [ "MyDelegatingHandler" ],
@@ -2351,7 +2351,7 @@ This comes in handy especially when generating multiple interfaces, by tag or en
 {
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore",
-  "dynamicQuerystringParametersThreshold": 2,
+  "useDynamicQuerystringParameters": true,
   "multipleInterfaces": "ByTag",
   "naming": {    
     "useOpenApiTitle": false,
@@ -2425,7 +2425,7 @@ This is what the `.refitter` settings file may look like, depending on you confi
 {
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore",
-  "dynamicQuerystringParametersThreshold": 2,
+  "useDynamicQuerystringParameters": true,
   "apizrSettings": {
     "withRequestOptions": true, // Recommended to include an Apizr request options parameter to Refit interface methods
     "withRegistrationHelper": true, // Mandatory to actually generate the Apizr registration extended method
@@ -2458,7 +2458,7 @@ This comes in handy especially when generating multiple interfaces, by tag or en
 {
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore",
-  "dynamicQuerystringParametersThreshold": 2,
+  "useDynamicQuerystringParameters": true,
   "multipleInterfaces": "ByTag",
   "naming": {    
     "useOpenApiTitle": false,
