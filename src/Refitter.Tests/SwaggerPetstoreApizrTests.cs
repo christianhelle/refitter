@@ -412,7 +412,7 @@ public class SwaggerPetstoreApizrTests
     {
         var generateCode = await GenerateCode(version, filename);
         BuildHelper
-            .BuildCSharp(generateCode, true)
+            .BuildCSharp(generateCode)
             .Should()
             .BeTrue();
     }
@@ -429,7 +429,7 @@ public class SwaggerPetstoreApizrTests
         var settings = new ApizrGeneratorSettings {ReturnIApiResponse = true};
         var generateCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode, true)
+            .BuildCSharp(generateCode)
             .Should()
             .BeTrue();
     }
@@ -442,7 +442,7 @@ public class SwaggerPetstoreApizrTests
         var generateCode = await GenerateCode(version, filename, settings);
 
         BuildHelper
-            .BuildCSharp(generateCode, true)
+            .BuildCSharp(generateCode)
             .Should()
             .BeTrue();
     }
@@ -459,7 +459,7 @@ public class SwaggerPetstoreApizrTests
         var settings = new ApizrGeneratorSettings {MultipleInterfaces = MultipleInterfaces.ByEndpoint};
         var generateCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode, true)
+            .BuildCSharp(generateCode)
             .Should()
             .BeTrue();
     }
@@ -476,7 +476,7 @@ public class SwaggerPetstoreApizrTests
         var settings = new ApizrGeneratorSettings {MultipleInterfaces = MultipleInterfaces.ByTag};
         var generateCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode, true)
+            .BuildCSharp(generateCode)
             .Should()
             .BeTrue();
     }
@@ -493,7 +493,7 @@ public class SwaggerPetstoreApizrTests
         var sut = await RefitGenerator.CreateAsync(settings);
         var generateCode = sut.Generate();
         BuildHelper
-            .BuildCSharp(generateCode, true)
+            .BuildCSharp(generateCode)
             .Should()
             .BeTrue();
     }
@@ -553,7 +553,7 @@ public class SwaggerPetstoreApizrTests
         };
         var generateCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode, true)
+            .BuildCSharp(generateCode)
             .Should()
             .BeTrue();
     }

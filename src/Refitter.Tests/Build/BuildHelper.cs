@@ -5,12 +5,12 @@ namespace Refitter.Tests.Build;
 
 public static class BuildHelper
 {
-    public static bool BuildCSharp(string generatedCode, bool useApizr = false)
+    public static bool BuildCSharp(string generatedCode)
     {
         var path = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(path);
         var projectFile = Path.Combine(path, "Project.csproj");
-        File.WriteAllText(projectFile, useApizr ? ProjectFileContents.Net80ApizrApp : ProjectFileContents.Net70App);
+        File.WriteAllText(projectFile, ProjectFileContents.Net80App);
         File.WriteAllText(Path.Combine(path, "Generated.cs"), generatedCode);
 
         var processStartInfo = new ProcessStartInfo(GetDotNetCli(), $"build \"{projectFile}\"");

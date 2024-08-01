@@ -180,7 +180,7 @@ paths:
     {
         string generateCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode, true)
+            .BuildCSharp(generateCode)
             .Should()
             .BeTrue();
     }
