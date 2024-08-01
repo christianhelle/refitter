@@ -99,7 +99,7 @@ namespace Refitter.Tests
                 Parameters = { new OpenApiParameter { OriginalName = "testParam", Description = "TestParameter" } },
             });
             this._generator.AppendMethodDocumentation(method, false, true, false, docs);
-            docs.ToString().Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter merging all others.</param>");
+            docs.ToString().Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
         }
 
         [Fact]

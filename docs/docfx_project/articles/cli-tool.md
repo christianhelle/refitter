@@ -90,7 +90,7 @@ OPTIONS:
                                                                     - Providing cancellation tokens by Apizr request options instead of a dedicated parameter
                                                                     - Using method overloads instead of optional parameters
                                                                     See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                                                               
-        --use-dynamic-querystring-parameters                        Merge multiple query parameters into a single complex one.
+        --use-dynamic-querystring-parameters                        Wrap multiple query parameters into a single complex one.
                                                                     See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
 ```
 

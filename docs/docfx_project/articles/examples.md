@@ -1413,7 +1413,7 @@ public partial interface ISwaggerPetstoreOpenAPI30
 
     /// <summary>Updates a pet in the store with form data</summary>
     /// <param name="petId">ID of pet that needs to be updated</param>
-    /// <param name="queryParams">The dynamic querystring parameter merging all others.</param>
+    /// <param name="queryParams">The dynamic querystring parameter wrapping all others.</param>
     /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
     /// <exception cref="ApiException">
     /// Thrown when the request returns a non-success status code:
@@ -1565,7 +1565,7 @@ public partial interface ISwaggerPetstoreOpenAPI30
     Task<User> CreateUsersWithListInput([Body] IEnumerable<User> body);
 
     /// <summary>Logs user into the system</summary>
-    /// <param name="queryParams">The dynamic querystring parameter merging all others.</param>
+    /// <param name="queryParams">The dynamic querystring parameter wrapping all others.</param>
     /// <returns>successful operation</returns>
     /// <exception cref="ApiException">
     /// Thrown when the request returns a non-success status code:

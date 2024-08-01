@@ -147,7 +147,7 @@ The following is an example `.refitter` file
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
-- `useDynamicQuerystringParameters`: Set to `true` to merge multiple query parameters into a single complex one. Default is `false` (no merging). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+- `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
@@ -351,7 +351,7 @@ The following is an example `.refitter` file
         },
         "useDynamicQuerystringParameters": {
             "type": "boolean",
-            "description": "Set to true to merge multiple query parameters into a single complex one."
+            "description": "Set to true to wrap multiple query parameters into a single complex one."
         },
         "dependencyInjectionSettings": {
             "type": "object",

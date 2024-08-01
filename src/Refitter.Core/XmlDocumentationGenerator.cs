@@ -74,7 +74,7 @@ public class XmlDocumentationGenerator
         {
             this.AppendXmlCommentBlock(
                 "param",
-                "The dynamic querystring parameter merging all others.",
+                "The dynamic querystring parameter wrapping all others.",
                 code,
                 new Dictionary<string, string> { ["name"] = "queryParams" });
         }

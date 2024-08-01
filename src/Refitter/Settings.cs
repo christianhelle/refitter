@@ -178,7 +178,7 @@ public sealed class Settings : CommandSettings
     public bool UseApizr { get; set; }
 
     [Description("""
-                 Set to <c>true</c> to merge multiple query parameters into a single complex one. Default is <c>false</c> (no merging).
+                 Set to <c>true</c> to wrap multiple query parameters into a single complex one. Default is <c>false</c> (no wrapping).
                  See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
                  """)]
     [CommandOption("--use-dynamic-querystring-parameters")]

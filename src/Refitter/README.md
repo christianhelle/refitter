@@ -93,7 +93,7 @@ OPTIONS:
                                                                     - Providing cancellation tokens by Apizr request options instead of a dedicated parameter
                                                                     - Using method overloads instead of optional parameters
                                                                     See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                                                               
-        --use-dynamic-querystring-parameters                        Merge multiple query parameters into a single complex one.
+        --use-dynamic-querystring-parameters                        Wrap multiple query parameters into a single complex one.
                                                                     See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
 ```
 
@@ -241,7 +241,7 @@ The following is an example `.refitter` file
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
-- `useDynamicQuerystringParameters`: Set to `true` to merge multiple query parameters into a single complex one. Default is `false` (no merging). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+- `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
@@ -1269,7 +1269,7 @@ public partial interface ISwaggerPetstoreOpenAPI30
 
     /// <summary>Updates a pet in the store with form data</summary>
     /// <param name="petId">ID of pet that needs to be updated</param>
-    /// <param name="queryParams">The dynamic querystring parameter merging all others.</param>
+    /// <param name="queryParams">The dynamic querystring parameter wrapping all others.</param>
     /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
     /// <exception cref="ApiException">
     /// Thrown when the request returns a non-success status code:
@@ -1421,7 +1421,7 @@ public partial interface ISwaggerPetstoreOpenAPI30
     Task<User> CreateUsersWithListInput([Body] IEnumerable<User> body);
 
     /// <summary>Logs user into the system</summary>
-    /// <param name="queryParams">The dynamic querystring parameter merging all others.</param>
+    /// <param name="queryParams">The dynamic querystring parameter wrapping all others.</param>
     /// <returns>successful operation</returns>
     /// <exception cref="ApiException">
     /// Thrown when the request returns a non-success status code:
