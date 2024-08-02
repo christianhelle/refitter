@@ -440,12 +440,6 @@ internal static class ApizrRegistrationGenerator
                     code.Append(
                 $"                  .AddManagerFor<{interfaceNames[i]}>()");
                 }
-                //foreach (var interfaceName in interfaceNames)
-                //{
-                //    code.AppendLine();
-                //    code.Append(
-                //$"                  .AddManagerFor<{interfaceName}>()");
-                //}
 
                 code.Append(",");
                 code.AppendLine();
