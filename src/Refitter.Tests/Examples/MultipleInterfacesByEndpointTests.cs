@@ -23,6 +23,23 @@ paths:
           required: true
           schema:
             type: 'string'
+        - in: 'query'
+          name: 'Title'
+          description: 'Job title'
+          nullable: true
+          schema:
+            type: 'string'
+        - in: 'query'
+          name: 'Description'
+          description: 'Job description'
+          optional: true
+          schema:
+            type: 'string'
+        - in: 'query'
+          name: 'Contact'
+          description: 'Contact Person'
+          schema:
+            type: 'string'
       responses:
         '200':
           description: 'successful operation'
@@ -31,7 +48,14 @@ paths:
       tags:
       - 'Foo'
       operationId: 'Get all foos'
-      description: 'Get all foos'      
+      description: 'Get all foos' 
+      parameters:
+        - in: 'query'
+          name: 'Title'
+          description: 'Foo title'
+          nullable: true
+          schema:
+            type: 'string'       
       responses:
         '200':
           description: 'successful operation'
@@ -50,6 +74,30 @@ paths:
       - 'Bar'
       operationId: 'Get bar details'
       description: 'Get the details of the specified bar'   
+      parameters:
+        - in: 'path'
+          name: 'id'
+          description: 'Bar ID'
+          required: true
+          schema:
+            type: 'string'
+        - in: 'query'
+          name: 'Title'
+          description: 'Bar title'
+          nullable: true
+          schema:
+            type: 'string'
+        - in: 'query'
+          name: 'Description'
+          description: 'Bar description'
+          optional: true
+          schema:
+            type: 'string'
+        - in: 'query'
+          name: 'Contact'
+          description: 'Contact Person'
+          schema:
+            type: 'string'
       responses:
         '200':
           description: 'successful operation'
@@ -91,6 +139,15 @@ paths:
     }
 
     [Fact]
+    public async Task Generates_Dynamic_Querystring_Parameters()
+    {
+        string generateCode = await GenerateCode(true);
+        generateCode.Should().Contain("GetFooDetailsQueryParams");
+        generateCode.Should().NotContain("GetAllFoosQueryParams");
+        generateCode.Should().Contain("GetBarDetailsQueryParams");
+    }
+
+    [Fact]
     public async Task Can_Build_Generated_Code()
     {
         string generateCode = await GenerateCode();
@@ -100,13 +157,15 @@ paths:
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(bool useDynamicQuerystringParameters = false)
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
-            MultipleInterfaces = MultipleInterfaces.ByEndpoint
+            MultipleInterfaces = MultipleInterfaces.ByEndpoint,
+            UseDynamicQuerystringParameters = useDynamicQuerystringParameters,
+            ImmutableRecords = true
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);

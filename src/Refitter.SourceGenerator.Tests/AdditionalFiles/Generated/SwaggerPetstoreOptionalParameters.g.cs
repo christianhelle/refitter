@@ -370,7 +370,8 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         Task DeleteUser(string username);
 
 
-    }
+    }    
+
 }
 
 

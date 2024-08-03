@@ -47,9 +47,10 @@ public class XmlDocumentationGenerator
     /// </summary>
     /// <param name="method">The NSwag model of the method's OpenAPI definition.</param>
     /// <param name="hasApiResponse">Indicates whether the method returns an <c>ApiResponse</c>.</param>
+    /// <param name="hasDynamicQuerystringParameter">Indicates whether the method get a dynamic querystring parameter</param>
     /// <param name="hasApizrRequestOptionsParameter">Indicates whether the method get an IApizrRequestOptions options final parameter</param>
     /// <param name="code">The builder to append the documentation to.</param>
-    public void AppendMethodDocumentation(CSharpOperationModel method, bool hasApiResponse, bool hasApizrRequestOptionsParameter, StringBuilder code)
+    public void AppendMethodDocumentation(CSharpOperationModel method, bool hasApiResponse, bool hasDynamicQuerystringParameter, bool hasApizrRequestOptionsParameter, StringBuilder code)
     {
         if (!_settings.GenerateXmlDocCodeComments)
             return;
@@ -69,7 +70,16 @@ public class XmlDocumentationGenerator
                 { ["name"] = parameter.VariableName });
         }
 
-        if(hasApizrRequestOptionsParameter)
+        if (hasDynamicQuerystringParameter)
+        {
+            this.AppendXmlCommentBlock(
+                "param",
+                "The dynamic querystring parameter wrapping all others.",
+                code,
+                new Dictionary<string, string> { ["name"] = "queryParams" });
+        }
+
+        if (hasApizrRequestOptionsParameter)
         {
             this.AppendXmlCommentBlock(
                 "param",

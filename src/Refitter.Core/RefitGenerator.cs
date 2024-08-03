@@ -177,10 +177,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             code.AppendLine();
         }
 
-        if (settings.OptionalParameters)
-        {
-            code.AppendLine("#nullable enable");
-        }
+        code.AppendLine("#nullable enable");
 
         var refitInterfaces = interfaceGenerator.GenerateCode();
         code.AppendLine($$"""

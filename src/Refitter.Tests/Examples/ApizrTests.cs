@@ -12,16 +12,16 @@ public class ApizrTests
     private const string OpenApiSpec = @"
 openapi: '3.0.0'
 paths:
-  /job/{Id}:
-    post:
+  /foo/{id}:
+    get:
       tags:
-      - 'Jobs'
-      operationId: 'Update job details'
-      description: 'Update the details of the specified job.'
+      - 'Foo'
+      operationId: 'Get foo details'
+      description: 'Get the details of the specified foo'
       parameters:
         - in: 'path'
-          name: 'Id'
-          description: 'Foo Id'
+          name: 'id'
+          description: 'Foo ID'
           required: true
           schema:
             type: 'string'
@@ -34,6 +34,64 @@ paths:
         - in: 'query'
           name: 'Description'
           description: 'Job description'
+          optional: true
+          schema:
+            type: 'string'
+        - in: 'query'
+          name: 'Contact'
+          description: 'Contact Person'
+          schema:
+            type: 'string'
+      responses:
+        '200':
+          description: 'successful operation'
+  /foo:
+    get:
+      tags:
+      - 'Foo'
+      operationId: 'Get all foos'
+      description: 'Get all foos' 
+      parameters:
+        - in: 'query'
+          name: 'Title'
+          description: 'Foo title'
+          nullable: true
+          schema:
+            type: 'string'       
+      responses:
+        '200':
+          description: 'successful operation'
+  /bar:
+    get:
+      tags:
+      - 'Bar'
+      operationId: 'Get all bars'
+      description: 'Get all bars'      
+      responses:
+        '200':
+          description: 'successful operation'
+  /bar/{id}:
+    get:
+      tags:
+      - 'Bar'
+      operationId: 'Get bar details'
+      description: 'Get the details of the specified bar'   
+      parameters:
+        - in: 'path'
+          name: 'id'
+          description: 'Bar ID'
+          required: true
+          schema:
+            type: 'string'
+        - in: 'query'
+          name: 'Title'
+          description: 'Bar title'
+          nullable: true
+          schema:
+            type: 'string'
+        - in: 'query'
+          name: 'Description'
+          description: 'Bar description'
           optional: true
           schema:
             type: 'string'
@@ -94,6 +152,30 @@ paths:
     }
 
     [Fact]
+    public async Task Generates_Dynamic_Querystring_Parameters()
+    {
+        string generateCode = await GenerateCode(true);
+        generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
+        generateCode.Should().Contain("public record GetFooDetailsQueryParams");
+    }
+
+    [Fact]
+    public async Task Generates_Dynamic_Querystring_Parameters_ByTag()
+    {
+        string generateCode = await GenerateCode(true, MultipleInterfaces.ByTag);
+        generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
+        generateCode.Should().Contain("public record GetFooDetailsQueryParams");
+    }
+
+    [Fact]
+    public async Task Generates_Dynamic_Querystring_Parameters_ByEndpoint()
+    {
+        string generateCode = await GenerateCode(true, MultipleInterfaces.ByEndpoint);
+        generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
+        generateCode.Should().Contain("public record GetFooDetailsQueryParams");
+    }
+
+    [Fact]
     public async Task Can_Build_Generated_Code()
     {
         string generateCode = await GenerateCode();
@@ -103,7 +185,7 @@ paths:
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(bool useDynamicQuerystringParameters = false, MultipleInterfaces multipleInterfaces = MultipleInterfaces.Unset)
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
@@ -114,7 +196,10 @@ paths:
             ApizrSettings = new ApizrSettings
             {
                 WithRequestOptions = true
-            }
+            },
+            UseDynamicQuerystringParameters = useDynamicQuerystringParameters,
+            ImmutableRecords = true,
+            MultipleInterfaces = multipleInterfaces
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
