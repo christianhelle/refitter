@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0-preview.52...HEAD)
 
+**Implemented enhancements:**
+
+- \[Query\] Dynamic Querystring Parameters implemented [\#435](https://github.com/christianhelle/refitter/pull/435) ([JeremyBP](https://github.com/JeremyBP))
+
 **Merged pull requests:**
 
 - Update dependency OasReader to v1.6.16.15 [\#434](https://github.com/christianhelle/refitter/pull/434) ([renovate[bot]](https://github.com/apps/renovate))
