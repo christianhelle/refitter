@@ -38,7 +38,8 @@ jobs:
           "--match-path ^/pet/.*",
           "--tag pet",
           "--no-deprecated-operations",
-          "--use-observable-response"
+          "--use-observable-response",
+          "--contract-only"
         ]
 
     steps:
