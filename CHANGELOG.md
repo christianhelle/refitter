@@ -2,24 +2,12 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0-preview.52...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...HEAD)
 
 **Implemented enhancements:**
 
 - Added GenerateClients options for seperate generation [\#436](https://github.com/christianhelle/refitter/pull/436) ([berkslv](https://github.com/berkslv))
 - \[Query\] Dynamic Querystring Parameters implemented [\#435](https://github.com/christianhelle/refitter/pull/435) ([JeremyBP](https://github.com/JeremyBP))
-
-**Merged pull requests:**
-
-- docs: add berkslv as a contributor for ideas, and code [\#437](https://github.com/christianhelle/refitter/pull/437) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Update dependency OasReader to v1.6.16.15 [\#434](https://github.com/christianhelle/refitter/pull/434) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.2.0-preview.52](https://github.com/christianhelle/refitter/tree/1.2.0-preview.52) (2024-07-28)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...1.2.0-preview.52)
-
-**Implemented enhancements:**
-
 - \[Apizr\] Docs updated about Apizr integration [\#432](https://github.com/christianhelle/refitter/pull/432) ([JeremyBP](https://github.com/JeremyBP))
 - \[Apizr\] Including an xml doc param for ApizrRequestOptions parameter [\#431](https://github.com/christianhelle/refitter/pull/431) ([JeremyBP](https://github.com/JeremyBP))
 - \[Apizr\] Generate Apizr formatted Refit interface without .refitter settings file [\#430](https://github.com/christianhelle/refitter/pull/430) ([JeremyBP](https://github.com/JeremyBP))
@@ -27,6 +15,8 @@
 
 **Merged pull requests:**
 
+- docs: add berkslv as a contributor for ideas, and code [\#437](https://github.com/christianhelle/refitter/pull/437) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Update dependency OasReader to v1.6.16.15 [\#434](https://github.com/christianhelle/refitter/pull/434) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add JeremyBP as a contributor for doc [\#433](https://github.com/christianhelle/refitter/pull/433) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add JeremyBP as a contributor for code [\#429](https://github.com/christianhelle/refitter/pull/429) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add MeikelLP as a contributor for ideas [\#426](https://github.com/christianhelle/refitter/pull/426) ([allcontributors[bot]](https://github.com/apps/allcontributors))
