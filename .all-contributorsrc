@@ -452,6 +452,16 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "berkslv",
+      "name": "Berk Selvi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/54676516?v=4",
+      "profile": "http://berkselvi.dev",
+      "contributions": [
+        "ideas",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
