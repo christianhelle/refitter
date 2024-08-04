@@ -26,6 +26,7 @@ EXAMPLES:
     refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --output ./GeneratedCode.cs
     refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode" --internal
     refitter ./openapi.json --output ./IGeneratedCode.cs --interface-only
+    refitter ./openapi.json --output ./GeneratedContracts.cs --contract-only
     refitter ./openapi.json --use-api-response
     refitter ./openapi.json --cancellation-tokens
     refitter ./openapi.json --no-operation-headers

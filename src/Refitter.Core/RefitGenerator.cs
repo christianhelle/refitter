@@ -125,11 +125,15 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var factory = new CSharpClientGeneratorFactory(settings, document);
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
-        var contracts = RefitInterfaceImports
-            .GetImportedNamespaces(settings)
-            .Aggregate(
-                generator.GenerateFile(),
-                (current, import) => current.Replace($"{import}.", string.Empty));
+        var contracts = generator.GenerateFile();
+        if (settings.GenerateClients)
+        {
+            contracts = RefitInterfaceImports
+                .GetImportedNamespaces(settings)
+                .Aggregate(
+                    contracts,
+                    (current, import) => current.Replace($"{import}.", string.Empty));
+        }
 
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
@@ -143,7 +147,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             ? document.Info!.Title.Sanitize()
             : settings.Naming.InterfaceName;
         return new StringBuilder()
-            .AppendLine(generatedCode.SourceCode)
+            .AppendLine(settings.GenerateClients ? generatedCode.SourceCode : string.Empty)
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
             .AppendLine(settings.ApizrSettings != null

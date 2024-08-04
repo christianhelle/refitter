@@ -32,6 +32,11 @@ public class RefitGeneratorSettings
     public bool GenerateContracts { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets a value indicating whether clients should be generated.
+    /// </summary>
+    public bool GenerateClients { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets a value indicating whether XML doc comments should be generated.
     /// </summary>
     public bool GenerateXmlDocCodeComments { get; set; } = true;

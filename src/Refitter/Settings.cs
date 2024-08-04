@@ -44,6 +44,11 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool InterfaceOnly { get; set; }
 
+    [Description("Don't generate clients")]
+    [CommandOption("--contract-only")]
+    [DefaultValue(false)]
+    public bool ContractOnly { get; set; }
+
     [Description("Return Task<IApiResponse<T>> instead of Task<T>")]
     [CommandOption("--use-api-response")]
     [DefaultValue(false)]

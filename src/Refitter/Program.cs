@@ -64,6 +64,13 @@ internal static class Program
                 configuration
                     .AddExample(
                         "./openapi.json",
+                        "--output",
+                        "./GeneratedContracts.cs",
+                        "--contract-only");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
                         "--use-api-response");
 
                 configuration
