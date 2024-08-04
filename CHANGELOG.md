@@ -6,10 +6,12 @@
 
 **Implemented enhancements:**
 
+- Added GenerateClients options for seperate generation [\#436](https://github.com/christianhelle/refitter/pull/436) ([berkslv](https://github.com/berkslv))
 - \[Query\] Dynamic Querystring Parameters implemented [\#435](https://github.com/christianhelle/refitter/pull/435) ([JeremyBP](https://github.com/JeremyBP))
 
 **Merged pull requests:**
 
+- docs: add berkslv as a contributor for ideas, and code [\#437](https://github.com/christianhelle/refitter/pull/437) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update dependency OasReader to v1.6.16.15 [\#434](https://github.com/christianhelle/refitter/pull/434) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.2.0-preview.52](https://github.com/christianhelle/refitter/tree/1.2.0-preview.52) (2024-07-28)
