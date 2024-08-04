@@ -138,6 +138,7 @@ function RunTests {
                     GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfaces" -outputPath "MultipleInterfacesWithCustomName$outputPath" -args "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync"
                     GenerateAndBuild -format $format -namespace "$namespace.TagFiltered" -outputPath "TagFiltered$outputPath" -args "--tag pet --tag user --tag store"
                     GenerateAndBuild -format $format -namespace "$namespace.MatchPathFiltered" -outputPath "MatchPathFiltered$outputPath" -args "--match-path ^/pet/.*"
+                    GenerateAndBuild -format $format -namespace "$namespace.ContractOnly" -outputPath "ContractOnly$outputPath" -args "--contract-only"
                 }
             }
         }
