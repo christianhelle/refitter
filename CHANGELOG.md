@@ -2,11 +2,7 @@
 
 ## [1.2.0](https://github.com/christianhelle/refitter/tree/1.2.0) (2024-08-11)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0-preview.53...1.2.0)
-
-## [1.2.0-preview.53](https://github.com/christianhelle/refitter/tree/1.2.0-preview.53) (2024-08-04)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...1.2.0-preview.53)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...1.2.0)
 
 **Implemented enhancements:**
 
