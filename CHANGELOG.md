@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.8 [\#439](https://github.com/christianhelle/refitter/pull/439) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [1.2.0](https://github.com/christianhelle/refitter/tree/1.2.0) (2024-08-11)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.1.3...1.2.0)
