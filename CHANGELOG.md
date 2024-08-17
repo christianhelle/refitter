@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency atc.test to v1.0.96 [\#442](https://github.com/christianhelle/refitter/pull/442) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency atc.test to v1.0.93 [\#441](https://github.com/christianhelle/refitter/pull/441) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.extensions.http.resilience to v8.8.0 [\#440](https://github.com/christianhelle/refitter/pull/440) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.extensions.http.polly to v8.0.8 [\#439](https://github.com/christianhelle/refitter/pull/439) ([renovate[bot]](https://github.com/apps/renovate))
