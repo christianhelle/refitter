@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Refitter.Tests.AdditionalFiles.NoFilename
 {
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
