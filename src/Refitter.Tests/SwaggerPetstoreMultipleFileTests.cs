@@ -31,6 +31,50 @@ public class SwaggerPetstoreMultipleFileTests
 
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_DependencyInjection(SampleOpenSpecifications version, string filename)
+    {
+        await GenerateCode(
+            version,
+            filename,
+            new RefitGeneratorSettings { DependencyInjectionSettings = new DependencyInjectionSettings() },
+            generatorOutput =>
+            {
+                generatorOutput.Files.Should().NotBeNullOrEmpty();
+                generatorOutput.Files.Should().HaveCountGreaterOrEqualTo(3);
+                foreach ((_, string content) in generatorOutput.Files)
+                {
+                    content.Should().NotBeNullOrWhiteSpace();
+                }
+            });
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_Apizr(SampleOpenSpecifications version, string filename)
+    {
+        await GenerateCode(
+            version,
+            filename,
+            new RefitGeneratorSettings { ApizrSettings = new ApizrSettings { WithRegistrationHelper = true } },
+            generatorOutput =>
+            {
+                generatorOutput.Files.Should().NotBeNullOrEmpty();
+                generatorOutput.Files.Should().HaveCountGreaterOrEqualTo(3);
+                foreach ((_, string content) in generatorOutput.Files)
+                {
+                    content.Should().NotBeNullOrWhiteSpace();
+                }
+            });
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
 #if !DEBUG
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]

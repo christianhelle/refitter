@@ -183,16 +183,25 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             generatedFiles.Add(new GeneratedCode("Contracts.cs", contracts));
         }
 
-        if (settings.DependencyInjectionSettings is not null)
+        if (settings.DependencyInjectionSettings is not null || settings.ApizrSettings is not null)
         {
-            generatedFiles.Add(
-                new GeneratedCode(
-                    "DependencyInjection.cs",
-                    settings.ApizrSettings != null
-                        ? ApizrRegistrationGenerator.Generate(settings, interfaces.InterfaceNames)
-                        : DependencyInjectionGenerator.Generate(settings, interfaces.InterfaceNames)
-                )
-            );
+            var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
+                ? document.Info!.Title.Sanitize()
+                : settings.Naming.InterfaceName;
+
+            var configurationCode = settings.ApizrSettings != null
+                ? ApizrRegistrationGenerator.Generate(settings, interfaces.InterfaceNames, title)
+                : DependencyInjectionGenerator.Generate(settings, interfaces.InterfaceNames);
+
+            if (!string.IsNullOrWhiteSpace(configurationCode))
+            {
+                generatedFiles.Add(
+                    new GeneratedCode(
+                        "DependencyInjection.cs",
+                        configurationCode
+                    )
+                );
+            }
         }
 
         return new GeneratorOutput(generatedFiles);
