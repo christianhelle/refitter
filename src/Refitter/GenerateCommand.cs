@@ -216,14 +216,18 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         RefitGeneratorSettings refitGeneratorSettings,
         GeneratedCode outputFile)
     {
+        var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)
+            ? string.Empty
+            : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
+
         if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder) &&
             refitGeneratorSettings.OutputFolder != RefitGeneratorSettings.DefaultOutputFolder)
         {
-            return Path.Combine(refitGeneratorSettings.OutputFolder, outputFile.Filename);
+            return Path.Combine(root, refitGeneratorSettings.OutputFolder, outputFile.Filename);
         }
 
         return !string.IsNullOrWhiteSpace(settings.OutputPath)
-            ? Path.Combine(settings.OutputPath, outputFile.Filename)
+            ? Path.Combine(root, settings.OutputPath, outputFile.Filename)
             : outputFile.Filename;
     }
 
