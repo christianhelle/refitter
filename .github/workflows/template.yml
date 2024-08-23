@@ -63,15 +63,15 @@ jobs:
     - name: 🛠️ Generate code
       run: |
         ${{ inputs.command }} ./openapi.${{ inputs.format }} --no-logging ${{ matrix.args }}
-        Copy-Item Output.cs ./ConsoleApp/Net6/
-        Copy-Item Output.cs ./ConsoleApp/Net7/
-        Copy-Item Output.cs ./ConsoleApp/Net8/
-        Copy-Item Output.cs ./ConsoleApp/Net48/
-        Copy-Item Output.cs ./ConsoleApp/Net472/
-        Copy-Item Output.cs ./ConsoleApp/Net462/
-        Copy-Item Output.cs ./ConsoleApp/Net481/
-        Copy-Item Output.cs ./ConsoleApp/NetStandard20/
-        Copy-Item Output.cs ./ConsoleApp/NetStandard21/
+        Copy-Item *.cs ./ConsoleApp/Net6/
+        Copy-Item *.cs ./ConsoleApp/Net7/
+        Copy-Item *.cs ./ConsoleApp/Net8/
+        Copy-Item *.cs ./ConsoleApp/Net48/
+        Copy-Item *.cs ./ConsoleApp/Net472/
+        Copy-Item *.cs ./ConsoleApp/Net462/
+        Copy-Item *.cs ./ConsoleApp/Net481/
+        Copy-Item *.cs ./ConsoleApp/NetStandard20/
+        Copy-Item *.cs ./ConsoleApp/NetStandard21/
       working-directory: test
       shell: pwsh
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
