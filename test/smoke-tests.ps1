@@ -112,7 +112,7 @@ function RunTests {
     Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
     
     GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter"
-    GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreApizr.generated.cs" -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj"
+    GenerateAndBuild -format " " -namespace " " -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj"
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
