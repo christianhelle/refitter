@@ -79,7 +79,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (!settings.SkipValidation)
                 await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath);
 
-            await (settings.GenerateMultipleFiles
+            await (refitGeneratorSettings.GenerateMultipleFiles
                 ? WriteMultipleFiles(generator, settings, refitGeneratorSettings)
                 : WriteSingleFile(generator, settings, refitGeneratorSettings));
 
