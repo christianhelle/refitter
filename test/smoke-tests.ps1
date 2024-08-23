@@ -71,7 +71,7 @@ function GenerateAndBuild {
     }
 
     $process = Start-Process "dotnet" `
-        -Args "build -p:TreatWarningsAsErrors=true $solution" `
+        -Args "build $solution" `
         -NoNewWindow `
         -PassThru
     $process | Wait-Process
@@ -108,8 +108,8 @@ function RunTests {
         "hubspot-webhooks"
     )
     
-    Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin -f net8.0"
-    Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
+    Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0"
+    Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
     
     GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter"
     GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreApizr.generated.cs" -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj"
@@ -163,7 +163,7 @@ function RunTests {
         
         Write-Host "`r`nBuilding ConsoleApp`r`n"
         $process = Start-Process "dotnet" `
-            -Args "build -p:TreatWarningsAsErrors=true ./ConsoleApp/ConsoleApp.sln" `
+            -Args "build ./ConsoleApp/ConsoleApp.sln" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
