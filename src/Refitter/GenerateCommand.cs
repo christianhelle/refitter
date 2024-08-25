@@ -55,7 +55,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             GenerateDefaultAdditionalProperties = !settings.SkipDefaultAdditionalProperties,
             ImmutableRecords = settings.ImmutableRecords,
             ApizrSettings = settings.UseApizr ? new ApizrSettings() : null,
-            UseDynamicQuerystringParameters = settings.UseDynamicQuerystringParameters
+            UseDynamicQuerystringParameters = settings.UseDynamicQuerystringParameters,
+            GenerateMultipleFiles = settings.GenerateMultipleFiles
         };
 
         try
@@ -78,19 +79,11 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (!settings.SkipValidation)
                 await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath);
 
-            var code = generator.Generate().ReplaceLineEndings();
-            AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
+            await (refitGeneratorSettings.GenerateMultipleFiles
+                ? WriteMultipleFiles(generator, settings, refitGeneratorSettings)
+                : WriteSingleFile(generator, settings, refitGeneratorSettings));
 
-            var outputPath = GetOutputPath(settings, refitGeneratorSettings);
-            AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}[/]");
-
-            var directory = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
-
-            await File.WriteAllTextAsync(outputPath, code);
             await Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
-
             AnsiConsole.MarkupLine($"[green]Duration: {stopwatch.Elapsed}{Crlf}[/]");
 
             if (!settings.NoBanner)
@@ -133,6 +126,46 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
     }
 
+    private static async Task WriteSingleFile(
+        RefitGenerator generator,
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings)
+    {
+        var code = generator.Generate().ReplaceLineEndings();
+        var outputPath = GetOutputPath(settings, refitGeneratorSettings);
+
+        AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}[/]");
+        AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
+
+        var directory = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+            Directory.CreateDirectory(directory);
+
+        await File.WriteAllTextAsync(outputPath, code);
+    }
+
+    private async Task WriteMultipleFiles(
+        RefitGenerator generator,
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings)
+    {
+        var generatorOutput = generator.GenerateMultipleFiles();
+        foreach (var outputFile in generatorOutput.Files)
+        {
+            var code = outputFile.Content;
+            var outputPath = GetOutputPath(settings, refitGeneratorSettings, outputFile);
+
+            AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}[/]");
+            AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
+
+            var directory = Path.GetDirectoryName(outputPath);
+            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            await File.WriteAllTextAsync(outputPath, code);
+        }
+    }
+
     private static void ShowDeprecationWarning(RefitGeneratorSettings refitGeneratorSettings)
     {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -164,9 +197,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
     {
-        var outputPath = settings.OutputPath != Settings.DefaultOutputPath && !string.IsNullOrWhiteSpace(settings.OutputPath)
-                        ? settings.OutputPath
-                        : refitGeneratorSettings.OutputFilename ?? "Output.cs";
+        var outputPath = settings.OutputPath != Settings.DefaultOutputPath &&
+                         !string.IsNullOrWhiteSpace(settings.OutputPath)
+            ? settings.OutputPath
+            : refitGeneratorSettings.OutputFilename ?? "Output.cs";
 
         if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder) &&
             refitGeneratorSettings.OutputFolder != RefitGeneratorSettings.DefaultOutputFolder)
@@ -175,6 +209,26 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
 
         return outputPath;
+    }
+
+    private string GetOutputPath(
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings,
+        GeneratedCode outputFile)
+    {
+        var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)
+            ? string.Empty
+            : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder) &&
+            refitGeneratorSettings.OutputFolder != RefitGeneratorSettings.DefaultOutputFolder)
+        {
+            return Path.Combine(root, refitGeneratorSettings.OutputFolder, outputFile.Filename);
+        }
+
+        return !string.IsNullOrWhiteSpace(settings.OutputPath)
+            ? Path.Combine(root, settings.OutputPath, outputFile.Filename)
+            : outputFile.Filename;
     }
 
     private static async Task ValidateOpenApiSpec(string openApiPath)

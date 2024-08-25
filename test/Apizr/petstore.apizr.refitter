@@ -3,6 +3,7 @@
   "namespace": "Petstore.ApizrSample",
   "outputFolder": "GeneratedCode",
   "outputFilename": "SwaggerPetstoreApizr.generated.cs",
+  "generateMultipleFiles": true,
   "naming": {    
     "useOpenApiTitle": false,
     "interfaceName": "SwaggerPetstoreApizr"

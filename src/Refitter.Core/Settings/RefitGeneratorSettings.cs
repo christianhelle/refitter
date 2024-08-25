@@ -197,4 +197,8 @@ public class RefitGeneratorSettings
     /// See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
     /// </summary>
     public bool UseDynamicQuerystringParameters { get; set; }
+
+    /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
+    /// </summary>
+    public bool GenerateMultipleFiles { get; set; }
 }

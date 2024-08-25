@@ -157,6 +157,56 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .TrimEnd();
     }
 
+    public GeneratorOutput GenerateMultipleFiles()
+    {
+        var factory = new CSharpClientGeneratorFactory(settings, document);
+        var generator = factory.Create();
+        var docGenerator = new XmlDocumentationGenerator(settings);
+        var contracts = generator.GenerateFile();
+
+        IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
+        {
+            MultipleInterfaces.ByEndpoint
+                => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
+            MultipleInterfaces.ByTag
+                => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
+            _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
+        };
+
+        var generatedFiles = new List<GeneratedCode>();
+
+        var interfaces = GenerateClient(interfaceGenerator);
+        generatedFiles.Add(new GeneratedCode("RefitInterfaces.cs", interfaces.SourceCode));
+
+        if (settings.GenerateContracts)
+        {
+            generatedFiles.Add(new GeneratedCode("Contracts.cs", contracts));
+        }
+
+        if (settings.DependencyInjectionSettings is not null || settings.ApizrSettings is not null)
+        {
+            var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
+                ? document.Info!.Title.Sanitize()
+                : settings.Naming.InterfaceName;
+
+            var configurationCode = settings.ApizrSettings != null
+                ? ApizrRegistrationGenerator.Generate(settings, interfaces.InterfaceNames, title)
+                : DependencyInjectionGenerator.Generate(settings, interfaces.InterfaceNames);
+
+            if (!string.IsNullOrWhiteSpace(configurationCode))
+            {
+                generatedFiles.Add(
+                    new GeneratedCode(
+                        "DependencyInjection.cs",
+                        configurationCode
+                    )
+                );
+            }
+        }
+
+        return new GeneratorOutput(generatedFiles);
+    }
+
     /// <summary>
     /// Generates the client code based on the specified interface generator.
     /// </summary>

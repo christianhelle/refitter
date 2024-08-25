@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using Refitter.Tests.AdditionalFiles.SingeInterface;
 
+#nullable enable
 namespace Refitter.Tests.AdditionalFiles.ByTag
 {
     /// <summary>Update an existing pet</summary>

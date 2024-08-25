@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using Refitter.Tests.AdditionalFiles.SingeInterface;
 
+#nullable enable
 namespace Refitter.Tests.CustomGenerated
 {
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
@@ -371,6 +372,6 @@ namespace Refitter.Tests.CustomGenerated
         Task DeleteUser(string username);
 
 
-    }    
+    }
 
 }

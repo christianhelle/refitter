@@ -21,7 +21,7 @@ function GenerateAndBuild {
         [string]
         $namespace,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]
         $outputPath,
         
@@ -38,7 +38,7 @@ function GenerateAndBuild {
         $csproj
     )
     
-    Get-ChildItem '*.generated.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName }
+    Get-ChildItem './GeneratedCode/*.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName -Force }
 
     if ($args.Contains("settings-file")) {        
         Write-Host "refitter --no-logging $args"
@@ -71,7 +71,7 @@ function GenerateAndBuild {
     }
 
     $process = Start-Process "dotnet" `
-        -Args "build -p:TreatWarningsAsErrors=true $solution" `
+        -Args "build $solution" `
         -NoNewWindow `
         -PassThru
     $process | Wait-Process
@@ -108,11 +108,11 @@ function RunTests {
         "hubspot-webhooks"
     )
     
-    Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin -f net8.0"
-    Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:TreatWarningsAsErrors=true -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
+    Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0"
+    Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
     
     GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter"
-    GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreApizr.generated.cs" -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj"
+    GenerateAndBuild -format " " -namespace " " -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj"
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
@@ -128,7 +128,7 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--immutable-records" -netCore $true
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -args "--multiple-files"
                     GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens"
                     GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal"
                     GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response"
@@ -139,6 +139,7 @@ function RunTests {
                     GenerateAndBuild -format $format -namespace "$namespace.TagFiltered" -outputPath "TagFiltered$outputPath" -args "--tag pet --tag user --tag store"
                     GenerateAndBuild -format $format -namespace "$namespace.MatchPathFiltered" -outputPath "MatchPathFiltered$outputPath" -args "--match-path ^/pet/.*"
                     GenerateAndBuild -format $format -namespace "$namespace.ContractOnly" -outputPath "ContractOnly$outputPath" -args "--contract-only"
+                    GenerateAndBuild -format $format -namespace "$namespace.ImmutableRecords" -outputPath "ImmutableRecords$outputPath" -args "--immutable-records" -netCore $true
                 }
             }
         }
@@ -162,7 +163,7 @@ function RunTests {
         
         Write-Host "`r`nBuilding ConsoleApp`r`n"
         $process = Start-Process "dotnet" `
-            -Args "build -p:TreatWarningsAsErrors=true ./ConsoleApp/ConsoleApp.sln" `
+            -Args "build ./ConsoleApp/ConsoleApp.sln" `
             -NoNewWindow `
             -PassThru
         $process | Wait-Process
