@@ -176,11 +176,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var generatedFiles = new List<GeneratedCode>();
 
         var interfaces = GenerateClient(interfaceGenerator);
-        generatedFiles.Add(new GeneratedCode("RefitInterfaces.cs", interfaces.SourceCode));
+        generatedFiles.Add(new GeneratedCode(FilenameConstants.RefitInterfaces, interfaces.SourceCode));
 
         if (settings.GenerateContracts)
         {
-            generatedFiles.Add(new GeneratedCode("Contracts.cs", contracts));
+            generatedFiles.Add(new GeneratedCode(FilenameConstants.Contracts, contracts));
         }
 
         if (settings.DependencyInjectionSettings is not null || settings.ApizrSettings is not null)
@@ -195,12 +195,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
             if (!string.IsNullOrWhiteSpace(configurationCode))
             {
-                generatedFiles.Add(
-                    new GeneratedCode(
-                        "DependencyInjection.cs",
-                        configurationCode
-                    )
-                );
+                generatedFiles.Add(new GeneratedCode(FilenameConstants.DependencyInjection, configurationCode));
             }
         }
 
