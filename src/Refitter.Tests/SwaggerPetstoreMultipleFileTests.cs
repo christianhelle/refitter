@@ -103,7 +103,16 @@ public class SwaggerPetstoreMultipleFileTests
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
         if (settings is null)
         {
-            settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, GenerateMultipleFiles = true };
+            settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                GenerateMultipleFiles = true,
+                Naming = new NamingSettings
+                {
+                    UseOpenApiTitle = false,
+                    InterfaceName = "PetStore"
+                }
+            };
         }
         else
         {

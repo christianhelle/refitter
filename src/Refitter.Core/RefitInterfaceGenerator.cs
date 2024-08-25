@@ -246,7 +246,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     private string GenerateInterfaceDeclaration(out string interfaceName)
     {
         var title = settings.Naming.UseOpenApiTitle
-            ? IdentifierUtils.Sanitize(document.Info?.Title ?? "ApiClient")
+            ? (document.Info?.Title ?? NamingSettings.DefaultInterfaceName).Sanitize()
             : settings.Naming.InterfaceName;
 
         interfaceName = $"I{title.CapitalizeFirstCharacter()}";
