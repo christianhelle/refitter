@@ -370,7 +370,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         Task DeleteUser(string username);
 
 
-    }    
+    }
 
 }
 

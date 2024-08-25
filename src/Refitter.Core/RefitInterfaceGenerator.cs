@@ -35,7 +35,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
               {{GenerateInterfaceDeclaration(out var interfaceName)}}
               {{Separator}}{
               {{GenerateInterfaceBody(out var dynamicQuerystringParameters)}}
-              {{Separator}}}    
+              {{Separator}}}
               {{dynamicQuerystringParameters}}
               """,
             interfaceName);
@@ -65,7 +65,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, dynamicQuerystringParameterType, out var operationDynamicQuerystringParameters).ToList();
 
                 var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
-                if (hasDynamicQuerystringParameter) 
+                if (hasDynamicQuerystringParameter)
                     dynamicQuerystringParametersCodeBuilder.AppendLine(operationDynamicQuerystringParameters);
 
                 var parametersString = string.Join(", ", parameters);

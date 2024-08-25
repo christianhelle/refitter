@@ -372,6 +372,6 @@ namespace Refitter.Tests.CustomGenerated
         Task DeleteUser(string username);
 
 
-    }    
+    }
 
 }

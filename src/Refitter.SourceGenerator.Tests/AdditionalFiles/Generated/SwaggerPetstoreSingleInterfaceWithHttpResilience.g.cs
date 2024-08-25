@@ -370,7 +370,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
         Task DeleteUser(string username);
 
 
-    }    
+    }
 
 }
 
