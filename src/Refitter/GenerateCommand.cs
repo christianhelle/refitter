@@ -154,6 +154,23 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         var generatorOutput = generator.GenerateMultipleFiles();
         foreach (var outputFile in generatorOutput.Files)
         {
+            if (
+                refitGeneratorSettings.ContractsOutputFolder != RefitGeneratorSettings.DefaultOutputFolder
+                && outputFile.Filename == FilenameConstants.Contracts
+            )
+            {
+                var contractsFolder = Path.GetDirectoryName(refitGeneratorSettings.ContractsOutputFolder);
+                if (!string.IsNullOrWhiteSpace(contractsFolder) && !Directory.Exists(contractsFolder))
+                    Directory.CreateDirectory(contractsFolder);
+
+                var contractsFile = Path.Combine(contractsFolder ?? "./", outputFile.Filename);
+                AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(contractsFile)}[/]");
+                AnsiConsole.MarkupLine($"[green]Length: {outputFile.Content.Length} bytes[/]");
+
+                await File.WriteAllTextAsync(contractsFile, outputFile.Content);
+                continue;
+            }
+
             var code = outputFile.Content;
             var outputPath = GetOutputPath(settings, refitGeneratorSettings, outputFile);
 
