@@ -1,9 +1,12 @@
 {
   "openApiPath": "./OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore",
+  "contractsNamespace": "Petstore.Contracts",
   "outputFolder": "GeneratedCode",
+  "contractsOutputFolder": "GeneratedCode/Contracts/",
   "outputFilename": "SwaggerPetstoreDirect.cs",
-  "naming": {    
+  "generateMultipleFiles": true,
+  "naming": {
     "useOpenApiTitle": false,
     "interfaceName": "SwaggerPetstoreDirect"
   },
