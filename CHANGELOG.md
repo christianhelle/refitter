@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...HEAD)
 
+**Implemented enhancements:**
+
+- Add support for generating multiple files [\#445](https://github.com/christianhelle/refitter/pull/445) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - chore\(deps\): update dependency microsoft.net.test.sdk to v17.11.0 [\#444](https://github.com/christianhelle/refitter/pull/444) ([renovate[bot]](https://github.com/apps/renovate))
