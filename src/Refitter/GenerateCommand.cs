@@ -57,7 +57,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ApizrSettings = settings.UseApizr ? new ApizrSettings() : null,
             UseDynamicQuerystringParameters = settings.UseDynamicQuerystringParameters,
             GenerateMultipleFiles = settings.GenerateMultipleFiles,
-            ContractsOutputFolder = settings.ContractsOutputPath,
+            ContractsOutputFolder = settings.ContractsOutputPath ?? settings.OutputPath,
             ContractsNamespace = settings.ContractsNamespace
         };
 
