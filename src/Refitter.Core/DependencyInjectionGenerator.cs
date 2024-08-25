@@ -36,24 +36,28 @@ internal static class DependencyInjectionGenerator
 
         var usings = iocSettings.TransientErrorHandler switch
         {
-            TransientErrorHandler.Polly =>
-                """
-                using System;
-                   using Microsoft.Extensions.DependencyInjection;
-                   using Polly;
-                   using Polly.Contrib.WaitAndRetry;
-                   using Polly.Extensions.Http;
-                """,
-            TransientErrorHandler.HttpResilience =>
-                """
-                using System;
-                    using Microsoft.Extensions.DependencyInjection;
-                    using Microsoft.Extensions.Http.Resilience;
-                """,
-            _ => """
-                 using System;
-                     using Microsoft.Extensions.DependencyInjection;
-                 """
+            TransientErrorHandler.Polly
+                => """
+                    using System;
+                       using Microsoft.Extensions.DependencyInjection;
+                       using Polly;
+                       using Polly.Contrib.WaitAndRetry;
+                       using Polly.Extensions.Http;
+                       using Refit;
+                    """,
+            TransientErrorHandler.HttpResilience
+                => """
+                    using System;
+                        using Microsoft.Extensions.DependencyInjection;
+                        using Microsoft.Extensions.Http.Resilience;
+                        using Refit;
+                    """,
+            _
+                => """
+                    using System;
+                        using Microsoft.Extensions.DependencyInjection;
+                        using Refit;
+                    """
         };
 
         code.AppendLine();
