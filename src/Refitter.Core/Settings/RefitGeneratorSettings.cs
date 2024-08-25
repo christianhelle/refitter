@@ -10,6 +10,7 @@ namespace Refitter.Core;
 public class RefitGeneratorSettings
 {
     public const string DefaultOutputFolder = "./Generated";
+    public const string DefaultNamespace = "GeneratedCode";
 
     /// <summary>
     /// Gets or sets the path to the Open API.
@@ -19,7 +20,11 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
     /// </summary>
-    public string Namespace { get; set; } = "GeneratedCode";
+    public string Namespace { get; set; } = DefaultNamespace;
+
+    /// <summary>
+    /// Gets or sets the namespace for the generated contracts. (default: GeneratedCode);
+    public string? ContractsNamespace { get; set; }
 
     /// <summary>
     /// Gets or sets the naming settings.
@@ -141,6 +146,11 @@ public class RefitGeneratorSettings
     /// Gets or sets the relative path to a folder in which the output files are generated. (default: ./Generated)
     /// </summary>
     public string OutputFolder { get; set; } = DefaultOutputFolder;
+
+    /// <summary>
+    /// Gets or sets the relative path to a folder where to store the generated contracts. (defauult: ./Generated)
+    /// </summary>
+    public string? ContractsOutputFolder { get; set; }
 
     /// <summary>
     /// Gets or sets the filename of the generated code.
