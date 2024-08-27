@@ -163,7 +163,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 if (!string.IsNullOrWhiteSpace(contractsFolder) && !Directory.Exists(contractsFolder))
                     Directory.CreateDirectory(contractsFolder);
 
-                var contractsFile = Path.Combine(contractsFolder ?? "./", outputFile.Filename);
+                var contractsFile = Path.Combine(contractsFolder ?? "./", "./", outputFile.Filename);
                 AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(contractsFile)}[/]");
                 AnsiConsole.MarkupLine($"[green]Length: {outputFile.Content.Length} bytes[/]");
 
