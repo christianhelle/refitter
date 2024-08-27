@@ -733,6 +733,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
     using System;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Http.Resilience;
+    using Refit;
 
     public static partial class IServiceCollectionExtensions
     {
