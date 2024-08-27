@@ -253,7 +253,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             return Path.Combine(root, refitGeneratorSettings.OutputFolder, outputFile.Filename);
         }
 
-        return !string.IsNullOrWhiteSpace(settings.OutputPath)
+        return !string.IsNullOrWhiteSpace(settings.OutputPath) && settings.OutputPath != Settings.DefaultOutputPath
             ? Path.Combine(root, settings.OutputPath, outputFile.Filename)
             : outputFile.Filename;
     }
