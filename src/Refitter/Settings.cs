@@ -34,7 +34,7 @@ public sealed class Settings : CommandSettings
     [DefaultValue(DefaultOutputPath)]
     public string? OutputPath { get; set; }
 
-    [Description("Output path for generated contracts")]
+    [Description("Output path for generated contracts. Enabling this automatically enables generating multiple files")]
     [CommandOption("--contracts-output")]
     [DefaultValue(null)]
     public string? ContractsOutputPath { get; set; }
