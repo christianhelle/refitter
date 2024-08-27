@@ -148,7 +148,7 @@ public class RefitGeneratorSettings
     public string OutputFolder { get; set; } = DefaultOutputFolder;
 
     /// <summary>
-    /// Gets or sets the relative path to a folder where to store the generated contracts. (defauult: ./Generated)
+    /// Gets or sets the relative path to a folder where to store the generated contracts. (default: ./Generated)
     /// </summary>
     public string? ContractsOutputFolder { get; set; }
 
@@ -208,6 +208,7 @@ public class RefitGeneratorSettings
     /// </summary>
     public bool UseDynamicQuerystringParameters { get; set; }
 
+    /// <summary>
     /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
     /// </summary>
     public bool GenerateMultipleFiles { get; set; }
