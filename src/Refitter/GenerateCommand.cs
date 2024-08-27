@@ -75,6 +75,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
                 refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
                 refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
+
+                if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder))
+                    refitGeneratorSettings.GenerateMultipleFiles = true;
             }
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
