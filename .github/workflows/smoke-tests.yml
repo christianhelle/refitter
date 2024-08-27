@@ -42,7 +42,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: 🛠️ Run smoke test script
-      run: ./smoke-test.ps1
+      run: ./smoke-tests.ps1
       working-directory: test
       shell: pwsh
   
