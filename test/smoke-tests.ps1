@@ -134,7 +134,8 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -args "--multiple-files --contracts-output GeneratedCode/Contracts --contracts-namespace $namespace.MultipleFiles.Contracts"
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -args "--multiple-files"
+                    GenerateAndBuild -format $format -namespace "$namespace.SeparateContractsFile" -args "--contracts-output GeneratedCode/Contracts --contracts-namespace $namespace.SeparateContractsFile.Contracts"
                     GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens"
                     GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal"
                     GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response"
