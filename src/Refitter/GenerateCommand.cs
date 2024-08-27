@@ -160,7 +160,11 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 && outputFile.Filename == FilenameConstants.Contracts
             )
             {
-                var contractsFolder = Path.GetFullPath(refitGeneratorSettings.ContractsOutputFolder);
+                var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)
+                    ? string.Empty
+                    : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
+
+                var contractsFolder = Path.GetFullPath(Path.Combine(root, refitGeneratorSettings.ContractsOutputFolder));
                 if (!string.IsNullOrWhiteSpace(contractsFolder) && !Directory.Exists(contractsFolder))
                     Directory.CreateDirectory(contractsFolder);
 
