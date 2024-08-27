@@ -14,6 +14,7 @@ on:
       - "!.github/workflows/template.yml"
       - "!.github/workflows/template-url.yml"
       - "!.github/workflows/smoke-tests.yml"
+      - "!test/smoke-tests.ps1"
     branches:
       - "*"
   pull_request:
@@ -28,72 +29,19 @@ on:
       - "!.github/workflows/template.yml"
       - "!.github/workflows/template-url.yml"
       - "!.github/workflows/smoke-tests.yml"
+      - "!test/smoke-tests.ps1"
     branches:
       - "*"
 
 jobs:
   
-  file:
-    strategy:
-      fail-fast: false
-      matrix:
-        framework: [net8.0]
-        format: [json, yaml]
-        version: [v2.0, v3.0]
-        os: [ubuntu-latest]
-        openapi: [
-          "api-with-examples",
-          "callback-example",
-          "link-example",
-          "uber",
-          "uspto",
-          "petstore",
-          "petstore-expanded",
-          "petstore-minimal",
-          "petstore-simple",
-          "petstore-with-external-docs",
-          "hubspot-events",
-          "hubspot-webhooks",
-          "bot.paths"
-        ]
-    
-    uses: ./.github/workflows/template.yml
-    with:
-      format: ${{ matrix.format }}
-      version: ${{ matrix.version }}
-      openapi: ${{ matrix.openapi }}
-      os: ${{ matrix.os }}
-      command: dotnet run --project ../src/Refitter/Refitter.csproj --framework ${{ matrix.framework }}
-  
-  url:
-    strategy:
-      fail-fast: false
-      matrix:
-        framework: [net8.0]
-        os: [ubuntu-latest]
-        openapi_url: [
-          "https://petstore3.swagger.io/api/v3/openapi.json", 
-          "https://petstore3.swagger.io/api/v3/openapi.yaml"
-        ]
-
-    uses: ./.github/workflows/template-url.yml
-    with:
-      os: ${{ matrix.os }}
-      openapi: ${{ matrix.openapi_url }}
-      command: dotnet run --project ../src/Refitter/Refitter.csproj --framework ${{ matrix.framework }}
-
-  apizr:
+  script:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v4
 
-    - name: 🛠️ Generate code
-      run: dotnet run --project ../../src/Refitter/Refitter.csproj --framework net8.0 -- --settings-file petstore.apizr.refitter --no-logging
-      working-directory: test/Apizr
-
-    - name: 🛠️ Build
-      run: dotnet build Sample.csproj
-      working-directory: test/Apizr
-
+    - name: 🛠️ Run smoke test script
+      run: ./smoke-tests.ps1
+      working-directory: test
+      shell: pwsh

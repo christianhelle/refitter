@@ -38,7 +38,12 @@ function GenerateAndBuild {
         $csproj
     )
     
-    Get-ChildItem './GeneratedCode/*.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName -Force }
+    try {
+        Get-ChildItem './GeneratedCode/*.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName -Force }        
+    }
+    catch {
+        # Do nothing
+    }
 
     if ($args.Contains("settings-file")) {        
         Write-Host "refitter --no-logging $args"
