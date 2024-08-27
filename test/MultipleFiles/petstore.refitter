@@ -1,0 +1,25 @@
+{
+  "openApiPath": "../OpenAPI/v3.0/petstore.json",
+  "namespace": "Petstore",
+  "contractsNamespace": "Petstore.Contracts",
+  "outputFolder": "Client",
+  "contractsOutputFolder": "Contracts/",
+  "generateMultipleFiles": true,
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstore"
+  },
+  "dependencyInjectionSettings": {
+    "baseUrl": "https://petstore3.swagger.io/api/v3",
+    "transientErrorHandler": "HttpResilience",
+    "maxRetryCount": 3,
+    "firstBackoffRetryInSeconds": 0.5
+  },
+  "codeGeneratorSettings": {
+    "dateType": "System.DateTime",
+    "dateTimeType": "System.DateTime",
+    "arrayType": "System.Collections.Generic.IList"
+  },
+  "operationNameGenerator": "default",
+  "typeAccessibility": "public"
+}

@@ -275,3 +275,4 @@ test/**/*Hubspot*.cs
 src/.tools
 test/GeneratedCode/
 test/Apizr/GeneratedCode
+test/MultipleFiles/**/*.cs
