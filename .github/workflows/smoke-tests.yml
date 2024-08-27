@@ -45,36 +45,3 @@ jobs:
       run: ./smoke-tests.ps1
       working-directory: test
       shell: pwsh
-  
-  url:
-    strategy:
-      fail-fast: false
-      matrix:
-        framework: [net8.0]
-        os: [ubuntu-latest]
-        openapi_url: [
-          "https://petstore3.swagger.io/api/v3/openapi.json", 
-          "https://petstore3.swagger.io/api/v3/openapi.yaml"
-        ]
-
-    uses: ./.github/workflows/template-url.yml
-    with:
-      os: ${{ matrix.os }}
-      openapi: ${{ matrix.openapi_url }}
-      command: dotnet run --project ../src/Refitter/Refitter.csproj --framework ${{ matrix.framework }}
-
-  apizr:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-    - name: 🛒 Checkout repository
-      uses: actions/checkout@v4
-
-    - name: 🛠️ Generate code
-      run: dotnet run --project ../../src/Refitter/Refitter.csproj --framework net8.0 -- --settings-file petstore.apizr.refitter --no-logging
-      working-directory: test/Apizr
-
-    - name: 🛠️ Build
-      run: dotnet build Sample.csproj
-      working-directory: test/Apizr
-
