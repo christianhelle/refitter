@@ -155,15 +155,16 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         foreach (var outputFile in generatorOutput.Files)
         {
             if (
-                refitGeneratorSettings.ContractsOutputFolder != RefitGeneratorSettings.DefaultOutputFolder
+                !string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder)
+                && refitGeneratorSettings.ContractsOutputFolder != RefitGeneratorSettings.DefaultOutputFolder
                 && outputFile.Filename == FilenameConstants.Contracts
             )
             {
-                var contractsFolder = Path.GetDirectoryName(refitGeneratorSettings.ContractsOutputFolder);
+                var contractsFolder = Path.GetFullPath(refitGeneratorSettings.ContractsOutputFolder);
                 if (!string.IsNullOrWhiteSpace(contractsFolder) && !Directory.Exists(contractsFolder))
                     Directory.CreateDirectory(contractsFolder);
 
-                var contractsFile = Path.Combine(contractsFolder ?? "./", "./", outputFile.Filename);
+                var contractsFile = Path.Combine(contractsFolder ?? "./", outputFile.Filename);
                 AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(contractsFile)}[/]");
                 AnsiConsole.MarkupLine($"[green]Length: {outputFile.Content.Length} bytes[/]");
 
