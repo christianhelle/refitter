@@ -14,6 +14,7 @@ on:
       - "!.github/workflows/template.yml"
       - "!.github/workflows/template-url.yml"
       - "!.github/workflows/smoke-tests.yml"
+      - "!tests/smoke-tests.ps1"
     branches:
       - "*"
   pull_request:
@@ -28,42 +29,22 @@ on:
       - "!.github/workflows/template.yml"
       - "!.github/workflows/template-url.yml"
       - "!.github/workflows/smoke-tests.yml"
+      - "!tests/smoke-tests.ps1"
     branches:
       - "*"
 
 jobs:
   
-  file:
-    strategy:
-      fail-fast: false
-      matrix:
-        framework: [net8.0]
-        format: [json, yaml]
-        version: [v2.0, v3.0]
-        os: [ubuntu-latest]
-        openapi: [
-          "api-with-examples",
-          "callback-example",
-          "link-example",
-          "uber",
-          "uspto",
-          "petstore",
-          "petstore-expanded",
-          "petstore-minimal",
-          "petstore-simple",
-          "petstore-with-external-docs",
-          "hubspot-events",
-          "hubspot-webhooks",
-          "bot.paths"
-        ]
-    
-    uses: ./.github/workflows/template.yml
-    with:
-      format: ${{ matrix.format }}
-      version: ${{ matrix.version }}
-      openapi: ${{ matrix.openapi }}
-      os: ${{ matrix.os }}
-      command: dotnet run --project ../src/Refitter/Refitter.csproj --framework ${{ matrix.framework }}
+  script:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🛠️ Run smoke test script
+      run: ./smoke-test.ps1
+      working-directory: test
+      shell: pwsh
   
   url:
     strategy:
