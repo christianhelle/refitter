@@ -118,6 +118,7 @@ function RunTests {
     
     GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter"
     GenerateAndBuild -format " " -namespace " " -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj"
+    GenerateAndBuild -format " " -namespace " " -args "--settings-file ./MultipleFiles/petstore.refitter" -csproj "MultipleFiles/Client/Client.csproj"
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
