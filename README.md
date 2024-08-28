@@ -183,6 +183,7 @@ The following is an example `.refitter` file
   "optionalParameters": false, // Optional. Default=false
   "outputFolder": "../CustomOutput" // Optional. Default=./Generated
   "outputFilename": "RefitInterface.cs", // Optional. Default=Output.cs for CLI tool
+  "generateMultipleFiles": false, // Optional. Default=false
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"

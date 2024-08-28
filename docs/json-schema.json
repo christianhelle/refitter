@@ -153,6 +153,10 @@
       "type": "boolean",
       "description": "Set to true to wrap multiple query parameters into a single complex one."
     },
+    "generateMultipleFiles": {
+        "type": "boolean",
+        "description": "Set to `true` to generate multiple files. Refit interface(s) are written to a file called `RefitInterfaces.cs`, Contracts are written to a file called `Contracts.cs`, and Dependency Injection is written to a file called `DependencyInjection.cs`"
+    },
     "dependencyInjectionSettings": {
       "type": "object",
       "properties": {
