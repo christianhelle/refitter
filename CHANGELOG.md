@@ -6,6 +6,8 @@
 
 **Implemented enhancements:**
 
+- Support generating multiple files [\#427](https://github.com/christianhelle/refitter/issues/427)
+- Add support for customizing Contracts namespace and output path [\#446](https://github.com/christianhelle/refitter/pull/446) ([christianhelle](https://github.com/christianhelle))
 - Add support for generating multiple files [\#445](https://github.com/christianhelle/refitter/pull/445) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
