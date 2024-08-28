@@ -210,6 +210,9 @@ public class RefitGeneratorSettings
 
     /// <summary>
     /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
+    /// Refit interface(s) are written to a file called RefitInterfaces.cs
+    /// Contracts are written to a file called Contracts.cs
+    /// Dependency Injection is written to a file called DependencyInjection.cs
     /// </summary>
     public bool GenerateMultipleFiles { get; set; }
 }

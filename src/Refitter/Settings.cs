@@ -110,6 +110,17 @@ public sealed class Settings : CommandSettings
     [CommandOption("--multiple-interfaces")]
     public Core.MultipleInterfaces MultipleInterfaces { get; set; } = Core.MultipleInterfaces.Unset;
 
+    [Description("""
+                 Generate multiple files instead of a single large file. 
+                 The output files can be the following:
+                 - RefitInterfaces.cs
+                 - DependencyInjection.cs
+                 - Contracts.cs
+                 """)]
+    [CommandOption("--multiple-files")]
+    [DefaultValue(false)]
+    public bool GenerateMultipleFiles { get; set; }
+
     [Description("Only include Paths that match the provided regular expression. May be set multiple times.")]
     [CommandOption("--match-path")]
     [DefaultValue(new string[0])]
@@ -199,9 +210,4 @@ public sealed class Settings : CommandSettings
     [CommandOption("--use-dynamic-querystring-parameters")]
     [DefaultValue(false)]
     public bool UseDynamicQuerystringParameters { get; set; }
-
-    [Description("Generate multiple files")]
-    [CommandOption("--multiple-files")]
-    [DefaultValue(false)]
-    public bool GenerateMultipleFiles { get; set; }
 }
