@@ -735,6 +735,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
    using Polly;
    using Polly.Contrib.WaitAndRetry;
    using Polly.Extensions.Http;
+   using Refit;
 
     public static partial class IServiceCollectionExtensions
     {

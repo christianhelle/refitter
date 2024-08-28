@@ -10,6 +10,7 @@ namespace Refitter.Core;
 public class RefitGeneratorSettings
 {
     public const string DefaultOutputFolder = "./Generated";
+    public const string DefaultNamespace = "GeneratedCode";
 
     /// <summary>
     /// Gets or sets the path to the Open API.
@@ -19,7 +20,11 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
     /// </summary>
-    public string Namespace { get; set; } = "GeneratedCode";
+    public string Namespace { get; set; } = DefaultNamespace;
+
+    /// <summary>
+    /// Gets or sets the namespace for the generated contracts. (default: GeneratedCode);
+    public string? ContractsNamespace { get; set; }
 
     /// <summary>
     /// Gets or sets the naming settings.
@@ -143,6 +148,11 @@ public class RefitGeneratorSettings
     public string OutputFolder { get; set; } = DefaultOutputFolder;
 
     /// <summary>
+    /// Gets or sets the relative path to a folder where to store the generated contracts. (default: ./Generated)
+    /// </summary>
+    public string? ContractsOutputFolder { get; set; }
+
+    /// <summary>
     /// Gets or sets the filename of the generated code.
     /// For the CLI tool, the default is Output.cs
     /// For the Source Generator, this is the name of the generated class and the default is [.refitter defined naming OR .refitter filename].g.cs)
@@ -198,7 +208,12 @@ public class RefitGeneratorSettings
     /// </summary>
     public bool UseDynamicQuerystringParameters { get; set; }
 
+    /// <summary>
     /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
+    /// This is automatically set to <c>true</c> when <see cref="ContractsOutputFolder"/> is specified
+    /// Refit interface(s) are written to a file called RefitInterfaces.cs
+    /// Contracts are written to a file called Contracts.cs
+    /// Dependency Injection is written to a file called DependencyInjection.cs
     /// </summary>
     public bool GenerateMultipleFiles { get; set; }
 }

@@ -16,7 +16,7 @@ on:
       - "!.github/workflows/smoke-tests.yml"
       - "!test/smoke-tests.ps1"
     branches:
-      - "*"
+      - "main"
   pull_request:
     paths-ignore:
       - "**/*"

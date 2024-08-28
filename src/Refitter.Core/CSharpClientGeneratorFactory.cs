@@ -28,7 +28,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                 CodeGeneratorSettings = { PropertyNameGenerator = new CustomCSharpPropertyNameGenerator(), },
                 CSharpGeneratorSettings =
                 {
-                    Namespace = settings.Namespace,
+                    Namespace = settings.ContractsNamespace ?? settings.Namespace,
                     JsonLibrary = CSharpJsonLibrary.SystemTextJson,
                     TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant(),
                     ClassStyle =

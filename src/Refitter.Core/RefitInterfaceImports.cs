@@ -44,6 +44,11 @@ internal static class RefitInterfaceImports
             namespaces = namespaces.Except(excludedNamespaces).ToList();
         }
 
+        if (settings.GenerateMultipleFiles && settings.ContractsNamespace is not null)
+        {
+            namespaces.Add(settings.ContractsNamespace);
+        }
+
         return namespaces.ToArray();
     }
 

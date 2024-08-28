@@ -462,6 +462,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
 {
     using System;
     using Microsoft.Extensions.DependencyInjection;
+    using Refit;
 
     public static partial class IServiceCollectionExtensions
     {

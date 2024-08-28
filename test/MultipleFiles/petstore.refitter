@@ -1,14 +1,13 @@
 {
-  "openApiPath": "./OpenAPI/v3.0/petstore.json",
+  "openApiPath": "https://petstore3.swagger.io/api/v3/openapi.json",
   "namespace": "Petstore",
   "contractsNamespace": "Petstore.Contracts",
-  "outputFolder": "GeneratedCode",
-  "contractsOutputFolder": "GeneratedCode/Contracts/",
-  "outputFilename": "SwaggerPetstoreDirect.cs",
+  "outputFolder": "Client",
+  "contractsOutputFolder": "Contracts/",
   "generateMultipleFiles": true,
   "naming": {
     "useOpenApiTitle": false,
-    "interfaceName": "SwaggerPetstoreDirect"
+    "interfaceName": "SwaggerPetstore"
   },
   "dependencyInjectionSettings": {
     "baseUrl": "https://petstore3.swagger.io/api/v3",

@@ -9,7 +9,7 @@ on:
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
     branches:
-      - '*'
+      - 'main'
   pull_request:
     paths-ignore:
       - '**/*'

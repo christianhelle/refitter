@@ -8,6 +8,7 @@ The following is an example `.refitter` file
 {
   "openApiPath": "/path/to/your/openAPI", // Required
   "namespace": "Org.System.Service.Api.GeneratedCode", // Optional. Default=GeneratedCode
+  "contractsNamespace": "Org.System.Service.Api.GeneratedCode.Contracts", // Optional. Default=GeneratedCode
   "naming": {
     "useOpenApiTitle": false, // Optional. Default=true
     "interfaceName": "MyApiClient" // Optional. Default=ApiClient
@@ -30,8 +31,10 @@ The following is an example `.refitter` file
   "generateDeprecatedOperations": false, // Optional. Default=true
   "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName} when multipleInterfaces != ByEndpoint
   "optionalParameters": false, // Optional. Default=false
-  "outputFolder": "../CustomOutput" // Optional. Default=./Generated
+  "outputFolder": "../CustomOutput", // Optional. Default=./Generated
   "outputFilename": "RefitInterface.cs", // Optional. Default=Output.cs for CLI tool
+  "contractsOutputFolder": "../Contracts", // Optional. Default=NULL
+  "generateMultipleFiles": false, // Optional. Automatically set to true if contractsOutputFolder is specified. Default=false
   "additionalNamespaces": [ // Optional
     "Namespace1",
     "Namespace2"
@@ -120,6 +123,7 @@ The following is an example `.refitter` file
 
 - `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS
 - `namespace` - the namespace used in the generated code. If not specified, this defaults to `GeneratedCode`
+- `contractsNamespace` - the namespace used in the generated contracts. If not specified, this defaults to what `namespace` is set to
 - `naming.useOpenApiTitle` - a boolean indicating whether the OpenApi title should be used. Default is `true`
 - `naming.interfaceName` - the name of the generated interface. The generated code will automatically prefix this with `I` so if this set to `MyApiClient` then the generated interface is called `IMyApiClient`. Default is `ApiClient`
 - `generateContracts` - a boolean indicating whether contracts should be generated. A use case for this is several API clients use the same contracts. Default is `true`
@@ -135,6 +139,7 @@ The following is an example `.refitter` file
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
 - `outputFolder` - a string describing a relative path to a desired output folder. Default is `./Generated`
 - `outputFilename` - Output filename. Default is `Output.cs` when used from the CLI tool, otherwise its the .refitter filename. So `Petstore.refitter` becomes `Petstore.cs`.
+- `contractsOutputFolder` - a string describing a relative path to a desired output folder for the Contrats.cs file. By the default, this uses the value specified in `outputFolder`
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 - `excludeNamespaces` - A collection of regular expressions to exclude namespaces from the generated file. A use case for this is when your project has global usings where these namepsaces would be redundant. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
@@ -148,6 +153,7 @@ The following is an example `.refitter` file
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+- `generateMultipleFiles`: Set to `true` to generate multiple files. This is automatically set to `true` when `ContractsOutputFolder` is specified. Refit interface(s) are written to a file called `RefitInterfaces.cs`, Contracts are written to a file called `Contracts.cs`, and Dependency Injection is written to a file called `DependencyInjection.cs`
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
@@ -209,6 +215,10 @@ The following is an example `.refitter` file
         "namespace": {
             "type": "string",
             "description": "The namespace for the generated code."
+        },
+        "contractsNamespace": {
+            "type": "string",
+            "description": "The namespace for the generated contracts code."
         },
         "naming": {
             "type": "object",
@@ -286,6 +296,10 @@ The following is an example `.refitter` file
             "type": "string",
             "description": "The output filename for the generated code."
         },
+        "contractsOutputFolder": {
+            "type": "string",
+            "description": "The output folder for the generated contracts code",
+        },
         "additionalNamespaces": {
             "type": "array",
             "items": {
@@ -352,6 +366,10 @@ The following is an example `.refitter` file
         "useDynamicQuerystringParameters": {
             "type": "boolean",
             "description": "Set to true to wrap multiple query parameters into a single complex one."
+        },
+        "generateMultipleFiles": {
+            "type": "boolean",
+            "description": "Set to `true` to generate multiple files. This is automatically set to `true` when `ContractsOutputFolder` is specified. Refit interface(s) are written to a file called `RefitInterfaces.cs`, Contracts are written to a file called `Contracts.cs`, and Dependency Injection is written to a file called `DependencyInjection.cs`"
         },
         "dependencyInjectionSettings": {
             "type": "object",

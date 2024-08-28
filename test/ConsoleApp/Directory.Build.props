@@ -8,7 +8,7 @@
         <Compile Include="..\Program.cs">
             <Link>Program.cs</Link>
         </Compile>
-        <Compile Include="../../GeneratedCode/*.cs" />
+        <Compile Include="../../GeneratedCode/**/*.cs" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
