@@ -210,6 +210,7 @@ public class RefitGeneratorSettings
 
     /// <summary>
     /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
+    /// This is automatically set to <c>true</c> when <see cref="ContractsOutputFolder"/> is specified
     /// Refit interface(s) are written to a file called RefitInterfaces.cs
     /// Contracts are written to a file called Contracts.cs
     /// Dependency Injection is written to a file called DependencyInjection.cs
