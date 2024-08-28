@@ -158,6 +158,7 @@ The following is an example `.refitter` file
 {
   "openApiPath": "/path/to/your/openAPI", // Required
   "namespace": "Org.System.Service.Api.GeneratedCode", // Optional. Default=GeneratedCode
+  "contractsNamespace": "Org.System.Service.Api.GeneratedCode.Contracts", // Optional. Default=GeneratedCode
   "naming": {
     "useOpenApiTitle": false, // Optional. Default=true
     "interfaceName": "MyApiClient" // Optional. Default=ApiClient
@@ -183,6 +184,7 @@ The following is an example `.refitter` file
   "optionalParameters": false, // Optional. Default=false
   "outputFolder": "../CustomOutput" // Optional. Default=./Generated
   "outputFilename": "RefitInterface.cs", // Optional. Default=Output.cs for CLI tool
+  "contractsOutputFolder": "../Contracts", // Optional. Default=NULL
   "generateMultipleFiles": false, // Optional. Default=false
   "additionalNamespaces": [ // Optional
     "Namespace1",
