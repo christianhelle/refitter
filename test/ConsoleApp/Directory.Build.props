@@ -3,6 +3,7 @@
         <OutputType>Exe</OutputType>
         <LangVersion>latest</LangVersion>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="..\Program.cs">
