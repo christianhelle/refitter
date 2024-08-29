@@ -31,7 +31,7 @@ function GenerateAndBuild {
 
         [Parameter(Mandatory=$false)]
         [bool]
-        $netCore = $false,
+        $netCore = $true,
 
         [Parameter(Mandatory=$false)]
         [string]
@@ -146,7 +146,7 @@ function RunTests {
                     GenerateAndBuild -format $format -namespace "$namespace.TagFiltered" -outputPath "TagFiltered$outputPath" -args "--tag pet --tag user --tag store"
                     GenerateAndBuild -format $format -namespace "$namespace.MatchPathFiltered" -outputPath "MatchPathFiltered$outputPath" -args "--match-path ^/pet/.*"
                     GenerateAndBuild -format $format -namespace "$namespace.ContractOnly" -outputPath "ContractOnly$outputPath" -args "--contract-only"
-                    GenerateAndBuild -format $format -namespace "$namespace.ImmutableRecords" -outputPath "ImmutableRecords$outputPath" -args "--immutable-records" -netCore $true
+                    GenerateAndBuild -format $format -namespace "$namespace.ImmutableRecords" -outputPath "ImmutableRecords$outputPath" -args "--immutable-records"
                 }
             }
         }
