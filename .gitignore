@@ -276,3 +276,4 @@ src/.tools
 test/GeneratedCode/
 test/Apizr/GeneratedCode
 test/MultipleFiles/**/*.cs
+test/HelloWorld/HelloWorld/Output.cs
