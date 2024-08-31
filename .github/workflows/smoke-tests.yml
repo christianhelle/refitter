@@ -34,12 +34,15 @@ on:
       - "*"
 
 jobs:
-  
+
   script:
     runs-on: ubuntu-latest
     steps:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0'
 
     - name: 🛠️ Run smoke test script
       run: ./smoke-tests.ps1
