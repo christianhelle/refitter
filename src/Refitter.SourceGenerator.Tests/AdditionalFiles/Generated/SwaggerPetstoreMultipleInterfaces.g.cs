@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 
 using Refitter.Tests.AdditionalFiles.SingeInterface;
 
-#nullable enable
+#nullable enable annotations
+
 namespace Refitter.Tests.AdditionalFiles.ByEndpoint
 {
     /// <summary>Update an existing pet</summary>
