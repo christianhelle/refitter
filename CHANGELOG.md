@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.54...HEAD)
+
+**Implemented enhancements:**
+
+- Enable nullable annotations and disable warnings [\#452](https://github.com/christianhelle/refitter/pull/452) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Explicit \#nullable enable introduced v1.2.0 produces excessive warnings [\#451](https://github.com/christianhelle/refitter/issues/451)
+
+## [1.2.1-preview.54](https://github.com/christianhelle/refitter/tree/1.2.1-preview.54) (2024-08-29)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.54)
 
 **Implemented enhancements:**
 
