@@ -227,7 +227,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
 
         code.AppendLine("#nullable enable annotations");
-        code.AppendLine("#nullable disable warnings");
+        code.AppendLine();
 
         var refitInterfaces = interfaceGenerator.GenerateCode();
         code.AppendLine($$"""
