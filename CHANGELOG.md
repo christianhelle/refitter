@@ -1,26 +1,19 @@
 # Changelog
 
-## [1.2.1-preview.55](https://github.com/christianhelle/refitter/tree/1.2.1-preview.55) (2024-09-02)
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.54...1.2.1-preview.55)
-
-**Implemented enhancements:**
-
-- Enable nullable annotations and disable warnings [\#452](https://github.com/christianhelle/refitter/pull/452) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- Explicit \#nullable enable introduced v1.2.0 produces excessive warnings [\#451](https://github.com/christianhelle/refitter/issues/451)
-
-## [1.2.1-preview.54](https://github.com/christianhelle/refitter/tree/1.2.1-preview.54) (2024-08-29)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.54)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...HEAD)
 
 **Implemented enhancements:**
 
 - Support generating multiple files [\#427](https://github.com/christianhelle/refitter/issues/427)
+- Enable nullable annotations and disable warnings [\#452](https://github.com/christianhelle/refitter/pull/452) ([christianhelle](https://github.com/christianhelle))
 - Add support for customizing Contracts namespace and output path [\#446](https://github.com/christianhelle/refitter/pull/446) ([christianhelle](https://github.com/christianhelle))
 - Add support for generating multiple files [\#445](https://github.com/christianhelle/refitter/pull/445) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Explicit \#nullable enable introduced v1.2.0 produces excessive warnings [\#451](https://github.com/christianhelle/refitter/issues/451)
 
 **Merged pull requests:**
 
