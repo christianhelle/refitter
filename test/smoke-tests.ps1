@@ -1,6 +1,6 @@
 param (
     [Parameter(Mandatory=$false)]
-    [bool]
+    [switch]
     $Parallel = $true,
 
     [Parameter(Mandatory=$false)]
@@ -197,6 +197,14 @@ function RunTests {
             throw "Build Failed!"
         }
     }
+}
+
+if ($UseProduction) {
+    Write-Host "Running smoke tests in production mode"
+    Write-Host "dotnet tool update -g refitter --prerelease"
+    Start-Process "dotnet" -Args "tool update -g refitter --prerelease" -NoNewWindow -PassThru | Wait-Process
+    ThrowOnNativeFailure
+    Write-Host "`r`n"
 }
 
 Measure-Command { RunTests -Method "dotnet-run" -Parallel $Parallel -buildFromSource (!$UseProduction) }
