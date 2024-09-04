@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-49-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-50-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -2612,6 +2612,9 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/bastiennoel93"><img src="https://avatars.githubusercontent.com/u/18250350?v=4?s=100" width="100px;" alt="bastien.noel"/><br /><sub><b>bastien.noel</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abastiennoel93" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MeikelLP"><img src="https://avatars.githubusercontent.com/u/11669846?v=4?s=100" width="100px;" alt="Meikel Philipp"/><br /><sub><b>Meikel Philipp</b></sub></a><br /><a href="#ideas-MeikelLP" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://berkselvi.dev"><img src="https://avatars.githubusercontent.com/u/54676516?v=4?s=100" width="100px;" alt="Berk Selvi"/><br /><sub><b>Berk Selvi</b></sub></a><br /><a href="#ideas-berkslv" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=berkslv" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.thebuildsheet.com/"><img src="https://avatars.githubusercontent.com/u/9909564?v=4?s=100" width="100px;" alt="Joshua Ozeri"/><br /><sub><b>Joshua Ozeri</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AXeClutch" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
