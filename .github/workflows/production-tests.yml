@@ -13,34 +13,23 @@ on:
 
 jobs:
 
-  cli:
+  script:
     strategy:
       fail-fast: false
       matrix:
-        format: [json, yaml]
-        version: [v2.0, v3.0]
         os: [macos-latest, windows-latest, ubuntu-latest]
-        openapi: [
-          "api-with-examples",
-          "callback-example",
-          "link-example",
-          "uber",
-          "uspto",
-          "petstore",
-          "petstore-expanded",
-          "petstore-minimal",
-          "petstore-simple",
-          "petstore-with-external-docs",
-          "hubspot-events",
-          "hubspot-webhooks"
-        ]
-    uses: ./.github/workflows/template.yml
-    with:
-      os: ${{ matrix.os }}
-      format: ${{ matrix.format }}
-      version: ${{ matrix.version }}
-      openapi: ${{ matrix.openapi }}
-      command: 'dotnet tool install --global --prerelease refitter; refitter'
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0'
+
+    - name: 🛠️ Run smoke test script
+      run: ./smoke-tests.ps1 -UseProduction
+      working-directory: test
+      shell: pwsh
 
   sourcegenerator:
     strategy:
