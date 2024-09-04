@@ -1,6 +1,6 @@
 param (
     [Parameter(Mandatory=$false)]
-    [switch]
+    [bool]
     $Parallel = $true,
 
     [Parameter(Mandatory=$false)]
@@ -34,8 +34,8 @@ function GenerateAndBuild {
         $args,
 
         [Parameter(Mandatory=$false)]
-        [bool]
-        $netCore = $true,
+        [switch]
+        $netCore = $false,
 
         [Parameter(Mandatory=$false)]
         [string]
@@ -165,7 +165,7 @@ function RunTests {
                     GenerateAndBuild -format $format -namespace "$namespace.TagFiltered" -outputPath "TagFiltered$outputPath" -args "--tag pet --tag user --tag store" -buildFromSource $buildFromSource
                     GenerateAndBuild -format $format -namespace "$namespace.MatchPathFiltered" -outputPath "MatchPathFiltered$outputPath" -args "--match-path ^/pet/.*" -buildFromSource $buildFromSource
                     GenerateAndBuild -format $format -namespace "$namespace.ContractOnly" -outputPath "ContractOnly$outputPath" -args "--contract-only" -buildFromSource $buildFromSource
-                    GenerateAndBuild -format $format -namespace "$namespace.ImmutableRecords" -outputPath "ImmutableRecords$outputPath" -args "--immutable-records" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.ImmutableRecords" -outputPath "ImmutableRecords$outputPath" -args "--immutable-records" -buildFromSource $buildFromSource -netCore
                 }
             }
         }
