@@ -462,6 +462,15 @@
         "ideas",
         "code"
       ]
+    },
+    {
+      "login": "XeClutch",
+      "name": "Joshua Ozeri",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9909564?v=4",
+      "profile": "https://www.thebuildsheet.com/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
