@@ -19,6 +19,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency microsoft.net.test.sdk to 17.11.1 [\#456](https://github.com/christianhelle/refitter/pull/456) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add XeClutch as a contributor for bug [\#454](https://github.com/christianhelle/refitter/pull/454) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency microsoft.net.test.sdk to v17.11.0 [\#444](https://github.com/christianhelle/refitter/pull/444) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency atc.test to v1.0.96 [\#442](https://github.com/christianhelle/refitter/pull/442) ([renovate[bot]](https://github.com/apps/renovate))
