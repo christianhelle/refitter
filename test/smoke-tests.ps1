@@ -177,8 +177,13 @@ function RunTests {
 
         Get-ChildItem '*.generated.cs' -Recurse | foreach { Remove-Item -Path $_.FullName }
 
+        $processPath = "./bin/refitter"
+        if ($buildFromSource -eq $false) {
+            $processPath = "refitter"
+        }
+
         Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
-        $process = Start-Process "./bin/refitter" `
+        $process = Start-Process $processPath `
             -Args """$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
             -NoNewWindow `
             -PassThru
