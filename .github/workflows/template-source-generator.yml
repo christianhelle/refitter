@@ -19,6 +19,11 @@ jobs:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v4
 
-    - name: 🛠️ Build SourceGenerator.sln
+    - name: 🛠️ Generate Code
       run: dotnet build
-      working-directory: test/SourceGenerator
+      working-directory: test/SourceGenerator/Net8
+      continue-on-error: true
+
+    - name: 🛠️ Build
+      run: dotnet build
+      working-directory: test/SourceGenerator/Net8

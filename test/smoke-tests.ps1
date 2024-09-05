@@ -1,7 +1,11 @@
 param (
     [Parameter(Mandatory=$false)]
     [bool]
-    $Parallel = $true
+    $Parallel = $true,
+
+    [Parameter(Mandatory=$false)]
+    [switch]
+    $UseProduction = $false
 )
 
 function ThrowOnNativeFailure {
@@ -16,44 +20,53 @@ function GenerateAndBuild {
         [Parameter(Mandatory=$true)]
         [string]
         $format,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         $namespace,
-        
+
         [Parameter(Mandatory=$false)]
         [string]
         $outputPath,
-        
+
         [Parameter(Mandatory=$false)]
         [string]
         $args,
 
         [Parameter(Mandatory=$false)]
-        [bool]
+        [switch]
         $netCore = $false,
 
         [Parameter(Mandatory=$false)]
         [string]
-        $csproj
+        $csproj,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $buildFromSource = $true
     )
-    
+
     try {
-        Get-ChildItem './GeneratedCode/*.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName -Force }        
+        Get-ChildItem './GeneratedCode/*.cs' -Recurse | ForEach-Object { Remove-Item -Path $_.FullName -Force }
     }
     catch {
         # Do nothing
     }
 
-    if ($args.Contains("settings-file")) {        
+    $processPath = "./bin/refitter"
+    if ($buildFromSource -eq $false) {
+        $processPath = "refitter"
+    }
+
+    if ($args.Contains("settings-file")) {
         Write-Host "refitter --no-logging $args"
-        $process = Start-Process "./bin/refitter" `
+        $process = Start-Process $processPath `
             -Args "--no-logging $args" `
             -NoNewWindow `
             -PassThru
-    } else {        
+    } else {
         Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
-        $process = Start-Process "./bin/refitter" `
+        $process = Start-Process  $processPath `
             -Args "./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
             -NoNewWindow `
             -PassThru
@@ -91,13 +104,17 @@ function RunTests {
         [ValidateSet("dotnet-run", "refitter")]
         [string]
         $Method,
-        
+
         [Parameter(Mandatory=$false)]
         [bool]
-        $Parallel = $false
+        $Parallel = $false,
+
+        [Parameter(Mandatory=$false)]
+        [bool]
+        $BuildFromSource = $true
     )
 
-    $filenames = @(        
+    $filenames = @(
         "bot.paths",
         "petstore",
         "petstore-expanded",
@@ -112,17 +129,19 @@ function RunTests {
         "hubspot-events",
         "hubspot-webhooks"
     )
-    
-    Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0"
-    Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
-    
-    GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter"
-    GenerateAndBuild -format " " -namespace " " -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj"
-    GenerateAndBuild -format " " -namespace " " -args "--settings-file ./MultipleFiles/petstore.refitter" -csproj "MultipleFiles/Client/Client.csproj"
+
+    if ($BuildFromSource) {
+        Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0"
+        Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
+    }
+
+    GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter" -buildFromSource $buildFromSource
+    GenerateAndBuild -format " " -namespace " " -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj" -buildFromSource $buildFromSource
+    GenerateAndBuild -format " " -namespace " " -args "--settings-file ./MultipleFiles/petstore.refitter" -csproj "MultipleFiles/Client/Client.csproj" -buildFromSource $buildFromSource
 
     "v3.0", "v2.0" | ForEach-Object {
         $version = $_
-        "json", "yaml" | ForEach-Object {            
+        "json", "yaml" | ForEach-Object {
             $format = $_
             $filenames | ForEach-Object {
                 $filename = "./OpenAPI/$version/$_.$format"
@@ -134,32 +153,37 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
-                    GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -args "--multiple-files"
-                    GenerateAndBuild -format $format -namespace "$namespace.SeparateContractsFile" -args "--contracts-output GeneratedCode/Contracts --contracts-namespace $namespace.SeparateContractsFile.Contracts"
-                    GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens"
-                    GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal"
-                    GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response"
-                    GenerateAndBuild -format $format -namespace "$namespace.UsingIObservable" -outputPath "IObservable$outputPath" -args "--use-observable-response"
-                    GenerateAndBuild -format $format -namespace "$namespace.UsingIsoDateFormat" -outputPath "UsingIsoDateFormat$outputPath" -args "--use-iso-date-format"
-                    GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfaces" -outputPath "MultipleInterfaces$outputPath" -args "--multiple-interfaces ByEndpoint"
-                    GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfaces" -outputPath "MultipleInterfacesWithCustomName$outputPath" -args "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync"
-                    GenerateAndBuild -format $format -namespace "$namespace.TagFiltered" -outputPath "TagFiltered$outputPath" -args "--tag pet --tag user --tag store"
-                    GenerateAndBuild -format $format -namespace "$namespace.MatchPathFiltered" -outputPath "MatchPathFiltered$outputPath" -args "--match-path ^/pet/.*"
-                    GenerateAndBuild -format $format -namespace "$namespace.ContractOnly" -outputPath "ContractOnly$outputPath" -args "--contract-only"
-                    GenerateAndBuild -format $format -namespace "$namespace.ImmutableRecords" -outputPath "ImmutableRecords$outputPath" -args "--immutable-records" -netCore $true
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -args "--multiple-files" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.SeparateContractsFile" -args "--contracts-output GeneratedCode/Contracts --contracts-namespace $namespace.SeparateContractsFile.Contracts" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.UsingApiResponse" -outputPath "IApi$outputPath" -args "--use-api-response" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.UsingIObservable" -outputPath "IObservable$outputPath" -args "--use-observable-response" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.UsingIsoDateFormat" -outputPath "UsingIsoDateFormat$outputPath" -args "--use-iso-date-format" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfaces" -outputPath "MultipleInterfaces$outputPath" -args "--multiple-interfaces ByEndpoint" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfaces" -outputPath "MultipleInterfacesWithCustomName$outputPath" -args "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.TagFiltered" -outputPath "TagFiltered$outputPath" -args "--tag pet --tag user --tag store" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.MatchPathFiltered" -outputPath "MatchPathFiltered$outputPath" -args "--match-path ^/pet/.*" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.ContractOnly" -outputPath "ContractOnly$outputPath" -args "--contract-only" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.ImmutableRecords" -outputPath "ImmutableRecords$outputPath" -args "--immutable-records" -buildFromSource $buildFromSource -netCore
                 }
             }
         }
-    }        
-    
+    }
+
     "https://petstore3.swagger.io/api/v3/openapi.json", "https://petstore3.swagger.io/api/v3/openapi.yaml" | ForEach-Object {
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.generated.cs"
-        
+
         Get-ChildItem '*.generated.cs' -Recurse | foreach { Remove-Item -Path $_.FullName }
 
+        $processPath = "./bin/refitter"
+        if ($buildFromSource -eq $false) {
+            $processPath = "refitter"
+        }
+
         Write-Host "refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
-        $process = Start-Process "./bin/refitter" `
+        $process = Start-Process $processPath `
             -Args """$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
             -NoNewWindow `
             -PassThru
@@ -167,7 +191,7 @@ function RunTests {
         if ($process.ExitCode -ne 0) {
             throw "Refitter failed"
         }
-        
+
         Write-Host "`r`nBuilding ConsoleApp`r`n"
         $process = Start-Process "dotnet" `
             -Args "build ./ConsoleApp/ConsoleApp.sln" `
@@ -180,5 +204,13 @@ function RunTests {
     }
 }
 
-Measure-Command { RunTests -Method "dotnet-run" -Parallel $Parallel }
+if ($UseProduction) {
+    Write-Host "Running smoke tests in production mode"
+    Write-Host "dotnet tool update -g refitter --prerelease"
+    Start-Process "dotnet" -Args "tool update -g refitter --prerelease" -NoNewWindow -PassThru | Wait-Process
+    ThrowOnNativeFailure
+    Write-Host "`r`n"
+}
+
+Measure-Command { RunTests -Method "dotnet-run" -Parallel $Parallel -buildFromSource (!$UseProduction) }
 Write-Host "`r`n"
