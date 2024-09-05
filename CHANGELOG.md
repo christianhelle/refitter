@@ -7,16 +7,19 @@
 **Implemented enhancements:**
 
 - Support generating multiple files [\#427](https://github.com/christianhelle/refitter/issues/427)
+- Handle '%' in property names [\#455](https://github.com/christianhelle/refitter/pull/455) ([christianhelle](https://github.com/christianhelle))
 - Enable nullable annotations and disable warnings [\#452](https://github.com/christianhelle/refitter/pull/452) ([christianhelle](https://github.com/christianhelle))
 - Add support for customizing Contracts namespace and output path [\#446](https://github.com/christianhelle/refitter/pull/446) ([christianhelle](https://github.com/christianhelle))
 - Add support for generating multiple files [\#445](https://github.com/christianhelle/refitter/pull/445) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
+- Percent symbol '%' can be inserted as a property name [\#453](https://github.com/christianhelle/refitter/issues/453)
 - Explicit \#nullable enable introduced v1.2.0 produces excessive warnings [\#451](https://github.com/christianhelle/refitter/issues/451)
 
 **Merged pull requests:**
 
+- docs: add XeClutch as a contributor for bug [\#454](https://github.com/christianhelle/refitter/pull/454) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency microsoft.net.test.sdk to v17.11.0 [\#444](https://github.com/christianhelle/refitter/pull/444) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency atc.test to v1.0.96 [\#442](https://github.com/christianhelle/refitter/pull/442) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency atc.test to v1.0.93 [\#441](https://github.com/christianhelle/refitter/pull/441) ([renovate[bot]](https://github.com/apps/renovate))
