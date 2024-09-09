@@ -471,6 +471,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "ryanheath",
+      "name": "Ryan Heath",
+      "avatar_url": "https://avatars.githubusercontent.com/u/701534?v=4",
+      "profile": "https://kancane.nl/",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
