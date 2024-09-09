@@ -210,4 +210,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--use-dynamic-querystring-parameters")]
     [DefaultValue(false)]
     public bool UseDynamicQuerystringParameters { get; set; }
+
+    [Description("Set to <c>true</c> to use System.Text.Json polymorphic serialization.")]
+    [CommandOption("--use-system-text-json-polymorphic-serialization")]
+    [DefaultValue(false)]
+    public bool UseSystemTextJsonPolymorphicSerialization { get; set; }
 }

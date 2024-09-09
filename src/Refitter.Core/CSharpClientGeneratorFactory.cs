@@ -1,3 +1,5 @@
+using System.Reflection;
+using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 
 using NSwag;
@@ -17,30 +19,43 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             }
         }
 
+        var csharpClientGeneratorSettings = new CSharpClientGeneratorSettings
+        {
+            GenerateClientClasses = false,
+            GenerateDtoTypes = true,
+            GenerateClientInterfaces = false,
+            GenerateExceptionClasses = false,
+            CodeGeneratorSettings = { PropertyNameGenerator = new CustomCSharpPropertyNameGenerator(), },
+            CSharpGeneratorSettings =
+            {
+                Namespace = settings.ContractsNamespace ?? settings.Namespace,
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant(),
+                ClassStyle =
+                    settings.ImmutableRecords ||
+                    settings.CodeGeneratorSettings?.GenerateNativeRecords is true
+                    ? CSharpClassStyle.Record
+                    : CSharpClassStyle.Poco,
+                GenerateNativeRecords =
+                    settings.ImmutableRecords ||
+                    settings.CodeGeneratorSettings?.GenerateNativeRecords is true,
+            }
+        };
+
+        if (settings.UseSystemTextJsonPolymorphicSerialization)
+        {
+            csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(
+                csharpClientGeneratorSettings.CSharpGeneratorSettings,
+                [
+                    typeof(CSharpGenerator).Assembly,
+                    typeof(CSharpGeneratorBaseSettings).Assembly,
+                    typeof(CustomTemplateFactory).Assembly,
+                ]);
+        }
+
         var generator = new CustomCSharpClientGenerator(
             document,
-            new CSharpClientGeneratorSettings
-            {
-                GenerateClientClasses = false,
-                GenerateDtoTypes = true,
-                GenerateClientInterfaces = false,
-                GenerateExceptionClasses = false,
-                CodeGeneratorSettings = { PropertyNameGenerator = new CustomCSharpPropertyNameGenerator(), },
-                CSharpGeneratorSettings =
-                {
-                    Namespace = settings.ContractsNamespace ?? settings.Namespace,
-                    JsonLibrary = CSharpJsonLibrary.SystemTextJson,
-                    TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant(),
-                    ClassStyle =
-                        settings.ImmutableRecords ||
-                        settings.CodeGeneratorSettings?.GenerateNativeRecords is true
-                        ? CSharpClassStyle.Record
-                        : CSharpClassStyle.Poco,
-                    GenerateNativeRecords =
-                        settings.ImmutableRecords ||
-                        settings.CodeGeneratorSettings?.GenerateNativeRecords is true,
-                }
-            });
+            csharpClientGeneratorSettings);
 
         MapCSharpGeneratorSettings(
             settings.CodeGeneratorSettings,
@@ -80,6 +95,44 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             }
 
             settingsProperty.SetValue(destination, value);
+        }
+    }
+
+    /// <summary>
+    /// custom template factory
+    /// solely for the purpose of supporting UseSystemTextJsonPolymorphicSerialization
+    /// This class and its templates should be removed when NSwag supports this feature.
+    /// </summary>
+    private class CustomTemplateFactory : NSwag.CodeGeneration.DefaultTemplateFactory
+    {
+        /// <summary>Initializes a new instance of the <see cref="DefaultTemplateFactory" /> class.</summary>
+        /// <param name="settings">The settings.</param>
+        /// <param name="assemblies">The assemblies.</param>
+        public CustomTemplateFactory(CodeGeneratorSettingsBase settings, Assembly[] assemblies)
+            : base(settings, assemblies)
+        {
+        }
+
+        /// <summary>Tries to load an embedded Liquid template.</summary>
+        /// <param name="language">The language.</param>
+        /// <param name="template">The template name.</param>
+        /// <returns>The template.</returns>
+        protected override string GetEmbeddedLiquidTemplate(string language, string template)
+        {
+            template = template.TrimEnd('!');
+            var assembly = GetLiquidAssembly("Refitter.Core");
+            var resourceName = $"Refitter.Core.Templates.{template}.liquid";
+
+            var resource = assembly.GetManifestResourceStream(resourceName);
+            if (resource != null)
+            {
+                using (var reader = new StreamReader(resource))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+
+            return base.GetEmbeddedLiquidTemplate(language, template);
         }
     }
 }

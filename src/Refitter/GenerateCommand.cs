@@ -131,7 +131,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             UseDynamicQuerystringParameters = settings.UseDynamicQuerystringParameters,
             GenerateMultipleFiles = settings.GenerateMultipleFiles || !string.IsNullOrWhiteSpace(settings.ContractsOutputPath),
             ContractsOutputFolder = settings.ContractsOutputPath ?? settings.OutputPath,
-            ContractsNamespace = settings.ContractsNamespace
+            ContractsNamespace = settings.ContractsNamespace,
+            UseSystemTextJsonPolymorphicSerialization = settings.UseSystemTextJsonPolymorphicSerialization,
         };
     }
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace Refitter.Core;
@@ -216,4 +216,10 @@ public class RefitGeneratorSettings
     /// Dependency Injection is written to a file called DependencyInjection.cs
     /// </summary>
     public bool GenerateMultipleFiles { get; set; }
+
+    /// <summary>
+    /// Set to <c>true</c> to use System.Text.Json polymorphic serialization. Default is <c>false</c>
+    /// Gets a value indicating whether to use System.Text.Json polymorphic serialization
+    /// </summary>
+    public bool UseSystemTextJsonPolymorphicSerialization { get; set; }
 }

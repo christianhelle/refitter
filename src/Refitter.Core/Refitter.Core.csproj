@@ -23,4 +23,12 @@
     </AssemblyAttribute>
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\*.liquid" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Templates\Class.liquid" />
+  </ItemGroup>
+
 </Project>
