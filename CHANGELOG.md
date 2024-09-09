@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.56...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency fluentassertions to 6.12.1 [\#461](https://github.com/christianhelle/refitter/pull/461) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [1.2.1-preview.56](https://github.com/christianhelle/refitter/tree/1.2.1-preview.56) (2024-09-05)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.56)
