@@ -120,8 +120,8 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         protected override string GetEmbeddedLiquidTemplate(string language, string template)
         {
             template = template.TrimEnd('!');
-            var assembly = GetLiquidAssembly("Refitter.Core");
-            var resourceName = $"Refitter.Core.Templates.{template}.liquid";
+            var assembly = Assembly.GetExecutingAssembly(); // this code is running in Refitter.Core and Refitter.SourceGenerator
+            var resourceName = $"{assembly.GetName().Name}.Templates.{template}.liquid";
 
             var resource = assembly.GetManifestResourceStream(resourceName);
             if (resource != null)
