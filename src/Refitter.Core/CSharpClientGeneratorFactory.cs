@@ -42,20 +42,18 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             }
         };
 
-        if (settings.UsePolymorphicSerialization)
-        {
-            csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(
-                csharpClientGeneratorSettings.CSharpGeneratorSettings,
-                [
-                    typeof(CSharpGenerator).Assembly,
-                    typeof(CSharpGeneratorBaseSettings).Assembly,
-                    typeof(CustomTemplateFactory).Assembly,
-                ]);
-        }
+        csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(
+            csharpClientGeneratorSettings.CSharpGeneratorSettings,
+            [
+                typeof(CSharpGenerator).Assembly,
+                typeof(CSharpGeneratorBaseSettings).Assembly,
+                typeof(CustomTemplateFactory).Assembly,
+            ]);
 
         var generator = new CustomCSharpClientGenerator(
             document,
-            csharpClientGeneratorSettings);
+            csharpClientGeneratorSettings,
+            settings.UsePolymorphicSerialization);
 
         MapCSharpGeneratorSettings(
             settings.CodeGeneratorSettings,
