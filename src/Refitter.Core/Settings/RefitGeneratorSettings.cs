@@ -221,5 +221,5 @@ public class RefitGeneratorSettings
     /// Set to <c>true</c> to use System.Text.Json polymorphic serialization. Default is <c>false</c>
     /// Gets a value indicating whether to use System.Text.Json polymorphic serialization
     /// </summary>
-    public bool UseSystemTextJsonPolymorphicSerialization { get; set; }
+    public bool UsePolymorphicSerialization { get; set; }
 }

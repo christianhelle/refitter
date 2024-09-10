@@ -132,7 +132,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             GenerateMultipleFiles = settings.GenerateMultipleFiles || !string.IsNullOrWhiteSpace(settings.ContractsOutputPath),
             ContractsOutputFolder = settings.ContractsOutputPath ?? settings.OutputPath,
             ContractsNamespace = settings.ContractsNamespace,
-            UseSystemTextJsonPolymorphicSerialization = settings.UseSystemTextJsonPolymorphicSerialization,
+            UsePolymorphicSerialization = settings.UsePolymorphicSerialization,
         };
     }
 

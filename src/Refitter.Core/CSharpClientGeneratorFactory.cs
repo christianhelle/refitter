@@ -42,7 +42,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             }
         };
 
-        if (settings.UseSystemTextJsonPolymorphicSerialization)
+        if (settings.UsePolymorphicSerialization)
         {
             csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(
                 csharpClientGeneratorSettings.CSharpGeneratorSettings,
@@ -100,7 +100,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 
     /// <summary>
     /// custom template factory
-    /// solely for the purpose of supporting UseSystemTextJsonPolymorphicSerialization
+    /// solely for the purpose of supporting UsePolymorphicSerialization
     /// This class and its templates should be removed when NSwag supports this feature.
     /// </summary>
     private class CustomTemplateFactory : NSwag.CodeGeneration.DefaultTemplateFactory

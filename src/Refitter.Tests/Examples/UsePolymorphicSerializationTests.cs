@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Refitter.Tests.Examples;
 
-public class UseSystemTextJsonPolymorphicSerializationTests
+public class UsePolymorphicSerializationTests
 {
     private const string OpenApiSpec = @"
 openapi: 3.0.1
@@ -196,7 +196,7 @@ components:
     }
 
     [Fact]
-    public async Task Use_SystemTextJson_Polymorphic_Serialization()
+    public async Task Use_Polymorphic_Serialization()
     {
         string generateCode = await GenerateCode();
 
@@ -227,7 +227,7 @@ components:
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
-            UseSystemTextJsonPolymorphicSerialization = true
+            UsePolymorphicSerialization = true
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
