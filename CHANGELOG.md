@@ -6,7 +6,9 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency atc.test to 1.0.98 [\#464](https://github.com/christianhelle/refitter/pull/464) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to 6.12.1 [\#461](https://github.com/christianhelle/refitter/pull/461) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add ryanheath as a contributor for ideas [\#460](https://github.com/christianhelle/refitter/pull/460) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
 ## [1.2.1-preview.56](https://github.com/christianhelle/refitter/tree/1.2.1-preview.56) (2024-09-05)
 
