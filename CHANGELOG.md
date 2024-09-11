@@ -1,28 +1,14 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [1.2.1-preview.57](https://github.com/christianhelle/refitter/tree/1.2.1-preview.57) (2024-09-11)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.56...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.57)
 
 **Implemented enhancements:**
 
 - Is it possible to replace the liquid files of NSwag? [\#459](https://github.com/christianhelle/refitter/issues/459)
-- Added setting UsePolymorphicSerialization [\#462](https://github.com/christianhelle/refitter/pull/462) ([ryanheath](https://github.com/ryanheath))
-
-**Merged pull requests:**
-
-- chore\(deps\): update dependency atc.test to 1.0.98 [\#464](https://github.com/christianhelle/refitter/pull/464) ([renovate[bot]](https://github.com/apps/renovate))
-- docs: add ryanheath as a contributor for code [\#463](https://github.com/christianhelle/refitter/pull/463) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- chore\(deps\): update dependency fluentassertions to 6.12.1 [\#461](https://github.com/christianhelle/refitter/pull/461) ([renovate[bot]](https://github.com/apps/renovate))
-- docs: add ryanheath as a contributor for ideas [\#460](https://github.com/christianhelle/refitter/pull/460) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-
-## [1.2.1-preview.56](https://github.com/christianhelle/refitter/tree/1.2.1-preview.56) (2024-09-05)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.56)
-
-**Implemented enhancements:**
-
 - Support generating multiple files [\#427](https://github.com/christianhelle/refitter/issues/427)
+- Added setting UsePolymorphicSerialization [\#462](https://github.com/christianhelle/refitter/pull/462) ([ryanheath](https://github.com/ryanheath))
 - Handle '%' in property names [\#455](https://github.com/christianhelle/refitter/pull/455) ([christianhelle](https://github.com/christianhelle))
 - Enable nullable annotations and disable warnings [\#452](https://github.com/christianhelle/refitter/pull/452) ([christianhelle](https://github.com/christianhelle))
 - Add support for customizing Contracts namespace and output path [\#446](https://github.com/christianhelle/refitter/pull/446) ([christianhelle](https://github.com/christianhelle))
@@ -35,6 +21,10 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency atc.test to 1.0.98 [\#464](https://github.com/christianhelle/refitter/pull/464) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add ryanheath as a contributor for code [\#463](https://github.com/christianhelle/refitter/pull/463) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency fluentassertions to 6.12.1 [\#461](https://github.com/christianhelle/refitter/pull/461) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add ryanheath as a contributor for ideas [\#460](https://github.com/christianhelle/refitter/pull/460) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency microsoft.net.test.sdk to 17.11.1 [\#456](https://github.com/christianhelle/refitter/pull/456) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add XeClutch as a contributor for bug [\#454](https://github.com/christianhelle/refitter/pull/454) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency microsoft.net.test.sdk to v17.11.0 [\#444](https://github.com/christianhelle/refitter/pull/444) ([renovate[bot]](https://github.com/apps/renovate))
