@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.57...HEAD)
+
+**Implemented enhancements:**
+
+- added IgnoreUnrecognizedTypeDiscriminators = true [\#465](https://github.com/christianhelle/refitter/pull/465) ([ryanheath](https://github.com/ryanheath))
+
 ## [1.2.1-preview.57](https://github.com/christianhelle/refitter/tree/1.2.1-preview.57) (2024-09-11)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.57)
