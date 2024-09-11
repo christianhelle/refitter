@@ -2615,7 +2615,7 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://www.thebuildsheet.com/"><img src="https://avatars.githubusercontent.com/u/9909564?v=4?s=100" width="100px;" alt="Joshua Ozeri"/><br /><sub><b>Joshua Ozeri</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AXeClutch" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://kancane.nl/"><img src="https://avatars.githubusercontent.com/u/701534?v=4?s=100" width="100px;" alt="Ryan Heath"/><br /><sub><b>Ryan Heath</b></sub></a><br /><a href="#ideas-ryanheath" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://kancane.nl/"><img src="https://avatars.githubusercontent.com/u/701534?v=4?s=100" width="100px;" alt="Ryan Heath"/><br /><sub><b>Ryan Heath</b></sub></a><br /><a href="#ideas-ryanheath" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=ryanheath" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
