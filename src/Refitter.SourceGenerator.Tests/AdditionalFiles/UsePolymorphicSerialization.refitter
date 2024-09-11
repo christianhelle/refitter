@@ -1,0 +1,5 @@
+{
+  "openApiPath": "../Resources/UsePolymorphicSerialization.yaml",
+  "namespace": "Refitter.Tests.UsePolymorphicSerialization",
+  "usePolymorphicSerialization": true
+}

@@ -29,4 +29,8 @@
     <Compile Include="../Refitter.Core/Settings/*.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="../Refitter.Core/Templates/*.liquid" LinkBase="Templates" />
+  </ItemGroup>
+
 </Project>
