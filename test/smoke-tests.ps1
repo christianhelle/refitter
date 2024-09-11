@@ -166,6 +166,7 @@ function RunTests {
                     GenerateAndBuild -format $format -namespace "$namespace.MatchPathFiltered" -outputPath "MatchPathFiltered$outputPath" -args "--match-path ^/pet/.*" -buildFromSource $buildFromSource
                     GenerateAndBuild -format $format -namespace "$namespace.ContractOnly" -outputPath "ContractOnly$outputPath" -args "--contract-only" -buildFromSource $buildFromSource
                     GenerateAndBuild -format $format -namespace "$namespace.ImmutableRecords" -outputPath "ImmutableRecords$outputPath" -args "--immutable-records" -buildFromSource $buildFromSource -netCore
+                    GenerateAndBuild -format $format -namespace "$namespace.PolymorphicSerialization" -outputPath "PolymorphicSerialization$outputPath" -args "--use-polymorphic-serialization" -buildFromSource $buildFromSource -netCore
                 }
             }
         }
