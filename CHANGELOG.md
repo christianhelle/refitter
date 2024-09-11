@@ -4,9 +4,15 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.56...HEAD)
 
+**Implemented enhancements:**
+
+- Is it possible to replace the liquid files of NSwag? [\#459](https://github.com/christianhelle/refitter/issues/459)
+- Added setting UsePolymorphicSerialization [\#462](https://github.com/christianhelle/refitter/pull/462) ([ryanheath](https://github.com/ryanheath))
+
 **Merged pull requests:**
 
 - chore\(deps\): update dependency atc.test to 1.0.98 [\#464](https://github.com/christianhelle/refitter/pull/464) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add ryanheath as a contributor for code [\#463](https://github.com/christianhelle/refitter/pull/463) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency fluentassertions to 6.12.1 [\#461](https://github.com/christianhelle/refitter/pull/461) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add ryanheath as a contributor for ideas [\#460](https://github.com/christianhelle/refitter/pull/460) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
