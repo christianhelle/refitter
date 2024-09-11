@@ -1,21 +1,14 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [1.2.1-preview.58](https://github.com/christianhelle/refitter/tree/1.2.1-preview.58) (2024-09-11)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.57...HEAD)
-
-**Implemented enhancements:**
-
-- added IgnoreUnrecognizedTypeDiscriminators = true [\#465](https://github.com/christianhelle/refitter/pull/465) ([ryanheath](https://github.com/ryanheath))
-
-## [1.2.1-preview.57](https://github.com/christianhelle/refitter/tree/1.2.1-preview.57) (2024-09-11)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.57)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.58)
 
 **Implemented enhancements:**
 
 - Is it possible to replace the liquid files of NSwag? [\#459](https://github.com/christianhelle/refitter/issues/459)
 - Support generating multiple files [\#427](https://github.com/christianhelle/refitter/issues/427)
+- added IgnoreUnrecognizedTypeDiscriminators = true [\#465](https://github.com/christianhelle/refitter/pull/465) ([ryanheath](https://github.com/ryanheath))
 - Added setting UsePolymorphicSerialization [\#462](https://github.com/christianhelle/refitter/pull/462) ([ryanheath](https://github.com/ryanheath))
 - Handle '%' in property names [\#455](https://github.com/christianhelle/refitter/pull/455) ([christianhelle](https://github.com/christianhelle))
 - Enable nullable annotations and disable warnings [\#452](https://github.com/christianhelle/refitter/pull/452) ([christianhelle](https://github.com/christianhelle))
