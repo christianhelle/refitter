@@ -193,7 +193,7 @@ public sealed class Settings : CommandSettings
     public bool ImmutableRecords { get; set; }
 
     [Description("""
-                 Set to true to use Apizr by:
+                 Use Apizr by:
                  - Adding a final IApizrRequestOptions options parameter to all generated methods
                  - Providing cancellation tokens by Apizr request options instead of a dedicated parameter
                  - Using method overloads instead of optional parameters
