@@ -88,7 +88,7 @@ namespace Refitter.Tests.UsePolymorphicSerialization
 
     }
 
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]
     [JsonDerivedType(typeof(Warehouse), typeDiscriminator: "Warehouse")]
     [JsonDerivedType(typeof(WarehouseResponse), typeDiscriminator: "WarehouseResponse")]
     [JsonDerivedType(typeof(LoadingAddress), typeDiscriminator: "LoadingAddress")]
@@ -197,7 +197,7 @@ namespace Refitter.Tests.UsePolymorphicSerialization
 
     }
 
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ProblemDetails
     {

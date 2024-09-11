@@ -203,7 +203,7 @@ components:
         generateCode.Should().NotContain("JsonInheritanceConverter");
         generateCode.Should().NotContain("JsonInheritanceAttribute");
 
-        generateCode.Should().Contain("[JsonPolymorphic(TypeDiscriminatorPropertyName = \"$type\", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]");
+        generateCode.Should().Contain("[JsonPolymorphic(TypeDiscriminatorPropertyName = \"$type\", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]");
         generateCode.Should().Contain("[JsonDerivedType(typeof(Warehouse), typeDiscriminator: \"Warehouse\")]");
         generateCode.Should().Contain("[JsonDerivedType(typeof(WarehouseResponse), typeDiscriminator: \"WarehouseResponse\")]");
         generateCode.Should().Contain("[JsonDerivedType(typeof(LoadingAddress), typeDiscriminator: \"LoadingAddress\")]");
