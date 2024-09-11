@@ -6,7 +6,7 @@
 {%- if HasDiscriminator -%}
 {%- if UseSystemTextJson -%}
 {%- if UsePolymorphicSerialization -%}
-[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = "{{ Discriminator }}", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
+[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = "{{ Discriminator }}", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]
 {%- else -%}
 [JsonInheritanceConverter(typeof({{ ClassName }}), "{{ Discriminator }}")]
 {%- endif -%}
