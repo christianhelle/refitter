@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.58...HEAD)
+
+**Merged pull requests:**
+
+- Add basic documentation for Polymorphic Serialization [\#466](https://github.com/christianhelle/refitter/pull/466) ([christianhelle](https://github.com/christianhelle))
+
 ## [1.2.1-preview.58](https://github.com/christianhelle/refitter/tree/1.2.1-preview.58) (2024-09-11)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.58)
