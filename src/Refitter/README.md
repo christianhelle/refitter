@@ -96,6 +96,7 @@ OPTIONS:
                                                                     See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                                                               
         --use-dynamic-querystring-parameters                        Wrap multiple query parameters into a single complex one.
                                                                     See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+        --use-polymorphic-serialization                             Use System.Text.Json polymorphic serialization
 ```
 
 ### .Refitter File format
@@ -156,6 +157,7 @@ The following is an example `.refitter` file
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": true, // Optional. Default=false
+  "usePolymorphicSerialization" true, // Optional. Default=false
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
@@ -243,6 +245,7 @@ The following is an example `.refitter` file
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+- `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization.
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline

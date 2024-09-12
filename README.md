@@ -111,13 +111,14 @@ OPTIONS:
                                                                  - SingleClientFromPathSegments                                                                                                            
                                                                  See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html for more information                                    
         --immutable-records                                      Generate contracts as immutable records instead of classes                                                                                
-        --use-apizr                                              Set to true to use Apizr by:                                                                                                              
+        --use-apizr                                              Use Apizr by:                                                                                                                             
                                                                  - Adding a final IApizrRequestOptions options parameter to all generated methods                                                          
                                                                  - Providing cancellation tokens by Apizr request options instead of a dedicated parameter                                                 
                                                                  - Using method overloads instead of optional parameters                                                                                   
                                                                  See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                   
-        --use-dynamic-querystring-parameters                     Set to <c>true</c> to wrap multiple query parameters into a single complex one. Default is <c>false</c> (no wrapping).                    
+        --use-dynamic-querystring-parameters                     Enable wrapping multiple query parameters into a single complex one. Default is no wrapping.                                              
                                                                  See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information                            
+        --use-polymorphic-serialization                          Use System.Text.Json polymorphic serialization                                                                                            
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -208,6 +209,7 @@ The following is an example `.refitter` file
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": true, // Optional. Default=false
+  "usePolymorphicSerialization", false, // Optional. Default=false
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional

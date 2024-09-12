@@ -61,6 +61,7 @@ The following is an example `.refitter` file
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": false, // Optional. Default=false
+  "usePolymorphicSerialization", false, // Optional. Default=false
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
@@ -153,6 +154,7 @@ The following is an example `.refitter` file
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+- `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization.
 - `generateMultipleFiles`: Set to `true` to generate multiple files. This is automatically set to `true` when `ContractsOutputFolder` is specified. Refit interface(s) are written to a file called `RefitInterfaces.cs`, Contracts are written to a file called `Contracts.cs`, and Dependency Injection is written to a file called `DependencyInjection.cs`
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
@@ -366,6 +368,10 @@ The following is an example `.refitter` file
         "useDynamicQuerystringParameters": {
             "type": "boolean",
             "description": "Set to true to wrap multiple query parameters into a single complex one."
+        },
+        "usePolymorphicSerialization": {
+            "type": "boolean",
+            "description": "Set to true to use System.Text.Json polymorphic serialization"
         },
         "generateMultipleFiles": {
             "type": "boolean",

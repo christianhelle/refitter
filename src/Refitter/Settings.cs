@@ -193,7 +193,7 @@ public sealed class Settings : CommandSettings
     public bool ImmutableRecords { get; set; }
 
     [Description("""
-                 Set to true to use Apizr by:
+                 Use Apizr by:
                  - Adding a final IApizrRequestOptions options parameter to all generated methods
                  - Providing cancellation tokens by Apizr request options instead of a dedicated parameter
                  - Using method overloads instead of optional parameters
@@ -204,14 +204,14 @@ public sealed class Settings : CommandSettings
     public bool UseApizr { get; set; }
 
     [Description("""
-                 Set to <c>true</c> to wrap multiple query parameters into a single complex one. Default is <c>false</c> (no wrapping).
+                 Enable wrapping multiple query parameters into a single complex one. Default is no wrapping.
                  See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
                  """)]
     [CommandOption("--use-dynamic-querystring-parameters")]
     [DefaultValue(false)]
     public bool UseDynamicQuerystringParameters { get; set; }
 
-    [Description("Set to <c>true</c> to use System.Text.Json polymorphic serialization.")]
+    [Description("Use System.Text.Json polymorphic serialization.")]
     [CommandOption("--use-polymorphic-serialization")]
     [DefaultValue(false)]
     public bool UsePolymorphicSerialization { get; set; }
