@@ -38,6 +38,7 @@ EXAMPLES:
     refitter ./openapi.json --no-deprecated-operations
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
+    refitter ./openapi.json --use-polymorphic-serialization
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -98,7 +99,10 @@ OPTIONS:
                                                                  - Using method overloads instead of optional parameters                                                                                   
                                                                  See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                   
         --use-dynamic-querystring-parameters                     Set to <c>true</c> to wrap multiple query parameters into a single complex one. Default is <c>false</c> (no wrapping).                    
-                                                                 See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information                            
+                                                                 See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information
+        --use-polymorphic-serialization                          Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes. To have the native support of inheritance (de)serialization and fallback to base types when payloads with (yet) unknown types are offered by newer versions of an API.
+                                                                 See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
+
 ```
 
 To generate code from an OpenAPI specifications file, run the following:

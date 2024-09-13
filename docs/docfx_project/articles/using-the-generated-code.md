@@ -504,3 +504,37 @@ var result = await petstoreManager.ExecuteAsync((api, opt) => api.GetPetById(1, 
 ```
 
 Please head to the [Apizr documentation](https://www.apizr.net) to get more.
+
+### Using the polymorphic serialization
+
+NSwag provides built-in support for inheritance serialization, which is enabled by default. To leverage the native inheritance serialization support from System.Text.Json, enable the ```use-polymorphic-serialization``` setting. This enhances serialization and deserialization performance while maintaining compatibility by falling back to base types when needed.
+
+Below are code examples with and without this setting enabled. The generated code is nearly identical, but with ```use-polymorphic-serialization``` enabled, deserialization attempts to instantiate the correct derived type wherever Tool instances are exposed. If an unknown type is encountered in the ```$type``` field, it will safely default to the base type.
+
+Additionally, this setting addresses a known issue in NSwag, preventing a ```StackOverflowException``` when unknown types are encountered.
+
+```csharp
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]
+[JsonDerivedType(typeof(TextTool), typeDiscriminator: "TextTool")]
+[JsonDerivedType(typeof(BrushTool), typeDiscriminator: "BrushTool")]
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial class Tool
+{
+}
+```
+
+```csharp
+[JsonInheritanceConverter(typeof(SomeComponent), "$type")]
+[JsonInheritanceAttribute("TextTool", typeof(TextTool))]
+[JsonInheritanceAttribute("BrushTool", typeof(BrushTool))]
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial class Tool
+{
+}
+```
+
+See 
+- [System.Text.Json.Serialization documentation](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism)
+- [Add support for STJ-native C# code gen](https://github.com/RicoSuter/NJsonSchema/pull/1675)
+- [Stackoverflow Exception](https://github.com/RicoSuter/NJsonSchema/issues/1728)
+for more information
