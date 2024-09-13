@@ -3,8 +3,12 @@ updates:
 - package-ecosystem: nuget
   directory: "/"
   schedule:
-    interval: hourly
+    interval: daily
 - package-ecosystem: devcontainers
   directory: "/"
   schedule:
-    interval: hourly
+    interval: daily
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: daily
