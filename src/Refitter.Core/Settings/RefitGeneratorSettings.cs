@@ -220,6 +220,10 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Set to <c>true</c> to use System.Text.Json polymorphic serialization. Default is <c>false</c>
     /// Gets a value indicating whether to use System.Text.Json polymorphic serialization
+    /// Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
+    /// To have the native support of inheritance (de)serialization and fallback to base types when
+    /// payloads with (yet) unknown types are offered by newer versions of an API
+    /// See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
     /// </summary>
     public bool UsePolymorphicSerialization { get; set; }
 }
