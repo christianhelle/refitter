@@ -4,8 +4,13 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.58...HEAD)
 
+**Implemented enhancements:**
+
+- Missing documentation for System.Text.Json polymorphic serialization [\#467](https://github.com/christianhelle/refitter/issues/467)
+
 **Merged pull requests:**
 
+- use-polymorphic-serialization docs [\#470](https://github.com/christianhelle/refitter/pull/470) ([ryanheath](https://github.com/ryanheath))
 - Add basic documentation for Polymorphic Serialization [\#466](https://github.com/christianhelle/refitter/pull/466) ([christianhelle](https://github.com/christianhelle))
 
 ## [1.2.1-preview.58](https://github.com/christianhelle/refitter/tree/1.2.1-preview.58) (2024-09-11)
