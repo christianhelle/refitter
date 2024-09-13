@@ -151,6 +151,11 @@ internal static class Program
                     .AddExample(
                         "./openapi.json",
                         "--optional-nullable-parameters");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
+                        "--use-polymorphic-serialization");
             });
 
         return app.Run(args);
