@@ -2,15 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.1-preview.59...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.0...HEAD)
 
 **Merged pull requests:**
 
-- Update dependency Atc.Test to 1.0.102 [\#469](https://github.com/christianhelle/refitter/pull/469) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Apizr.Integrations.Fusillade to 6.0.0 [\#475](https://github.com/christianhelle/refitter/pull/475) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Apizr.Integrations.FileTransfer.Optional to 6.0.0 [\#474](https://github.com/christianhelle/refitter/pull/474) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Apizr.Integrations.AutoMapper to 6.0.0 [\#473](https://github.com/christianhelle/refitter/pull/473) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Apizr.Extensions.Microsoft.Caching to 6.0.0 [\#472](https://github.com/christianhelle/refitter/pull/472) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Atc.Test to 1.0.105 [\#471](https://github.com/christianhelle/refitter/pull/471) ([renovate[bot]](https://github.com/apps/renovate))
 
-## [1.2.1-preview.59](https://github.com/christianhelle/refitter/tree/1.2.1-preview.59) (2024-09-13)
+## [1.3.0](https://github.com/christianhelle/refitter/tree/1.3.0) (2024-09-14)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.2.1-preview.59)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.2.0...1.3.0)
 
 **Implemented enhancements:**
 
@@ -32,6 +36,7 @@
 **Merged pull requests:**
 
 - use-polymorphic-serialization docs [\#470](https://github.com/christianhelle/refitter/pull/470) ([ryanheath](https://github.com/ryanheath))
+- Update dependency Atc.Test to 1.0.102 [\#469](https://github.com/christianhelle/refitter/pull/469) ([renovate[bot]](https://github.com/apps/renovate))
 - Add basic documentation for Polymorphic Serialization [\#466](https://github.com/christianhelle/refitter/pull/466) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency atc.test to 1.0.98 [\#464](https://github.com/christianhelle/refitter/pull/464) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add ryanheath as a contributor for code [\#463](https://github.com/christianhelle/refitter/pull/463) ([allcontributors[bot]](https://github.com/apps/allcontributors))
