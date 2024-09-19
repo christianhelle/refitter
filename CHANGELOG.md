@@ -6,6 +6,12 @@
 
 **Merged pull requests:**
 
+- Update dependency Polly to v8 [\#481](https://github.com/christianhelle/refitter/pull/481) ([renovate[bot]](https://github.com/apps/renovate))
+- Update refit monorepo to 7.2.1 [\#480](https://github.com/christianhelle/refitter/pull/480) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Swashbuckle.AspNetCore to 6.7.3 [\#479](https://github.com/christianhelle/refitter/pull/479) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Refitter.SourceGenerator to 1.3.0 [\#478](https://github.com/christianhelle/refitter/pull/478) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency System.Reactive to 6.0.1 [\#477](https://github.com/christianhelle/refitter/pull/477) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Polly to 7.2.4 [\#476](https://github.com/christianhelle/refitter/pull/476) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Apizr.Integrations.Fusillade to 6.0.0 [\#475](https://github.com/christianhelle/refitter/pull/475) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Apizr.Integrations.FileTransfer.Optional to 6.0.0 [\#474](https://github.com/christianhelle/refitter/pull/474) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Apizr.Integrations.AutoMapper to 6.0.0 [\#473](https://github.com/christianhelle/refitter/pull/473) ([renovate[bot]](https://github.com/apps/renovate))
