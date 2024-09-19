@@ -1,10 +1,7 @@
 using System.Reflection;
-using System.Text.Json;
 using Exceptionless;
 using Exceptionless.Plugins;
-
 using Refitter.Core;
-
 using Spectre.Console.Cli;
 
 namespace Refitter;

@@ -1,13 +1,7 @@
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Text;
-using System.Xml.Linq;
-
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using NSwag.CodeGeneration.Models;
-
-using YamlDotNet.Serialization;
 
 namespace Refitter.Core;
 

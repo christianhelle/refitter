@@ -1,11 +1,8 @@
 using System.Diagnostics;
-
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers.Exceptions;
-
 using Refitter.Core;
 using Refitter.Validation;
-
 using Spectre.Console;
 using Spectre.Console.Cli;
 

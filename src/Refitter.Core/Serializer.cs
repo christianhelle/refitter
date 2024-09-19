@@ -1,5 +1,4 @@
 using System.Text.Json;
-
 using JsonSerializerOptions = System.Text.Json.JsonSerializerOptions;
 
 namespace Refitter.Core;

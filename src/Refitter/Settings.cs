@@ -1,7 +1,5 @@
 using System.ComponentModel;
-
 using Refitter.Core;
-
 using Spectre.Console.Cli;
 
 namespace Refitter;

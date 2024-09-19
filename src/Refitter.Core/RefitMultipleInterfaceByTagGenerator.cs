@@ -1,7 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
-using System.Xml.Linq;
-
+﻿using System.Text;
 using NSwag;
 
 namespace Refitter.Core;

@@ -1,6 +1,5 @@
 using System.Text;
 using System.Text.RegularExpressions;
-
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 

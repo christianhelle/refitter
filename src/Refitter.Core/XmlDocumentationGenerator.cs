@@ -1,5 +1,4 @@
 using System.Text;
-
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 

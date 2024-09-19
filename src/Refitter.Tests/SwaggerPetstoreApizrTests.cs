@@ -1,10 +1,7 @@
 ﻿using FluentAssertions;
-using FluentAssertions.Equivalency;
-
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.Resources;
-
 using Xunit;
 
 namespace Refitter.Tests;

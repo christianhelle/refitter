@@ -1,9 +1,6 @@
 using FluentAssertions;
-
 using Refit;
-
 using Refitter.Tests.AdditionalFiles.ByEndpoint;
-
 using Xunit;
 
 namespace Refitter.SourceGenerators.Tests;

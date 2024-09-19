@@ -1,15 +1,7 @@
-using System.Dynamic;
-using System.Text.Json;
-
 using Atc.Test;
-
 using FluentAssertions;
-
-using NJsonSchema.CodeGeneration.CSharp;
-
 using Refitter.Core;
 using Refitter.Tests.Resources;
-
 using Xunit;
 
 namespace Refitter.Tests;
