@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Update dotnet monorepo \(major\) [\#482](https://github.com/christianhelle/refitter/pull/482) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Polly to v8 [\#481](https://github.com/christianhelle/refitter/pull/481) ([renovate[bot]](https://github.com/apps/renovate))
 - Update refit monorepo to 7.2.1 [\#480](https://github.com/christianhelle/refitter/pull/480) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Swashbuckle.AspNetCore to 6.7.3 [\#479](https://github.com/christianhelle/refitter/pull/479) ([renovate[bot]](https://github.com/apps/renovate))
