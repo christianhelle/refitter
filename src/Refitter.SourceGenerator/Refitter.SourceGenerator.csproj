@@ -7,7 +7,7 @@
     <AssemblyName>Refitter.SourceGenerator</AssemblyName>
     <RootNamespace>Refitter.SourceGenerator</RootNamespace>
     <Title>Refitter.SourceGenerator</Title>
-    <Description>A C# Source Generator that uses Refitter for generating a REST API Client using the Refit library</Description>
+    <Description>A C# Source Generator that uses Refitter for generating a REST API Client using the Refit library from OpenAPI specifications.</Description>
     <DevelopmentDependency>true</DevelopmentDependency>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>

@@ -7,7 +7,7 @@
     <AssemblyName>refitter</AssemblyName>
     <RootNamespace>Refitter</RootNamespace>
     <Product>Refit API Client Code Generator</Product>
-    <Description>Refitter is a CLI tool for generating a C# REST API Client using the Refit library.</Description>
+    <Description>Refitter is a CLI tool for generating a C# REST API Client using the Refit library from OpenAPI specifications.</Description>
     <PackAsTool>true</PackAsTool>
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
