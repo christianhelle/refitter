@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-
 using NJsonSchema;
 using NJsonSchema.CodeGeneration;
 

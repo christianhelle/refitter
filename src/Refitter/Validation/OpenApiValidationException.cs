@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Refitter.Validation;
+﻿namespace Refitter.Validation;
 
 public class OpenApiValidationException : Exception
 {

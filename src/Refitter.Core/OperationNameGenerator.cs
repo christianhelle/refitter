@@ -1,8 +1,6 @@
-﻿using NSwag;
+﻿using System.Diagnostics.CodeAnalysis;
+using NSwag;
 using NSwag.CodeGeneration.OperationNameGenerators;
-
-using System.Diagnostics.CodeAnalysis;
-
 using GeneratorType = Refitter.Core.OperationNameGeneratorTypes;
 
 namespace Refitter.Core;

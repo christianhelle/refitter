@@ -1,7 +1,6 @@
-﻿using NSwag;
-
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
+using NSwag;
 
 namespace Refitter.Core;
 

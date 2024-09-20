@@ -1,7 +1,5 @@
 ﻿using FluentAssertions;
-
 using Refitter.Core;
-
 using Xunit;
 
 namespace Refitter.Tests;

@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
-
 using Microsoft.CodeAnalysis;
-
 using Refitter.Core;
 
 namespace Refitter.SourceGenerator;

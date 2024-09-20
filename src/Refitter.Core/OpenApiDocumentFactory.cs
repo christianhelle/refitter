@@ -1,10 +1,7 @@
 ﻿using System.Net;
-
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Readers;
-
 using NSwag;
-
 using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;

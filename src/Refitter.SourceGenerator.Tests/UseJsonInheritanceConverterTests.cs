@@ -1,5 +1,4 @@
 using FluentAssertions;
-
 using Refitter.Tests.UseJsonInheritanceConverter;
 using Xunit;
 

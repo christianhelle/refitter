@@ -1,7 +1,6 @@
 using System.Reflection;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
-
 using NSwag;
 using NSwag.CodeGeneration.CSharp;
 

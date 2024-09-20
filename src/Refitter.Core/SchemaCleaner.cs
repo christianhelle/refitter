@@ -1,7 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-
 using NJsonSchema;
-
 using NSwag;
 
 namespace Refitter.Core;

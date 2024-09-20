@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Security;
-
-using Microsoft.OpenApi.Readers;
+﻿using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Services;
 
 namespace Refitter.Validation;

@@ -1,12 +1,8 @@
 using System.Text;
-
 using FluentAssertions;
-
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
-
 using Refitter.Core;
-
 using Xunit;
 
 namespace Refitter.Tests

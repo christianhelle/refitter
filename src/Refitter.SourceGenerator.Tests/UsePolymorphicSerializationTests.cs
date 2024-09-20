@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
 using FluentAssertions;
-
 using Refitter.Tests.UsePolymorphicSerialization;
-
 using Xunit;
 
 namespace Refitter.SourceGenerators.Tests;

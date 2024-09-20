@@ -1,13 +1,6 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System.Text.Json;
-
-using Atc.Test;
-
+﻿using Atc.Test;
 using FluentAssertions;
-
 using Refitter.Core;
-
 using Xunit;
 
 namespace Refitter.Tests;
