@@ -2,7 +2,20 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.1...HEAD)
+
+**Fixed bugs:**
+
+- "While scanning a multi-line double-quoted scalar, found wrong indentation." on valid yaml file [\#486](https://github.com/christianhelle/refitter/issues/486)
+
+**Merged pull requests:**
+
+- Update dependency xunit to 2.9.1 [\#487](https://github.com/christianhelle/refitter/pull/487) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Refitter.SourceGenerator to 1.3.1 [\#485](https://github.com/christianhelle/refitter/pull/485) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.3.1](https://github.com/christianhelle/refitter/tree/1.3.1) (2024-09-20)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.0...1.3.1)
 
 **Merged pull requests:**
 
