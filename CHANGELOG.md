@@ -6,11 +6,11 @@
 
 **Implemented enhancements:**
 
-- Exceptionless monthly limit exceeded in only a few days [\#488](https://github.com/christianhelle/refitter/issues/488)
 - Use Azure App Insights for telemetry [\#490](https://github.com/christianhelle/refitter/pull/490) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
+- Exceptionless monthly limit exceeded in only a few days [\#488](https://github.com/christianhelle/refitter/issues/488)
 - "While scanning a multi-line double-quoted scalar, found wrong indentation." on valid yaml file [\#486](https://github.com/christianhelle/refitter/issues/486)
 
 **Merged pull requests:**
