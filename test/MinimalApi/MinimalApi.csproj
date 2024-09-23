@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.8.0" />
     <PackageReference Include="Refit.HttpClientFactory" Version="7.2.1" />
     <PackageReference Include="Polly" Version="8.4.1" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
