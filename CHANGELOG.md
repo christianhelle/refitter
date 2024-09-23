@@ -4,12 +4,18 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.1...HEAD)
 
+**Implemented enhancements:**
+
+- Exceptionless monthly limit exceeded in only a few days [\#488](https://github.com/christianhelle/refitter/issues/488)
+- Use Azure App Insights for telemetry [\#490](https://github.com/christianhelle/refitter/pull/490) ([christianhelle](https://github.com/christianhelle))
+
 **Fixed bugs:**
 
 - "While scanning a multi-line double-quoted scalar, found wrong indentation." on valid yaml file [\#486](https://github.com/christianhelle/refitter/issues/486)
 
 **Merged pull requests:**
 
+- Update dependency Swashbuckle.AspNetCore to 6.8.0 [\#489](https://github.com/christianhelle/refitter/pull/489) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency xunit to 2.9.1 [\#487](https://github.com/christianhelle/refitter/pull/487) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refitter.SourceGenerator to 1.3.1 [\#485](https://github.com/christianhelle/refitter/pull/485) ([renovate[bot]](https://github.com/apps/renovate))
 
