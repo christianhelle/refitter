@@ -190,7 +190,7 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         /// </returns>
         [Headers("Accept: application/json")]
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> UploadFile(long petId,  StreamPart body, [Query] string? additionalMetadata = default);
+        Task<ApiResponse> UploadFile(long petId, StreamPart body, [Query] string? additionalMetadata = default);
 
         /// <summary>Returns pet inventories by status</summary>
         /// <remarks>Returns a map of status codes to quantities</remarks>

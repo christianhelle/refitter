@@ -222,7 +222,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </returns>
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata,  StreamPart body);
+        Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata, StreamPart body);
     }
 
     /// <summary>Returns pet inventories by status</summary>

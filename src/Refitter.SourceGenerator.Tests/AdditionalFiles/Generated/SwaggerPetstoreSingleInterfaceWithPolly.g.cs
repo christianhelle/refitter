@@ -190,7 +190,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </returns>
         [Headers("Accept: application/json")]
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> UploadFile(long petId, [Query] string additionalMetadata,  StreamPart body);
+        Task<ApiResponse> UploadFile(long petId, [Query] string additionalMetadata, StreamPart body);
 
         /// <summary>Returns pet inventories by status</summary>
         /// <remarks>Returns a map of status codes to quantities</remarks>
