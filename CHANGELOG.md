@@ -2,15 +2,11 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2-preview.60...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2...HEAD)
 
 **Merged pull requests:**
 
 - Update dependency Refitter.SourceGenerator to 1.3.2 [\#491](https://github.com/christianhelle/refitter/pull/491) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.3.2-preview.60](https://github.com/christianhelle/refitter/tree/1.3.2-preview.60) (2024-09-23)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2...1.3.2-preview.60)
 
 ## [1.3.2](https://github.com/christianhelle/refitter/tree/1.3.2) (2024-09-23)
 
