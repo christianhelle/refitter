@@ -6,6 +6,8 @@
 
 **Merged pull requests:**
 
+- Update dependency Atc.Test to 1.0.107 [\#496](https://github.com/christianhelle/refitter/pull/496) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Swashbuckle.AspNetCore to 6.8.1 [\#494](https://github.com/christianhelle/refitter/pull/494) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency xunit to 2.9.2 [\#493](https://github.com/christianhelle/refitter/pull/493) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Polly to 8.4.2 [\#492](https://github.com/christianhelle/refitter/pull/492) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refitter.SourceGenerator to 1.3.2 [\#491](https://github.com/christianhelle/refitter/pull/491) ([renovate[bot]](https://github.com/apps/renovate))
