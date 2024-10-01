@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Apizr.Extensions.Microsoft.Caching" Version="6.0.0" />
     <PackageReference Include="Apizr.Integrations.AutoMapper" Version="6.0.0" />
-    <PackageReference Include="Apizr.Integrations.FileTransfer.Optional" Version="6.0.0" />
+    <PackageReference Include="Apizr.Integrations.FileTransfer.Optional" Version="6.1.0" />
     <PackageReference Include="Apizr.Integrations.Fusillade" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.9.1" />
     <PackageReference Include="System.Text.Json" Version="8.0.4" />
