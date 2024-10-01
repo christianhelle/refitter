@@ -8,6 +8,7 @@ public static class ProjectFileContents
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include=""System.Text.Json"" Version=""8.0.4"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""4.5.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
     <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""8.0.0"" />
