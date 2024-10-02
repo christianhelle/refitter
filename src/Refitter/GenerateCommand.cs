@@ -26,7 +26,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         try
         {
             var stopwatch = Stopwatch.StartNew();
-            AnsiConsole.MarkupLine($"[green]Refitter v{GetType().Assembly.GetName().Version!}[/]");
+            var version = GetType().Assembly.GetName().Version!.ToString();
+            if (version == "1.0.0.0")
+                version += " (local build)";
+            AnsiConsole.MarkupLine($"[green]Refitter v{version}[/]");
             AnsiConsole.MarkupLine(
                 settings.NoLogging
                     ? "[green]Support key: Unavailable when logging is disabled[/]"
