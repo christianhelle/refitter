@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Update Apizr Dependencies to v6.1.0 [\#504](https://github.com/christianhelle/refitter/pull/504) ([christianhelle](https://github.com/christianhelle))
 - Update dependency Atc.Test to 1.1.2 [\#501](https://github.com/christianhelle/refitter/pull/501) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Atc.Test to 1.0.107 [\#496](https://github.com/christianhelle/refitter/pull/496) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Swashbuckle.AspNetCore to 6.8.1 [\#494](https://github.com/christianhelle/refitter/pull/494) ([renovate[bot]](https://github.com/apps/renovate))
