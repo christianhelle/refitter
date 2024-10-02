@@ -16,13 +16,13 @@ public static class ProjectFileContents
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""8.0.0"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
     <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
-    <PackageReference Include=""Apizr.Integrations.FileTransfer.Optional"" Version=""6.0.0-preview.7"" />
-    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.0.0-preview.7"" />
-    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.0.0-preview.7"" />
-    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.0.0-preview.7"" />
-    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.0.0-preview.7"" />
-    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.0.0-preview.7"" />
-    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.0.0-preview.7"" />
+    <PackageReference Include=""Apizr.Integrations.FileTransfer.Optional"" Version=""6.1.0"" />
+    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.1.0"" />
+    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.1.0"" />
+    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.1.0"" />
+    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.1.0"" />
+    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.1.0"" />
+    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.1.0"" />
   </ItemGroup>
 </Project>";
 }
