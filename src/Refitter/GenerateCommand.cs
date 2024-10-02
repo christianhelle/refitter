@@ -174,8 +174,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                     Directory.CreateDirectory(contractsFolder);
 
                 var contractsFile = Path.Combine(contractsFolder ?? "./", outputFile.Filename);
-                AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(contractsFile)}[/]");
-                AnsiConsole.MarkupLine($"[green]Length: {outputFile.Content.Length} bytes[/]");
+                AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(contractsFile)} ({outputFile.Content.Length} bytes)[/]");
 
                 await File.WriteAllTextAsync(contractsFile, outputFile.Content);
                 continue;
@@ -184,8 +183,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var code = outputFile.Content;
             var outputPath = GetOutputPath(settings, refitGeneratorSettings, outputFile);
 
-            AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)}[/]");
-            AnsiConsole.MarkupLine($"[green]Length: {code.Length} bytes[/]");
+            AnsiConsole.MarkupLine($"[green]Output: {Path.GetFullPath(outputPath)} ({code.Length} bytes)[/]");
 
             var directory = Path.GetDirectoryName(outputPath);
             if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
