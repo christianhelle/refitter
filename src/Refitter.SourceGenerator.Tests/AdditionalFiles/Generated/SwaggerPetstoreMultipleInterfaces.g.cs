@@ -451,9 +451,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task Execute(string username);
     }
 
-
 }
-
 
 
 

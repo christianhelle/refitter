@@ -1,8 +1,8 @@
 namespace Refitter.Core;
 
-public static class FilenameConstants
+public static class TypenameConstants
 {
-    public const string RefitInterfaces = "RefitInterfaces.cs";
-    public const string Contracts = "Contracts.cs";
-    public const string DependencyInjection = "DependencyInjection.cs";
+    public const string RefitInterfaces = "RefitInterfaces";
+    public const string Contracts = "Contracts";
+    public const string DependencyInjection = "DependencyInjection";
 }

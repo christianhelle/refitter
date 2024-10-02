@@ -21,5 +21,6 @@
     "arrayType": "System.Collections.Generic.IList"
   },
   "operationNameGenerator": "default",
-  "typeAccessibility": "public"
+  "typeAccessibility": "public",
+  "multipleInterfaces": "ByEndpoint"
 }

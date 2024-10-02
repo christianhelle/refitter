@@ -27,17 +27,18 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
-    public virtual RefitGeneratedCode GenerateCode()
+    public virtual IEnumerable<GeneratedCode> GenerateCode()
     {
-        return new RefitGeneratedCode(
+        var interfaceDeclaration = GenerateInterfaceDeclaration(out var interfaceName);
+        yield return new GeneratedCode(
+            interfaceName,
             $$"""
-              {{GenerateInterfaceDeclaration(out var interfaceName)}}
+              {{interfaceDeclaration}}
               {{Separator}}{
               {{GenerateInterfaceBody(out var dynamicQuerystringParameters)}}
               {{Separator}}}
               {{dynamicQuerystringParameters}}
-              """,
-            interfaceName);
+              """);
     }
 
     private string GenerateInterfaceBody(out string? dynamicQuerystringParameters)

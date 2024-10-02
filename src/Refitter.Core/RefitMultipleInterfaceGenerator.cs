@@ -16,12 +16,8 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
     {
     }
 
-    public override RefitGeneratedCode GenerateCode()
+    public override IEnumerable<GeneratedCode> GenerateCode()
     {
-        var code = new StringBuilder();
-        var interfaceNames = new List<string>();
-        var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
-
         foreach (var kv in document.Paths)
         {
             foreach (var operations in kv.Value)
@@ -36,11 +32,11 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                 var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
                 var methodName = settings.OperationNameTemplate ?? "Execute";
+                var code = new StringBuilder();
 
                 this.docGenerator.AppendInterfaceDocumentation(operation, code);
-                
+
                 var interfaceName = GetInterfaceName(kv, verb, operation);
-                interfaceNames.Add(interfaceName);
                 code.AppendLine($$"""
                                   {{GenerateInterfaceDeclaration(interfaceName)}}
                                   {{Separator}}{
@@ -52,7 +48,9 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
 
                 var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(methodDynamicQuerystringParameters);
                 if (hasDynamicQuerystringParameter)
-                    dynamicQuerystringParametersCodeBuilder.AppendLine(methodDynamicQuerystringParameters);
+                    yield return new GeneratedCode(
+                        dynamicQuerystringParameterType,
+                        methodDynamicQuerystringParameters!);
 
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
@@ -64,8 +62,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
 
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
-                    .AppendLine($"{Separator}}}")
-                    .AppendLine();
+                    .AppendLine($"{Separator}}}");
 
                 if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
                 {
@@ -80,13 +77,10 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                         .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
                         .AppendLine();
                 }
+
+                yield return new GeneratedCode(interfaceName, code.ToString());
             }
         }
-
-        if (dynamicQuerystringParametersCodeBuilder.Length > 0) 
-            code.AppendLine(dynamicQuerystringParametersCodeBuilder.ToString());
-
-        return new RefitGeneratedCode(code.ToString(), interfaceNames.ToArray());
     }
 
     private string GetInterfaceName(

@@ -371,5 +371,4 @@ namespace Refitter.Tests.AdditionalFiles.ByTag
         Task DeleteUser(string username);
     }
 
-
 }
