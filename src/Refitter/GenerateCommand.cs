@@ -162,7 +162,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (
                 !string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder)
                 && refitGeneratorSettings.ContractsOutputFolder != RefitGeneratorSettings.DefaultOutputFolder
-                && outputFile.Filename == FilenameConstants.Contracts
+                && outputFile.Filename == $"{TypenameConstants.Contracts}.cs"
             )
             {
                 var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)

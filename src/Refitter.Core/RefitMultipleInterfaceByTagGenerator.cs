@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using NSwag;
 
 namespace Refitter.Core;
@@ -16,7 +16,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
     {
     }
 
-    public override RefitGeneratedCode GenerateCode()
+    public override IEnumerable<GeneratedCode> GenerateCode()
     {
         var ungroupedTitle = settings.Naming.UseOpenApiTitle
             ? IdentifierUtils.Sanitize(document.Info?.Title ?? "ApiClient")
@@ -28,8 +28,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             .GroupBy(x => GetGroupName(x.Operation.Value, ungroupedTitle), (k, v) => new { Key = k, Combined = v });
 
         Dictionary<string, StringBuilder> interfacesByGroup = new();
-        var interfaceNames = new List<string>();
-        var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
+        Dictionary<string, string> interfacesNamesByGroup = new();
 
         foreach (var kv in byGroup)
         {
@@ -53,21 +52,31 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                     this.docGenerator.AppendInterfaceDocumentation(operation, sb);
 
                     interfaceName = GetInterfaceName(kv.Key);
-                    interfaceNames.Add(interfaceName);
                     sb.AppendLine($$"""
                                     {{GenerateInterfaceDeclaration(interfaceName)}}
                                     {{Separator}}{
                                     """);
+
+                    interfacesNamesByGroup[kv.Key] = interfaceName;
                 }
 
                 var operationName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
                 var dynamicQuerystringParameterType = operationName + "QueryParams";
                 var operationModel = generator.CreateOperationModel(operation);
-                var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, dynamicQuerystringParameterType, out var operationDynamicQuerystringParameters).ToList();
+                var parameters = ParameterExtractor
+                    .GetParameters(
+                        operationModel,
+                        operation,
+                        settings,
+                        dynamicQuerystringParameterType,
+                        out var operationDynamicQuerystringParameters)
+                    .ToList();
 
                 var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
                 if (hasDynamicQuerystringParameter)
-                    dynamicQuerystringParametersCodeBuilder.AppendLine(operationDynamicQuerystringParameters);
+                    yield return new GeneratedCode(
+                        dynamicQuerystringParameterType,
+                        operationDynamicQuerystringParameters!);
 
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
@@ -97,9 +106,12 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             }
         }
 
-        var code = new StringBuilder();
-        foreach (var value in interfacesByGroup.Select(kv => kv.Value))
+        foreach (var keyValuePair in interfacesByGroup)
         {
+            var code = new StringBuilder();
+            var key = keyValuePair.Key;
+            var value = keyValuePair.Value;
+
             while (char.IsWhiteSpace(value[value.Length - 1]))
             {
                 value.Length--;
@@ -107,13 +119,11 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
             code.AppendLine(value.ToString());
             code.AppendLine($"{Separator}}}");
-            code.AppendLine();
+
+            yield return new GeneratedCode(
+                interfacesNamesByGroup[key],
+                code.ToString());
         }
-
-        if (dynamicQuerystringParametersCodeBuilder.Length > 0) 
-            code.AppendLine(dynamicQuerystringParametersCodeBuilder.ToString());
-
-        return new RefitGeneratedCode(code.ToString(), interfaceNames.ToArray());
     }
 
     private string GetGroupName(OpenApiOperation operation, string ungroupedTitle)
