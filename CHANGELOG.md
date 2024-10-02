@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2...HEAD)
 
+**Implemented enhancements:**
+
+- Add support for generating multiple files per Refit interface [\#502](https://github.com/christianhelle/refitter/pull/502) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - Update Apizr Dependencies to v6.1.0 [\#504](https://github.com/christianhelle/refitter/pull/504) ([christianhelle](https://github.com/christianhelle))
