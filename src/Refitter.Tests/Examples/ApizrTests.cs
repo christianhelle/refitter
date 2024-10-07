@@ -84,18 +84,19 @@ paths:
         - in: 'query'
           name: 'Title'
           description: 'Bar title'
-          nullable: true
+          required: true
           schema:
             type: 'string'
         - in: 'query'
           name: 'Description'
           description: 'Bar description'
-          optional: true
+          required: true
           schema:
             type: 'string'
         - in: 'query'
           name: 'Contact'
           description: 'Contact Person'
+          nullable: true
           schema:
             type: 'string'
       responses:
@@ -153,8 +154,17 @@ paths:
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
         string generateCode = await GenerateCode(true);
+
+        // All nullable query params ending with a nullable query parameter
         generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
         generateCode.Should().Contain("public record GetFooDetailsQueryParams");
+
+        // Some required query params ending with a non-nullable query parameter with injected params
+        generateCode.Should().Contain("string id, [Query] GetBarDetailsQueryParams queryParams, [RequestOptions] IApizrRequestOptions options);");
+        generateCode.Should().Contain("public record GetBarDetailsQueryParams");
+        generateCode.Should().Contain("public GetBarDetailsQueryParams(string title, string description)");
+        generateCode.Should().Contain("Title = title;");
+        generateCode.Should().Contain("Description = description;");
     }
 
     [Fact]

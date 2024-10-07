@@ -166,6 +166,8 @@ internal static class ParameterExtractor
                     ? "init"
                     : "set";
 
+                var injectedParametersCodeBuilder = new StringBuilder();
+                var initializedParametersCodeBuilder = new StringBuilder();
                 var propertiesCodeBuilder = new StringBuilder();
                 var allNullable = true;
                 foreach (var operationParameter in operationParameters)
@@ -174,6 +176,19 @@ internal static class ParameterExtractor
                     var propertyType = GetQueryParameterType(operationParameter, settings);
                     allNullable = allNullable && propertyType.EndsWith("?");
                     var propertyName = operationParameter.VariableName.CapitalizeFirstCharacter();
+                    if (operationParameter.IsRequired)
+                    {
+                        injectedParametersCodeBuilder.Append(injectedParametersCodeBuilder.Length == 0
+                            ? $$"""{{propertyType}} {{operationParameter.VariableName}}"""
+                            : $$""", {{propertyType}} {{operationParameter.VariableName}}""");
+
+                        initializedParametersCodeBuilder.AppendLine();
+                        initializedParametersCodeBuilder.Append(
+            $$"""
+                        {{propertyName}} = {{operationParameter.VariableName}};
+            """);
+                    }
+
                     propertiesCodeBuilder.AppendLine();
                     if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
                     {
@@ -195,11 +210,25 @@ internal static class ParameterExtractor
                     operationModel.Parameters.Remove(operationParameter);
                 }
 
-                dynamicQuerystringParametersCodeBuilder.AppendLine();
-                dynamicQuerystringParametersCodeBuilder.Append(
+                dynamicQuerystringParametersCodeBuilder.AppendLine(
             $$"""               
                 {{modifier}} {{classStyle}} {{dynamicQuerystringParameterType}}
                 {
+            """);
+
+                if (injectedParametersCodeBuilder.Length > 0)
+                {
+                    dynamicQuerystringParametersCodeBuilder.AppendLine(
+            $$"""
+                    {{modifier}} {{dynamicQuerystringParameterType}}({{injectedParametersCodeBuilder}})
+                    {
+                        {{initializedParametersCodeBuilder}}
+                    }
+            """); 
+                }
+
+                dynamicQuerystringParametersCodeBuilder.AppendLine(
+            $$"""
                     {{propertiesCodeBuilder}}
                 }
             """);
