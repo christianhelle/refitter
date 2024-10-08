@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.0-preview.61...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dotnet monorepo [\#458](https://github.com/christianhelle/refitter/pull/458) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.4.0-preview.61](https://github.com/christianhelle/refitter/tree/1.4.0-preview.61) (2024-10-07)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2...1.4.0-preview.61)
 
 **Implemented enhancements:**
 
