@@ -10,6 +10,9 @@ namespace Refitter;
 
 public static class Analytics
 {
+    // API keys are stored in the source code because I'm interested in how forks of this project are used.
+    private const string ExceptionlessApiKey = "pRql7vmgecZ0Iph6MU5TJE5XsZeesdTe0yx7TN4f";
+    private const string ApplicationInsightsConnectionString = "InstrumentationKey=470c204f-b460-493a-9e31-d9b2f5e25abb;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=0836c3ac-e8ac-4e0c-ade8-3e0fadb9b40c";
     private static TelemetryClient telemetryClient = null!;
 
     public static void Configure()
@@ -20,10 +23,10 @@ public static class Analytics
 
         ExceptionlessClient.Default.Configuration.UseSessions();
         ExceptionlessClient.Default.Configuration.SetVersion(typeof(GenerateCommand).Assembly.GetName().Version!);
-        ExceptionlessClient.Default.Startup("pRql7vmgecZ0Iph6MU5TJE5XsZeesdTe0yx7TN4f");
+        ExceptionlessClient.Default.Startup(ExceptionlessApiKey);
 
         var configuration = TelemetryConfiguration.CreateDefault();
-        configuration.ConnectionString = "InstrumentationKey=470c204f-b460-493a-9e31-d9b2f5e25abb;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=0836c3ac-e8ac-4e0c-ade8-3e0fadb9b40c";
+        configuration.ConnectionString = ApplicationInsightsConnectionString;
 
         telemetryClient = new TelemetryClient(configuration);
         telemetryClient.Context.User.Id = SupportInformation.GetSupportKey();
