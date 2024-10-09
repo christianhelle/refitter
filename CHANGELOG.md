@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency atc.test to 1.1.4 [\#508](https://github.com/christianhelle/refitter/pull/508) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dotnet monorepo [\#458](https://github.com/christianhelle/refitter/pull/458) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.4.0-preview.61](https://github.com/christianhelle/refitter/tree/1.4.0-preview.61) (2024-10-07)
