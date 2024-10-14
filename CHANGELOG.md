@@ -2,16 +2,7 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.0-preview.61...HEAD)
-
-**Merged pull requests:**
-
-- chore\(deps\): update dependency atc.test to 1.1.4 [\#508](https://github.com/christianhelle/refitter/pull/508) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dotnet monorepo [\#458](https://github.com/christianhelle/refitter/pull/458) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.4.0-preview.61](https://github.com/christianhelle/refitter/tree/1.4.0-preview.61) (2024-10-07)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2...1.4.0-preview.61)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2...HEAD)
 
 **Implemented enhancements:**
 
@@ -20,6 +11,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency atc.test to 1.1.4 [\#508](https://github.com/christianhelle/refitter/pull/508) ([renovate[bot]](https://github.com/apps/renovate))
 - Update Apizr Dependencies to v6.1.0 [\#504](https://github.com/christianhelle/refitter/pull/504) ([christianhelle](https://github.com/christianhelle))
 - docs: add Briaoeuidhtns as a contributor for ideas [\#503](https://github.com/christianhelle/refitter/pull/503) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update dependency Atc.Test to 1.1.2 [\#501](https://github.com/christianhelle/refitter/pull/501) ([renovate[bot]](https://github.com/apps/renovate))
@@ -29,6 +21,7 @@
 - Update dependency Polly to 8.4.2 [\#492](https://github.com/christianhelle/refitter/pull/492) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refitter.SourceGenerator to 1.3.2 [\#491](https://github.com/christianhelle/refitter/pull/491) ([renovate[bot]](https://github.com/apps/renovate))
 - Bump actions/upload-artifact from 3 to 4 [\#468](https://github.com/christianhelle/refitter/pull/468) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): update dotnet monorepo [\#458](https://github.com/christianhelle/refitter/pull/458) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.3.2](https://github.com/christianhelle/refitter/tree/1.3.2) (2024-09-23)
 
