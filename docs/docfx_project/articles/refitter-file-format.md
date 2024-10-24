@@ -160,7 +160,7 @@ The following is an example `.refitter` file
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
-  - `usePolly` - (DEPRECATED) Set this to true to configure the HttpClient to use Polly using a retry policy with a jittered backoff
+  - `usePolly` - Set this to `true` to configure the HttpClient to use Polly using a retry policy with a jittered backoff.  This is **DEPRECATED**, use `transientErrorHandler` instead
   - `transientErrorHandler`: Set this to configure transient error handling with a retry policy that uses a jittered backoff. See https://refitter.github.io/api/Refitter.Core.TransientErrorHandler.html
   - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
