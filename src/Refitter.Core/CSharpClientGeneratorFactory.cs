@@ -24,7 +24,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             GenerateDtoTypes = true,
             GenerateClientInterfaces = false,
             GenerateExceptionClasses = false,
-            CodeGeneratorSettings = { PropertyNameGenerator = new CustomCSharpPropertyNameGenerator(), },
+            CodeGeneratorSettings = { PropertyNameGenerator = settings.CodeGeneratorSettings?.PropertyNameGenerator ?? new CustomCSharpPropertyNameGenerator() },
             CSharpGeneratorSettings =
             {
                 Namespace = settings.ContractsNamespace ?? settings.Namespace,
@@ -40,6 +40,11 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                     settings.CodeGeneratorSettings?.GenerateNativeRecords is true,
             }
         };
+
+        if (settings.ParameterNameGenerator != default)
+        {
+            csharpClientGeneratorSettings.ParameterNameGenerator = settings.ParameterNameGenerator;
+        }
 
         csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(
             csharpClientGeneratorSettings.CSharpGeneratorSettings,

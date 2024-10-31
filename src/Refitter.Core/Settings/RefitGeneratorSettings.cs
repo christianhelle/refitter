@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using NSwag.CodeGeneration;
 
 namespace Refitter.Core;
 
@@ -226,4 +227,7 @@ public class RefitGeneratorSettings
     /// See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
     /// </summary>
     public bool UsePolymorphicSerialization { get; set; }
+
+    [JsonIgnore]
+    public IParameterNameGenerator? ParameterNameGenerator { get; set; }
 }

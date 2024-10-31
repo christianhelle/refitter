@@ -1,4 +1,7 @@
-﻿namespace Refitter.Core;
+using System.Text.Json.Serialization;
+using NJsonSchema.CodeGeneration;
+
+namespace Refitter.Core;
 
 /// <summary>
 /// CSharp code generator settings
@@ -145,7 +148,7 @@ public class CodeGeneratorSettings
     /// Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).
     /// </summary>
     public bool GenerateDefaultValues { get; set; } = true;
-    
+
     /// <summary>
     /// Gets or sets a value indicating whether named/referenced any schemas should be inlined or generated as class.
     /// </summary>
@@ -155,4 +158,10 @@ public class CodeGeneratorSettings
     /// Gets or sets the excluded type names (must be defined in an import or other namespace).
     /// </summary>
     public string[] ExcludedTypeNames { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Gets or sets a custom <see cref="IPropertyNameGenerator"/>.
+    /// </summary>
+    [JsonIgnore]
+    public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
 }

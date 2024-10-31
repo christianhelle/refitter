@@ -1,4 +1,5 @@
-﻿using Atc.Test;
+using System.Reflection;
+using Atc.Test;
 using FluentAssertions;
 using Refitter.Core;
 using Xunit;
@@ -18,14 +19,16 @@ public class SerializerTests
     }
 
     [Theory, AutoNSubstituteData]
-    public void Can_Deserialize_RefitGeneratorSettings(
+    public void Can_Deserialize_RefitGeneratorSettingsWithoutNameGenerators(
         RefitGeneratorSettings settings)
     {
         var json = Serializer.Serialize(settings);
         Serializer
             .Deserialize<RefitGeneratorSettings>(json)
             .Should()
-            .BeEquivalentTo(settings);
+            .BeEquivalentTo(settings, options => options
+                .Excluding(settings => settings.ParameterNameGenerator)
+                .Excluding(settings => settings.CodeGeneratorSettings.PropertyNameGenerator));
     }
 
     [Theory, AutoNSubstituteData]
@@ -37,13 +40,15 @@ public class SerializerTests
         {
             var jsonProperty = "\"" + property.Name + "\"";
             json = json.Replace(
-                jsonProperty, 
+                jsonProperty,
                 jsonProperty.ToUpperInvariant());
         }
 
         Serializer
             .Deserialize<RefitGeneratorSettings>(json)
             .Should()
-            .BeEquivalentTo(settings);
+            .BeEquivalentTo(settings, options => options
+                .Excluding(settings => settings.ParameterNameGenerator)
+                .Excluding(settings => settings.CodeGeneratorSettings.PropertyNameGenerator));
     }
 }
