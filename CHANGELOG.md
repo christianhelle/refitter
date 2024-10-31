@@ -2,7 +2,20 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.0...HEAD)
+
+**Implemented enhancements:**
+
+- added options for a custom Name Generators [\#517](https://github.com/christianhelle/refitter/pull/517) ([fsamiec](https://github.com/fsamiec))
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 6.9.0 [\#514](https://github.com/christianhelle/refitter/pull/514) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.4.0 [\#513](https://github.com/christianhelle/refitter/pull/513) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.4.0](https://github.com/christianhelle/refitter/tree/1.4.0) (2024-10-14)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.3.2...1.4.0)
 
 **Implemented enhancements:**
 
