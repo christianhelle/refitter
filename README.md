@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-52-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-53-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -2620,6 +2620,7 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
       <td align="center" valign="top" width="14.28%"><a href="https://www.thebuildsheet.com/"><img src="https://avatars.githubusercontent.com/u/9909564?v=4?s=100" width="100px;" alt="Joshua Ozeri"/><br /><sub><b>Joshua Ozeri</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AXeClutch" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://kancane.nl/"><img src="https://avatars.githubusercontent.com/u/701534?v=4?s=100" width="100px;" alt="Ryan Heath"/><br /><sub><b>Ryan Heath</b></sub></a><br /><a href="#ideas-ryanheath" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=ryanheath" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Briaoeuidhtns"><img src="https://avatars.githubusercontent.com/u/7530156?v=4?s=100" width="100px;" alt="Brian Brunner"/><br /><sub><b>Brian Brunner</b></sub></a><br /><a href="#ideas-Briaoeuidhtns" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/fsamiec"><img src="https://avatars.githubusercontent.com/u/13166020?v=4?s=100" width="100px;" alt="Frank Samiec"/><br /><sub><b>Frank Samiec</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=fsamiec" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
