@@ -40,7 +40,7 @@ public class SerializerTests
         {
             var jsonProperty = "\"" + property.Name + "\"";
             json = json.Replace(
-                jsonProperty, 
+                jsonProperty,
                 jsonProperty.ToUpperInvariant());
         }
 
@@ -51,6 +51,4 @@ public class SerializerTests
                 .Excluding(settings => settings.ParameterNameGenerator)
                 .Excluding(settings => settings.CodeGeneratorSettings.PropertyNameGenerator));
     }
-
-
 }
