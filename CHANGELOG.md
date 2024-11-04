@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1-preview.62...HEAD)
+
+**Implemented enhancements:**
+
+- Add PropertyNameGenerator as an optional Parameter [\#516](https://github.com/christianhelle/refitter/issues/516)
+
+**Merged pull requests:**
+
+- chore\(deps\): update refit monorepo to v8 \(major\) [\#519](https://github.com/christianhelle/refitter/pull/519) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.4.1-preview.62](https://github.com/christianhelle/refitter/tree/1.4.1-preview.62) (2024-10-31)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.0...1.4.1-preview.62)
 
 **Implemented enhancements:**
 
@@ -10,6 +22,7 @@
 
 **Merged pull requests:**
 
+- docs: add fsamiec as a contributor for code [\#518](https://github.com/christianhelle/refitter/pull/518) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 6.9.0 [\#514](https://github.com/christianhelle/refitter/pull/514) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.4.0 [\#513](https://github.com/christianhelle/refitter/pull/513) ([renovate[bot]](https://github.com/apps/renovate))
 
