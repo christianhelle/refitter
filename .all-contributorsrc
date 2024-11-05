@@ -499,6 +499,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "fabioloreggian",
+      "name": "Fabio Loreggian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31480768?v=4",
+      "profile": "https://github.com/fabioloreggian",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
