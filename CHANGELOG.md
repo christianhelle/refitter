@@ -6,10 +6,13 @@
 
 **Implemented enhancements:**
 
+- Thanks for the great tool! [\#522](https://github.com/christianhelle/refitter/issues/522)
 - Add PropertyNameGenerator as an optional Parameter [\#516](https://github.com/christianhelle/refitter/issues/516)
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency fluentassertions to 6.12.2 [\#523](https://github.com/christianhelle/refitter/pull/523) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add fabioloreggian as a contributor for bug [\#521](https://github.com/christianhelle/refitter/pull/521) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update refit monorepo to v8 \(major\) [\#519](https://github.com/christianhelle/refitter/pull/519) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.4.1-preview.62](https://github.com/christianhelle/refitter/tree/1.4.1-preview.62) (2024-10-31)
