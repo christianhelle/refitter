@@ -11,6 +11,9 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency h.generators.extensions to 1.24.0 [\#528](https://github.com/christianhelle/refitter/pull/528) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to v7 [\#526](https://github.com/christianhelle/refitter/pull/526) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency polly to 8.5.0 [\#525](https://github.com/christianhelle/refitter/pull/525) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to 6.12.2 [\#523](https://github.com/christianhelle/refitter/pull/523) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add fabioloreggian as a contributor for bug [\#521](https://github.com/christianhelle/refitter/pull/521) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update refit monorepo to v8 \(major\) [\#519](https://github.com/christianhelle/refitter/pull/519) ([renovate[bot]](https://github.com/apps/renovate))
