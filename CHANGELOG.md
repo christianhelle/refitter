@@ -8,6 +8,7 @@
 
 - Thanks for the great tool! [\#522](https://github.com/christianhelle/refitter/issues/522)
 - Add PropertyNameGenerator as an optional Parameter [\#516](https://github.com/christianhelle/refitter/issues/516)
+- NSwag v14.2.0 [\#532](https://github.com/christianhelle/refitter/pull/532) ([renovate[bot]](https://github.com/apps/renovate))
 
 **Merged pull requests:**
 
