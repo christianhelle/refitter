@@ -12,6 +12,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency microsoft.net.test.sdk to 17.12.0 [\#531](https://github.com/christianhelle/refitter/pull/531) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency h.generators.extensions to 1.24.0 [\#528](https://github.com/christianhelle/refitter/pull/528) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dotnet monorepo to v9 \(major\) [\#527](https://github.com/christianhelle/refitter/pull/527) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to v7 [\#526](https://github.com/christianhelle/refitter/pull/526) ([renovate[bot]](https://github.com/apps/renovate))
