@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Apizr.Extensions.Microsoft.Caching" Version="6.3.0" />
+    <PackageReference Include="Apizr.Extensions.Microsoft.Caching" Version="6.4.0" />
     <PackageReference Include="Apizr.Integrations.AutoMapper" Version="6.3.0" />
     <PackageReference Include="Apizr.Integrations.FileTransfer.Optional" Version="6.3.0" />
     <PackageReference Include="Apizr.Integrations.Fusillade" Version="6.3.0" />
