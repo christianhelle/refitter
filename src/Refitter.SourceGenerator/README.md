@@ -83,7 +83,6 @@ The following is an example `.refitter` file
     "withCacheProvider": "InMemory", // Optional. Values=None|Akavache|MonkeyCache|InMemory|DistributedAsString|DistributedAsByteArray. Default=None
     "withPriority": true, // Optional. Default=false
     "withMediation": true, // Optional. Default=false
-    "withOptionalMediation": true, // Optional. Default=false
     "withMappingProvider": "AutoMapper", // Optional. Values=None|AutoMapper|Mapster. Default=None
     "withFileTransfer": true // Optional. Default=false
   },
@@ -160,7 +159,6 @@ The following is an example `.refitter` file
   - `withCacheProvider` - Set the cache provider to be used
   - `withPriority` - Tells if Apizr should handle request priority
   - `withMediation` - Tells if Apizr should handle request mediation (extended only)
-  - `withOptionalMediation` - Tells if Apizr should handle optional request mediation (extended only)
   - `withMappingProvider` - Set the mapping provider to be used
   - `withFileTransfer` - Tells if Apizr should handle file transfer
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts

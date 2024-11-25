@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Refitter.Core;
 using Xunit;
 
@@ -27,7 +27,6 @@ public class ApizrGeneratorWithPollyTests
             WithCacheProvider = CacheProviderType.InMemory,
             WithPriority = true,
             WithMediation = true,
-            WithOptionalMediation = true,
             WithMappingProvider = MappingProviderType.AutoMapper,
             WithFileTransfer = true
         }

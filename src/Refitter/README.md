@@ -174,7 +174,6 @@ The following is an example `.refitter` file
     "withCacheProvider": "InMemory", // Optional. Values=None|Akavache|MonkeyCache|InMemory|DistributedAsString|DistributedAsByteArray. Default=None
     "withPriority": true, // Optional. Default=false
     "withMediation": true, // Optional. Default=false
-    "withOptionalMediation": true, // Optional. Default=false
     "withMappingProvider": "AutoMapper", // Optional. Values=None|AutoMapper|Mapster. Default=None
     "withFileTransfer": true // Optional. Default=false
   },
@@ -258,7 +257,6 @@ The following is an example `.refitter` file
   - `withCacheProvider` - Set the cache provider to be used
   - `withPriority` - Tells if Apizr should handle request priority
   - `withMediation` - Tells if Apizr should handle request mediation (extended only)
-  - `withOptionalMediation` - Tells if Apizr should handle optional request mediation (extended only)
   - `withMappingProvider` - Set the mapping provider to be used
   - `withFileTransfer` - Tells if Apizr should handle file transfer
 - `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
@@ -1832,7 +1830,6 @@ This is what the `.refitter` settings file may look like, depending on you confi
     "withCacheProvider": "InMemory", // Optional, default is None
     "withPriority": true, // Optional, default is false
     "withMediation": true, // Optional, default is false
-    "withOptionalMediation": true, // Optional, default is false
     "withMappingProvider": "AutoMapper", // Optional, default is None
     "withFileTransfer": true // Optional, default is false
   }
@@ -1863,8 +1860,7 @@ public static IServiceCollection ConfigurePetstoreApiApizrManager(
         .WithInMemoryCacheHandler()
         .WithAutoMapperMappingHandler()
         .WithPriority()
-        .WithOptionalMediation()
-        .WithFileTransferOptionalMediation();
+        .WithFileTransferMediation();
                  
     return services.AddApizrManagerFor<IPetstoreApi>(optionsBuilder);
 }
@@ -1895,7 +1891,6 @@ This comes in handy especially when generating multiple interfaces, by tag or en
     "withCacheProvider": "InMemory", // Optional, default is None
     "withPriority": true, // Optional, default is false
     "withMediation": true, // Optional, default is false
-    "withOptionalMediation": true, // Optional, default is false
     "withMappingProvider": "AutoMapper", // Optional, default is None
     "withFileTransfer": true // Optional, default is false
   }
@@ -1926,8 +1921,7 @@ public static IServiceCollection ConfigurePetstoreApizrManagers(
         .WithInMemoryCacheHandler()
         .WithAutoMapperMappingHandler()
         .WithPriority()
-        .WithOptionalMediation()
-        .WithFileTransferOptionalMediation();
+        .WithFileTransferMediation();
             
     return services.AddApizr(
         registry => registry
@@ -1971,7 +1965,8 @@ public static IApizrManager<ISwaggerPetstoreOpenAPI30> BuildPetstore30ApizrManag
     optionsBuilder += options => options
         .WithAkavacheCacheHandler()
         .WithAutoMapperMappingHandler(new MapperConfiguration(config => { /* YOUR_MAPPINGS_HERE */ }))
-        .WithPriority();
+        .WithPriority()
+        .WithFileTransfer();
             
     return ApizrBuilder.Current.CreateManagerFor<ISwaggerPetstoreOpenAPI30>(optionsBuilder);  
 }
@@ -2002,7 +1997,6 @@ This comes in handy especially when generating multiple interfaces, by tag or en
     "withCacheProvider": "InMemory", // Optional, default is None
     "withPriority": true, // Optional, default is false
     "withMediation": true, // Optional, default is false
-    "withOptionalMediation": true, // Optional, default is false
     "withMappingProvider": "AutoMapper", // Optional, default is None
     "withFileTransfer": true // Optional, default is false
   }
@@ -2018,7 +2012,8 @@ public static IApizrRegistry BuildPetstoreApizrManagers(Action<IApizrCommonOptio
     optionsBuilder += options => options
         .WithAkavacheCacheHandler()
         .WithAutoMapperMappingHandler(new MapperConfiguration(config => { /* YOUR_MAPPINGS_HERE */ }))
-        .WithPriority();
+        .WithPriority()
+        .WithFileTransferMediation();
             
     return ApizrBuilder.Current.CreateRegistry(
         registry => registry

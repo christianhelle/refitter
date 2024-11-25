@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Refitter.Core
 {
@@ -51,11 +51,6 @@ namespace Refitter.Core
         /// Set it to true to handle request with MediatR (default: false)
         /// </summary>
         public bool WithMediation { get; set; } = false;
-
-        /// <summary>
-        /// Set it to true to handle request with MediatR and Optional result (default: false)
-        /// </summary>
-        public bool WithOptionalMediation { get; set; } = false;
 
         /// <summary>
         /// Set it to true to manage file transfers (default: false)
