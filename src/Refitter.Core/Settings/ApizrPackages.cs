@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Refitter.Core.Settings
 {
@@ -38,12 +38,6 @@ namespace Refitter.Core.Settings
         Apizr_Integrations_MediatR = 1024 | Apizr_Extensions_Microsoft_DependencyInjection,
 
         [Description("dotnet add package Apizr.Integrations.FileTransfer.MediatR, then register MediatR")]
-        Apizr_Integrations_FileTransfer_MediatR = 2048 | Apizr_Integrations_MediatR | Apizr_Extensions_Microsoft_FileTransfer,
-
-        [Description("dotnet add package Apizr.Integrations.Optional, then register MediatR")]
-        Apizr_Integrations_Optional = 4096 | Apizr_Integrations_MediatR,
-
-        [Description("dotnet add package Apizr.Integrations.FileTransfer.Optional, then register MediatR")]
-        Apizr_Integrations_FileTransfer_Optional = 8192 | Apizr_Integrations_Optional | Apizr_Integrations_FileTransfer_MediatR,
+        Apizr_Integrations_FileTransfer_MediatR = 2048 | Apizr_Integrations_MediatR | Apizr_Extensions_Microsoft_FileTransfer
     }
 }

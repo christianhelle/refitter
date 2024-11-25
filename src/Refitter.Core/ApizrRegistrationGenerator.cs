@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using Refitter.Core.Settings;
 
@@ -235,20 +235,7 @@ internal static class ApizrRegistrationGenerator
                 """);
         }
 
-        if (settings.ApizrSettings.WithOptionalMediation && isDependencyInjectionExtension)
-        {
-            apizrPackages.Add(ApizrPackages.Apizr_Integrations_Optional);
-            usingsCodeBuilder.AppendLine(
-                $$"""
-                    using MediatR;
-                """);
-            optionsCodeBuilder.AppendLine();
-            optionsCodeBuilder.Append(
-                $$"""
-                                .WithOptionalMediation()
-                """);
-        }
-        else if (settings.ApizrSettings.WithMediation && isDependencyInjectionExtension)
+        if (settings.ApizrSettings.WithMediation && isDependencyInjectionExtension)
         {
             apizrPackages.Add(ApizrPackages.Apizr_Integrations_MediatR);
             usingsCodeBuilder.AppendLine(
@@ -266,16 +253,7 @@ internal static class ApizrRegistrationGenerator
         {
             if (isDependencyInjectionExtension)
             {
-                if (settings.ApizrSettings.WithOptionalMediation)
-                {
-                    apizrPackages.Add(ApizrPackages.Apizr_Integrations_FileTransfer_Optional);
-                    optionsCodeBuilder.AppendLine();
-                    optionsCodeBuilder.Append(
-                $$"""
-                                .WithFileTransferOptionalMediation()
-                """);
-                }
-                else if (settings.ApizrSettings.WithMediation)
+                if (settings.ApizrSettings.WithMediation)
                 {
                     apizrPackages.Add(ApizrPackages.Apizr_Integrations_FileTransfer_MediatR);
                     optionsCodeBuilder.AppendLine();
@@ -310,8 +288,7 @@ internal static class ApizrRegistrationGenerator
         var packages = apizrPackages.OrderByDescending(p => p).ToList();
         if (packages.Count > 0)
         {
-            if (!isDependencyInjectionExtension && (settings.ApizrSettings.WithOptionalMediation ||
-                                                    settings.ApizrSettings.WithMediation ||
+            if (!isDependencyInjectionExtension && (settings.ApizrSettings.WithMediation ||
                                                     settings.ApizrSettings.WithCacheProvider == CacheProviderType.InMemory ||
                                                     settings.ApizrSettings.WithCacheProvider == CacheProviderType.DistributedAsString ||
                                                     settings.ApizrSettings.WithCacheProvider == CacheProviderType.DistributedAsByteArray))

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Refitter.Core;
 using Xunit;
 
@@ -25,7 +25,6 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
             WithCacheProvider = CacheProviderType.InMemory,
             WithPriority = true,
             WithMediation = true,
-            WithOptionalMediation = true,
             WithMappingProvider = MappingProviderType.AutoMapper,
             WithFileTransfer = true
         }
@@ -41,7 +40,6 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
             WithCacheProvider = CacheProviderType.InMemory,
             WithPriority = true,
             WithMediation = true,
-            WithOptionalMediation = true,
             WithMappingProvider = MappingProviderType.AutoMapper,
             WithFileTransfer = true
         }

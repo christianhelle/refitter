@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.Resources;
@@ -24,7 +24,6 @@ public class SwaggerPetstoreApizrTests
                 WithCacheProvider = CacheProviderType.InMemory,
                 WithPriority = true,
                 WithMediation = true,
-                WithOptionalMediation = true,
                 WithMappingProvider = MappingProviderType.AutoMapper,
                 WithFileTransfer = true
             };
