@@ -2,13 +2,31 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1-preview.62...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1...HEAD)
+
+**Implemented enhancements:**
+
+- \[Apizr\] Deprecated Optional package removed from code & doc [\#539](https://github.com/christianhelle/refitter/pull/539) ([JeremyBP](https://github.com/JeremyBP))
+
+**Fixed bugs:**
+
+- How to use in class library? [\#534](https://github.com/christianhelle/refitter/issues/534)
+
+**Merged pull requests:**
+
+- docs: add geometrikal as a contributor for bug [\#535](https://github.com/christianhelle/refitter/pull/535) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.4.1 [\#533](https://github.com/christianhelle/refitter/pull/533) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.4.1](https://github.com/christianhelle/refitter/tree/1.4.1) (2024-11-19)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.0...1.4.1)
 
 **Implemented enhancements:**
 
 - Thanks for the great tool! [\#522](https://github.com/christianhelle/refitter/issues/522)
 - Add PropertyNameGenerator as an optional Parameter [\#516](https://github.com/christianhelle/refitter/issues/516)
 - NSwag v14.2.0 [\#532](https://github.com/christianhelle/refitter/pull/532) ([renovate[bot]](https://github.com/apps/renovate))
+- added options for a custom Name Generators [\#517](https://github.com/christianhelle/refitter/pull/517) ([fsamiec](https://github.com/fsamiec))
 
 **Merged pull requests:**
 
@@ -20,17 +38,6 @@
 - chore\(deps\): update dependency fluentassertions to 6.12.2 [\#523](https://github.com/christianhelle/refitter/pull/523) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add fabioloreggian as a contributor for bug [\#521](https://github.com/christianhelle/refitter/pull/521) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update refit monorepo to v8 \(major\) [\#519](https://github.com/christianhelle/refitter/pull/519) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.4.1-preview.62](https://github.com/christianhelle/refitter/tree/1.4.1-preview.62) (2024-10-31)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.0...1.4.1-preview.62)
-
-**Implemented enhancements:**
-
-- added options for a custom Name Generators [\#517](https://github.com/christianhelle/refitter/pull/517) ([fsamiec](https://github.com/fsamiec))
-
-**Merged pull requests:**
-
 - docs: add fsamiec as a contributor for code [\#518](https://github.com/christianhelle/refitter/pull/518) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 6.9.0 [\#514](https://github.com/christianhelle/refitter/pull/514) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.4.0 [\#513](https://github.com/christianhelle/refitter/pull/513) ([renovate[bot]](https://github.com/apps/renovate))
