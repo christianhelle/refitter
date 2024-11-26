@@ -252,13 +252,13 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         interfaceName = $"I{title.CapitalizeFirstCharacter()}";
 
         var inheritance = settings.GenerateDisposableClients
-            ? ": IDisposable"
+            ? " : IDisposable"
             : null;
-        
+
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         return $"""
                 {Separator}{GetGeneratedCodeAttribute()}
-                {Separator}{modifier} partial interface {interfaceName} {inheritance}
+                {Separator}{modifier} partial interface {interfaceName}{inheritance}
                 """;
     }
 
