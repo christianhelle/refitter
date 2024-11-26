@@ -94,6 +94,28 @@ public class SwaggerPetstoreMultipleFileTests
             });
     }
 
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+#if !DEBUG
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+#endif
+    public async Task Can_Build_Generate_Code_With_IDisposable(SampleOpenSpecifications version, string filename)
+    {
+        await GenerateCode(
+            version,
+            filename,
+            new RefitGeneratorSettings { GenerateDisposableClients = true },
+            assert: generatorOutput =>
+            {
+                BuildHelper
+                    .BuildCSharp(generatorOutput.Files.Select(code => code.Content).ToArray())
+                    .Should()
+                    .BeTrue();
+            });
+    }
+
     private static async Task GenerateCode(
         SampleOpenSpecifications version,
         string filename,

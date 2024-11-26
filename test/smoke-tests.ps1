@@ -153,6 +153,7 @@ function RunTests {
                     $namespace = $_.Replace("-", "")
                     $namespace = $namespace.Substring(0, 1).ToUpperInvariant() + $namespace.Substring(1, $namespace.Length - 1)
 
+                    GenerateAndBuild -format $format -namespace "$namespace.Disposable" -outputPath "Disposable$outputPath" -args "--disposable" -buildFromSource $buildFromSource -netCore
                     GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -args "--multiple-files" -buildFromSource $buildFromSource
                     GenerateAndBuild -format $format -namespace "$namespace.SeparateContractsFile" -args "--contracts-output GeneratedCode/Contracts --contracts-namespace $namespace.SeparateContractsFile.Contracts" -buildFromSource $buildFromSource
                     GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens" -buildFromSource $buildFromSource

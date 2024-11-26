@@ -119,7 +119,12 @@ OPTIONS:
                                                                  See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                   
         --use-dynamic-querystring-parameters                     Enable wrapping multiple query parameters into a single complex one. Default is no wrapping.                                              
                                                                  See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information                            
-        --use-polymorphic-serialization                          Use System.Text.Json polymorphic serialization                                                                                            
+        --use-polymorphic-serialization                          Use System.Text.Json polymorphic serialization.                                                                                           
+                                                                 Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.                                       
+                                                                 To have the native support of inheritance (de)serialization and fallback to base types when                                               
+                                                                 payloads with (yet) unknown types are offered by newer versions of an API                                                                 
+                                                                 See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information                    
+        --disposable                                             Generate refit clients that implement IDisposable                                                                                         
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -210,7 +215,8 @@ The following is an example `.refitter` file
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": true, // Optional. Default=false
-  "usePolymorphicSerialization", false, // Optional. Default=false
+  "usePolymorphicSerialization": true, // Optional. Default=false
+  "generateDisposableClients": true, // Optional. Default=false
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional

@@ -66,7 +66,8 @@ The following is an example `.refitter` file
     "^/store/.*"
   ],
   "useDynamicQuerystringParameters": true, // Optional. Default=false
-  "usePolymorphicSerialization": false, // Optional. Default=false
+  "usePolymorphicSerialization": true, // Optional. Default=false
+  "generateDisposableClients": true, // Optional. Default=false
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
