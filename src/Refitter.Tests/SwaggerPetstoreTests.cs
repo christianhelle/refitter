@@ -358,7 +358,7 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Apizr_Setup(SampleOpenSpecifications version, string filename)
     {
-        var settings = new RefitGeneratorSettings 
+        var settings = new RefitGeneratorSettings
         {
             DependencyInjectionSettings = new DependencyInjectionSettings
             {
@@ -387,7 +387,7 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Apizr_Setup_With_Polly(SampleOpenSpecifications version, string filename)
     {
-        var settings = new RefitGeneratorSettings 
+        var settings = new RefitGeneratorSettings
         {
             DependencyInjectionSettings = new DependencyInjectionSettings
             {
@@ -416,7 +416,7 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Apizr_Setup_Without_Polly(SampleOpenSpecifications version, string filename)
     {
-        var settings = new RefitGeneratorSettings 
+        var settings = new RefitGeneratorSettings
         {
             DependencyInjectionSettings = new DependencyInjectionSettings
             {
@@ -739,5 +739,35 @@ public class SwaggerPetstoreTests
 
         generateCode.Should().Contain("[Query] LoginUserQueryParams queryParams);")
             .And.Contain("public class LoginUserQueryParams");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_IDisposable(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings { GenerateDisposableClients = true };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("IDisposable");
+    }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+#if !DEBUG
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+#endif
+    public async Task Can_Build_Generated_Code_With_IDisposable(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.GenerateDisposableClients = true;
+        var generateCode = await GenerateCode(version, filename, settings);
+        BuildHelper
+            .BuildCSharp(generateCode)
+            .Should()
+            .BeTrue();
     }
 }
