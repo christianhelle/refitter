@@ -93,16 +93,19 @@ OPTIONS:
                                                                  - SingleClientFromPathSegments                                                                                                            
                                                                  See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html for more information                                    
         --immutable-records                                      Generate contracts as immutable records instead of classes                                                                                
-        --use-apizr                                              Set to true to use Apizr by:                                                                                                              
+        --use-apizr                                              Use Apizr by:                                                                                                                             
                                                                  - Adding a final IApizrRequestOptions options parameter to all generated methods                                                          
                                                                  - Providing cancellation tokens by Apizr request options instead of a dedicated parameter                                                 
                                                                  - Using method overloads instead of optional parameters                                                                                   
                                                                  See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr                                   
-        --use-dynamic-querystring-parameters                     Set to <c>true</c> to wrap multiple query parameters into a single complex one. Default is <c>false</c> (no wrapping).                    
-                                                                 See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information
-        --use-polymorphic-serialization                          Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes. To have the native support of inheritance (de)serialization and fallback to base types when payloads with (yet) unknown types are offered by newer versions of an API.
-                                                                 See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
-
+        --use-dynamic-querystring-parameters                     Enable wrapping multiple query parameters into a single complex one. Default is no wrapping.                                              
+                                                                 See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information                            
+        --use-polymorphic-serialization                          Use System.Text.Json polymorphic serialization.                                                                                           
+                                                                 Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.                                       
+                                                                 To have the native support of inheritance (de)serialization and fallback to base types when                                               
+                                                                 payloads with (yet) unknown types are offered by newer versions of an API                                                                 
+                                                                 See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information                    
+        --disposable                                             Generate refit clients that implement IDisposable                                                                                         
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
