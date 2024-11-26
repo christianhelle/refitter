@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Generate IDisposable Refit Interfaces [\#543](https://github.com/christianhelle/refitter/pull/543) ([christianhelle](https://github.com/christianhelle))
 - Clients implementing IDisposable interface [\#541](https://github.com/christianhelle/refitter/pull/541) ([shubinp](https://github.com/shubinp))
 - \[Apizr\] Deprecated Optional package removed from code & doc [\#539](https://github.com/christianhelle/refitter/pull/539) ([JeremyBP](https://github.com/JeremyBP))
 
@@ -15,6 +16,7 @@
 
 **Merged pull requests:**
 
+- docs: add shubinp as a contributor for code [\#542](https://github.com/christianhelle/refitter/pull/542) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 7.1.0 [\#540](https://github.com/christianhelle/refitter/pull/540) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add geometrikal as a contributor for bug [\#535](https://github.com/christianhelle/refitter/pull/535) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.4.1 [\#533](https://github.com/christianhelle/refitter/pull/533) ([renovate[bot]](https://github.com/apps/renovate))
