@@ -109,7 +109,7 @@ public sealed class Settings : CommandSettings
     public Core.MultipleInterfaces MultipleInterfaces { get; set; } = Core.MultipleInterfaces.Unset;
 
     [Description("""
-                 Generate multiple files instead of a single large file. 
+                 Generate multiple files instead of a single large file.
                  The output files can be the following:
                  - RefitInterfaces.cs
                  - DependencyInjection.cs
@@ -169,8 +169,8 @@ public sealed class Settings : CommandSettings
     public bool SkipDefaultAdditionalProperties { get; set; }
 
     [Description("""
-                 The NSwag IOperationNameGenerator implementation to use. 
-                 May be one of: 
+                 The NSwag IOperationNameGenerator implementation to use.
+                 May be one of:
                  - Default
                  - MultipleClientsFromOperationId
                  - MultipleClientsFromPathSegments
@@ -219,4 +219,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--use-polymorphic-serialization")]
     [DefaultValue(false)]
     public bool UsePolymorphicSerialization { get; set; }
+
+    [Description("Generate refit clients that implement IDisposable")]
+    [CommandOption("--disposable")]
+    [DefaultValue(false)]
+    public bool GenerateDisposableClients { get; set; }
 }

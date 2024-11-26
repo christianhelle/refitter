@@ -133,6 +133,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ContractsOutputFolder = settings.ContractsOutputPath ?? settings.OutputPath,
             ContractsNamespace = settings.ContractsNamespace,
             UsePolymorphicSerialization = settings.UsePolymorphicSerialization,
+            GenerateDisposableClients = settings.GenerateDisposableClients,
         };
     }
 
