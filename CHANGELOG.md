@@ -14,6 +14,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 7.1.0 [\#540](https://github.com/christianhelle/refitter/pull/540) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add geometrikal as a contributor for bug [\#535](https://github.com/christianhelle/refitter/pull/535) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.4.1 [\#533](https://github.com/christianhelle/refitter/pull/533) ([renovate[bot]](https://github.com/apps/renovate))
 
