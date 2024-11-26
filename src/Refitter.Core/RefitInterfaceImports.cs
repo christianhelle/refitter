@@ -15,11 +15,6 @@ internal static class RefitInterfaceImports
     {
         var namespaces = new List<string>(defaultNamespases);
 
-        if(settings.GenerateDisposableClients)
-        {
-            namespaces.Add("System");
-        }
-
         if (settings.ApizrSettings?.WithRequestOptions == true)
         {
             namespaces.Add("Apizr.Configuring.Request");
@@ -44,7 +39,7 @@ internal static class RefitInterfaceImports
                 .Where(n => !string.IsNullOrWhiteSpace(n))
                 .Select(x => new Regex(x, RegexOptions.Compiled))
                 .ToList();
-            
+
             var excludedNamespaces = exclusionNamespacesRegexes.SelectMany(k => namespaces.Where(x => k.IsMatch(x)));
             namespaces = namespaces.Except(excludedNamespaces).ToList();
         }
