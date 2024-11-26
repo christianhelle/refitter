@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Clients implementing IDisposable interface [\#541](https://github.com/christianhelle/refitter/pull/541) ([shubinp](https://github.com/shubinp))
 - \[Apizr\] Deprecated Optional package removed from code & doc [\#539](https://github.com/christianhelle/refitter/pull/539) ([JeremyBP](https://github.com/JeremyBP))
 
 **Fixed bugs:**
