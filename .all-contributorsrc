@@ -526,6 +526,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "zidad",
+      "name": "Wiebe Tijsma",
+      "avatar_url": "https://avatars.githubusercontent.com/u/303034?v=4",
+      "profile": "https://www.netindustry.nl",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
