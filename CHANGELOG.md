@@ -16,6 +16,8 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency fluentassertions to v7 [\#546](https://github.com/christianhelle/refitter/pull/546) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add zidad as a contributor for ideas [\#545](https://github.com/christianhelle/refitter/pull/545) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add shubinp as a contributor for code [\#542](https://github.com/christianhelle/refitter/pull/542) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 7.1.0 [\#540](https://github.com/christianhelle/refitter/pull/540) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add geometrikal as a contributor for bug [\#535](https://github.com/christianhelle/refitter/pull/535) ([allcontributors[bot]](https://github.com/apps/allcontributors))
