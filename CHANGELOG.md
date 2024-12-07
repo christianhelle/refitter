@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- MSBuild Custom Task [\#548](https://github.com/christianhelle/refitter/pull/548) ([christianhelle](https://github.com/christianhelle))
 - Generate IDisposable Refit Interfaces [\#543](https://github.com/christianhelle/refitter/pull/543) ([christianhelle](https://github.com/christianhelle))
 - Clients implementing IDisposable interface [\#541](https://github.com/christianhelle/refitter/pull/541) ([shubinp](https://github.com/shubinp))
 - \[Apizr\] Deprecated Optional package removed from code & doc [\#539](https://github.com/christianhelle/refitter/pull/539) ([JeremyBP](https://github.com/JeremyBP))
