@@ -1,4 +1,4 @@
-name: MSBuild
+name: MSBuild Tasks
 
 on:
   workflow_dispatch:
