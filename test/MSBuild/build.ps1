@@ -5,8 +5,9 @@ nuget locals global-packages -clear
 Remove-Item ./refitter.msbuild -Recurse -Force
 Remove-Item Refitter.MSBuild.*.nupkg -Force
 Remove-Item Petstore.cs
-dotnet clean -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
-dotnet restore ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
+dotnet restore ../../src/Refitter.sln
+dotnet clean -c release ../../src/Refitter.sln
+dotnet build -c release ../../src/Refitter/Refitter.csproj
 dotnet build -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
 nuget add .\Refitter.MSBuild.1.0.0.nupkg -source .
