@@ -45,7 +45,8 @@ public class RefitterGenerateTask : MSBuildTask
     {
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
-        var refitterDll = $"{packageFolder}\\..\\refitter.dll";
+        var seperator = Path.DirectorySeparatorChar;
+        var refitterDll = $"{packageFolder}{seperator}..{seperator}refitter.dll";
         TryLogCommandLine("Starting " + refitterDll);
 
         using var process = new Process
