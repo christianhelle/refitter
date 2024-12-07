@@ -1,0 +1,11 @@
+<Project TreatAsLocalProperty="TaskFolder;TaskAssembly">
+
+    <PropertyGroup>
+        <TaskFolder>$(MSBuildThisFileDirectory)..\tasks</TaskFolder>
+        <TaskAssembly>$(TaskFolder)\netstandard2.0\Refitter.MSBuild.dll</TaskAssembly>
+    </PropertyGroup>
+
+    <UsingTask TaskName="Refitter.MSBuild.RefitterGenerateTask"
+               AssemblyFile="$(TaskAssembly)" />
+
+</Project>
