@@ -23,7 +23,9 @@ jobs:
         with:
           setAllVars: true
       - name: Build
-        run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}" -p:Version="${{ inputs.version }}"
+        run: |
+          dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}" -p:Version="${{ inputs.version }}"
+          dotnet pack -c Release src/Refitter.MSBuild/Refitter.MSBuild.csproj -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}" -p:Version="${{ inputs.version }}"
       - name: Move packages
         shell: pwsh
         run: Get-ChildItem -Filter *.nupkg -Recurse | ForEach-Object { Move-Item -Path $_ -Destination . }
