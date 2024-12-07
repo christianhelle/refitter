@@ -54,7 +54,7 @@ jobs:
         Get-ChildItem '*.coveragexml' -Recurse | Select-Object -First 1 | Copy-Item -Path { $_.FullName } -Destination ./coverage.xml
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         directory: src
         file: coverage.xml
