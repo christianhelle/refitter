@@ -1,6 +1,7 @@
 <Project>
 
     <Target Name="Refitter" BeforeTargets="BeforeBuild">
+        <Exec Command="dotnet tool update --global refitter --version $(RefitterVersion)" ContinueOnError="true" />
         <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)" />
         <ItemGroup>
             <Compile Include="**/*.cs" />
