@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refitter.SourceGenerator", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Refitter.SourceGenerator.Tests", "Refitter.SourceGenerator.Tests\Refitter.SourceGenerator.Tests.csproj", "{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refitter.MSBuild", "Refitter.MSBuild\Refitter.MSBuild.csproj", "{3CBC5045-9427-42D5-B71F-C25EAC86E042}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFF920A9-765D-4ABA-9BEF-2A5BE7A2AFAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CBC5045-9427-42D5-B71F-C25EAC86E042}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CBC5045-9427-42D5-B71F-C25EAC86E042}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CBC5045-9427-42D5-B71F-C25EAC86E042}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CBC5045-9427-42D5-B71F-C25EAC86E042}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

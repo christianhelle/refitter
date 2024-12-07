@@ -1,0 +1,10 @@
+{
+  "openApiPath": "https://petstore3.swagger.io/api/v3/openapi.json",
+  "namespace": "Refitter.MSBuild.Tests.Petstore",
+  "outputFileName": "Petstore.cs",
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstore",
+    "filename": "SwaggerPetstore"
+  }
+}

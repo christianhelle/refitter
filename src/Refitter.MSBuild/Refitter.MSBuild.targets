@@ -1,0 +1,10 @@
+<Project>
+
+    <Target Name="Refitter" BeforeTargets="BeforeBuild">
+        <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)" />
+        <ItemGroup>
+            <Compile Include="**/*.cs" />
+        </ItemGroup>
+    </Target>
+
+</Project>
