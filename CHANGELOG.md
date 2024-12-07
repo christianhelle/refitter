@@ -2,15 +2,7 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.0-preview.63...HEAD)
-
-**Merged pull requests:**
-
-- Update codecov/codecov-action action to v5 [\#549](https://github.com/christianhelle/refitter/pull/549) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.5.0-preview.63](https://github.com/christianhelle/refitter/tree/1.5.0-preview.63) (2024-12-07)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1...1.5.0-preview.63)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1...HEAD)
 
 **Implemented enhancements:**
 
@@ -25,6 +17,7 @@
 
 **Merged pull requests:**
 
+- Update codecov/codecov-action action to v5 [\#549](https://github.com/christianhelle/refitter/pull/549) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to v7 [\#546](https://github.com/christianhelle/refitter/pull/546) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add zidad as a contributor for ideas [\#545](https://github.com/christianhelle/refitter/pull/545) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add shubinp as a contributor for code [\#542](https://github.com/christianhelle/refitter/pull/542) ([allcontributors[bot]](https://github.com/apps/allcontributors))
