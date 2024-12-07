@@ -8,6 +8,8 @@ public class RefitterGenerateTask : MSBuildTask
 {
     public string ProjectFileDirectory { get; set; }
 
+    public bool DisableLogging { get; set; }
+
     public override bool Execute()
     {
         TryLogCommandLine($"Starting {nameof(RefitterGenerateTask)}");
@@ -49,12 +51,18 @@ public class RefitterGenerateTask : MSBuildTask
         var refitterDll = $"{packageFolder}{seperator}..{seperator}refitter.dll";
         TryLogCommandLine("Starting " + refitterDll);
 
+        var args = $"{refitterDll} --settings-file {file}";
+        if (DisableLogging)
+        {
+            args += " --no-logging";
+        }
+
         using var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"{refitterDll} --settings-file {file}",
+                Arguments = args,
                 WorkingDirectory = Path.GetDirectoryName(file)!,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
