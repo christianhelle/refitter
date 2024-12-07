@@ -39,3 +39,22 @@ jobs:
     uses: ./.github/workflows/template-source-generator.yml
     with:
       os: ${{ matrix.os }}
+
+  msbuild:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0'
+    - name: 🛠️ Add Refitter.MSBuild package
+      run: dotnet add package Refitter.MSBuild --prerelease
+      working-directory: test/MSBuild
+    - name: 🛠️ Build MSBuild Test
+      run: dotnet build
+      working-directory: test/MSBuild
