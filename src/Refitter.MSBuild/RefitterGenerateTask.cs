@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using MSBuildTask = Microsoft.Build.Utilities.Task;
 
 namespace Refitter.MSBuild;
@@ -17,7 +18,7 @@ public class RefitterGenerateTask : MSBuildTask
             "*.refitter",
             SearchOption.AllDirectories);
 
-        TryLogCommandLine($"Found {files.Length} .refitter files...");        
+        TryLogCommandLine($"Found {files.Length} .refitter files...");
 
         foreach (var file in files)
         {
@@ -42,12 +43,17 @@ public class RefitterGenerateTask : MSBuildTask
 
     private void StartProcess(string file)
     {
+        var assembly = Assembly.GetExecutingAssembly();
+        var packageFolder = Path.GetDirectoryName(assembly.Location);
+        var refitterDll = $"{packageFolder}\\..\\refitter.dll";
+        TryLogCommandLine("Starting " + refitterDll);
+
         using var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = "refitter",
-                Arguments = $"--settings-file {file}",
+                FileName = "dotnet",
+                Arguments = $"{refitterDll} --settings-file {file}",
                 WorkingDirectory = Path.GetDirectoryName(file)!,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
