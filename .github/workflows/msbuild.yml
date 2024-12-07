@@ -40,4 +40,11 @@ jobs:
       run: dotnet build -v d -filelogger
     - name: 🧪 Build Output
       working-directory: test/MSBuild
-      run: cat msbuild.log
+      run: cat msbuild.log   
+    - name: 🗳️ Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: Packages
+        path: |
+          **/*.nupkg
+          README.md
