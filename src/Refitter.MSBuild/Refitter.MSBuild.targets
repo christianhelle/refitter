@@ -1,7 +1,8 @@
 <Project>
 
     <Target Name="Refitter" BeforeTargets="BeforeBuild">
-        <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)" />
+        <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
+                              DisableLogging="$(RefitterNoLogging)"/>
         <ItemGroup>
             <Compile Include="**/*.cs" />
         </ItemGroup>
