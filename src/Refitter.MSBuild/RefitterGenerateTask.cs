@@ -49,13 +49,14 @@ public class RefitterGenerateTask : MSBuildTask
         var packageFolder = Path.GetDirectoryName(assembly.Location);
         var seperator = Path.DirectorySeparatorChar;
         var refitterDll = $"{packageFolder}{seperator}..{seperator}refitter.dll";
-        TryLogCommandLine("Starting " + refitterDll);
 
         var args = $"{refitterDll} --settings-file {file}";
         if (DisableLogging)
         {
             args += " --no-logging";
         }
+
+        TryLogCommandLine($"Starting dotnet {args}");
 
         using var process = new Process
         {
