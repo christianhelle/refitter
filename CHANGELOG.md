@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Add support for disabling telemetry from MSBuild task [\#550](https://github.com/christianhelle/refitter/pull/550) ([christianhelle](https://github.com/christianhelle))
 - MSBuild Custom Task [\#548](https://github.com/christianhelle/refitter/pull/548) ([christianhelle](https://github.com/christianhelle))
 - Generate IDisposable Refit Interfaces [\#543](https://github.com/christianhelle/refitter/pull/543) ([christianhelle](https://github.com/christianhelle))
 - Clients implementing IDisposable interface [\#541](https://github.com/christianhelle/refitter/pull/541) ([shubinp](https://github.com/shubinp))
