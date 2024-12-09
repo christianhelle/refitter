@@ -4,6 +4,9 @@
 - name: Source Generator
   href: source-generator.md
 
+- name: MSBuild
+  href: msbuild.md
+
 - name: .refitter file format
   href: refitter-file-format.md
 
