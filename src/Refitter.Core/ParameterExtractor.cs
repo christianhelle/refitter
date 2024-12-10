@@ -90,8 +90,8 @@ internal static class ParameterExtractor
         return (parameter, settings) switch
         {
             { parameter.IsArray: true } => "Query(CollectionFormat.Multi)",
-            { parameter.IsDate: true, settings.UseIsoDateFormat: false } => $"Query(Format = \"{ (settings.CodeGeneratorSettings is not null ? settings.CodeGeneratorSettings?.DateFormat : "yyyy-MM-dd")}\")",
             { parameter.IsDate: true, settings.UseIsoDateFormat: true } => "Query(Format = \"yyyy-MM-dd\")",
+            { parameter.IsDate: true, settings.CodeGeneratorSettings: not null } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateFormat}\")",
             _ => "Query",
         };
     }
