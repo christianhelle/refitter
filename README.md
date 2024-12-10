@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-57-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-58-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -2705,6 +2705,7 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://www.netindustry.nl"><img src="https://avatars.githubusercontent.com/u/303034?v=4?s=100" width="100px;" alt="Wiebe Tijsma"/><br /><sub><b>Wiebe Tijsma</b></sub></a><br /><a href="#ideas-zidad" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/hgdemers"><img src="https://avatars.githubusercontent.com/u/169190876?v=4?s=100" width="100px;" alt="Henri Demers"/><br /><sub><b>Henri Demers</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Ahgdemers" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
