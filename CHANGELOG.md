@@ -2,11 +2,24 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.0-preview.65...HEAD)
 
 **Implemented enhancements:**
 
-- Add support for disabling telemetry from MSBuild task [\#550](https://github.com/christianhelle/refitter/pull/550) ([christianhelle](https://github.com/christianhelle))
+- Added support for custom date format [\#554](https://github.com/christianhelle/refitter/pull/554) ([Fargekritt](https://github.com/Fargekritt))
+
+**Merged pull requests:**
+
+- docs: add hgdemers as a contributor for bug [\#553](https://github.com/christianhelle/refitter/pull/553) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- MSBuild Documentation [\#552](https://github.com/christianhelle/refitter/pull/552) ([christianhelle](https://github.com/christianhelle))
+
+## [1.5.0-preview.65](https://github.com/christianhelle/refitter/tree/1.5.0-preview.65) (2024-12-08)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1...1.5.0-preview.65)
+
+**Implemented enhancements:**
+
+- Add support for disabling telemetry in MSBuild task [\#550](https://github.com/christianhelle/refitter/pull/550) ([christianhelle](https://github.com/christianhelle))
 - MSBuild Custom Task [\#548](https://github.com/christianhelle/refitter/pull/548) ([christianhelle](https://github.com/christianhelle))
 - Generate IDisposable Refit Interfaces [\#543](https://github.com/christianhelle/refitter/pull/543) ([christianhelle](https://github.com/christianhelle))
 - Clients implementing IDisposable interface [\#541](https://github.com/christianhelle/refitter/pull/541) ([shubinp](https://github.com/shubinp))
