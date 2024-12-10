@@ -11,7 +11,7 @@ internal static class ParameterExtractor
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings,
-        string dynamicQuerystringParameterType, 
+        string dynamicQuerystringParameterType,
         out string? dynamicQuerystringParameters)
     {
         var routeParameters = operationModel.Parameters
@@ -46,7 +46,7 @@ internal static class ParameterExtractor
                 var generatedAliasAsAttribute = string.IsNullOrWhiteSpace(GetAliasAsAttribute(p))
                     ? string.Empty
                     : $"[{GetAliasAsAttribute(p)}]";
-                
+
                 return $"{generatedAliasAsAttribute}StreamPart {p.VariableName}";
             })
             .ToList();
@@ -90,7 +90,7 @@ internal static class ParameterExtractor
         return (parameter, settings) switch
         {
             { parameter.IsArray: true } => "Query(CollectionFormat.Multi)",
-            { parameter.IsDate: true, settings.UseIsoDateFormat: true } => "Query(Format = \"yyyy-MM-dd\")",
+            { parameter.IsDate: true, settings.UseIsoDateFormat: true } => $"Query(Format = \"{ (settings.CodeGeneratorSettings is not null ? settings.CodeGeneratorSettings?.DateFormat : "yyyy-MM-dd")}\")",
             _ => "Query",
         };
     }
@@ -211,7 +211,7 @@ internal static class ParameterExtractor
                 }
 
                 dynamicQuerystringParametersCodeBuilder.AppendLine(
-            $$"""               
+            $$"""
                 {{modifier}} {{classStyle}} {{dynamicQuerystringParameterType}}
                 {
             """);
@@ -224,7 +224,7 @@ internal static class ParameterExtractor
                     {
                         {{initializedParametersCodeBuilder}}
                     }
-            """); 
+            """);
                 }
 
                 dynamicQuerystringParametersCodeBuilder.AppendLine(
