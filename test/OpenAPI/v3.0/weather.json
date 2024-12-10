@@ -1,0 +1,103 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "WebApplication",
+      "version": "1.0"
+    },
+    "paths": {
+      "/weatherforecast/{id}": {
+        "get": {
+          "tags": [
+            "WebApplication"
+          ],
+          "operationId": "GetWeatherForecastById",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/WeatherForecast"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/weatherforecast/{code}": {
+        "get": {
+          "tags": [
+            "WebApplication3"
+          ],
+          "operationId": "GetWeatherForecastByCode",
+          "parameters": [
+            {
+              "name": "code",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/WeatherForecast"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "WeatherForecast": {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string",
+              "format": "date"
+            },
+            "temperatureC": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "summary": {
+              "type": "string",
+              "nullable": true
+            },
+            "temperatureF": {
+              "type": "integer",
+              "format": "int32",
+              "readOnly": true
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  }
