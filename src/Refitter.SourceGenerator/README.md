@@ -2,7 +2,7 @@
 
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
-The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `--outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code 
+The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `--outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code
 
 ***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
 
@@ -71,9 +71,9 @@ The following is an example `.refitter` file
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
-        "AuthorizationMessageHandler", 
-        "TelemetryMessageHandler" 
-    ], 
+        "AuthorizationMessageHandler",
+        "TelemetryMessageHandler"
+    ],
     "transientErrorHandler": "Polly", // Optional. Value=None|Polly|HttpResilience
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
@@ -116,6 +116,7 @@ The following is an example `.refitter` file
     "generateNativeRecords": false,
     "generateDefaultValues": true,
     "inlineNamedAny": false,
+    "dateFormat": "yyyy-MM-dd",
     "excludedTypeNames": [
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
@@ -151,7 +152,7 @@ The following is an example `.refitter` file
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients. See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
-  - `transientErrorHandler` - This is the transient error handler to use. Possible values are `None`, `Polly`, and `HttpResilience`. Default is `None` 
+  - `transientErrorHandler` - This is the transient error handler to use. Possible values are `None`, `Polly`, and `HttpResilience`. Default is `None`
   - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
 - `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See https://www.apizr.net for more information
@@ -191,4 +192,5 @@ The following is an example `.refitter` file
   - `generateNativeRecords` - Default is false
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
+  - `dateFormat` - Default is `yyyy-MM-dd`
   - `excludedTypeNames` - Default is empty
