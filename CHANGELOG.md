@@ -10,6 +10,8 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency oasreader to 1.6.16.16 [\#556](https://github.com/christianhelle/refitter/pull/556) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add Fargekritt as a contributor for code [\#555](https://github.com/christianhelle/refitter/pull/555) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add hgdemers as a contributor for bug [\#553](https://github.com/christianhelle/refitter/pull/553) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - MSBuild Documentation [\#552](https://github.com/christianhelle/refitter/pull/552) ([christianhelle](https://github.com/christianhelle))
 
