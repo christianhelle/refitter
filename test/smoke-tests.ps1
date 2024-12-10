@@ -114,7 +114,8 @@ function RunTests {
         $BuildFromSource = $true
     )
 
-    $filenames = @(
+    $filenames = @(        
+        "weather",
         "bot.paths",
         "petstore",
         "petstore-expanded",
