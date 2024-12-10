@@ -109,7 +109,6 @@ public class CustomDateFormatTests
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
-            UseIsoDateFormat = true,
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
                 DateFormat = "yyyy-MM-ddThh:mm:ssZ"
