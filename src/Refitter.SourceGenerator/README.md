@@ -116,7 +116,7 @@ The following is an example `.refitter` file
     "generateNativeRecords": false,
     "generateDefaultValues": true,
     "inlineNamedAny": false,
-    "dateFormat": "yyyy-MM-dd"
+    "dateFormat": "yyyy-MM-dd",
     "excludedTypeNames": [
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
