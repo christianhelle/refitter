@@ -6,10 +6,18 @@
 
 **Implemented enhancements:**
 
+- Fix -v|--version CLI tool argument [\#561](https://github.com/christianhelle/refitter/pull/561) ([christianhelle](https://github.com/christianhelle))
+- Less strict OpenAPI Validation rules [\#558](https://github.com/christianhelle/refitter/pull/558) ([christianhelle](https://github.com/christianhelle))
 - Added support for custom date format [\#554](https://github.com/christianhelle/refitter/pull/554) ([Fargekritt](https://github.com/Fargekritt))
+
+**Fixed bugs:**
+
+- Refitter -v not showing version number [\#560](https://github.com/christianhelle/refitter/issues/560)
+- Two almost identical routes that fail at validation. [\#551](https://github.com/christianhelle/refitter/issues/551)
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 7.2.0 [\#559](https://github.com/christianhelle/refitter/pull/559) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency oasreader to 1.6.16.16 [\#556](https://github.com/christianhelle/refitter/pull/556) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add Fargekritt as a contributor for code [\#555](https://github.com/christianhelle/refitter/pull/555) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add hgdemers as a contributor for bug [\#553](https://github.com/christianhelle/refitter/pull/553) ([allcontributors[bot]](https://github.com/apps/allcontributors))
