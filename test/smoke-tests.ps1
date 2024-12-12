@@ -136,6 +136,16 @@ function RunTests {
         Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
     }
 
+    Write-Host "refitter --version"
+    $process = Start-Process "./bin/refitter" `
+        -Args " --version" `
+        -NoNewWindow `
+        -PassThru
+    $process | Wait-Process
+    if ($process.ExitCode -ne 0) {
+        throw "Show version failed!"
+    }
+
     GenerateAndBuild -format " " -namespace " " -outputPath "SwaggerPetstoreDirect.generated.cs" -args "--settings-file ./petstore.refitter" -buildFromSource $buildFromSource
     GenerateAndBuild -format " " -namespace " " -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj" -buildFromSource $buildFromSource
     GenerateAndBuild -format " " -namespace " " -args "--settings-file ./MultipleFiles/petstore.refitter" -csproj "MultipleFiles/Client/Client.csproj" -buildFromSource $buildFromSource
