@@ -17,6 +17,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (!settings.NoLogging)
             Analytics.Configure();
 
+        if (context.Arguments.Any(a => a.Equals("--version", StringComparison.OrdinalIgnoreCase)) ||
+            context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase)))
+            return ValidationResult.Success();
+
         return SettingsValidator.Validate(settings);
     }
 
@@ -34,6 +38,12 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 settings.NoLogging
                     ? "[green]Support key: Unavailable when logging is disabled[/]"
                     : $"[green]Support key: {SupportInformation.GetSupportKey()}[/]");
+
+            if (context.Arguments.Any(a => a.Equals("--version", StringComparison.OrdinalIgnoreCase)) ||
+                context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase)))
+            {
+                return 0;
+            }
 
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
