@@ -40,6 +40,16 @@ internal static class IdentifierUtils
     public static string Sanitize(this string value)
     {
         const char dash = '-';
+
+        // @ can be used and still make valid methode names. but this should make most use cases safe
+        if (
+            (value.First() < 'A' || value.First() > 'Z') &&
+            (value.First() < 'a' || value.First() > 'z') &&
+            value.First() != '_'
+            )
+        {
+            value = "_" + value;
+        }
         return string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries))
                 .Trim(dash);
     }
