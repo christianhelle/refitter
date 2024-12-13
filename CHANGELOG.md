@@ -2,33 +2,13 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.0-preview.65...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1...HEAD)
 
 **Implemented enhancements:**
 
 - Fix -v|--version CLI tool argument [\#561](https://github.com/christianhelle/refitter/pull/561) ([christianhelle](https://github.com/christianhelle))
 - Less strict OpenAPI Validation rules [\#558](https://github.com/christianhelle/refitter/pull/558) ([christianhelle](https://github.com/christianhelle))
 - Added support for custom date format [\#554](https://github.com/christianhelle/refitter/pull/554) ([Fargekritt](https://github.com/Fargekritt))
-
-**Fixed bugs:**
-
-- Refitter -v not showing version number [\#560](https://github.com/christianhelle/refitter/issues/560)
-- Two almost identical routes that fail at validation. [\#551](https://github.com/christianhelle/refitter/issues/551)
-
-**Merged pull requests:**
-
-- chore\(deps\): update dependency swashbuckle.aspnetcore to 7.2.0 [\#559](https://github.com/christianhelle/refitter/pull/559) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency oasreader to 1.6.16.16 [\#556](https://github.com/christianhelle/refitter/pull/556) ([renovate[bot]](https://github.com/apps/renovate))
-- docs: add Fargekritt as a contributor for code [\#555](https://github.com/christianhelle/refitter/pull/555) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- docs: add hgdemers as a contributor for bug [\#553](https://github.com/christianhelle/refitter/pull/553) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- MSBuild Documentation [\#552](https://github.com/christianhelle/refitter/pull/552) ([christianhelle](https://github.com/christianhelle))
-
-## [1.5.0-preview.65](https://github.com/christianhelle/refitter/tree/1.5.0-preview.65) (2024-12-08)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1...1.5.0-preview.65)
-
-**Implemented enhancements:**
-
 - Add support for disabling telemetry in MSBuild task [\#550](https://github.com/christianhelle/refitter/pull/550) ([christianhelle](https://github.com/christianhelle))
 - MSBuild Custom Task [\#548](https://github.com/christianhelle/refitter/pull/548) ([christianhelle](https://github.com/christianhelle))
 - Generate IDisposable Refit Interfaces [\#543](https://github.com/christianhelle/refitter/pull/543) ([christianhelle](https://github.com/christianhelle))
@@ -37,10 +17,17 @@
 
 **Fixed bugs:**
 
+- Refitter -v not showing version number [\#560](https://github.com/christianhelle/refitter/issues/560)
+- Two almost identical routes that fail at validation. [\#551](https://github.com/christianhelle/refitter/issues/551)
 - How to use in class library? [\#534](https://github.com/christianhelle/refitter/issues/534)
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 7.2.0 [\#559](https://github.com/christianhelle/refitter/pull/559) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency oasreader to 1.6.16.16 [\#556](https://github.com/christianhelle/refitter/pull/556) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add Fargekritt as a contributor for code [\#555](https://github.com/christianhelle/refitter/pull/555) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add hgdemers as a contributor for bug [\#553](https://github.com/christianhelle/refitter/pull/553) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- MSBuild Documentation [\#552](https://github.com/christianhelle/refitter/pull/552) ([christianhelle](https://github.com/christianhelle))
 - Update codecov/codecov-action action to v5 [\#549](https://github.com/christianhelle/refitter/pull/549) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to v7 [\#546](https://github.com/christianhelle/refitter/pull/546) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add zidad as a contributor for ideas [\#545](https://github.com/christianhelle/refitter/pull/545) ([allcontributors[bot]](https://github.com/apps/allcontributors))
