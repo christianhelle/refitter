@@ -21,6 +21,7 @@
 - Refitter -v not showing version number [\#560](https://github.com/christianhelle/refitter/issues/560)
 - Two almost identical routes that fail at validation. [\#551](https://github.com/christianhelle/refitter/issues/551)
 - How to use in class library? [\#534](https://github.com/christianhelle/refitter/issues/534)
+- Code Generator creates unsafe interface method names [\#360](https://github.com/christianhelle/refitter/issues/360)
 
 **Merged pull requests:**
 
