@@ -23,8 +23,13 @@
 - How to use in class library? [\#534](https://github.com/christianhelle/refitter/issues/534)
 - Code Generator creates unsafe interface method names [\#360](https://github.com/christianhelle/refitter/issues/360)
 
+**Closed issues:**
+
+- \[ISSUE\]\[1.2.1-preview.54\] Some impediments using CLI version. Is not enough for my needs?  [\#450](https://github.com/christianhelle/refitter/issues/450)
+
 **Merged pull requests:**
 
+- Remove full code output examples from README [\#563](https://github.com/christianhelle/refitter/pull/563) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 7.2.0 [\#559](https://github.com/christianhelle/refitter/pull/559) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency oasreader to 1.6.16.16 [\#556](https://github.com/christianhelle/refitter/pull/556) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add Fargekritt as a contributor for code [\#555](https://github.com/christianhelle/refitter/pull/555) ([allcontributors[bot]](https://github.com/apps/allcontributors))
