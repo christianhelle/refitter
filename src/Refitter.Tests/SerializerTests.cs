@@ -28,7 +28,7 @@ public class SerializerTests
             .Should()
             .BeEquivalentTo(settings, options => options
                 .Excluding(settings => settings.ParameterNameGenerator)
-                .Excluding(settings => settings.CodeGeneratorSettings.PropertyNameGenerator));
+                .Excluding(settings => settings.CodeGeneratorSettings!.PropertyNameGenerator));
     }
 
     [Theory, AutoNSubstituteData]
@@ -49,6 +49,6 @@ public class SerializerTests
             .Should()
             .BeEquivalentTo(settings, options => options
                 .Excluding(settings => settings.ParameterNameGenerator)
-                .Excluding(settings => settings.CodeGeneratorSettings.PropertyNameGenerator));
+                .Excluding(settings => settings.CodeGeneratorSettings!.PropertyNameGenerator));
     }
 }
