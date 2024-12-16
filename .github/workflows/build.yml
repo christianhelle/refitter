@@ -35,6 +35,7 @@ jobs:
         dotnet --list-sdks
         rm -rf src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
         dotnet build src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
+        ls src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
     - name: 🛠️ Build
       run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
     - name: 🧪 Test
