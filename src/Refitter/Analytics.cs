@@ -37,12 +37,12 @@ public static class Analytics
         telemetryClient.TelemetryConfiguration.TelemetryInitializers.Add(new SupportKeyInitializer());
     }
 
-    public static Task LogFeatureUsage(
+    public static void LogFeatureUsage(
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings)
     {
         if (settings.NoLogging)
-            return Task.CompletedTask;
+            return;
 
         foreach (var property in typeof(Settings).GetProperties())
         {
@@ -72,8 +72,6 @@ public static class Analytics
                 });
             telemetryClient.Flush();
         }
-
-        return ExceptionlessClient.Default.ProcessQueueAsync();
     }
 
     private static void LogFeatureUsage(CommandOptionAttribute attribute, PropertyInfo property)
