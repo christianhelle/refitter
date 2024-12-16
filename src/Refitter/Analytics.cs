@@ -78,11 +78,6 @@ public static class Analytics
     {
         var featureName = attribute.LongNames.FirstOrDefault() ?? property.Name;
 
-        ExceptionlessClient
-            .Default
-            .CreateFeatureUsage(featureName)
-            .Submit();
-
         telemetryClient.TrackEvent(featureName);
         telemetryClient.Flush();
     }
