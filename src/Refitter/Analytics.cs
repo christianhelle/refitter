@@ -64,11 +64,6 @@ public static class Analytics
 
         if (settings.SettingsFilePath is not null)
         {
-            ExceptionlessClient
-                .Default.CreateFeatureUsage("settings-file")
-                .AddObject(refitGeneratorSettings, ignoreSerializationErrors: true)
-                .Submit();
-
             telemetryClient.TrackEvent(
                 "settings-file",
                 new Dictionary<string, string>
