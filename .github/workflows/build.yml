@@ -37,7 +37,9 @@ jobs:
         dotnet build src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
         ls src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
     - name: 🛠️ Build
-      run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
+      run: |
+        ls src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
+        dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
     - name: 🧪 Test
       run: dotnet test src/Refitter.sln -c Release    
     - name: 🗳️ Upload
