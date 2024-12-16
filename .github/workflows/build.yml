@@ -32,6 +32,7 @@ jobs:
     - name: 🛠️ Prepare
       continue-on-error: true
       run: |
+        dotnet --list-sdks
         rm -rf src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
         dotnet build src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
     - name: 🛠️ Build
