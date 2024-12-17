@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Limit Exceptionless telemetry [\#564](https://github.com/christianhelle/refitter/pull/564) ([christianhelle](https://github.com/christianhelle))
 - Added simple logic to make most identifier strings valid [\#562](https://github.com/christianhelle/refitter/pull/562) ([Fargekritt](https://github.com/Fargekritt))
 - Fix -v|--version CLI tool argument [\#561](https://github.com/christianhelle/refitter/pull/561) ([christianhelle](https://github.com/christianhelle))
 - Less strict OpenAPI Validation rules [\#558](https://github.com/christianhelle/refitter/pull/558) ([christianhelle](https://github.com/christianhelle))
