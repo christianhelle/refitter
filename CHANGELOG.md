@@ -31,6 +31,7 @@
 **Merged pull requests:**
 
 - Fix Build workflow [\#567](https://github.com/christianhelle/refitter/pull/567) ([christianhelle](https://github.com/christianhelle))
+- Update dependency xunit.runner.visualstudio to v3 [\#565](https://github.com/christianhelle/refitter/pull/565) ([renovate[bot]](https://github.com/apps/renovate))
 - Remove full code output examples from README [\#563](https://github.com/christianhelle/refitter/pull/563) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 7.2.0 [\#559](https://github.com/christianhelle/refitter/pull/559) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency oasreader to 1.6.16.16 [\#556](https://github.com/christianhelle/refitter/pull/556) ([renovate[bot]](https://github.com/apps/renovate))
