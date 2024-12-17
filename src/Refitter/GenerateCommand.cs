@@ -63,7 +63,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 ? WriteMultipleFiles(generator, settings, refitGeneratorSettings)
                 : WriteSingleFile(generator, settings, refitGeneratorSettings));
 
-            await Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
+            Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
             AnsiConsole.MarkupLine($"[green]Duration: {stopwatch.Elapsed}{Crlf}[/]");
 
             if (!settings.NoBanner)

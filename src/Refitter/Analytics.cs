@@ -37,12 +37,12 @@ public static class Analytics
         telemetryClient.TelemetryConfiguration.TelemetryInitializers.Add(new SupportKeyInitializer());
     }
 
-    public static Task LogFeatureUsage(
+    public static void LogFeatureUsage(
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings)
     {
         if (settings.NoLogging)
-            return Task.CompletedTask;
+            return;
 
         foreach (var property in typeof(Settings).GetProperties())
         {
@@ -64,11 +64,6 @@ public static class Analytics
 
         if (settings.SettingsFilePath is not null)
         {
-            ExceptionlessClient
-                .Default.CreateFeatureUsage("settings-file")
-                .AddObject(refitGeneratorSettings, ignoreSerializationErrors: true)
-                .Submit();
-
             telemetryClient.TrackEvent(
                 "settings-file",
                 new Dictionary<string, string>
@@ -77,18 +72,11 @@ public static class Analytics
                 });
             telemetryClient.Flush();
         }
-
-        return ExceptionlessClient.Default.ProcessQueueAsync();
     }
 
     private static void LogFeatureUsage(CommandOptionAttribute attribute, PropertyInfo property)
     {
         var featureName = attribute.LongNames.FirstOrDefault() ?? property.Name;
-
-        ExceptionlessClient
-            .Default
-            .CreateFeatureUsage(featureName)
-            .Submit();
 
         telemetryClient.TrackEvent(featureName);
         telemetryClient.Flush();
