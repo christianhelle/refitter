@@ -29,6 +29,9 @@ jobs:
     steps:    
     - name: 🛒 Checkout repository
       uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0'
     - name: 🛠️ Prepare
       continue-on-error: true
       run: |
