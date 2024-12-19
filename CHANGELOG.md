@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Show Deserializaton Errors from Source Generator [\#572](https://github.com/christianhelle/refitter/pull/572) ([christianhelle](https://github.com/christianhelle))
 - Limit Exceptionless telemetry [\#564](https://github.com/christianhelle/refitter/pull/564) ([christianhelle](https://github.com/christianhelle))
 - Added simple logic to make most identifier strings valid [\#562](https://github.com/christianhelle/refitter/pull/562) ([Fargekritt](https://github.com/Fargekritt))
 - Fix -v|--version CLI tool argument [\#561](https://github.com/christianhelle/refitter/pull/561) ([christianhelle](https://github.com/christianhelle))
@@ -19,13 +20,14 @@
 
 **Fixed bugs:**
 
+- Source generator errors are hidden [\#568](https://github.com/christianhelle/refitter/issues/568)
 - Refitter -v not showing version number [\#560](https://github.com/christianhelle/refitter/issues/560)
 - Two almost identical routes that fail at validation. [\#551](https://github.com/christianhelle/refitter/issues/551)
-- How to use in class library? [\#534](https://github.com/christianhelle/refitter/issues/534)
 - Code Generator creates unsafe interface method names [\#360](https://github.com/christianhelle/refitter/issues/360)
 
 **Closed issues:**
 
+- How to use in class library? [\#534](https://github.com/christianhelle/refitter/issues/534)
 - \[ISSUE\]\[1.2.1-preview.54\] Some impediments using CLI version. Is not enough for my needs?  [\#450](https://github.com/christianhelle/refitter/issues/450)
 
 **Merged pull requests:**
