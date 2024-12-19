@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Refitter.Core;
@@ -76,7 +76,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                         true),
                     Location.None));
 
-            var settings = TryDeserialize(json);
+            var settings = TryDeserialize(json, diagnostics);
             if (settings is null)
             {
                 return diagnostics;
@@ -151,14 +151,28 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static RefitGeneratorSettings? TryDeserialize(string json)
+    private static RefitGeneratorSettings? TryDeserialize(string json, List<Diagnostic> diagnostics)
     {
         try
         {
             return Serializer.Deserialize<RefitGeneratorSettings>(json);
         }
-        catch
+        catch (Exception e)
         {
+            diagnostics.Add(
+                Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "REFITTER000",
+                        "Error",
+                        $"Unable to deserialize .refitter file: {e}",
+                        "Refitter",
+                        DiagnosticSeverity.Error,
+                        true
+                    ),
+                    Location.None
+                )
+            );
+
             return null;
         }
     }
