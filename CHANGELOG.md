@@ -32,6 +32,7 @@
 
 **Merged pull requests:**
 
+- Update dependency Atc.Test to 1.1.9 [\#574](https://github.com/christianhelle/refitter/pull/574) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency coverlet.collector to 6.0.3 [\#573](https://github.com/christianhelle/refitter/pull/573) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix Build workflow [\#567](https://github.com/christianhelle/refitter/pull/567) ([christianhelle](https://github.com/christianhelle))
 - Update dependency xunit.runner.visualstudio to v3 [\#565](https://github.com/christianhelle/refitter/pull/565) ([renovate[bot]](https://github.com/apps/renovate))
