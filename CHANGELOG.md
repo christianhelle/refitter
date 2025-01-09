@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Return null when object subtype is not found [\#577](https://github.com/christianhelle/refitter/pull/577) ([velvolue](https://github.com/velvolue))
 - Show Deserializaton Errors from Source Generator [\#572](https://github.com/christianhelle/refitter/pull/572) ([christianhelle](https://github.com/christianhelle))
 - Limit Exceptionless telemetry [\#564](https://github.com/christianhelle/refitter/pull/564) ([christianhelle](https://github.com/christianhelle))
 - Added simple logic to make most identifier strings valid [\#562](https://github.com/christianhelle/refitter/pull/562) ([Fargekritt](https://github.com/Fargekritt))
@@ -32,6 +33,8 @@
 
 **Merged pull requests:**
 
+- docs: add velvolue as a contributor for code [\#578](https://github.com/christianhelle/refitter/pull/578) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency xunit to 2.9.3 [\#576](https://github.com/christianhelle/refitter/pull/576) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Atc.Test to 1.1.9 [\#574](https://github.com/christianhelle/refitter/pull/574) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency coverlet.collector to 6.0.3 [\#573](https://github.com/christianhelle/refitter/pull/573) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix Build workflow [\#567](https://github.com/christianhelle/refitter/pull/567) ([christianhelle](https://github.com/christianhelle))
