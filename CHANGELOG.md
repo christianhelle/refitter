@@ -33,6 +33,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency xunit.runner.visualstudio to 3.0.1 [\#579](https://github.com/christianhelle/refitter/pull/579) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add velvolue as a contributor for code [\#578](https://github.com/christianhelle/refitter/pull/578) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency xunit to 2.9.3 [\#576](https://github.com/christianhelle/refitter/pull/576) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Atc.Test to 1.1.9 [\#574](https://github.com/christianhelle/refitter/pull/574) ([renovate[bot]](https://github.com/apps/renovate))
