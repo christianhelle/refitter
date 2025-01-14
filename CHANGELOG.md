@@ -34,6 +34,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency fluentassertions to v8 [\#586](https://github.com/christianhelle/refitter/pull/586) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add brad-technologik as a contributor for bug [\#584](https://github.com/christianhelle/refitter/pull/584) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency polly to 8.5.1 [\#582](https://github.com/christianhelle/refitter/pull/582) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency xunit.runner.visualstudio to 3.0.1 [\#579](https://github.com/christianhelle/refitter/pull/579) ([renovate[bot]](https://github.com/apps/renovate))
