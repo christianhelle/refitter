@@ -83,9 +83,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             if (exception is not OpenApiValidationException)
             {
-                AnsiConsole.MarkupLine($"[red]Error: {exception.Message}[/]");
-                AnsiConsole.MarkupLine($"[red]Exception: {exception.GetType()}[/]");
-                AnsiConsole.MarkupLine($"[yellow]Stack Trace:{Crlf}{exception.StackTrace}[/]");
+                AnsiConsole.MarkupLine("[red]Exception:[/]");
+                AnsiConsole.WriteException(exception);
                 AnsiConsole.WriteLine();
             }
 
