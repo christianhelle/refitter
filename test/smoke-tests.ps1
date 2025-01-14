@@ -128,7 +128,8 @@ function RunTests {
         "uber",
         "uspto",
         "hubspot-events",
-        "hubspot-webhooks"
+        "hubspot-webhooks",
+        "clickup"        
     )
 
     if ($BuildFromSource) {
@@ -150,7 +151,7 @@ function RunTests {
     GenerateAndBuild -format " " -namespace " " -args "--settings-file ./Apizr/petstore.apizr.refitter" -csproj "./Apizr/Sample.csproj" -buildFromSource $buildFromSource
     GenerateAndBuild -format " " -namespace " " -args "--settings-file ./MultipleFiles/petstore.refitter" -csproj "MultipleFiles/Client/Client.csproj" -buildFromSource $buildFromSource
 
-    "v3.0", "v2.0" | ForEach-Object {
+    "v3.0", "v2.0", "v3.1" | ForEach-Object {
         $version = $_
         "json", "yaml" | ForEach-Object {
             $format = $_

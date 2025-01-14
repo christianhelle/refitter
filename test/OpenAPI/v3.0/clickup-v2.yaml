@@ -1,0 +1,526 @@
+openapi: 3.0.3
+info:
+  title: ClickUp API V2
+  version: 1.0.0
+  contact: {}
+servers:
+- url: https://api.clickup.com
+paths:
+  /api/v2/oauth/token:
+    post:
+      tags:
+      - Authorization
+      summary: Get Access Token
+      description: Get Access Token
+      operationId: getAccessToken
+      parameters:
+      - name: client_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: client_secret
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: code
+        in: query
+        schema:
+          type: string
+          example: ''
+      responses:
+        '200':
+          description: ''
+  /api/v2/task/task_id/dependency:
+    delete:
+      tags:
+      - Dependencies
+      summary: Delete Dependency
+      description: Delete Dependency
+      operationId: deleteDependency
+      parameters:
+      - name: depends_on
+        in: query
+        schema:
+          type: string
+          example: task_id
+      - name: dependency_of
+        in: query
+        schema:
+          type: string
+          example: task_id
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              Delete Dependency:
+                value: ''
+      responses:
+        '200':
+          description: ''
+  /api/v2/list/list_id/task/task_id:
+    post:
+      tags:
+      - Lists
+      summary: Add Task To List
+      description: Add Task To List
+      operationId: addTaskToList
+      parameters:
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: task_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      responses:
+        '200':
+          description: ''
+  /api/v2/team/team_id/space:
+    get:
+      tags:
+      - Spaces
+      summary: Get Spaces
+      description: Get Spaces
+      operationId: getSpaces
+      parameters:
+      - name: archived
+        in: query
+        schema:
+          type: string
+          example: ''
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              Get Spaces:
+                value: ''
+      responses:
+        '200':
+          description: ''
+  /api/v2/task/task_id/tag/tag_name:
+    post:
+      tags:
+      - Tags
+      summary: Add Tag To Task
+      description: Add Tag To Task
+      operationId: addTagToTask
+      parameters:
+      - name: custom_task_ids
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      responses:
+        '200':
+          description: ''
+    delete:
+      tags:
+      - Tags
+      summary: Remove Tag From Task
+      description: Remove Tag From Task
+      operationId: removeTagFromTask
+      parameters:
+      - name: custom_task_ids
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      responses:
+        '200':
+          description: ''
+  /api/v2/task/task_id:
+    get:
+      tags:
+      - Tasks
+      summary: Get Task
+      description: Get Task
+      operationId: getTask
+      parameters:
+      - name: custom_task_ids
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              Get Task:
+                value: ''
+      responses:
+        '200':
+          description: ''
+    put:
+      tags:
+      - Tasks
+      summary: Update a Task
+      description: |-
+        Paste task_id from previously created task.
+
+        Make sure to update all fields when testing to make sure they are all updated.
+      operationId: updateATask
+      parameters:
+      - name: custom_task_ids
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              Update a Task:
+                value: |-
+                  {
+                      "name": "Updated Task Name",
+                      "description": "Updated Task Content",
+                      "status": "in progress",
+                      "priority": 1,
+                      "time_estimate": 8640000,
+                      "assignees": {
+                          "add": [182],
+                          "rem": [183]
+                      },
+                      "archived": false,
+                  }
+      responses:
+        '200':
+          description: ''
+    delete:
+      tags:
+      - Tasks
+      summary: Delete a Task
+      description: Please delete previously created/updated task for continuity
+      operationId: deleteATask
+      parameters:
+      - name: custom_task_ids
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      responses:
+        '200':
+          description: ''
+  /api/v2/list/list_id/task:
+    get:
+      tags:
+      - Tasks
+      summary: Get Tasks
+      description: Get Tasks
+      operationId: getTasks
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: order_by
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: reverse
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: subtasks
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: space_ids[]
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: project_ids[]
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: statuses[]
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: include_closed
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: assignees[]
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: due_date_gt
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: due_date_lt
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: date_created_gt
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: date_created_lt
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: date_updated_gt
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: date_updated_lt
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: custom_fields
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: custom_task_ids
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              Get Tasks:
+                value: ''
+      responses:
+        '200':
+          description: ''
+  /api/v2/task/task_id/time_in_status:
+    get:
+      tags:
+      - Tasks
+      summary: Get Task's Time in Status
+      description: Get Task's Time in Status
+      operationId: getTaskSTimeInStatus
+      parameters:
+      - name: custom_task_ids
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      responses:
+        '200':
+          description: ''
+  /api/v2/task/bulk_time_in_status/task_ids:
+    get:
+      tags:
+      - Tasks
+      summary: Get Bulk Tasks' Time in Status
+      description: Get Bulk Tasks' Time in Status
+      operationId: getBulkTasksTimeInStatus
+      parameters:
+      - name: custom_task_ids
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      responses:
+        '200':
+          description: ''
+  /api/v2/team/team_id/taskTemplate:
+    get:
+      tags:
+      - Task Templates
+      summary: Get Task Templates
+      description: Get Task Templates
+      operationId: getTaskTemplates
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: string
+          example: '0'
+      responses:
+        '200':
+          description: ''
+  /api/v2/team/team_id/time_entries/timer_id:
+    put:
+      tags:
+      - Time Tracking 2.0
+      summary: Update a Time Entry
+      description: Update a Time Entry
+      operationId: updateATimeEntry
+      parameters:
+      - name: custom_task_ids
+        in: query
+        schema:
+          type: string
+          example: ''
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          example: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assignee:
+                  type: number
+                  example: 0
+                billable:
+                  type: boolean
+                  example: true
+                description:
+                  type: string
+                  example: string
+                duration:
+                  type: number
+                  example: 40000
+                end:
+                  type: number
+                  example: 0
+                start:
+                  type: number
+                  example: 0
+                tag_action:
+                  type: string
+                  example: replace
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: string
+                  example:
+                  - string
+                tid:
+                  type: string
+                  example: JOSH-720
+            examples:
+              Update a Time Entry:
+                value:
+                  assignee: 0
+                  billable: true
+                  description: string
+                  duration: 40000
+                  end: 0
+                  start: 0
+                  tag_action: replace
+                  tags:
+                  - string
+                  tid: JOSH-720
+      responses:
+        '200':
+          description: ''
+  /api/v2/view/view_id/task:
+    get:
+      tags:
+      - Views
+      summary: Get View Tasks
+      description: Get View Tasks
+      operationId: getViewTasks
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: string
+          example: '0'
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              Get View Tasks:
+                value: ''
+      responses:
+        '200':
+          description: ''
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: Authorization
+      in: header
+security:
+- apiKey: []
+tags:
+- name: Attachments
+- name: Authorization
+- name: Checklists
+- name: Comments
+- name: Custom Fields
+- name: Dependencies
+- name: Folders
+- name: Goals
+- name: Guests
+  description: |
+    Ability to add and remove guests in certain contexts
+- name: Lists
+- name: Members
+- name: Shared Hierarchy
+- name: Spaces
+- name: Tags
+- name: Tasks
+- name: Task Templates
+- name: Teams (User Groups)
+- name: Teams (Workspaces)
+- name: Time Tracking Legacy
+- name: Time Tracking 2.0
+- name: Users
+- name: Views
+- name: Webhooks
+
