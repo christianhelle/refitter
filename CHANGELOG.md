@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Fix incorrect error message shown due to Spectre.Console parsing [\#585](https://github.com/christianhelle/refitter/pull/585) ([christianhelle](https://github.com/christianhelle))
 - Return null when object subtype is not found [\#577](https://github.com/christianhelle/refitter/pull/577) ([velvolue](https://github.com/velvolue))
 - Show Deserializaton Errors from Source Generator [\#572](https://github.com/christianhelle/refitter/pull/572) ([christianhelle](https://github.com/christianhelle))
 - Limit Exceptionless telemetry [\#564](https://github.com/christianhelle/refitter/pull/564) ([christianhelle](https://github.com/christianhelle))
@@ -33,6 +34,8 @@
 
 **Merged pull requests:**
 
+- docs: add brad-technologik as a contributor for bug [\#584](https://github.com/christianhelle/refitter/pull/584) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency polly to 8.5.1 [\#582](https://github.com/christianhelle/refitter/pull/582) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency xunit.runner.visualstudio to 3.0.1 [\#579](https://github.com/christianhelle/refitter/pull/579) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add velvolue as a contributor for code [\#578](https://github.com/christianhelle/refitter/pull/578) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency xunit to 2.9.3 [\#576](https://github.com/christianhelle/refitter/pull/576) ([renovate[bot]](https://github.com/apps/renovate))
