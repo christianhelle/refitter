@@ -22,6 +22,7 @@
 
 **Fixed bugs:**
 
+- "Error: Could not find color or style 'System.String'." [\#583](https://github.com/christianhelle/refitter/issues/583)
 - Source generator errors are hidden [\#568](https://github.com/christianhelle/refitter/issues/568)
 - Refitter -v not showing version number [\#560](https://github.com/christianhelle/refitter/issues/560)
 - Two almost identical routes that fail at validation. [\#551](https://github.com/christianhelle/refitter/issues/551)
@@ -34,6 +35,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dotnet monorepo [\#587](https://github.com/christianhelle/refitter/pull/587) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to v8 [\#586](https://github.com/christianhelle/refitter/pull/586) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add brad-technologik as a contributor for bug [\#584](https://github.com/christianhelle/refitter/pull/584) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency polly to 8.5.1 [\#582](https://github.com/christianhelle/refitter/pull/582) ([renovate[bot]](https://github.com/apps/renovate))
