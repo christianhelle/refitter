@@ -35,6 +35,7 @@
 
 **Merged pull requests:**
 
+- Revert "chore\(deps\): update dependency fluentassertions to v8" [\#588](https://github.com/christianhelle/refitter/pull/588) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dotnet monorepo [\#587](https://github.com/christianhelle/refitter/pull/587) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to v8 [\#586](https://github.com/christianhelle/refitter/pull/586) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add brad-technologik as a contributor for bug [\#584](https://github.com/christianhelle/refitter/pull/584) ([allcontributors[bot]](https://github.com/apps/allcontributors))
