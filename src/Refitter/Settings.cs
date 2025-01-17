@@ -158,6 +158,11 @@ public sealed class Settings : CommandSettings
     [DefaultValue(new string[0])]
     public string[]? KeepSchemaPatterns { get; set; }
 
+    [Description("Keep all possible inherited types/union types even if they are not directly used.")]
+    [CommandOption("--include-inheritance-hierarchy")]
+    [DefaultValue(false)]
+    public bool IncludeInheritanceHierarchy { get; set; }
+
     [Description("Don't show donation banner")]
     [CommandOption("--no-banner")]
     [DefaultValue(false)]

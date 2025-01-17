@@ -9,6 +9,8 @@ public class SchemaCleaner
     private readonly OpenApiDocument document;
     private readonly string[] keepSchemaPatterns;
 
+    public bool IncludeInheritanceHierarchy { get; set; }
+
     public SchemaCleaner(OpenApiDocument document, string[] keepSchemaPatterns)
     {
         this.document = document;
@@ -17,8 +19,7 @@ public class SchemaCleaner
 
     public void RemoveUnreferencedSchema()
     {
-        var usage = FindUsedSchema(document);
-
+        var (usedJsonSchema, usage) = FindUsedJsonSchema(document);
         var unused = document.Components.Schemas.Where(s => !usage.Contains(s.Key))
             .ToArray();
 
@@ -26,9 +27,30 @@ public class SchemaCleaner
         {
             document.Components.Schemas.Remove(unusedSchema);
         }
+
+        if (!IncludeInheritanceHierarchy)
+        {
+            foreach (var schema in usedJsonSchema)
+            {
+                // Fix any "abstract/sum" types so that the unused-types get removed
+                if (schema.DiscriminatorObject != null)
+                {
+                    var mappings = schema.DiscriminatorObject.Mapping;
+                    var keepMappings = mappings.Where(x =>
+                            (x.Value.ActualSchema.Id ?? x.Value.Id) is { } id && usage.Contains(id))
+                        .ToArray();
+
+                    schema.DiscriminatorObject.Mapping.Clear();
+                    foreach (var kvp in keepMappings)
+                    {
+                        schema.DiscriminatorObject.Mapping[kvp.Key] = kvp.Value;
+                    }
+                }
+            }
+        }
     }
 
-    private HashSet<string> FindUsedSchema(OpenApiDocument doc)
+    private (IReadOnlyCollection<JsonSchema>, HashSet<string>) FindUsedJsonSchema(OpenApiDocument doc)
     {
         var toProcess = new Stack<JsonSchema>();
         var schemaIdLookup = document.Components.Schemas
@@ -82,7 +104,7 @@ public class SchemaCleaner
             }
         }
 
-        return seenIds;
+        return (seen, seenIds);
     }
 
     private IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
@@ -144,10 +166,10 @@ public class SchemaCleaner
             .Where(x => x != null)
             .Select(x => x!);
 
-        static IEnumerable<JsonSchema?> EnumerateInternal(JsonSchema schema)
+        IEnumerable<JsonSchema?> EnumerateInternal(JsonSchema schema)
         {
             schema = schema.ActualSchema;
-            
+
             yield return schema.AdditionalItemsSchema;
             yield return schema.AdditionalPropertiesSchema;
             if (schema.AllInheritedSchemas != null)
@@ -157,12 +179,12 @@ public class SchemaCleaner
                     yield return s;
                 }
             }
-            
+
             if (schema.Item != null)
             {
                 yield return schema.Item;
             }
-            
+
             if (schema.Items != null)
             {
                 foreach (JsonSchema s in schema.Items)
@@ -177,6 +199,16 @@ public class SchemaCleaner
             foreach (var subSchema in schema.AllOf)
             {
                 yield return subSchema;
+            }
+
+            if (schema.DiscriminatorObject != null && IncludeInheritanceHierarchy)
+            {
+                // abstract type
+                // if we let these out, we get a bunch of "AnonymousN"-classes
+                foreach (var subSchema in schema.DiscriminatorObject.Mapping)
+                {
+                    yield return subSchema.Value;
+                }
             }
 
             foreach (var subSchema in schema.AnyOf)

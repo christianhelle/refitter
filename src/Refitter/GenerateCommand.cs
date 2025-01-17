@@ -133,6 +133,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             OptionalParameters = settings.OptionalNullableParameters,
             TrimUnusedSchema = settings.TrimUnusedSchema,
             KeepSchemaPatterns = settings.KeepSchemaPatterns ?? Array.Empty<string>(),
+            IncludeInheritanceHierarchy = settings.IncludeInheritanceHierarchy,
             OperationNameGenerator = settings.OperationNameGenerator,
             GenerateDefaultAdditionalProperties = !settings.SkipDefaultAdditionalProperties,
             ImmutableRecords = settings.ImmutableRecords,

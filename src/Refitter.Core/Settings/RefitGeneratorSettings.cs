@@ -138,7 +138,7 @@ public class RefitGeneratorSettings
     public bool GenerateDeprecatedOperations { get; set; } = true;
 
     /// <summary>
-    /// Generate operation names using pattern. 
+    /// Generate operation names using pattern.
     /// When using <see cref="MultipleInterfaces"/> <see cref="Core.MultipleInterfaces.ByEndpoint"/>, this is name of the Execute() method in the interface.
     /// </summary>
     public string? OperationNameTemplate { get; set; }
@@ -186,6 +186,13 @@ public class RefitGeneratorSettings
     /// This works in conjunction with <see cref="TrimUnusedSchema"/>.
     /// </summary>
     public string[] KeepSchemaPatterns { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Set to <c>true</c> to keep all possible type-instances of inheritance/union types.
+    /// If this is <c>false</c> only directly referenced types will be kept.
+    /// This works in conjunction with <see cref="TrimUnusedSchema"/>.
+    /// </summary>
+    public bool IncludeInheritanceHierarchy { get; set; }
 
     /// <summary>
     /// The NSwag IOperationNameGenerator implementation to use
