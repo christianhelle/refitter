@@ -35,6 +35,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency fluentassertions to 7.1.0 [\#590](https://github.com/christianhelle/refitter/pull/590) ([renovate[bot]](https://github.com/apps/renovate))
 - Revert "chore\(deps\): update dependency fluentassertions to v8" [\#588](https://github.com/christianhelle/refitter/pull/588) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dotnet monorepo [\#587](https://github.com/christianhelle/refitter/pull/587) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to v8 [\#586](https://github.com/christianhelle/refitter/pull/586) ([renovate[bot]](https://github.com/apps/renovate))
