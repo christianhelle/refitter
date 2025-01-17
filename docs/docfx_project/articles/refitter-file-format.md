@@ -151,6 +151,7 @@ The following is an example `.refitter` file
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
 - `trimUnusedSchema` - Removes unreferenced components schema to keep the generated output to a minimum
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
+- `includeInheritanceHierarchy`: Set to true to keep all possible type-instances of inheritance/union types. If this is false only directly referenced types will be kept. This works in conjunction with `trimUnusedSchema`
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`

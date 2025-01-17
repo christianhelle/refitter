@@ -82,6 +82,7 @@ OPTIONS:
         --optional-nullable-parameters                           Generate nullable parameters as optional parameters
         --trim-unused-schema                                     Removes unreferenced components schema to keep the generated output to a minimum
         --keep-schema                                            Force to keep matching schema, uses regular expressions. Use together with "--trim-unused-schema". Can be set multiple times
+        --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used
         --no-banner                                              Don't show donation banner
         --skip-default-additional-properties                     Set to true to skip default additional properties
         --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
