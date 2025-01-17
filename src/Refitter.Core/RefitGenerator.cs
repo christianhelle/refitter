@@ -20,7 +20,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         ProcessTagFilters(openApiDocument, settings.IncludeTags);
         ProcessPathFilters(openApiDocument, settings.IncludePathMatches);
-        ProcessContractFilter(openApiDocument, settings.TrimUnusedSchema, settings.KeepSchemaPatterns);
+        ProcessContractFilter(openApiDocument, settings.TrimUnusedSchema, settings.KeepSchemaPatterns, settings.IncludeInheritanceHierarchy);
 
         return new RefitGenerator(settings, openApiDocument);
     }
@@ -55,13 +55,17 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         return openApiDocument;
     }
 
-    private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches)
+    private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches,
+        bool includeInheritanceHierarchy)
     {
         if (!removeUnusedSchema)
         {
             return;
         }
-        var cleaner = new SchemaCleaner(openApiDocument, includeSchemaMatches);
+        var cleaner = new SchemaCleaner(openApiDocument, includeSchemaMatches)
+        {
+            IncludeInheritanceHierarchy = includeInheritanceHierarchy
+        };
         cleaner.RemoveUnreferencedSchema();
     }
 
