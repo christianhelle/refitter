@@ -37,8 +37,7 @@ public class SchemaCleaner
                 {
                     var mappings = schema.DiscriminatorObject.Mapping;
                     var keepMappings = mappings.Where(x =>
-                            usage.Contains(x.Value.ActualSchema.Id ?? x.Value.Id ?? "_________SOME NON EXISTING VALUE")
-                            )
+                            (x.Value.ActualSchema.Id ?? x.Value.Id) is { } id && usage.Contains(id))
                         .ToArray();
 
                     schema.DiscriminatorObject.Mapping.Clear();
