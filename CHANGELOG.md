@@ -8,6 +8,7 @@
 
 - Fix incorrect error message shown due to Spectre.Console parsing [\#585](https://github.com/christianhelle/refitter/pull/585) ([christianhelle](https://github.com/christianhelle))
 - Return null when object subtype is not found [\#577](https://github.com/christianhelle/refitter/pull/577) ([velvolue](https://github.com/velvolue))
+- Discard unused union types/inheritance types via config [\#575](https://github.com/christianhelle/refitter/pull/575) ([kirides](https://github.com/kirides))
 - Show Deserializaton Errors from Source Generator [\#572](https://github.com/christianhelle/refitter/pull/572) ([christianhelle](https://github.com/christianhelle))
 - Limit Exceptionless telemetry [\#564](https://github.com/christianhelle/refitter/pull/564) ([christianhelle](https://github.com/christianhelle))
 - Added simple logic to make most identifier strings valid [\#562](https://github.com/christianhelle/refitter/pull/562) ([Fargekritt](https://github.com/Fargekritt))
@@ -25,6 +26,7 @@
 - "Error: Could not find color or style 'System.String'." [\#583](https://github.com/christianhelle/refitter/issues/583)
 - Source generator errors are hidden [\#568](https://github.com/christianhelle/refitter/issues/568)
 - Refitter -v not showing version number [\#560](https://github.com/christianhelle/refitter/issues/560)
+- Not so nice behavior when generating client with trim-unused-schema [\#557](https://github.com/christianhelle/refitter/issues/557)
 - Two almost identical routes that fail at validation. [\#551](https://github.com/christianhelle/refitter/issues/551)
 - Code Generator creates unsafe interface method names [\#360](https://github.com/christianhelle/refitter/issues/360)
 
