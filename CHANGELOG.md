@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.0...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency coverlet.collector to 6.0.4 [\#594](https://github.com/christianhelle/refitter/pull/594) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.5.0](https://github.com/christianhelle/refitter/tree/1.5.0) (2025-01-17)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.4.1...1.5.0)
 
 **Implemented enhancements:**
 
@@ -37,6 +45,7 @@
 
 **Merged pull requests:**
 
+- Update docs for --include-inheritance-hierarchy [\#591](https://github.com/christianhelle/refitter/pull/591) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency fluentassertions to 7.1.0 [\#590](https://github.com/christianhelle/refitter/pull/590) ([renovate[bot]](https://github.com/apps/renovate))
 - Revert "chore\(deps\): update dependency fluentassertions to v8" [\#588](https://github.com/christianhelle/refitter/pull/588) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dotnet monorepo [\#587](https://github.com/christianhelle/refitter/pull/587) ([renovate[bot]](https://github.com/apps/renovate))
