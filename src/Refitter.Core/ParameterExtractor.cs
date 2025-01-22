@@ -39,8 +39,14 @@ internal static class ParameterExtractor
                 .ToList();
         }
 
+        var formParameters = operationModel.Parameters
+            .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
+            .Select(p =>
+                $"{GetParameterType(p, settings)} {p.VariableName}")
+            .ToList();
+
         var binaryBodyParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter || p.IsFile)
+            .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
             .Select(p =>
             {
                 var generatedAliasAsAttribute = string.IsNullOrWhiteSpace(GetAliasAsAttribute(p))
@@ -56,6 +62,7 @@ internal static class ParameterExtractor
         parameters.AddRange(queryParameters);
         parameters.AddRange(bodyParameters);
         parameters.AddRange(headerParameters);
+        parameters.AddRange(formParameters);
         parameters.AddRange(binaryBodyParameters);
 
         parameters = ReOrderNullableParameters(parameters, settings);
@@ -142,7 +149,7 @@ internal static class ParameterExtractor
     }
 
     private static string FindSupportedType(string typeName) =>
-        typeName == "FileResponse" ? "StreamPart" : typeName;
+        typeName is "FileResponse" or "FileParameter" ? "StreamPart" : typeName;
 
     private static List<string> GetQueryParameters(CSharpOperationModel operationModel, RefitGeneratorSettings settings, string dynamicQuerystringParameterType, out string? dynamicQuerystringParameters)
     {

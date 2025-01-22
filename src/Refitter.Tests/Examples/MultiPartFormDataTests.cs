@@ -1,6 +1,8 @@
 using FluentAssertions;
+
 using Refitter.Core;
 using Refitter.Tests.Build;
+
 using Xunit;
 
 namespace Refitter.Tests.Examples;
@@ -9,52 +11,88 @@ public class MultiPartFormDataTests
 {
     private const string OpenApiSpec = @"
 {
-   ""openapi"":""3.0.2"",
-   ""paths"":{
-      ""/foo/{id}/files"":{
-         ""post"":{
-            ""summary"":""uploads a file"",
-            ""operationId"":""uploadFile"",
-            ""parameters"":[
-               {
-                  ""name"":""id"",
-                  ""in"":""path"",
-                  ""description"":""Id of the foo resource"",
-                  ""required"":true,
-                  ""schema"":{
-                     ""type"":""integer"",
-                     ""format"":""int64""
+  ""openapi"": ""3.0.1"",  
+  ""paths"": {
+    ""/animals"": {
+      ""post"": {
+        ""tags"": [
+          ""Animals""
+        ],
+        ""requestBody"": {
+          ""content"": {
+            ""multipart/form-data"": {
+              ""schema"": {
+                ""type"": ""object"",
+                ""properties"": {
+                  ""Name"": {
+                    ""type"": ""string""
+                  },
+                  ""AnimalClassFile"": {
+                    ""type"": ""string"",
+                    ""format"": ""binary""
+                  },
+                  ""AnimalCrowdFile"": {
+                    ""type"": ""string"",
+                    ""format"": ""binary""
                   }
-               }
-            ],
-            ""requestBody"":{
-               ""content"":{
-                  ""multipart/form-data"":{
-                     ""schema"":{
-                        ""type"":""object"",
-                        ""properties"":{
-                           ""formFile"":{
-                              ""type"":""string"",
-                              ""format"":""binary""
-                           }
-                        }
-                     },
-                     ""encoding"":{
-                        ""formFile"":{
-                           ""style"":""form""
-                        }
-                     }
-                  }
-               }
-            },
-            ""responses"":{
-               ""200"":{
-                  ""description"":""successful operation""
-               }
+                }
+              },
+              ""encoding"": {
+                ""Name"": {
+                  ""style"": ""form""
+                },
+                ""AnimalClassFile"": {
+                  ""style"": ""form""
+                },
+                ""AnimalCrowdFile"": {
+                  ""style"": ""form""
+                }
+              }
             }
-         }
+          }
+        },
+        ""responses"": {
+          ""201"": {
+            ""description"": ""Created"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": {
+                  ""$ref"": ""#/components/schemas/AnimalResponse""
+                }
+              }
+            }
+          }
+        }
       }
-   }
+    }
+  },
+  ""components"": {
+    ""schemas"": {
+      ""AnimalResponse"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""id"": {
+            ""type"": ""string"",
+            ""format"": ""uuid"",
+            ""nullable"": true
+          },
+          ""Name"": {
+            ""type"": ""string"",
+            ""nullable"": true
+          },
+          ""AnimalClassFileUri"": {
+            ""type"": ""string"",
+            ""nullable"": true
+          },
+          ""AnimalCrowdFileUri"": {
+            ""type"": ""string"",
+            ""nullable"": true
+          }
+        },
+        ""additionalProperties"": false
+      }
+    }
+  }
 }
 ";
 
@@ -83,10 +121,10 @@ public class MultiPartFormDataTests
     }
 
     [Fact]
-    public async Task Generated_Code_Contains_StreamPart_Parameter()
+    public async Task Generated_Code_Contains_Correct_Parameters()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("StreamPart");
+        generateCode.Should().Contain("string name, StreamPart animalClassFile, StreamPart animalCrowdFile");
     }
 
     private static async Task<string> GenerateCode()
