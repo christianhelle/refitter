@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-61-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-62-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1275,6 +1275,7 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Fargekritt"><img src="https://avatars.githubusercontent.com/u/11448941?v=4?s=100" width="100px;" alt="Amund"/><br /><sub><b>Amund</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=Fargekritt" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/velvolue"><img src="https://avatars.githubusercontent.com/u/155445968?v=4?s=100" width="100px;" alt="Vegard Løkken"/><br /><sub><b>Vegard Løkken</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=velvolue" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/brad-technologik"><img src="https://avatars.githubusercontent.com/u/159975063?v=4?s=100" width="100px;" alt="brad-technologik"/><br /><sub><b>brad-technologik</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abrad-technologik" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jaroslaw-dutka"><img src="https://avatars.githubusercontent.com/u/40070136?v=4?s=100" width="100px;" alt="Jarosław Dutka"/><br /><sub><b>Jarosław Dutka</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=jaroslaw-dutka" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
