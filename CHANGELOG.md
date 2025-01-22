@@ -4,8 +4,13 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.0...HEAD)
 
+**Fixed bugs:**
+
+- \[FromForm\] parameter on minimal api doesn't get generated on Interface [\#515](https://github.com/christianhelle/refitter/issues/515)
+
 **Merged pull requests:**
 
+- Proper support for multipart form [\#595](https://github.com/christianhelle/refitter/pull/595) ([jaroslaw-dutka](https://github.com/jaroslaw-dutka))
 - chore\(deps\): update dependency coverlet.collector to 6.0.4 [\#594](https://github.com/christianhelle/refitter/pull/594) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.5.0](https://github.com/christianhelle/refitter/tree/1.5.0) (2025-01-17)
