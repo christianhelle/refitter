@@ -571,6 +571,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "jaroslaw-dutka",
+      "name": "Jarosław Dutka",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40070136?v=4",
+      "profile": "https://github.com/jaroslaw-dutka",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
