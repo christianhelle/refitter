@@ -45,12 +45,25 @@ internal static class ParameterExtractor
                 $"{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
+        var binaryBodyParameters = operationModel.Parameters
+            .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
+            .Select(p =>
+            {
+                var generatedAliasAsAttribute = string.IsNullOrWhiteSpace(GetAliasAsAttribute(p))
+                    ? string.Empty
+                    : $"[{GetAliasAsAttribute(p)}]";
+
+                return $"{generatedAliasAsAttribute}StreamPart {p.VariableName}";
+            })
+            .ToList();
+
         var parameters = new List<string>();
         parameters.AddRange(routeParameters);
         parameters.AddRange(queryParameters);
         parameters.AddRange(bodyParameters);
         parameters.AddRange(headerParameters);
         parameters.AddRange(formParameters);
+        parameters.AddRange(binaryBodyParameters);
 
         parameters = ReOrderNullableParameters(parameters, settings);
 
