@@ -4,14 +4,20 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.0...HEAD)
 
+**Implemented enhancements:**
+
+- Proper support for multipart form [\#595](https://github.com/christianhelle/refitter/pull/595) ([jaroslaw-dutka](https://github.com/jaroslaw-dutka))
+
 **Fixed bugs:**
 
 - \[FromForm\] parameter on minimal api doesn't get generated on Interface [\#515](https://github.com/christianhelle/refitter/issues/515)
 
 **Merged pull requests:**
 
-- Proper support for multipart form [\#595](https://github.com/christianhelle/refitter/pull/595) ([jaroslaw-dutka](https://github.com/jaroslaw-dutka))
+- Remove dependency on System.Text.Json [\#597](https://github.com/christianhelle/refitter/pull/597) ([christianhelle](https://github.com/christianhelle))
+- docs: add jaroslaw-dutka as a contributor for code [\#596](https://github.com/christianhelle/refitter/pull/596) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency coverlet.collector to 6.0.4 [\#594](https://github.com/christianhelle/refitter/pull/594) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.5.0 [\#593](https://github.com/christianhelle/refitter/pull/593) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.5.0](https://github.com/christianhelle/refitter/tree/1.5.0) (2025-01-17)
 
