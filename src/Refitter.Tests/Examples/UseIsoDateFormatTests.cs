@@ -12,9 +12,7 @@ openapi: '3.0.1'
 paths:
   '/t/foo/{id}':
     get:
-      summary: X
-      description: X
-      operationId: foo
+      operationId: getFoo
       parameters:
         - name: id
           in: path
