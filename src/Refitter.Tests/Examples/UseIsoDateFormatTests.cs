@@ -8,48 +8,36 @@ namespace Refitter.Tests.Examples;
 public class UseIsoDateFormatTests
 {
     private const string OpenApiSpec = @"
-swagger: '2.0'
-info:
-  title: XX
-  version: 0.0.0
-host: x.io
-basePath: /
-schemes:
-  - https
+openapi: '3.0.1'
 paths:
-  '/t/dummy/{employee_id}':
+  '/t/foo/{id}':
     get:
       summary: X
       description: X
-      operationId: dummy
+      operationId: foo
       parameters:
-        - name: employee_id
+        - name: id
           in: path
-          description: the specific employee
           required: true
           format: int64
           type: integer
         - name: valid_from
           in: query
-          description: the start of the period
           required: true
           format: date
           type: string
         - name: valid_to
           in: query
-          description: the end of the period
           required: true
           format: date
           type: string
         - name: test_time
           in: query
-          description: test parameter
           required: true
           format: time
           type: string
         - name: test_datetime
           in: query
-          description: test parameter
           required: true
           format: date-time
           type: string
