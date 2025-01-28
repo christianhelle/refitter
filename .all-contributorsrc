@@ -580,6 +580,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "maksionkin",
+      "name": "maksionkin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11482043?v=4",
+      "profile": "https://github.com/maksionkin",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
