@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.1-preview.66...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.1...HEAD)
 
 **Implemented enhancements:**
 
@@ -16,10 +16,6 @@
 
 - docs: add maksionkin as a contributor for bug [\#601](https://github.com/christianhelle/refitter/pull/601) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.5.1 [\#598](https://github.com/christianhelle/refitter/pull/598) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.5.1-preview.66](https://github.com/christianhelle/refitter/tree/1.5.1-preview.66) (2025-01-25)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.1...1.5.1-preview.66)
 
 ## [1.5.1](https://github.com/christianhelle/refitter/tree/1.5.1) (2025-01-25)
 
