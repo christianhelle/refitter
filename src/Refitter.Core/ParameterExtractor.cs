@@ -98,7 +98,7 @@ internal static class ParameterExtractor
         {
             { parameter.IsArray: true } => "Query(CollectionFormat.Multi)",
             { parameter.IsDate: true, settings.UseIsoDateFormat: true } => "Query(Format = \"yyyy-MM-dd\")",
-            { parameter.IsDateOrDateTime: true, settings.CodeGeneratorSettings: not null } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateFormat}\")",
+            { parameter.IsDate: true, settings.CodeGeneratorSettings.DateFormat: not null } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateFormat}\")",
             _ => "Query",
         };
     }

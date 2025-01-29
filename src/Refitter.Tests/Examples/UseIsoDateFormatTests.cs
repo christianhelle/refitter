@@ -75,6 +75,52 @@ paths:
     }
 
     [Fact]
+    public async Task GeneratedCode_Contains_Date_Format_String_With_Empty_Settings()
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings());
+        generateCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_from");
+        generateCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_to");
+    }
+
+    [Fact]
+    public async Task GeneratedCode_NotContains_DateTime_Format_String_With_Empty_Settings()
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings());
+		generateCode.Should().Contain(@"[Query] System.DateTimeOffset test_datetime");
+        generateCode.Should().NotContain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset time_datetime");
+    }
+
+    [Fact]
+    public async Task GeneratedCode_Contains_TimeSpan_Parameter_With_Empty_Settings()
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings());
+        generateCode.Should().Contain("[Query] System.TimeSpan");
+    }
+
+    [Fact]
+    public async Task GeneratedCode_Contains_Date_Format_String_With_Settings()
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings { DateFormat = "yyyy-MM-dd" });
+        generateCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_from");
+        generateCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_to");
+    }
+
+    [Fact]
+    public async Task GeneratedCode_NotContains_DateTime_Format_String_With_Settings()
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings { DateFormat = "yyyy-MM-dd" });
+		generateCode.Should().Contain(@"[Query] System.DateTimeOffset test_datetime");
+        generateCode.Should().NotContain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset time_datetime");
+    }
+
+    [Fact]
+    public async Task GeneratedCode_Contains_TimeSpan_Parameter_With_Settings()
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings { DateFormat = "yyyy-MM-dd" });
+        generateCode.Should().Contain("[Query] System.TimeSpan");
+    }
+
+    [Fact]
     public async Task Can_Build_Generated_Code()
     {
         string generateCode = await GenerateCode();
@@ -84,10 +130,15 @@ paths:
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(CodeGeneratorSettings? generatorSettings = null)
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, UseIsoDateFormat = true };
+        var settings = new RefitGeneratorSettings 
+		{ 
+			OpenApiPath = swaggerFile,
+			UseIsoDateFormat = true,
+			CodeGeneratorSettings = generatorSettings
+		};
 
         var sut = await RefitGenerator.CreateAsync(settings);
         var generateCode = sut.Generate();
