@@ -159,7 +159,10 @@ public class CodeGeneratorSettings
     /// </summary>
     public string[] ExcludedTypeNames { get; set; } = Array.Empty<string>();
 
-    public string DateFormat { get; set; } = "yyyy-MM-dd";
+    /// <summary>
+    /// Gets or sets the date string format to use
+    /// </summary>
+    public string? DateFormat { get; set; }
 
     /// <summary>
     /// Gets or sets a custom <see cref="IPropertyNameGenerator"/>.
