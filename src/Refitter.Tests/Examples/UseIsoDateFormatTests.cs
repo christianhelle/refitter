@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+using AutoFixture.Xunit2;
+using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Xunit;
@@ -7,7 +8,8 @@ namespace Refitter.Tests.Examples;
 
 public class UseIsoDateFormatTests
 {
-    private const string OpenApiSpec = @"
+    private const string OpenApiSpec =
+        @"
 openapi: '3.0.1'
 paths:
   '/t/foo/{id}':
@@ -75,19 +77,67 @@ paths:
     }
 
     [Fact]
+    public async Task GeneratedCode_Contains_Date_Format_String_With_Empty_Settings()
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings());
+        generateCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_from");
+        generateCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_to");
+    }
+
+    [Fact]
+    public async Task GeneratedCode_NotContains_DateTime_Format_String_With_Empty_Settings()
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings());
+        generateCode.Should().Contain(@"[Query] System.DateTimeOffset test_datetime");
+        generateCode.Should().NotContain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset time_datetime");
+    }
+
+    [Fact]
+    public async Task GeneratedCode_Contains_TimeSpan_Parameter_With_Empty_Settings()
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings());
+        generateCode.Should().Contain("[Query] System.TimeSpan");
+    }
+
+    [Theory, AutoData]
+    public async Task GeneratedCode_Contains_Date_Format_String_With_Settings(string format)
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings { DateFormat = format });
+        generateCode.Should().Contain(@$"[Query(Format = ""{format}"")] System.DateTimeOffset valid_from");
+        generateCode.Should().Contain(@$"[Query(Format = ""{format}"")] System.DateTimeOffset valid_to");
+    }
+
+    [Theory, AutoData]
+    public async Task GeneratedCode_NotContains_DateTime_Format_String_With_Settings(string format)
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings { DateFormat = format });
+        generateCode.Should().Contain(@"[Query] System.DateTimeOffset test_datetime");
+        generateCode.Should().NotContain(@$"[Query(Format = ""{format}"")] System.DateTimeOffset time_datetime");
+    }
+
+    [Theory, AutoData]
+    public async Task GeneratedCode_Contains_TimeSpan_Parameter_With_Settings(string format)
+    {
+        string generateCode = await GenerateCode(new CodeGeneratorSettings { DateFormat = format });
+        generateCode.Should().Contain("[Query] System.TimeSpan");
+    }
+
+    [Fact]
     public async Task Can_Build_Generated_Code()
     {
         string generateCode = await GenerateCode();
-        BuildHelper
-            .BuildCSharp(generateCode)
-            .Should()
-            .BeTrue();
+        BuildHelper.BuildCSharp(generateCode).Should().BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(CodeGeneratorSettings? generatorSettings = null)
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, UseIsoDateFormat = true };
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            UseIsoDateFormat = generatorSettings?.DateFormat is null,
+            CodeGeneratorSettings = generatorSettings
+        };
 
         var sut = await RefitGenerator.CreateAsync(settings);
         var generateCode = sut.Generate();

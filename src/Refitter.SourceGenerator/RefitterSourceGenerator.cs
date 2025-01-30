@@ -91,6 +91,21 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                     settings.OpenApiPath);
             }
 
+            if (settings.UseIsoDateFormat &&
+                settings.CodeGeneratorSettings?.DateFormat is not null)
+            {
+                diagnostics.Add(
+                    Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "REFITTER002",
+                            "Warning",
+                            "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
+                            "Refitter",
+                            DiagnosticSeverity.Warning,
+                            true),
+                        Location.None));
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
             var generator = RefitGenerator.CreateAsync(settings).GetAwaiter().GetResult();
             var refit = generator.Generate();

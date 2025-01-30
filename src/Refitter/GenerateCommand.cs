@@ -69,7 +69,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (!settings.NoBanner)
                 DonationBanner();
 
-            ShowDeprecationWarning(refitGeneratorSettings);
+            ShowWarnings(refitGeneratorSettings);
             return 0;
         }
         catch (Exception exception)
@@ -77,7 +77,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             AnsiConsole.WriteLine();
             if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
             {
-                AnsiConsole.MarkupLine($"[red]Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]");
+                AnsiConsole.MarkupLine(
+                    $"[red]Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]"
+                );
                 AnsiConsole.WriteLine();
             }
 
@@ -207,8 +209,15 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
     }
 
-    private static void ShowDeprecationWarning(RefitGeneratorSettings refitGeneratorSettings)
+    private static void ShowWarnings(RefitGeneratorSettings refitGeneratorSettings)
     {
+        if (refitGeneratorSettings.UseIsoDateFormat &&
+            refitGeneratorSettings.CodeGeneratorSettings?.DateFormat is not null)
+        {
+            AnsiConsole.MarkupLine("[yellow]WARNING: 'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true[/]");
+            AnsiConsole.WriteLine();
+        }
+
 #pragma warning disable CS0618 // Type or member is obsolete
         if (refitGeneratorSettings.DependencyInjectionSettings?.UsePolly is true)
 #pragma warning restore CS0618 // Type or member is obsolete
