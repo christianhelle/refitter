@@ -165,11 +165,6 @@ public class CodeGeneratorSettings
     public string? DateFormat { get; set; }
 
     /// <summary>
-    /// Gets or sets the time string format to use
-    /// </summary>
-    public string? TimeFormat { get; set; }
-
-    /// <summary>
     /// Gets or sets the date-time string format to use
     /// </summary>
     public string? DateTimeFormat { get; set; }

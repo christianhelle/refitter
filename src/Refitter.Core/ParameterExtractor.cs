@@ -107,10 +107,6 @@ internal static class ParameterExtractor
                     parameter.IsDateOrDateTime: true, parameter.Schema.Format: "date-time",
                     settings.CodeGeneratorSettings.DateTimeFormat: not null
                 } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateTimeFormat}\")",
-            {
-                    parameter.Schema.Type: JsonObjectType.String, parameter.Schema.Format: "time",
-                    settings.CodeGeneratorSettings.TimeFormat: not null
-                } => $"Query(Format = \"{settings.CodeGeneratorSettings?.TimeFormat}\")",
             _ => "Query",
         };
     }
