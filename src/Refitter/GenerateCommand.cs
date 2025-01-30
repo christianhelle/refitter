@@ -77,7 +77,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             AnsiConsole.WriteLine();
             if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
             {
-                AnsiConsole.MarkupLine($"[red]Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]");
+                AnsiConsole.MarkupLine(
+                    $"[red]Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]"
+                );
                 AnsiConsole.WriteLine();
             }
 
@@ -212,7 +214,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (refitGeneratorSettings.UseIsoDateFormat &&
             refitGeneratorSettings.CodeGeneratorSettings?.DateFormat is not null)
         {
-            AnsiConsole.MarkupLine("[yellow]'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true");
+            AnsiConsole.MarkupLine("[yellow]WARNING: 'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true[/]");
             AnsiConsole.WriteLine();
         }
 
