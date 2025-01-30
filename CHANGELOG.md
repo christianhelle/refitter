@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...HEAD)
+
+**Implemented enhancements:**
+
+- Fix ISO date format handling when dateFormat is defined in settings file [\#603](https://github.com/christianhelle/refitter/pull/603) ([christianhelle](https://github.com/christianhelle))
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.5.2 [\#602](https://github.com/christianhelle/refitter/pull/602) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [1.5.2](https://github.com/christianhelle/refitter/tree/1.5.2) (2025-01-29)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.1...1.5.2)
@@ -7,10 +19,6 @@
 **Implemented enhancements:**
 
 - Fix date formatting for date-time types [\#600](https://github.com/christianhelle/refitter/pull/600) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- date-time parameters are encoded as date when iso8601 is used [\#599](https://github.com/christianhelle/refitter/issues/599)
 
 **Merged pull requests:**
 
