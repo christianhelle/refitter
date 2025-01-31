@@ -16,9 +16,9 @@ public class CodeGeneratorSettings
     /// </summary>
     [Description(
         """
-            Gets or sets a value indicating whether a required property must be defined in JSON
-            (sets Required.Always when the property is required) (default: true).
-            """
+        Gets or sets a value indicating whether a required property must be defined in JSON
+        (sets Required.Always when the property is required) (default: true).
+        """
     )]
     public bool RequiredPropertiesMustBeDefined { get; set; } = true;
 
@@ -83,8 +83,8 @@ public class CodeGeneratorSettings
     /// </summary>
     [Description(
         """
-            Gets or sets the generic dictionary .NET type which is used for DictionaryType instances (default: 'Dictionary').
-            """
+        Gets or sets the generic dictionary .NET type which is used for DictionaryType instances (default: 'Dictionary').
+        """
     )]
     public string DictionaryInstanceType { get; set; } = "System.Collections.Generic.Dictionary";
 
@@ -111,9 +111,9 @@ public class CodeGeneratorSettings
     /// </summary>
     [Description(
         """
-            Gets or sets the custom Json.NET converters (class names)
-            which are registered for serialization and deserialization.
-            """
+        Gets or sets the custom Json.NET converters (class names)
+        which are registered for serialization and deserialization.
+        """
     )]
     public string[]? JsonConverters { get; set; }
 
@@ -168,8 +168,8 @@ public class CodeGeneratorSettings
     /// </summary>
     [Description(
         """
-            Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with dictionary inheritance.
-            """
+        Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with dictionary inheritance.
+        """
     )]
     public bool InlineNamedDictionaries { get; set; } = false;
 
@@ -178,8 +178,8 @@ public class CodeGeneratorSettings
     /// </summary>
     [Description(
         """
-            Gets or sets a value indicating whether named/referenced tuples should be inlined or generated as class with tuple inheritance.
-            """
+        Gets or sets a value indicating whether named/referenced tuples should be inlined or generated as class with tuple inheritance.
+        """
     )]
     public bool InlineNamedTuples { get; set; } = true;
 
@@ -188,8 +188,8 @@ public class CodeGeneratorSettings
     /// </summary>
     [Description(
         """
-            Gets or sets a value indicating whether named/referenced arrays should be inlined or generated as class with array inheritance.
-            """
+        Gets or sets a value indicating whether named/referenced arrays should be inlined or generated as class with array inheritance.
+        """
     )]
     public bool InlineNamedArrays { get; set; } = false;
 
@@ -228,8 +228,8 @@ public class CodeGeneratorSettings
     /// </summary>
     [Description(
         """
-            Gets or sets a value indicating whether named/referenced any schemas should be inlined or generated as class.
-            """
+        Gets or sets a value indicating whether named/referenced any schemas should be inlined or generated as class.
+        """
     )]
     public bool InlineNamedAny { get; set; }
 

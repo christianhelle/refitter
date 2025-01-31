@@ -68,9 +68,9 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            Indicating whether <c>ApiException</c> and <c>IApiResponse</c> should be documented with
-            the relevant status codes specified in the OpenAPI document.
-            """
+        Indicating whether <c>ApiException</c> and <c>IApiResponse</c> should be documented with
+        the relevant status codes specified in the OpenAPI document.
+        """
     )]
     public bool GenerateStatusCodeComments { get; set; } = true;
 
@@ -104,9 +104,9 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            AddAcceptHeaders dictionary of operation ids and a specific response type that they should use.
-            The type is wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).
-            """
+        AddAcceptHeaders dictionary of operation ids and a specific response type that they should use.
+        The type is wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).
+        """
     )]
     public Dictionary<string, string> ResponseTypeOverride { get; set; } = new();
 
@@ -135,9 +135,9 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            Set to true to explicitly format date query string parameters
-            in ISO 8601 standard date format using delimiters (for example: 2023-06-15)
-            """
+        Set to true to explicitly format date query string parameters
+        in ISO 8601 standard date format using delimiters (for example: 2023-06-15)
+        """
     )]
     public bool UseIsoDateFormat { get; set; }
 
@@ -186,9 +186,9 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            Generate operation names using pattern. When using --multiple-interfaces ByEndpoint,
-            this is name of the Execute() method in the interface.
-            """
+        Generate operation names using pattern. When using --multiple-interfaces ByEndpoint,
+        this is name of the Execute() method in the interface.
+        """
     )]
     public string? OperationNameTemplate { get; set; }
 
@@ -217,11 +217,11 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            The filename of the generated code.
-            For the CLI tool, the default is Output.cs
-            The the Source Generator, this is the name of the generated class
-            and the default is [.refitter defined naming OR .refitter filename].g.cs)
-            """
+        The filename of the generated code.
+        For the CLI tool, the default is Output.cs
+        The the Source Generator, this is the name of the generated class
+        and the default is [.refitter defined naming OR .refitter filename].g.cs)
+        """
     )]
     public string? OutputFilename { get; set; }
 
@@ -243,9 +243,9 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            Apply tree-shaking to the OpenApi schema.
-            This works in conjunction with includeTags and includePathMatches.
-            """
+        Apply tree-shaking to the OpenApi schema.
+        This works in conjunction with includeTags and includePathMatches.
+        """
     )]
     public bool TrimUnusedSchema { get; set; }
 
@@ -255,9 +255,9 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            Array of regular expressions that determine if a schema needs to be kept.
-            This works in conjunction with TrimUnusedSchema.
-            """
+        Array of regular expressions that determine if a schema needs to be kept.
+        This works in conjunction with TrimUnusedSchema.
+        """
     )]
     public string[] KeepSchemaPatterns { get; set; } = Array.Empty<string>();
 
@@ -268,10 +268,10 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            Keep all possible type-instances of inheritance/union types.
-            If this is false only directly referenced types will be kept.
-            This works in conjunction with TrimUnusedSchema.
-            """
+        Keep all possible type-instances of inheritance/union types.
+        If this is false only directly referenced types will be kept.
+        This works in conjunction with TrimUnusedSchema.
+        """
     )]
     public bool IncludeInheritanceHierarchy { get; set; }
 
@@ -306,9 +306,9 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            Wrap multiple query parameters into a single complex one.
-            See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
-            """
+        Wrap multiple query parameters into a single complex one.
+        See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+        """
     )]
     public bool UseDynamicQuerystringParameters { get; set; }
 
@@ -321,12 +321,12 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            Generate multiple files. Default is false.
-            This is automatically set to true when ContractsOutputFolder is specified
-            Refit interface(s) are written to a file called RefitInterfaces.cs
-            Contracts are written to a file called Contracts.cs
-            Dependency Injection is written to a file called DependencyInjection.cs
-            """
+        Generate multiple files. Default is false.
+        This is automatically set to true when ContractsOutputFolder is specified
+        Refit interface(s) are written to a file called RefitInterfaces.cs
+        Contracts are written to a file called Contracts.cs
+        Dependency Injection is written to a file called DependencyInjection.cs
+        """
     )]
     public bool GenerateMultipleFiles { get; set; }
 
@@ -340,15 +340,14 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description(
         """
-            Use System.Text.Json polymorphic serialization. Default is false.
-            Replace NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
-            To have the native support of inheritance (de)serialization and fallback to base types when
-            payloads with (yet) unknown types are offered by newer versions of an API
-            See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
-            """
+        Use System.Text.Json polymorphic serialization. Default is false.
+        Replace NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
+        To have the native support of inheritance (de)serialization and fallback to base types when
+        payloads with (yet) unknown types are offered by newer versions of an API
+        See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
+        """
     )]
     public bool UsePolymorphicSerialization { get; set; }
 
-    [JsonIgnore]
-    public IParameterNameGenerator? ParameterNameGenerator { get; set; }
+    [JsonIgnore] public IParameterNameGenerator? ParameterNameGenerator { get; set; }
 }
