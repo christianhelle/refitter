@@ -465,6 +465,7 @@ The following is an example `.refitter` file
         },
         "codeGeneratorSettings": {
             "type": "object",
+            "description": "Settings for the code generator."
             "properties": {
                 "requiredPropertiesMustBeDefined": {
                     "type": "boolean",
@@ -477,9 +478,104 @@ The following is an example `.refitter` file
                 "anyType": {
                     "type": "string",
                     "description": "The type used for 'any' in the code generator settings."
+                },
+                "dateType": {
+                    "type": "string"
+                },
+                "dateTimeType": {
+                    "type": "string"
+                },
+                "timeType": {
+                    "type": "string"
+                },
+                "timeSpanType": {
+                    "type": "string"
+                },
+                "arrayType": {
+                    "type": "string"
+                },
+                "dictionaryType": {
+                    "type": "string"
+                },
+                "arrayInstanceType": {
+                    "type": "string"
+                },
+                "dictionaryInstanceType": {
+                    "type": "string"
+                },
+                "arrayBaseType": {
+                    "type": "string"
+                },
+                "dictionaryBaseType": {
+                    "type": "string"
+                },
+                "propertySetterAccessModifier": {
+                    "type": "string"
+                },
+                "jsonConverters": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "generateImmutableArrayProperties": {
+                    "type": "boolean"
+                },
+                "generateImmutableDictionaryProperties": {
+                    "type": "boolean"
+                },
+                "handleReferences": {
+                    "type": "boolean"
+                },
+                "jsonSerializerSettingsTransformationMethod": {
+                    "type": "string"
+                },
+                "generateJsonMethods": {
+                    "type": "boolean"
+                },
+                "enforceFlagEnums": {
+                    "type": "boolean"
+                },
+                "inlineNamedDictionaries": {
+                    "type": "boolean"
+                },
+                "inlineNamedTuples": {
+                    "type": "boolean"
+                },
+                "inlineNamedArrays": {
+                    "type": "boolean"
+                },
+                "generateOptionalPropertiesAsNullable": {
+                    "type": "boolean"
+                },
+                "generateNullableReferenceTypes": {
+                    "type": "boolean"
+                },
+                "generateNativeRecords": {
+                    "type": "boolean"
+                },
+                "generateDefaultValues": {
+                    "type": "boolean"
+                },
+                "inlineNamedAny": {
+                    "type": "boolean"
+                },
+                "excludedTypeNames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "dateFormat": {
+                    "type": "string"
+                },
+                "dateTimeFormat": {
+                    "type": "string"
+                },
+                "propertyNameGenerator": {
+                    "type": "object"
                 }
             },
-            "description": "Settings for the code generator."
         }
     }
 }
