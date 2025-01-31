@@ -165,6 +165,11 @@ public class CodeGeneratorSettings
     public string? DateFormat { get; set; }
 
     /// <summary>
+    /// Gets or sets the date-time string format to use
+    /// </summary>
+    public string? DateTimeFormat { get; set; }
+
+    /// <summary>
     /// Gets or sets a custom <see cref="IPropertyNameGenerator"/>.
     /// </summary>
     [JsonIgnore]

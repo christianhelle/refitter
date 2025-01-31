@@ -100,11 +100,21 @@ paths:
     }
 
     [Theory, AutoData]
-    public async Task GeneratedCode_Contains_Date_Format_String_With_Settings(string format)
+    public async Task GeneratedCode_Contains_Date_Format_String_With_Settings(
+        string dateFormat,
+        string dateTimeFormat)
     {
-        string generateCode = await GenerateCode(new CodeGeneratorSettings { DateFormat = format });
-        generateCode.Should().Contain(@$"[Query(Format = ""{format}"")] System.DateTimeOffset valid_from");
-        generateCode.Should().Contain(@$"[Query(Format = ""{format}"")] System.DateTimeOffset valid_to");
+        var generateCode = await GenerateCode(
+            new CodeGeneratorSettings
+            {
+                DateFormat = dateFormat,
+                DateTimeFormat = dateTimeFormat
+            });
+
+        generateCode.Should().Contain(@$"[Query(Format = ""{dateFormat}"")] System.DateTimeOffset valid_from");
+        generateCode.Should().Contain(@$"[Query(Format = ""{dateFormat}"")] System.DateTimeOffset valid_to");
+        generateCode.Should().Contain(@$"[Query(Format = ""{dateTimeFormat}"")] System.DateTimeOffset test_datetime");
+        generateCode.Should().Contain(@$"[Query] System.TimeSpan test_time");
     }
 
     [Theory, AutoData]

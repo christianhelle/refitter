@@ -1,4 +1,5 @@
 using System.Text;
+using NJsonSchema;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using NSwag.CodeGeneration.Models;
@@ -96,9 +97,16 @@ internal static class ParameterExtractor
     {
         return (parameter, settings) switch
         {
-            { parameter.IsArray: true } => "Query(CollectionFormat.Multi)",
-            { parameter.IsDate: true, settings.UseIsoDateFormat: true } => "Query(Format = \"yyyy-MM-dd\")",
-            { parameter.IsDate: true, settings.CodeGeneratorSettings.DateFormat: not null } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateFormat}\")",
+            { parameter.IsArray: true }
+                => "Query(CollectionFormat.Multi)",
+            { parameter.IsDate: true, settings.UseIsoDateFormat: true }
+                => "Query(Format = \"yyyy-MM-dd\")",
+            { parameter.IsDate: true, settings.CodeGeneratorSettings.DateFormat: not null }
+                => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateFormat}\")",
+            {
+                    parameter.IsDateOrDateTime: true, parameter.Schema.Format: "date-time",
+                    settings.CodeGeneratorSettings.DateTimeFormat: not null
+                } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateTimeFormat}\")",
             _ => "Query",
         };
     }
