@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.3-preview.67...HEAD)
+
+**Implemented enhancements:**
+
+- Add support for custom DateTimeFormat [\#604](https://github.com/christianhelle/refitter/pull/604) ([christianhelle](https://github.com/christianhelle))
+
+## [1.5.3-preview.67](https://github.com/christianhelle/refitter/tree/1.5.3-preview.67) (2025-01-30)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...1.5.3-preview.67)
 
 **Implemented enhancements:**
 
