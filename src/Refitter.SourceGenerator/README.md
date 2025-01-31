@@ -117,6 +117,7 @@ The following is an example `.refitter` file
     "generateDefaultValues": true,
     "inlineNamedAny": false,
     "dateFormat": "yyyy-MM-dd",
+    "dateTimeFormat": "yyyy-MM-dd",
     "excludedTypeNames": [
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
@@ -149,13 +150,13 @@ The following is an example `.refitter` file
 - `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using `"multipleIinterfaces": "ByEndpoint"`, This is name of the Execute() method in the interface
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping).
-- `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients. See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+- `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients. See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
   - `transientErrorHandler` - This is the transient error handler to use. Possible values are `None`, `Polly`, and `HttpResilience`. Default is `None`
   - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
-- `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See https://www.apizr.net for more information
+- `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See <https://www.apizr.net> for more information
   - `withRequestOptions` - Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter
   - `withRegistrationHelper` - Tells if Refitter should generate Apizr registration helpers (extended with dependencyInjectionSettings set, otherwise static)
   - `withCacheProvider` - Set the cache provider to be used
@@ -192,5 +193,6 @@ The following is an example `.refitter` file
   - `generateNativeRecords` - Default is false
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
-  - `dateFormat` - Default is `yyyy-MM-dd`
+  - `dateFormat` - Default is null
+  - `dateTimeFormat` - Default is null
   - `excludedTypeNames` - Default is empty
