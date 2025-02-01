@@ -589,6 +589,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "wocasella",
+      "name": "wocasella",
+      "avatar_url": "https://avatars.githubusercontent.com/u/37601504?v=4",
+      "profile": "https://github.com/wocasella",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
