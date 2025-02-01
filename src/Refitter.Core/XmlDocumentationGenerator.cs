@@ -55,10 +55,10 @@ public class XmlDocumentationGenerator
             return;
 
         if (!string.IsNullOrWhiteSpace(method.Summary))
-            this.AppendXmlCommentBlock("summary", method.Summary, code);
+            this.AppendXmlCommentBlock("summary", EscapeSymbols(method.Summary), code);
 
         if (!string.IsNullOrWhiteSpace(method.Description))
-            this.AppendXmlCommentBlock("remarks", method.Description, code);
+            this.AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
 
         foreach (var parameter in method.Parameters)
         {
@@ -230,5 +230,15 @@ public class XmlDocumentationGenerator
             .Append("</list>");
 
         return description.ToString();
+    }
+
+    private string EscapeSymbols(string input)
+    {
+        return input
+            .Replace("&", "&amp;")
+            .Replace("<", "&lt;")
+            .Replace(">", "&gt;")
+            .Replace("\"", "&quot;")
+            .Replace("'", "&apos;");
     }
 }
