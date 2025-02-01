@@ -235,10 +235,7 @@ public class XmlDocumentationGenerator
     private string EscapeSymbols(string input)
     {
         return input
-            .Replace("&", "&amp;")
             .Replace("<", "&lt;")
-            .Replace(">", "&gt;")
-            .Replace("\"", "&quot;")
-            .Replace("'", "&apos;");
+            .Replace(">", "&gt;");
     }
 }
