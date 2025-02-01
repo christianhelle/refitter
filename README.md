@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-63-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-64-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1277,6 +1277,9 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/brad-technologik"><img src="https://avatars.githubusercontent.com/u/159975063?v=4?s=100" width="100px;" alt="brad-technologik"/><br /><sub><b>brad-technologik</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abrad-technologik" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jaroslaw-dutka"><img src="https://avatars.githubusercontent.com/u/40070136?v=4?s=100" width="100px;" alt="Jarosław Dutka"/><br /><sub><b>Jarosław Dutka</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=jaroslaw-dutka" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/maksionkin"><img src="https://avatars.githubusercontent.com/u/11482043?v=4?s=100" width="100px;" alt="maksionkin"/><br /><sub><b>maksionkin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amaksionkin" title="Bug reports">🐛</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/wocasella"><img src="https://avatars.githubusercontent.com/u/37601504?v=4?s=100" width="100px;" alt="wocasella"/><br /><sub><b>wocasella</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Awocasella" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
