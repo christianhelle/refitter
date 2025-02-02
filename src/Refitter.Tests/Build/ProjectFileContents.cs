@@ -6,6 +6,7 @@ public static class ProjectFileContents
 <Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""System.Text.Json"" Version=""8.0.5"" />

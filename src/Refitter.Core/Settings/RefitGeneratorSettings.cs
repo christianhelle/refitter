@@ -25,6 +25,7 @@ public class RefitGeneratorSettings
 
     /// <summary>
     /// Gets or sets the namespace for the generated contracts. (default: GeneratedCode);
+    /// </summary>
     public string? ContractsNamespace { get; set; }
 
     /// <summary>

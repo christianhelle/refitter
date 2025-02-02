@@ -221,7 +221,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         Task<Order> PlaceOrder([Body] Order body);
 
         /// <summary>Find purchase order by ID</summary>
-        /// <remarks>For valid response try integer IDs with value <= 5 or > 10. Other values will generated exceptions</remarks>
+        /// <remarks>For valid response try integer IDs with value &lt;= 5 or &gt; 10. Other values will generated exceptions</remarks>
         /// <param name="orderId">ID of order that needs to be fetched</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
@@ -246,7 +246,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         Task<Order> GetOrderById(long orderId);
 
         /// <summary>Delete purchase order by ID</summary>
-        /// <remarks>For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors</remarks>
+        /// <remarks>For valid response try integer IDs with value &lt; 1000. Anything above 1000 or nonintegers will generate API errors</remarks>
         /// <param name="orderId">ID of the order that needs to be deleted</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
