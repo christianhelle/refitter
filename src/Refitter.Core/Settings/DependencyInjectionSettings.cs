@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace Refitter.Core;
@@ -23,9 +23,9 @@ public class DependencyInjectionSettings
     /// </summary>
     [Description(
         """
-        A collection of HttpMessageHandlers to be added to the HttpClient pipeline.
-        This can be for telemetry logging, authorization, etc.
-        """
+            A collection of HttpMessageHandlers to be added to the HttpClient pipeline.
+            This can be for telemetry logging, authorization, etc.
+            """
     )]
     public string[] HttpMessageHandlers { get; set; } = Array.Empty<string>();
 
@@ -35,9 +35,9 @@ public class DependencyInjectionSettings
     /// </summary>
     [Description(
         """
-        Set this to true to use Polly for transient fault handling.
-        This is deprecated. Use TransientErrorHandler instead.
-        """
+            Set this to true to use Polly for transient fault handling.
+            This is deprecated. Use TransientErrorHandler instead.
+            """
     )]
     [Obsolete("Use TransientErrorHandler instead")]
     public bool UsePolly
@@ -55,12 +55,12 @@ public class DependencyInjectionSettings
     /// </summary>
     [Description(
         """
-        Library to use for transient error handling
-        Options:
-        - None
-        - Polly - Polly Framework and HTTP Extensions
-        - HttpResilience - Microsoft HTTP Resilience Library
-        """
+            Library to use for transient error handling
+            Options:
+            - None
+            - Polly - Polly Framework and HTTP Extensions
+            - HttpResilience - Microsoft HTTP Resilience Library
+            """
     )]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TransientErrorHandler TransientErrorHandler { get; set; }
@@ -71,9 +71,9 @@ public class DependencyInjectionSettings
     /// </summary>
     [Description(
         """
-        Default max retry count for transient error handling. Default is 6.
-        This is deprecated. Use MaxRetryCount instead.
-        """
+            Default max retry count for transient error handling. Default is 6.
+            This is deprecated. Use MaxRetryCount instead.
+            """
     )]
     [Obsolete("Use MaxRetryCount instead")]
     public int PollyMaxRetryCount
@@ -99,9 +99,9 @@ public class DependencyInjectionSettings
     /// </summary>
     [Description(
         """
-        Name of IServiceCollection Extension Method.
-        Default is ConfigureRefitClients, or ConfigureApizrManagers if ApizrSettings property is set
-        """
+            Name of IServiceCollection Extension Method.
+            Default is ConfigureRefitClients, or ConfigureApizrManagers if ApizrSettings property is set
+            """
     )]
     public string ExtensionMethodName { get; set; } = DefaultExtensionMethodName;
 }
