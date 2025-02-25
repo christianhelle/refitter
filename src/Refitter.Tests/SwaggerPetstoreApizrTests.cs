@@ -268,9 +268,9 @@ public class SwaggerPetstoreApizrTests
         var settings = new ApizrGeneratorSettings();
         var generateCode = await GenerateCode(version, filename, settings);
         if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
-            generateCode.Should().Contain("[Headers(\"Accept: application/json\")]");
+            generateCode.Should().Contain("[Headers(\"Accept: application/json\"");
         else if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV2 or SampleOpenSpecifications.SwaggerPetstoreYamlV2)
-            generateCode.Should().NotContain("[Headers(\"Accept: application/json\")]");
+            generateCode.Should().NotContain("[Headers(\"Accept: application/json\"");
     }
 
     [Theory]

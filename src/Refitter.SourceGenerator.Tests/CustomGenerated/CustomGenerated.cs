@@ -42,7 +42,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/xml, application/json")]
+        [Headers("Accept: application/xml, application/json", "Content-Type: application/json")]
         [Put("/pet")]
         Task<Pet> UpdatePet([Body] Pet body);
 
@@ -63,7 +63,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/xml, application/json")]
+        [Headers("Accept: application/xml, application/json", "Content-Type: application/json")]
         [Post("/pet")]
         Task<Pet> AddPet([Body] Pet body);
 
@@ -84,7 +84,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json")]
+        [Headers("Accept: application/json", "Content-Type: ")]
         [Get("/pet/findByStatus")]
         Task<ICollection<Pet>> FindPetsByStatus([Query] Status? status);
 
@@ -105,7 +105,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json")]
+        [Headers("Accept: application/json", "Content-Type: ")]
         [Get("/pet/findByTags")]
         Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
 
@@ -130,7 +130,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/xml, application/json")]
+        [Headers("Accept: application/xml, application/json", "Content-Type: ")]
         [Get("/pet/{petId}")]
         Task<Pet> GetPetById(long petId);
 
@@ -152,6 +152,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
+        [Headers("Content-Type: ")]
         [Post("/pet/{petId}")]
         Task UpdatePetWithForm(long petId, [Query] string name, [Query] string status);
 
@@ -171,6 +172,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
+        [Headers("Content-Type: ")]
         [Delete("/pet/{petId}")]
         Task DeletePet(long petId, [Header("api_key")] string api_key);
 
@@ -190,7 +192,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </returns>
-        [Headers("Accept: application/json")]
+        [Headers("Accept: application/json", "Content-Type: application/octet-stream")]
         [Post("/pet/{petId}/uploadImage")]
         Task<ApiResponse> UploadFile(long petId, [Query] string additionalMetadata, StreamPart body);
 
@@ -198,7 +200,7 @@ namespace Refitter.Tests.CustomGenerated
         /// <remarks>Returns a map of status codes to quantities</remarks>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
-        [Headers("Accept: application/json")]
+        [Headers("Accept: application/json", "Content-Type: ")]
         [Get("/store/inventory")]
         Task<IDictionary<string, int>> GetInventory();
 
@@ -218,7 +220,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json")]
+        [Headers("Accept: application/json", "Content-Type: application/json")]
         [Post("/store/order")]
         Task<Order> PlaceOrder([Body] Order body);
 
@@ -243,7 +245,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json")]
+        [Headers("Accept: application/json", "Content-Type: ")]
         [Get("/store/order/{orderId}")]
         Task<Order> GetOrderById(long orderId);
 
@@ -268,6 +270,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
+        [Headers("Content-Type: ")]
         [Delete("/store/order/{orderId}")]
         Task DeleteOrder(long orderId);
 
@@ -276,7 +279,7 @@ namespace Refitter.Tests.CustomGenerated
         /// <param name="body">Created user object</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
-        [Headers("Accept: application/json, application/xml")]
+        [Headers("Accept: application/json, application/xml", "Content-Type: application/json")]
         [Post("/user")]
         Task CreateUser([Body] User body);
 
@@ -284,7 +287,7 @@ namespace Refitter.Tests.CustomGenerated
         /// <remarks>Creates list of users with given input array</remarks>
         /// <returns>Successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
-        [Headers("Accept: application/xml, application/json")]
+        [Headers("Accept: application/xml, application/json", "Content-Type: application/json")]
         [Post("/user/createWithList")]
         Task<User> CreateUsersWithListInput([Body] IEnumerable<User> body);
 
@@ -305,13 +308,14 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json")]
+        [Headers("Accept: application/json", "Content-Type: ")]
         [Get("/user/login")]
         Task<string> LoginUser([Query] string username, [Query] string password);
 
         /// <summary>Logs out current logged in user session</summary>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Content-Type: ")]
         [Get("/user/logout")]
         Task LogoutUser();
 
@@ -335,7 +339,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json")]
+        [Headers("Accept: application/json", "Content-Type: ")]
         [Get("/user/{username}")]
         Task<User> GetUserByName(string username);
 
@@ -345,6 +349,7 @@ namespace Refitter.Tests.CustomGenerated
         /// <param name="body">Update an existent user in the store</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Content-Type: application/json")]
         [Put("/user/{username}")]
         Task UpdateUser(string username, [Body] User body);
 
@@ -369,6 +374,7 @@ namespace Refitter.Tests.CustomGenerated
         /// </item>
         /// </list>
         /// </exception>
+        [Headers("Content-Type: ")]
         [Delete("/user/{username}")]
         Task DeleteUser(string username);
 
