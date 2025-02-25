@@ -18,18 +18,11 @@ paths:
           application/json:
             schema:
               type: string
-          application/xml:
-            schema:
-              type: string
         required: true
       responses:
         '200':
-          description: OK
           content:
             application/json:
-              schema:
-                type: string
-            application/xml:
               schema:
                 type: string
 ";
@@ -47,6 +40,14 @@ paths:
         var generateCode = await GenerateCode();
         using var scope = new AssertionScope();
         generateCode.Should().Contain("Content-Type: application/json");
+    }
+
+    [Fact]
+    public async Task Generates_Accept_Header_Attribute()
+    {
+        var generateCode = await GenerateCode();
+        using var scope = new AssertionScope();
+        generateCode.Should().Contain("Accept: application/json");
     }
 
     [Fact]
