@@ -69,6 +69,11 @@ public class RefitGeneratorSettings
     public bool AddAcceptHeaders { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets a value indicating whether to add content-type headers [Headers("Content-Type: application/json")].
+    /// </summary>
+    public bool AddContentTypeHeaders { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets a value indicating whether to return <c>IApiResponse</c> objects.
     /// </summary>
     public bool ReturnIApiResponse { get; set; }
