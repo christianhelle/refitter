@@ -171,6 +171,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         OpenApiOperation operation,
         StringBuilder code)
     {
+        var headers = new List<string>();
+
         if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
         {
             //Generate header "Accept"
@@ -185,8 +187,23 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
             if (uniqueContentTypes.Any())
             {
-                code.AppendLine($"{Separator}{Separator}[Headers(\"Accept: {string.Join(", ", uniqueContentTypes)}\")]");
+                headers.Add($"\"Accept: {string.Join(", ", uniqueContentTypes)}\"");
             }
+        }
+
+        if (settings.AddContentTypeHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
+        {
+            var uniqueContentTypes = operations.Value.RequestBody?.Content.Keys ?? Array.Empty<string>();
+            var contentType =
+                uniqueContentTypes.FirstOrDefault(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase)) ??
+                uniqueContentTypes.FirstOrDefault();
+
+            headers.Add($"\"Content-Type: {contentType}\"");
+        }
+
+        if (headers.Any())
+        {
+            code.AppendLine($"{Separator}{Separator}[Headers({string.Join(", ", headers)})]");
         }
     }
 
