@@ -34,7 +34,7 @@ namespace Refitter.Tests.UsePolymorphicSerialization
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json")]
+        [Headers("Accept: application/json", "Content-Type: application/json")]
         [Post("/v1/Warehouses")]
         Task<ICollection<WarehouseResponse>> CreateWarehouse([Query] string token, [Body] Warehouse body);
 
