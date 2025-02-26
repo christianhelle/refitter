@@ -74,7 +74,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
-                GenerateAcceptHeaders(operations, operation, code);
+                GenerateHeaders(operations, operation, code);
 
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
@@ -85,7 +85,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
                     GenerateObsoleteAttribute(operation, code);
                     GenerateForMultipartFormData(operationModel, code);
-                    GenerateAcceptHeaders(operations, operation, code);
+                    GenerateHeaders(operations, operation, code);
 
                     parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
@@ -166,7 +166,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
     }
 
-    protected void GenerateAcceptHeaders(
+    protected void GenerateHeaders(
         KeyValuePair<string, OpenApiOperation> operations,
         OpenApiOperation operation,
         StringBuilder code)
