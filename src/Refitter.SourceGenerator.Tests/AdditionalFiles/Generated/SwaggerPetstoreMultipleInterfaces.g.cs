@@ -43,6 +43,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
+        [Headers("Content-Type: application/json")]
         [Put("/pet")]
         Task<Pet> Execute([Body] Pet body);
     }
@@ -68,6 +69,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
+        [Headers("Content-Type: application/json")]
         [Post("/pet")]
         Task<Pet> Execute([Body] Pet body);
     }
@@ -221,6 +223,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </returns>
+        [Headers("Content-Type: application/octet-stream")]
         [Post("/pet/{petId}/uploadImage")]
         Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata, StreamPart body);
     }
@@ -257,6 +260,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
+        [Headers("Content-Type: application/json")]
         [Post("/store/order")]
         Task<Order> Execute([Body] Order body);
     }
@@ -328,6 +332,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <param name="body">Created user object</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Content-Type: application/json")]
         [Post("/user")]
         Task Execute([Body] User body);
     }
@@ -340,6 +345,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <remarks>Creates list of users with given input array</remarks>
         /// <returns>Successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Content-Type: application/json")]
         [Post("/user/createWithList")]
         Task<User> Execute([Body] IEnumerable<User> body);
     }
@@ -418,6 +424,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <param name="body">Update an existent user in the store</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Content-Type: application/json")]
         [Put("/user/{username}")]
         Task Execute(string username, [Body] User body);
     }

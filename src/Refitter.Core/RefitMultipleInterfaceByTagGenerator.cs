@@ -84,7 +84,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, sb);
                 GenerateObsoleteAttribute(operation, sb);
                 GenerateForMultipartFormData(operationModel, sb);
-                GenerateAcceptHeaders(operations, operation, sb);
+                GenerateHeaders(operations, operation, sb);
 
                 sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
@@ -95,7 +95,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                     this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, sb);
                     GenerateObsoleteAttribute(operation, sb);
                     GenerateForMultipartFormData(operationModel, sb);
-                    GenerateAcceptHeaders(operations, operation, sb);
+                    GenerateHeaders(operations, operation, sb);
 
                     parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
