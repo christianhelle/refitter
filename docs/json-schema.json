@@ -1,464 +1,468 @@
 {
-    "definitions": {
-        "ApizrSettings": {
-            "description": "The settings describing how to configure Apizr.",
-            "type": "object",
-            "properties": {
-                "withRequestOptions": {
-                    "description": "Set it to true to include an Apizr Request Options parameter into all api methods\nand get all the Apizr goodness (default: true)",
-                    "type": "boolean"
-                },
-                "withRegistrationHelper": {
-                    "description": "Set it to true to generate an Apizr registration helper ready to use (default: false).\nPlease note that it will generate an extended or static helper depending on DependencyInjectionSettings property value.",
-                    "type": "boolean"
-                },
-                "withCacheProvider": {
-                    "description": "Library to use for cache handling (default: None)\nOptions:\n- None\n- Akavache\n- MonkeyCache\n- InMemory (Microsoft.Extensions.Caching.Memory)\n- Distributed (Microsoft.Extensions.Caching.Distributed)",
-                    "type": "string",
-                    "enum": [
-                        "None",
-                        "Akavache",
-                        "MonkeyCache",
-                        "InMemory",
-                        "DistributedAsString",
-                        "DistributedAsByteArray"
-                    ]
-                },
-                "withMappingProvider": {
-                    "description": "Library to use for data mapping handling (default: None)\nOptions:\n- None\n- AutoMapper\n- Mapster",
-                    "type": "string",
-                    "enum": [
-                        "None",
-                        "AutoMapper",
-                        "Mapster"
-                    ]
-                },
-                "withPriority": {
-                    "description": "Set it to true to handle request with priority (default: false)",
-                    "type": "boolean"
-                },
-                "withMediation": {
-                    "description": "Set it to true to handle request with MediatR (default: false)",
-                    "type": "boolean"
-                },
-                "withFileTransfer": {
-                    "description": "Set it to true to manage file transfers (default: false)",
-                    "type": "boolean"
-                }
-            }
+  "definitions": {
+    "ApizrSettings": {
+      "description": "The settings describing how to configure Apizr.",
+      "type": "object",
+      "properties": {
+        "withRequestOptions": {
+          "description": "Set it to true to include an Apizr Request Options parameter into all api methods\nand get all the Apizr goodness (default: true)",
+          "type": "boolean"
         },
-        "CodeGeneratorSettings": {
-            "description": "The settings describing how to generate types using NSwag.",
-            "type": "object",
-            "properties": {
-                "requiredPropertiesMustBeDefined": {
-                    "description": "Gets or sets a value indicating whether a required property must be defined in JSON\n(sets Required.Always when the property is required) (default: true).",
-                    "type": "boolean"
-                },
-                "generateDataAnnotations": {
-                    "description": "Gets or sets a value indicating whether to generated data annotation attributes (default: true).",
-                    "type": "boolean"
-                },
-                "anyType": {
-                    "description": "Gets or sets the any type (default: 'object').",
-                    "type": "string"
-                },
-                "dateType": {
-                    "description": "Gets or sets the date .NET type (default: 'DateTimeOffset').",
-                    "type": "string"
-                },
-                "dateTimeType": {
-                    "description": "Gets or sets the date time .NET type (default: 'DateTimeOffset').",
-                    "type": "string"
-                },
-                "timeType": {
-                    "description": "Gets or sets the time .NET type (default: 'TimeSpan').",
-                    "type": "string"
-                },
-                "timeSpanType": {
-                    "description": "Gets or sets the time span .NET type (default: 'TimeSpan').",
-                    "type": "string"
-                },
-                "arrayType": {
-                    "description": "Gets or sets the generic array .NET type (default: 'ICollection').",
-                    "type": "string"
-                },
-                "dictionaryType": {
-                    "description": "Gets or sets the generic dictionary .NET type (default: 'IDictionary').",
-                    "type": "string"
-                },
-                "arrayInstanceType": {
-                    "description": "Gets or sets the generic array .NET type which is used for ArrayType instances (default: 'Collection').",
-                    "type": "string"
-                },
-                "dictionaryInstanceType": {
-                    "description": "Gets or sets the generic dictionary .NET type which is used for DictionaryType instances (default: 'Dictionary').",
-                    "type": "string"
-                },
-                "arrayBaseType": {
-                    "description": "Gets or sets the generic array .NET type which is used as base class (default: 'Collection').",
-                    "type": "string"
-                },
-                "dictionaryBaseType": {
-                    "description": "Gets or sets the generic dictionary .NET type which is used as base class (default: 'Dictionary').",
-                    "type": "string"
-                },
-                "propertySetterAccessModifier": {
-                    "description": "Gets the access modifier of property setters (default: '').",
-                    "type": "string"
-                },
-                "jsonConverters": {
-                    "description": "Gets or sets the custom Json.NET converters (class names)\nwhich are registered for serialization and deserialization.",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "generateImmutableArrayProperties": {
-                    "description": "Gets or sets a value indicating whether to remove the setter for non-nullable array properties (default: false).",
-                    "type": "boolean"
-                },
-                "generateImmutableDictionaryProperties": {
-                    "description": "Gets or sets a value indicating whether to remove the setter for non-nullable dictionary properties (default: false).",
-                    "type": "boolean"
-                },
-                "handleReferences": {
-                    "description": "Gets or sets a value indicating whether to use preserve references handling (All) in the JSON serializer (default: false).",
-                    "type": "boolean"
-                },
-                "jsonSerializerSettingsTransformationMethod": {
-                    "description": "Gets or sets the name of a static method which is called to transform the JsonSerializerSettings (for Newtonsoft.Json) or the JsonSerializerOptions (for System.Text.Json) used in the generated ToJson()/FromJson() methods (default: null).",
-                    "type": "string"
-                },
-                "generateJsonMethods": {
-                    "description": "Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: false).",
-                    "type": "boolean"
-                },
-                "enforceFlagEnums": {
-                    "description": "Gets or sets a value indicating whether enums should be always generated as bit flags (default: false).",
-                    "type": "boolean"
-                },
-                "inlineNamedDictionaries": {
-                    "description": "Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with dictionary inheritance.",
-                    "type": "boolean"
-                },
-                "inlineNamedTuples": {
-                    "description": "Gets or sets a value indicating whether named/referenced tuples should be inlined or generated as class with tuple inheritance.",
-                    "type": "boolean"
-                },
-                "inlineNamedArrays": {
-                    "description": "Gets or sets a value indicating whether named/referenced arrays should be inlined or generated as class with array inheritance.",
-                    "type": "boolean"
-                },
-                "generateOptionalPropertiesAsNullable": {
-                    "description": "Gets or sets a value indicating whether optional schema properties (not required) are generated as nullable properties (default: false).",
-                    "type": "boolean"
-                },
-                "generateNullableReferenceTypes": {
-                    "description": "Gets or sets a value indicating whether to generate Nullable Reference Type annotations (default: false).",
-                    "type": "boolean"
-                },
-                "generateNativeRecords": {
-                    "description": "Generate C# 9.0 record types instead of record-like classes.",
-                    "type": "boolean"
-                },
-                "generateDefaultValues": {
-                    "description": "Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).",
-                    "type": "boolean"
-                },
-                "inlineNamedAny": {
-                    "description": "Gets or sets a value indicating whether named/referenced any schemas should be inlined or generated as class.",
-                    "type": "boolean"
-                },
-                "excludedTypeNames": {
-                    "description": "Gets or sets the excluded type names (must be defined in an import or other namespace).",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "dateFormat": {
-                    "description": "Gets or sets the date string format to use",
-                    "type": "string"
-                },
-                "dateTimeFormat": {
-                    "description": "Gets or sets the date-time string format to use",
-                    "type": "string"
-                },
-                "propertyNameGenerator": {
-                    "$ref": "#/definitions/IPropertyNameGenerator"
-                }
-            }
+        "withRegistrationHelper": {
+          "description": "Set it to true to generate an Apizr registration helper ready to use (default: false).\nPlease note that it will generate an extended or static helper depending on DependencyInjectionSettings property value.",
+          "type": "boolean"
         },
-        "DependencyInjectionSettings": {
-            "description": "The settings describing how to register generated interface to the .NET Core DI container.",
-            "type": "object",
-            "properties": {
-                "baseUrl": {
-                    "description": "Base Address for the HttpClient",
-                    "type": "string"
-                },
-                "httpMessageHandlers": {
-                    "description": "A collection of HttpMessageHandlers to be added to the HttpClient pipeline.\r\nThis can be for telemetry logging, authorization, etc.",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "usePolly": {
-                    "description": "Set this to true to use Polly for transient fault handling.\r\nThis is deprecated. Use TransientErrorHandler instead.",
-                    "type": "boolean"
-                },
-                "transientErrorHandler": {
-                    "description": "Library to use for transient error handling\r\nOptions:\r\n- None\r\n- Polly - Polly Framework and HTTP Extensions\r\n- HttpResilience - Microsoft HTTP Resilience Library",
-                    "type": "string",
-                    "enum": [
-                        "None",
-                        "Polly",
-                        "HttpResilience"
-                    ]
-                },
-                "pollyMaxRetryCount": {
-                    "description": "Default max retry count for transient error handling. Default is 6.\r\nThis is deprecated. Use MaxRetryCount instead.",
-                    "type": "integer"
-                },
-                "maxRetryCount": {
-                    "description": "Default max retry count for transient error handling. Default is 6.",
-                    "type": "integer"
-                },
-                "firstBackoffRetryInSeconds": {
-                    "description": "The median delay to target before the first retry in seconds. Default is 1 second",
-                    "type": "number"
-                },
-                "extensionMethodName": {
-                    "description": "Name of IServiceCollection Extension Method.\r\nDefault is ConfigureRefitClients, or ConfigureApizrManagers if ApizrSettings property is set",
-                    "type": "string"
-                }
-            }
+        "withCacheProvider": {
+          "description": "Library to use for cache handling (default: None)\nOptions:\n- None\n- Akavache\n- MonkeyCache\n- InMemory (Microsoft.Extensions.Caching.Memory)\n- Distributed (Microsoft.Extensions.Caching.Distributed)",
+          "type": "string",
+          "enum": [
+            "None",
+            "Akavache",
+            "MonkeyCache",
+            "InMemory",
+            "DistributedAsString",
+            "DistributedAsByteArray"
+          ]
         },
-        "IParameterNameGenerator": {
-            "type": "object"
+        "withMappingProvider": {
+          "description": "Library to use for data mapping handling (default: None)\nOptions:\n- None\n- AutoMapper\n- Mapster",
+          "type": "string",
+          "enum": [
+            "None",
+            "AutoMapper",
+            "Mapster"
+          ]
         },
-        "IPropertyNameGenerator": {
-            "description": "Gets or sets a custom IPropertyNameGenerator.",
-            "type": "object"
+        "withPriority": {
+          "description": "Set it to true to handle request with priority (default: false)",
+          "type": "boolean"
         },
-        "NamingSettings": {
-            "description": "The naming settings.",
-            "type": "object",
-            "properties": {
-                "useOpenApiTitle": {
-                    "description": "Set to true to use the title defined in the OpenAPI document for the interface name.\r\nDefault is true",
-                    "type": "boolean"
-                },
-                "interfaceName": {
-                    "description": "The name of the interface if UseOpenApiTitle is set to false. Default is IApiClient",
-                    "type": "string"
-                }
-            }
+        "withMediation": {
+          "description": "Set it to true to handle request with MediatR (default: false)",
+          "type": "boolean"
+        },
+        "withFileTransfer": {
+          "description": "Set it to true to manage file transfers (default: false)",
+          "type": "boolean"
         }
+      }
     },
-    "type": "object",
-    "properties": {
-        "openApiPath": {
-            "description": "The path to the OpenAPI document.",
+    "CodeGeneratorSettings": {
+      "description": "The settings describing how to generate types using NSwag.",
+      "type": "object",
+      "properties": {
+        "requiredPropertiesMustBeDefined": {
+          "description": "Gets or sets a value indicating whether a required property must be defined in JSON\n(sets Required.Always when the property is required) (default: true).",
+          "type": "boolean"
+        },
+        "generateDataAnnotations": {
+          "description": "Gets or sets a value indicating whether to generated data annotation attributes (default: true).",
+          "type": "boolean"
+        },
+        "anyType": {
+          "description": "Gets or sets the any type (default: 'object').",
+          "type": "string"
+        },
+        "dateType": {
+          "description": "Gets or sets the date .NET type (default: 'DateTimeOffset').",
+          "type": "string"
+        },
+        "dateTimeType": {
+          "description": "Gets or sets the date time .NET type (default: 'DateTimeOffset').",
+          "type": "string"
+        },
+        "timeType": {
+          "description": "Gets or sets the time .NET type (default: 'TimeSpan').",
+          "type": "string"
+        },
+        "timeSpanType": {
+          "description": "Gets or sets the time span .NET type (default: 'TimeSpan').",
+          "type": "string"
+        },
+        "arrayType": {
+          "description": "Gets or sets the generic array .NET type (default: 'ICollection').",
+          "type": "string"
+        },
+        "dictionaryType": {
+          "description": "Gets or sets the generic dictionary .NET type (default: 'IDictionary').",
+          "type": "string"
+        },
+        "arrayInstanceType": {
+          "description": "Gets or sets the generic array .NET type which is used for ArrayType instances (default: 'Collection').",
+          "type": "string"
+        },
+        "dictionaryInstanceType": {
+          "description": "Gets or sets the generic dictionary .NET type which is used for DictionaryType instances (default: 'Dictionary').",
+          "type": "string"
+        },
+        "arrayBaseType": {
+          "description": "Gets or sets the generic array .NET type which is used as base class (default: 'Collection').",
+          "type": "string"
+        },
+        "dictionaryBaseType": {
+          "description": "Gets or sets the generic dictionary .NET type which is used as base class (default: 'Dictionary').",
+          "type": "string"
+        },
+        "propertySetterAccessModifier": {
+          "description": "Gets the access modifier of property setters (default: '').",
+          "type": "string"
+        },
+        "jsonConverters": {
+          "description": "Gets or sets the custom Json.NET converters (class names)\nwhich are registered for serialization and deserialization.",
+          "type": "array",
+          "items": {
             "type": "string"
+          }
         },
-        "namespace": {
-            "description": "The namespace for the generated code. Default is GeneratedCode.",
+        "generateImmutableArrayProperties": {
+          "description": "Gets or sets a value indicating whether to remove the setter for non-nullable array properties (default: false).",
+          "type": "boolean"
+        },
+        "generateImmutableDictionaryProperties": {
+          "description": "Gets or sets a value indicating whether to remove the setter for non-nullable dictionary properties (default: false).",
+          "type": "boolean"
+        },
+        "handleReferences": {
+          "description": "Gets or sets a value indicating whether to use preserve references handling (All) in the JSON serializer (default: false).",
+          "type": "boolean"
+        },
+        "jsonSerializerSettingsTransformationMethod": {
+          "description": "Gets or sets the name of a static method which is called to transform the JsonSerializerSettings (for Newtonsoft.Json) or the JsonSerializerOptions (for System.Text.Json) used in the generated ToJson()/FromJson() methods (default: null).",
+          "type": "string"
+        },
+        "generateJsonMethods": {
+          "description": "Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: false).",
+          "type": "boolean"
+        },
+        "enforceFlagEnums": {
+          "description": "Gets or sets a value indicating whether enums should be always generated as bit flags (default: false).",
+          "type": "boolean"
+        },
+        "inlineNamedDictionaries": {
+          "description": "Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with dictionary inheritance.",
+          "type": "boolean"
+        },
+        "inlineNamedTuples": {
+          "description": "Gets or sets a value indicating whether named/referenced tuples should be inlined or generated as class with tuple inheritance.",
+          "type": "boolean"
+        },
+        "inlineNamedArrays": {
+          "description": "Gets or sets a value indicating whether named/referenced arrays should be inlined or generated as class with array inheritance.",
+          "type": "boolean"
+        },
+        "generateOptionalPropertiesAsNullable": {
+          "description": "Gets or sets a value indicating whether optional schema properties (not required) are generated as nullable properties (default: false).",
+          "type": "boolean"
+        },
+        "generateNullableReferenceTypes": {
+          "description": "Gets or sets a value indicating whether to generate Nullable Reference Type annotations (default: false).",
+          "type": "boolean"
+        },
+        "generateNativeRecords": {
+          "description": "Generate C# 9.0 record types instead of record-like classes.",
+          "type": "boolean"
+        },
+        "generateDefaultValues": {
+          "description": "Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).",
+          "type": "boolean"
+        },
+        "inlineNamedAny": {
+          "description": "Gets or sets a value indicating whether named/referenced any schemas should be inlined or generated as class.",
+          "type": "boolean"
+        },
+        "excludedTypeNames": {
+          "description": "Gets or sets the excluded type names (must be defined in an import or other namespace).",
+          "type": "array",
+          "items": {
             "type": "string"
+          }
         },
-        "contractsNamespace": {
-            "description": "The namespace for the generated contracts. Default is GeneratedCode.",
-            "type": "string"
+        "dateFormat": {
+          "description": "Gets or sets the date string format to use",
+          "type": "string"
         },
-        "naming": {
-            "$ref": "#/definitions/NamingSettings"
+        "dateTimeFormat": {
+          "description": "Gets or sets the date-time string format to use",
+          "type": "string"
         },
-        "generateContracts": {
-            "description": "Generate contracts. Default is true.",
-            "type": "boolean"
-        },
-        "generateClients": {
-            "description": "Generate clients. Default is true.",
-            "type": "boolean"
-        },
-        "generateDisposableClients": {
-            "description": "Generate clients that implement IDisposable.",
-            "type": "boolean"
-        },
-        "generateXmlDocCodeComments": {
-            "description": "Generate XML doc comments. Default is true.",
-            "type": "boolean"
-        },
-        "generateStatusCodeComments": {
-            "description": "Indicating whether <c>ApiException</c> and <c>IApiResponse</c> should be documented with\nthe relevant status codes specified in the OpenAPI document.",
-            "type": "boolean"
-        },
-        "addAutoGeneratedHeader": {
-            "description": "Add auto-generated header. Default is true.",
-            "type": "boolean"
-        },
-        "addAcceptHeaders": {
-            "description": "Add accept headers [Headers(\"Accept: application/json\")]. Default is true.",
-            "type": "boolean"
-        },
-        "returnIApiResponse": {
-            "description": "Return IApiResponse objects.",
-            "type": "boolean"
-        },
-        "returnIObservable": {
-            "description": "Return IObservable or Task.",
-            "type": "boolean"
-        },
-        "responseTypeOverride": {
-            "description": "AddAcceptHeaders dictionary of operation ids and a specific response type that they should use.\nThe type is wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).",
-            "type": "object",
-            "additionalProperties": {
-                "type": "string"
-            }
-        },
-        "generateOperationHeaders": {
-            "description": "Generate operation headers. Default is true.",
-            "type": "boolean"
-        },
-        "typeAccessibility": {
-            "description": "The generated type accessibility. Default is Public.",
-            "type": "string",
-            "enum": [
-                "Public",
-                "Internal"
-            ]
-        },
-        "useCancellationTokens": {
-            "description": "Enable or disable the use of cancellation tokens.",
-            "type": "boolean"
-        },
-        "useIsoDateFormat": {
-            "description": "Set to true to explicitly format date query string parameters\nin ISO 8601 standard date format using delimiters (for example: 2023-06-15)",
-            "type": "boolean"
-        },
-        "additionalNamespaces": {
-            "description": "Add additional namespace to generated types.",
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "excludeNamespaces": {
-            "description": "Exclude namespaces on generated types.",
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "multipleInterfaces": {
-            "description": "Generate a Refit interface for each endpoint.",
-            "type": "string",
-            "enum": [
-                "Unset",
-                "ByEndpoint",
-                "ByTag"
-            ]
-        },
-        "includePathMatches": {
-            "description": "Only include Paths that match the provided regular expression. May be set multiple times.",
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "includeTags": {
-            "description": "Generate a Refit interface for each endpoint.",
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "generateDeprecatedOperations": {
-            "description": "Generate deprecated operations. Default is true.",
-            "type": "boolean"
-        },
-        "operationNameTemplate": {
-            "description": "Generate operation names using pattern. When using --multiple-interfaces ByEndpoint,\nthis is name of the Execute() method in the interface.",
-            "type": "string"
-        },
-        "optionalParameters": {
-            "description": "Re-order optional parameters to the end of the parameter list.",
-            "type": "boolean"
-        },
-        "outputFolder": {
-            "description": "The relative path to a folder in which the output files are generated. Default is ./Generated.",
-            "type": "string"
-        },
-        "contractsOutputFolder": {
-            "description": "The relative path to a folder where to store the generated contracts. Default is ./Generated.",
-            "type": "string"
-        },
-        "outputFilename": {
-            "description": "The filename of the generated code.\nFor the CLI tool, the default is Output.cs\nThe the Source Generator, this is the name of the generated class\nand the default is [.refitter defined naming OR .refitter filename].g.cs)",
-            "type": "string"
-        },
-        "dependencyInjectionSettings": {
-            "$ref": "#/definitions/DependencyInjectionSettings"
-        },
-        "codeGeneratorSettings": {
-            "$ref": "#/definitions/CodeGeneratorSettings"
-        },
-        "trimUnusedSchema": {
-            "description": "Apply tree-shaking to the OpenApi schema.\nThis works in conjunction with includeTags and includePathMatches.",
-            "type": "boolean"
-        },
-        "keepSchemaPatterns": {
-            "description": "Array of regular expressions that determine if a schema needs to be kept.\nThis works in conjunction with TrimUnusedSchema.",
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "includeInheritanceHierarchy": {
-            "description": "Keep all possible type-instances of inheritance/union types.\nIf this is false only directly referenced types will be kept.\nThis works in conjunction with TrimUnusedSchema.",
-            "type": "boolean"
-        },
-        "operationNameGenerator": {
-            "description": "The NSwag IOperationNameGenerator implementation to use.",
-            "type": "string",
-            "enum": [
-                "Default",
-                "MultipleClientsFromOperationId",
-                "MultipleClientsFromPathSegments",
-                "MultipleClientsFromFirstTagAndOperationId",
-                "MultipleClientsFromFirstTagAndOperationName",
-                "MultipleClientsFromFirstTagAndPathSegments",
-                "SingleClientFromOperationId",
-                "SingleClientFromPathSegments"
-            ]
-        },
-        "generateDefaultAdditionalProperties": {
-            "description": "Skip default additional properties. Default is true.",
-            "type": "boolean"
-        },
-        "immutableRecords": {
-            "description": "Generate contracts as immutable records instead of classes.",
-            "type": "boolean"
-        },
-        "apizrSettings": {
-            "$ref": "#/definitions/ApizrSettings"
-        },
-        "useDynamicQuerystringParameters": {
-            "description": "Wrap multiple query parameters into a single complex one.\nSee https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.",
-            "type": "boolean"
-        },
-        "generateMultipleFiles": {
-            "description": "Generate multiple files. Default is false.\nThis is automatically set to true when ContractsOutputFolder is specified\nRefit interface(s) are written to a file called RefitInterfaces.cs\nContracts are written to a file called Contracts.cs\nDependency Injection is written to a file called DependencyInjection.cs",
-            "type": "boolean"
-        },
-        "usePolymorphicSerialization": {
-            "description": "Use System.Text.Json polymorphic serialization. Default is false.\nReplace NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.\nTo have the native support of inheritance (de)serialization and fallback to base types when\npayloads with (yet) unknown types are offered by newer versions of an API\nSee https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information",
-            "type": "boolean"
-        },
-        "parameterNameGenerator": {
-            "$ref": "#/definitions/IParameterNameGenerator"
+        "propertyNameGenerator": {
+          "$ref": "#/definitions/IPropertyNameGenerator"
         }
+      }
+    },
+    "DependencyInjectionSettings": {
+      "description": "The settings describing how to register generated interface to the .NET Core DI container.",
+      "type": "object",
+      "properties": {
+        "baseUrl": {
+          "description": "Base Address for the HttpClient",
+          "type": "string"
+        },
+        "httpMessageHandlers": {
+          "description": "A collection of HttpMessageHandlers to be added to the HttpClient pipeline.\nThis can be for telemetry logging, authorization, etc.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "usePolly": {
+          "description": "Set this to true to use Polly for transient fault handling.\nThis is deprecated. Use TransientErrorHandler instead.",
+          "type": "boolean"
+        },
+        "transientErrorHandler": {
+          "description": "Library to use for transient error handling\nOptions:\n- None\n- Polly - Polly Framework and HTTP Extensions\n- HttpResilience - Microsoft HTTP Resilience Library",
+          "type": "string",
+          "enum": [
+            "None",
+            "Polly",
+            "HttpResilience"
+          ]
+        },
+        "pollyMaxRetryCount": {
+          "description": "Default max retry count for transient error handling. Default is 6.\nThis is deprecated. Use MaxRetryCount instead.",
+          "type": "integer"
+        },
+        "maxRetryCount": {
+          "description": "Default max retry count for transient error handling. Default is 6.",
+          "type": "integer"
+        },
+        "firstBackoffRetryInSeconds": {
+          "description": "The median delay to target before the first retry in seconds. Default is 1 second",
+          "type": "number"
+        },
+        "extensionMethodName": {
+          "description": "Name of IServiceCollection Extension Method.\nDefault is ConfigureRefitClients, or ConfigureApizrManagers if ApizrSettings property is set",
+          "type": "string"
+        }
+      }
+    },
+    "IParameterNameGenerator": {
+      "type": "object"
+    },
+    "IPropertyNameGenerator": {
+      "description": "Gets or sets a custom IPropertyNameGenerator.",
+      "type": "object"
+    },
+    "NamingSettings": {
+      "description": "The naming settings.",
+      "type": "object",
+      "properties": {
+        "useOpenApiTitle": {
+          "description": "Set to true to use the title defined in the OpenAPI document for the interface name.\nDefault is true",
+          "type": "boolean"
+        },
+        "interfaceName": {
+          "description": "The name of the interface if UseOpenApiTitle is set to false. Default is IApiClient",
+          "type": "string"
+        }
+      }
     }
+  },
+  "type": "object",
+  "properties": {
+    "openApiPath": {
+      "description": "The path to the OpenAPI document.",
+      "type": "string"
+    },
+    "namespace": {
+      "description": "The namespace for the generated code. Default is GeneratedCode.",
+      "type": "string"
+    },
+    "contractsNamespace": {
+      "description": "The namespace for the generated contracts. Default is GeneratedCode.",
+      "type": "string"
+    },
+    "naming": {
+      "$ref": "#/definitions/NamingSettings"
+    },
+    "generateContracts": {
+      "description": "Generate contracts. Default is true.",
+      "type": "boolean"
+    },
+    "generateClients": {
+      "description": "Generate clients. Default is true.",
+      "type": "boolean"
+    },
+    "generateDisposableClients": {
+      "description": "Generate clients that implement IDisposable.",
+      "type": "boolean"
+    },
+    "generateXmlDocCodeComments": {
+      "description": "Generate XML doc comments. Default is true.",
+      "type": "boolean"
+    },
+    "generateStatusCodeComments": {
+      "description": "Indicating whether <c>ApiException</c> and <c>IApiResponse</c> should be documented with\r\nthe relevant status codes specified in the OpenAPI document.",
+      "type": "boolean"
+    },
+    "addAutoGeneratedHeader": {
+      "description": "Add auto-generated header. Default is true.",
+      "type": "boolean"
+    },
+    "addAcceptHeaders": {
+      "description": "Add accept headers [Headers(\"Accept: application/json\")]. Default is true.",
+      "type": "boolean"
+    },
+    "addContentTypeHeaders": {
+      "description": "Add content-type headers [Headers(\"Content-Type: application/json\")]. Default is true.",
+      "type": "boolean"
+    },
+    "returnIApiResponse": {
+      "description": "Return IApiResponse objects.",
+      "type": "boolean"
+    },
+    "returnIObservable": {
+      "description": "Return IObservable or Task.",
+      "type": "boolean"
+    },
+    "responseTypeOverride": {
+      "description": "AddAcceptHeaders dictionary of operation ids and a specific response type that they should use.\r\nThe type is wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "generateOperationHeaders": {
+      "description": "Generate operation headers. Default is true.",
+      "type": "boolean"
+    },
+    "typeAccessibility": {
+      "description": "The generated type accessibility. Default is Public.",
+      "type": "string",
+      "enum": [
+        "Public",
+        "Internal"
+      ]
+    },
+    "useCancellationTokens": {
+      "description": "Enable or disable the use of cancellation tokens.",
+      "type": "boolean"
+    },
+    "useIsoDateFormat": {
+      "description": "Set to true to explicitly format date query string parameters\r\nin ISO 8601 standard date format using delimiters (for example: 2023-06-15)",
+      "type": "boolean"
+    },
+    "additionalNamespaces": {
+      "description": "Add additional namespace to generated types.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "excludeNamespaces": {
+      "description": "Exclude namespaces on generated types.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "multipleInterfaces": {
+      "description": "Generate a Refit interface for each endpoint.",
+      "type": "string",
+      "enum": [
+        "Unset",
+        "ByEndpoint",
+        "ByTag"
+      ]
+    },
+    "includePathMatches": {
+      "description": "Only include Paths that match the provided regular expression. May be set multiple times.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "includeTags": {
+      "description": "Generate a Refit interface for each endpoint.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "generateDeprecatedOperations": {
+      "description": "Generate deprecated operations. Default is true.",
+      "type": "boolean"
+    },
+    "operationNameTemplate": {
+      "description": "Generate operation names using pattern. When using --multiple-interfaces ByEndpoint,\r\nthis is name of the Execute() method in the interface.",
+      "type": "string"
+    },
+    "optionalParameters": {
+      "description": "Re-order optional parameters to the end of the parameter list.",
+      "type": "boolean"
+    },
+    "outputFolder": {
+      "description": "The relative path to a folder in which the output files are generated. Default is ./Generated.",
+      "type": "string"
+    },
+    "contractsOutputFolder": {
+      "description": "The relative path to a folder where to store the generated contracts. Default is ./Generated.",
+      "type": "string"
+    },
+    "outputFilename": {
+      "description": "The filename of the generated code.\r\nFor the CLI tool, the default is Output.cs\r\nThe the Source Generator, this is the name of the generated class\r\nand the default is [.refitter defined naming OR .refitter filename].g.cs)",
+      "type": "string"
+    },
+    "dependencyInjectionSettings": {
+      "$ref": "#/definitions/DependencyInjectionSettings"
+    },
+    "codeGeneratorSettings": {
+      "$ref": "#/definitions/CodeGeneratorSettings"
+    },
+    "trimUnusedSchema": {
+      "description": "Apply tree-shaking to the OpenApi schema.\r\nThis works in conjunction with includeTags and includePathMatches.",
+      "type": "boolean"
+    },
+    "keepSchemaPatterns": {
+      "description": "Array of regular expressions that determine if a schema needs to be kept.\r\nThis works in conjunction with TrimUnusedSchema.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "includeInheritanceHierarchy": {
+      "description": "Keep all possible type-instances of inheritance/union types.\r\nIf this is false only directly referenced types will be kept.\r\nThis works in conjunction with TrimUnusedSchema.",
+      "type": "boolean"
+    },
+    "operationNameGenerator": {
+      "description": "The NSwag IOperationNameGenerator implementation to use.",
+      "type": "string",
+      "enum": [
+        "Default",
+        "MultipleClientsFromOperationId",
+        "MultipleClientsFromPathSegments",
+        "MultipleClientsFromFirstTagAndOperationId",
+        "MultipleClientsFromFirstTagAndOperationName",
+        "MultipleClientsFromFirstTagAndPathSegments",
+        "SingleClientFromOperationId",
+        "SingleClientFromPathSegments"
+      ]
+    },
+    "generateDefaultAdditionalProperties": {
+      "description": "Skip default additional properties. Default is true.",
+      "type": "boolean"
+    },
+    "immutableRecords": {
+      "description": "Generate contracts as immutable records instead of classes.",
+      "type": "boolean"
+    },
+    "apizrSettings": {
+      "$ref": "#/definitions/ApizrSettings"
+    },
+    "useDynamicQuerystringParameters": {
+      "description": "Wrap multiple query parameters into a single complex one.\r\nSee https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.",
+      "type": "boolean"
+    },
+    "generateMultipleFiles": {
+      "description": "Generate multiple files. Default is false.\r\nThis is automatically set to true when ContractsOutputFolder is specified\r\nRefit interface(s) are written to a file called RefitInterfaces.cs\r\nContracts are written to a file called Contracts.cs\r\nDependency Injection is written to a file called DependencyInjection.cs",
+      "type": "boolean"
+    },
+    "usePolymorphicSerialization": {
+      "description": "Use System.Text.Json polymorphic serialization. Default is false.\r\nReplace NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.\r\nTo have the native support of inheritance (de)serialization and fallback to base types when\r\npayloads with (yet) unknown types are offered by newer versions of an API\r\nSee https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information",
+      "type": "boolean"
+    },
+    "parameterNameGenerator": {
+      "$ref": "#/definitions/IParameterNameGenerator"
+    }
+  }
 }
