@@ -6,12 +6,14 @@
 
 **Implemented enhancements:**
 
+- Fix missing Content-Type \[Headers\] [\#619](https://github.com/christianhelle/refitter/pull/619) ([christianhelle](https://github.com/christianhelle))
 - Fix invalid characters in generated XML docs [\#607](https://github.com/christianhelle/refitter/pull/607) ([christianhelle](https://github.com/christianhelle))
 - Add support for custom DateTimeFormat [\#604](https://github.com/christianhelle/refitter/pull/604) ([christianhelle](https://github.com/christianhelle))
 - Fix ISO date format handling when dateFormat is defined in settings file [\#603](https://github.com/christianhelle/refitter/pull/603) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
+- Doesn't add Content-Type request header when body is plain JSON string [\#617](https://github.com/christianhelle/refitter/issues/617)
 - Broken xml doc when swagger descriptions contains "\<" or "\>" characters [\#605](https://github.com/christianhelle/refitter/issues/605)
 - date-time parameters are encoded as date when iso8601 is used [\#599](https://github.com/christianhelle/refitter/issues/599)
 
