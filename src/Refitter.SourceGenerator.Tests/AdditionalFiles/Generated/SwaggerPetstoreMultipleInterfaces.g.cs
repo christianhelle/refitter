@@ -95,7 +95,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Get("/pet/findByStatus")]
         Task<ICollection<Pet>> Execute([Query] Status? status);
     }
@@ -121,7 +120,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Get("/pet/findByTags")]
         Task<ICollection<Pet>> Execute([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
     }
@@ -151,7 +149,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Get("/pet/{petId}")]
         Task<Pet> Execute(long petId);
     }
@@ -178,7 +175,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Post("/pet/{petId}")]
         Task Execute(long petId, [Query] string name, [Query] string status);
     }
@@ -203,7 +199,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Delete("/pet/{petId}")]
         Task Execute(long petId, [Header("api_key")] string api_key);
     }
@@ -241,7 +236,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <remarks>Returns a map of status codes to quantities</remarks>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
-        [Headers("Content-Type: ")]
         [Get("/store/inventory")]
         Task<IDictionary<string, int>> Execute();
     }
@@ -296,7 +290,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Get("/store/order/{orderId}")]
         Task<Order> Execute(long orderId);
     }
@@ -326,7 +319,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Delete("/store/order/{orderId}")]
         Task Execute(long orderId);
     }
@@ -379,7 +371,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Get("/user/login")]
         Task<string> Execute([Query] string username, [Query] string password);
     }
@@ -391,7 +382,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Logs out current logged in user session</summary>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
-        [Headers("Content-Type: ")]
         [Get("/user/logout")]
         Task Execute();
     }
@@ -420,7 +410,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Get("/user/{username}")]
         Task<User> Execute(string username);
     }
@@ -465,7 +454,6 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Delete("/user/{username}")]
         Task Execute(string username);
     }

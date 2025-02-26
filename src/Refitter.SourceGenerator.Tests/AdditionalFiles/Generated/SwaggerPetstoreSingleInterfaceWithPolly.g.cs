@@ -82,7 +82,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json", "Content-Type: ")]
+        [Headers("Accept: application/json")]
         [Get("/pet/findByStatus")]
         Task<ICollection<Pet>> FindPetsByStatus([Query] Status? status);
 
@@ -103,7 +103,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json", "Content-Type: ")]
+        [Headers("Accept: application/json")]
         [Get("/pet/findByTags")]
         Task<ICollection<Pet>> FindPetsByTags([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
 
@@ -128,7 +128,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/xml, application/json", "Content-Type: ")]
+        [Headers("Accept: application/xml, application/json")]
         [Get("/pet/{petId}")]
         Task<Pet> GetPetById(long petId);
 
@@ -150,7 +150,6 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Post("/pet/{petId}")]
         Task UpdatePetWithForm(long petId, [Query] string name, [Query] string status);
 
@@ -170,7 +169,6 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Delete("/pet/{petId}")]
         Task DeletePet(long petId, [Header("api_key")] string api_key);
 
@@ -198,7 +196,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// <remarks>Returns a map of status codes to quantities</remarks>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
-        [Headers("Accept: application/json", "Content-Type: ")]
+        [Headers("Accept: application/json")]
         [Get("/store/inventory")]
         Task<IDictionary<string, int>> GetInventory();
 
@@ -243,7 +241,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json", "Content-Type: ")]
+        [Headers("Accept: application/json")]
         [Get("/store/order/{orderId}")]
         Task<Order> GetOrderById(long orderId);
 
@@ -268,7 +266,6 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Delete("/store/order/{orderId}")]
         Task DeleteOrder(long orderId);
 
@@ -306,14 +303,13 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json", "Content-Type: ")]
+        [Headers("Accept: application/json")]
         [Get("/user/login")]
         Task<string> LoginUser([Query] string username, [Query] string password);
 
         /// <summary>Logs out current logged in user session</summary>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
-        [Headers("Content-Type: ")]
         [Get("/user/logout")]
         Task LogoutUser();
 
@@ -337,7 +333,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Accept: application/json", "Content-Type: ")]
+        [Headers("Accept: application/json")]
         [Get("/user/{username}")]
         Task<User> GetUserByName(string username);
 
@@ -372,7 +368,6 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         /// </item>
         /// </list>
         /// </exception>
-        [Headers("Content-Type: ")]
         [Delete("/user/{username}")]
         Task DeleteUser(string username);
 
