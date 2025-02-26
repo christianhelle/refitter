@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- JSON Schema generator for documentation [\#623](https://github.com/christianhelle/refitter/pull/623) ([christianhelle](https://github.com/christianhelle))
 - Fix missing Content-Type \[Headers\] [\#619](https://github.com/christianhelle/refitter/pull/619) ([christianhelle](https://github.com/christianhelle))
 - Fix invalid characters in generated XML docs [\#607](https://github.com/christianhelle/refitter/pull/607) ([christianhelle](https://github.com/christianhelle))
 - Add support for custom DateTimeFormat [\#604](https://github.com/christianhelle/refitter/pull/604) ([christianhelle](https://github.com/christianhelle))
@@ -19,10 +20,22 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency fluentassertions to 7.2.0 [\#622](https://github.com/christianhelle/refitter/pull/622) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency apizr.integrations.fusillade to 6.4.2 [\#621](https://github.com/christianhelle/refitter/pull/621) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add Metziell as a contributor for bug [\#620](https://github.com/christianhelle/refitter/pull/620) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add Fargekritt as a contributor for bug [\#618](https://github.com/christianhelle/refitter/pull/618) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency apizr.integrations.automapper to 6.4.2 [\#616](https://github.com/christianhelle/refitter/pull/616) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency apizr.extensions.microsoft.caching to 6.4.2 [\#615](https://github.com/christianhelle/refitter/pull/615) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency microsoft.applicationinsights.windowsserver to 2.23.0 [\#614](https://github.com/christianhelle/refitter/pull/614) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency microsoft.build.utilities.core to 17.13.9 [\#612](https://github.com/christianhelle/refitter/pull/612) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dotnet monorepo [\#611](https://github.com/christianhelle/refitter/pull/611) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency microsoft.net.test.sdk to 17.13.0 [\#610](https://github.com/christianhelle/refitter/pull/610) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency xunit.runner.visualstudio to 3.0.2 [\#609](https://github.com/christianhelle/refitter/pull/609) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency polly to 8.5.2 [\#608](https://github.com/christianhelle/refitter/pull/608) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add wocasella as a contributor for bug [\#606](https://github.com/christianhelle/refitter/pull/606) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.5.2 [\#602](https://github.com/christianhelle/refitter/pull/602) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency atc.test to 1.1.17 [\#592](https://github.com/christianhelle/refitter/pull/592) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency h.generators.extensions to 1.24.2 [\#581](https://github.com/christianhelle/refitter/pull/581) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.5.2](https://github.com/christianhelle/refitter/tree/1.5.2) (2025-01-29)
 
