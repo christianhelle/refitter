@@ -89,6 +89,7 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Gets or sets a value indicating whether to add content-type headers [Headers("Content-Type: application/json")].
     /// </summary>
+    [Description("Add content-type headers [Headers(\"Content-Type: application/json\")]. Default is true.")]
     public bool AddContentTypeHeaders { get; set; } = true;
 
     /// <summary>
