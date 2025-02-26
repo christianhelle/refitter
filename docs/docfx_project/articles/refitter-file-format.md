@@ -257,6 +257,10 @@ The following is an example `.refitter` file
             "type": "boolean",
             "description": "Indicates whether to add accept headers."
         },
+        "addContentTypeHeaders": {
+            "type": "boolean",
+            "description": "Indicates whether to add content-type headers."
+        },
         "returnIApiResponse": {
             "type": "boolean",
             "description": "Indicates whether to return IApiResponse."
