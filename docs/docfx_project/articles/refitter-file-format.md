@@ -66,8 +66,8 @@ The following is an example `.refitter` file
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
-        "AuthorizationMessageHandler", 
-        "TelemetryMessageHandler" 
+        "AuthorizationMessageHandler",
+        "TelemetryMessageHandler"
     ],
     "usePolly": true, // DEPRECATED - Use "transientErrorHandler": "None|Polly|HttpResilience" instead
     "transientErrorHandler": "HttpResilience", // Optional. Set this to configure transient error handling with a retry policy that uses a jittered backoff. May be one of None, Polly, HttpResilience
@@ -113,6 +113,8 @@ The following is an example `.refitter` file
     "generateNativeRecords": false,
     "generateDefaultValues": true,
     "inlineNamedAny": false,
+    "dateFormat": "string",
+    "dateTimeFormat": "string",
     "excludedTypeNames": [
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
@@ -153,19 +155,19 @@ The following is an example `.refitter` file
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
 - `includeInheritanceHierarchy`: Set to true to keep all possible type-instances of inheritance/union types. If this is false only directly referenced types will be kept. This works in conjunction with `trimUnusedSchema`
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
-- `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html
+- `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
-- `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
+- `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
 - `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization.
 - `generateMultipleFiles`: Set to `true` to generate multiple files. This is automatically set to `true` when `ContractsOutputFolder` is specified. Refit interface(s) are written to a file called `RefitInterfaces.cs`, Contracts are written to a file called `Contracts.cs`, and Dependency Injection is written to a file called `DependencyInjection.cs`
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
   - `usePolly` - Set this to `true` to configure the HttpClient to use Polly using a retry policy with a jittered backoff.  This is **DEPRECATED**, use `transientErrorHandler` instead
-  - `transientErrorHandler`: Set this to configure transient error handling with a retry policy that uses a jittered backoff. See https://refitter.github.io/api/Refitter.Core.TransientErrorHandler.html
+  - `transientErrorHandler`: Set this to configure transient error handling with a retry policy that uses a jittered backoff. See <https://refitter.github.io/api/Refitter.Core.TransientErrorHandler.html>
   - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
-- `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See https://www.apizr.net for more information
+- `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See <https://www.apizr.net> for more information
   - `withRequestOptions` - Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter
   - `withRegistrationHelper` - Tells if Refitter should generate Apizr registration helpers (extended with dependencyInjectionSettings set, otherwise static)
   - `withCacheProvider` - Set the cache provider to be used
@@ -204,6 +206,8 @@ The following is an example `.refitter` file
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
   - `excludedTypeNames` - Default is empty
+  - `dateFormat` - Default is null
+  - `dateTimeFormat` - Default is null
 
 ### JSON Schema
 
@@ -252,6 +256,10 @@ The following is an example `.refitter` file
         "addAcceptHeaders": {
             "type": "boolean",
             "description": "Indicates whether to add accept headers."
+        },
+        "addContentTypeHeaders": {
+            "type": "boolean",
+            "description": "Indicates whether to add content-type headers."
         },
         "returnIApiResponse": {
             "type": "boolean",
@@ -461,6 +469,7 @@ The following is an example `.refitter` file
         },
         "codeGeneratorSettings": {
             "type": "object",
+            "description": "Settings for the code generator."
             "properties": {
                 "requiredPropertiesMustBeDefined": {
                     "type": "boolean",
@@ -473,9 +482,104 @@ The following is an example `.refitter` file
                 "anyType": {
                     "type": "string",
                     "description": "The type used for 'any' in the code generator settings."
+                },
+                "dateType": {
+                    "type": "string"
+                },
+                "dateTimeType": {
+                    "type": "string"
+                },
+                "timeType": {
+                    "type": "string"
+                },
+                "timeSpanType": {
+                    "type": "string"
+                },
+                "arrayType": {
+                    "type": "string"
+                },
+                "dictionaryType": {
+                    "type": "string"
+                },
+                "arrayInstanceType": {
+                    "type": "string"
+                },
+                "dictionaryInstanceType": {
+                    "type": "string"
+                },
+                "arrayBaseType": {
+                    "type": "string"
+                },
+                "dictionaryBaseType": {
+                    "type": "string"
+                },
+                "propertySetterAccessModifier": {
+                    "type": "string"
+                },
+                "jsonConverters": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "generateImmutableArrayProperties": {
+                    "type": "boolean"
+                },
+                "generateImmutableDictionaryProperties": {
+                    "type": "boolean"
+                },
+                "handleReferences": {
+                    "type": "boolean"
+                },
+                "jsonSerializerSettingsTransformationMethod": {
+                    "type": "string"
+                },
+                "generateJsonMethods": {
+                    "type": "boolean"
+                },
+                "enforceFlagEnums": {
+                    "type": "boolean"
+                },
+                "inlineNamedDictionaries": {
+                    "type": "boolean"
+                },
+                "inlineNamedTuples": {
+                    "type": "boolean"
+                },
+                "inlineNamedArrays": {
+                    "type": "boolean"
+                },
+                "generateOptionalPropertiesAsNullable": {
+                    "type": "boolean"
+                },
+                "generateNullableReferenceTypes": {
+                    "type": "boolean"
+                },
+                "generateNativeRecords": {
+                    "type": "boolean"
+                },
+                "generateDefaultValues": {
+                    "type": "boolean"
+                },
+                "inlineNamedAny": {
+                    "type": "boolean"
+                },
+                "excludedTypeNames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "dateFormat": {
+                    "type": "string"
+                },
+                "dateTimeFormat": {
+                    "type": "string"
+                },
+                "propertyNameGenerator": {
+                    "type": "object"
                 }
             },
-            "description": "Settings for the code generator."
         }
     }
 }
