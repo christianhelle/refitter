@@ -198,7 +198,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 uniqueContentTypes.FirstOrDefault(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase)) ??
                 uniqueContentTypes.FirstOrDefault();
 
-            headers.Add($"\"Content-Type: {contentType}\"");
+            if (!string.IsNullOrWhiteSpace(contentType))
+            {
+                headers.Add($"\"Content-Type: {contentType}\"");
+            }
         }
 
         if (headers.Any())
