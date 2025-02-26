@@ -2,22 +2,24 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.3-preview.67...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...HEAD)
 
 **Implemented enhancements:**
 
+- Fix invalid characters in generated XML docs [\#607](https://github.com/christianhelle/refitter/pull/607) ([christianhelle](https://github.com/christianhelle))
 - Add support for custom DateTimeFormat [\#604](https://github.com/christianhelle/refitter/pull/604) ([christianhelle](https://github.com/christianhelle))
-
-## [1.5.3-preview.67](https://github.com/christianhelle/refitter/tree/1.5.3-preview.67) (2025-01-30)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...1.5.3-preview.67)
-
-**Implemented enhancements:**
-
 - Fix ISO date format handling when dateFormat is defined in settings file [\#603](https://github.com/christianhelle/refitter/pull/603) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Broken xml doc when swagger descriptions contains "\<" or "\>" characters [\#605](https://github.com/christianhelle/refitter/issues/605)
+- date-time parameters are encoded as date when iso8601 is used [\#599](https://github.com/christianhelle/refitter/issues/599)
 
 **Merged pull requests:**
 
+- docs: add Metziell as a contributor for bug [\#620](https://github.com/christianhelle/refitter/pull/620) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add Fargekritt as a contributor for bug [\#618](https://github.com/christianhelle/refitter/pull/618) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add wocasella as a contributor for bug [\#606](https://github.com/christianhelle/refitter/pull/606) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.5.2 [\#602](https://github.com/christianhelle/refitter/pull/602) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.5.2](https://github.com/christianhelle/refitter/tree/1.5.2) (2025-01-29)
