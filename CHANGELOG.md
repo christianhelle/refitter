@@ -20,6 +20,7 @@
 
 **Merged pull requests:**
 
+- Update dependency Swashbuckle.AspNetCore to 7.3.0 [\#624](https://github.com/christianhelle/refitter/pull/624) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to 7.2.0 [\#622](https://github.com/christianhelle/refitter/pull/622) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency apizr.integrations.fusillade to 6.4.2 [\#621](https://github.com/christianhelle/refitter/pull/621) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add Metziell as a contributor for bug [\#620](https://github.com/christianhelle/refitter/pull/620) ([allcontributors[bot]](https://github.com/apps/allcontributors))
@@ -302,7 +303,7 @@
 - Support generating immutable records [\#407](https://github.com/christianhelle/refitter/issues/407)
 - Update dependency Microsoft.CodeAnalysis.CSharp to v4.10.0 [\#416](https://github.com/christianhelle/refitter/pull/416) ([renovate[bot]](https://github.com/apps/renovate))
 - Introduce --immutable-records CLI tool argument [\#415](https://github.com/christianhelle/refitter/pull/415) ([christianhelle](https://github.com/christianhelle))
-- Add optional RefitterSettings in generated IoC registration code [\#413](https://github.com/christianhelle/refitter/pull/413) ([christianhelle](https://github.com/christianhelle))
+- Add optional RefitSettings in generated IoC registration code [\#413](https://github.com/christianhelle/refitter/pull/413) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
