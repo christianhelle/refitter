@@ -181,7 +181,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                         "Error",
                         $"Unable to deserialize .refitter file: {e}",
                         "Refitter",
-                        DiagnosticSeverity.Error,
+                        DiagnosticSeverity.Info,
                         true
                     ),
                     Location.None
