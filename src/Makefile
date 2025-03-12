@@ -16,3 +16,7 @@ test:
 # Clean target
 clean:
 	dotnet clean Refitter.sln
+	rm -rf ./Refitter/bin
+	rm -rf ./Refitter/obj
+	rm -rf ./Refitter.Core/bin
+	rm -rf ./Refitter.Core/obj
