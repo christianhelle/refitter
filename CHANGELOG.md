@@ -18,8 +18,15 @@
 - Broken xml doc when swagger descriptions contains "\<" or "\>" characters [\#605](https://github.com/christianhelle/refitter/issues/605)
 - date-time parameters are encoded as date when iso8601 is used [\#599](https://github.com/christianhelle/refitter/issues/599)
 
+**Closed issues:**
+
+- OpenAPI Schema and Authorization Attributes [\#629](https://github.com/christianhelle/refitter/issues/629)
+
 **Merged pull requests:**
 
+- Update dotnet monorepo [\#630](https://github.com/christianhelle/refitter/pull/630) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Atc.Test to 1.1.18 [\#628](https://github.com/christianhelle/refitter/pull/628) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Swashbuckle.AspNetCore to 7.3.1 [\#626](https://github.com/christianhelle/refitter/pull/626) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Swashbuckle.AspNetCore to 7.3.0 [\#624](https://github.com/christianhelle/refitter/pull/624) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to 7.2.0 [\#622](https://github.com/christianhelle/refitter/pull/622) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency apizr.integrations.fusillade to 6.4.2 [\#621](https://github.com/christianhelle/refitter/pull/621) ([renovate[bot]](https://github.com/apps/renovate))
