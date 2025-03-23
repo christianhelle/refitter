@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Temporary fix for Source Generator when running in Visual Studio [\#634](https://github.com/christianhelle/refitter/pull/634) ([christianhelle](https://github.com/christianhelle))
 - JSON Schema generator for documentation [\#623](https://github.com/christianhelle/refitter/pull/623) ([christianhelle](https://github.com/christianhelle))
 - Fix missing Content-Type \[Headers\] [\#619](https://github.com/christianhelle/refitter/pull/619) ([christianhelle](https://github.com/christianhelle))
 - Fix invalid characters in generated XML docs [\#607](https://github.com/christianhelle/refitter/pull/607) ([christianhelle](https://github.com/christianhelle))
@@ -14,6 +15,7 @@
 
 **Fixed bugs:**
 
+- SourceGenerator 1.5 and newer causes build error with Visual Studio 2022 [\#627](https://github.com/christianhelle/refitter/issues/627)
 - Doesn't add Content-Type request header when body is plain JSON string [\#617](https://github.com/christianhelle/refitter/issues/617)
 - Broken xml doc when swagger descriptions contains "\<" or "\>" characters [\#605](https://github.com/christianhelle/refitter/issues/605)
 - date-time parameters are encoded as date when iso8601 is used [\#599](https://github.com/christianhelle/refitter/issues/599)
@@ -24,6 +26,7 @@
 
 **Merged pull requests:**
 
+- Update dependency Swashbuckle.AspNetCore to v8 [\#633](https://github.com/christianhelle/refitter/pull/633) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dotnet monorepo [\#630](https://github.com/christianhelle/refitter/pull/630) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Atc.Test to 1.1.18 [\#628](https://github.com/christianhelle/refitter/pull/628) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Swashbuckle.AspNetCore to 7.3.1 [\#626](https://github.com/christianhelle/refitter/pull/626) ([renovate[bot]](https://github.com/apps/renovate))
