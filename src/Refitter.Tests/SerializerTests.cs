@@ -51,4 +51,19 @@ public class SerializerTests
                 .Excluding(settings => settings.ParameterNameGenerator)
                 .Excluding(settings => settings.CodeGeneratorSettings!.PropertyNameGenerator));
     }
+
+    [Theory, AutoNSubstituteData]
+    public void Deserialize_With_Comments(
+        RefitGeneratorSettings settings)
+    {
+        var json = Serializer.Serialize(settings);
+        json = "// Comment\n" + json;
+
+        Serializer
+            .Deserialize<RefitGeneratorSettings>(json)
+            .Should()
+            .BeEquivalentTo(settings, options => options
+                .Excluding(settings => settings.ParameterNameGenerator)
+                .Excluding(settings => settings.CodeGeneratorSettings!.PropertyNameGenerator));
+    }
 }
