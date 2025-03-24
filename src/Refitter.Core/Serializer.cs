@@ -11,6 +11,7 @@ public static class Serializer
 {
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
+        ReadCommentHandling = JsonCommentHandling.Skip,
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true
@@ -23,7 +24,7 @@ public static class Serializer
     /// <param name="json">The JSON string to deserialize.</param>
     /// <param name="options">Optional custom serialization options</param>
     /// <returns>The deserialized object of type T.</returns>
-    public static T Deserialize<T>(string json, JsonSerializerOptions? options = null) => 
+    public static T Deserialize<T>(string json, JsonSerializerOptions? options = null) =>
         JsonSerializer.Deserialize<T>(json, options ?? JsonSerializerOptions)!;
 
     /// <summary>
@@ -32,6 +33,6 @@ public static class Serializer
     /// <param name="any">The object to serialize.</param>
     /// <param name="options">Optional custom serialization options</param>
     /// <returns>The JSON string representation of the object.</returns>
-    public static string Serialize(object any, JsonSerializerOptions? options = null) => 
+    public static string Serialize(object any, JsonSerializerOptions? options = null) =>
         JsonSerializer.Serialize(any, options ?? JsonSerializerOptions);
 }
