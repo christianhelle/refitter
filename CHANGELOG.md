@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.3-preview.68...HEAD)
+
+**Implemented enhancements:**
+
+- Add support for deserializing JSON with comments and update tests [\#637](https://github.com/christianhelle/refitter/pull/637) ([sebastian-wachsmuth](https://github.com/sebastian-wachsmuth))
+
+## [1.5.3-preview.68](https://github.com/christianhelle/refitter/tree/1.5.3-preview.68) (2025-03-23)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...1.5.3-preview.68)
 
 **Implemented enhancements:**
 
@@ -15,7 +23,6 @@
 
 **Fixed bugs:**
 
-- SourceGenerator 1.5 and newer causes build error with Visual Studio 2022 [\#627](https://github.com/christianhelle/refitter/issues/627)
 - Doesn't add Content-Type request header when body is plain JSON string [\#617](https://github.com/christianhelle/refitter/issues/617)
 - Broken xml doc when swagger descriptions contains "\<" or "\>" characters [\#605](https://github.com/christianhelle/refitter/issues/605)
 - date-time parameters are encoded as date when iso8601 is used [\#599](https://github.com/christianhelle/refitter/issues/599)
