@@ -608,6 +608,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "sebastian-wachsmuth",
+      "name": "Sebastian Wachsmuth",
+      "avatar_url": "https://avatars.githubusercontent.com/u/87482207?v=4",
+      "profile": "https://github.com/sebastian-wachsmuth",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
