@@ -617,6 +617,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "qrzychu",
+      "name": "qrzychu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4633810?v=4",
+      "profile": "https://github.com/qrzychu",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
