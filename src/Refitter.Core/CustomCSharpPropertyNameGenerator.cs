@@ -42,7 +42,9 @@ internal class CustomCSharpPropertyNameGenerator : IPropertyNameGenerator
                 .Replace("+", "plus");
         }
 
-        name = ConversionUtilities.ConvertToUpperCamelCase(name, true);
+        name = ConversionUtilities
+            .ConvertToUpperCamelCase(name, true)
+            .ConvertSnakeCaseToPascalCase();
 
         if (name.IndexOfAny(ReservedSecondPassChars) != -1)
         {
