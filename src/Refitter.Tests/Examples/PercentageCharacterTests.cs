@@ -56,7 +56,7 @@ components:
     public async Task Replaces_Percentage_With_PascalCase()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("string Percent_of_something");
+        generateCode.Should().Contain("string PercentOfSomething");
     }
 
     [Fact]
