@@ -626,6 +626,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "lowern1ght",
+      "name": "Александр",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43214081?v=4",
+      "profile": "http://stbl.com",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
