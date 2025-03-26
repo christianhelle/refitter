@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Refitter.Tests.Examples;
 
-public class PercentageCharacterTests
+public class HandleUnderscoresTests
 {
     private const string OpenApiSpec = @"
 openapi: '3.0.0'
@@ -15,32 +15,37 @@ info:
 servers:
   - url: 'https://test.host.com/api/v1'
 paths:
-  /data:
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: 'object'
-              properties:
-                '% of something':
-                  type: 'string'
+  /jobs/{jobId}:
+    get:
+      tags:
+      - 'Jobs'
+      summary: 'Get job details'
+      description: 'Get the details of the specified job.'
+      parameters:
+        - in: 'path'
+          name: 'jobId'
+          description: 'Job ID'
+          required: true
+          schema:
+            type: 'string'
       responses:
         '200':
+          description: 'successful operation'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SomeResponse'
+                $ref: '#/components/schemas/JobResponse'
 components:
   schemas:
-    SomeResponse:
+    JobResponse:
       type: 'object'
       properties:
-        data:
+        job:
           type: 'object'
           properties:
-            id:
+            start_date:
               type: 'string'
+              format: 'date-time'
             details:
               type: 'string'
 ";
@@ -53,10 +58,10 @@ components:
     }
 
     [Fact]
-    public async Task Replaces_Percentage_With_PascalCase()
+    public async Task Replaces_Underscore_Properties_With_PascalCase()
     {
         string generateCode = await GenerateCode();
-        generateCode.Should().Contain("string PercentOfSomething");
+        generateCode.Should().Contain("DateTimeOffset StartDate");
     }
 
     [Fact]
