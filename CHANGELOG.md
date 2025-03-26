@@ -6,7 +6,16 @@
 
 **Implemented enhancements:**
 
+- Naming properties problem [\#641](https://github.com/christianhelle/refitter/issues/641)
+- Allow comments in .refitter Configuration [\#631](https://github.com/christianhelle/refitter/issues/631)
+- Convert properties with underscores to PascalCase [\#643](https://github.com/christianhelle/refitter/pull/643) ([christianhelle](https://github.com/christianhelle))
 - Add support for deserializing JSON with comments and update tests [\#637](https://github.com/christianhelle/refitter/pull/637) ([sebastian-wachsmuth](https://github.com/sebastian-wachsmuth))
+
+**Merged pull requests:**
+
+- docs: add lowern1ght as a contributor for bug [\#642](https://github.com/christianhelle/refitter/pull/642) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add qrzychu as a contributor for bug [\#639](https://github.com/christianhelle/refitter/pull/639) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add sebastian-wachsmuth as a contributor for code [\#638](https://github.com/christianhelle/refitter/pull/638) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
 ## [1.5.3-preview.68](https://github.com/christianhelle/refitter/tree/1.5.3-preview.68) (2025-03-23)
 
