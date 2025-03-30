@@ -1,28 +1,17 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [1.5.3](https://github.com/christianhelle/refitter/tree/1.5.3) (2025-03-29)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.3-preview.68...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...1.5.3)
 
 **Implemented enhancements:**
 
 - Naming properties problem [\#641](https://github.com/christianhelle/refitter/issues/641)
+- Can we write custom middleware for generators? [\#636](https://github.com/christianhelle/refitter/issues/636)
 - Allow comments in .refitter Configuration [\#631](https://github.com/christianhelle/refitter/issues/631)
+- NSwag v14.3.0 [\#644](https://github.com/christianhelle/refitter/pull/644) ([renovate[bot]](https://github.com/apps/renovate))
 - Convert properties with underscores to PascalCase [\#643](https://github.com/christianhelle/refitter/pull/643) ([christianhelle](https://github.com/christianhelle))
 - Add support for deserializing JSON with comments and update tests [\#637](https://github.com/christianhelle/refitter/pull/637) ([sebastian-wachsmuth](https://github.com/sebastian-wachsmuth))
-
-**Merged pull requests:**
-
-- docs: add lowern1ght as a contributor for bug [\#642](https://github.com/christianhelle/refitter/pull/642) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- docs: add qrzychu as a contributor for bug [\#639](https://github.com/christianhelle/refitter/pull/639) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- docs: add sebastian-wachsmuth as a contributor for code [\#638](https://github.com/christianhelle/refitter/pull/638) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-
-## [1.5.3-preview.68](https://github.com/christianhelle/refitter/tree/1.5.3-preview.68) (2025-03-23)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...1.5.3-preview.68)
-
-**Implemented enhancements:**
-
 - Temporary fix for Source Generator when running in Visual Studio [\#634](https://github.com/christianhelle/refitter/pull/634) ([christianhelle](https://github.com/christianhelle))
 - JSON Schema generator for documentation [\#623](https://github.com/christianhelle/refitter/pull/623) ([christianhelle](https://github.com/christianhelle))
 - Fix missing Content-Type \[Headers\] [\#619](https://github.com/christianhelle/refitter/pull/619) ([christianhelle](https://github.com/christianhelle))
@@ -42,6 +31,9 @@
 
 **Merged pull requests:**
 
+- docs: add lowern1ght as a contributor for bug [\#642](https://github.com/christianhelle/refitter/pull/642) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add qrzychu as a contributor for bug [\#639](https://github.com/christianhelle/refitter/pull/639) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add sebastian-wachsmuth as a contributor for code [\#638](https://github.com/christianhelle/refitter/pull/638) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update dependency Swashbuckle.AspNetCore to v8 [\#633](https://github.com/christianhelle/refitter/pull/633) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dotnet monorepo [\#630](https://github.com/christianhelle/refitter/pull/630) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Atc.Test to 1.1.18 [\#628](https://github.com/christianhelle/refitter/pull/628) ([renovate[bot]](https://github.com/apps/renovate))
