@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.3...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency exceptionless to 6.1.0 [\#647](https://github.com/christianhelle/refitter/pull/647) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 8.1.0 [\#646](https://github.com/christianhelle/refitter/pull/646) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.5.3 [\#645](https://github.com/christianhelle/refitter/pull/645) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [1.5.3](https://github.com/christianhelle/refitter/tree/1.5.3) (2025-03-29)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.2...1.5.3)
