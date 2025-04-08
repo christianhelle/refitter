@@ -7,6 +7,7 @@
 **Merged pull requests:**
 
 - chore\(deps\): update dependency spectre.console.cli to 0.50.0 [\#649](https://github.com/christianhelle/refitter/pull/649) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dotnet monorepo to 9.0.4 [\#648](https://github.com/christianhelle/refitter/pull/648) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency exceptionless to 6.1.0 [\#647](https://github.com/christianhelle/refitter/pull/647) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 8.1.0 [\#646](https://github.com/christianhelle/refitter/pull/646) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.5.3 [\#645](https://github.com/christianhelle/refitter/pull/645) ([renovate[bot]](https://github.com/apps/renovate))
