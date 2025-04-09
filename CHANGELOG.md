@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency microsoft.extensions.http.resilience to 9.4.0 [\#650](https://github.com/christianhelle/refitter/pull/650) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency spectre.console.cli to 0.50.0 [\#649](https://github.com/christianhelle/refitter/pull/649) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dotnet monorepo to 9.0.4 [\#648](https://github.com/christianhelle/refitter/pull/648) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency exceptionless to 6.1.0 [\#647](https://github.com/christianhelle/refitter/pull/647) ([renovate[bot]](https://github.com/apps/renovate))
