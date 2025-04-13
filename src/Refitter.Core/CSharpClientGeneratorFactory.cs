@@ -1,4 +1,5 @@
 using System.Reflection;
+using NJsonSchema;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
@@ -24,7 +25,11 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             GenerateDtoTypes = true,
             GenerateClientInterfaces = false,
             GenerateExceptionClasses = false,
-            CodeGeneratorSettings = { PropertyNameGenerator = settings.CodeGeneratorSettings?.PropertyNameGenerator ?? new CustomCSharpPropertyNameGenerator() },
+            CodeGeneratorSettings =
+            {
+                PropertyNameGenerator = settings.CodeGeneratorSettings?.PropertyNameGenerator ??
+                                        new CustomCSharpPropertyNameGenerator()
+            },
             CSharpGeneratorSettings =
             {
                 Namespace = settings.ContractsNamespace ?? settings.Namespace,
@@ -33,15 +38,18 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                 ClassStyle =
                     settings.ImmutableRecords ||
                     settings.CodeGeneratorSettings?.GenerateNativeRecords is true
-                    ? CSharpClassStyle.Record
-                    : CSharpClassStyle.Poco,
+                        ? CSharpClassStyle.Record
+                        : CSharpClassStyle.Poco,
                 GenerateNativeRecords =
                     settings.ImmutableRecords ||
                     settings.CodeGeneratorSettings?.GenerateNativeRecords is true,
+                TypeNameGenerator = settings.CodeGeneratorSettings is not null
+                    ? new CustomTypeNameGenerator(settings.CodeGeneratorSettings)
+                    : new DefaultTypeNameGenerator(),
             }
         };
 
-        if (settings.ParameterNameGenerator != default)
+        if (settings.ParameterNameGenerator != null)
         {
             csharpClientGeneratorSettings.ParameterNameGenerator = settings.ParameterNameGenerator;
         }
