@@ -257,4 +257,10 @@ public class CodeGeneratorSettings
     [Description("Gets or sets a custom IPropertyNameGenerator.")]
     [JsonIgnore]
     public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
+
+    /// <summary>
+    /// Gets or sets a custom <see cref="TypeOverride"/> definitions
+    /// </summary>
+    [Description("Gets or sets a custom TypeOverride definitions")]
+    public TypeOverride[] TypeOverrides { get; set; } = [];
 }
