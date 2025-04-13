@@ -37,6 +37,16 @@ internal class CustomCSharpClientGenerator(OpenApiDocument document, CSharpClien
         /// </summary>
         protected override CodeArtifact GenerateType(JsonSchema schema, string typeNameHint)
         {
+            // Check if we have a custom type override for this schema type and format
+            var parentGenerator = Parent as CustomCSharpClientGenerator;
+            if (parentGenerator != null && schema.Format != null && 
+                parentGenerator.Settings is ExtendedCSharpClientGeneratorSettings extendedSettings && 
+                extendedSettings.TypeOverrides.TryGetValue($"{schema.Type}:{schema.Format}", out var overriddenType))
+            {
+                // If we have an override, use it directly instead of generating a type name
+                return GenerateClass(schema, overriddenType);
+            }
+            
             var typeName = resolver.GetOrGenerateTypeName(schema, typeNameHint);
 
             if (schema.IsEnumeration)
@@ -136,4 +146,15 @@ internal class CustomCSharpClientGenerator(OpenApiDocument document, CSharpClien
             public bool UsePolymorphicSerialization => usePolymorphicSerialization;
         }
     }
+}
+
+/// <summary>
+/// Extended CSharpClientGeneratorSettings class that adds support for type overrides
+/// </summary>
+internal class ExtendedCSharpClientGeneratorSettings : CSharpClientGeneratorSettings
+{
+    /// <summary>
+    /// Dictionary of type overrides in the format "string:my-date-time" -> "Domain.Specific.DataType"
+    /// </summary>
+    public Dictionary<string, string> TypeOverrides { get; set; } = new();
 }
