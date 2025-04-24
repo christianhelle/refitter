@@ -55,7 +55,6 @@ internal static class ParameterExtractor
                     && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
                 {
                     headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {securityScheme.Name}");
-                    break;
                 }
             }
         }
