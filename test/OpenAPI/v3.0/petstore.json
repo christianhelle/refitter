@@ -39,6 +39,11 @@
       }
     }
   ],
+  "security": [
+    {
+       "api_key": []
+    }
+  ],
   "paths": {
     "/pet": {
       "put": {
