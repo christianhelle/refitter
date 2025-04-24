@@ -9,6 +9,10 @@ public enum SampleOpenSpecifications
     SwaggerPetstoreJsonV2WithDifferentHeaders,
     SwaggerPetstoreJsonV3WithDifferentHeaders,
     SwaggerPetstoreYamlV2WithDifferentHeaders,
-    SwaggerPetstoreYamlV3WithDifferentHeaders,     
+    SwaggerPetstoreYamlV3WithDifferentHeaders,
+    SwaggerPetstoreJsonV2WithAuthenticationHeaders,
+    SwaggerPetstoreJsonV3WithAuthenticationHeaders,
+    SwaggerPetstoreYamlV2WithAuthenticationHeaders,
+    SwaggerPetstoreYamlV3WithAuthenticationHeaders,
     IllegalPathsJsonV3
 }

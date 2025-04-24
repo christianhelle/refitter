@@ -40,6 +40,25 @@ internal static class ParameterExtractor
                 .ToList();
         }
 
+        if (settings.GenerateAuthenticationHeader)
+        {
+            var document = operation.Parent.Parent;
+            foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
+            {
+                if (!document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
+                {
+                    continue;
+                }
+
+                if (securityScheme.Type == OpenApiSecuritySchemeType.ApiKey
+                    && securityScheme.In == OpenApiSecurityApiKeyLocation.Header
+                    && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
+                {
+                    headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {securityScheme.Name}");
+                }
+            }
+        }
+
         var formParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
             .Select(p =>

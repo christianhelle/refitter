@@ -356,4 +356,10 @@ public class RefitGeneratorSettings
     public bool UsePolymorphicSerialization { get; set; }
 
     [JsonIgnore] public IParameterNameGenerator? ParameterNameGenerator { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to generate Security Schema Authentication headers.
+    /// </summary>
+    [Description("Generate Security Schema Authentication headers")]
+    public bool GenerateAuthenticationHeader { get; set; }
 }
