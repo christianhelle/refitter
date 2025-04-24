@@ -635,6 +635,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "AragornHL",
+      "name": "AragornHL",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18478623?v=4",
+      "profile": "https://github.com/AragornHL",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
