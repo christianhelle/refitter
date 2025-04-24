@@ -133,7 +133,7 @@ components:
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<User> GetUserByIdWithDefault(string id);");
-        generatedCode.Should().Contain("Task<IEnumerable<User>> GetUsersWithDefault();");
+        generatedCode.Should().Contain("Task<ICollection<User>> GetUsersWithDefault();");
     }
 
     [Fact]
@@ -141,7 +141,7 @@ components:
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<Category> GetCategoryByIdWithRange(string id);");
-        generatedCode.Should().Contain("Task<IEnumerable<Category>> GetCategoriesWithRange();");
+        generatedCode.Should().Contain("Task<ICollection<Category>> GetCategoriesWithRange();");
     }
 
     [Fact]
@@ -166,8 +166,8 @@ components:
     private static async Task<string> GenerateCode()
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings 
-        { 
+        var settings = new RefitGeneratorSettings
+        {
             OpenApiPath = swaggerFile,
             UseCancellationTokens = false
         };
