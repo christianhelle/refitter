@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Response type handling to only use 2XX range [\#661](https://github.com/christianhelle/refitter/pull/661) ([christianhelle](https://github.com/christianhelle))
 - Add support for 2XX and Default Response Objects [\#660](https://github.com/christianhelle/refitter/pull/660) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
