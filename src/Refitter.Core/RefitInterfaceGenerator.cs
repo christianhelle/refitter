@@ -116,7 +116,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             .FirstOrDefault();
 
         // If no explicit success codes found, check for range responses in precedence order
-        string[] ranges = { "2XX", "200", "1XX", "3XX", "4XX", "5XX" };
+        string[] ranges = { "1XX", "2XX", "3XX", "4XX", "5XX" };
         if (returnTypeParameter == null)
         {
             foreach (var rangeCode in ranges)
