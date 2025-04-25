@@ -4,8 +4,22 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.3...HEAD)
 
+**Implemented enhancements:**
+
+- Add support for 2XX and Default Response Objects [\#660](https://github.com/christianhelle/refitter/pull/660) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- 2xx and default are not recognized as responses [\#658](https://github.com/christianhelle/refitter/issues/658)
+
 **Merged pull requests:**
 
+- docs: add pfeigl as a contributor for bug [\#659](https://github.com/christianhelle/refitter/pull/659) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Update smoke tests to generate authentication headers [\#657](https://github.com/christianhelle/refitter/pull/657) ([christianhelle](https://github.com/christianhelle))
+- docs: add kmfd3s as a contributor for code [\#656](https://github.com/christianhelle/refitter/pull/656) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add AragornHL as a contributor for code [\#655](https://github.com/christianhelle/refitter/pull/655) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Add Header Parameters for Security Schemes [\#653](https://github.com/christianhelle/refitter/pull/653) ([AragornHL](https://github.com/AragornHL))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 8.1.1 [\#651](https://github.com/christianhelle/refitter/pull/651) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.extensions.http.resilience to 9.4.0 [\#650](https://github.com/christianhelle/refitter/pull/650) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency spectre.console.cli to 0.50.0 [\#649](https://github.com/christianhelle/refitter/pull/649) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dotnet monorepo to 9.0.4 [\#648](https://github.com/christianhelle/refitter/pull/648) ([renovate[bot]](https://github.com/apps/renovate))
