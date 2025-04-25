@@ -115,18 +115,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             .Select(code => GetTypeName(code, operation))
             .FirstOrDefault();
 
-        // If no explicit success codes found, check for range responses in precedence order
-        string[] ranges = { "1XX", "2XX", "3XX", "4XX", "5XX" };
-        if (returnTypeParameter == null)
+        // If no explicit success codes found, check for 2XX range
+        if (returnTypeParameter == null && operation.Responses.ContainsKey("2XX"))
         {
-            foreach (var rangeCode in ranges)
-            {
-                if (operation.Responses.ContainsKey(rangeCode))
-                {
-                    returnTypeParameter = GetTypeName(rangeCode, operation);
-                    break;
-                }
-            }
+            returnTypeParameter = GetTypeName("2XX", operation);
         }
 
         // If no success codes or ranges found, check for default response
