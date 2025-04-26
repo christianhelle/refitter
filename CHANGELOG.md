@@ -6,8 +6,10 @@
 
 **Implemented enhancements:**
 
+- Adding security schemes to the api interface generator  [\#106](https://github.com/christianhelle/refitter/issues/106)
 - Response type handling to only use 2XX range [\#661](https://github.com/christianhelle/refitter/pull/661) ([christianhelle](https://github.com/christianhelle))
 - Add support for 2XX and Default Response Objects [\#660](https://github.com/christianhelle/refitter/pull/660) ([christianhelle](https://github.com/christianhelle))
+- Add Header Parameters for Security Schemes [\#653](https://github.com/christianhelle/refitter/pull/653) ([AragornHL](https://github.com/AragornHL))
 
 **Fixed bugs:**
 
@@ -19,7 +21,6 @@
 - Update smoke tests to generate authentication headers [\#657](https://github.com/christianhelle/refitter/pull/657) ([christianhelle](https://github.com/christianhelle))
 - docs: add kmfd3s as a contributor for code [\#656](https://github.com/christianhelle/refitter/pull/656) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add AragornHL as a contributor for code [\#655](https://github.com/christianhelle/refitter/pull/655) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Add Header Parameters for Security Schemes [\#653](https://github.com/christianhelle/refitter/pull/653) ([AragornHL](https://github.com/AragornHL))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 8.1.1 [\#651](https://github.com/christianhelle/refitter/pull/651) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.extensions.http.resilience to 9.4.0 [\#650](https://github.com/christianhelle/refitter/pull/650) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency spectre.console.cli to 0.50.0 [\#649](https://github.com/christianhelle/refitter/pull/649) ([renovate[bot]](https://github.com/apps/renovate))
