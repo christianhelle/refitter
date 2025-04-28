@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using NJsonSchema;
 using NSwag;
@@ -54,7 +55,7 @@ internal static class ParameterExtractor
                     && securityScheme.In == OpenApiSecurityApiKeyLocation.Header
                     && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
                 {
-                    headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {securityScheme.Name}");
+                    headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {ReplaceUnsafeCharacters(securityScheme.Name)}");
                 }
             }
         }
@@ -93,6 +94,24 @@ internal static class ParameterExtractor
             parameters.Add("CancellationToken cancellationToken = default");
 
         return parameters;
+    }
+
+    private static string ReplaceUnsafeCharacters(
+        string unsafeText)
+    {
+        var safeText = string.Empty;
+        foreach (var character in unsafeText)
+        {
+            var safeCharacter = character;
+            if (char.GetUnicodeCategory(character) == UnicodeCategory.OtherPunctuation)
+            {
+                safeCharacter = '_';
+            }
+
+            safeText += safeCharacter;
+        }
+
+        return safeText;
     }
 
     private static List<string> ReOrderNullableParameters(
