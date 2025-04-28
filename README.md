@@ -104,6 +104,7 @@ OPTIONS:
         --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used
         --no-banner                                              Don't show donation banner
         --skip-default-additional-properties                     Set to true to skip default additional properties
+        --collection-format                      Multi           Determines the format of collection parameters. May be one of Multi, Csv, Ssv, Tsv, Pipes
         --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
                                                                  May be one of:
                                                                  - Default
