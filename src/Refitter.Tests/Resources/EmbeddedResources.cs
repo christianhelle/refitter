@@ -140,6 +140,50 @@ public static class EmbeddedResources
         }
     }
 
+    public static string SwaggerPetstoreJsonV2WithUnsafeAuthenticationHeaders
+    {
+        get
+        {
+            using var stream = GetStream("V2.SwaggerPetstoreWithUnsafeAuthenticationHeaders.json");
+            using var reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
+        }
+    }
+
+    public static string SwaggerPetstoreJsonV3WithUnsafeAuthenticationHeaders
+    {
+        get
+        {
+            using var stream = GetStream("V3.SwaggerPetstoreWithUnsafeAuthenticationHeaders.json");
+            using var reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
+        }
+    }
+
+    public static string SwaggerPetstoreYamlV2WithUnsafeAuthenticationHeaders
+    {
+        get
+        {
+            using var stream = GetStream("V2.SwaggerPetstoreWithUnsafeAuthenticationHeaders.yaml");
+            using var reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
+        }
+    }
+
+    public static string SwaggerPetstoreYamlV3WithUnsafeAuthenticationHeaders
+    {
+        get
+        {
+            using var stream = GetStream("V3.SwaggerPetstoreWithUnsafeAuthenticationHeaders.yaml");
+            using var reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
+        }
+    }
+
     public static string SwaggerIllegalPathsJsonV3
     {
         get
@@ -186,6 +230,14 @@ public static class EmbeddedResources
                 SwaggerPetstoreYamlV2WithAuthenticationHeaders,
             SampleOpenSpecifications.SwaggerPetstoreYamlV3WithAuthenticationHeaders =>
                 SwaggerPetstoreYamlV3WithAuthenticationHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreJsonV2WithUnsafeAuthenticationHeaders =>
+                SwaggerPetstoreJsonV2WithUnsafeAuthenticationHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreJsonV3WithUnsafeAuthenticationHeaders =>
+                SwaggerPetstoreJsonV3WithUnsafeAuthenticationHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreYamlV2WithUnsafeAuthenticationHeaders =>
+                SwaggerPetstoreYamlV2WithUnsafeAuthenticationHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreYamlV3WithUnsafeAuthenticationHeaders =>
+                SwaggerPetstoreYamlV3WithUnsafeAuthenticationHeaders,
             _ => throw new ArgumentOutOfRangeException(nameof(version), version, null)
         };
     }
