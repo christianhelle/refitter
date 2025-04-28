@@ -1,14 +1,14 @@
 namespace Refitter.Core;
 
 /// <summary>
-/// Collection format defined in https://swagger.io/docs/specification/2-0/describing-parameters/
+/// Collection format defined in https://swagger.io/docs/specification/v2_0/describing-parameters/#array-and-multi-value-parameters
 /// </summary>
 public enum CollectionFormat
 {
     /// <summary>
-    /// Values formatted with UrlParameterFormatter or FormUrlEncodedParameterFormatter
+    /// Multiple parameter instances
     /// </summary>
-    RefitParameterFormatter,
+    Multi,
 
     /// <summary>
     /// Comma-separated values
@@ -28,10 +28,5 @@ public enum CollectionFormat
     /// <summary>
     /// Pipe-separated values
     /// </summary>
-    Pipes,
-
-    /// <summary>
-    /// Multiple parameter instances
-    /// </summary>
-    Multi
+    Pipes
 }
