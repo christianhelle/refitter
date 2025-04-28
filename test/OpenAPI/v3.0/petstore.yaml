@@ -33,6 +33,8 @@ tags:
     externalDocs:
       description: Find out more about our store
       url: 'http://swagger.io'
+security:
+  - api_key: []
 paths:
   /pet:
     put:

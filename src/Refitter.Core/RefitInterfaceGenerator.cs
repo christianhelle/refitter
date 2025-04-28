@@ -108,11 +108,24 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             return type is null or "void" ? GetAsyncOperationType(true) : $"{GetAsyncOperationType(false)}<{WellKnownNamesspaces.TrimImportedNamespaces(type)}>";
         }
 
-        var returnTypeParameter =
-            (new[] { "200", "201", "203", "206" })
-                .Where(operation.Responses.ContainsKey)
-                .Select(code => GetTypeName(code, operation))
-                .FirstOrDefault();
+        // First check for explicit success status codes
+        var successCodes = new[] { "200", "201", "203", "206" };
+        var returnTypeParameter = successCodes
+            .Where(operation.Responses.ContainsKey)
+            .Select(code => GetTypeName(code, operation))
+            .FirstOrDefault();
+
+        // If no explicit success codes found, check for 2XX range
+        if (returnTypeParameter == null && operation.Responses.ContainsKey("2XX"))
+        {
+            returnTypeParameter = GetTypeName("2XX", operation);
+        }
+
+        // If no success codes or ranges found, check for default response
+        if (returnTypeParameter == null && operation.Responses.ContainsKey("default"))
+        {
+            returnTypeParameter = GetTypeName("default", operation);
+        }
 
         return GetReturnType(returnTypeParameter);
     }

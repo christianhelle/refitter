@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-68-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-71-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1291,6 +1291,11 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sebastian-wachsmuth"><img src="https://avatars.githubusercontent.com/u/87482207?v=4?s=100" width="100px;" alt="Sebastian Wachsmuth"/><br /><sub><b>Sebastian Wachsmuth</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=sebastian-wachsmuth" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/qrzychu"><img src="https://avatars.githubusercontent.com/u/4633810?v=4?s=100" width="100px;" alt="qrzychu"/><br /><sub><b>qrzychu</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Aqrzychu" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://stbl.com"><img src="https://avatars.githubusercontent.com/u/43214081?v=4?s=100" width="100px;" alt="Александр"/><br /><sub><b>Александр</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Alowern1ght" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/AragornHL"><img src="https://avatars.githubusercontent.com/u/18478623?v=4?s=100" width="100px;" alt="AragornHL"/><br /><sub><b>AragornHL</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=AragornHL" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kmfd3s"><img src="https://avatars.githubusercontent.com/u/5180898?v=4?s=100" width="100px;" alt="kmfd3s"/><br /><sub><b>kmfd3s</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=kmfd3s" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/pfeigl"><img src="https://avatars.githubusercontent.com/u/237891?v=4?s=100" width="100px;" alt="Philipp Feigl"/><br /><sub><b>Philipp Feigl</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Apfeigl" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
