@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.3...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.4...HEAD)
+
+**Implemented enhancements:**
+
+- Made Security Header Parameters safe for C\# when unsafe characters are present [\#663](https://github.com/christianhelle/refitter/pull/663) ([AragornHL](https://github.com/AragornHL))
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.5.4 [\#662](https://github.com/christianhelle/refitter/pull/662) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.5.4](https://github.com/christianhelle/refitter/tree/1.5.4) (2025-04-26)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.3...1.5.4)
 
 **Implemented enhancements:**
 
