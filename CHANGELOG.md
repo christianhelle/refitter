@@ -6,6 +6,8 @@
 
 **Implemented enhancements:**
 
+- Using CollectionFormats other than Multi [\#640](https://github.com/christianhelle/refitter/issues/640)
+- Add collection format option to CLI tool documentation [\#664](https://github.com/christianhelle/refitter/pull/664) ([christianhelle](https://github.com/christianhelle))
 - Made Security Header Parameters safe for C\# when unsafe characters are present [\#663](https://github.com/christianhelle/refitter/pull/663) ([AragornHL](https://github.com/AragornHL))
 
 **Merged pull requests:**
