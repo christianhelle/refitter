@@ -39,6 +39,7 @@ EXAMPLES:
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
     refitter ./openapi.json --use-polymorphic-serialization
+    refitter ./openapi.json --collection-format Csv
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -82,6 +83,12 @@ OPTIONS:
         --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used                                                          
         --no-banner                                              Don't show donation banner                                                                                                                
         --skip-default-additional-properties                     Set to true to skip default additional properties                                                                                         
+        --collection-format                      Multi           Determines the format of collection parameters. May be one of:
+                                                                 - Multi (separate parameter instances for each array item)
+                                                                 - Csv (comma separated values)
+                                                                 - Ssv (space separated values)
+                                                                 - Tsv (tab separated values)
+                                                                 - Pipes (pipe separated values)
         --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.                                                                                  
                                                                  May be one of:                                                                                                                            
                                                                  - Default                                                                                                                                 

@@ -155,6 +155,12 @@ internal static class Program
                     .AddExample(
                         "./openapi.json",
                         "--use-polymorphic-serialization");
+
+                configuration
+                    .AddExample(
+                        "./openapi.json",
+                        "--collection-format",
+                        "Csv");
             });
 
         return app.Run(args);

@@ -146,6 +146,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ContractsNamespace = settings.ContractsNamespace,
             UsePolymorphicSerialization = settings.UsePolymorphicSerialization,
             GenerateDisposableClients = settings.GenerateDisposableClients,
+            CollectionFormat = settings.CollectionFormat
         };
     }
 

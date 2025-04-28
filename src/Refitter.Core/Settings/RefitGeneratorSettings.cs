@@ -362,4 +362,12 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Generate Security Schema Authentication headers")]
     public bool GenerateAuthenticationHeader { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection format to use for array query parameters.
+    /// Default is CollectionFormat.Multi.
+    /// </summary>
+    [Description("The collection format to use for array query parameters. Default is CollectionFormat.Multi.")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public CollectionFormat CollectionFormat { get; set; } = CollectionFormat.Multi;
 }

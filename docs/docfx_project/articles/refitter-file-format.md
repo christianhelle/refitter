@@ -63,6 +63,7 @@ The following is an example `.refitter` file
   "useDynamicQuerystringParameters": false, // Optional. Default=false
   "usePolymorphicSerialization": true, // Optional. Default=false
   "generateDisposableClients": true, // Optional. Default=false
+  "collectionFormat": "Multi", // Optional. Determines the format of collection parameters. Values=Multi|Csv|Ssv|Tsv|Pipes. Default=Multi
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
     "httpMessageHandlers": [ // Optional
@@ -421,7 +422,7 @@ The following is an example `.refitter` file
             "properties": {
                 "withRequestOptions": {
                     "type": "boolean",
-                    "description": "Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter."
+                    "description": "Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter"
                 },
                 "withRegistrationHelper": {
                     "type": "boolean",
