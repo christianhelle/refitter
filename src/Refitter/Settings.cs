@@ -230,7 +230,16 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool GenerateDisposableClients { get; set; }
 
-    [Description("The collection format to use for query parameters. Default is Multi")]
+    [Description("""
+                 The collection format to use for query parameters. Default is Multi.
+                 May be one of:
+                 - Multi: Multiple parameter instances rather than multiple values. Only supported for the in: query and in: formData parameters. (?param=value1&param=value2)
+                 - Csv: Comma-separated values. (?param=value1,value2)
+                 - Ssv: Space-separated values. (?param=value1 value2)
+                 - Tsv: Tab-separated values. (?param=value1\tvalue2)
+                 - Pipes: Pipe-separated values. (?param=value1|value2)    
+                 See https://swagger.io/docs/specification/v2_0/describing-parameters/#array-and-multi-value-parameters for more information.
+                 """)]
     [CommandOption("--collection-format")]
     [DefaultValue(CollectionFormat.Multi)]
     public CollectionFormat CollectionFormat { get; set; } = CollectionFormat.Multi;
