@@ -229,4 +229,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--disposable")]
     [DefaultValue(false)]
     public bool GenerateDisposableClients { get; set; }
+
+    [Description("The collection format to use for query parameters. Default is Multi")]
+    [CommandOption("--collection-format")]
+    [DefaultValue(CollectionFormat.Multi)]
+    public CollectionFormat CollectionFormat { get; set; } = CollectionFormat.Multi;
 }
