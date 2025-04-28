@@ -39,6 +39,7 @@ EXAMPLES:
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
     refitter ./openapi.json --use-polymorphic-serialization
+    refitter ./openapi.json --collection-format Csv
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
