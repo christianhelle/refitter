@@ -46,7 +46,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             {
                 Directory.CreateDirectory(folder);
             }
-            if (result.GenerateVisibilFile == true)
+            if (result.GenerateVisibileFile == true)
             {
                 File.WriteAllText(
                     output,
@@ -134,7 +134,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 Diagnostics = diagnostics,
                 GeneratedCode = refit,
                 OutputFilename = settings.OutputFilename,
-                GenerateVisibilFile = settings.GenerateVisibilFile,
+                GenerateVisibileFile = settings.GenerateVisibileFile,
                 ConfigFile = file
             };
         }
@@ -238,7 +238,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         public string? GeneratedCode { get; init; }
         public string? OutputFilename { get; init; }
         public required AdditionalText ConfigFile { get; init; }
-        public bool? GenerateVisibilFile { get; init; }
+        public bool? GenerateVisibileFile { get; init; }
         public required List<Diagnostic> Diagnostics { get; init; } = new List<Diagnostic>();
     }
 }

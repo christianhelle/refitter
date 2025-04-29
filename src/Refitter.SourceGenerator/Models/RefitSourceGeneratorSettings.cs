@@ -29,5 +29,5 @@ public class RefitSourceGeneratorSettings: RefitGeneratorSettings
     /// </remarks>
     [Description("Will generate the file, visibile into the project directory. " +
     "If this is enabled the generated files must be checked in into the repository, to not break CI builds.")]
-    public bool GenerateVisibilFile { get; set; } = false;
+    public bool GenerateVisibileFile { get; set; } = false;
 }
