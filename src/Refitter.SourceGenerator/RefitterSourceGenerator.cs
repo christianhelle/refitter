@@ -40,14 +40,14 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             {
                 filename = "Refitter.g.cs";
             }
-            var folder = Path.Combine(Path.GetDirectoryName(result.ConfigFile.Path)!, "Generated");
-            var output = Path.Combine(folder, filename);
-            if (!Directory.Exists(folder))
-            {
-                Directory.CreateDirectory(folder);
-            }
             if (result.GenerateVisibileFile == true)
             {
+                var folder = Path.Combine(Path.GetDirectoryName(result.ConfigFile.Path)!, "Generated");
+                var output = Path.Combine(folder, filename);
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
                 File.WriteAllText(
                     output,
                     result.GeneratedCode,
