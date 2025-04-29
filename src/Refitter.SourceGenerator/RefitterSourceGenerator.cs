@@ -57,7 +57,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             else
             {
                 context.AddSource(
-                    output,
+                    // just the hint name – keeps it portable
+                    filename,
                     // the compilere thinks the GeneratedCode property is null, but it is not.
                     // It's already checked in the first statement of this method.
                     result.GeneratedCode!);
