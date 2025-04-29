@@ -12,6 +12,7 @@
 
 **Merged pull requests:**
 
+- Update nswag monorepo to 14.4.0 [\#665](https://github.com/christianhelle/refitter/pull/665) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.5.4 [\#662](https://github.com/christianhelle/refitter/pull/662) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.5.4](https://github.com/christianhelle/refitter/tree/1.5.4) (2025-04-26)
