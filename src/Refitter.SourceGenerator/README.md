@@ -207,7 +207,7 @@ If one of the above points matches your situation use `GenerateVisibileFile` wit
 
 ### Why not always use `true`?
 
-The problem with generating the code visibile is that we don't use the source generator native way of creating the files.
+The problem with generating the code visible is that we don't use the source generator native way of creating the files.
 This is the problem, if the solution your are working in, creates while the buildtime the open api specification. (so your team is the source of it.)
 And what will happen then is the following:
 

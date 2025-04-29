@@ -17,7 +17,7 @@ namespace Refitter.SourceGenerator.Models;
 public class RefitSourceGeneratorSettings: RefitGeneratorSettings
 {
     /// <summary>
-    /// Will generate the file, visibile into the project directory.
+    /// Will generate the file, visible into the project directory.
     /// If this is enabled the generated files must be checked in into the repository, to not break CI builds.
     /// </summary>
     /// <remarks>
@@ -27,7 +27,7 @@ public class RefitSourceGeneratorSettings: RefitGeneratorSettings
     /// If this setting is set to true, it can happen that only the second build is successful, inspecial if your OpenApi Spec is generated while your solution builds.
     /// For old projects it's recommend to set this property to true, to not break existing documentation on how to build a project.
     /// </remarks>
-    [Description("Will generate the file, visibile into the project directory. " +
+    [Description("Will generate the file, visible into the project directory. " +
     "If this is enabled the generated files must be checked in into the repository, to not break CI builds.")]
-    public bool GenerateVisibileFile { get; set; } = false;
+    public bool GenerateVisibleFile{ get; set; } = false;
 }
