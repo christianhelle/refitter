@@ -135,7 +135,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 Diagnostics = diagnostics,
                 GeneratedCode = refit,
                 OutputFilename = settings.OutputFilename,
-                GenerateVisibleFile= settings.GenerateVisibileFile,
+                GenerateVisibleFile= settings.GenerateVisibleFile,
                 ConfigFile = file
             };
         }
