@@ -40,7 +40,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             {
                 filename = "Refitter.g.cs";
             }
-            if (result.GenerateVisibleFile== true)
+            if (result.GenerateVisibleFile == true)
             {
                 var folder = Path.Combine(Path.GetDirectoryName(result.ConfigFile.Path)!, "Generated");
                 var output = Path.Combine(folder, filename);
@@ -135,7 +135,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 Diagnostics = diagnostics,
                 GeneratedCode = refit,
                 OutputFilename = settings.OutputFilename,
-                GenerateVisibleFile= settings.GenerateVisibleFile,
+                GenerateVisibleFile = settings.GenerateVisibleFile,
                 ConfigFile = file
             };
         }
@@ -239,7 +239,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         public string? GeneratedCode { get; init; }
         public string? OutputFilename { get; init; }
         public required AdditionalText ConfigFile { get; init; }
-        public bool? GenerateVisibleFile{ get; init; }
+        public bool? GenerateVisibleFile { get; init; }
         public required List<Diagnostic> Diagnostics { get; init; } = new List<Diagnostic>();
     }
 }
