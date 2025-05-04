@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.4...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.5-preview.69...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency xunit.runner.visualstudio to 3.1.0 [\#670](https://github.com/christianhelle/refitter/pull/670) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add tommieemeli as a contributor for bug [\#669](https://github.com/christianhelle/refitter/pull/669) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
+## [1.5.5-preview.69](https://github.com/christianhelle/refitter/tree/1.5.5-preview.69) (2025-04-30)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.4...1.5.5-preview.69)
 
 **Implemented enhancements:**
 
