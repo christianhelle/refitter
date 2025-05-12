@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-72-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-73-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1299,6 +1299,7 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/pfeigl"><img src="https://avatars.githubusercontent.com/u/237891?v=4?s=100" width="100px;" alt="Philipp Feigl"/><br /><sub><b>Philipp Feigl</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Apfeigl" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://tommihaapa.fi/"><img src="https://avatars.githubusercontent.com/u/47896768?v=4?s=100" width="100px;" alt="Tommi Haapa"/><br /><sub><b>Tommi Haapa</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Atommieemeli" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/MrScottyTay"><img src="https://avatars.githubusercontent.com/u/24463321?v=4?s=100" width="100px;" alt="Scott Taylor"/><br /><sub><b>Scott Taylor</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AMrScottyTay" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
