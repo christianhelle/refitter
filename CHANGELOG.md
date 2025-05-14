@@ -2,7 +2,17 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.4...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.5...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dotnet monorepo [\#674](https://github.com/christianhelle/refitter/pull/674) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add MrScottyTay as a contributor for bug [\#673](https://github.com/christianhelle/refitter/pull/673) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.5.5 [\#671](https://github.com/christianhelle/refitter/pull/671) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.5.5](https://github.com/christianhelle/refitter/tree/1.5.5) (2025-05-04)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.4...1.5.5)
 
 **Implemented enhancements:**
 
