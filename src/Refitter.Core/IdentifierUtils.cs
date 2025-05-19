@@ -15,7 +15,7 @@ internal static class IdentifierUtils
 
         if (hasParent)
         {
-            name = Regex.Replace(name, @"\d+$", string.Empty);
+            name = Regex.Replace(name, @"\d+$", string.Empty, RegexOptions.None, TimeSpan.FromMilliseconds(50));
         }
 
         if (!knownIdentifiers.Contains(string.IsNullOrEmpty(parent) ? $"{name}{suffix}" : $"{parent}.{name}{suffix}"))
