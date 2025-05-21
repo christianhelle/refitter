@@ -30,6 +30,7 @@ If you encounter a bug or issue, please create a GitHub issue with the following
 - Expected behavior
 - Actual behavior
 - Environment information (OS, .NET version, etc.)
+- **Support Key**: `[your-support-key]` (The support key is a unique identifier generated on your machine, displayed in the output when running Refitter since v0.5.4, and used for telemetry data)
 - Any relevant error messages or logs
 
 ### Feature Requests
