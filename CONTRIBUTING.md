@@ -35,10 +35,12 @@ If you encounter a bug or issue, please create a GitHub issue with the following
 
 ### Feature Requests
 
-Feature requests are welcome! When submitting a feature request:
-- Provide a clear, detailed description of the proposed feature
-- Explain why the feature would be beneficial
-- Include any relevant examples or use cases
+Feature requests are welcome! Please follow the feature request template in `.github/ISSUE_TEMPLATE/feature_request.md` when submitting a feature request. The template guides you to provide:
+
+- A description of whether your feature request is related to a problem
+- A clear, detailed description of the solution you'd like
+- Alternative solutions or features you've considered
+- Any additional context or screenshots
 
 ### Pull Requests
 
@@ -46,6 +48,11 @@ Feature requests are welcome! When submitting a feature request:
 2. Create a new branch for your changes
 3. Make your changes following the development guidelines below
 4. Submit a pull request with a clear description of the changes and any related issues
+5. Follow the pull request template in `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md` which asks for:
+   - A description of the changes being made
+   - Association with existing issues if applicable
+   - Example OpenAPI specifications
+   - Example generated Refit interface
 
 ## Development Guidelines
 
