@@ -1199,6 +1199,10 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
 
 .NET 8.0
 
+## Contributing
+
+Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to contribute to the project.
+
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
