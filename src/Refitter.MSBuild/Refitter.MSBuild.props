@@ -4,6 +4,7 @@
         <TaskFolder>$(MSBuildThisFileDirectory)..\tasks</TaskFolder>
         <TaskAssembly>$(TaskFolder)\netstandard2.0\Refitter.MSBuild.dll</TaskAssembly>
         <RefitterVersion>$(Version)</RefitterVersion>
+        <RefitterTaskFolder>$(TaskFolder)</RefitterTaskFolder>
     </PropertyGroup>
 
     <UsingTask TaskName="Refitter.MSBuild.RefitterGenerateTask"

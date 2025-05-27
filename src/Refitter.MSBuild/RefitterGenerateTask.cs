@@ -48,7 +48,19 @@ public class RefitterGenerateTask : MSBuildTask
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
         var seperator = Path.DirectorySeparatorChar;
-        var refitterDll = $"{packageFolder}{seperator}..{seperator}refitter.dll";
+        
+        // Try to find the appropriate Refitter binary for the current .NET SDK version
+        var refitterDllPaths = new[]
+        {
+            $"{packageFolder}{seperator}..{seperator}net9.0{seperator}refitter.dll",
+            $"{packageFolder}{seperator}..{seperator}net8.0{seperator}refitter.dll",
+            $"{packageFolder}{seperator}..{seperator}refitter.dll"  // Fallback to the original path
+        };
+        
+        var refitterDll = refitterDllPaths.FirstOrDefault(File.Exists) 
+                         ?? refitterDllPaths.Last(); // Use last as fallback even if it doesn't exist
+        
+        TryLogCommandLine($"Using Refitter binary: {refitterDll}");
 
         var args = $"{refitterDll} --settings-file {file}";
         if (DisableLogging)
