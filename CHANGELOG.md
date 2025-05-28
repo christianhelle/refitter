@@ -4,8 +4,25 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.5...HEAD)
 
+**Implemented enhancements:**
+
+- Use fully qualified type name in Class template [\#686](https://github.com/christianhelle/refitter/pull/686) ([velvolue](https://github.com/velvolue))
+
+**Fixed bugs:**
+
+- Missing references when generating contracts only using polymorphic serialization [\#683](https://github.com/christianhelle/refitter/issues/683)
+- --- [\#681](https://github.com/christianhelle/refitter/issues/681)
+
+**Closed issues:**
+
+- Contribution Guidelines [\#678](https://github.com/christianhelle/refitter/issues/678)
+
 **Merged pull requests:**
 
+- docs: add velvolue as a contributor for bug [\#687](https://github.com/christianhelle/refitter/pull/687) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 8.1.2 [\#682](https://github.com/christianhelle/refitter/pull/682) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency microsoft.net.test.sdk to 17.14.0 [\#680](https://github.com/christianhelle/refitter/pull/680) ([renovate[bot]](https://github.com/apps/renovate))
+- Add Contribution Guidelines [\#679](https://github.com/christianhelle/refitter/pull/679) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - chore\(deps\): update dependency microsoft.build.utilities.core to 17.14.8 [\#676](https://github.com/christianhelle/refitter/pull/676) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.build.utilities.core to 17.14.7 [\#675](https://github.com/christianhelle/refitter/pull/675) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dotnet monorepo [\#674](https://github.com/christianhelle/refitter/pull/674) ([renovate[bot]](https://github.com/apps/renovate))
