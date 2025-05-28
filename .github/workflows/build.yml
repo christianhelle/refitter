@@ -20,7 +20,7 @@ on:
       - '*'
 
 env:
-  VERSION: 1.5.5.${{ github.run_number }}
+  VERSION: 1.5.6.${{ github.run_number }}
 
 jobs:
   build:
