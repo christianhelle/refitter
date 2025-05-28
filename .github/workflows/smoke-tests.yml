@@ -6,6 +6,7 @@ on:
     paths-ignore:
       - "**/*"
       - '!src/Refitter/**/*.cs'
+      - '!src/Refitter/**/*.liquid'
       - '!src/Refitter.Core/**/*.cs'
       - '!src/Refitter.SourceGenerator/**/*.cs'
       - '!src/Refitter/**/*.csproj'
