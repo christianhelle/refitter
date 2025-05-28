@@ -25,7 +25,7 @@
         <Content Include="$(AssemblyName).props" PackagePath="tasks" />
         <Content Include="$(AssemblyName).targets" PackagePath="tasks" />
         <Content Include="../Refitter/bin/$(Configuration)/net8.0/**/*" PackagePath="tasks/net8.0" />
-        <Content Include="../Refitter/bin/$(Configuration)/net9.0/**/*" PackagePath="tasks/net9.0" />
+        <Content Include="../Refitter/bin/$(Configuration)/net9.0/**/*" PackagePath="tasks/net9.0" Condition="Exists('../Refitter/bin/$(Configuration)/net9.0')" />
     </ItemGroup>
 
 </Project>
