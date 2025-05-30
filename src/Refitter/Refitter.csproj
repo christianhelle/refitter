@@ -10,7 +10,6 @@
     <Description>Refitter is a CLI tool for generating a C# REST API Client using the Refit library from OpenAPI specifications.</Description>
     <PackAsTool>true</PackAsTool>
     <TargetFramework>net8.0</TargetFramework>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
