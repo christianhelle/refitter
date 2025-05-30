@@ -4,19 +4,33 @@ using NSwag;
 
 namespace Refitter.Core;
 
+/// <summary>
+/// Cleans up OpenAPI schema by removing unreferenced schemas and handling inheritance hierarchies.
+/// </summary>
 public class SchemaCleaner
 {
     private readonly OpenApiDocument document;
     private readonly string[] keepSchemaPatterns;
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to include inheritance hierarchy in the schema cleaning process.
+    /// </summary>
     public bool IncludeInheritanceHierarchy { get; set; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SchemaCleaner"/> class.
+    /// </summary>
+    /// <param name="document">The OpenAPI document to clean.</param>
+    /// <param name="keepSchemaPatterns">Regular expression patterns for schemas to keep.</param>
     public SchemaCleaner(OpenApiDocument document, string[] keepSchemaPatterns)
     {
         this.document = document;
         this.keepSchemaPatterns = keepSchemaPatterns;
     }
 
+    /// <summary>
+    /// Removes unreferenced schemas from the OpenAPI document.
+    /// </summary>
     public void RemoveUnreferencedSchema()
     {
         var (usedJsonSchema, usage) = FindUsedJsonSchema(document);

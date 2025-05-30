@@ -9,6 +9,9 @@ namespace Refitter.Core;
 /// </summary>
 public class DependencyInjectionSettings
 {
+    /// <summary>
+    /// Default name for the extension method used for configuring Refit clients.
+    /// </summary>
     public const string DefaultExtensionMethodName = "ConfigureRefitClients";
 
     /// <summary>

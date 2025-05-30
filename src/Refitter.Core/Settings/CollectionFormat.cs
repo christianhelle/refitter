@@ -8,7 +8,7 @@ public enum CollectionFormat
     /// <summary>
     /// Multiple parameter instances rather than multiple values. 
     /// Only supported for the in: query and in: formData parameters. 
-    /// Example: ?param=value1&param=value2&param=value3
+    /// Example: ?param=value1&amp;param=value2&amp;param=value3
     /// </summary>
     Multi,
 
