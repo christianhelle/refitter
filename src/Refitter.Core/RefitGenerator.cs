@@ -163,6 +163,10 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .TrimEnd();
     }
 
+    /// <summary>
+    /// Generates multiple files containing Refit interfaces and contracts.
+    /// </summary>
+    /// <returns>A GeneratorOutput containing all generated code files.</returns>
     public GeneratorOutput GenerateMultipleFiles()
     {
         var factory = new CSharpClientGeneratorFactory(settings, document);

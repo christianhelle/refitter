@@ -10,6 +10,9 @@ namespace Refitter.Core;
 [ExcludeFromCodeCoverage]
 public class NamingSettings
 {
+    /// <summary>
+    /// Default interface name for generated API clients.
+    /// </summary>
     public const string DefaultInterfaceName = "ApiClient";
 
     /// <summary>

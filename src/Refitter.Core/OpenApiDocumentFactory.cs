@@ -90,7 +90,7 @@ public static class OpenApiDocumentFactory
     /// <summary>
     /// Gets the content of the URI as a string and decompresses it if necessary. 
     /// </summary>
-    /// <param name="settings">The settings used to configure the generator.</param>
+    /// <param name="openApiPath">The path to the OpenAPI document.</param>
     /// <returns>The content of the HTTP request.</returns>
     private static async Task<string> GetHttpContent(string openApiPath)
     {

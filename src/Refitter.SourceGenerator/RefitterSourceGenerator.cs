@@ -5,10 +5,17 @@ using Refitter.Core;
 
 namespace Refitter.SourceGenerator;
 
+/// <summary>
+/// Source generator for Refitter that generates Refit interfaces from .refitter configuration files.
+/// </summary>
 [ExcludeFromCodeCoverage]
 [Generator(LanguageNames.CSharp)]
 public class RefitterSourceGenerator : IIncrementalGenerator
 {
+    /// <summary>
+    /// Initializes the incremental generator with the necessary configurations.
+    /// </summary>
+    /// <param name="context">The initialization context for the incremental generator.</param>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var sourceFiles = context

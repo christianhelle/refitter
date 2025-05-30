@@ -11,7 +11,14 @@ namespace Refitter.Core;
 [ExcludeFromCodeCoverage]
 public class RefitGeneratorSettings
 {
+    /// <summary>
+    /// Default output folder for generated files.
+    /// </summary>
     public const string DefaultOutputFolder = "./Generated";
+    
+    /// <summary>
+    /// Default namespace for generated code.
+    /// </summary>
     public const string DefaultNamespace = "GeneratedCode";
 
     /// <summary>
@@ -167,7 +174,7 @@ public class RefitGeneratorSettings
     public MultipleInterfaces MultipleInterfaces { get; set; }
 
     /// <summary>
-    /// Set to <c>true<c/> to only include Paths that match the provided regular expression.
+    /// Set to <c>true</c> to only include Paths that match the provided regular expression.
     /// May be set multiple times
     /// </summary>
     [Description("Only include Paths that match the provided regular expression. May be set multiple times.")]
@@ -355,7 +362,11 @@ public class RefitGeneratorSettings
     )]
     public bool UsePolymorphicSerialization { get; set; }
 
-    [JsonIgnore] public IParameterNameGenerator? ParameterNameGenerator { get; set; }
+    /// <summary>
+    /// Gets or sets the parameter name generator for customizing parameter names.
+    /// </summary>
+    [JsonIgnore] 
+    public IParameterNameGenerator? ParameterNameGenerator { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate Security Schema Authentication headers.
