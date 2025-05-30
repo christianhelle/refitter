@@ -12,8 +12,13 @@
 
 - Missing references when generating contracts only using polymorphic serialization [\#683](https://github.com/christianhelle/refitter/issues/683)
 
+**Closed issues:**
+
+- Resolve build warnings [\#688](https://github.com/christianhelle/refitter/issues/688)
+
 **Merged pull requests:**
 
+- Resolve build warnings and add TreatWarningsAsErrors [\#689](https://github.com/christianhelle/refitter/pull/689) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - docs: add velvolue as a contributor for bug [\#687](https://github.com/christianhelle/refitter/pull/687) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 8.1.2 [\#682](https://github.com/christianhelle/refitter/pull/682) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.net.test.sdk to 17.14.0 [\#680](https://github.com/christianhelle/refitter/pull/680) ([renovate[bot]](https://github.com/apps/renovate))
