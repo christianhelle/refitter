@@ -31,7 +31,13 @@ jobs:
     steps:
     
     - name: 🛒 Checkout repository
-      uses: actions/checkout@v4    
+      uses: actions/checkout@v4   
+
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x 
     
     - name: 🧪 Test
       run: dotnet test src/Refitter.Tests/Refitter.Tests.csproj -c Release --collect "Code coverage" -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}"
