@@ -22,6 +22,11 @@ jobs:
         uses: dotnet/nbgv@master
         with:
           setAllVars: true
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
       - name: Build
         run: |
           dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}" -p:Version="${{ inputs.version }}"
