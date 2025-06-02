@@ -2,23 +2,12 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.6-preview.73...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.5...HEAD)
 
 **Implemented enhancements:**
 
 - Support for .NET 9 [\#684](https://github.com/christianhelle/refitter/issues/684)
 - Add .NET 9.0 to Target Frameworks [\#690](https://github.com/christianhelle/refitter/pull/690) ([christianhelle](https://github.com/christianhelle))
-
-**Merged pull requests:**
-
-- Resolve build warnings and add TreatWarningsAsErrors [\#689](https://github.com/christianhelle/refitter/pull/689) ([Copilot](https://github.com/apps/copilot-swe-agent))
-
-## [1.5.6-preview.73](https://github.com/christianhelle/refitter/tree/1.5.6-preview.73) (2025-05-31)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.5-preview.70...1.5.6-preview.73)
-
-**Implemented enhancements:**
-
 - Use fully qualified type name in Class template [\#686](https://github.com/christianhelle/refitter/pull/686) ([velvolue](https://github.com/velvolue))
 
 **Fixed bugs:**
@@ -28,9 +17,11 @@
 **Closed issues:**
 
 - Resolve build warnings [\#688](https://github.com/christianhelle/refitter/issues/688)
+- Contribution Guidelines [\#678](https://github.com/christianhelle/refitter/issues/678)
 
 **Merged pull requests:**
 
+- Resolve build warnings and add TreatWarningsAsErrors [\#689](https://github.com/christianhelle/refitter/pull/689) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - docs: add velvolue as a contributor for bug [\#687](https://github.com/christianhelle/refitter/pull/687) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 8.1.2 [\#682](https://github.com/christianhelle/refitter/pull/682) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.net.test.sdk to 17.14.0 [\#680](https://github.com/christianhelle/refitter/pull/680) ([renovate[bot]](https://github.com/apps/renovate))
@@ -40,14 +31,6 @@
 - chore\(deps\): update dotnet monorepo [\#674](https://github.com/christianhelle/refitter/pull/674) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add MrScottyTay as a contributor for bug [\#673](https://github.com/christianhelle/refitter/pull/673) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.5.5 [\#671](https://github.com/christianhelle/refitter/pull/671) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.5.5-preview.70](https://github.com/christianhelle/refitter/tree/1.5.5-preview.70) (2025-05-28)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.5...1.5.5-preview.70)
-
-**Closed issues:**
-
-- Contribution Guidelines [\#678](https://github.com/christianhelle/refitter/issues/678)
 
 ## [1.5.5](https://github.com/christianhelle/refitter/tree/1.5.5) (2025-05-04)
 
