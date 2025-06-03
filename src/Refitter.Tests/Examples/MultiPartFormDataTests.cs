@@ -118,6 +118,7 @@ public class MultiPartFormDataTests
     {
         string generateCode = await GenerateCode();
         generateCode.Should().Contain("[Multipart]");
+        generateCode.Should().NotContain("Content-Type: multipart/form-data");
     }
 
     [Fact]
