@@ -74,7 +74,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
-                GenerateHeaders(operations, operation, code);
+                GenerateHeaders(operations, operation, operationModel, code);
 
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
@@ -85,7 +85,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
                     GenerateObsoleteAttribute(operation, code);
                     GenerateForMultipartFormData(operationModel, code);
-                    GenerateHeaders(operations, operation, code);
+                    GenerateHeaders(operations, operation, operationModel, code);
 
                     parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
@@ -182,6 +182,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     protected void GenerateHeaders(
         KeyValuePair<string, OpenApiOperation> operations,
         OpenApiOperation operation,
+        CSharpOperationModel operationModel,
         StringBuilder code)
     {
         var headers = new List<string>();
@@ -211,7 +212,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 uniqueContentTypes.FirstOrDefault(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase)) ??
                 uniqueContentTypes.FirstOrDefault();
 
-            if (!string.IsNullOrWhiteSpace(contentType))
+            if (!string.IsNullOrWhiteSpace(contentType) && !operationModel.Consumes.Contains("multipart/form-data"))
             {
                 headers.Add($"\"Content-Type: {contentType}\"");
             }
