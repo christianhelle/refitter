@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - Support for .NET 9 [\#684](https://github.com/christianhelle/refitter/issues/684)
+- Do not add both \[Multipart\] and "Content-Type: multipart/form-data" [\#693](https://github.com/christianhelle/refitter/pull/693) ([jaroslaw-dutka](https://github.com/jaroslaw-dutka))
 - Add .NET 9.0 to Target Frameworks [\#690](https://github.com/christianhelle/refitter/pull/690) ([christianhelle](https://github.com/christianhelle))
 - Use fully qualified type name in Class template [\#686](https://github.com/christianhelle/refitter/pull/686) ([velvolue](https://github.com/velvolue))
 
