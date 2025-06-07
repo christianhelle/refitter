@@ -2,7 +2,20 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.5...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.6...HEAD)
+
+**Fixed bugs:**
+
+- Generates Content-Type: multipart/form-data Header which breaks Multipart uploads [\#654](https://github.com/christianhelle/refitter/issues/654)
+
+**Merged pull requests:**
+
+- Update dependency Microsoft.NET.Test.Sdk to 17.14.1 [\#692](https://github.com/christianhelle/refitter/pull/692) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Swashbuckle.AspNetCore to 8.1.4 [\#691](https://github.com/christianhelle/refitter/pull/691) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.5.6](https://github.com/christianhelle/refitter/tree/1.5.6) (2025-06-03)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.5...1.5.6)
 
 **Implemented enhancements:**
 
