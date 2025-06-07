@@ -76,7 +76,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             stopwatch.Stop();
             var successPanel = new Panel(
                 $"[bold green]✅ Generation completed successfully![/]\n\n" +
-                $"[dim]⏱️ Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.fff}[/]\n" +
+                $"[dim]⏱️ Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
                 $"[dim]🚀 Performance:[/] [green]{(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation[/]"
             )
             .BorderColor(Color.Green)
@@ -375,7 +375,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var table = new Table()
                 .RoundedBorder()
                 .BorderColor(Color.Orange3)
-                .AddColumn(new TableColumn("[bold white]⚠️  Warning[/]").LeftAligned())
+                .AddColumn(new TableColumn("[bold white]⚠️ Warning[/]").LeftAligned())
                 .AddColumn(new TableColumn("[bold white]📋 Description[/]").LeftAligned());
 
             table.Title = new TableTitle("[bold yellow]⚠️  Configuration Warnings[/]");
