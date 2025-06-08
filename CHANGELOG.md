@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.6...HEAD)
 
+**Implemented enhancements:**
+
+- Fancy CLI output using  Spectre Console [\#695](https://github.com/christianhelle/refitter/pull/695) ([christianhelle](https://github.com/christianhelle))
+
 **Fixed bugs:**
 
 - Generates Content-Type: multipart/form-data Header which breaks Multipart uploads [\#654](https://github.com/christianhelle/refitter/issues/654)
