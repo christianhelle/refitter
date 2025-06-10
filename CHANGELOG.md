@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- fix missing schema for dictionary keys [\#697](https://github.com/christianhelle/refitter/pull/697) ([kirides](https://github.com/kirides))
 - Fancy CLI output using  Spectre Console [\#695](https://github.com/christianhelle/refitter/pull/695) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
@@ -14,6 +15,7 @@
 
 **Merged pull requests:**
 
+- Update dependency Refitter.SourceGenerator to 1.5.6 [\#696](https://github.com/christianhelle/refitter/pull/696) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Microsoft.NET.Test.Sdk to 17.14.1 [\#692](https://github.com/christianhelle/refitter/pull/692) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Swashbuckle.AspNetCore to 8.1.4 [\#691](https://github.com/christianhelle/refitter/pull/691) ([renovate[bot]](https://github.com/apps/renovate))
 
