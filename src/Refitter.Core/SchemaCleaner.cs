@@ -194,6 +194,11 @@ public class SchemaCleaner
                 }
             }
 
+            if (schema.DictionaryKey != null)
+            {
+                yield return schema.DictionaryKey;
+            }
+
             if (schema.Item != null)
             {
                 yield return schema.Item;
