@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.6...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.0-preview.74...HEAD)
+
+**Fixed bugs:**
+
+- \[Bug\] Refitter generates invalid \[Range\] attribute for decimal properties starting from v1.5.2 [\#668](https://github.com/christianhelle/refitter/issues/668)
+
+**Merged pull requests:**
+
+- Update dotnet monorepo [\#699](https://github.com/christianhelle/refitter/pull/699) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.6.0-preview.74](https://github.com/christianhelle/refitter/tree/1.6.0-preview.74) (2025-06-10)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.6...1.6.0-preview.74)
 
 **Implemented enhancements:**
 
@@ -15,6 +27,7 @@
 
 **Merged pull requests:**
 
+- Update dependency Polly to 8.6.0 [\#698](https://github.com/christianhelle/refitter/pull/698) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refitter.SourceGenerator to 1.5.6 [\#696](https://github.com/christianhelle/refitter/pull/696) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Microsoft.NET.Test.Sdk to 17.14.1 [\#692](https://github.com/christianhelle/refitter/pull/692) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Swashbuckle.AspNetCore to 8.1.4 [\#691](https://github.com/christianhelle/refitter/pull/691) ([renovate[bot]](https://github.com/apps/renovate))
