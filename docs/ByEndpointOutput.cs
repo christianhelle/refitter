@@ -411,7 +411,7 @@ public partial interface IUpdateUserEndpoint
 {
     /// <summary>Update user</summary>
     /// <remarks>This can only be done by the logged in user.</remarks>
-    /// <param name="username">name that need to be deleted</param>
+    /// <param name="username">name that needs to be deleted</param>
     /// <param name="body">Update an existent user in the store</param>
     /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
     /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>

@@ -332,7 +332,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
 
         /// <summary>Update user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
-        /// <param name="username">name that need to be deleted</param>
+        /// <param name="username">name that needs to be deleted</param>
         /// <param name="body">Update an existent user in the store</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
@@ -754,7 +754,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
 
         /// <summary>Update user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
-        /// <param name="username">name that need to be deleted</param>
+        /// <param name="username">name that needs to be deleted</param>
         /// <param name="body">Update an existent user in the store</param>
         /// <returns>A <see cref="Task"/> representing the <see cref="IApiResponse"/> instance containing the result.</returns>
         [Put("/user/{username}")]
