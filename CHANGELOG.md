@@ -8,8 +8,13 @@
 
 - \[Bug\] Refitter generates invalid \[Range\] attribute for decimal properties starting from v1.5.2 [\#668](https://github.com/christianhelle/refitter/issues/668)
 
+**Closed issues:**
+
+- Improve documentation [\#700](https://github.com/christianhelle/refitter/issues/700)
+
 **Merged pull requests:**
 
+- Fix typos and grammar issues in documentation [\#701](https://github.com/christianhelle/refitter/pull/701) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Update dotnet monorepo [\#699](https://github.com/christianhelle/refitter/pull/699) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.6.0-preview.74](https://github.com/christianhelle/refitter/tree/1.6.0-preview.74) (2025-06-10)
