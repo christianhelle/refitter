@@ -354,7 +354,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
 
         /// <summary>Update user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
-        /// <param name="username">name that need to be deleted</param>
+        /// <param name="username">name that needs to be deleted</param>
         /// <param name="body">Update an existent user in the store</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
@@ -776,7 +776,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
 
         /// <summary>Update user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
-        /// <param name="username">name that need to be deleted</param>
+        /// <param name="username">name that needs to be deleted</param>
         /// <param name="body">Update an existent user in the store</param>
         /// <returns>A <see cref="Task"/> representing the <see cref="IApiResponse"/> instance containing the result.</returns>
         [Put("/user/{username}")]
@@ -1242,7 +1242,7 @@ public partial interface IUpdateUserEndpoint
 {
     /// <summary>Update user</summary>
     /// <remarks>This can only be done by the logged in user.</remarks>
-    /// <param name="username">name that need to be deleted</param>
+    /// <param name="username">name that needs to be deleted</param>
     /// <param name="body">Update an existent user in the store</param>
     /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
     /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
@@ -1280,7 +1280,7 @@ public partial interface IDeleteUserEndpoint
 }
 ```
 
-Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with dynamic querystring paremeters
+Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with dynamic querystring parameters
 
 **CLI Tool**
 
@@ -2060,7 +2060,7 @@ namespace Your.Namespace.Of.Choice.GeneratedCode
 
         /// <summary>Update user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
-        /// <param name="username">name that need to be deleted</param>
+        /// <param name="username">name that needs to be deleted</param>
         /// <param name="body">Update an existent user in the store</param>
         /// <param name="options">The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>

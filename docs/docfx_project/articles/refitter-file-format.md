@@ -144,9 +144,9 @@ The following is an example `.refitter` file
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
 - `outputFolder` - a string describing a relative path to a desired output folder. Default is `./Generated`
 - `outputFilename` - Output filename. Default is `Output.cs` when used from the CLI tool, otherwise its the .refitter filename. So `Petstore.refitter` becomes `Petstore.cs`.
-- `contractsOutputFolder` - a string describing a relative path to a desired output folder for the Contrats.cs file. By the default, this uses the value specified in `outputFolder`
+- `contractsOutputFolder` - a string describing a relative path to a desired output folder for the Contracts.cs file. By the default, this uses the value specified in `outputFolder`
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
-- `excludeNamespaces` - A collection of regular expressions to exclude namespaces from the generated file. A use case for this is when your project has global usings where these namepsaces would be redundant. Default is empty
+- `excludeNamespaces` - A collection of regular expressions to exclude namespaces from the generated file. A use case for this is when your project has global usings where these namespaces would be redundant. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`

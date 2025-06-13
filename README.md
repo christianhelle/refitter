@@ -630,7 +630,7 @@ public partial interface IUpdatePetEndpoint
 }
 ```
 
-Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with dynamic querystring paremeters
+Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) configured to generate an interface with dynamic querystring parameters
 
 **CLI Tool**
 
@@ -944,7 +944,7 @@ In both cases, it will format the generated Refit interfaces to be Apizr ready b
 - Providing cancellation tokens by Apizr request options instead of a dedicated parameter (if `withRequestOptions` is set to `true`)
 - Using method overloads instead of optional parameters (note that setting `useDynamicQuerystringParameters` to `true` improve overloading experience)
 
-From here, you're definitly free to use the formatted interface with Apizr by registering, configuring and using it following the [Apizr documentation](https://www.apizr.net). But Refitter can go further by generating some helpers to make the configuration easier.
+From here, you're definitely free to use the formatted interface with Apizr by registering, configuring and using it following the [Apizr documentation](https://www.apizr.net). But Refitter can go further by generating some helpers to make the configuration easier.
 
 ### Generating the helpers
 
