@@ -2,24 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.0-preview.74...HEAD)
-
-**Fixed bugs:**
-
-- \[Bug\] Refitter generates invalid \[Range\] attribute for decimal properties starting from v1.5.2 [\#668](https://github.com/christianhelle/refitter/issues/668)
-
-**Closed issues:**
-
-- Improve documentation [\#700](https://github.com/christianhelle/refitter/issues/700)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.0...HEAD)
 
 **Merged pull requests:**
 
-- Fix typos and grammar issues in documentation [\#701](https://github.com/christianhelle/refitter/pull/701) ([Copilot](https://github.com/apps/copilot-swe-agent))
-- Update dotnet monorepo [\#699](https://github.com/christianhelle/refitter/pull/699) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Refitter.SourceGenerator to 1.6.0 [\#704](https://github.com/christianhelle/refitter/pull/704) ([renovate[bot]](https://github.com/apps/renovate))
 
-## [1.6.0-preview.74](https://github.com/christianhelle/refitter/tree/1.6.0-preview.74) (2025-06-10)
+## [1.6.0](https://github.com/christianhelle/refitter/tree/1.6.0) (2025-06-16)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.6...1.6.0-preview.74)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.5.6...1.6.0)
 
 **Implemented enhancements:**
 
@@ -28,10 +19,19 @@
 
 **Fixed bugs:**
 
+- \[Bug\] Refitter generates invalid \[Range\] attribute for decimal properties starting from v1.5.2 [\#668](https://github.com/christianhelle/refitter/issues/668)
 - Generates Content-Type: multipart/form-data Header which breaks Multipart uploads [\#654](https://github.com/christianhelle/refitter/issues/654)
+
+**Closed issues:**
+
+- Improve documentation [\#700](https://github.com/christianhelle/refitter/issues/700)
 
 **Merged pull requests:**
 
+- Update dependency Polly to 8.6.1 [\#703](https://github.com/christianhelle/refitter/pull/703) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Swashbuckle.AspNetCore to v9 [\#702](https://github.com/christianhelle/refitter/pull/702) ([renovate[bot]](https://github.com/apps/renovate))
+- Fix typos and grammar issues in documentation [\#701](https://github.com/christianhelle/refitter/pull/701) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Update dotnet monorepo [\#699](https://github.com/christianhelle/refitter/pull/699) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Polly to 8.6.0 [\#698](https://github.com/christianhelle/refitter/pull/698) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refitter.SourceGenerator to 1.5.6 [\#696](https://github.com/christianhelle/refitter/pull/696) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Microsoft.NET.Test.Sdk to 17.14.1 [\#692](https://github.com/christianhelle/refitter/pull/692) ([renovate[bot]](https://github.com/apps/renovate))
