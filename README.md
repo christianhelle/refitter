@@ -140,6 +140,12 @@ refitter [path to OpenAPI spec file] --namespace "[Your.Namespace.Of.Choice.Gene
 
 This will generate a file called `Output.cs` which contains the Refit interface and contract classes generated using [NSwag](https://github.com/RicoSuter/NSwag)
 
+### CLI Tool Output Example
+
+Here's what the console output looks like when running the Refitter CLI tool:
+
+![Console Output](images/console-output.png)
+
 ## Source Generator
 
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
