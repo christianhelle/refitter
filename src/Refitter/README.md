@@ -109,9 +109,14 @@ OPTIONS:
                                                                  Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
                                                                  To have the native support of inheritance (de)serialization and fallback to base types when
                                                                  payloads with (yet) unknown types are offered by newer versions of an API
-                                                                 See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
-        --disposable                                             Generate refit clients that implement IDisposable
+                                                                 See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information        --disposable                                             Generate refit clients that implement IDisposable
 ```
+
+## CLI Tool Output Example
+
+Here's what the console output looks like when running the Refitter CLI tool:
+
+![Console Output](https://raw.githubusercontent.com/christianhelle/refitter/refs/heads/main/images/console-output.png)
 
 ### .Refitter File format
 

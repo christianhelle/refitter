@@ -8,6 +8,10 @@ Here's an example generated output from the [Swagger Petstore example](https://p
 $ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode"
 ```
 
+**Console Output**
+
+![Console Output](https://raw.githubusercontent.com/christianhelle/refitter/refs/heads/main/images/console-output.png)
+
 **Source Generator ***.refitter*** file**
 
 ```json
