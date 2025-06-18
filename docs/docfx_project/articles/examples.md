@@ -10,7 +10,7 @@ $ refitter ./openapi.json --namespace "Your.Namespace.Of.Choice.GeneratedCode"
 
 **Console Output**
 
-![Console Output](../../../images/console-output.png)
+![Console Output](https://raw.githubusercontent.com/christianhelle/refitter/refs/heads/main/images/console-output.png)
 
 **Source Generator ***.refitter*** file**
 

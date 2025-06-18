@@ -119,7 +119,7 @@ OPTIONS:
 
 Here's what the console output looks like when running the Refitter CLI tool:
 
-![Console Output](../../../images/console-output.png)
+![Console Output](https://raw.githubusercontent.com/christianhelle/refitter/refs/heads/main/images/console-output.png)
 
 ## Basic Usage
 
