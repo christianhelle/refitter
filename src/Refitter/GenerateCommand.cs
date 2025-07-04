@@ -193,7 +193,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ContractsNamespace = settings.ContractsNamespace,
             UsePolymorphicSerialization = settings.UsePolymorphicSerialization,
             GenerateDisposableClients = settings.GenerateDisposableClients,
-            CollectionFormat = settings.CollectionFormat
+                        CollectionFormat = settings.CollectionFormat,
+            GenerateXmlDocCodeComments = !settings.NoXmlDocCodeComments
         };
     }
     private static async Task WriteSingleFile(
