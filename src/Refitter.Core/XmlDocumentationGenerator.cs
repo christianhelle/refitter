@@ -30,15 +30,36 @@ public class XmlDocumentationGenerator
 
     /// <summary>
     /// Appends XML docs for the given interface definition to the given code builder.
+    /// This uses the OpenAPI operation info to generate the summary and remarks.
     /// </summary>
     /// <param name="group">The OpenAPI definition of the interface.</param>
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendInterfaceDocumentation(OpenApiOperation group, StringBuilder code)
     {
         if (!_settings.GenerateXmlDocCodeComments || string.IsNullOrWhiteSpace(group.Summary))
+        {
+            this.AppendXmlCommentBlock("summary", "Refit interface - no description available", code, indent: Separator);
             return;
+        }
 
         this.AppendXmlCommentBlock("summary", group.Summary, code, indent: Separator);
+    }
+
+    /// <summary>
+    /// Appends XML docs for the given interface definition to the given code builder.
+    /// This uses the OpenAPI document's info description as the summary.
+    /// </summary>
+    /// <param name="document">The OpenAPI definition of the interface.</param>
+    /// <param name="code">The builder to append the documentation to.</param>
+    public void AppendInterfaceDocumentation(OpenApiDocument document, StringBuilder code)
+    {
+        if (!_settings.GenerateXmlDocCodeComments || string.IsNullOrWhiteSpace(document.Info?.Description))
+        {
+            this.AppendXmlCommentBlock("summary", "Refit interface - no description available", code, indent: Separator);
+            return;
+        }
+
+        this.AppendXmlCommentBlock("summary", document.Info!.Description, code, indent: Separator);
     }
 
     /// <summary>
