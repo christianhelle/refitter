@@ -71,7 +71,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
+                                if (settings.GenerateXmlDocCodeComments)
+                {
+                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
+                }
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateHeaders(operations, operation, operationModel, code);
@@ -80,9 +83,12 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                     .AppendLine();
 
-                if (parametersString.Contains("?") && settings is {OptionalParameters: true, ApizrSettings: not null})
+                                if (parametersString.Contains("?") && settings is {OptionalParameters: true, ApizrSettings: not null})
                 {
-                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
+                    if (settings.GenerateXmlDocCodeComments)
+                    {
+                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
+                    }
                     GenerateObsoleteAttribute(operation, code);
                     GenerateForMultipartFormData(operationModel, code);
                     GenerateHeaders(operations, operation, operationModel, code);
