@@ -6,6 +6,9 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency xunit.runner.visualstudio to 3.1.1 [\#708](https://github.com/christianhelle/refitter/pull/708) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add sb-chericks as a contributor for ideas, and bug [\#707](https://github.com/christianhelle/refitter/pull/707) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Add console output screenshots to documentation [\#705](https://github.com/christianhelle/refitter/pull/705) ([christianhelle](https://github.com/christianhelle))
 - Update dependency Refitter.SourceGenerator to 1.6.0 [\#704](https://github.com/christianhelle/refitter/pull/704) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.6.0](https://github.com/christianhelle/refitter/tree/1.6.0) (2025-06-16)
