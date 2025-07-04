@@ -296,10 +296,13 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             : null;
 
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
-        return $"""
+        var code = new StringBuilder();
+        docGenerator.AppendInterfaceDocumentation(document, code);
+        code.Append($"""
                 {Separator}{GetGeneratedCodeAttribute()}
                 {Separator}{modifier} partial interface {interfaceName}{inheritance}
-                """;
+                """);
+        return code.ToString();
     }
 
     protected string GetGeneratedCodeAttribute() =>
