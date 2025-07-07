@@ -71,10 +71,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
 
-                                if (settings.GenerateXmlDocCodeComments)
+                if (settings.GenerateXmlDocCodeComments)
                 {
                     this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
                 }
+
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateHeaders(operations, operation, operationModel, code);
@@ -83,7 +84,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                     .AppendLine();
 
-                                if (parametersString.Contains("?") && settings is {OptionalParameters: true, ApizrSettings: not null})
+                if (parametersString.Contains("?") && settings is {OptionalParameters: true, ApizrSettings: not null})
                 {
                     if (settings.GenerateXmlDocCodeComments)
                     {
