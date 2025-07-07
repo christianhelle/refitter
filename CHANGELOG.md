@@ -4,6 +4,11 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.0...HEAD)
 
+**Implemented enhancements:**
+
+- Generated Refit Code Pragmas Start Above Interface [\#706](https://github.com/christianhelle/refitter/issues/706)
+- Ensure that Refit interfaces have a \<summary\> [\#709](https://github.com/christianhelle/refitter/pull/709) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - chore\(deps\): update dependency xunit.runner.visualstudio to 3.1.1 [\#708](https://github.com/christianhelle/refitter/pull/708) ([renovate[bot]](https://github.com/apps/renovate))
