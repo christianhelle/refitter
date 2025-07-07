@@ -36,13 +36,12 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendInterfaceDocumentation(OpenApiOperation group, StringBuilder code)
     {
-        if (!_settings.GenerateXmlDocCodeComments || string.IsNullOrWhiteSpace(group.Summary))
+        if (!_settings.GenerateXmlDocCodeComments)
         {
-            this.AppendXmlCommentBlock("summary", "Refit interface - no description available", code, indent: Separator);
             return;
         }
 
-        this.AppendXmlCommentBlock("summary", group.Summary, code, indent: Separator);
+        this.AppendXmlCommentBlock("summary", group?.Summary ?? "No summary available", code, indent: Separator);
     }
 
     /// <summary>
@@ -53,13 +52,16 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendInterfaceDocumentation(OpenApiDocument document, StringBuilder code)
     {
-        if (!_settings.GenerateXmlDocCodeComments || string.IsNullOrWhiteSpace(document.Info?.Title))
+        if (!_settings.GenerateXmlDocCodeComments)
         {
-            this.AppendXmlCommentBlock("summary", "Refit interface - no description available", code, indent: Separator);
             return;
         }
 
-        this.AppendXmlCommentBlock("summary", document.Info!.Title, code, indent: Separator);
+        this.AppendXmlCommentBlock(
+            "summary",
+            document.Info?.Title ?? "Refit interface - no description available",
+            code,
+            indent: Separator);
     }
 
     /// <summary>
@@ -70,7 +72,12 @@ public class XmlDocumentationGenerator
     /// <param name="hasDynamicQuerystringParameter">Indicates whether the method gets a dynamic querystring parameter</param>
     /// <param name="hasApizrRequestOptionsParameter">Indicates whether the method gets an IApizrRequestOptions options final parameter</param>
     /// <param name="code">The builder to append the documentation to.</param>
-    public void AppendMethodDocumentation(CSharpOperationModel method, bool hasApiResponse, bool hasDynamicQuerystringParameter, bool hasApizrRequestOptionsParameter, StringBuilder code)
+    public void AppendMethodDocumentation(
+        CSharpOperationModel method,
+        bool hasApiResponse,
+        bool hasDynamicQuerystringParameter,
+        bool hasApizrRequestOptionsParameter,
+        StringBuilder code)
     {
         if (!_settings.GenerateXmlDocCodeComments)
             return;
@@ -86,8 +93,14 @@ public class XmlDocumentationGenerator
             if (parameter == null || string.IsNullOrWhiteSpace(parameter.Description))
                 continue;
 
-            this.AppendXmlCommentBlock("param", parameter.Description, code, new Dictionary<string, string>
-                { ["name"] = parameter.VariableName });
+            this.AppendXmlCommentBlock(
+                "param",
+                parameter.Description,
+                code,
+                new Dictionary<string, string>
+                {
+                    ["name"] = parameter.VariableName
+                });
         }
 
         if (hasDynamicQuerystringParameter)
@@ -96,7 +109,10 @@ public class XmlDocumentationGenerator
                 "param",
                 "The dynamic querystring parameter wrapping all others.",
                 code,
-                new Dictionary<string, string> { ["name"] = "queryParams" });
+                new Dictionary<string, string>
+                {
+                    ["name"] = "queryParams"
+                });
         }
 
         if (hasApizrRequestOptionsParameter)
@@ -105,7 +121,10 @@ public class XmlDocumentationGenerator
                 "param",
                 "The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.",
                 code,
-                new Dictionary<string, string> { ["name"] = "options" });
+                new Dictionary<string, string>
+                {
+                    ["name"] = "options"
+                });
         }
 
         if (hasApiResponse)
@@ -135,7 +154,10 @@ public class XmlDocumentationGenerator
                 "exception",
                 this.BuildErrorDescription(method.Responses),
                 code,
-                new Dictionary<string, string> { ["cref"] = "ApiException" });
+                new Dictionary<string, string>
+                {
+                    ["cref"] = "ApiException"
+                });
         }
     }
 
@@ -163,12 +185,22 @@ public class XmlDocumentationGenerator
 
         code.Append(">");
 
-        var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        var lines = content.Split(
+            new[]
+            {
+                "\r\n", "\r", "\n"
+            },
+            StringSplitOptions.None);
         if (lines.Length > 1)
         {
             // When working with multiple lines, place the content on a separate line with normalized linebreaks.
             code.AppendLine();
-            foreach (var line in content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
+            foreach (var line in content.Split(
+                new[]
+                {
+                    "\r\n", "\r", "\n"
+                },
+                StringSplitOptions.None))
                 code.AppendLine($"{indent}/// {line.Trim()}");
 
             code.AppendLine($"{indent}/// </{tagName}>");
