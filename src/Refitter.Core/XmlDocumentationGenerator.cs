@@ -53,13 +53,13 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendInterfaceDocumentation(OpenApiDocument document, StringBuilder code)
     {
-        if (!_settings.GenerateXmlDocCodeComments || string.IsNullOrWhiteSpace(document.Info?.Description))
+        if (!_settings.GenerateXmlDocCodeComments || string.IsNullOrWhiteSpace(document.Info?.Title))
         {
             this.AppendXmlCommentBlock("summary", "Refit interface - no description available", code, indent: Separator);
             return;
         }
 
-        this.AppendXmlCommentBlock("summary", document.Info!.Description, code, indent: Separator);
+        this.AppendXmlCommentBlock("summary", document.Info!.Title, code, indent: Separator);
     }
 
     /// <summary>
