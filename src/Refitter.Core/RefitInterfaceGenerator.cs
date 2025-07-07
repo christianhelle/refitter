@@ -71,7 +71,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
+                if (settings.GenerateXmlDocCodeComments)
+                {
+                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
+                }
+
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateHeaders(operations, operation, operationModel, code);
@@ -82,7 +86,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
                 if (parametersString.Contains("?") && settings is {OptionalParameters: true, ApizrSettings: not null})
                 {
-                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
+                    if (settings.GenerateXmlDocCodeComments)
+                    {
+                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
+                    }
                     GenerateObsoleteAttribute(operation, code);
                     GenerateForMultipartFormData(operationModel, code);
                     GenerateHeaders(operations, operation, operationModel, code);
@@ -290,10 +297,13 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             : null;
 
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
-        return $"""
+        var code = new StringBuilder();
+        docGenerator.AppendInterfaceDocumentation(document, code);
+        code.Append($"""
                 {Separator}{GetGeneratedCodeAttribute()}
                 {Separator}{modifier} partial interface {interfaceName}{inheritance}
-                """;
+                """);
+        return code.ToString();
     }
 
     protected string GetGeneratedCodeAttribute() =>

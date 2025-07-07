@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
 {
+    /// <summary>Swagger Petstore - OpenAPI 3.0</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface ISwaggerPetstoreInterfaceWithHttpResilience
     {

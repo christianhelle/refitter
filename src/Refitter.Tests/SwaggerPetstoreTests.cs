@@ -823,4 +823,16 @@ public class SwaggerPetstoreTests
             .Should()
             .BeTrue();
     }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Interface_With_Summary(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings { GenerateXmlDocCodeComments = true };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("<summary>Swagger Petstore");
+    }
 }

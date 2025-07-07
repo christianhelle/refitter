@@ -14,6 +14,7 @@ using Refitter.Tests.AdditionalFiles.SingeInterface;
 
 namespace Refitter.Tests.CustomGenerated
 {
+    /// <summary>Swagger Petstore - OpenAPI 3.0</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IApiInCustomGeneratedFolder
     {
