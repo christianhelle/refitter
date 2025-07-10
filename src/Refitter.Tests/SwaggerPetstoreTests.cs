@@ -835,4 +835,17 @@ public class SwaggerPetstoreTests
         var generateCode = await GenerateCode(version, filename, settings);
         generateCode.Should().Contain("<summary>Swagger Petstore");
     }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Interfaces_Filtered_By_Path_Match(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings { IncludePathMatches = ["^/pet.*"] };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("\"/pet\"");
+        generateCode.Should().Contain("\"/pet/{petId}\"");
+    }
 }
