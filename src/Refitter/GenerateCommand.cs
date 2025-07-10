@@ -75,6 +75,27 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
 
+            if (refitGeneratorSettings.IncludePathMatches.Length > 0 &&
+                generator.OpenApiDocument.Paths.Count == 0)
+            {
+                Console.WriteLine("⚠️ WARNING: All API paths were filtered out by --match-path patterns. ⚠️");
+                Console.WriteLine($"   Match Patterns used: {string.Join(", ", refitGeneratorSettings.IncludePathMatches)}");
+                Console.WriteLine();
+                Console.WriteLine("   This could indicate that:");
+                Console.WriteLine("     1. The regex patterns don't match any available paths");
+                Console.WriteLine("     2. There's a syntax error in the regex patterns");
+                Console.WriteLine("     3. The patterns were corrupted by command line interpretation");
+                Console.WriteLine();
+                Console.WriteLine("   This commonly happens when using the Windows Command Prompt (CMD) instead of PowerShell.");
+                Console.WriteLine("   The ^ character in regex patterns is interpreted as an escape character in CMD.");
+                Console.WriteLine();
+                Console.WriteLine("   Solutions:");
+                Console.WriteLine("     1. Use PowerShell instead of CMD");
+                Console.WriteLine("     2. In CMD, escape the ^ character or use different quoting");
+                Console.WriteLine("     3. Use a .refitter settings file instead of command line arguments");
+                Console.WriteLine();
+            }
+
             // Success summary with performance metrics
             stopwatch.Stop();
             var successPanel = new Panel(
@@ -210,7 +231,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             .SpinnerStyle(Style.Parse("green bold"))
             .StartAsync("[yellow]🔧 Generating code...[/]", async _ =>
             {
-                await Task.Delay(100); // Brief delay to show spinner
+                await Task.Delay(1000); // Brief delay to show spinner
             });
 
         var code = generator.Generate().ReplaceLineEndings();
