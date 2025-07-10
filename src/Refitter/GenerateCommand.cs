@@ -71,7 +71,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             await (refitGeneratorSettings.GenerateMultipleFiles
                 ? WriteMultipleFiles(generator, settings, refitGeneratorSettings)
-                : WriteSingleFile(generator, settings, refitGeneratorSettings)); Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
+                : WriteSingleFile(generator, settings, refitGeneratorSettings));
+
+            Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
 
             // Success summary with performance metrics
             stopwatch.Stop();
