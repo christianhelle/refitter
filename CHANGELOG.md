@@ -2,7 +2,18 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.1...HEAD)
+
+**Merged pull requests:**
+
+- docs: add SWarnberg as a contributor for bug [\#714](https://github.com/christianhelle/refitter/pull/714) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dotnet monorepo [\#712](https://github.com/christianhelle/refitter/pull/712) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.6.1 [\#711](https://github.com/christianhelle/refitter/pull/711) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 9.0.3 [\#710](https://github.com/christianhelle/refitter/pull/710) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.6.1](https://github.com/christianhelle/refitter/tree/1.6.1) (2025-07-08)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.0...1.6.1)
 
 **Implemented enhancements:**
 
