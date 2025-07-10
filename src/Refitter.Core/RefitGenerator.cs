@@ -10,6 +10,11 @@ namespace Refitter.Core;
 public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
 {
     /// <summary>
+    /// OpenAPI specifications used to generate Refit clients and interfaces.
+    /// </summary>
+    public OpenApiDocument OpenApiDocument => document;
+
+    /// <summary>
     /// Creates a new instance of the <see cref="RefitGenerator"/> class asynchronously.
     /// </summary>
     /// <param name="settings">The settings used to configure the generator.</param>
