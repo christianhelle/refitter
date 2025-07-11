@@ -231,7 +231,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             .SpinnerStyle(Style.Parse("green bold"))
             .StartAsync("[yellow]🔧 Generating code...[/]", async _ =>
             {
-                await Task.Delay(1000); // Brief delay to show spinner
+                await Task.Delay(100); // Brief delay to show spinner
             });
 
         var code = generator.Generate().ReplaceLineEndings();
