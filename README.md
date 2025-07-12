@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-75-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-76-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1312,6 +1312,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MrScottyTay"><img src="https://avatars.githubusercontent.com/u/24463321?v=4?s=100" width="100px;" alt="Scott Taylor"/><br /><sub><b>Scott Taylor</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AMrScottyTay" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sb-chericks"><img src="https://avatars.githubusercontent.com/u/160796564?v=4?s=100" width="100px;" alt="sb-chericks"/><br /><sub><b>sb-chericks</b></sub></a><br /><a href="#ideas-sb-chericks" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/issues?q=author%3Asb-chericks" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/SWarnberg"><img src="https://avatars.githubusercontent.com/u/26246346?v=4?s=100" width="100px;" alt="Staffan Wärnberg"/><br /><sub><b>Staffan Wärnberg</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3ASWarnberg" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lilinus"><img src="https://avatars.githubusercontent.com/u/78953007?v=4?s=100" width="100px;" alt="Linus Hamlin"/><br /><sub><b>Linus Hamlin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Alilinus" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
