@@ -4,8 +4,18 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.1...HEAD)
 
+**Implemented enhancements:**
+
+- Fix missing namespace import [\#718](https://github.com/christianhelle/refitter/pull/718) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Missing usings for separate contract/interface namespaces in same file [\#715](https://github.com/christianhelle/refitter/issues/715)
+
 **Merged pull requests:**
 
+- docs: add lilinus as a contributor for bug [\#717](https://github.com/christianhelle/refitter/pull/717) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency polly to 8.6.2 [\#716](https://github.com/christianhelle/refitter/pull/716) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add SWarnberg as a contributor for bug [\#714](https://github.com/christianhelle/refitter/pull/714) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dotnet monorepo [\#712](https://github.com/christianhelle/refitter/pull/712) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.6.1 [\#711](https://github.com/christianhelle/refitter/pull/711) ([renovate[bot]](https://github.com/apps/renovate))
