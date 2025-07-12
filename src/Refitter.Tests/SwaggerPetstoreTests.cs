@@ -848,4 +848,22 @@ public class SwaggerPetstoreTests
         generateCode.Should().Contain("\"/pet\"");
         generateCode.Should().Contain("\"/pet/{petId}\"");
     }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+#if !DEBUG
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+#endif
+    public async Task Can_Import_Contracts_Namespace(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings { ContractsNamespace = "Contracts" };
+        var generateCode = await GenerateCode(version, filename, settings);
+        generateCode.Should().Contain("using Contracts;");
+        BuildHelper
+            .BuildCSharp(generateCode)
+            .Should()
+            .BeTrue();
+    }
 }
