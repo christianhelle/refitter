@@ -100,7 +100,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             stopwatch.Stop();
             var successPanel = new Panel(
                 $"[bold green]✅ Generation completed successfully![/]\n\n" +
-                $"[dim]⏱️  Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
+                $"[dim]📊 Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
                 $"[dim]🚀 Performance:[/] [green]{(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation[/]"
             )
             .BorderColor(Color.Green)
