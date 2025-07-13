@@ -6,11 +6,13 @@
 
 **Implemented enhancements:**
 
+- Fix match path on cmd prompt [\#719](https://github.com/christianhelle/refitter/pull/719) ([christianhelle](https://github.com/christianhelle))
 - Fix missing namespace import [\#718](https://github.com/christianhelle/refitter/pull/718) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
 - Missing usings for separate contract/interface namespaces in same file [\#715](https://github.com/christianhelle/refitter/issues/715)
+- match-path doesn't work from cmd prompt [\#713](https://github.com/christianhelle/refitter/issues/713)
 
 **Merged pull requests:**
 
