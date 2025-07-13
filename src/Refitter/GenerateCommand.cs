@@ -100,7 +100,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             stopwatch.Stop();
             var successPanel = new Panel(
                 $"[bold green]✅ Generation completed successfully![/]\n\n" +
-                $"[dim]⏱️  Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
+                $"[dim]📊 Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
                 $"[dim]🚀 Performance:[/] [green]{(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation[/]"
             )
             .BorderColor(Color.Green)
@@ -216,7 +216,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ContractsNamespace = settings.ContractsNamespace,
             UsePolymorphicSerialization = settings.UsePolymorphicSerialization,
             GenerateDisposableClients = settings.GenerateDisposableClients,
-                        CollectionFormat = settings.CollectionFormat,
+            CollectionFormat = settings.CollectionFormat,
             GenerateXmlDocCodeComments = !settings.NoXmlDocCodeComments
         };
     }
@@ -378,13 +378,12 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     }
     private static void ShowWarnings(RefitGeneratorSettings refitGeneratorSettings)
     {
-        var warnings = new List<(string icon, string title, string description)>();
+        var warnings = new List<(string title, string description)>();
 
         if (refitGeneratorSettings.UseIsoDateFormat &&
             refitGeneratorSettings.CodeGeneratorSettings?.DateFormat is not null)
         {
             warnings.Add((
-                "⚠️",
                 "Date Format Override",
                 "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true"
             ));
@@ -395,7 +394,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 #pragma warning restore CS0618 // Type or member is obsolete
         {
             warnings.Add((
-                "⚠️ ",
                 "Deprecated Setting",
                 "The 'usePolly' property is deprecated. Use 'transientErrorHandler: Polly' instead"
             ));
@@ -406,15 +404,15 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var table = new Table()
                 .RoundedBorder()
                 .BorderColor(Color.Orange3)
-                .AddColumn(new TableColumn("[bold white]⚠️  Warning[/]").LeftAligned())
-                .AddColumn(new TableColumn("[bold white]📋 Description[/]").LeftAligned());
+                .AddColumn(new TableColumn("[bold white]Warning[/]").LeftAligned())
+                .AddColumn(new TableColumn("[bold white]Description[/]").LeftAligned());
 
-            table.Title = new TableTitle("[bold yellow]⚠️  Configuration Warnings[/]");
+            table.Title = new TableTitle("[bold yellow]⚠️ Configuration Warnings[/]");
 
-            foreach (var (icon, title, description) in warnings)
+            foreach (var (title, description) in warnings)
             {
                 table.AddRow(
-                    $"{icon} [bold orange3]{title}[/]",
+                    $"[bold orange3]{title}[/]",
                     $"[orange3]{description}[/]"
                 );
             }
