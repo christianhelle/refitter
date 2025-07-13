@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Fix table alignments in CLI Output [\#720](https://github.com/christianhelle/refitter/pull/720) ([christianhelle](https://github.com/christianhelle))
 - Fix match path on cmd prompt [\#719](https://github.com/christianhelle/refitter/pull/719) ([christianhelle](https://github.com/christianhelle))
 - Fix missing namespace import [\#718](https://github.com/christianhelle/refitter/pull/718) ([christianhelle](https://github.com/christianhelle))
 
