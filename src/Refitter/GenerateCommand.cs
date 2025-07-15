@@ -47,11 +47,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             // Header with branding
             AnsiConsole.WriteLine();
             AnsiConsole.MarkupLine($"[bold cyan]{asciiArt}[/]");
-            AnsiConsole.WriteLine();
-            AnsiConsole.MarkupLine($"[bold cyan]╔══════════════════════════════════════════════════════════════════════════════╗[/]");
-            AnsiConsole.MarkupLine($"[bold cyan]║[/] [bold white]🚀 Refitter v{version,-63}[/] [bold cyan]║[/]");
-            AnsiConsole.MarkupLine($"[bold cyan]║[/] [dim]   OpenAPI to Refit Interface Generator[/]{new string(' ', 37)} [bold cyan]║[/]");
-            AnsiConsole.MarkupLine($"[bold cyan]╚══════════════════════════════════════════════════════════════════════════════╝[/]");
+            AnsiConsole.MarkupLine($"[bold cyan]╔═══════════════════════════════════════════════════════════════╗[/]");
+            AnsiConsole.MarkupLine($"[bold cyan]║[/] [bold white]🚀 Refitter v{version,-48}[/] [bold cyan]║[/]");
+            AnsiConsole.MarkupLine($"[bold cyan]║[/] [dim]   OpenAPI to Refit Interface Generator[/]{new string(' ', 22)} [bold cyan]║[/]");
+            AnsiConsole.MarkupLine($"[bold cyan]╚═══════════════════════════════════════════════════════════════╝[/]");
             AnsiConsole.WriteLine();
 
             // Support information
