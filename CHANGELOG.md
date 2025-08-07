@@ -18,6 +18,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dotnet monorepo to 9.0.8 [\#723](https://github.com/christianhelle/refitter/pull/723) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency xunit.runner.visualstudio to 3.1.3 [\#721](https://github.com/christianhelle/refitter/pull/721) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add lilinus as a contributor for bug [\#717](https://github.com/christianhelle/refitter/pull/717) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency polly to 8.6.2 [\#716](https://github.com/christianhelle/refitter/pull/716) ([renovate[bot]](https://github.com/apps/renovate))
