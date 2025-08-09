@@ -51,7 +51,7 @@ paths:
         string generateCode = await GenerateCode();
         generateCode.Should().NotBeNullOrWhiteSpace();
     }
-    
+
     [Fact]
     public async Task Generates_Nullable_Directive()
     {

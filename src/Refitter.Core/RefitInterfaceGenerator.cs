@@ -84,7 +84,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                     .AppendLine();
 
-                if (parametersString.Contains("?") && settings is {OptionalParameters: true, ApizrSettings: not null})
+                if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
                 {
                     if (settings.GenerateXmlDocCodeComments)
                     {
