@@ -1,4 +1,4 @@
-﻿#if !DEBUG
+#if !DEBUG
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;

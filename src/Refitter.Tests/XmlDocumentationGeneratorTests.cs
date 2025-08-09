@@ -67,7 +67,8 @@ namespace Refitter.Tests
         public void Can_Generate_Method_Param()
         {
             var docs = new StringBuilder();
-            var method = CreateOperationModel(new OpenApiOperation {
+            var method = CreateOperationModel(new OpenApiOperation
+            {
                 Parameters = { new OpenApiParameter { OriginalName = "testParam", Description = "TestParameter" } },
             });
             this._generator.AppendMethodDocumentation(method, false, false, false, docs);
@@ -102,7 +103,8 @@ namespace Refitter.Tests
         public void Can_Generate_Method_Returns()
         {
             var docs = new StringBuilder();
-            var method = CreateOperationModel(new OpenApiOperation {
+            var method = CreateOperationModel(new OpenApiOperation
+            {
                 Responses =
                 {
                     ["200"] = new OpenApiResponse
@@ -121,7 +123,8 @@ namespace Refitter.Tests
         public void Can_Generate_Method_Returns_With_Empty_Result()
         {
             var docs = new StringBuilder();
-            var method = CreateOperationModel(new OpenApiOperation {
+            var method = CreateOperationModel(new OpenApiOperation
+            {
                 Responses =
                 {
                     ["200"] = new OpenApiResponse { Content = { [""] = new OpenApiMediaType() } },

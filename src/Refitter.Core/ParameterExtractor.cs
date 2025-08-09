@@ -142,9 +142,9 @@ internal static class ParameterExtractor
             { parameter.IsDate: true, settings.CodeGeneratorSettings.DateFormat: not null }
                 => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateFormat}\")",
             {
-                    parameter.IsDateOrDateTime: true, parameter.Schema.Format: "date-time",
-                    settings.CodeGeneratorSettings.DateTimeFormat: not null
-                } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateTimeFormat}\")",
+                parameter.IsDateOrDateTime: true, parameter.Schema.Format: "date-time",
+                settings.CodeGeneratorSettings.DateTimeFormat: not null
+            } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateTimeFormat}\")",
             _ => "Query",
         };
     }

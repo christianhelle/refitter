@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using NSwag;
 using NSwag.CodeGeneration.OperationNameGenerators;
 using GeneratorType = Refitter.Core.OperationNameGeneratorTypes;

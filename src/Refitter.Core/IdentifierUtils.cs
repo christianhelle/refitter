@@ -1,4 +1,4 @@
-﻿namespace Refitter.Core;
+namespace Refitter.Core;
 
 internal static class IdentifierUtils
 {

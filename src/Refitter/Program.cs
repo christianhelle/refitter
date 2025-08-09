@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Spectre.Console.Cli;
 
 namespace Refitter;
@@ -134,7 +134,7 @@ internal static class Program
                         "./openapi.json",
                         "--trim-unused-schema",
                         " --keep-schema",
-                        "'^Model$'", 
+                        "'^Model$'",
                         "--keep-schema",
                         "'^Person.+'");
 
@@ -148,7 +148,7 @@ internal static class Program
                         "--operation-name-template",
                         "'{operationName}Async'");
 
-				configuration
+                configuration
                     .AddExample(
                         "./openapi.json",
                         "--optional-nullable-parameters");

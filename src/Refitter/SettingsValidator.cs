@@ -1,4 +1,4 @@
-﻿using Refitter.Core;
+using Refitter.Core;
 using Spectre.Console;
 
 namespace Refitter;

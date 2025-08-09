@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 
 namespace Refitter.Core;
@@ -29,7 +29,7 @@ internal static class DependencyInjectionGenerator
                            Action<IHttpClientBuilder>? builder = default, 
                            RefitSettings? settings = default)
                """;
-        
+
         var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
             : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
@@ -76,7 +76,7 @@ internal static class DependencyInjectionGenerator
               """");
         foreach (var interfaceName in interfaceNames)
         {
-            var clientBuilderName = $"clientBuilder{interfaceName}"; 
+            var clientBuilderName = $"clientBuilder{interfaceName}";
             code.Append(
                 $$"""
                               var {{clientBuilderName}} = services
@@ -89,7 +89,7 @@ internal static class DependencyInjectionGenerator
                 code.AppendLine();
                 code.Append($"                .AddHttpMessageHandler<{httpMessageHandler}>()");
             }
-            
+
             code.Append(";");
             code.AppendLine();
 
@@ -108,7 +108,7 @@ internal static class DependencyInjectionGenerator
                                                       TimeSpan.FromSeconds({{durationString}}),
                                                       {{iocSettings.MaxRetryCount}})));
                       """);
-            } 
+            }
             else if (iocSettings.TransientErrorHandler == TransientErrorHandler.HttpResilience)
             {
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
@@ -132,7 +132,7 @@ internal static class DependencyInjectionGenerator
             code.AppendLine($"            builder?.Invoke({clientBuilderName});");
             code.AppendLine();
         }
-        
+
 #pragma warning disable RS1035
         code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
 #pragma warning restore RS1035
