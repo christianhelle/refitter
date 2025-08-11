@@ -1,4 +1,4 @@
-namespace Refitter.Core
+﻿namespace Refitter.Core
 {
     /// <summary>
     /// Enumeration of mapping provider types.
@@ -9,12 +9,12 @@ namespace Refitter.Core
         /// No mapping provider.
         /// </summary>
         None,
-
+        
         /// <summary>
         /// AutoMapper mapping provider.
         /// </summary>
         AutoMapper,
-
+        
         /// <summary>
         /// Mapster mapping provider.
         /// </summary>

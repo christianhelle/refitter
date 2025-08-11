@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Xunit;
@@ -145,7 +145,7 @@ components:
     private static async Task<string> GenerateCode()
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, TrimUnusedSchema = true, KeepSchemaPatterns = new[] { "^UserComponent$" }, };
+        var settings = new RefitGeneratorSettings {OpenApiPath = swaggerFile, TrimUnusedSchema = true, KeepSchemaPatterns = new[] {"^UserComponent$"},};
 
         var sut = await RefitGenerator.CreateAsync(settings);
         var generateCode = sut.Generate();

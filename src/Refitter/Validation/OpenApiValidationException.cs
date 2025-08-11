@@ -1,11 +1,11 @@
-namespace Refitter.Validation;
+﻿namespace Refitter.Validation;
 
 public class OpenApiValidationException : Exception
 {
     public OpenApiValidationResult ValidationResult { get; }
 
     public OpenApiValidationException(
-        OpenApiValidationResult validationResult)
+        OpenApiValidationResult validationResult) 
         : base("OpenAPI validation failed")
     {
         ValidationResult = validationResult;

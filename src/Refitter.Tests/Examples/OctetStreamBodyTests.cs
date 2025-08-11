@@ -48,21 +48,21 @@ paths:
         string generateCode = await GenerateCode();
         generateCode.Should().NotBeNullOrWhiteSpace();
     }
-
+    
     [Fact]
     public async Task Generates_Pet_Interface()
     {
         string generateCode = await GenerateCode();
         generateCode.Should().Contain("partial interface IPetApi");
     }
-
+    
     [Fact]
     public async Task Generates_StreamPart_Parameter()
     {
         string generateCode = await GenerateCode(true);
         generateCode.Should().Contain("long petId, [Query] string additionalMetadata, StreamPart body");
     }
-
+    
     [Fact]
     public async Task Can_Build_Generated_Code()
     {

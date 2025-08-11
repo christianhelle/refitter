@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Refit;
 using Refitter.Tests.AdditionalFiles.SingeInterface;
 using Xunit;

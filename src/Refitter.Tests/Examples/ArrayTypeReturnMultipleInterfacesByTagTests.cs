@@ -72,8 +72,8 @@ components:
     private static async Task<string> GenerateCode()
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings
-        {
+        var settings = new RefitGeneratorSettings 
+        { 
             OpenApiPath = swaggerFile,
             MultipleInterfaces = MultipleInterfaces.ByTag,
             CodeGeneratorSettings = new CodeGeneratorSettings { ArrayType = "System.Collections.Generic.IList" }

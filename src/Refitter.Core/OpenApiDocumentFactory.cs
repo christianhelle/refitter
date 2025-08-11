@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Readers;
 using NSwag;
@@ -37,7 +37,7 @@ public static class OpenApiDocumentFactory
             return await OpenApiDocument.FromJsonAsync(json);
         }
         catch
-        {
+        {    
             return await CreateUsingNSwagAsync(openApiPath);
         }
     }
@@ -47,13 +47,13 @@ public static class OpenApiDocumentFactory
         if (IsHttp(openApiPath))
         {
             var content = await GetHttpContent(openApiPath);
-            return IsYaml(openApiPath)
-                ? await OpenApiYamlDocument.FromYamlAsync(content)
+            return IsYaml(openApiPath) 
+                ? await OpenApiYamlDocument.FromYamlAsync(content) 
                 : await OpenApiDocument.FromJsonAsync(content);
         }
 
-        return IsYaml(openApiPath)
-            ? await OpenApiYamlDocument.FromFileAsync(openApiPath)
+        return IsYaml(openApiPath) 
+            ? await OpenApiYamlDocument.FromFileAsync(openApiPath) 
             : await OpenApiDocument.FromFileAsync(openApiPath);
     }
 

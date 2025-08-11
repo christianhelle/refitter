@@ -15,7 +15,7 @@ public class RefitGeneratorSettings
     /// Default output folder for generated files.
     /// </summary>
     public const string DefaultOutputFolder = "./Generated";
-
+    
     /// <summary>
     /// Default namespace for generated code.
     /// </summary>
@@ -365,7 +365,7 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Gets or sets the parameter name generator for customizing parameter names.
     /// </summary>
-    [JsonIgnore]
+    [JsonIgnore] 
     public IParameterNameGenerator? ParameterNameGenerator { get; set; }
 
     /// <summary>

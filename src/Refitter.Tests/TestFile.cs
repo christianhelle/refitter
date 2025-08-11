@@ -1,4 +1,4 @@
-namespace Refitter.Tests;
+﻿namespace Refitter.Tests;
 
 public static class TestFile
 {

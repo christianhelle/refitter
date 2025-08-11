@@ -1,4 +1,4 @@
-namespace Refitter.Tests.Resources;
+﻿namespace Refitter.Tests.Resources;
 
 public enum SampleOpenSpecifications
 {

@@ -86,7 +86,7 @@ public class CollectionFormatTests
     public async Task Generated_Code_Contains_Expected_Collection_Format(CollectionFormat format, string expectedAttribute)
     {
         string generateCode = await GenerateCode(format);
-
+        
         using (new AssertionScope())
         {
             generateCode.Should().Contain(expectedAttribute);

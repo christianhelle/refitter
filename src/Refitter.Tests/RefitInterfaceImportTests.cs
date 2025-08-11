@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Refitter.Core;
 using Xunit;
 
@@ -36,7 +36,7 @@ public class RefitInterfaceImportTests
     [Fact]
     public void Should_NotContain_SystemThreading_Excluded()
     {
-        var settings = new RefitGeneratorSettings { UseCancellationTokens = true, ReturnIObservable = false, ExcludeNamespaces = new string[] { "System.Threading$" } };
+        var settings = new RefitGeneratorSettings { UseCancellationTokens = true, ReturnIObservable = false,  ExcludeNamespaces = new string[] { "System.Threading$" } };
         var refitInterfaceImport = RefitInterfaceImports.GetImportedNamespaces(settings);
         refitInterfaceImport.Should().NotContain("System.Threading");
         refitInterfaceImport.Should().Contain("System.Threading.Tasks");

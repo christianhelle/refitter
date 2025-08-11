@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Resources;
 using Xunit;
@@ -17,7 +17,7 @@ public class OpenApiDocumentFactoryTests
             .Should()
             .NotBeNull();
     }
-
+    
     [Theory]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]

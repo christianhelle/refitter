@@ -1,4 +1,4 @@
-using Microsoft.OpenApi.Readers;
+﻿using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Services;
 
 namespace Refitter.Validation;
