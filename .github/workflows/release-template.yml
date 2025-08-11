@@ -15,7 +15,7 @@ jobs:
     name: 🚚 Prepare new release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Sets environment variables - branch-name
         uses: nelonoel/branch-name@v1.0.1
       - name: Sets environment variables - Nerdbank.GitVersioning

@@ -18,7 +18,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - name: Checkout
-        uses: actions/checkout@v4  
+        uses: actions/checkout@v5  
       - run: dotnet tool update -g docfx
       - run: docfx docs/docfx_project/docfx.json  
       - name: Deploy
