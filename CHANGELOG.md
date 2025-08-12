@@ -16,8 +16,14 @@
 - Missing usings for separate contract/interface namespaces in same file [\#715](https://github.com/christianhelle/refitter/issues/715)
 - match-path doesn't work from cmd prompt [\#713](https://github.com/christianhelle/refitter/issues/713)
 
+**Closed issues:**
+
+- Setup CoPilot Instructions [\#724](https://github.com/christianhelle/refitter/issues/724)
+
 **Merged pull requests:**
 
+- Bump actions/checkout from 4 to 5 [\#727](https://github.com/christianhelle/refitter/pull/727) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add comprehensive GitHub Copilot instructions for Refitter repository [\#725](https://github.com/christianhelle/refitter/pull/725) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - chore\(deps\): update dotnet monorepo to 9.0.8 [\#723](https://github.com/christianhelle/refitter/pull/723) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency xunit.runner.visualstudio to 3.1.3 [\#721](https://github.com/christianhelle/refitter/pull/721) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add lilinus as a contributor for bug [\#717](https://github.com/christianhelle/refitter/pull/717) ([allcontributors[bot]](https://github.com/apps/allcontributors))
