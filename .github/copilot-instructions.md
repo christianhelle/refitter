@@ -191,5 +191,3 @@ dotnet run --project src/Refitter --configuration Release --framework net9.0 -- 
 - Source generator: Runs during build time, adds minimal overhead
 - Test execution: Allow full test suite to complete (~5 minutes)
 - Build process: Complete clean build takes ~2-3 minutes including restore
-
-Fixes #724.
