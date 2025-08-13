@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- ASCII Art Title [\#729](https://github.com/christianhelle/refitter/pull/729) ([christianhelle](https://github.com/christianhelle))
 - NSwag v14.5.0 [\#722](https://github.com/christianhelle/refitter/pull/722) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix table alignments in CLI Output [\#720](https://github.com/christianhelle/refitter/pull/720) ([christianhelle](https://github.com/christianhelle))
 - Fix match path on cmd prompt [\#719](https://github.com/christianhelle/refitter/pull/719) ([christianhelle](https://github.com/christianhelle))
