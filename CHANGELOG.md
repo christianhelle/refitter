@@ -22,6 +22,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency microsoft.extensions.http.resilience to 9.8.0 [\#728](https://github.com/christianhelle/refitter/pull/728) ([renovate[bot]](https://github.com/apps/renovate))
 - Bump actions/checkout from 4 to 5 [\#727](https://github.com/christianhelle/refitter/pull/727) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Add comprehensive GitHub Copilot instructions for Refitter repository [\#725](https://github.com/christianhelle/refitter/pull/725) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - chore\(deps\): update dotnet monorepo to 9.0.8 [\#723](https://github.com/christianhelle/refitter/pull/723) ([renovate[bot]](https://github.com/apps/renovate))
