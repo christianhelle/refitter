@@ -14,7 +14,7 @@ paths:
     get:
       tags:
       - 'Foo'
-      operationId: 'Get foo details'
+      operationId: 'Get details'
       description: 'Get the details of the specified foo'
       parameters:
         - in: 'path'
@@ -47,7 +47,7 @@ paths:
     get:
       tags:
       - 'Foo'
-      operationId: 'Get all foos'
+      operationId: 'Get all'
       description: 'Get all foos'  
       parameters:
         - in: 'query'
@@ -74,7 +74,7 @@ paths:
     get:
       tags:
       - 'Bar'
-      operationId: 'Get all bars'
+      operationId: 'Get all'
       description: 'Get all bars'      
       responses:
         '200':
@@ -83,7 +83,7 @@ paths:
     get:
       tags:
       - 'Bar'
-      operationId: 'Get bar details'
+      operationId: 'Get details'
       description: 'Get the details of the specified bar'   
       parameters:
         - in: 'path'
@@ -139,9 +139,18 @@ paths:
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
         string generateCode = await GenerateCode(true);
-        generateCode.Should().Contain("GetFooDetailsQueryParams");
-        generateCode.Should().Contain("GetAllFoosQueryParams");
-        generateCode.Should().Contain("GetBarDetailsQueryParams");
+        generateCode.Should().Contain("FooGetDetailsQueryParams");
+        generateCode.Should().Contain("FooGetAllQueryParams");
+        generateCode.Should().Contain("BarGetDetailsQueryParams");
+    }
+
+    [Fact]
+    public async Task Can_Generate_Scoped_Interfaces()
+    {
+        string generateCode = await GenerateCode(true);
+        generateCode.Should().NotContain("GetAll2");
+        generateCode.Should().NotContain("GetDetails2");
+        generateCode.Should().NotContain("GetDetails2QueryParams");
     }
 
     [Fact]
