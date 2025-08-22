@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Refitter.Core;
+using Refitter.SourceGenerator.Models;
 
 namespace Refitter.SourceGenerator;
 
@@ -26,9 +27,66 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         context.RegisterImplementationSourceOutput(sourceFiles, ProcessResults);
     }
 
-    private static void ProcessResults(SourceProductionContext context, List<Diagnostic> diagnostics)
+    private static void ProcessResults(SourceProductionContext context, GeneratedCodeResult result)
     {
-        foreach (var diagnostic in diagnostics)
+
+        if (string.IsNullOrEmpty(result.GeneratedCode))
+        {
+            foreach (var diagnostic in result.Diagnostics)
+            {
+                context.ReportDiagnostic(diagnostic);
+            }
+            return;
+        }
+        context.CancellationToken.ThrowIfCancellationRequested();
+        try
+        {
+
+            var filename = result.OutputFilename ?? Path.GetFileName(result.ConfigFile.Path).Replace(".refitter", ".g.cs");
+            if (filename == ".g.cs")
+            {
+                filename = "Refitter.g.cs";
+            }
+            if (result.GenerateVisibleFile == true)
+            {
+                var folder = Path.Combine(Path.GetDirectoryName(result.ConfigFile.Path)!, "Generated");
+                var output = Path.Combine(folder, filename);
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+                File.WriteAllText(
+                    output,
+                    result.GeneratedCode,
+                    Encoding.UTF8
+                );
+            }
+            else
+            {
+                context.AddSource(
+                    // just the hint name – keeps it portable
+                    filename,
+                    // the compilere thinks the GeneratedCode property is null, but it is not.
+                    // It's already checked in the first statement of this method.
+                    result.GeneratedCode!);
+            }
+
+        }
+        catch (Exception e)
+        {
+            result.Diagnostics.Add(
+                Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "REFITTER000",
+                        "Error",
+                        $"Refitter failed to write generated code: {e}",
+                        "Refitter",
+                        DiagnosticSeverity.Error,
+                        true),
+                    Location.None));
+        }
+
+        foreach (var diagnostic in result.Diagnostics)
         {
             context.ReportDiagnostic(diagnostic);
         }
@@ -49,7 +107,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
         Justification = "By design")]
-    private static List<Diagnostic> GenerateCode(
+    private static GeneratedCodeResult GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
     {
@@ -69,92 +127,24 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
         try
         {
-            var content = file.GetText(cancellationToken)!;
-            var json = content.ToString();
-
-            diagnostics.Add(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER001",
-                        "Refitter File Contents",
-                        json,
-                        "Refitter",
-                        DiagnosticSeverity.Info,
-                        true),
-                    Location.None));
-
-            var settings = TryDeserialize(json, diagnostics);
+            var settings = ExtractSettings(file, diagnostics, cancellationToken);
             if (settings is null)
             {
-                return diagnostics;
+                return new GeneratedCodeResult() { Diagnostics = diagnostics, ConfigFile = file };
             }
-
-            cancellationToken.ThrowIfCancellationRequested();
-            if (!settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
-                !File.Exists(settings.OpenApiPath))
-            {
-                settings.OpenApiPath = Path.Combine(
-                    Path.GetDirectoryName(file.Path)!,
-                    settings.OpenApiPath);
-            }
-
-            if (settings.UseIsoDateFormat &&
-                settings.CodeGeneratorSettings?.DateFormat is not null)
-            {
-                diagnostics.Add(
-                    Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "REFITTER002",
-                            "Warning",
-                            "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
-                            "Refitter",
-                            DiagnosticSeverity.Warning,
-                            true),
-                        Location.None));
-            }
-
             cancellationToken.ThrowIfCancellationRequested();
             var generator = RefitGenerator.CreateAsync(settings).GetAwaiter().GetResult();
+            // TODO: currently even if `settings.generateMultipleFiles` is set, it will only generate a single file,
+            // if the source generator was the one who generated the code.
             var refit = generator.Generate();
-
-            cancellationToken.ThrowIfCancellationRequested();
-            try
+            return new GeneratedCodeResult()
             {
-                var filename = settings.OutputFilename ?? Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
-                if (filename == ".g.cs")
-                {
-                    filename = "Refitter.g.cs";
-                }
-
-                var folder = Path.Combine(Path.GetDirectoryName(file.Path)!, settings.OutputFolder);
-                var output = Path.Combine(folder, filename);
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-
-                File.WriteAllText(
-                    output,
-                    refit,
-                    Encoding.UTF8);
-
-                return diagnostics;
-            }
-            catch (Exception e)
-            {
-                diagnostics.Add(
-                    Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "REFITTER000",
-                            "Error",
-                            $"Refitter failed to write generated code: {e}",
-                            "Refitter",
-                            DiagnosticSeverity.Error,
-                            true),
-                        Location.None));
-            }
-
-            return diagnostics;
+                Diagnostics = diagnostics,
+                GeneratedCode = refit,
+                OutputFilename = settings.OutputFilename,
+                GenerateVisibleFile = settings.GenerateVisibleFile,
+                ConfigFile = file
+            };
         }
         catch (Exception e)
         {
@@ -169,15 +159,67 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                         true),
                     Location.None));
 
-            return diagnostics;
+            return new GeneratedCodeResult() { Diagnostics = diagnostics, ConfigFile = file };
         }
     }
 
-    private static RefitGeneratorSettings? TryDeserialize(string json, List<Diagnostic> diagnostics)
+    private static RefitSourceGeneratorSettings? ExtractSettings(
+        AdditionalText file,
+        List<Diagnostic> diagnostics,
+        CancellationToken cancellationToken = default)
+    {
+        var content = file.GetText(cancellationToken)!;
+        var json = content.ToString();
+
+        diagnostics.Add(
+            Diagnostic.Create(
+                new DiagnosticDescriptor(
+                    "REFITTER001",
+                    "Refitter File Contents",
+                    json,
+                    "Refitter",
+                    DiagnosticSeverity.Info,
+                    true),
+                Location.None));
+
+        var settings = TryDeserialize(json, diagnostics);
+        if (settings is null)
+        {
+            return null;
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
+            !File.Exists(settings.OpenApiPath))
+        {
+            settings.OpenApiPath = Path.Combine(
+                Path.GetDirectoryName(file.Path)!,
+                settings.OpenApiPath);
+        }
+
+        if (settings.UseIsoDateFormat &&
+            settings.CodeGeneratorSettings?.DateFormat is not null)
+        {
+            diagnostics.Add(
+                Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "REFITTER002",
+                        "Warning",
+                        "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
+                        "Refitter",
+                        DiagnosticSeverity.Warning,
+                        true),
+                    Location.None));
+        }
+
+        return settings;
+    }
+
+    private static RefitSourceGeneratorSettings? TryDeserialize(string json, List<Diagnostic> diagnostics)
     {
         try
         {
-            return Serializer.Deserialize<RefitGeneratorSettings>(json);
+            return Serializer.Deserialize<RefitSourceGeneratorSettings>(json);
         }
         catch (Exception e)
         {
@@ -197,5 +239,14 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
             return null;
         }
+    }
+
+    class GeneratedCodeResult
+    {
+        public string? GeneratedCode { get; init; }
+        public string? OutputFilename { get; init; }
+        public required AdditionalText ConfigFile { get; init; }
+        public bool? GenerateVisibleFile { get; init; }
+        public required List<Diagnostic> Diagnostics { get; init; } = new List<Diagnostic>();
     }
 }
