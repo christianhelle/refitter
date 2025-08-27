@@ -2,15 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.2-preview.76...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.2...HEAD)
+
+**Implemented enhancements:**
+
+- Revert NSwag back to v14.4.0 [\#734](https://github.com/christianhelle/refitter/pull/734) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
-- chore\(deps\): update dependency xunit.runner.visualstudio to 3.1.4 [\#730](https://github.com/christianhelle/refitter/pull/730) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.6.2 [\#731](https://github.com/christianhelle/refitter/pull/731) ([renovate[bot]](https://github.com/apps/renovate))
 
-## [1.6.2-preview.76](https://github.com/christianhelle/refitter/tree/1.6.2-preview.76) (2025-08-13)
+## [1.6.2](https://github.com/christianhelle/refitter/tree/1.6.2) (2025-08-18)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.1...1.6.2-preview.76)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.1...1.6.2)
 
 **Implemented enhancements:**
 
@@ -31,6 +35,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency xunit.runner.visualstudio to 3.1.4 [\#730](https://github.com/christianhelle/refitter/pull/730) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.extensions.http.resilience to 9.8.0 [\#728](https://github.com/christianhelle/refitter/pull/728) ([renovate[bot]](https://github.com/apps/renovate))
 - Bump actions/checkout from 4 to 5 [\#727](https://github.com/christianhelle/refitter/pull/727) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Add comprehensive GitHub Copilot instructions for Refitter repository [\#725](https://github.com/christianhelle/refitter/pull/725) ([Copilot](https://github.com/apps/copilot-swe-agent))
