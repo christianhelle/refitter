@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using Refitter.Core;
 
 namespace Refitter.SourceGenerator;
@@ -18,13 +20,37 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     /// <param name="context">The initialization context for the incremental generator.</param>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var sourceFiles = context
+        var refitterFiles = context
             .AdditionalTextsProvider
-            .Where(text => text.Path.EndsWith(".refitter", StringComparison.InvariantCultureIgnoreCase))
-            .Select(GenerateCode);
+            .Where(text => text.Path.EndsWith(".refitter", StringComparison.InvariantCultureIgnoreCase));
 
-        context.RegisterImplementationSourceOutput(sourceFiles, ProcessResults);
+        // collect and sort the paths of the .refitter files for logging
+        var refitterPathList = refitterFiles
+            .Select((t, _) => t.Path)
+            .Collect()
+            .Select((arr, _) => arr.Sort(StringComparer.InvariantCultureIgnoreCase));
+
+        // add a source output that logs what we found for easier troubleshooting and setup
+        context.RegisterSourceOutput(refitterPathList, static (spc, paths) =>
+        {
+            if (paths.Length == 0)
+            {
+                // log a warning if no .refitter files were found, instructing the user how to add them
+                Debug.WriteLine("[Refitter] No .refitter files found. Ensure they are added to your project as `<AdditionalFiles Include=\"Petstore.refitter\" />`");
+                return;
+            }
+
+            // log each found .refitter file path
+            foreach (var path in paths)
+            {
+                Debug.WriteLine($"[Refitter] Found .refitter file: {path}");
+            }
+        });
+
+        // generate code for each .refitter file and process the results
+        context.RegisterImplementationSourceOutput(refitterFiles.Select(GenerateCode), ProcessResults);
     }
+
 
     private static void ProcessResults(SourceProductionContext context, List<Diagnostic> diagnostics)
     {
