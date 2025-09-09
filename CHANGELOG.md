@@ -10,6 +10,12 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency spectre.console.cli to 0.51.1 [\#741](https://github.com/christianhelle/refitter/pull/741) ([renovate[bot]](https://github.com/apps/renovate))
+- Bump actions/github-script from 7 to 8 [\#740](https://github.com/christianhelle/refitter/pull/740) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/setup-dotnet from 4 to 5 [\#738](https://github.com/christianhelle/refitter/pull/738) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): update dependency system.reactive to 6.0.2 [\#736](https://github.com/christianhelle/refitter/pull/736) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 9.0.4 [\#733](https://github.com/christianhelle/refitter/pull/733) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency polly to 8.6.3 [\#732](https://github.com/christianhelle/refitter/pull/732) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency refitter.sourcegenerator to 1.6.2 [\#731](https://github.com/christianhelle/refitter/pull/731) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.6.2](https://github.com/christianhelle/refitter/tree/1.6.2) (2025-08-18)
