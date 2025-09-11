@@ -3,7 +3,7 @@
     <UsingTask TaskName="RefitterGenerateTask" AssemblyFile="$(MSBuildThisFileDirectory)../Refitter.MSBuild/bin/$(Configuration)/netstandard2.0/Refitter.MSBuild.dll" Condition="Exists('$(MSBuildThisFileDirectory)../Refitter.MSBuild/bin/$(Configuration)/netstandard2.0/Refitter.MSBuild.dll')" />
     <UsingTask TaskName="RefitterGenerateTask" AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll" Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
 
-    <Target Name="RefitterGenerate" BeforeTargets="BeforeCompile" Condition="'@(RefitterFiles)' != ''">
+    <Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
         <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                               DisableLogging="$(RefitterNoLogging)">
             <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
