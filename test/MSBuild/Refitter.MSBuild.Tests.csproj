@@ -15,14 +15,4 @@
         <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
     </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\Refitter.MSBuild\Refitter.MSBuild.csproj" ReferenceOutputAssembly="false" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <RefitterFiles Include="petstore.refitter" />
-    </ItemGroup>
-
-    <Import Project="..\..\src\Refitter.MSBuild\Refitter.MSBuild.targets" />
-
 </Project>
