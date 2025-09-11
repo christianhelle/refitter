@@ -17,9 +17,6 @@
                           Version="17.14.8"
                           PrivateAssets="all"
                           ExcludeAssets="runtime"/>
-        <PackageReference Include="Newtonsoft.Json"
-                          Version="13.0.3"
-                          PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>    
