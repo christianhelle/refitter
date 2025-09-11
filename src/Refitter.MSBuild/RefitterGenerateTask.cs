@@ -1,8 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using MSBuildTask = Microsoft.Build.Utilities.Task;
 
 namespace Refitter.MSBuild;
@@ -131,15 +130,13 @@ public class RefitterGenerateTask : MSBuildTask
         {
             var refitterFileDirectory = Path.GetDirectoryName(refitterFilePath) ?? string.Empty;
             var refitterContent = File.ReadAllText(refitterFilePath);
-            var settings = JsonConvert.DeserializeObject<JObject>(refitterContent);
 
-            if (settings == null)
-                return new List<string>();
-
-            var outputFolder = settings["outputFolder"]?.ToString();
-            var outputFilename = settings["outputFilename"]?.ToString();
-            var generateMultipleFiles = settings["generateMultipleFiles"]?.ToObject<bool>() ?? false;
-            var contractsOutputFolder = settings["contractsOutputFolder"]?.ToString();
+            // Parse JSON properties using simple regex patterns
+            var outputFolder = ExtractJsonStringValue(refitterContent, "outputFolder");
+            var outputFilename = ExtractJsonStringValue(refitterContent, "outputFilename");
+            var generateMultipleFiles = ExtractJsonBoolValue(refitterContent, "generateMultipleFiles");
+            var contractsOutputFolder = ExtractJsonStringValue(refitterContent, "contractsOutputFolder");
+            var hasDependencyInjectionSettings = refitterContent.Contains("\"dependencyInjectionSettings\"");
 
             // If contractsOutputFolder is specified, automatically enable multiple files
             if (!string.IsNullOrWhiteSpace(contractsOutputFolder))
@@ -170,7 +167,7 @@ public class RefitterGenerateTask : MSBuildTask
                 generatedFiles.Add(contractsOutputPath);
                 
                 // DependencyInjection.cs is only generated if dependencyInjectionSettings are specified
-                if (settings["dependencyInjectionSettings"] != null)
+                if (hasDependencyInjectionSettings)
                 {
                     generatedFiles.Add(diOutputPath);
                 }
@@ -236,5 +233,23 @@ public class RefitterGenerateTask : MSBuildTask
         {
             // ignore
         }
+    }
+
+    private static string? ExtractJsonStringValue(string json, string propertyName)
+    {
+        // Simple regex to extract string values from JSON
+        // Pattern: "propertyName": "value" or "propertyName":"value"
+        var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*""([^""]*)""";
+        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase);
+        return match.Success ? match.Groups[1].Value : null;
+    }
+
+    private static bool ExtractJsonBoolValue(string json, string propertyName)
+    {
+        // Simple regex to extract boolean values from JSON
+        // Pattern: "propertyName": true or "propertyName":false
+        var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*(true|false)";
+        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase);
+        return match.Success && string.Equals(match.Groups[1].Value, "true", StringComparison.OrdinalIgnoreCase);
     }
 }
