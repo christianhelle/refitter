@@ -4,7 +4,7 @@
                AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll" 
                Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
 
-    <Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
+    <Target Name="RefitterGenerate" BeforeTargets="CoreCompile">
         <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                               DisableLogging="$(RefitterNoLogging)">
             <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
