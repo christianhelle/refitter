@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using Microsoft.Build.Framework;
 using MSBuildTask = Microsoft.Build.Utilities.Task;
 
 namespace Refitter.MSBuild;
@@ -9,6 +11,9 @@ public class RefitterGenerateTask : MSBuildTask
     public string ProjectFileDirectory { get; set; }
 
     public bool DisableLogging { get; set; }
+
+    [Output]
+    public ITaskItem[] GeneratedFiles { get; set; }
 
     public override bool Execute()
     {
@@ -22,29 +27,40 @@ public class RefitterGenerateTask : MSBuildTask
 
         TryLogCommandLine($"Found {files.Length} .refitter files...");
 
+        var generatedFiles = new List<string>();
+
         foreach (var file in files)
         {
             TryLogCommandLine($"Processing {file}");
-            TryExecuteRefitter(file);
+            var generated = TryExecuteRefitter(file);
+            if (generated != null)
+            {
+                generatedFiles.AddRange(generated);
+            }
         }
+
+        GeneratedFiles = generatedFiles.Select(f => new Microsoft.Build.Utilities.TaskItem(f)).ToArray();
+        TryLogCommandLine($"Generated {GeneratedFiles.Length} files");
 
         return true;
     }
 
-    private void TryExecuteRefitter(string file)
+    private List<string>? TryExecuteRefitter(string file)
     {
         try
         {
-            StartProcess(file);
+            return StartProcess(file);
         }
         catch (Exception e)
         {
             TryLogErrorFromException(e);
+            return null;
         }
     }
 
-    private void StartProcess(string file)
+    private List<string> StartProcess(string file)
     {
+        var expectedFiles = GetExpectedGeneratedFiles(file);        
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
         var seperator = Path.DirectorySeparatorChar;
@@ -54,6 +70,14 @@ public class RefitterGenerateTask : MSBuildTask
         if (DisableLogging)
         {
             args += " --no-logging";
+        }
+
+        if (!File.Exists(refitterDll))
+        {
+            TryLogError($"Refitter CLI not found at: {refitterDll}");
+            TryLogError($"Assembly location: {assembly.Location}");
+            TryLogError($"Package folder: {packageFolder}");
+            return new List<string>();
         }
 
         TryLogCommandLine($"Starting dotnet {args}");
@@ -79,6 +103,84 @@ public class RefitterGenerateTask : MSBuildTask
         process.BeginErrorReadLine();
         process.BeginOutputReadLine();
         process.WaitForExit();
+
+        // Return the list of files that should have been generated
+        return expectedFiles.Where(File.Exists).ToList();
+    }
+
+    private List<string> GetExpectedGeneratedFiles(string refitterFilePath)
+    {
+        try
+        {
+            var refitterFileDirectory = Path.GetDirectoryName(refitterFilePath) ?? string.Empty;
+            var refitterContent = File.ReadAllText(refitterFilePath);
+
+            // Parse JSON properties using simple regex patterns
+            var outputFolder = ExtractJsonStringValue(refitterContent, "outputFolder");
+            var outputFilename = ExtractJsonStringValue(refitterContent, "outputFilename");
+            var generateMultipleFiles = ExtractJsonBoolValue(refitterContent, "generateMultipleFiles");
+            var contractsOutputFolder = ExtractJsonStringValue(refitterContent, "contractsOutputFolder");
+            var hasDependencyInjectionSettings = refitterContent.Contains("\"dependencyInjectionSettings\"");
+
+            // If contractsOutputFolder is specified, automatically enable multiple files
+            if (!string.IsNullOrWhiteSpace(contractsOutputFolder))
+            {
+                generateMultipleFiles = true;
+            }
+
+            // Default output filename based on .refitter filename if not specified
+            if (string.IsNullOrWhiteSpace(outputFilename))
+            {
+                var refitterFileName = Path.GetFileNameWithoutExtension(refitterFilePath);
+                outputFilename = $"{refitterFileName}.cs";
+            }
+
+            var generatedFiles = new List<string>();
+
+            if (generateMultipleFiles)
+            {
+                // Multiple files mode
+                var baseOutputFolder = !string.IsNullOrWhiteSpace(outputFolder) ? outputFolder : "./Generated";
+                var interfaceOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, baseOutputFolder, "RefitInterfaces.cs"));
+                var contractsOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, 
+                    !string.IsNullOrWhiteSpace(contractsOutputFolder) ? contractsOutputFolder : baseOutputFolder, 
+                    "Contracts.cs"));
+                var diOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, baseOutputFolder, "DependencyInjection.cs"));
+
+                generatedFiles.Add(interfaceOutputPath);
+                generatedFiles.Add(contractsOutputPath);
+                
+                // DependencyInjection.cs is only generated if dependencyInjectionSettings are specified
+                if (hasDependencyInjectionSettings)
+                {
+                    generatedFiles.Add(diOutputPath);
+                }
+            }
+            else
+            {
+                // Single file mode
+                string outputPath;
+                if (!string.IsNullOrWhiteSpace(outputFolder))
+                {
+                    // outputFolder is specified
+                    outputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, outputFolder, outputFilename));
+                }
+                else
+                {
+                    // No outputFolder specified - generate in current directory (default behavior)
+                    outputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, outputFilename));
+                }
+                generatedFiles.Add(outputPath);
+            }
+
+            TryLogCommandLine($"Expected generated files: {string.Join(", ", generatedFiles)}");
+            return generatedFiles;
+        }
+        catch (Exception ex)
+        {
+            TryLogError($"Error parsing .refitter file {refitterFilePath}: {ex.Message}");
+            return new List<string>();
+        }
     }
 
     private void TryLogErrorFromException(Exception e)
@@ -115,5 +217,23 @@ public class RefitterGenerateTask : MSBuildTask
         {
             // ignore
         }
+    }
+
+    private static string? ExtractJsonStringValue(string json, string propertyName)
+    {
+        // Simple regex to extract string values from JSON
+        // Pattern: "propertyName": "value" or "propertyName":"value"
+        var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*""([^""]*)""";
+        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase);
+        return match.Success ? match.Groups[1].Value : null;
+    }
+
+    private static bool ExtractJsonBoolValue(string json, string propertyName)
+    {
+        // Simple regex to extract boolean values from JSON
+        // Pattern: "propertyName": true or "propertyName":false
+        var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*(true|false)";
+        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase);
+        return match.Success && string.Equals(match.Groups[1].Value, "true", StringComparison.OrdinalIgnoreCase);
     }
 }

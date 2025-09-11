@@ -1,10 +1,16 @@
 <Project>
 
-    <Target Name="Refitter" BeforeTargets="BeforeBuild">
+    <UsingTask TaskName="RefitterGenerateTask" 
+               AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll" 
+               Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
+
+    <Target Name="RefitterGenerate" BeforeTargets="CoreCompile">
         <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
-                              DisableLogging="$(RefitterNoLogging)"/>
+                              DisableLogging="$(RefitterNoLogging)">
+            <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
+        </RefitterGenerateTask>
         <ItemGroup>
-            <Compile Include="**/*.cs" />
+            <Compile Include="@(RefitterGeneratedFiles)" />
         </ItemGroup>
     </Target>
 

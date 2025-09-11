@@ -1,17 +1,22 @@
-## MSBuild Tasks for Refitter
+# MSBuild Tasks for Refitter
 
 Refitter is available as custom MSBuild tasks that includes the Refitter CLI executable for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
 The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task and looks something like this:
 
 ```xml
-<Target Name="Refitter" BeforeTargets="BeforeBuild">
+<UsingTask TaskName="RefitterGenerateTask" 
+           AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll" 
+           Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
+<Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
     <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
-                          DisableLogging="$(RefitterNoLogging)"/>
+                          DisableLogging="$(RefitterNoLogging)">
+        <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
+    </RefitterGenerateTask>
     <ItemGroup>
-        <Compile Include="**/*.cs" />
+        <Compile Include="@(RefitterGeneratedFiles)" />
     </ItemGroup>
-  </Target>
+</Target>
 ```
 
 The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and executes them all. By default, telemetry collection is enabled, and to opt-out of it you must specify `<RefitterNoLogging>true</RefitterNoLogging>` in the `.csproj` `<PropertyGroup>`
