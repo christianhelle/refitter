@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Add support for systems running only .NET 9.0 \(without .NET 8.0\) in Refitter.MSBuild [\#746](https://github.com/christianhelle/refitter/pull/746) ([christianhelle](https://github.com/christianhelle))
 - Fix MSBuild task so that the generated code is included in the compilation [\#745](https://github.com/christianhelle/refitter/pull/745) ([christianhelle](https://github.com/christianhelle))
 - Revert NSwag back to v14.4.0 [\#734](https://github.com/christianhelle/refitter/pull/734) ([christianhelle](https://github.com/christianhelle))
 
