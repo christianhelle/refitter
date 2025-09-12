@@ -60,24 +60,28 @@ public class RefitterGenerateTask : MSBuildTask
 
     private List<string> StartProcess(string file)
     {
-        var expectedFiles = GetExpectedGeneratedFiles(file);        
+        var expectedFiles = GetExpectedGeneratedFiles(file);
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
         var seperator = Path.DirectorySeparatorChar;
         var refitterDll = $"{packageFolder}{seperator}..{seperator}net8.0{seperator}refitter.dll";
 
+        List<string> installedRuntimes = GetInstalledDotnetRuntimes();
+        if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 9.")))
+        {
+            // Use .NET 9 version if available
+            refitterDll = $"{packageFolder}{seperator}..{seperator}net9.0{seperator}refitter.dll";
+            TryLogCommandLine("Detected .NET 9 runtime. Using .NET 9 version of Refitter.");
+        }
+        else
+        {
+            TryLogCommandLine("Using .NET 8 version of Refitter.");
+        }
+
         var args = $"{refitterDll} --settings-file {file}";
         if (DisableLogging)
         {
             args += " --no-logging";
-        }
-
-        if (!File.Exists(refitterDll))
-        {
-            TryLogError($"Refitter CLI not found at: {refitterDll}");
-            TryLogError($"Assembly location: {assembly.Location}");
-            TryLogError($"Package folder: {packageFolder}");
-            return new List<string>();
         }
 
         TryLogCommandLine($"Starting dotnet {args}");
@@ -106,6 +110,29 @@ public class RefitterGenerateTask : MSBuildTask
 
         // Return the list of files that should have been generated
         return expectedFiles.Where(File.Exists).ToList();
+    }
+
+    private static List<string> GetInstalledDotnetRuntimes()
+    {
+        var installedRuntimes = new List<string>();
+        using (var process = new Process())
+        {
+            process.StartInfo.FileName = "dotnet";
+            process.StartInfo.Arguments = "--list-runtimes";
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+
+            process.Start();
+            using (var reader = process.StandardOutput)
+            {
+                var output = reader.ReadToEnd();
+                installedRuntimes.AddRange(output?.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries));
+            }
+            process.WaitForExit();
+        }
+
+        return installedRuntimes;
     }
 
     private List<string> GetExpectedGeneratedFiles(string refitterFilePath)
