@@ -64,7 +64,7 @@ public class RefitterGenerateTask : MSBuildTask
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
         var seperator = Path.DirectorySeparatorChar;
-        var refitterDll = $"{packageFolder}{seperator}..{seperator}refitter.dll";
+        var refitterDll = $"{packageFolder}{seperator}..{seperator}net8.0{seperator}refitter.dll";
 
         var args = $"{refitterDll} --settings-file {file}";
         if (DisableLogging)
