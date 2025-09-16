@@ -709,6 +709,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "codymullins",
+      "name": "Cody Mullins",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1738479?v=4",
+      "profile": "https://github.com/codymullins",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
