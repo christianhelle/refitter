@@ -51,9 +51,7 @@ internal static class ParameterExtractor
                     continue;
                 }
 
-                if (securityScheme.Type == OpenApiSecuritySchemeType.ApiKey
-                    && securityScheme.In == OpenApiSecurityApiKeyLocation.Header
-                    && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
+                if (ShouldGenerateHeaderParameter(securityScheme, operationModel))
                 {
                     headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {ReplaceUnsafeCharacters(securityScheme.Name)}");
                 }
@@ -304,5 +302,12 @@ internal static class ParameterExtractor
             .ToList();
 
         return parameters;
+    }
+
+    private static bool ShouldGenerateHeaderParameter(OpenApiSecurityScheme securityScheme, CSharpOperationModel operationModel)
+    {
+        return securityScheme.Type == OpenApiSecuritySchemeType.ApiKey
+               && securityScheme.In == OpenApiSecurityApiKeyLocation.Header
+               && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name);
     }
 }
