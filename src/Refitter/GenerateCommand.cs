@@ -11,6 +11,18 @@ namespace Refitter;
 public sealed class GenerateCommand : AsyncCommand<Settings>
 {
     private static readonly string Crlf = Environment.NewLine;
+    
+    // Constants for better maintainability
+    private const int FileSize1024 = 1024;
+    private const int SpinnerDelayMs = 100;
+    private const string LocalBuildVersion = " (local build)";
+    private const string GitHubIssuesUrl = "https://github.com/christianhelle/refitter/issues";
+    private const string GitHubSponsorsUrl = "https://github.com/sponsors/christianhelle";
+    private const string BuyMeCoffeeUrl = "https://www.buymeacoffee.com/christianhelle";
+    private const string SkipValidationSuggestion = "💡 Try using the --skip-validation argument.";
+    private const string GenerationFailedMessage = "Generation failed!";
+    private const string GenerationSuccessMessage = "Generation completed successfully!";
+    private const int TableWidth = 55;
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
     {
@@ -32,7 +44,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var stopwatch = Stopwatch.StartNew();
             var version = GetType().Assembly.GetName().Version!.ToString();
             if (version == "1.0.0.0")
-                version += " (local build)";
+                version += LocalBuildVersion;
 
             const string asciiArt =
 """
@@ -130,7 +142,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             stopwatch.Stop();
             if (settings.SimpleOutput)
             {
-                Console.WriteLine("Generation completed successfully!");
+                Console.WriteLine(GenerationSuccessMessage);
                 Console.WriteLine($"Duration: {stopwatch.Elapsed:mm\\:ss\\.ffff}");
                 Console.WriteLine($"Performance: {(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation");
                 Console.WriteLine();
@@ -138,7 +150,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             else
             {
                 var successPanel = new Panel(
-                    $"[bold green]✅ Generation completed successfully![/]\n\n" +
+                    $"[bold green]✅ {GenerationSuccessMessage}[/]\n\n" +
                     $"[dim]📊 Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
                     $"[dim]🚀 Performance:[/] [green]{(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation[/]"
                 )
@@ -167,12 +179,12 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             // Error summary panel
             if (settings.SimpleOutput)
             {
-                Console.WriteLine("Generation failed!");
+                Console.WriteLine(GenerationFailedMessage);
                 Console.WriteLine();
             }
             else
             {
-                var errorPanel = new Panel("[bold red]❌ Generation failed![/]")
+                var errorPanel = new Panel($"[bold red]❌ {GenerationFailedMessage}[/]")
                     .BorderColor(Color.Red)
                     .RoundedBorder()
                     .Header("[bold red]🚨 Error[/]")
@@ -228,9 +240,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 }
                 else
                 {
-                    var suggestionPanel = new Panel(
-                        "💡 Try using the --skip-validation argument."
-                    )
+                    var suggestionPanel = new Panel(SkipValidationSuggestion)
                     .BorderColor(Color.Yellow)
                     .RoundedBorder()
                     .Header("Suggestion");
@@ -245,14 +255,14 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 Console.WriteLine("Support");
                 Console.WriteLine("Need Help?");
                 Console.WriteLine();
-                Console.WriteLine("Report an issue: https://github.com/christianhelle/refitter/issues");
+                Console.WriteLine($"Report an issue: {GitHubIssuesUrl}");
                 Console.WriteLine();
             }
             else
             {
                 var helpPanel = new Panel(
-                    "🆘 Need Help?\n\n" +
-                    "🐛 Report an issue: https://github.com/christianhelle/refitter/issues"
+                    $"🆘 Need Help?\n\n" +
+                    $"🐛 Report an issue: {GitHubIssuesUrl}"
                 )
                 .BorderColor(Color.Yellow)
                 .RoundedBorder()
@@ -328,7 +338,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 .SpinnerStyle(Style.Parse("green bold"))
                 .StartAsync("[yellow]🔧 Generating code...[/]", async _ =>
                 {
-                    await Task.Delay(100); // Brief delay to show spinner
+                    await Task.Delay(SpinnerDelayMs); // Brief delay to show spinner
                 });
         }
 
@@ -379,9 +389,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         double size = bytes;
         int suffixIndex = 0;
 
-        while (size >= 1024 && suffixIndex < suffixes.Length - 1)
+        while (size >= FileSize1024 && suffixIndex < suffixes.Length - 1)
         {
-            size /= 1024;
+            size /= FileSize1024;
             suffixIndex++;
         }
 
@@ -406,7 +416,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 .SpinnerStyle(Style.Parse("green bold"))
                 .StartAsync("[yellow]🔧 Generating multiple files...[/]", async _ =>
                 {
-                    await Task.Delay(100); // Brief delay to show spinner
+                    await Task.Delay(SpinnerDelayMs); // Brief delay to show spinner
                     return generator.GenerateMultipleFiles();
                 });
         }
@@ -420,7 +430,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         {
             Console.WriteLine("Generated Output Files");
             Console.WriteLine($"{"File",-30} {"Size",-10} {"Lines",-10}");
-            Console.WriteLine(new string('-', 55));
+            Console.WriteLine(new string('-', TableWidth));
         }
         else
         {
@@ -510,7 +520,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         if (settings.SimpleOutput)
         {
-            Console.WriteLine(new string('-', 55));
+            Console.WriteLine(new string('-', TableWidth));
             Console.WriteLine($"{"Total (" + generatorOutput.Files.Count + " files)",-30} {FormatFileSize(totalSize),-10} {totalLines,-10:N0}");
             Console.WriteLine();
         }
@@ -594,9 +604,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     {
         var panel = new Panel(
             "[yellow]💖 [bold]Enjoying Refitter?[/] Consider supporting the project![/]\n\n" +
-            "[cyan]🎯 Sponsor:[/] [link]https://github.com/sponsors/christianhelle[/]\n" +
-            "[yellow]☕ Buy me a coffee:[/] [link]https://www.buymeacoffee.com/christianhelle[/]\n\n" +
-            "[red]🐛 Found an issue?[/] [link]https://github.com/christianhelle/refitter/issues[/]"
+            $"[cyan]🎯 Sponsor:[/] [link]{GitHubSponsorsUrl}[/]\n" +
+            $"[yellow]☕ Buy me a coffee:[/] [link]{BuyMeCoffeeUrl}[/]\n\n" +
+            $"[red]🐛 Found an issue?[/] [link]{GitHubIssuesUrl}[/]"
         )
         .BorderColor(Color.Grey)
         .RoundedBorder()
@@ -612,10 +622,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         Console.WriteLine("Support");
         Console.WriteLine("Enjoying Refitter? Consider supporting the project!");
         Console.WriteLine();
-        Console.WriteLine("Sponsor: https://github.com/sponsors/christianhelle");
-        Console.WriteLine("Buy me a coffee: https://www.buymeacoffee.com/christianhelle");
+        Console.WriteLine($"Sponsor: {GitHubSponsorsUrl}");
+        Console.WriteLine($"Buy me a coffee: {BuyMeCoffeeUrl}");
         Console.WriteLine();
-        Console.WriteLine("Found an issue? https://github.com/christianhelle/refitter/issues");
+        Console.WriteLine($"Found an issue? {GitHubIssuesUrl}");
         Console.WriteLine();
     }
 
