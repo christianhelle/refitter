@@ -67,7 +67,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var supportKey = settings.NoLogging
                 ? "Unavailable when logging is disabled"
                 : SupportInformation.GetSupportKey();
-            
+
             if (settings.SimpleOutput)
             {
                 Console.WriteLine($"Support key: {supportKey}");
@@ -239,7 +239,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                     AnsiConsole.WriteLine();
                 }
             }
-            
+
             if (settings.SimpleOutput)
             {
                 Console.WriteLine("Support");
@@ -413,7 +413,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         var totalSize = 0L;
         var totalLines = 0;
-        
+
         Table? table = null;
 
         if (settings.SimpleOutput)

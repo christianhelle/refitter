@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Readers;
+using Microsoft.OpenApi.Readers;
 
 namespace Refitter.Validation;
 
@@ -7,7 +7,7 @@ public record OpenApiValidationResult(
     OpenApiStats Statistics)
 {
     public bool IsValid => Diagnostics.Errors.Count == 0;
-    
+
     public void ThrowIfInvalid()
     {
         if (!IsValid)

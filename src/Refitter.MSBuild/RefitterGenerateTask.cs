@@ -169,14 +169,14 @@ public class RefitterGenerateTask : MSBuildTask
                 // Multiple files mode
                 var baseOutputFolder = !string.IsNullOrWhiteSpace(outputFolder) ? outputFolder : "./Generated";
                 var interfaceOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, baseOutputFolder, "RefitInterfaces.cs"));
-                var contractsOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, 
-                    !string.IsNullOrWhiteSpace(contractsOutputFolder) ? contractsOutputFolder : baseOutputFolder, 
+                var contractsOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory,
+                    !string.IsNullOrWhiteSpace(contractsOutputFolder) ? contractsOutputFolder : baseOutputFolder,
                     "Contracts.cs"));
                 var diOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, baseOutputFolder, "DependencyInjection.cs"));
 
                 generatedFiles.Add(interfaceOutputPath);
                 generatedFiles.Add(contractsOutputPath);
-                
+
                 // DependencyInjection.cs is only generated if dependencyInjectionSettings are specified
                 if (hasDependencyInjectionSettings)
                 {
