@@ -23,16 +23,18 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             : settings.Naming.InterfaceName;
         ungroupedTitle = ungroupedTitle.CapitalizeFirstCharacter();
 
-        var byGroup = document.Paths
-            .SelectMany(x => x.Value, (k, v) => (PathItem: k, Operation: v))
-            .GroupBy(x => GetGroupName(x.Operation.Value, ungroupedTitle), (k, v) => new { Key = k, Combined = v });
+        var pathOperations = document.Paths
+            .SelectMany(x => x.Value, (pathItem, operation) => new { PathItem = pathItem, Operation = operation });
+            
+        var byGroup = pathOperations
+            .GroupBy(x => GetGroupName(x.Operation.Value, ungroupedTitle));
 
         Dictionary<string, StringBuilder> interfacesByGroup = new();
         Dictionary<string, string> interfacesNamesByGroup = new();
 
-        foreach (var kv in byGroup)
+        foreach (var group in byGroup)
         {
-            foreach (var op in kv.Combined)
+            foreach (var op in group)
             {
                 var operations = op.Operation;
                 var operation = operations.Value;
@@ -46,18 +48,18 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
                 string interfaceName = null!;
-                if (!interfacesByGroup.TryGetValue(kv.Key, out var sb))
+                if (!interfacesByGroup.TryGetValue(group.Key, out var sb))
                 {
-                    interfacesByGroup[kv.Key] = sb = new StringBuilder();
+                    interfacesByGroup[group.Key] = sb = new StringBuilder();
                     this.docGenerator.AppendInterfaceDocumentation(operation, sb);
 
-                    interfaceName = GetInterfaceName(kv.Key);
+                    interfaceName = GetInterfaceName(group.Key);
                     sb.AppendLine($$"""
                                     {{GenerateInterfaceDeclaration(interfaceName)}}
                                     {{Separator}}{
                                     """);
 
-                    interfacesNamesByGroup[kv.Key] = interfaceName;
+                    interfacesNamesByGroup[group.Key] = interfaceName;
                 }
 
                 var operationName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
