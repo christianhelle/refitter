@@ -137,11 +137,20 @@ dotnet run --project src/Refitter --configuration Release --framework net9.0 -- 
 ## Common Development Tasks
 
 ### Adding New CLI Options
-1. Update `src/Refitter/GenerateCommand.cs` with new command-line arguments
-2. Add corresponding property to `src/Refitter.Core/Settings/RefitGeneratorSettings.cs`
-3. Implement logic in `src/Refitter.Core/RefitInterfaceGenerator.cs`
-4. Add unit tests in `src/Refitter.Tests/Examples/`
-5. Update README.md documentation
+1. Add new property to `src/Refitter/Settings.cs` with `[CommandOption("--option-name")]` attribute
+2. Update `CreateRefitGeneratorSettings()` method in `src/Refitter/GenerateCommand.cs` to map the setting
+3. Add corresponding property to `src/Refitter.Core/Settings/RefitGeneratorSettings.cs`
+4. Implement logic in `src/Refitter.Core/RefitInterfaceGenerator.cs` or related generator classes
+5. Add unit tests in `src/Refitter.Tests/Examples/` following the established pattern
+6. Update README.md documentation with the new option
+
+### Recent CLI Options Added
+- `--use-apizr`: Integration with Apizr library for request options
+- `--use-dynamic-querystring-parameters`: Enable dynamic query string parameter wrapping  
+- `--use-polymorphic-serialization`: Use System.Text.Json polymorphic serialization
+- `--disposable`: Generate IDisposable clients
+- `--collection-format`: Control query parameter collection formatting (Multi/Csv/Ssv/Tsv/Pipes)
+- `--no-banner`: Hide donation banner in CLI output
 
 ### Working with OpenAPI Specifications
 - Test resources are located in `src/Refitter.Tests/Resources/V2/` and `src/Refitter.Tests/Resources/V3/`
@@ -155,14 +164,25 @@ dotnet run --project src/Refitter --configuration Release --framework net9.0 -- 
 - Use meaningful variable and method names
 - Keep methods focused with single responsibility
 
+### UI and Console Output
+- CLI uses **Spectre.Console** for rich terminal output with colors, tables, and panels
+- ASCII art banner is displayed on startup (can be disabled with `--no-banner`)
+- Progress indicators and formatted tables show generation status and file information
+- Error handling includes styled panels and structured exception display
+- Support key display for troubleshooting (disabled when `--no-logging` is used)
+
 ## Build and CI/CD Information
 
 ### GitHub Workflows
 - **build.yml**: Main build workflow (builds and tests)
 - **smoke-tests.yml**: Quick validation tests
 - **release.yml**: Automated releases
+- **release-preview.yml**: Preview releases
 - **docfx.yml**: Documentation generation
 - **msbuild.yml**: MSBuild-specific testing
+- **regression-tests.yml**: Regression testing against known scenarios
+- **production-tests.yml**: Production environment testing
+- **codecov.yml**: Code coverage reporting
 
 ### Expected Build Times
 - Package restore: ~65 seconds

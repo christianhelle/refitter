@@ -248,4 +248,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--collection-format")]
     [DefaultValue(CollectionFormat.Multi)]
     public CollectionFormat CollectionFormat { get; set; } = CollectionFormat.Multi;
+
+    [Description("Generate simple, plain-text console output without ASCII art, tables, emojis, or color formatting (suitable for IDE output windows)")]
+    [CommandOption("--simple-output")]
+    [DefaultValue(false)]
+    public bool SimpleOutput { get; set; }
 }
