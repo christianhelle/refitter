@@ -419,8 +419,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (settings.SimpleOutput)
         {
             Console.WriteLine("Generated Output Files");
-            Console.WriteLine($"{"File",-30} {"Directory",-40} {"Size",-10} {"Lines",-10}");
-            Console.WriteLine(new string('-', 95));
+            Console.WriteLine($"{"File",-30} {"Size",-10} {"Lines",-10}");
+            Console.WriteLine(new string('-', 55));
         }
         else
         {
@@ -459,7 +459,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
                 if (settings.SimpleOutput)
                 {
-                    Console.WriteLine($"{outputFile.Filename,-30} {contractsDir,-40} {sizeFormatted,-10} {lines,-10:N0}");
+                    Console.WriteLine($"{outputFile.Filename,-30} {sizeFormatted,-10} {lines,-10:N0}");
                 }
                 else
                 {
@@ -486,7 +486,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             if (settings.SimpleOutput)
             {
-                Console.WriteLine($"{outputFile.Filename,-30} {outputDirectory,-40} {formattedSize,-10} {fileLines,-10:N0}");
+                Console.WriteLine($"{outputFile.Filename,-30} {formattedSize,-10} {fileLines,-10:N0}");
             }
             else
             {
@@ -510,8 +510,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         if (settings.SimpleOutput)
         {
-            Console.WriteLine(new string('-', 95));
-            Console.WriteLine($"{"Total (" + generatorOutput.Files.Count + " files)",-30} {"---",-40} {FormatFileSize(totalSize),-10} {totalLines,-10:N0}");
+            Console.WriteLine(new string('-', 55));
+            Console.WriteLine($"{"Total (" + generatorOutput.Files.Count + " files)",-30} {FormatFileSize(totalSize),-10} {totalLines,-10:N0}");
             Console.WriteLine();
         }
         else
