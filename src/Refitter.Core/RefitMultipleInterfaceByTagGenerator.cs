@@ -32,6 +32,8 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
         foreach (var kv in byGroup)
         {
+            string interfaceName = null!;
+            
             foreach (var op in kv.Combined)
             {
                 var operations = op.Operation;
@@ -45,7 +47,6 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
-                string interfaceName = null!;
                 if (!interfacesByGroup.TryGetValue(kv.Key, out var sb))
                 {
                     interfacesByGroup[kv.Key] = sb = new StringBuilder();
@@ -61,7 +62,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 }
 
                 var operationName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
-                var dynamicQuerystringParameterType = operationName + "QueryParams";
+                var dynamicQuerystringParameterType = kv.Key.CapitalizeFirstCharacter() + operationName + "QueryParams";
                 var operationModel = generator.CreateOperationModel(operation);
                 var parameters = ParameterExtractor
                     .GetParameters(

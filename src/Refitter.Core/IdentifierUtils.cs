@@ -1,4 +1,7 @@
-﻿namespace Refitter.Core;
+﻿using System.Text.RegularExpressions;
+using Parlot.Fluent;
+
+namespace Refitter.Core;
 
 internal static class IdentifierUtils
 {
@@ -8,13 +11,20 @@ internal static class IdentifierUtils
     /// </summary>
     public static string Counted(ISet<string> knownIdentifiers, string name, string suffix = "", string parent = "")
     {
+        var hasParent = !string.IsNullOrEmpty(parent);
+
+        if (hasParent)
+        {
+            name = Regex.Replace(name, @"\d+$", string.Empty, RegexOptions.None, TimeSpan.FromMilliseconds(50));
+        }
+
         if (!knownIdentifiers.Contains(string.IsNullOrEmpty(parent) ? $"{name}{suffix}" : $"{parent}.{name}{suffix}"))
         {
             return $"{name}{suffix}";
         }
 
         var counter = 2;
-        while (knownIdentifiers.Contains(string.IsNullOrEmpty(parent)
+        while (knownIdentifiers.Contains(!hasParent
                    ? $"{name}{counter}{suffix}"
                    : $"{parent}.{name}{counter}{suffix}"))
             counter++;
