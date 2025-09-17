@@ -112,6 +112,10 @@ public class RefitterGenerateTask : MSBuildTask
         return expectedFiles.Where(File.Exists).ToList();
     }
 
+    /// <summary>
+    /// Gets the list of installed .NET runtimes by executing 'dotnet --list-runtimes'
+    /// </summary>
+    /// <returns>List of installed runtime strings</returns>
     private static List<string> GetInstalledDotnetRuntimes()
     {
         var installedRuntimes = new List<string>();
@@ -135,6 +139,11 @@ public class RefitterGenerateTask : MSBuildTask
         return installedRuntimes;
     }
 
+    /// <summary>
+    /// Determines the expected output files that should be generated from a .refitter configuration file
+    /// </summary>
+    /// <param name="refitterFilePath">Path to the .refitter configuration file</param>
+    /// <returns>List of expected output file paths</returns>
     private List<string> GetExpectedGeneratedFiles(string refitterFilePath)
     {
         try
@@ -150,10 +159,7 @@ public class RefitterGenerateTask : MSBuildTask
             var hasDependencyInjectionSettings = refitterContent.Contains("\"dependencyInjectionSettings\"");
 
             // If contractsOutputFolder is specified, automatically enable multiple files
-            if (!string.IsNullOrWhiteSpace(contractsOutputFolder))
-            {
-                generateMultipleFiles = true;
-            }
+            generateMultipleFiles = generateMultipleFiles || !string.IsNullOrWhiteSpace(contractsOutputFolder);
 
             // Default output filename based on .refitter filename if not specified
             if (string.IsNullOrWhiteSpace(outputFilename))
@@ -246,6 +252,12 @@ public class RefitterGenerateTask : MSBuildTask
         }
     }
 
+    /// <summary>
+    /// Extracts a string value from a JSON property using regex pattern matching
+    /// </summary>
+    /// <param name="json">The JSON content to search</param>
+    /// <param name="propertyName">The name of the property to extract</param>
+    /// <returns>The extracted string value, or null if not found</returns>
     private static string? ExtractJsonStringValue(string json, string propertyName)
     {
         // Simple regex to extract string values from JSON
@@ -255,6 +267,12 @@ public class RefitterGenerateTask : MSBuildTask
         return match.Success ? match.Groups[1].Value : null;
     }
 
+    /// <summary>
+    /// Extracts a boolean value from a JSON property using regex pattern matching
+    /// </summary>
+    /// <param name="json">The JSON content to search</param>
+    /// <param name="propertyName">The name of the property to extract</param>
+    /// <returns>True if the property value is "true", false otherwise</returns>
     private static bool ExtractJsonBoolValue(string json, string propertyName)
     {
         // Simple regex to extract boolean values from JSON
