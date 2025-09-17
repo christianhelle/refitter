@@ -61,6 +61,7 @@ EXAMPLES:
     refitter ./openapi.json --optional-nullable-parameters
     refitter ./openapi.json --use-polymorphic-serialization
     refitter ./openapi.json --collection-format Csv
+    refitter ./openapi.json --simple-output
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -103,6 +104,7 @@ OPTIONS:
         --keep-schema                                            Force to keep matching schema, uses regular expressions. Use together with "--trim-unused-schema". Can be set multiple times
         --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used
         --no-banner                                              Don't show donation banner
+        --simple-output                                          Generate simple, plain-text console output without ASCII art, tables, emojis, or color formatting (suitable for IDE output windows)
         --skip-default-additional-properties                     Set to true to skip default additional properties
         --collection-format                      Multi           Determines the format of collection parameters. May be one of Multi, Csv, Ssv, Tsv, Pipes
         --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
@@ -145,6 +147,28 @@ This will generate a file called `Output.cs` which contains the Refit interface 
 Here's what the console output looks like when running the Refitter CLI tool:
 
 ![Console Output](images/console-output.png)
+
+### Simple Output Mode
+
+For integration with IDEs and build tools that don't support rich console formatting, Refitter provides a `--simple-output` option:
+
+```shell
+refitter ./openapi.json --simple-output
+```
+
+This mode generates plain text output without:
+
+- ASCII art and banners
+- Colored text and rich formatting
+- Unicode characters and emojis
+- Tables and panels
+
+This is particularly useful when:
+
+- Running Refitter from Visual Studio extensions
+- Integrating with build systems that capture console output
+- Using tools that don't support ANSI escape sequences
+- Running in environments with limited console capabilities
 
 ## Source Generator
 
