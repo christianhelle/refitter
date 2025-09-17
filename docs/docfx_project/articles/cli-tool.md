@@ -40,6 +40,7 @@ EXAMPLES:
     refitter ./openapi.json --optional-nullable-parameters
     refitter ./openapi.json --use-polymorphic-serialization
     refitter ./openapi.json --collection-format Csv
+    refitter ./openapi.json --simple-output
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -83,6 +84,7 @@ OPTIONS:
         --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used                                                          
         --no-banner                                              Don't show donation banner                                                                                                                
         --skip-default-additional-properties                     Set to true to skip default additional properties                                                                                         
+        --simple-output                                          Generate output with no color, no formatting, no emojis, and no banners suitable for terminal or IDE output                            
         --collection-format                      Multi           Determines the format of collection parameters. May be one of:
                                                                  - Multi (separate parameter instances for each array item)
                                                                  - Csv (comma separated values)
