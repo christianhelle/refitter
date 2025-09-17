@@ -1,4 +1,5 @@
 #if !DEBUG
+using Refitter.Tests.TestUtilities;
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
@@ -44,5 +45,5 @@ public class OpenApiUrlTests
             .Should()
             .BeTrue(url);
     }
-}
 #endif
+}

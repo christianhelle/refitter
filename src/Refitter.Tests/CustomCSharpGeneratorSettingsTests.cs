@@ -3,6 +3,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Resources;
 using Xunit;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests;
 

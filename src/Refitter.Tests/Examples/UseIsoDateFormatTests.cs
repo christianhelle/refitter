@@ -1,4 +1,5 @@
 using AutoFixture.Xunit2;
+using Refitter.Tests.TestUtilities;
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
@@ -141,7 +142,7 @@ paths:
 
     private static async Task<string> GenerateCode(CodeGeneratorSettings? generatorSettings = null)
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
@@ -154,13 +155,4 @@ paths:
         return generatedCode;
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yaml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

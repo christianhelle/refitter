@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Refitter.Tests.TestUtilities;
 using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
@@ -98,7 +99,7 @@ public class CollectionFormatTests
 
     private static async Task<string> GenerateCode(CollectionFormat format = CollectionFormat.Multi)
     {
-        string swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         try
         {
             var settings = new RefitGeneratorSettings
@@ -124,13 +125,4 @@ public class CollectionFormatTests
         }
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.json";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }
