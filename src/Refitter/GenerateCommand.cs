@@ -42,70 +42,16 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         try
         {
             var stopwatch = Stopwatch.StartNew();
-            var version = GetType().Assembly.GetName().Version!.ToString();
-            if (version == "1.0.0.0")
-                version += LocalBuildVersion;
-
-            const string asciiArt =
-"""
-  ██████╗ ███████╗███████╗██╗████████╗████████╗███████╗██████╗
-  ██╔══██╗██╔════╝██╔════╝██║╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
-  ██████╔╝█████╗  █████╗  ██║   ██║      ██║   █████╗  ██████╔╝
-  ██╔══██╗██╔══╝  ██╔══╝  ██║   ██║      ██║   ██╔══╝  ██╔══██╗
-  ██║  ██║███████╗██║     ██║   ██║      ██║   ███████╗██║  ██║
-  ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
-""";
-
-            // Header with branding
-            if (settings.SimpleOutput)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"Refitter v{version}");
-                Console.WriteLine("OpenAPI to Refit Interface Generator");
-                Console.WriteLine();
-            }
-            else
-            {
-                AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine($"[bold cyan]{asciiArt}[/]");
-                AnsiConsole.MarkupLine($"[bold cyan]╔═══════════════════════════════════════════════════════════════╗[/]");
-                AnsiConsole.MarkupLine($"[bold cyan]║[/] [bold white]🚀 Refitter v{version,-48}[/] [bold cyan]║[/]");
-                AnsiConsole.MarkupLine($"[bold cyan]║[/] [dim]   OpenAPI to Refit Interface Generator[/]{new string(' ', 22)} [bold cyan]║[/]");
-                AnsiConsole.MarkupLine($"[bold cyan]╚═══════════════════════════════════════════════════════════════╝[/]");
-                AnsiConsole.WriteLine();
-            }
-
-            // Support information
-            var supportKey = settings.NoLogging
-                ? "Unavailable when logging is disabled"
-                : SupportInformation.GetSupportKey();
             
-            if (settings.SimpleOutput)
-            {
-                Console.WriteLine($"Support key: {supportKey}");
-                Console.WriteLine();
-            }
-            else
-            {
-                AnsiConsole.MarkupLine($"[dim]🔑 Support key: {supportKey}[/]");
-                AnsiConsole.WriteLine();
-            }
+            DisplayHeader(settings);
+            DisplaySupportInfo(settings);
 
-            if (context.Arguments.Any(a => a.Equals("--version", StringComparison.OrdinalIgnoreCase)) ||
-                context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase)))
+            if (IsVersionRequest(context))
             {
                 return 0;
             }
 
-            if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
-            {
-                var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
-                refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
-                refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
-
-                if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder))
-                    refitGeneratorSettings.GenerateMultipleFiles = true;
-            }
+            refitGeneratorSettings = await LoadSettingsFileIfProvided(settings, refitGeneratorSettings);
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             if (!settings.SkipValidation)
@@ -117,164 +63,15 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
 
-            if (refitGeneratorSettings.IncludePathMatches.Length > 0 &&
-                generator.OpenApiDocument.Paths.Count == 0)
-            {
-                Console.WriteLine("⚠️ WARNING: All API paths were filtered out by --match-path patterns. ⚠️");
-                Console.WriteLine($"   Match Patterns used: {string.Join(", ", refitGeneratorSettings.IncludePathMatches)}");
-                Console.WriteLine();
-                Console.WriteLine("   This could indicate that:");
-                Console.WriteLine("     1. The regex patterns don't match any available paths");
-                Console.WriteLine("     2. There's a syntax error in the regex patterns");
-                Console.WriteLine("     3. The patterns were corrupted by command line interpretation");
-                Console.WriteLine();
-                Console.WriteLine("   This commonly happens when using the Windows Command Prompt (CMD) instead of PowerShell.");
-                Console.WriteLine("   The ^ character in regex patterns is interpreted as an escape character in CMD.");
-                Console.WriteLine();
-                Console.WriteLine("   Solutions:");
-                Console.WriteLine("     1. Use PowerShell instead of CMD");
-                Console.WriteLine("     2. In CMD, escape the ^ character or use different quoting");
-                Console.WriteLine("     3. Use a .refitter settings file instead of command line arguments");
-                Console.WriteLine();
-            }
-
-            // Success summary with performance metrics
-            stopwatch.Stop();
-            if (settings.SimpleOutput)
-            {
-                Console.WriteLine(GenerationSuccessMessage);
-                Console.WriteLine($"Duration: {stopwatch.Elapsed:mm\\:ss\\.ffff}");
-                Console.WriteLine($"Performance: {(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation");
-                Console.WriteLine();
-            }
-            else
-            {
-                var successPanel = new Panel(
-                    $"[bold green]✅ {GenerationSuccessMessage}[/]\n\n" +
-                    $"[dim]📊 Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
-                    $"[dim]🚀 Performance:[/] [green]{(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation[/]"
-                )
-                .BorderColor(Color.Green)
-                .RoundedBorder()
-                .Header("[bold green]🎉 Success[/]")
-                .HeaderAlignment(Justify.Center);
-
-                AnsiConsole.Write(successPanel);
-                AnsiConsole.WriteLine();
-            }
-
-            if (!settings.NoBanner)
-            {
-                if (settings.SimpleOutput)
-                    SimpleDonationBanner();
-                else
-                    DonationBanner();
-            }
-
+            ShowPathFilteringWarnings(refitGeneratorSettings, generator);
+            ShowSuccessSummary(settings, refitGeneratorSettings, stopwatch);
+            ShowDonationBanner(settings);
             ShowWarnings(refitGeneratorSettings, settings);
             return 0;
         }
         catch (Exception exception)
         {
-            // Error summary panel
-            if (settings.SimpleOutput)
-            {
-                Console.WriteLine(GenerationFailedMessage);
-                Console.WriteLine();
-            }
-            else
-            {
-                var errorPanel = new Panel($"[bold red]❌ {GenerationFailedMessage}[/]")
-                    .BorderColor(Color.Red)
-                    .RoundedBorder()
-                    .Header("[bold red]🚨 Error[/]")
-                    .HeaderAlignment(Justify.Center);
-
-                AnsiConsole.Write(errorPanel);
-                AnsiConsole.WriteLine();
-            }
-
-            if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
-            {
-                if (settings.SimpleOutput)
-                {
-                    Console.WriteLine($"Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}");
-                    Console.WriteLine();
-                }
-                else
-                {
-                    var versionPanel = new Panel(
-                        $"[bold red]🚫 Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]"
-                    )
-                    .BorderColor(Color.Red)
-                    .RoundedBorder();
-
-                    AnsiConsole.Write(versionPanel);
-                    AnsiConsole.WriteLine();
-                }
-            }
-
-            if (exception is not OpenApiValidationException)
-            {
-                if (settings.SimpleOutput)
-                {
-                    Console.WriteLine("Exception Details:");
-                    Console.WriteLine(exception.ToString());
-                    Console.WriteLine();
-                }
-                else
-                {
-                    AnsiConsole.MarkupLine("[bold red]🐛 Exception Details:[/]");
-                    AnsiConsole.WriteException(exception);
-                    AnsiConsole.WriteLine();
-                }
-            }
-
-            if (!settings.SkipValidation)
-            {
-                if (settings.SimpleOutput)
-                {
-                    Console.WriteLine("Suggestion");
-                    Console.WriteLine("Try using the --skip-validation argument.");
-                    Console.WriteLine();
-                }
-                else
-                {
-                    var suggestionPanel = new Panel(SkipValidationSuggestion)
-                    .BorderColor(Color.Yellow)
-                    .RoundedBorder()
-                    .Header("Suggestion");
-
-                    AnsiConsole.Write(suggestionPanel);
-                    AnsiConsole.WriteLine();
-                }
-            }
-            
-            if (settings.SimpleOutput)
-            {
-                Console.WriteLine("Support");
-                Console.WriteLine("Need Help?");
-                Console.WriteLine();
-                Console.WriteLine($"Report an issue: {GitHubIssuesUrl}");
-                Console.WriteLine();
-            }
-            else
-            {
-                var helpPanel = new Panel(
-                    $"🆘 Need Help?\n\n" +
-                    $"🐛 Report an issue: {GitHubIssuesUrl}"
-                )
-                .BorderColor(Color.Yellow)
-                .RoundedBorder()
-                .Header("Support")
-                .HeaderAlignment(Justify.Center);
-
-                AnsiConsole.Write(helpPanel);
-                AnsiConsole.WriteLine();
-            }
-
-            await Analytics.LogError(exception, settings);
-            return exception.HResult;
+            return await HandleException(exception, settings);
         }
     }
 
@@ -834,5 +631,244 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             Console.ForegroundColor = originalColor;
         }
+    }
+
+    private static void DisplayHeader(Settings settings)
+    {
+        var version = typeof(GenerateCommand).Assembly.GetName().Version!.ToString();
+        if (version == "1.0.0.0")
+            version += LocalBuildVersion;
+
+        const string asciiArt =
+"""
+  ██████╗ ███████╗███████╗██╗████████╗████████╗███████╗██████╗
+  ██╔══██╗██╔════╝██╔════╝██║╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
+  ██████╔╝█████╗  █████╗  ██║   ██║      ██║   █████╗  ██████╔╝
+  ██╔══██╗██╔══╝  ██╔══╝  ██║   ██║      ██║   ██╔══╝  ██╔══██╗
+  ██║  ██║███████╗██║     ██║   ██║      ██║   ███████╗██║  ██║
+  ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
+""";
+
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine();
+            Console.WriteLine($"Refitter v{version}");
+            Console.WriteLine("OpenAPI to Refit Interface Generator");
+            Console.WriteLine();
+        }
+        else
+        {
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine($"[bold cyan]{asciiArt}[/]");
+            AnsiConsole.MarkupLine($"[bold cyan]╔═══════════════════════════════════════════════════════════════╗[/]");
+            AnsiConsole.MarkupLine($"[bold cyan]║[/] [bold white]🚀 Refitter v{version,-48}[/] [bold cyan]║[/]");
+            AnsiConsole.MarkupLine($"[bold cyan]║[/] [dim]   OpenAPI to Refit Interface Generator[/]{new string(' ', 22)} [bold cyan]║[/]");
+            AnsiConsole.MarkupLine($"[bold cyan]╚═══════════════════════════════════════════════════════════════╝[/]");
+            AnsiConsole.WriteLine();
+        }
+    }
+
+    private static void DisplaySupportInfo(Settings settings)
+    {
+        var supportKey = settings.NoLogging
+            ? "Unavailable when logging is disabled"
+            : SupportInformation.GetSupportKey();
+        
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine($"Support key: {supportKey}");
+            Console.WriteLine();
+        }
+        else
+        {
+            AnsiConsole.MarkupLine($"[dim]🔑 Support key: {supportKey}[/]");
+            AnsiConsole.WriteLine();
+        }
+    }
+
+    private static bool IsVersionRequest(CommandContext context)
+    {
+        return context.Arguments.Any(a => a.Equals("--version", StringComparison.OrdinalIgnoreCase)) ||
+               context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static async Task<RefitGeneratorSettings> LoadSettingsFileIfProvided(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+        {
+            var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
+            refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+            refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
+
+            if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder))
+                refitGeneratorSettings.GenerateMultipleFiles = true;
+        }
+
+        return refitGeneratorSettings;
+    }
+
+    private static void ShowPathFilteringWarnings(RefitGeneratorSettings refitGeneratorSettings, RefitGenerator generator)
+    {
+        if (refitGeneratorSettings.IncludePathMatches.Length > 0 &&
+            generator.OpenApiDocument.Paths.Count == 0)
+        {
+            Console.WriteLine("⚠️ WARNING: All API paths were filtered out by --match-path patterns. ⚠️");
+            Console.WriteLine($"   Match Patterns used: {string.Join(", ", refitGeneratorSettings.IncludePathMatches)}");
+            Console.WriteLine();
+            Console.WriteLine("   This could indicate that:");
+            Console.WriteLine("     1. The regex patterns don't match any available paths");
+            Console.WriteLine("     2. There's a syntax error in the regex patterns");
+            Console.WriteLine("     3. The patterns were corrupted by command line interpretation");
+            Console.WriteLine();
+            Console.WriteLine("   This commonly happens when using the Windows Command Prompt (CMD) instead of PowerShell.");
+            Console.WriteLine("   The ^ character in regex patterns is interpreted as an escape character in CMD.");
+            Console.WriteLine();
+            Console.WriteLine("   Solutions:");
+            Console.WriteLine("     1. Use PowerShell instead of CMD");
+            Console.WriteLine("     2. In CMD, escape the ^ character or use different quoting");
+            Console.WriteLine("     3. Use a .refitter settings file instead of command line arguments");
+            Console.WriteLine();
+        }
+    }
+
+    private static void ShowSuccessSummary(Settings settings, RefitGeneratorSettings refitGeneratorSettings, Stopwatch stopwatch)
+    {
+        stopwatch.Stop();
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine(GenerationSuccessMessage);
+            Console.WriteLine($"Duration: {stopwatch.Elapsed:mm\\:ss\\.ffff}");
+            Console.WriteLine($"Performance: {(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation");
+            Console.WriteLine();
+        }
+        else
+        {
+            var successPanel = new Panel(
+                $"[bold green]✅ {GenerationSuccessMessage}[/]\n\n" +
+                $"[dim]📊 Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
+                $"[dim]🚀 Performance:[/] [green]{(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation[/]"
+            )
+            .BorderColor(Color.Green)
+            .RoundedBorder()
+            .Header("[bold green]🎉 Success[/]")
+            .HeaderAlignment(Justify.Center);
+
+            AnsiConsole.Write(successPanel);
+            AnsiConsole.WriteLine();
+        }
+    }
+
+    private static void ShowDonationBanner(Settings settings)
+    {
+        if (!settings.NoBanner)
+        {
+            if (settings.SimpleOutput)
+                SimpleDonationBanner();
+            else
+                DonationBanner();
+        }
+    }
+
+    private static async Task<int> HandleException(Exception exception, Settings settings)
+    {
+        // Error summary panel
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine(GenerationFailedMessage);
+            Console.WriteLine();
+        }
+        else
+        {
+            var errorPanel = new Panel($"[bold red]❌ {GenerationFailedMessage}[/]")
+                .BorderColor(Color.Red)
+                .RoundedBorder()
+                .Header("[bold red]🚨 Error[/]")
+                .HeaderAlignment(Justify.Center);
+
+            AnsiConsole.Write(errorPanel);
+            AnsiConsole.WriteLine();
+        }
+
+        if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
+        {
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine($"Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}");
+                Console.WriteLine();
+            }
+            else
+            {
+                var versionPanel = new Panel(
+                    $"[bold red]🚫 Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]"
+                )
+                .BorderColor(Color.Red)
+                .RoundedBorder();
+
+                AnsiConsole.Write(versionPanel);
+                AnsiConsole.WriteLine();
+            }
+        }
+
+        if (exception is not OpenApiValidationException)
+        {
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine("Exception Details:");
+                Console.WriteLine(exception.ToString());
+                Console.WriteLine();
+            }
+            else
+            {
+                AnsiConsole.MarkupLine("[bold red]🐛 Exception Details:[/]");
+                AnsiConsole.WriteException(exception);
+                AnsiConsole.WriteLine();
+            }
+        }
+
+        if (settings.SkipValidation == false)
+        {
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine("Suggestion");
+                Console.WriteLine("Try using the --skip-validation argument.");
+                Console.WriteLine();
+            }
+            else
+            {
+                var suggestionPanel = new Panel(SkipValidationSuggestion)
+                .BorderColor(Color.Yellow)
+                .RoundedBorder()
+                .Header("Suggestion");
+
+                AnsiConsole.Write(suggestionPanel);
+                AnsiConsole.WriteLine();
+            }
+        }
+        
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine("Support");
+            Console.WriteLine("Need Help?");
+            Console.WriteLine();
+            Console.WriteLine($"Report an issue: {GitHubIssuesUrl}");
+            Console.WriteLine();
+        }
+        else
+        {
+            var helpPanel = new Panel(
+                $"🆘 Need Help?\n\n" +
+                $"🐛 Report an issue: {GitHubIssuesUrl}"
+            )
+            .BorderColor(Color.Yellow)
+            .RoundedBorder()
+            .Header("Support")
+            .HeaderAlignment(Justify.Center);
+
+            AnsiConsole.Write(helpPanel);
+            AnsiConsole.WriteLine();
+        }
+
+        await Analytics.LogError(exception, settings);
+        return exception.HResult;
     }
 }
