@@ -62,28 +62,28 @@ components:
         [InlineData(false)]
         public async Task Can_Generate_Code(bool includeHierarchy)
         {
-            string generateCode = await GenerateCode(includeHierarchy);
-            generateCode.Should().NotBeNullOrWhiteSpace();
+            string generatedCode = await GenerateCode(includeHierarchy);
+            generatedCode.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
         public async Task Removes_Unreferenced_Schema()
         {
-            string generateCode = await GenerateCode(includeHierarchy: false);
-            generateCode.Should().NotContain("Anonymous");
+            string generatedCode = await GenerateCode(includeHierarchy: false);
+            generatedCode.Should().NotContain("Anonymous");
 
-            generateCode.Should().NotContain("class B");
-            generateCode.Should().Contain("class A");
+            generatedCode.Should().NotContain("class B");
+            generatedCode.Should().Contain("class A");
         }
 
         [Fact]
         public async Task Keeps_All_Union_Cases_Schema()
         {
-            string generateCode = await GenerateCode(includeHierarchy: true);
-            generateCode.Should().NotContain("Anonymous");
+            string generatedCode = await GenerateCode(includeHierarchy: true);
+            generatedCode.Should().NotContain("Anonymous");
 
-            generateCode.Should().Contain("class B");
-            generateCode.Should().Contain("class A");
+            generatedCode.Should().Contain("class B");
+            generatedCode.Should().Contain("class A");
         }
 
         [Theory]
@@ -91,9 +91,9 @@ components:
         [InlineData(false)]
         public async Task Can_Build_Generated_Code(bool includeHierarchy)
         {
-            string generateCode = await GenerateCode(includeHierarchy);
+            string generatedCode = await GenerateCode(includeHierarchy);
             BuildHelper
-                .BuildCSharp(generateCode)
+                .BuildCSharp(generatedCode)
                 .Should()
                 .BeTrue();
         }
@@ -110,8 +110,8 @@ components:
             };
 
             var sut = await RefitGenerator.CreateAsync(settings);
-            var generateCode = sut.Generate();
-            return generateCode;
+            var generatedCode = sut.Generate();
+            return generatedCode;
         }
 
         private static async Task<string> CreateSwaggerFile(string contents)

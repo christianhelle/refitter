@@ -58,26 +58,26 @@ paths:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Generates_Methods()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("\"/bar\"");
-        generateCode.Should().NotContain("\"/bar/{id}\"");
-        generateCode.Should().Contain("\"/foo\"");
-        generateCode.Should().Contain("\"/foo/{id}\"");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("\"/bar\"");
+        generatedCode.Should().NotContain("\"/bar/{id}\"");
+        generatedCode.Should().Contain("\"/foo\"");
+        generatedCode.Should().Contain("\"/foo/{id}\"");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -92,8 +92,8 @@ paths:
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

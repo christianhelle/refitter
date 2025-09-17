@@ -24,32 +24,32 @@ paths:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        var generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Should_Not_Generate_ContentType_Header_Attribute()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         using var scope = new AssertionScope();
-        generateCode.Should().NotContain("Content-Type: \")]");
+        generatedCode.Should().NotContain("Content-Type: \")]");
     }
 
     [Fact]
     public async Task Generates_Accept_Header_Attribute()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         using var scope = new AssertionScope();
-        generateCode.Should().Contain("Accept: application/json");
+        generatedCode.Should().Contain("Accept: application/json");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -60,8 +60,8 @@ paths:
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, AddAcceptHeaders = true };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

@@ -56,24 +56,24 @@ parameters:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        var generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Generates_IApiResponse_For_NoContent()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         using var scope = new AssertionScope();
-        generateCode.Should().Contain("Task<IApiResponse>");
+        generatedCode.Should().Contain("Task<IApiResponse>");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -85,8 +85,8 @@ parameters:
         settings.ReturnIApiResponse = true;
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

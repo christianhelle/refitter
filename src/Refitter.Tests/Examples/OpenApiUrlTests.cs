@@ -21,9 +21,9 @@ public class OpenApiUrlTests
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
+        var generatedCode = sut.Generate();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue(url);
     }
@@ -38,9 +38,9 @@ public class OpenApiUrlTests
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
+        var generatedCode = sut.Generate();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue(url);
     }

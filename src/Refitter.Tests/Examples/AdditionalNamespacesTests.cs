@@ -62,16 +62,16 @@ public class AdditionalNamespacesTests
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -79,8 +79,8 @@ public class AdditionalNamespacesTests
     [Fact]
     public async Task Generated_Types_Contains_Additional_Namespaces()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("using System.Diagnostics.CodeAnalysis;");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("using System.Diagnostics.CodeAnalysis;");
     }
 
     private static async Task<string> GenerateCode()
@@ -93,8 +93,8 @@ public class AdditionalNamespacesTests
         };
 
         var sut = await RefitGenerator.CreateAsync(foo);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

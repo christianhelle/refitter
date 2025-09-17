@@ -53,23 +53,23 @@ components:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Replaces_Underscore_Properties_With_PascalCase()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("DateTimeOffset StartDate");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("DateTimeOffset StartDate");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -80,8 +80,8 @@ components:
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

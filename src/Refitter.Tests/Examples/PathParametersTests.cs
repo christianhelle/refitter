@@ -56,25 +56,25 @@ parameters:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        var generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Generates_Path_Parameters()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         using var scope = new AssertionScope();
-        generateCode.Should().Contain("Guid orderId");
-        generateCode.Should().Contain("Guid orderItemId");
+        generatedCode.Should().Contain("Guid orderId");
+        generatedCode.Should().Contain("Guid orderItemId");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -85,8 +85,8 @@ parameters:
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

@@ -63,14 +63,14 @@ public class RefitterGenerateTask : MSBuildTask
         var expectedFiles = GetExpectedGeneratedFiles(file);
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
-        var seperator = Path.DirectorySeparatorChar;
-        var refitterDll = $"{packageFolder}{seperator}..{seperator}net8.0{seperator}refitter.dll";
+        var separator = Path.DirectorySeparatorChar;
+        var refitterDll = $"{packageFolder}{separator}..{separator}net8.0{separator}refitter.dll";
 
         List<string> installedRuntimes = GetInstalledDotnetRuntimes();
         if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 9.")))
         {
             // Use .NET 9 version if available
-            refitterDll = $"{packageFolder}{seperator}..{seperator}net9.0{seperator}refitter.dll";
+            refitterDll = $"{packageFolder}{separator}..{separator}net9.0{separator}refitter.dll";
             TryLogCommandLine("Detected .NET 9 runtime. Using .NET 9 version of Refitter.");
         }
         else

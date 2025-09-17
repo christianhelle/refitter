@@ -48,15 +48,15 @@ paths:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Generates_Nullable_Directive()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("#nullable");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("#nullable");
     }
 
     [Theory]
@@ -65,30 +65,30 @@ paths:
     [InlineData("description")]
     public async Task Generates_Nullable_Parameters(string parameterName)
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain($"string? {parameterName} = default");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain($"string? {parameterName} = default");
     }
 
     [Fact]
     public async Task Generates_CancellationToken_Last()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("CancellationToken cancellationToken = default);");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("CancellationToken cancellationToken = default);");
     }
 
     [Fact]
     public async Task Generates_DynamicQuerystring_Param()
     {
-        string generateCode = await GenerateCode(true);
-        generateCode.Should().Contain("string id, [Query] UpdateJobDetailsQueryParams? queryParams = default, CancellationToken cancellationToken = default);");
+        string generatedCode = await GenerateCode(true);
+        generatedCode.Should().Contain("string id, [Query] UpdateJobDetailsQueryParams? queryParams = default, CancellationToken cancellationToken = default);");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -105,8 +105,8 @@ paths:
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

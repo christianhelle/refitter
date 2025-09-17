@@ -63,16 +63,16 @@ public class CollectionFormatTests
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -85,14 +85,14 @@ public class CollectionFormatTests
     [InlineData(CollectionFormat.Pipes, "Query(CollectionFormat.Pipes)")]
     public async Task Generated_Code_Contains_Expected_Collection_Format(CollectionFormat format, string expectedAttribute)
     {
-        string generateCode = await GenerateCode(format);
+        string generatedCode = await GenerateCode(format);
 
         using (new AssertionScope())
         {
-            generateCode.Should().Contain(expectedAttribute);
+            generatedCode.Should().Contain(expectedAttribute);
             // Check both array parameters use the same format
-            generateCode.Should().Contain($"[{expectedAttribute}] IEnumerable<int> ids");
-            generateCode.Should().Contain($"[{expectedAttribute}] IEnumerable<string> tags");
+            generatedCode.Should().Contain($"[{expectedAttribute}] IEnumerable<int> ids");
+            generatedCode.Should().Contain($"[{expectedAttribute}] IEnumerable<string> tags");
         }
     }
 

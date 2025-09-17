@@ -106,53 +106,53 @@ paths:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Generates_IGetAllFooEndpoint()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IGetAllFoosEndpoint");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("partial interface IGetAllFoosEndpoint");
     }
 
     [Fact]
     public async Task Generates_IGetFooDetailsEndpoint()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IGetFooDetailsEndpoint");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("partial interface IGetFooDetailsEndpoint");
     }
 
     [Fact]
     public async Task Generates_IGetAllBarEndpoint()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IGetAllBarsEndpoint");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("partial interface IGetAllBarsEndpoint");
     }
 
     [Fact]
     public async Task Generates_IGetBarDetailsEndpoint()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IGetBarDetailsEndpoint");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("partial interface IGetBarDetailsEndpoint");
     }
 
     [Fact]
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
-        string generateCode = await GenerateCode(true);
-        generateCode.Should().Contain("GetFooDetailsQueryParams");
-        generateCode.Should().NotContain("GetAllFoosQueryParams");
-        generateCode.Should().Contain("GetBarDetailsQueryParams");
+        string generatedCode = await GenerateCode(true);
+        generatedCode.Should().Contain("GetFooDetailsQueryParams");
+        generatedCode.Should().NotContain("GetAllFoosQueryParams");
+        generatedCode.Should().Contain("GetBarDetailsQueryParams");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -169,8 +169,8 @@ paths:
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

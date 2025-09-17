@@ -116,28 +116,28 @@ components:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Keeps_Unreferenced_Schema()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
 
-        generateCode.Should().NotContain("class UserComponent2");
-        generateCode.Should().Contain("class UserComponent");
-        generateCode.Should().Contain("class SomeComponent");
-        generateCode.Should().Contain("class Component");
-        generateCode.Should().Contain("class Metadata");
+        generatedCode.Should().NotContain("class UserComponent2");
+        generatedCode.Should().Contain("class UserComponent");
+        generatedCode.Should().Contain("class SomeComponent");
+        generatedCode.Should().Contain("class Component");
+        generatedCode.Should().Contain("class Metadata");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -148,8 +148,8 @@ components:
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, TrimUnusedSchema = true, KeepSchemaPatterns = new[] { "^UserComponent$" }, };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

@@ -40,37 +40,37 @@ paths:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Generates_IDeleteFooEndpoint()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IDeleteFooEndpoint");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("partial interface IDeleteFooEndpoint");
     }
 
     [Fact]
     public async Task Generates_IDeleteBarEndpoint()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("partial interface IDeleteBarEndpoint");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("partial interface IDeleteBarEndpoint");
     }
 
     [Fact]
     public async Task Generates_IServiceCollectionExtensions()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("static partial class IServiceCollectionExtensions");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("static partial class IServiceCollectionExtensions");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -91,8 +91,8 @@ paths:
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

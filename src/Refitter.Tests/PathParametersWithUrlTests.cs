@@ -16,8 +16,8 @@ public class PathParametersWithUrlTests
 #endif
     public async Task Can_Generate_Code(string url)
     {
-        var generateCode = await GenerateCode(url);
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode(url);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Theory]
@@ -29,9 +29,9 @@ public class PathParametersWithUrlTests
 #endif
     public async Task Can_Build_Generated_Code(string url)
     {
-        var generateCode = await GenerateCode(url);
+        var generatedCode = await GenerateCode(url);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -40,7 +40,7 @@ public class PathParametersWithUrlTests
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 }

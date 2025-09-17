@@ -189,36 +189,36 @@ components:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Removes_Unreferenced_Schema()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("class Warehouse");
-        generateCode.Should().Contain("class WarehouseResponse");
-        generateCode.Should().Contain("class SomeComponent");
-        generateCode.Should().Contain("class Component");
-        generateCode.Should().Contain("class ProblemDetails");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("class Warehouse");
+        generatedCode.Should().Contain("class WarehouseResponse");
+        generatedCode.Should().Contain("class SomeComponent");
+        generatedCode.Should().Contain("class Component");
+        generatedCode.Should().Contain("class ProblemDetails");
 
         // Schema is manipulated to return ARRAY of WarehouseResponse
         // previously (<= 0.9.9.0) this wasn't accomodated.
         //
         // For whatever reason NSwag OpenApi-Schema doesn't contain Schema for "Items"
         // Instead it's inside "Item"
-        generateCode.Should().Contain("Task<ICollection<WarehouseResponse>> CreateWarehouse([Query] string token, [Body] Warehouse ");
+        generatedCode.Should().Contain("Task<ICollection<WarehouseResponse>> CreateWarehouse([Query] string token, [Body] Warehouse ");
 
-        generateCode.Should().NotContain("class UserComponent");
+        generatedCode.Should().NotContain("class UserComponent");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -233,8 +233,8 @@ components:
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

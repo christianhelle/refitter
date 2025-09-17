@@ -99,16 +99,16 @@ public class MultiPartFormDataTests
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -116,16 +116,16 @@ public class MultiPartFormDataTests
     [Fact]
     public async Task Generated_Code_Contains_MultiPart_Attribute()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("[Multipart]");
-        generateCode.Should().NotContain("Content-Type: multipart/form-data");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("[Multipart]");
+        generatedCode.Should().NotContain("Content-Type: multipart/form-data");
     }
 
     [Fact]
     public async Task Generated_Code_Contains_Correct_Parameters()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("string name, StreamPart animalClassFile, StreamPart animalCrowdFile");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("string name, StreamPart animalClassFile, StreamPart animalCrowdFile");
     }
 
     private static async Task<string> GenerateCode()
@@ -134,8 +134,8 @@ public class MultiPartFormDataTests
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)

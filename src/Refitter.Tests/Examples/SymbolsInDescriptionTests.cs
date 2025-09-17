@@ -36,23 +36,23 @@ definitions:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        var generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Symbols_In_Description_Are_Escaped()
     {
-        var generateCode = await GenerateCode();
-        generateCode.Should().Contain("&lt;test&gt; &gt;&gt; &lt;&lt; &lt;/test&gt;");
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("&lt;test&gt; &gt;&gt; &lt;&lt; &lt;/test&gt;");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -63,8 +63,8 @@ definitions:
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
     private static async Task<string> CreateSwaggerFile(string contents)
