@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.3-preview.78...HEAD)
+
+**Implemented enhancements:**
+
+- Introduce --simple-output CLI argument [\#751](https://github.com/christianhelle/refitter/pull/751) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Refitter Output is mangled and unreadable [\#750](https://github.com/christianhelle/refitter/issues/750)
+
+## [1.6.3-preview.78](https://github.com/christianhelle/refitter/tree/1.6.3-preview.78) (2025-09-12)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.2...1.6.3-preview.78)
 
 **Implemented enhancements:**
 
