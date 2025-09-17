@@ -23,6 +23,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     private const string GenerationFailedMessage = "Generation failed!";
     private const string GenerationSuccessMessage = "Generation completed successfully!";
     private const int TableWidth = 55;
+    private const int FileNameColumnWidth = 30;
+    private const int FileSizeColumnWidth = 10;
+    private const int FileLinesColumnWidth = 10;
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
     {
@@ -226,7 +229,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (settings.SimpleOutput)
         {
             Console.WriteLine("Generated Output Files");
-            Console.WriteLine($"{"File",-30} {"Size",-10} {"Lines",-10}");
+            Console.WriteLine($"{"File",-FileNameColumnWidth} {"Size",-FileSizeColumnWidth} {"Lines",-FileLinesColumnWidth}");
             Console.WriteLine(new string('-', TableWidth));
         }
         else
@@ -266,7 +269,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
                 if (settings.SimpleOutput)
                 {
-                    Console.WriteLine($"{outputFile.Filename,-30} {sizeFormatted,-10} {lines,-10:N0}");
+                    Console.WriteLine($"{outputFile.Filename,-FileNameColumnWidth} {sizeFormatted,-FileSizeColumnWidth} {lines,-FileLinesColumnWidth:N0}");
                 }
                 else
                 {
@@ -293,7 +296,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             if (settings.SimpleOutput)
             {
-                Console.WriteLine($"{outputFile.Filename,-30} {formattedSize,-10} {fileLines,-10:N0}");
+                Console.WriteLine($"{outputFile.Filename,-FileNameColumnWidth} {formattedSize,-FileSizeColumnWidth} {fileLines,-FileLinesColumnWidth:N0}");
             }
             else
             {
@@ -318,7 +321,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (settings.SimpleOutput)
         {
             Console.WriteLine(new string('-', TableWidth));
-            Console.WriteLine($"{"Total (" + generatorOutput.Files.Count + " files)",-30} {FormatFileSize(totalSize),-10} {totalLines,-10:N0}");
+            Console.WriteLine($"{"Total (" + generatorOutput.Files.Count + " files)",-FileNameColumnWidth} {FormatFileSize(totalSize),-FileSizeColumnWidth} {totalLines,-FileLinesColumnWidth:N0}");
             Console.WriteLine();
         }
         else

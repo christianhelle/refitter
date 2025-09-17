@@ -8,6 +8,15 @@ namespace Refitter.Core;
 internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 {
     protected const string Separator = "    ";
+    
+    // HTTP Status Code Constants
+    private static readonly string[] SuccessStatusCodes = { "200", "201", "203", "206" };
+    private const string StatusCode2XX = "2XX";
+    private const string DefaultResponseKey = "default";
+    
+    // Content Type Constants
+    private const string MultipartFormDataContentType = "multipart/form-data";
+    private const string ApplicationJsonContentType = "application/json";
 
     protected readonly RefitGeneratorSettings settings;
     protected readonly OpenApiDocument document;
@@ -116,22 +125,21 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         // First check for explicit success status codes
-        var successCodes = new[] { "200", "201", "203", "206" };
-        var returnTypeParameter = successCodes
+        var returnTypeParameter = SuccessStatusCodes
             .Where(operation.Responses.ContainsKey)
             .Select(code => GetTypeName(code, operation))
             .FirstOrDefault();
 
         // If no explicit success codes found, check for 2XX range
-        if (returnTypeParameter == null && operation.Responses.ContainsKey("2XX"))
+        if (returnTypeParameter == null && operation.Responses.ContainsKey(StatusCode2XX))
         {
-            returnTypeParameter = GetTypeName("2XX", operation);
+            returnTypeParameter = GetTypeName(StatusCode2XX, operation);
         }
 
         // If no success codes or ranges found, check for default response
-        if (returnTypeParameter == null && operation.Responses.ContainsKey("default"))
+        if (returnTypeParameter == null && operation.Responses.ContainsKey(DefaultResponseKey))
         {
-            returnTypeParameter = GetTypeName("default", operation);
+            returnTypeParameter = GetTypeName(DefaultResponseKey, operation);
         }
 
         return GetReturnType(returnTypeParameter);
@@ -180,7 +188,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
     protected static void GenerateForMultipartFormData(CSharpOperationModel operationModel, StringBuilder code)
     {
-        if (operationModel.Consumes.Contains("multipart/form-data"))
+        if (operationModel.Consumes.Contains(MultipartFormDataContentType))
         {
             code.AppendLine($"{Separator}{Separator}[Multipart]");
         }
@@ -216,10 +224,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         {
             var uniqueContentTypes = operations.Value.RequestBody?.Content.Keys ?? Array.Empty<string>();
             var contentType =
-                uniqueContentTypes.FirstOrDefault(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase)) ??
+                uniqueContentTypes.FirstOrDefault(c => c.Equals(ApplicationJsonContentType, StringComparison.OrdinalIgnoreCase)) ??
                 uniqueContentTypes.FirstOrDefault();
 
-            if (!string.IsNullOrWhiteSpace(contentType) && !operationModel.Consumes.Contains("multipart/form-data"))
+            if (!string.IsNullOrWhiteSpace(contentType) && !operationModel.Consumes.Contains(MultipartFormDataContentType))
             {
                 headers.Add($"\"Content-Type: {contentType}\"");
             }
