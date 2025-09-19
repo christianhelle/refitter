@@ -3,6 +3,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Resources;
 using Xunit;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests;
 
@@ -19,9 +20,9 @@ public class CustomCSharpGeneratorSettingsTests
     {
         var settings = new RefitGeneratorSettings();
         settings.CodeGeneratorSettings = new CodeGeneratorSettings();
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotBeNullOrWhiteSpace();
-        generateCode.Should().Contain(settings.CodeGeneratorSettings!.DateType);
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain(settings.CodeGeneratorSettings!.DateType);
     }
 
     [Theory]
@@ -35,9 +36,9 @@ public class CustomCSharpGeneratorSettingsTests
     {
         var settings = new RefitGeneratorSettings();
         settings.CodeGeneratorSettings = new CodeGeneratorSettings();
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotBeNullOrWhiteSpace();
-        generateCode.Should().Contain(settings.CodeGeneratorSettings!.DateTimeType);
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain(settings.CodeGeneratorSettings!.DateTimeType);
     }
 
     [Theory]
@@ -51,9 +52,9 @@ public class CustomCSharpGeneratorSettingsTests
     {
         var settings = new RefitGeneratorSettings();
         settings.CodeGeneratorSettings = new CodeGeneratorSettings();
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotBeNullOrWhiteSpace();
-        generateCode.Should().Contain("ICollection<");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain("ICollection<");
     }
 
     [Theory]
@@ -68,9 +69,9 @@ public class CustomCSharpGeneratorSettingsTests
         var settings = new RefitGeneratorSettings();
         settings.CodeGeneratorSettings = new CodeGeneratorSettings();
         settings.CodeGeneratorSettings!.DateType = "DateTime";
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotBeNullOrWhiteSpace();
-        generateCode.Should().Contain("DateTime");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain("DateTime");
     }
 
     [Theory]
@@ -85,9 +86,9 @@ public class CustomCSharpGeneratorSettingsTests
         var settings = new RefitGeneratorSettings();
         settings.CodeGeneratorSettings = new CodeGeneratorSettings();
         settings.CodeGeneratorSettings!.DateTimeType = "DateTime";
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotBeNullOrWhiteSpace();
-        generateCode.Should().Contain("DateTime");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain("DateTime");
     }
 
     [Theory]
@@ -102,9 +103,9 @@ public class CustomCSharpGeneratorSettingsTests
         var settings = new RefitGeneratorSettings();
         settings.CodeGeneratorSettings = new CodeGeneratorSettings();
         settings.CodeGeneratorSettings!.ArrayType = "System.Collection.Generic.IList";
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotBeNullOrWhiteSpace();
-        generateCode.Should().Contain("System.Collection.Generic.IList<");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain("System.Collection.Generic.IList<");
     }
 
     [Theory]
@@ -122,9 +123,9 @@ public class CustomCSharpGeneratorSettingsTests
         {
             "User"
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotBeNullOrWhiteSpace();
-        generateCode.Should().NotContain("class User");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().NotContain("class User");
     }
 
     [Theory]
@@ -137,10 +138,10 @@ public class CustomCSharpGeneratorSettingsTests
         var settings = new RefitGeneratorSettings();
         settings.ReturnIApiResponse = true;
         settings.CodeGeneratorSettings = new CodeGeneratorSettings { GenerateNativeRecords = true, };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("record Pet");
-        generateCode.Should().Contain("Pet(");
-        generateCode.Should().Contain("[JsonConstructor]");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("record Pet");
+        generatedCode.Should().Contain("Pet(");
+        generatedCode.Should().Contain("[JsonConstructor]");
     }
 
     private static async Task<string> GenerateCode(

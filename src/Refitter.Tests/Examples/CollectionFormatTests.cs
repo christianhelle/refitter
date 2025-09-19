@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Refitter.Tests.TestUtilities;
 using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
@@ -63,16 +64,16 @@ public class CollectionFormatTests
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -85,20 +86,20 @@ public class CollectionFormatTests
     [InlineData(CollectionFormat.Pipes, "Query(CollectionFormat.Pipes)")]
     public async Task Generated_Code_Contains_Expected_Collection_Format(CollectionFormat format, string expectedAttribute)
     {
-        string generateCode = await GenerateCode(format);
-        
+        string generatedCode = await GenerateCode(format);
+
         using (new AssertionScope())
         {
-            generateCode.Should().Contain(expectedAttribute);
+            generatedCode.Should().Contain(expectedAttribute);
             // Check both array parameters use the same format
-            generateCode.Should().Contain($"[{expectedAttribute}] IEnumerable<int> ids");
-            generateCode.Should().Contain($"[{expectedAttribute}] IEnumerable<string> tags");
+            generatedCode.Should().Contain($"[{expectedAttribute}] IEnumerable<int> ids");
+            generatedCode.Should().Contain($"[{expectedAttribute}] IEnumerable<string> tags");
         }
     }
 
     private static async Task<string> GenerateCode(CollectionFormat format = CollectionFormat.Multi)
     {
-        string swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         try
         {
             var settings = new RefitGeneratorSettings
@@ -124,13 +125,4 @@ public class CollectionFormatTests
         }
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.json";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

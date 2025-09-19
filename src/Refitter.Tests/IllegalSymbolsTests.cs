@@ -1,8 +1,9 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.Resources;
 using Xunit;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests;
 
@@ -11,9 +12,9 @@ public class IllegalSymbolsTests
     [Fact]
     public async Task Illegal_Symbols_In_Paths__Should_Build_Successfully()
     {
-        var generateCode = await GenerateCode(EmbeddedResources.SwaggerIllegalPathsJsonV3);
+        var generatedCode = await GenerateCode(EmbeddedResources.SwaggerIllegalPathsJsonV3);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -21,9 +22,9 @@ public class IllegalSymbolsTests
     [Fact]
     public async Task Illegal_Symbols_In_Title__Should_Build_Successfully()
     {
-        var generateCode = await GenerateCode(EmbeddedResources.SwaggerIllegalSymbolsInTitleJsonV3);
+        var generatedCode = await GenerateCode(EmbeddedResources.SwaggerIllegalSymbolsInTitleJsonV3);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }

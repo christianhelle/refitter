@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
+using Refitter.Tests.TestUtilities;
 using Xunit;
 
 namespace Refitter.Tests.Examples;
@@ -107,15 +108,15 @@ paths:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
-    
+
     [Fact]
     public async Task Generates_Nullable_Directive()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("#nullable");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("#nullable");
     }
 
     [Theory]
@@ -124,78 +125,78 @@ paths:
     [InlineData("description")]
     public async Task Generates_Nullable_Parameters(string parameterName)
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain($"string? {parameterName}");
-        generateCode.Should().NotContain($"string? {parameterName} = default");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain($"string? {parameterName}");
+        generatedCode.Should().NotContain($"string? {parameterName} = default");
     }
 
     [Fact]
     public async Task DoesNot_Generate_CancellationToken()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotContain("CancellationToken cancellationToken");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotContain("CancellationToken cancellationToken");
     }
 
     [Fact]
     public async Task Generates_RequestOptions_Last()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("[RequestOptions] IApizrRequestOptions options);");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("[RequestOptions] IApizrRequestOptions options);");
     }
 
     [Fact]
     public async Task Generates_An_Overload_Without_Optional_Parameters()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("string id, [RequestOptions] IApizrRequestOptions options);");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("string id, [RequestOptions] IApizrRequestOptions options);");
     }
 
     [Fact]
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
-        string generateCode = await GenerateCode(true);
+        string generatedCode = await GenerateCode(true);
 
         // All nullable query params ending with a nullable query parameter
-        generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
-        generateCode.Should().Contain("public record GetFooDetailsQueryParams");
+        generatedCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
+        generatedCode.Should().Contain("public record GetFooDetailsQueryParams");
 
         // Some required query params ending with a non-nullable query parameter with injected params
-        generateCode.Should().Contain("string id, [Query] GetBarDetailsQueryParams queryParams, [RequestOptions] IApizrRequestOptions options);");
-        generateCode.Should().Contain("public record GetBarDetailsQueryParams");
-        generateCode.Should().Contain("public GetBarDetailsQueryParams(string title, string description)");
-        generateCode.Should().Contain("Title = title;");
-        generateCode.Should().Contain("Description = description;");
+        generatedCode.Should().Contain("string id, [Query] GetBarDetailsQueryParams queryParams, [RequestOptions] IApizrRequestOptions options);");
+        generatedCode.Should().Contain("public record GetBarDetailsQueryParams");
+        generatedCode.Should().Contain("public GetBarDetailsQueryParams(string title, string description)");
+        generatedCode.Should().Contain("Title = title;");
+        generatedCode.Should().Contain("Description = description;");
     }
 
     [Fact]
     public async Task Generates_Dynamic_Querystring_Parameters_ByTag()
     {
-        string generateCode = await GenerateCode(true, MultipleInterfaces.ByTag);
-        generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
-        generateCode.Should().Contain("public record GetFooDetailsQueryParams");
+        string generatedCode = await GenerateCode(true, MultipleInterfaces.ByTag);
+        generatedCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
+        generatedCode.Should().Contain("public record GetFooDetailsQueryParams");
     }
 
     [Fact]
     public async Task Generates_Dynamic_Querystring_Parameters_ByEndpoint()
     {
-        string generateCode = await GenerateCode(true, MultipleInterfaces.ByEndpoint);
-        generateCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
-        generateCode.Should().Contain("public record GetFooDetailsQueryParams");
+        string generatedCode = await GenerateCode(true, MultipleInterfaces.ByEndpoint);
+        generatedCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
+        generatedCode.Should().Contain("public record GetFooDetailsQueryParams");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
     private static async Task<string> GenerateCode(bool useDynamicQuerystringParameters = false, MultipleInterfaces multipleInterfaces = MultipleInterfaces.Unset)
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
@@ -211,17 +212,7 @@ paths:
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
-    }
-
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 }

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Refitter.Tests.TestUtilities;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Xunit;
@@ -60,44 +61,35 @@ paths:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Should_Contain_Obsolete_Attribute()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("[System.Obsolete]");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("[System.Obsolete]");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

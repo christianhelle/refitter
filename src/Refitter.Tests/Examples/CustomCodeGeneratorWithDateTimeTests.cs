@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+using FluentAssertions;
+using Refitter.Tests.TestUtilities;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Xunit;
@@ -74,44 +75,44 @@ public class CustomCodeGeneratorWithDateTimeTests
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("[Query] System.TimeSpan");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
     [Fact]
     public async Task GeneratedCode_Contains_DateTime_Parameter()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("System.DateTime");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("System.DateTime");
     }
 
     [Fact]
     public async Task GeneratedCode_NotContains_DateTimeOffset_Parameter()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotContain("System.DateTimeOffset");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotContain("System.DateTimeOffset");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
@@ -122,17 +123,8 @@ public class CustomCodeGeneratorWithDateTimeTests
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.json";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

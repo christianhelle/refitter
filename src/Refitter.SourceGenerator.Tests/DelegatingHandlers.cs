@@ -4,7 +4,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
     {
     }
 
-    public class AnotherEmptyMessageHandler : DelegatingHandler 
+    public class AnotherEmptyMessageHandler : DelegatingHandler
     {
     }
 }

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Refitter.Tests.TestUtilities;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Xunit;
@@ -189,39 +190,39 @@ components:
     [Fact]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Use_Polymorphic_Serialization()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
 
-        generateCode.Should().NotContain("JsonInheritanceConverter");
-        generateCode.Should().NotContain("JsonInheritanceAttribute");
+        generatedCode.Should().NotContain("JsonInheritanceConverter");
+        generatedCode.Should().NotContain("JsonInheritanceAttribute");
 
-        generateCode.Should().Contain("[JsonPolymorphic(TypeDiscriminatorPropertyName = \"$type\", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]");
-        generateCode.Should().Contain("[JsonDerivedType(typeof(Warehouse), typeDiscriminator: \"Warehouse\")]");
-        generateCode.Should().Contain("[JsonDerivedType(typeof(WarehouseResponse), typeDiscriminator: \"WarehouseResponse\")]");
-        generateCode.Should().Contain("[JsonDerivedType(typeof(LoadingAddress), typeDiscriminator: \"LoadingAddress\")]");
-        generateCode.Should().Contain("[JsonDerivedType(typeof(UserComponent), typeDiscriminator: \"UserComponent\")]");
-        generateCode.Should().Contain("[JsonDerivedType(typeof(UserComponent2), typeDiscriminator: \"UserComponent2\")]");
+        generatedCode.Should().Contain("[JsonPolymorphic(TypeDiscriminatorPropertyName = \"$type\", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]");
+        generatedCode.Should().Contain("[JsonDerivedType(typeof(Warehouse), typeDiscriminator: \"Warehouse\")]");
+        generatedCode.Should().Contain("[JsonDerivedType(typeof(WarehouseResponse), typeDiscriminator: \"WarehouseResponse\")]");
+        generatedCode.Should().Contain("[JsonDerivedType(typeof(LoadingAddress), typeDiscriminator: \"LoadingAddress\")]");
+        generatedCode.Should().Contain("[JsonDerivedType(typeof(UserComponent), typeDiscriminator: \"UserComponent\")]");
+        generatedCode.Should().Contain("[JsonDerivedType(typeof(UserComponent2), typeDiscriminator: \"UserComponent2\")]");
     }
 
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
@@ -229,17 +230,8 @@ components:
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

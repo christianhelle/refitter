@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+using FluentAssertions;
+using Refitter.Tests.TestUtilities;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Xunit;
@@ -57,71 +58,61 @@ components:
       additionalProperties: false
 ";
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Can_Generate_Code(bool includeHierarchy)
-    {
-        string generateCode = await GenerateCode(includeHierarchy);
-        generateCode.Should().NotBeNullOrWhiteSpace();
-    }
-
-    [Fact]
-    public async Task Removes_Unreferenced_Schema()
-    {
-        string generateCode = await GenerateCode(includeHierarchy: false);
-        generateCode.Should().NotContain("Anonymous");
-
-        generateCode.Should().NotContain("class B");
-        generateCode.Should().Contain("class A");
-    }
-
-    [Fact]
-    public async Task Keeps_All_Union_Cases_Schema()
-    {
-        string generateCode = await GenerateCode(includeHierarchy: true);
-        generateCode.Should().NotContain("Anonymous");
-
-        generateCode.Should().Contain("class B");
-        generateCode.Should().Contain("class A");
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Can_Build_Generated_Code(bool includeHierarchy)
-    {
-        string generateCode = await GenerateCode(includeHierarchy);
-        BuildHelper
-            .BuildCSharp(generateCode)
-            .Should()
-            .BeTrue();
-    }
-
-    private static async Task<string> GenerateCode(bool includeHierarchy)
-    {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_Generate_Code(bool includeHierarchy)
         {
-            OpenApiPath = swaggerFile,
-            TrimUnusedSchema = true,
-            IncludeInheritanceHierarchy = includeHierarchy,
-            UsePolymorphicSerialization = true, // use System.Text.Json attributes
-        };
+            string generatedCode = await GenerateCode(includeHierarchy);
+            generatedCode.Should().NotBeNullOrWhiteSpace();
+        }
 
-        var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
-    }
+        [Fact]
+        public async Task Removes_Unreferenced_Schema()
+        {
+            string generatedCode = await GenerateCode(includeHierarchy: false);
+            generatedCode.Should().NotContain("Anonymous");
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
+            generatedCode.Should().NotContain("class B");
+            generatedCode.Should().Contain("class A");
+        }
+
+        [Fact]
+        public async Task Keeps_All_Union_Cases_Schema()
+        {
+            string generatedCode = await GenerateCode(includeHierarchy: true);
+            generatedCode.Should().NotContain("Anonymous");
+
+            generatedCode.Should().Contain("class B");
+            generatedCode.Should().Contain("class A");
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_Build_Generated_Code(bool includeHierarchy)
+        {
+            string generatedCode = await GenerateCode(includeHierarchy);
+            BuildHelper
+                .BuildCSharp(generatedCode)
+                .Should()
+                .BeTrue();
+        }
+
+        private static async Task<string> GenerateCode(bool includeHierarchy)
+        {
+            var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                TrimUnusedSchema = true,
+                IncludeInheritanceHierarchy = includeHierarchy,
+                UsePolymorphicSerialization = true, // use System.Text.Json attributes
+            };
+
+            var sut = await RefitGenerator.CreateAsync(settings);
+            var generatedCode = sut.Generate();
+            return generatedCode;
+        }
     }
-}
 }

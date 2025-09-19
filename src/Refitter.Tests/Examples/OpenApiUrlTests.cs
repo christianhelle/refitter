@@ -1,4 +1,5 @@
-﻿#if !DEBUG
+#if !DEBUG
+using Refitter.Tests.TestUtilities;
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
@@ -21,9 +22,9 @@ public class OpenApiUrlTests
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
+        var generatedCode = sut.Generate();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue(url);
     }
@@ -38,11 +39,11 @@ public class OpenApiUrlTests
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
+        var generatedCode = sut.Generate();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue(url);
     }
-}
 #endif
+}

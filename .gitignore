@@ -278,3 +278,7 @@ test/Apizr/GeneratedCode
 test/MultipleFiles/**/*.cs
 test/HelloWorld/HelloWorld/Output.cs
 test/MSBuild/refitter.msbuild/
+
+# Install scripts
+dotnet-install.sh
+install.sh

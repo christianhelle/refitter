@@ -3,6 +3,7 @@ using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.Resources;
 using Xunit;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests;
 
@@ -15,8 +16,8 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(version, filename);
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode(version, filename);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Theory]
@@ -26,8 +27,8 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Partial_Interfaces(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(version, filename);
-        generateCode.Should().Contain("partial interface");
+        var generatedCode = await GenerateCode(version, filename);
+        generatedCode.Should().Contain("partial interface");
     }
 
     [Theory]
@@ -37,11 +38,11 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_Contracts(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(
+        var generatedCode = await GenerateCode(
             version,
             filename,
             new RefitGeneratorSettings { GenerateXmlDocCodeComments = false, GenerateContracts = false });
-        generateCode.Should().NotContain("class Pet");
+        generatedCode.Should().NotContain("class Pet");
     }
 
     [Theory]
@@ -51,11 +52,11 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_Clients(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(
+        var generatedCode = await GenerateCode(
             version,
             filename,
             new RefitGeneratorSettings { GenerateXmlDocCodeComments = false, GenerateClients = false });
-        generateCode.Should().NotContain("ISwaggerPetstore");
+        generatedCode.Should().NotContain("ISwaggerPetstore");
     }
 
     [Theory]
@@ -65,11 +66,11 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_XmlDoc_Code_Comments(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(
+        var generatedCode = await GenerateCode(
             version,
             filename,
             new RefitGeneratorSettings { GenerateXmlDocCodeComments = true, GenerateContracts = false });
-        generateCode.Should().Contain("<summary>");
+        generatedCode.Should().Contain("<summary>");
     }
 
     [Theory]
@@ -79,11 +80,11 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_XmlDoc_Code_Comments(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(
+        var generatedCode = await GenerateCode(
             version,
             filename,
             new RefitGeneratorSettings { GenerateXmlDocCodeComments = false, GenerateContracts = false });
-        generateCode.Should().NotContain("<summary>");
+        generatedCode.Should().NotContain("<summary>");
     }
 
     [Theory]
@@ -93,11 +94,11 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Default_Namespace(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(
+        var generatedCode = await GenerateCode(
             version,
             filename,
             new RefitGeneratorSettings { Namespace = "Some.Other.Namespace" });
-        generateCode.Should().Contain("namespace Some.Other.Namespace");
+        generatedCode.Should().Contain("namespace Some.Other.Namespace");
     }
 
     [Theory]
@@ -110,8 +111,8 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.Naming.UseOpenApiTitle = false;
         settings.Naming.InterfaceName = "SomeOtherName";
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("interface ISomeOtherName");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("interface ISomeOtherName");
     }
 
     [Theory]
@@ -123,8 +124,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.AddAutoGeneratedHeader = false;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("This code was generated by Refitter");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("This code was generated by Refitter");
     }
 
     [Theory]
@@ -136,8 +137,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.ReturnIApiResponse = true;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("Task<IApiResponse<Pet>>");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("Task<IApiResponse<Pet>>");
     }
 
     [Theory]
@@ -157,10 +158,10 @@ public class SwaggerPetstoreTests
                 ["addPet"] = "void", // Remove type
             },
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("Task<IApiResponse<Pet>> GetPetById");
-        generateCode.Should().Contain("Task<Pet> DeletePet");
-        generateCode.Should().Contain("Task AddPet");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("Task<IApiResponse<Pet>> GetPetById");
+        generatedCode.Should().Contain("Task<Pet> DeletePet");
+        generatedCode.Should().Contain("Task AddPet");
     }
 
     [Theory]
@@ -172,8 +173,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.TypeAccessibility = TypeAccessibility.Internal;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("internal partial class");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("internal partial class");
     }
 
     [Theory]
@@ -185,8 +186,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.TypeAccessibility = TypeAccessibility.Internal;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("internal partial interface");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("internal partial interface");
     }
 
     [Theory]
@@ -198,8 +199,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.UseCancellationTokens = true;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("CancellationToken cancellationToken = default");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("CancellationToken cancellationToken = default");
     }
 
     [Theory]
@@ -218,8 +219,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.UseCancellationTokens = cancellationTokens;
-        var generateCode = await GenerateCode(version, filename, settings);
-        Assert.Equal(cancellationTokens, generateCode.Contains("using System.Threading;"));
+        var generatedCode = await GenerateCode(version, filename, settings);
+        Assert.Equal(cancellationTokens, generatedCode.Contains("using System.Threading;"));
     }
 
     [Theory]
@@ -231,8 +232,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.GenerateOperationHeaders = true;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"api-key\")] string api_key");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"api-key\")] string api_key");
     }
 
     [Theory]
@@ -244,8 +245,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.GenerateOperationHeaders = true;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"api_key\")] string api_key");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"api_key\")] string api_key");
     }
 
     [Theory]
@@ -257,8 +258,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.GenerateOperationHeaders = false;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("[Header(\"api_key\")] string? api_key");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Header(\"api_key\")] string? api_key");
     }
 
     [Theory]
@@ -270,8 +271,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.GenerateAuthenticationHeader = true;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"auth.key\")] string auth_key");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"auth.key\")] string auth_key");
     }
 
     [Theory]
@@ -283,8 +284,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.GenerateAuthenticationHeader = true;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
     }
 
     [Theory]
@@ -297,8 +298,8 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.GenerateOperationHeaders = false;
         settings.GenerateAuthenticationHeader = true;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
     }
 
     [Theory]
@@ -310,8 +311,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.GenerateAuthenticationHeader = false;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("[Header(\"auth_key\")] string? auth_key");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Header(\"auth_key\")] string? auth_key");
     }
 
     [Theory]
@@ -322,11 +323,11 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_With_Accept_Request_Header(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
         if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
-            generateCode.Should().Contain("[Headers(\"Accept: application/json\"");
+            generatedCode.Should().Contain("[Headers(\"Accept: application/json\"");
         else if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV2 or SampleOpenSpecifications.SwaggerPetstoreYamlV2)
-            generateCode.Should().NotContain("[Headers(\"Accept: application/json\"");
+            generatedCode.Should().NotContain("[Headers(\"Accept: application/json\"");
     }
 
     [Theory]
@@ -336,8 +337,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.AddAcceptHeaders = false;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("[Headers(\"Accept");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Headers(\"Accept");
     }
 
     [Theory]
@@ -349,8 +350,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Theory]
@@ -366,8 +367,8 @@ public class SwaggerPetstoreTests
             BaseUrl = "https://petstore3.swagger.io/api/v3",
             TransientErrorHandler = TransientErrorHandler.Polly
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("ConfigureRefitClients");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("ConfigureRefitClients");
     }
 
     [Theory]
@@ -383,8 +384,8 @@ public class SwaggerPetstoreTests
             BaseUrl = "https://petstore3.swagger.io/api/v3",
             TransientErrorHandler = TransientErrorHandler.Polly
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("using Polly");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("using Polly");
     }
 
     [Theory]
@@ -400,8 +401,8 @@ public class SwaggerPetstoreTests
             BaseUrl = "https://petstore3.swagger.io/api/v3",
             TransientErrorHandler = TransientErrorHandler.None
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("using Polly");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("using Polly");
     }
 
     [Theory]
@@ -429,8 +430,8 @@ public class SwaggerPetstoreTests
                 WithFileTransfer = true
             }
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("AddApizrManagerFor");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("AddApizrManagerFor");
     }
 
     [Theory]
@@ -458,8 +459,8 @@ public class SwaggerPetstoreTests
                 WithFileTransfer = true
             }
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("using Polly");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("using Polly");
     }
 
     [Theory]
@@ -487,8 +488,8 @@ public class SwaggerPetstoreTests
                 WithFileTransfer = true
             }
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("using Polly");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("using Polly");
     }
 
     [Theory]
@@ -511,8 +512,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.MultipleInterfaces = multipleInterfaces;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[System.CodeDom.Compiler.GeneratedCode(\"Refitter\"");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[System.CodeDom.Compiler.GeneratedCode(\"Refitter\"");
     }
 
     [Theory]
@@ -528,8 +529,8 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.MultipleInterfaces = multipleInterfaces;
         settings.OperationNameTemplate = "ExecuteAsync";
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("ExecuteAsync(");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("ExecuteAsync(");
     }
 
     [Theory]
@@ -541,9 +542,9 @@ public class SwaggerPetstoreTests
 #endif
     public async Task Can_Build_Generated_Code(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(version, filename);
+        var generatedCode = await GenerateCode(version, filename);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -559,9 +560,9 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.ReturnIApiResponse = true;
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -572,10 +573,10 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.ReturnIObservable = true;
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
 
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -591,9 +592,9 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint;
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -609,9 +610,9 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.MultipleInterfaces = MultipleInterfaces.ByTag;
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -626,9 +627,9 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
+        var generatedCode = sut.Generate();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -660,8 +661,8 @@ public class SwaggerPetstoreTests
     [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Obsolete_Attribute(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(version, filename);
-        generateCode.Should().Contain("[System.Obsolete]");
+        var generatedCode = await GenerateCode(version, filename);
+        generatedCode.Should().Contain("[System.Obsolete]");
     }
 
     [Theory]
@@ -673,8 +674,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.GenerateDeprecatedOperations = false;
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain(@"/pet/findByTags");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain(@"/pet/findByTags");
     }
 
     [Theory]
@@ -686,8 +687,8 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.OperationNameTemplate = "{operationName}Async";
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("FindPetsByStatusAsync");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("FindPetsByStatusAsync");
     }
 
     [Theory]
@@ -707,9 +708,9 @@ public class SwaggerPetstoreTests
         {
             OperationNameGenerator = type
         };
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -724,8 +725,8 @@ public class SwaggerPetstoreTests
         var settings = new RefitGeneratorSettings();
         settings.GenerateDefaultAdditionalProperties = false;
         settings.OperationNameTemplate = "{operationName}Async";
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("Dictionary<string, object> AdditionalProperties");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("Dictionary<string, object> AdditionalProperties");
     }
 
     [Theory]
@@ -741,9 +742,9 @@ public class SwaggerPetstoreTests
             GenerateNullableReferenceTypes = true,
             GenerateOptionalPropertiesAsNullable = true
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("Task<Pet>");
-        generateCode.Should().NotContain("Task<Pet?>");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("Task<Pet>");
+        generatedCode.Should().NotContain("Task<Pet?>");
     }
 
     [Theory]
@@ -760,9 +761,9 @@ public class SwaggerPetstoreTests
             GenerateNullableReferenceTypes = true,
             GenerateOptionalPropertiesAsNullable = true
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("Task<IApiResponse<Pet>>");
-        generateCode.Should().NotContain("Task<IApiResponse<Pet?>>");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("Task<IApiResponse<Pet>>");
+        generatedCode.Should().NotContain("Task<IApiResponse<Pet?>>");
     }
 
     [Theory]
@@ -773,8 +774,8 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_With_ImmutableRecords(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings { ImmutableRecords = true };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("record Pet");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("record Pet");
     }
 
     [Theory]
@@ -785,12 +786,12 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_With_DynamicQuerystringParameters(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings { UseDynamicQuerystringParameters = true };
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
         if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
-            generateCode.Should().Contain("long petId, [Query] UpdatePetWithFormQueryParams queryParams);")
+            generatedCode.Should().Contain("long petId, [Query] UpdatePetWithFormQueryParams queryParams);")
                 .And.Contain("public class UpdatePetWithFormQueryParams");
 
-        generateCode.Should().Contain("[Query] LoginUserQueryParams queryParams);")
+        generatedCode.Should().Contain("[Query] LoginUserQueryParams queryParams);")
             .And.Contain("public class LoginUserQueryParams");
     }
 
@@ -802,8 +803,8 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_With_IDisposable(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings { GenerateDisposableClients = true };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("IDisposable");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("IDisposable");
     }
 
     [Theory]
@@ -817,9 +818,9 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.GenerateDisposableClients = true;
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -832,8 +833,8 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Interface_With_Summary(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings { GenerateXmlDocCodeComments = true };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("<summary>Swagger Petstore");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("<summary>Swagger Petstore");
     }
 
     [Theory]
@@ -844,9 +845,9 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Interfaces_Filtered_By_Path_Match(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings { IncludePathMatches = ["^/pet.*"] };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("\"/pet\"");
-        generateCode.Should().Contain("\"/pet/{petId}\"");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("\"/pet\"");
+        generatedCode.Should().Contain("\"/pet/{petId}\"");
     }
 
     [Theory]
@@ -859,10 +860,10 @@ public class SwaggerPetstoreTests
     public async Task Can_Import_Contracts_Namespace(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings { ContractsNamespace = "Contracts" };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("using Contracts;");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("using Contracts;");
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
