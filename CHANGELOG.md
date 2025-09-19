@@ -2,25 +2,31 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.3-preview.78...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.3...HEAD)
+
+**Closed issues:**
+
+- Fix SonarCloud  issues [\#752](https://github.com/christianhelle/refitter/issues/752)
+
+**Merged pull requests:**
+
+- Update dependency Refitter.SourceGenerator to 1.6.3 [\#755](https://github.com/christianhelle/refitter/pull/755) ([renovate[bot]](https://github.com/apps/renovate))
+- Fix SonarCloud maintainability issues - eliminate code duplication and improve code quality [\#753](https://github.com/christianhelle/refitter/pull/753) ([Copilot](https://github.com/apps/copilot-swe-agent))
+
+## [1.6.3](https://github.com/christianhelle/refitter/tree/1.6.3) (2025-09-17)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.2...1.6.3)
 
 **Implemented enhancements:**
 
 - Introduce --simple-output CLI argument [\#751](https://github.com/christianhelle/refitter/pull/751) ([christianhelle](https://github.com/christianhelle))
+- Add support for systems running only .NET 9.0 \(without .NET 8.0\) in Refitter.MSBuild [\#746](https://github.com/christianhelle/refitter/pull/746) ([christianhelle](https://github.com/christianhelle))
+- Fix MSBuild task so that the generated code is included in the compilation [\#745](https://github.com/christianhelle/refitter/pull/745) ([christianhelle](https://github.com/christianhelle))
+- Revert NSwag back to v14.4.0 [\#734](https://github.com/christianhelle/refitter/pull/734) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
 - Refitter Output is mangled and unreadable [\#750](https://github.com/christianhelle/refitter/issues/750)
-
-## [1.6.3-preview.78](https://github.com/christianhelle/refitter/tree/1.6.3-preview.78) (2025-09-12)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.2...1.6.3-preview.78)
-
-**Implemented enhancements:**
-
-- Add support for systems running only .NET 9.0 \(without .NET 8.0\) in Refitter.MSBuild [\#746](https://github.com/christianhelle/refitter/pull/746) ([christianhelle](https://github.com/christianhelle))
-- Fix MSBuild task so that the generated code is included in the compilation [\#745](https://github.com/christianhelle/refitter/pull/745) ([christianhelle](https://github.com/christianhelle))
-- Revert NSwag back to v14.4.0 [\#734](https://github.com/christianhelle/refitter/pull/734) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
