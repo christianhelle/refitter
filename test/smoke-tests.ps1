@@ -166,6 +166,8 @@ function RunTests {
 
                     GenerateAndBuild -format $format -namespace "$namespace.Disposable" -outputPath "Disposable$outputPath" -args "--disposable" -buildFromSource $buildFromSource -netCore
                     GenerateAndBuild -format $format -namespace "$namespace.MultipleFiles" -args "--multiple-files" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfacesByEndpoint" -args "--multiple-interfaces ByEndpoint" -buildFromSource $buildFromSource
+                    GenerateAndBuild -format $format -namespace "$namespace.MultipleInterfacesByTag" -args "--multiple-interfaces ByTag" -buildFromSource $buildFromSource
                     GenerateAndBuild -format $format -namespace "$namespace.SeparateContractsFile" -args "--contracts-output GeneratedCode/Contracts --contracts-namespace $namespace.SeparateContractsFile.Contracts" -buildFromSource $buildFromSource
                     GenerateAndBuild -format $format -namespace "$namespace.Cancellation" -outputPath "WithCancellation$outputPath" "--cancellation-tokens" -buildFromSource $buildFromSource
                     GenerateAndBuild -format $format -namespace "$namespace.Internal" -outputPath "Internal$outputPath" -args "--internal" -buildFromSource $buildFromSource
