@@ -31,7 +31,8 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
 
                 var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
-                var methodName = settings.OperationNameTemplate ?? "Execute";
+                var methodName = settings.OperationNameTemplate?.Replace("{operationName}", "Execute") ?? "Execute";
+
                 var code = new StringBuilder();
 
                 this.docGenerator.AppendInterfaceDocumentation(operation, code);
