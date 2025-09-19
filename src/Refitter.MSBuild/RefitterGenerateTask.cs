@@ -159,7 +159,8 @@ public class RefitterGenerateTask : MSBuildTask
             var hasDependencyInjectionSettings = refitterContent.Contains("\"dependencyInjectionSettings\"");
 
             // If contractsOutputFolder is specified, automatically enable multiple files
-            generateMultipleFiles = generateMultipleFiles || !string.IsNullOrWhiteSpace(contractsOutputFolder);
+            bool hasContractsOutputFolder = !string.IsNullOrWhiteSpace(contractsOutputFolder);
+            generateMultipleFiles = generateMultipleFiles || hasContractsOutputFolder;
 
             // Default output filename based on .refitter filename if not specified
             if (string.IsNullOrWhiteSpace(outputFilename))
