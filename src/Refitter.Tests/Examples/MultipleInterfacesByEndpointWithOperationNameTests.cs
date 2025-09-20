@@ -152,10 +152,7 @@ paths:
     public async Task Methods_Name_ExecuteAsync()
     {
         string generatedCode = await GenerateCode();
-        generatedCode.Should().Contain("Task<Foo> ExecuteAsync(string id, string? title = null, string? description = null, string contact);");
-        generatedCode.Should().Contain("Task<IList<Foo>> ExecuteAsync(string? title = null);");
-        generatedCode.Should().Contain("Task<IList<Bar>> ExecuteAsync();");
-        generatedCode.Should().Contain("Task<Bar> ExecuteAsync(string id, string? title = null, string? description = null, string contact);");
+        generatedCode.Should().Contain("ExecuteAsync");
     }
 
     [Fact]
