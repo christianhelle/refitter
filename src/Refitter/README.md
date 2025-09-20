@@ -79,7 +79,7 @@ OPTIONS:
         --tag                                                    Only include Endpoints that contain this tag. May be set multiple times and result in OR'ed evaluation
         --skip-validation                                        Skip validation of the OpenAPI specification
         --no-deprecated-operations                               Don't generate deprecated operations
-        --operation-name-template                                Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, {operationName} is replaced with 'Execute'
+        --operation-name-template                                Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface where all instances of the string '{operationName}' is replaced with 'Execute'
         --optional-nullable-parameters                           Generate nullable parameters as optional parameters
         --trim-unused-schema                                     Removes unreferenced components schema to keep the generated output to a minimum
         --keep-schema                                            Force to keep matching schema, uses regular expressions. Use together with "--trim-unused-schema". Can be set multiple times
@@ -147,7 +147,7 @@ The following is an example `.refitter` file
   "useIsoDateFormat": false, // Optional. Default=false
   "multipleInterfaces": "ByEndpoint", // Optional. May be one of "ByEndpoint" or "ByTag"
   "generateDeprecatedOperations": false, // Optional. Default=true
-  "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName}. When multipleInterfaces == "ByEndpoint", {operationName} is replaced with 'Execute'
+  "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName}. When multipleInterfaces == "ByEndpoint", this is name of the Execute() method in the interface where all instances of the string '{operationName}' is replaced with 'Execute'
   "optionalParameters": false, // Optional. Default=false
   "outputFolder": "../CustomOutput" // Optional. Default=./Generated
   "outputFilename": "RefitInterface.cs", // Optional. Default=Output.cs for CLI tool
@@ -259,7 +259,7 @@ The following is an example `.refitter` file
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
-- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using multiple interfaces with `ByEndpoint`, {operationName} is replaced with 'Execute'
+- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using multiple interfaces with `ByEndpoint`, this is name of the Execute() method in the interface where all instances of the string '{operationName}' is replaced with 'Execute'
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
 - `trimUnusedSchema` - Removes unreferenced components schema to keep the generated output to a minimum
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
