@@ -384,7 +384,7 @@
       "type": "boolean"
     },
     "operationNameTemplate": {
-      "description": "Generate operation names using pattern. When using --multiple-interfaces ByEndpoint,\r\nthis is name of the Execute() method in the interface.",
+      "description": "Generate operation names using pattern. When using multiple interfaces ByEndpoint,\r\n{operationName} is replaced with 'Execute'.",
       "type": "string"
     },
     "optionalParameters": {

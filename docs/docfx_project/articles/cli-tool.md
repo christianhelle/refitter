@@ -77,7 +77,7 @@ OPTIONS:
         --tag                                                    Only include Endpoints that contain this tag. May be set multiple times and result in OR'ed evaluation                                    
         --skip-validation                                        Skip validation of the OpenAPI specification                                                                                              
         --no-deprecated-operations                               Don't generate deprecated operations                                                                                                      
-        --operation-name-template                                Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface
+        --operation-name-template                                Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, {operationName} is replaced with 'Execute'
         --optional-nullable-parameters                           Generate nullable parameters as optional parameters                                                                                       
         --trim-unused-schema                                     Removes unreferenced components schema to keep the generated output to a minimum                                                          
         --keep-schema                                            Force to keep matching schema, uses regular expressions. Use together with "--trim-unused-schema". Can be set multiple times              
