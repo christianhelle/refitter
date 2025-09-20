@@ -4,12 +4,18 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.3...HEAD)
 
+**Implemented enhancements:**
+
+- Update --operation-name-template implementation to replace all {operationName} instances with Execute [\#759](https://github.com/christianhelle/refitter/pull/759) ([christianhelle](https://github.com/christianhelle))
+
 **Closed issues:**
 
 - Fix SonarCloud  issues [\#752](https://github.com/christianhelle/refitter/issues/752)
 
 **Merged pull requests:**
 
+- docs: add marcohern as a contributor for ideas [\#760](https://github.com/christianhelle/refitter/pull/760) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add marcohern as a contributor for bug [\#758](https://github.com/christianhelle/refitter/pull/758) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update dependency Refitter.SourceGenerator to 1.6.3 [\#755](https://github.com/christianhelle/refitter/pull/755) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix SonarCloud maintainability issues - eliminate code duplication and improve code quality [\#753](https://github.com/christianhelle/refitter/pull/753) ([Copilot](https://github.com/apps/copilot-swe-agent))
 
