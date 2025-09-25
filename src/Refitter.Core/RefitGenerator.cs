@@ -32,32 +32,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private static async Task<OpenApiDocument> GetOpenApiDocument(RefitGeneratorSettings settings)
     {
-        var specialCharacters = new[]
-        {
-            ":"
-        };
-
-        return specialCharacters.Aggregate(
-            await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath),
-            SanitizePath);
-    }
-
-    private static OpenApiDocument SanitizePath(
-        OpenApiDocument openApiDocument,
-        string stringToRemove)
-    {
-        var paths = openApiDocument.Paths.Keys
-            .Where(pathKey => pathKey.Contains(stringToRemove))
-            .ToArray();
-
-        foreach (var path in paths)
-        {
-            var value = openApiDocument.Paths[path];
-            openApiDocument.Paths.Remove(path);
-            openApiDocument.Paths.Add(path.Replace(stringToRemove, string.Empty), value);
-        }
-
-        return openApiDocument;
+        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath);
     }
 
     private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches,
