@@ -52,11 +52,12 @@ parameters:
     }
 
     [Fact]
-    public async Task Generates_Path_Without_Colons()
+    public async Task Generates_OperationName_Without_Colons()
     {
         var generatedCode = await GenerateCode();
         using var scope = new AssertionScope();
-        generatedCode.Should().NotContain("/:");
+        generatedCode.Should().NotContain(":OrderItems(");
+        generatedCode.Should().Contain("\"/orders/{orderId}/:orderItems/{orderItemId}\"");
     }
 
     [Fact]
