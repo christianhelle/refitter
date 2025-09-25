@@ -5,12 +5,13 @@ Refitter is available as custom MSBuild tasks that includes the Refitter CLI exe
 The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task and looks something like this:
 
 ```xml
-<UsingTask TaskName="RefitterGenerateTask" 
-           AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll" 
+<UsingTask TaskName="RefitterGenerateTask"
+           AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll"
            Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
 <Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
     <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
-                          DisableLogging="$(RefitterNoLogging)">
+                          DisableLogging="$(RefitterNoLogging)"
+                          SkipValidation="$(RefitterSkipValidation)">
         <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
     </RefitterGenerateTask>
     <ItemGroup>
