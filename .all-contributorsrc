@@ -728,6 +728,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "eoma-knowit",
+      "name": "eoma-knowit",
+      "avatar_url": "https://avatars.githubusercontent.com/u/150660175?v=4",
+      "profile": "https://github.com/eoma-knowit",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
