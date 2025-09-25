@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-77-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-78-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1343,6 +1343,9 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/SWarnberg"><img src="https://avatars.githubusercontent.com/u/26246346?v=4?s=100" width="100px;" alt="Staffan Wärnberg"/><br /><sub><b>Staffan Wärnberg</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3ASWarnberg" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/lilinus"><img src="https://avatars.githubusercontent.com/u/78953007?v=4?s=100" width="100px;" alt="Linus Hamlin"/><br /><sub><b>Linus Hamlin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Alilinus" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://marcohern.com/en/#about"><img src="https://avatars.githubusercontent.com/u/5376517?v=4?s=100" width="100px;" alt="Marco Hernandez"/><br /><sub><b>Marco Hernandez</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amarcohern" title="Bug reports">🐛</a> <a href="#ideas-marcohern" title="Ideas, Planning, & Feedback">🤔</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/david-pw"><img src="https://avatars.githubusercontent.com/u/178433875?v=4?s=100" width="100px;" alt="david-pw"/><br /><sub><b>david-pw</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adavid-pw" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
