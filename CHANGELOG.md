@@ -2,7 +2,24 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.3...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.4...HEAD)
+
+**Implemented enhancements:**
+
+- Do not remove colon from url paths, verify they're not present in operation names [\#765](https://github.com/christianhelle/refitter/pull/765) ([eoma-knowit](https://github.com/eoma-knowit))
+
+**Fixed bugs:**
+
+- Explicitely setting multipleInterfaces = "ByEndpoint" causes Refitter to render names literally "{operationName}Async" [\#757](https://github.com/christianhelle/refitter/issues/757)
+
+**Merged pull requests:**
+
+- docs: add eoma-knowit as a contributor for code [\#766](https://github.com/christianhelle/refitter/pull/766) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add david-pw as a contributor for bug [\#764](https://github.com/christianhelle/refitter/pull/764) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
+## [1.6.4](https://github.com/christianhelle/refitter/tree/1.6.4) (2025-09-20)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.3...1.6.4)
 
 **Implemented enhancements:**
 
