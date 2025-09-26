@@ -1345,7 +1345,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="http://marcohern.com/en/#about"><img src="https://avatars.githubusercontent.com/u/5376517?v=4?s=100" width="100px;" alt="Marco Hernandez"/><br /><sub><b>Marco Hernandez</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amarcohern" title="Bug reports">🐛</a> <a href="#ideas-marcohern" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/david-pw"><img src="https://avatars.githubusercontent.com/u/178433875?v=4?s=100" width="100px;" alt="david-pw"/><br /><sub><b>david-pw</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adavid-pw" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/david-pw"><img src="https://avatars.githubusercontent.com/u/178433875?v=4?s=100" width="100px;" alt="david-pw"/><br /><sub><b>david-pw</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adavid-pw" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=david-pw" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/eoma-knowit"><img src="https://avatars.githubusercontent.com/u/150660175?v=4?s=100" width="100px;" alt="eoma-knowit"/><br /><sub><b>eoma-knowit</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=eoma-knowit" title="Code">💻</a></td>
     </tr>
   </tbody>
