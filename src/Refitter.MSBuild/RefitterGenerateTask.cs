@@ -80,7 +80,7 @@ public class RefitterGenerateTask : MSBuildTask
             TryLogCommandLine("Using .NET 8 version of Refitter.");
         }
 
-        var args = $"{refitterDll} --settings-file {file} --simple-output";
+        var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
         if (DisableLogging)
         {
             args += " --no-logging";
