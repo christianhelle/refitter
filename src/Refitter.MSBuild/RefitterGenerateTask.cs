@@ -12,6 +12,8 @@ public class RefitterGenerateTask : MSBuildTask
 
     public bool DisableLogging { get; set; }
 
+    public bool SkipValidation { get; set; }
+
     [Output]
     public ITaskItem[] GeneratedFiles { get; set; }
 
@@ -78,10 +80,14 @@ public class RefitterGenerateTask : MSBuildTask
             TryLogCommandLine("Using .NET 8 version of Refitter.");
         }
 
-        var args = $"{refitterDll} --settings-file {file}";
+        var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
         if (DisableLogging)
         {
             args += " --no-logging";
+        }
+        if (SkipValidation)
+        {
+            args += " --skip-validation";
         }
 
         TryLogCommandLine($"Starting dotnet {args}");
