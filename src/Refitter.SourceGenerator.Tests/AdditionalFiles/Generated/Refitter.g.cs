@@ -424,7 +424,6 @@ namespace Refitter.Tests.AdditionalFiles.NoFilename
         /// <summary>
         /// Order Status
         /// </summary>
-
         [JsonPropertyName("status")]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public OrderStatus Status { get; set; }
@@ -543,7 +542,6 @@ namespace Refitter.Tests.AdditionalFiles.NoFilename
         /// <summary>
         /// User Status
         /// </summary>
-
         [JsonPropertyName("userStatus")]
         public int UserStatus { get; set; }
 
@@ -603,7 +601,6 @@ namespace Refitter.Tests.AdditionalFiles.NoFilename
         /// <summary>
         /// pet status in the store
         /// </summary>
-
         [JsonPropertyName("status")]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public PetStatus Status { get; set; }

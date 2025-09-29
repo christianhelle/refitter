@@ -29,6 +29,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             {
                 Namespace = settings.ContractsNamespace ?? settings.Namespace,
                 JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                JsonPolymorphicSerializationStyle = settings.UsePolymorphicSerialization ? CSharpJsonPolymorphicSerializationStyle.SystemTextJson : CSharpJsonPolymorphicSerializationStyle.NJsonSchema,
                 TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant(),
                 ClassStyle =
                     settings.ImmutableRecords ||
@@ -46,18 +47,11 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             csharpClientGeneratorSettings.ParameterNameGenerator = settings.ParameterNameGenerator;
         }
 
-        csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(
-            csharpClientGeneratorSettings.CSharpGeneratorSettings,
-            [
-                typeof(CSharpGenerator).Assembly,
-                typeof(CSharpGeneratorBaseSettings).Assembly,
-                typeof(CustomTemplateFactory).Assembly,
-            ]);
+        csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(csharpClientGeneratorSettings.CSharpGeneratorSettings);
 
         var generator = new CustomCSharpClientGenerator(
             document,
-            csharpClientGeneratorSettings,
-            settings.UsePolymorphicSerialization);
+            csharpClientGeneratorSettings);
 
         MapCSharpGeneratorSettings(
             settings.CodeGeneratorSettings,
@@ -102,39 +96,30 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 
     /// <summary>
     /// custom template factory
-    /// solely for the purpose of supporting UsePolymorphicSerialization
-    /// This class and its templates should be removed when NSwag supports this feature.
+    /// solely for the purpose of tweaking the JsonPolymorphic attribute with UnknownDerivedTypeHandling = FallBackToBaseType and IgnoreUnrecognizedTypeDiscriminators = true
+    /// This class should be removed if NSwag eventually supports setting UnknownDerivedTypeHandling and IgnoreUnrecognizedTypeDiscriminators.
     /// </summary>
     private class CustomTemplateFactory : NSwag.CodeGeneration.DefaultTemplateFactory
     {
-        /// <summary>Initializes a new instance of the <see cref="DefaultTemplateFactory" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="CustomTemplateFactory" /> class.</summary>
         /// <param name="settings">The settings.</param>
-        /// <param name="assemblies">The assemblies.</param>
-        public CustomTemplateFactory(CodeGeneratorSettingsBase settings, Assembly[] assemblies)
-            : base(settings, assemblies)
+        public CustomTemplateFactory(CodeGeneratorSettingsBase settings)
+            : base(settings, [typeof(CSharpGenerator).Assembly, typeof(CSharpGeneratorBaseSettings).Assembly])
         {
         }
 
-        /// <summary>Tries to load an embedded Liquid template.</summary>
-        /// <param name="language">The language.</param>
-        /// <param name="template">The template name.</param>
-        /// <returns>The template.</returns>
+        /// <inheritdoc />
         protected override string GetEmbeddedLiquidTemplate(string language, string template)
         {
-            template = template.TrimEnd('!');
-            var assembly = Assembly.GetExecutingAssembly(); // this code is running in Refitter.Core and Refitter.SourceGenerator
-            var resourceName = $"{assembly.GetName().Name}.Templates.{template}.liquid";
-
-            var resource = assembly.GetManifestResourceStream(resourceName);
-            if (resource != null)
+            var templateText = base.GetEmbeddedLiquidTemplate(language, template);
+            return template switch
             {
-                using (var reader = new StreamReader(resource))
-                {
-                    return reader.ReadToEnd();
-                }
-            }
-
-            return base.GetEmbeddedLiquidTemplate(language, template);
+                "Class" => templateText
+                    .Replace(
+                        "[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = \"{{ Discriminator }}\")]",
+                        "[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = \"{{ Discriminator }}\", UnknownDerivedTypeHandling = System.Text.Json.Serialization.JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]"),
+                _ => templateText,
+            };
         }
     }
 }
