@@ -37,7 +37,8 @@ jobs:
       with:
         dotnet-version: |
           8.0.x
-          9.0.x 
+          9.0.x
+          10.0.x
     
     - name: 🧪 Test
       run: dotnet test src/Refitter.Tests/Refitter.Tests.csproj -c Release --collect:"XPlat Code Coverage" -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}"
