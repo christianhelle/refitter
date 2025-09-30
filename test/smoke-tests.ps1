@@ -82,9 +82,9 @@ function GenerateAndBuild {
       $solution = $csproj
     } else {
       Write-Host "`r`nBuilding ConsoleApp`r`n"
-      $solution = "./ConsoleApp/ConsoleApp.sln"
+      $solution = "./ConsoleApp/ConsoleApp.slnx"
       if ($netCore) {
-          $solution = "./ConsoleApp/ConsoleApp.Core.sln"
+          $solution = "./ConsoleApp/ConsoleApp.Core.slnx"
       }
     }
 
