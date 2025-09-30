@@ -89,7 +89,7 @@ function GenerateAndBuild {
     }
 
     $process = Start-Process "dotnet" `
-        -Args "build $solution" `
+        -Args "build $solution --nologo -v q --property WarningLevel=0 /clp:ErrorsOnly" `
         -NoNewWindow `
         -PassThru
     $process | Wait-Process
