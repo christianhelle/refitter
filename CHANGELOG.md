@@ -6,6 +6,8 @@
 
 **Implemented enhancements:**
 
+- Use NSwag's built-in System.Text.Json polymorphic serialization [\#772](https://github.com/christianhelle/refitter/pull/772) ([0xced](https://github.com/0xced))
+- chore: add ability to skip-validation + simplify unicode logging [\#767](https://github.com/christianhelle/refitter/pull/767) ([david-pw](https://github.com/david-pw))
 - Do not remove colon from url paths, verify they're not present in operation names [\#765](https://github.com/christianhelle/refitter/pull/765) ([eoma-knowit](https://github.com/eoma-knowit))
 
 **Fixed bugs:**
@@ -14,6 +16,8 @@
 
 **Merged pull requests:**
 
+- docs: add 0xced as a contributor for code [\#773](https://github.com/christianhelle/refitter/pull/773) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add david-pw as a contributor for code [\#768](https://github.com/christianhelle/refitter/pull/768) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add eoma-knowit as a contributor for code [\#766](https://github.com/christianhelle/refitter/pull/766) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add david-pw as a contributor for bug [\#764](https://github.com/christianhelle/refitter/pull/764) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 
