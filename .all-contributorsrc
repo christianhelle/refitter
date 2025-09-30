@@ -738,6 +738,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "0xced",
+      "name": "Cédric Luthi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/51363?v=4",
+      "profile": "https://github.com/0xced",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
