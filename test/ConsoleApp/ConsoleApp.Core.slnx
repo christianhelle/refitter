@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Net8/Net8.csproj" />
+  <Project Path="Net9/Net9.csproj" />
+</Solution>
