@@ -16,10 +16,14 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency system.reactive to 6.1.0 [\#775](https://github.com/christianhelle/refitter/pull/775) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add 0xced as a contributor for code [\#773](https://github.com/christianhelle/refitter/pull/773) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 9.0.6 [\#771](https://github.com/christianhelle/refitter/pull/771) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add david-pw as a contributor for code [\#768](https://github.com/christianhelle/refitter/pull/768) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add eoma-knowit as a contributor for code [\#766](https://github.com/christianhelle/refitter/pull/766) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add david-pw as a contributor for bug [\#764](https://github.com/christianhelle/refitter/pull/764) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency newtonsoft.json to 13.0.4 [\#748](https://github.com/christianhelle/refitter/pull/748) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dotnet monorepo [\#742](https://github.com/christianhelle/refitter/pull/742) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.6.4](https://github.com/christianhelle/refitter/tree/1.6.4) (2025-09-20)
 
