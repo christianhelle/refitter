@@ -17,6 +17,7 @@
 **Merged pull requests:**
 
 - chore\(deps\): update dependency system.reactive to 6.1.0 [\#775](https://github.com/christianhelle/refitter/pull/775) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency microsoft.net.test.sdk to v18 [\#774](https://github.com/christianhelle/refitter/pull/774) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add 0xced as a contributor for code [\#773](https://github.com/christianhelle/refitter/pull/773) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 9.0.6 [\#771](https://github.com/christianhelle/refitter/pull/771) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add david-pw as a contributor for code [\#768](https://github.com/christianhelle/refitter/pull/768) ([allcontributors[bot]](https://github.com/apps/allcontributors))
