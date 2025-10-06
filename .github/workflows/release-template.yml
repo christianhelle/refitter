@@ -10,10 +10,13 @@ on:
 env:
   NUGET_REPO_URL: "https://api.nuget.org/v3/index.json"
 
+permissions:
+  id-token: write  # enable GitHub OIDC token issuance for this job
+  contents: write
+  packages: write
+
 jobs:
   CLI:
-    permissions:
-      id-token: write  # enable GitHub OIDC token issuance for this job
     name: 🚚 Prepare new release
     runs-on: ubuntu-latest
     steps:
