@@ -2,7 +2,23 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.4...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.5...HEAD)
+
+**Fixed bugs:**
+
+- Refitter.MSBuild 1.6.4 - Can't generate from .refitter file [\#763](https://github.com/christianhelle/refitter/issues/763)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency microsoft.build.utilities.core to 17.14.28 [\#781](https://github.com/christianhelle/refitter/pull/781) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dotnet monorepo [\#780](https://github.com/christianhelle/refitter/pull/780) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency spectre.console.cli to 0.52.0 [\#779](https://github.com/christianhelle/refitter/pull/779) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency ruby to v3.4.7 [\#777](https://github.com/christianhelle/refitter/pull/777) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency refitter.sourcegenerator to 1.6.5 [\#776](https://github.com/christianhelle/refitter/pull/776) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.6.5](https://github.com/christianhelle/refitter/tree/1.6.5) (2025-10-06)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.4...1.6.5)
 
 **Implemented enhancements:**
 
@@ -21,6 +37,7 @@
 - docs: add 0xced as a contributor for code [\#773](https://github.com/christianhelle/refitter/pull/773) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 9.0.6 [\#771](https://github.com/christianhelle/refitter/pull/771) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency xunit.runner.visualstudio to 3.1.5 [\#770](https://github.com/christianhelle/refitter/pull/770) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency polly to 8.6.4 [\#769](https://github.com/christianhelle/refitter/pull/769) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add david-pw as a contributor for code [\#768](https://github.com/christianhelle/refitter/pull/768) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add eoma-knowit as a contributor for code [\#766](https://github.com/christianhelle/refitter/pull/766) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add david-pw as a contributor for bug [\#764](https://github.com/christianhelle/refitter/pull/764) ([allcontributors[bot]](https://github.com/apps/allcontributors))
