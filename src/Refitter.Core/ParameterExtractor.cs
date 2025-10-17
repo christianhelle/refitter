@@ -194,8 +194,21 @@ internal static class ParameterExtractor
         return type;
     }
 
-    private static string FindSupportedType(string typeName) =>
-        typeName is "FileResponse" or "FileParameter" ? "StreamPart" : typeName;
+    private static string FindSupportedType(string typeName)
+    {
+        if (typeName is "FileResponse" or "FileParameter")
+            return "StreamPart";
+
+        // Handle collections of FileParameter/FileResponse
+        if (typeName.Contains("FileParameter") || typeName.Contains("FileResponse"))
+        {
+            return typeName
+                .Replace("FileParameter", "StreamPart")
+                .Replace("FileResponse", "StreamPart");
+        }
+
+        return typeName;
+    }
 
     private static List<string> GetQueryParameters(CSharpOperationModel operationModel, RefitGeneratorSettings settings, string dynamicQuerystringParameterType, out string? dynamicQuerystringParameters)
     {
