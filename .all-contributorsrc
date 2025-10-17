@@ -747,6 +747,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "christophdebaene",
+      "name": "Christoph De Baene",
+      "avatar_url": "https://avatars.githubusercontent.com/u/642207?v=4",
+      "profile": "https://christophdebaene.be",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

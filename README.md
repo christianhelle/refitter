@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-80-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-81-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1348,6 +1348,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/david-pw"><img src="https://avatars.githubusercontent.com/u/178433875?v=4?s=100" width="100px;" alt="david-pw"/><br /><sub><b>david-pw</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adavid-pw" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=david-pw" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/eoma-knowit"><img src="https://avatars.githubusercontent.com/u/150660175?v=4?s=100" width="100px;" alt="eoma-knowit"/><br /><sub><b>eoma-knowit</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=eoma-knowit" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/0xced"><img src="https://avatars.githubusercontent.com/u/51363?v=4?s=100" width="100px;" alt="Cédric Luthi"/><br /><sub><b>Cédric Luthi</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=0xced" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://christophdebaene.be"><img src="https://avatars.githubusercontent.com/u/642207?v=4?s=100" width="100px;" alt="Christoph De Baene"/><br /><sub><b>Christoph De Baene</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Achristophdebaene" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
