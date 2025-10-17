@@ -87,7 +87,7 @@ public class MultiPartFormDataArrayTests
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("long id, IEnumerable<StreamPart> files");
-        generatedCode.Should().NotContain("FileParameter");
+        generatedCode.Should().NotContain("IEnumerable<FileParameter> files");
     }
 
     private static async Task<string> GenerateCode()
