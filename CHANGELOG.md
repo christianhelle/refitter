@@ -4,12 +4,19 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.5...HEAD)
 
+**Implemented enhancements:**
+
+- Fix Multipart file array support [\#784](https://github.com/christianhelle/refitter/pull/784) ([christianhelle](https://github.com/christianhelle))
+
 **Fixed bugs:**
 
+- Multipart file array generates IEnumerable\<FileParameter\> instead of IEnumerable\<StreamPart\> [\#783](https://github.com/christianhelle/refitter/issues/783)
 - Refitter.MSBuild 1.6.4 - Can't generate from .refitter file [\#763](https://github.com/christianhelle/refitter/issues/763)
 
 **Merged pull requests:**
 
+- docs: add christophdebaene as a contributor for bug [\#785](https://github.com/christianhelle/refitter/pull/785) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Fix Codecov workflow to generate and upload coverage reports correctly [\#782](https://github.com/christianhelle/refitter/pull/782) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - chore\(deps\): update dependency microsoft.build.utilities.core to 17.14.28 [\#781](https://github.com/christianhelle/refitter/pull/781) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dotnet monorepo [\#780](https://github.com/christianhelle/refitter/pull/780) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency spectre.console.cli to 0.52.0 [\#779](https://github.com/christianhelle/refitter/pull/779) ([renovate[bot]](https://github.com/apps/renovate))
