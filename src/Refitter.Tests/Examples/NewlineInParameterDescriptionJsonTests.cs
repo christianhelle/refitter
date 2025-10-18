@@ -108,7 +108,7 @@ public class NewlineInParameterDescriptionJsonTests
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile
@@ -121,7 +121,7 @@ public class NewlineInParameterDescriptionJsonTests
 
     private static async Task<string> GenerateCodeWithDynamicQuerystring()
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
