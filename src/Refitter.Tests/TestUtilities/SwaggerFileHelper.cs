@@ -22,4 +22,19 @@ public static class SwaggerFileHelper
         await File.WriteAllTextAsync(swaggerFile, contents);
         return swaggerFile;
     }
+
+    /// <summary>
+    /// Creates a temporary JSON file with the specified OpenAPI content
+    /// </summary>
+    /// <param name="contents">The OpenAPI specification content</param>
+    /// <returns>The path to the created temporary file</returns>
+    public static async Task<string> CreateSwaggerJsonFile(string contents)
+    {
+        var filename = $"{Guid.NewGuid()}.json";
+        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(folder);
+        var swaggerFile = Path.Combine(folder, filename);
+        await File.WriteAllTextAsync(swaggerFile, contents);
+        return swaggerFile;
+    }
 }
