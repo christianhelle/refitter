@@ -211,7 +211,14 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         const string pattern = @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*$";
         var lines = contracts.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-        var filteredLines = lines.Where(line => !Regex.IsMatch(line, pattern)).ToArray();
+        var filteredLines = lines
+            .Where(
+                line => !Regex.IsMatch(
+                    line,
+                    pattern,
+                    RegexOptions.None,
+                    TimeSpan.FromSeconds(1)))
+            .ToArray();
         return string.Join(Environment.NewLine, filteredLines);
     }
 
