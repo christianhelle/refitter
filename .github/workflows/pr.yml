@@ -1,0 +1,37 @@
+
+name: PR Verification
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - "**/*"
+      - '!src/Refitter/**/*.cs'
+      - '!src/Refitter/**/*.liquid'
+      - '!src/Refitter.Core/**/*.cs'
+      - '!src/Refitter.SourceGenerator/**/*.cs'
+      - '!src/Refitter/**/*.csproj'
+      - '!src/Refitter.Core/**/*.csproj'
+      - '!src/Refitter.SourceGenerator/**/*.csproj'
+      - "!.github/workflows/template.yml"
+      - "!.github/workflows/template-url.yml"
+      - "!.github/workflows/smoke-tests.yml"
+      - "!test/smoke-tests.ps1"
+    branches:
+      - "main"
+
+jobs:
+
+  script:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v5
+    - uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '9.0'
+
+    - name: 🛠️ Run smoke test script
+      run: ./smoke-tests.ps1
+      working-directory: test
+      shell: pwsh
