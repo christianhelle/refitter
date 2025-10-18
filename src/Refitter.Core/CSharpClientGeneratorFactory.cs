@@ -1,4 +1,5 @@
 using System.Reflection;
+using NJsonSchema;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
@@ -17,6 +18,8 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                 kvp.Value.ActualSchema.AllowAdditionalProperties = false;
             }
         }
+
+        ApplyCustomIntegerType();
 
         var csharpClientGeneratorSettings = new CSharpClientGeneratorSettings
         {
@@ -58,6 +61,95 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             generator.Settings.CSharpGeneratorSettings);
 
         return generator;
+    }
+
+    private void ApplyCustomIntegerType()
+    {
+        var customIntegerType = settings.CodeGeneratorSettings?.IntegerType;
+        if (string.IsNullOrEmpty(customIntegerType) || customIntegerType == "int")
+            return;
+
+        if (customIntegerType != "long")
+            return;
+
+        ProcessSchemasForIntegerType(document.Components.Schemas);
+
+        foreach (var path in document.Paths)
+        {
+            foreach (var operation in path.Value.Values)
+            {
+                if (operation == null) continue;
+
+                foreach (var parameter in operation.Parameters)
+                {
+                    if (parameter.ActualSchema.Type == JsonObjectType.Integer &&
+                        string.IsNullOrEmpty(parameter.ActualSchema.Format))
+                    {
+                        parameter.ActualSchema.Format = "int64";
+                    }
+                }
+
+                if (operation.RequestBody?.Content != null)
+                {
+                    foreach (var content in operation.RequestBody.Content.Values)
+                    {
+                        ProcessSchemaForIntegerType(content.Schema);
+                    }
+                }
+
+                foreach (var response in operation.Responses.Values)
+                {
+                    if (response.Content != null)
+                    {
+                        foreach (var content in response.Content.Values)
+                        {
+                            ProcessSchemaForIntegerType(content.Schema);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void ProcessSchemasForIntegerType(IDictionary<string, JsonSchema> schemas)
+    {
+        foreach (var schema in schemas.Values)
+        {
+            ProcessSchemaForIntegerType(schema);
+        }
+    }
+
+    private void ProcessSchemaForIntegerType(JsonSchema? schema)
+    {
+        if (schema == null) return;
+
+        var actualSchema = schema.ActualSchema;
+
+        if (actualSchema.Type == JsonObjectType.Integer &&
+            string.IsNullOrEmpty(actualSchema.Format))
+        {
+            actualSchema.Format = "int64";
+        }
+
+        foreach (var property in actualSchema.Properties.Values)
+        {
+            ProcessSchemaForIntegerType(property);
+        }
+
+        if (actualSchema.Item != null)
+        {
+            ProcessSchemaForIntegerType(actualSchema.Item);
+        }
+
+        if (actualSchema.AdditionalPropertiesSchema != null)
+        {
+            ProcessSchemaForIntegerType(actualSchema.AdditionalPropertiesSchema);
+        }
+
+        foreach (var subSchema in actualSchema.AllOf.Concat(actualSchema.OneOf).Concat(actualSchema.AnyOf))
+        {
+            ProcessSchemaForIntegerType(subSchema);
+        }
     }
 
     private static void MapCSharpGeneratorSettings(
