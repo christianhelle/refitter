@@ -6,6 +6,8 @@
 
 **Implemented enhancements:**
 
+- Option to Disable JsonStringEnumConverter Attributes in Refitter Code Generation [\#652](https://github.com/christianhelle/refitter/issues/652)
+- Add option to remove \[JsonConverter\(typeof\(JsonStringEnumConverter\)\)\] from generated contracts [\#786](https://github.com/christianhelle/refitter/pull/786) ([christianhelle](https://github.com/christianhelle))
 - Fix Multipart file array support [\#784](https://github.com/christianhelle/refitter/pull/784) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
