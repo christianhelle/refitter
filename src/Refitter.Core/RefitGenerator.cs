@@ -209,20 +209,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             return contracts;
         }
 
-        var lines = contracts.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-        var filteredLines = new List<string>();
-
-        foreach (var line in lines)
-        {
-            var trimmedLine = line.Trim();
-
-            if (trimmedLine != "[JsonConverter(typeof(JsonStringEnumConverter))]" &&
-                trimmedLine != "[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]")
-            {
-                filteredLines.Add(line);
-            }
-        }
-
+        const string pattern = @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*$";
+        var lines = contracts.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
+        var filteredLines = lines.Where(line => !Regex.IsMatch(line, pattern)).ToArray();
         return string.Join(Environment.NewLine, filteredLines);
     }
 
