@@ -109,27 +109,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = generator.GenerateFile();
-
-        // Remove JsonConverter attributes if InlineJsonConverters is disabled
-        if (settings.CodeGeneratorSettings is { InlineJsonConverters: false })
-        {
-            var lines = contracts.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            var filteredLines = new List<string>();
-
-            for (int i = 0; i < lines.Length; i++)
-            {
-                var line = lines[i];
-                var trimmedLine = line.Trim();
-                // Skip lines that contain the JsonStringEnumConverter attribute (with or without namespace)
-                if (trimmedLine != "[JsonConverter(typeof(JsonStringEnumConverter))]" &&
-                    trimmedLine != "[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]")
-                {
-                    filteredLines.Add(line);
-                }
-            }
-
-            contracts = string.Join(Environment.NewLine, filteredLines);
-        }
+        contracts = SanitizeGeneratedContracts(contracts);
 
         if (settings.GenerateClients)
         {
@@ -175,27 +155,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = generator.GenerateFile();
-
-        // Remove JsonConverter attributes if InlineJsonConverters is disabled
-        if (settings.CodeGeneratorSettings is { InlineJsonConverters: false })
-        {
-            var lines = contracts.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            var filteredLines = new List<string>();
-
-            for (int i = 0; i < lines.Length; i++)
-            {
-                var line = lines[i];
-                var trimmedLine = line.Trim();
-                // Skip lines that contain the JsonStringEnumConverter attribute (with or without namespace)
-                if (trimmedLine != "[JsonConverter(typeof(JsonStringEnumConverter))]" &&
-                    trimmedLine != "[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]")
-                {
-                    filteredLines.Add(line);
-                }
-            }
-
-            contracts = string.Join(Environment.NewLine, filteredLines);
-        }
+        contracts = SanitizeGeneratedContracts(contracts);
 
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
@@ -240,6 +200,30 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
 
         return new GeneratorOutput(generatedFiles);
+    }
+
+    private string SanitizeGeneratedContracts(string contracts)
+    {
+        if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
+        {
+            return contracts;
+        }
+
+        var lines = contracts.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        var filteredLines = new List<string>();
+
+        foreach (var line in lines)
+        {
+            var trimmedLine = line.Trim();
+
+            if (trimmedLine != "[JsonConverter(typeof(JsonStringEnumConverter))]" &&
+                trimmedLine != "[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]")
+            {
+                filteredLines.Add(line);
+            }
+        }
+
+        return string.Join(Environment.NewLine, filteredLines);
     }
 
     /// <summary>
