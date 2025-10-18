@@ -1,8 +1,8 @@
 using FluentAssertions;
-using Refitter.Tests.TestUtilities;
 using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
+using Refitter.Tests.TestUtilities;
 using Xunit;
 
 namespace Refitter.Tests.Examples;

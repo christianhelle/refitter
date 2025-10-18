@@ -1,8 +1,8 @@
 using AutoFixture.Xunit2;
-using Refitter.Tests.TestUtilities;
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
+using Refitter.Tests.TestUtilities;
 using Xunit;
 
 namespace Refitter.Tests.Examples;
