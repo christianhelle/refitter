@@ -103,6 +103,10 @@
           "description": "Gets or sets the generic dictionary .NET type which is used as base class (default: 'Dictionary').",
           "type": "string"
         },
+        "integerType": {
+          "description": "Gets or sets the .NET type for OpenAPI integers without a format specifier (default: 'int'). Common values: 'int' (default), 'long'.",
+          "type": "string"
+        },
         "propertySetterAccessModifier": {
           "description": "Gets the access modifier of property setters (default: '').",
           "type": "string"
