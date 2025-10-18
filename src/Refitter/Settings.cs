@@ -258,4 +258,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--no-inline-json-converters")]
     [DefaultValue(false)]
     public bool NoInlineJsonConverters { get; set; }
+
+    [Description("The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'")]
+    [CommandOption("--integer-type")]
+    [DefaultValue("int")]
+    public string? IntegerType { get; set; }
 }
