@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Refitter.Tests.Examples;
 
-public class IntegerWithoutFormatTests
+public class IntegerFormatTests
 {
     private const string OpenApiSpec =
         """
