@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - Option to Disable JsonStringEnumConverter Attributes in Refitter Code Generation [\#652](https://github.com/christianhelle/refitter/issues/652)
+- Improve OpenAPI Description handling [\#787](https://github.com/christianhelle/refitter/pull/787) ([christianhelle](https://github.com/christianhelle))
 - Add option to remove \[JsonConverter\(typeof\(JsonStringEnumConverter\)\)\] from generated contracts [\#786](https://github.com/christianhelle/refitter/pull/786) ([christianhelle](https://github.com/christianhelle))
 - Fix Multipart file array support [\#784](https://github.com/christianhelle/refitter/pull/784) ([christianhelle](https://github.com/christianhelle))
 
@@ -14,9 +15,12 @@
 
 - Multipart file array generates IEnumerable\<FileParameter\> instead of IEnumerable\<StreamPart\> [\#783](https://github.com/christianhelle/refitter/issues/783)
 - Refitter.MSBuild 1.6.4 - Can't generate from .refitter file [\#763](https://github.com/christianhelle/refitter/issues/763)
+- If description has /n the Generator dont add /// to comment the line for QueryParameter classes [\#613](https://github.com/christianhelle/refitter/issues/613)
 
 **Merged pull requests:**
 
+- docs: add HGCollier as a contributor for ideas [\#790](https://github.com/christianhelle/refitter/pull/790) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add 7amou3 as a contributor for ideas [\#789](https://github.com/christianhelle/refitter/pull/789) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Re-format code [\#788](https://github.com/christianhelle/refitter/pull/788) ([christianhelle](https://github.com/christianhelle))
 - docs: add christophdebaene as a contributor for bug [\#785](https://github.com/christianhelle/refitter/pull/785) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Fix Codecov workflow to generate and upload coverage reports correctly [\#782](https://github.com/christianhelle/refitter/pull/782) ([Copilot](https://github.com/apps/copilot-swe-agent))
