@@ -1,12 +1,12 @@
-name: Smoke Tests
+
+name: PR Verification
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     paths-ignore:
       - "**/*"
       - '!src/Refitter/**/*.cs'
-      - '!src/Refitter/**/*.liquid'
       - '!src/Refitter.Core/**/*.cs'
       - '!src/Refitter.SourceGenerator/**/*.cs'
       - '!src/Refitter/**/*.csproj'
@@ -18,6 +18,9 @@ on:
       - "!test/smoke-tests.ps1"
     branches:
       - "main"
+
+permissions:
+  contents: read
 
 jobs:
 
