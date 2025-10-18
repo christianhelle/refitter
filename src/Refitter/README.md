@@ -43,6 +43,7 @@ EXAMPLES:
     refitter ./openapi.json --operation-name-template '{operationName}Async'
     refitter ./openapi.json --optional-nullable-parameters
     refitter ./openapi.json --use-polymorphic-serialization
+    refitter ./openapi.json --no-inline-json-converters
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -109,7 +110,9 @@ OPTIONS:
                                                                  Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
                                                                  To have the native support of inheritance (de)serialization and fallback to base types when
                                                                  payloads with (yet) unknown types are offered by newer versions of an API
-                                                                 See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information        --disposable                                             Generate refit clients that implement IDisposable
+                                                                 See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
+        --disposable                                             Generate refit clients that implement IDisposable
+        --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
 ```
 
 ## CLI Tool Output Example

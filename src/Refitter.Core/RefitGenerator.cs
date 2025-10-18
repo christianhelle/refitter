@@ -109,6 +109,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = generator.GenerateFile();
+        contracts = SanitizeGeneratedContracts(contracts);
+
         if (settings.GenerateClients)
         {
             contracts = RefitInterfaceImports
@@ -153,6 +155,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = generator.GenerateFile();
+        contracts = SanitizeGeneratedContracts(contracts);
 
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
@@ -197,6 +200,19 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
 
         return new GeneratorOutput(generatedFiles);
+    }
+
+    private string SanitizeGeneratedContracts(string contracts)
+    {
+        if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
+        {
+            return contracts;
+        }
+
+        const string pattern = @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*$";
+        var lines = contracts.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
+        var filteredLines = lines.Where(line => !Regex.IsMatch(line, pattern)).ToArray();
+        return string.Join(Environment.NewLine, filteredLines);
     }
 
     /// <summary>

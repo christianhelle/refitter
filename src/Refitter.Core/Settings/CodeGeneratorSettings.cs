@@ -257,4 +257,13 @@ public class CodeGeneratorSettings
     [Description("Gets or sets a custom IPropertyNameGenerator.")]
     [JsonIgnore]
     public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to inline JsonConverter attributes for enum properties (default: true).
+    /// When set to false, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes.
+    /// </summary>
+    [Description(
+        "Gets or sets a value indicating whether to inline JsonConverter attributes for enum properties (default: true). When set to false, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes."
+    )]
+    public bool InlineJsonConverters { get; set; } = true;
 }

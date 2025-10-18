@@ -116,6 +116,7 @@ The following is an example `.refitter` file
     "generateNativeRecords": false,
     "generateDefaultValues": true,
     "inlineNamedAny": false,
+    "inlineJsonConverters": true, // Optional. Default=true. Set to false to not generate JsonConverter attributes for enum properties
     "dateFormat": "yyyy-MM-dd",
     "dateTimeFormat": "yyyy-MM-dd",
     "excludedTypeNames": [
@@ -193,6 +194,7 @@ The following is an example `.refitter` file
   - `generateNativeRecords` - Default is false
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
+  - `inlineJsonConverters` - Default is true. When set to false, enum properties will not have `[JsonConverter(typeof(JsonStringEnumConverter))]` attributes
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
   - `excludedTypeNames` - Default is empty
