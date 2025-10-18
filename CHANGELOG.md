@@ -17,6 +17,7 @@
 
 **Merged pull requests:**
 
+- Re-format code [\#788](https://github.com/christianhelle/refitter/pull/788) ([christianhelle](https://github.com/christianhelle))
 - docs: add christophdebaene as a contributor for bug [\#785](https://github.com/christianhelle/refitter/pull/785) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Fix Codecov workflow to generate and upload coverage reports correctly [\#782](https://github.com/christianhelle/refitter/pull/782) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - chore\(deps\): update dependency microsoft.build.utilities.core to 17.14.28 [\#781](https://github.com/christianhelle/refitter/pull/781) ([renovate[bot]](https://github.com/apps/renovate))
