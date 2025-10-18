@@ -62,6 +62,7 @@ EXAMPLES:
     refitter ./openapi.json --use-polymorphic-serialization
     refitter ./openapi.json --collection-format Csv
     refitter ./openapi.json --simple-output
+    refitter ./openapi.json --no-inline-json-converters
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -132,6 +133,7 @@ OPTIONS:
                                                                  payloads with (yet) unknown types are offered by newer versions of an API
                                                                  See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
         --disposable                                             Generate refit clients that implement IDisposable
+        --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -304,6 +306,7 @@ The following is an example `.refitter` file
     "generateNativeRecords": false,
     "generateDefaultValues": true,
     "inlineNamedAny": false,
+    "inlineJsonConverters": true, // Optional. Default=true. Set to false to not generate JsonConverter attributes for enum properties
     "dateFormat": "yyyy-MM-dd",
     "dateTimeFormat": "yyyy-MM-dd",
     "excludedTypeNames": [
@@ -390,6 +393,7 @@ The following is an example `.refitter` file
   - `generateNativeRecords` - Default is false
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
+  - `inlineJsonConverters` - Default is true. When set to false, enum properties will not have `[JsonConverter(typeof(JsonStringEnumConverter))]` attributes
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
   - `excludedTypeNames` - Default is empty
