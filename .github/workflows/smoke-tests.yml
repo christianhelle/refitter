@@ -16,19 +16,6 @@ on:
       - "!.github/workflows/template-url.yml"
       - "!.github/workflows/smoke-tests.yml"
       - "!test/smoke-tests.ps1"
-  pull_request:
-    paths-ignore:
-      - "**/*"
-      - '!src/Refitter/**/*.cs'
-      - '!src/Refitter.Core/**/*.cs'
-      - '!src/Refitter.SourceGenerator/**/*.cs'
-      - '!src/Refitter/**/*.csproj'
-      - '!src/Refitter.Core/**/*.csproj'
-      - '!src/Refitter.SourceGenerator/**/*.csproj'
-      - "!.github/workflows/template.yml"
-      - "!.github/workflows/template-url.yml"
-      - "!.github/workflows/smoke-tests.yml"
-      - "!test/**/*"
     branches:
       - "main"
 
