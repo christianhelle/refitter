@@ -44,6 +44,7 @@ EXAMPLES:
     refitter ./openapi.json --optional-nullable-parameters
     refitter ./openapi.json --use-polymorphic-serialization
     refitter ./openapi.json --no-inline-json-converters
+    refitter ./openapi.json --integer-type long
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -113,6 +114,7 @@ OPTIONS:
                                                                  See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
         --disposable                                             Generate refit clients that implement IDisposable
         --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
+        --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
 ```
 
 ## CLI Tool Output Example
@@ -215,6 +217,7 @@ The following is an example `.refitter` file
     "dictionaryInstanceType": "System.Collections.Generic.Dictionary",
     "arrayBaseType": "System.Collections.ObjectModel.Collection",
     "dictionaryBaseType": "System.Collections.Generic.Dictionary",
+    "integerType": "int", // Optional. Default="int". The .NET type for OpenAPI integers without a format. Common values: "int", "long"
     "propertySetterAccessModifier": "",
     "generateImmutableArrayProperties": false,
     "generateImmutableDictionaryProperties": false,
@@ -299,6 +302,7 @@ The following is an example `.refitter` file
   - `dictionaryInstanceType` - Default is `System.Collections.Generic.Dictionary`,
   - `arrayBaseType` - Default is `System.Collections.ObjectModel.Collection`,
   - `dictionaryBaseType` - Default is `System.Collections.Generic.Dictionary`,
+  - `integerType` - Default is `int`. The .NET type to use for OpenAPI integer types without a format specifier. Common values: `int`, `long`
   - `propertySetterAccessModifier` - Default is ``,
   - `generateImmutableArrayProperties` - Default is false,
   - `generateImmutableDictionaryProperties` - Default is false,
