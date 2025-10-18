@@ -259,13 +259,7 @@ internal static class ParameterExtractor
                     propertiesCodeBuilder.AppendLine();
                     if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
                     {
-                        propertiesCodeBuilder.Append(
-            $$"""
-                    /// <summary>
-                    /// {{operationParameter.Description}}
-                    /// </summary>
-            """);
-                        propertiesCodeBuilder.AppendLine();
+                        AppendXmlDocComment(operationParameter.Description, propertiesCodeBuilder);
                     }
 
                     propertiesCodeBuilder.Append(
@@ -317,5 +311,33 @@ internal static class ParameterExtractor
             .ToList();
 
         return parameters;
+    }
+
+    private static void AppendXmlDocComment(string description, StringBuilder codeBuilder)
+    {
+        codeBuilder.Append(
+$$"""
+                /// <summary>
+""");
+
+        var lines = description.Split(
+            new[] { "\r\n", "\r", "\n" },
+            StringSplitOptions.None);
+
+        foreach (var line in lines)
+        {
+            codeBuilder.AppendLine();
+            codeBuilder.Append(
+$$"""
+                /// {{line.Trim()}}
+""");
+        }
+
+        codeBuilder.AppendLine();
+        codeBuilder.Append(
+$$"""
+                /// </summary>
+""");
+        codeBuilder.AppendLine();
     }
 }
