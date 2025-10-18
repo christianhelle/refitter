@@ -308,7 +308,11 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             UsePolymorphicSerialization = settings.UsePolymorphicSerialization,
             GenerateDisposableClients = settings.GenerateDisposableClients,
             CollectionFormat = settings.CollectionFormat,
-            GenerateXmlDocCodeComments = !settings.NoXmlDocCodeComments
+            GenerateXmlDocCodeComments = !settings.NoXmlDocCodeComments,
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                InlineJsonConverters = !settings.NoInlineJsonConverters
+            }
         };
     }
     private static async Task WriteSingleFile(
