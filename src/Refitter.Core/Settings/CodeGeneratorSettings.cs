@@ -59,11 +59,10 @@ public class CodeGeneratorSettings
     public string TimeSpanType { get; set; } = "System.TimeSpan";
 
     /// <summary>
-    /// Gets or sets the .NET type for OpenAPI integers without a format specifier (default: 'int').
-    /// Common values: 'int' (default), 'long'.
+    /// Gets or sets the .NET type for OpenAPI integers without a format specifier (default: Int32).
     /// </summary>
-    [Description("Gets or sets the .NET type for OpenAPI integers without a format specifier (default: 'int'). Common values: 'int' (default), 'long'.")]
-    public string IntegerType { get; set; } = "int";
+    [Description("Gets or sets the .NET type for OpenAPI integers without a format specifier (default: Int32).")]
+    public IntegerType IntegerType { get; set; } = IntegerType.Int32;
 
     /// <summary>
     /// Gets or sets the generic array .NET type (default: 'ICollection').

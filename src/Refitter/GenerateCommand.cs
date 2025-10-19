@@ -312,7 +312,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
                 InlineJsonConverters = !settings.NoInlineJsonConverters,
-                IntegerType = settings.IntegerType ?? "int"
+                IntegerType = settings.IntegerType
             }
         };
     }

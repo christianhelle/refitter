@@ -242,7 +242,7 @@ public sealed class Settings : CommandSettings
                  - Csv: Comma-separated values. (?param=value1,value2)
                  - Ssv: Space-separated values. (?param=value1 value2)
                  - Tsv: Tab-separated values. (?param=value1\tvalue2)
-                 - Pipes: Pipe-separated values. (?param=value1|value2)    
+                 - Pipes: Pipe-separated values. (?param=value1|value2)
                  See https://swagger.io/docs/specification/v2_0/describing-parameters/#array-and-multi-value-parameters for more information.
                  """)]
     [CommandOption("--collection-format")]
@@ -259,8 +259,8 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool NoInlineJsonConverters { get; set; }
 
-    [Description("The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'")]
+    [Description("The .NET type to use for OpenAPI integers without a format specifier. May be one of: Int32, Int64")]
     [CommandOption("--integer-type")]
-    [DefaultValue("int")]
-    public string? IntegerType { get; set; }
+    [DefaultValue(IntegerType.Int32)]
+    public IntegerType IntegerType { get; set; } = IntegerType.Int32;
 }

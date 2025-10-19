@@ -65,11 +65,8 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 
     private void ApplyCustomIntegerType()
     {
-        var customIntegerType = settings.CodeGeneratorSettings?.IntegerType;
-        if (string.IsNullOrEmpty(customIntegerType) || customIntegerType == "int")
-            return;
-
-        if (customIntegerType != "long")
+        var customIntegerType = settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32;
+        if (customIntegerType == IntegerType.Int32)
             return;
 
         ProcessSchemasForIntegerType(document.Components.Schemas);

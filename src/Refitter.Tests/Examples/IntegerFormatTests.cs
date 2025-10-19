@@ -128,7 +128,7 @@ public class IntegerFormatTests
             OpenApiPath = swaggerFile,
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
-                IntegerType = "long"
+                IntegerType = IntegerType.Int64
             }
         };
 
