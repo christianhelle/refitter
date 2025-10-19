@@ -143,7 +143,12 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             ProcessSchemaForIntegerType(actualSchema.AdditionalPropertiesSchema);
         }
 
-        foreach (var subSchema in actualSchema.AllOf.Concat(actualSchema.OneOf).Concat(actualSchema.AnyOf))
+        var subSchemas = actualSchema.AllOf
+            .Concat(actualSchema.OneOf)
+            .Concat(actualSchema.AnyOf)
+            .ToArray();
+
+        foreach (var subSchema in subSchemas)
         {
             ProcessSchemaForIntegerType(subSchema);
         }
