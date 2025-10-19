@@ -99,7 +99,7 @@ The following is an example `.refitter` file
     "dictionaryInstanceType": "System.Collections.Generic.Dictionary",
     "arrayBaseType": "System.Collections.ObjectModel.Collection",
     "dictionaryBaseType": "System.Collections.Generic.Dictionary",
-    "integerType": "int", // Optional. Default="int". The .NET type for OpenAPI integers without a format. Common values: "int", "long"
+    "integerType": "Int32", // Optional. Default="Int32". The .NET type for OpenAPI integers without a format. Possible values: "Int32", "Int64"
     "propertySetterAccessModifier": "",
     "generateImmutableArrayProperties": false,
     "generateImmutableDictionaryProperties": false,
@@ -193,7 +193,7 @@ The following is an example `.refitter` file
   - `dictionaryInstanceType` - Default is `System.Collections.Generic.Dictionary`,
   - `arrayBaseType` - Default is `System.Collections.ObjectModel.Collection`,
   - `dictionaryBaseType` - Default is `System.Collections.Generic.Dictionary`,
-  - `integerType` - Default is `int`. The .NET type to use for OpenAPI integer types without a format specifier. Common values: `int`, `long`
+  - `integerType` - Default is `Int32`. The .NET type to use for OpenAPI integer types without a format specifier. Possible values: `Int32`, `Int64`
   - `propertySetterAccessModifier` - Default is ``,
   - `generateImmutableArrayProperties` - Default is false,
   - `generateImmutableDictionaryProperties` - Default is false,
