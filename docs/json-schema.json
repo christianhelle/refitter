@@ -104,8 +104,9 @@
           "type": "string"
         },
         "integerType": {
-          "description": "Gets or sets the .NET type for OpenAPI integers without a format specifier (default: 'int'). Common values: 'int' (default), 'long'.",
-          "type": "string"
+          "description": "Gets or sets the .NET type for OpenAPI integers without a format specifier (default: Int32). Possible values: Int32, Int64.",
+          "type": "string",
+          "enum": ["Int32", "Int64"]
         },
         "propertySetterAccessModifier": {
           "description": "Gets the access modifier of property setters (default: '').",
