@@ -31,4 +31,109 @@ public class OpenApiDocumentFactoryTests
             .Should()
             .NotBeNull();
     }
+
+    [Theory]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "petstore.json")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yaml")]
+    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yml")]
+    public async Task Create_From_File_Detects_Format_Correctly(SampleOpenSpecifications version, string filename)
+    {
+        var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        document.Should().NotBeNull();
+        document.Info.Should().NotBeNull();
+        document.Info.Title.Should().NotBeNullOrEmpty();
+    }
+
+    [Fact]
+    public async Task Create_From_File_With_External_References_Returns_NotNull()
+    {
+        var spec = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": {
+    ""title"": ""Test API"",
+    ""version"": ""1.0.0""
+  },
+  ""paths"": {
+    ""/test"": {
+      ""get"": {
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": {
+                  ""type"": ""object""
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}";
+        var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        document.Should().NotBeNull();
+        document.Info.Title.Should().Be("Test API");
+    }
+
+    [Fact]
+    public async Task Create_From_Yaml_File_Without_Extension_Returns_NotNull()
+    {
+        var spec = @"openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+paths:
+  /test:
+    get:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object";
+        var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.yaml");
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        document.Should().NotBeNull();
+        document.Info.Title.Should().Be("Test API");
+    }
+
+    [Theory]
+    [InlineData("https://petstore.swagger.io/v2/swagger.json")]
+    [InlineData("http://petstore.swagger.io/v2/swagger.json")]
+    public async Task Create_From_Http_Url_Returns_NotNull(string url)
+    {
+        var document = await OpenApiDocumentFactory.CreateAsync(url);
+        document.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Create_Handles_Missing_Info_Fields()
+    {
+        var spec = @"{
+  ""openapi"": ""3.0.0"",
+  ""paths"": {
+    ""/test"": {
+      ""get"": {
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success""
+          }
+        }
+      }
+    }
+  }
+}";
+        var swaggerFile = await TestFile.CreateSwaggerFile(spec, "minimal.json");
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        document.Should().NotBeNull();
+    }
 }
