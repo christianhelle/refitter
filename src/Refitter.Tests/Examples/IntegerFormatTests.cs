@@ -20,13 +20,50 @@ public class IntegerFormatTests
             "/test": {
               "get": {
                 "operationId": "TestEndpoint",
+                "parameters": [
+                    {
+                        "name": "integerWithoutFormat",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "integerWithInt32Format",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "integerWithInt64Format",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/RequestModel"
+                      }
+                    }
+                  }
+                },
                 "responses": {
                   "200": {
                     "description": "Success",
                     "content": {
                       "application/json": {
                         "schema": {
-                          "$ref": "#/components/schemas/TestModel"
+                          "$ref": "#/components/schemas/ResponseModel"
                         }
                       }
                     }
@@ -37,7 +74,24 @@ public class IntegerFormatTests
           },
           "components": {
             "schemas": {
-              "TestModel": {
+              "RequestModel": {
+                "type": "object",
+                "properties": {
+                  "integerWithoutFormat": {
+                    "type": "integer",
+                    "description": "Integer without format - should default to int but optionally be long"
+                  },
+                  "integerWithInt32Format": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "integerWithInt64Format": {
+                    "type": "integer",
+                    "format": "int64"
+                  }
+                }
+              }
+              "ResponseModel": {
                 "type": "object",
                 "properties": {
                   "integerWithoutFormat": {
