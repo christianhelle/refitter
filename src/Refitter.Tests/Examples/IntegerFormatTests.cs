@@ -88,9 +88,38 @@ public class IntegerFormatTests
                   "integerWithInt64Format": {
                     "type": "integer",
                     "format": "int64"
+                  },
+                  "additionalPropsObject": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "allOfExample": {
+                    "allOf": [
+                      { "$ref": "#/components/schemas/BaseType" },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "extra": { "type": "string" }
+                        }
+                      }
+                    ]
+                  },
+                  "oneOfExample": {
+                    "oneOf": [
+                      { "$ref": "#/components/schemas/TypeA" },
+                      { "$ref": "#/components/schemas/TypeB" }
+                    ]
+                  },
+                  "anyOfExample": {
+                    "anyOf": [
+                      { "$ref": "#/components/schemas/TypeA" },
+                      { "$ref": "#/components/schemas/TypeB" }
+                    ]
                   }
                 }
-              }
+              },
               "ResponseModel": {
                 "type": "object",
                 "properties": {
@@ -105,7 +134,54 @@ public class IntegerFormatTests
                   "integerWithInt64Format": {
                     "type": "integer",
                     "format": "int64"
+                  },
+                  "additionalPropsObject": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "integer"
+                    }
+                  },
+                  "allOfExample": {
+                    "allOf": [
+                      { "$ref": "#/components/schemas/BaseType" },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "extra": { "type": "integer" }
+                        }
+                      }
+                    ]
+                  },
+                  "oneOfExample": {
+                    "oneOf": [
+                      { "$ref": "#/components/schemas/TypeA" },
+                      { "$ref": "#/components/schemas/TypeB" }
+                    ]
+                  },
+                  "anyOfExample": {
+                    "anyOf": [
+                      { "$ref": "#/components/schemas/TypeA" },
+                      { "$ref": "#/components/schemas/TypeB" }
+                    ]
                   }
+                }
+              },
+              "BaseType": {
+                "type": "object",
+                "properties": {
+                  "baseProp": { "type": "integer" }
+                }
+              },
+              "TypeA": {
+                "type": "object",
+                "properties": {
+                  "typeAProp": { "type": "integer" }
+                }
+              },
+              "TypeB": {
+                "type": "object",
+                "properties": {
+                  "typeBProp": { "type": "integer" }
                 }
               }
             }
