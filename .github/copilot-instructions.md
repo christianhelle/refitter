@@ -151,6 +151,7 @@ dotnet run --project src/Refitter --configuration Release --framework net9.0 -- 
 - `--disposable`: Generate IDisposable clients
 - `--collection-format`: Control query parameter collection formatting (Multi/Csv/Ssv/Tsv/Pipes)
 - `--no-banner`: Hide donation banner in CLI output
+- `--integer-type`: Set the .NET type for OpenAPI integers without a format specifier (Int32/Int64)
 
 ### Working with OpenAPI Specifications
 - Test resources are located in `src/Refitter.Tests/Resources/V2/` and `src/Refitter.Tests/Resources/V3/`

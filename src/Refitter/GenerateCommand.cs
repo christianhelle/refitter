@@ -311,7 +311,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             GenerateXmlDocCodeComments = !settings.NoXmlDocCodeComments,
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
-                InlineJsonConverters = !settings.NoInlineJsonConverters
+                InlineJsonConverters = !settings.NoInlineJsonConverters,
+                IntegerType = settings.IntegerType
             }
         };
     }
