@@ -61,11 +61,15 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .ToArray();
         foreach (var path in clonedPaths)
         {
+            if (path.Value == null) continue;
+
             var methods = path.Value.Where(pair => pair.Value != null)
                 // same reason as with document.Paths
                 .ToArray();
             foreach (var method in methods)
             {
+                if (method.Value == null) continue;
+
                 var exclude = method.Value.Tags?.Exists(includeTags.Contains) != true;
                 if (exclude)
                 {

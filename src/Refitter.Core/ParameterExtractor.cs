@@ -99,7 +99,7 @@ internal static class ParameterExtractor
     private static string ReplaceUnsafeCharacters(
         string unsafeText)
     {
-        var safeText = string.Empty;
+        var safeText = new StringBuilder(unsafeText.Length);
         foreach (var character in unsafeText)
         {
             var safeCharacter = character;
@@ -108,10 +108,10 @@ internal static class ParameterExtractor
                 safeCharacter = '_';
             }
 
-            safeText += safeCharacter;
+            safeText.Append(safeCharacter);
         }
 
-        return safeText;
+        return safeText.ToString();
     }
 
     private static List<string> ReOrderNullableParameters(

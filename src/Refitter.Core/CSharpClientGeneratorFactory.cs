@@ -73,6 +73,8 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 
         foreach (var path in document.Paths)
         {
+            if (path.Value == null) continue;
+
             foreach (var operation in path.Value.Values)
             {
                 if (operation == null) continue;
