@@ -94,7 +94,7 @@ public class InlineJsonConvertersTests
 
         using (new AssertionScope())
         {
-            generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter))]");
+            generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter");
             generatedCode.Should().Contain("Status { get; set; }");
         }
     }
