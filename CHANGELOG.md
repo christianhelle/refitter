@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - Option to Disable JsonStringEnumConverter Attributes in Refitter Code Generation [\#652](https://github.com/christianhelle/refitter/issues/652)
+- Nswag 14.6.2 [\#800](https://github.com/christianhelle/refitter/pull/800) ([christianhelle](https://github.com/christianhelle))
 - Add support for customizing the default Integer format [\#792](https://github.com/christianhelle/refitter/pull/792) ([christianhelle](https://github.com/christianhelle))
 - Improve OpenAPI Description handling [\#787](https://github.com/christianhelle/refitter/pull/787) ([christianhelle](https://github.com/christianhelle))
 - Add option to remove \[JsonConverter\(typeof\(JsonStringEnumConverter\)\)\] from generated contracts [\#786](https://github.com/christianhelle/refitter/pull/786) ([christianhelle](https://github.com/christianhelle))
@@ -21,6 +22,7 @@
 
 **Merged pull requests:**
 
+- Update actions/upload-artifact action to v5 [\#798](https://github.com/christianhelle/refitter/pull/798) ([renovate[bot]](https://github.com/apps/renovate))
 - Update Smoke Tests workflow trigger [\#791](https://github.com/christianhelle/refitter/pull/791) ([christianhelle](https://github.com/christianhelle))
 - docs: add HGCollier as a contributor for ideas [\#790](https://github.com/christianhelle/refitter/pull/790) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add 7amou3 as a contributor for ideas [\#789](https://github.com/christianhelle/refitter/pull/789) ([allcontributors[bot]](https://github.com/apps/allcontributors))
