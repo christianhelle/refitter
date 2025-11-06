@@ -173,29 +173,8 @@ This is particularly useful when:
 - Using tools that don't support ANSI escape sequences
 - Running in environments with limited console capabilities
 
-## Source Generator
 
-Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
-
-The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `--outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code
-
-***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
-
-### Installation
-
-The source generator is distributed as a NuGet package and should be installed to the project that will contain the generated code
-
-```shell
-dotnet add package Refitter.SourceGenerator
-```
-
-### Usage
-
-This source generator generates code based on any `.refitter` file included to the project as `AdditionalFiles`.
-
-The generator can automatically detect all `.refitter` files inside the project that referenced the `Refitter.SourceGenerator` package and there is no need to include them manually as `AdditionalFiles`
-
-### .Refitter File format
+## .Refitter File format
 
 The following is an example `.refitter` file
 
@@ -451,17 +430,15 @@ Refitter ships with an MSBuild custom task that is distributed as a NuGet packag
 
 To use the package, install `Refitter.MSBuild`
 
-```xml
-<ItemGroup>
-    <PackageReference Include="Refitter.MSBuild" Version="1.5.0" />
-</ItemGroup>
+```shell
+dotnet add package Refitter.MSBuild
 ```
 
 The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task and looks something like this:
 
 ```xml
-<UsingTask TaskName="RefitterGenerateTask" 
-           AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll" 
+<UsingTask TaskName="RefitterGenerateTask"
+           AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll"
            Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
 <Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
     <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
@@ -475,6 +452,28 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
 ```
 
 The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and executes them all. By default, telemetry collection is enabled, and to opt-out of it you must specify `<RefitterNoLogging>true</RefitterNoLogging>` in the `.csproj` `<PropertyGroup>`
+
+## Source Generator
+
+Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
+
+The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `--outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code
+
+***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
+
+### Installation
+
+The source generator is distributed as a NuGet package and should be installed to the project that will contain the generated code
+
+```shell
+dotnet add package Refitter.SourceGenerator
+```
+
+### Usage
+
+This source generator generates code based on any `.refitter` file included to the project as `AdditionalFiles`.
+
+The generator can automatically detect all `.refitter` files inside the project that referenced the `Refitter.SourceGenerator` package and there is no need to include them manually as `AdditionalFiles`
 
 # Using the generated code
 
