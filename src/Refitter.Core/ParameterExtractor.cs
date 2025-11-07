@@ -312,6 +312,12 @@ internal static class ParameterExtractor
                     {{attributes}}
                     {{modifier}} {{propertyType}} {{propertyName}} { get; {{setterStyle}}; }
             """);
+                    var defaultValue = operationParameter.Schema.Default;
+                    if (defaultValue != null)
+                    {
+                        var formattedDefaultValue = FormatDefaultValue(defaultValue, propertyType);
+                        propertiesCodeBuilder.Append($" = {formattedDefaultValue};");
+                    }
                     propertiesCodeBuilder.AppendLine();
                     operationModel.Parameters.Remove(operationParameter);
                 }
