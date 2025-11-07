@@ -138,24 +138,19 @@ internal static class ParameterExtractor
 
     private static string GetDefaultValueForParameter(string parameterString, ICollection<CSharpParameterModel> parameterModels)
     {
-        // Extract variable name from the parameter string
-        var parts = parameterString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        var parts = parameterString.Split([' '], StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length == 0)
             return "default";
 
         var variableName = parts[parts.Length - 1].TrimEnd(';', ',');
 
-        // Find the matching parameter model
         var parameterModel = parameterModels.FirstOrDefault(p => p.VariableName == variableName);
-        if (parameterModel?.Schema?.Default != null)
-        {
-            return FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type);
-        }
-
-        return "default";
+        return parameterModel?.Schema?.Default != null
+            ? FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type)
+            : "default";
     }
 
-    private static string FormatDefaultValue(object defaultValue, string parameterType)
+    private static string FormatDefaultValue(object? defaultValue, string parameterType)
     {
         if (defaultValue == null)
             return "default";
@@ -204,9 +199,11 @@ internal static class ParameterExtractor
 
     private static string JoinAttributes(params string[] attributes)
     {
-        var filteredAttributes = attributes.Where(a => !string.IsNullOrWhiteSpace(a));
+        var filteredAttributes = attributes
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .ToList();
 
-        if (!filteredAttributes.Any())
+        if (filteredAttributes.Count == 0)
             return string.Empty;
 
         return "[" + string.Join(", ", filteredAttributes) + "] ";
@@ -364,12 +361,12 @@ internal static class ParameterExtractor
     private static void AppendXmlDocComment(string description, StringBuilder codeBuilder)
     {
         codeBuilder.Append(
-$$"""
+"""
                 /// <summary>
 """);
 
         var lines = description.Split(
-            new[] { "\r\n", "\r", "\n" },
+            ["\r\n", "\r", "\n"],
             StringSplitOptions.None);
 
         foreach (var line in lines)
@@ -383,7 +380,7 @@ $$"""
 
         codeBuilder.AppendLine();
         codeBuilder.Append(
-$$"""
+"""
                 /// </summary>
 """);
         codeBuilder.AppendLine();
