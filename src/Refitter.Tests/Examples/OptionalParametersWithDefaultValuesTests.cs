@@ -8,85 +8,87 @@ namespace Refitter.Tests.Examples;
 
 public class OptionalParametersWithDefaultValuesTests
 {
-    private const string OpenApiSpec = @"
-{
-  ""openapi"": ""3.0.1"",
-  ""info"": {
-    ""title"": ""Test API"",
-    ""version"": ""v1""
-  },
-  ""paths"": {
-    ""/api/schedule/list"": {
-      ""get"": {
-        ""tags"": [""Schedule""],
-        ""operationId"": ""List"",
-        ""parameters"": [
-          {
-            ""name"": ""start"",
-            ""in"": ""query"",
-            ""required"": true,
-            ""schema"": {
-              ""type"": ""string"",
-              ""format"": ""date""
-            }
+    private const string OpenApiSpec =
+        """
+        {
+          "openapi": "3.0.1",
+          "info": {
+            "title": "Test API",
+            "version": "v1"
           },
-          {
-            ""name"": ""end"",
-            ""in"": ""query"",
-            ""required"": true,
-            ""schema"": {
-              ""type"": ""string"",
-              ""format"": ""date""
-            }
-          },
-          {
-            ""name"": ""includeCancelled"",
-            ""in"": ""query"",
-            ""required"": false,
-            ""schema"": {
-              ""type"": ""boolean"",
-              ""default"": true
-            }
-          },
-          {
-            ""name"": ""pageSize"",
-            ""in"": ""query"",
-            ""required"": false,
-            ""schema"": {
-              ""type"": ""integer"",
-              ""format"": ""int32"",
-              ""default"": 10
-            }
-          },
-          {
-            ""name"": ""filter"",
-            ""in"": ""query"",
-            ""required"": false,
-            ""schema"": {
-              ""type"": ""string"",
-              ""default"": ""active""
-            }
-          }
-        ],
-        ""responses"": {
-          ""200"": {
-            ""description"": ""Success"",
-            ""content"": {
-              ""application/json"": {
-                ""schema"": {
-                  ""type"": ""array"",
-                  ""items"": {
-                    ""type"": ""object""
+          "paths": {
+            "/api/schedule/list": {
+              "get": {
+                "tags": ["Schedule"],
+                "operationId": "List",
+                "parameters": [
+                  {
+                    "name": "start",
+                    "in": "query",
+                    "required": true,
+                    "schema": {
+                      "type": "string",
+                      "format": "date"
+                    }
+                  },
+                  {
+                    "name": "end",
+                    "in": "query",
+                    "required": true,
+                    "schema": {
+                      "type": "string",
+                      "format": "date"
+                    }
+                  },
+                  {
+                    "name": "includeCancelled",
+                    "in": "query",
+                    "required": false,
+                    "schema": {
+                      "type": "boolean",
+                      "default": true
+                    }
+                  },
+                  {
+                    "name": "pageSize",
+                    "in": "query",
+                    "required": false,
+                    "schema": {
+                      "type": "integer",
+                      "format": "int32",
+                      "default": 10
+                    }
+                  },
+                  {
+                    "name": "filter",
+                    "in": "query",
+                    "required": false,
+                    "schema": {
+                      "type": "string",
+                      "default": "active"
+                    }
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-    }
-  }
-}";
+        """;
 
     [Fact]
     public async Task Can_Generate_Code()
