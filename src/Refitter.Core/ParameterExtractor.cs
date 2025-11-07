@@ -145,7 +145,7 @@ internal static class ParameterExtractor
         var variableName = parts[parts.Length - 1].TrimEnd(';', ',');
 
         var parameterModel = parameterModels.FirstOrDefault(p => p.VariableName == variableName);
-        return parameterModel?.Schema?.Default != null
+        return parameterModel?.Schema?.Default != null && !string.IsNullOrEmpty(parameterModel?.Type)
             ? FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type)
             : "default";
     }
@@ -160,9 +160,33 @@ internal static class ParameterExtractor
         return type switch
         {
             "bool" => defaultValue.ToString()?.ToLowerInvariant() ?? "default",
-            "string" => $"\"{defaultValue}\"",
-            _ when IsNumericType(type) => defaultValue.ToString() ?? "default",
+            "string" => $"\"{EscapeString(defaultValue.ToString() ?? string.Empty)}\"",
+            _ when IsNumericType(type) => FormatNumericValue(defaultValue, type),
             _ => "default"
+        };
+    }
+
+    private static string EscapeString(string value)
+    {
+        return value
+            .Replace("\\", "\\\\")
+            .Replace("\"", "\\\"")
+            .Replace("\n", "\\n")
+            .Replace("\r", "\\r")
+            .Replace("\t", "\\t");
+    }
+
+    private static string FormatNumericValue(object defaultValue, string type)
+    {
+        var numericString = defaultValue is IFormattable formattable
+            ? formattable.ToString(null, CultureInfo.InvariantCulture)
+            : (defaultValue.ToString() ?? "default");
+
+        return type switch
+        {
+            "float" or "Single" => $"{numericString}f",
+            "decimal" or "Decimal" => $"{numericString}m",
+            _ => numericString
         };
     }
 
