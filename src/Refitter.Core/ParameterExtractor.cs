@@ -86,7 +86,7 @@ internal static class ParameterExtractor
         parameters.AddRange(formParameters);
         parameters.AddRange(binaryBodyParameters);
 
-        parameters = ReOrderNullableParameters(parameters, settings);
+        parameters = ReOrderNullableParameters(parameters, settings, operationModel.Parameters);
 
         if (settings.ApizrSettings?.WithRequestOptions == true)
             parameters.Add("[RequestOptions] IApizrRequestOptions options");
@@ -116,7 +116,8 @@ internal static class ParameterExtractor
 
     private static List<string> ReOrderNullableParameters(
         List<string> parameters,
-        RefitGeneratorSettings settings)
+        RefitGeneratorSettings settings,
+        ICollection<CSharpParameterModel> parameterModels)
     {
         if (!settings.OptionalParameters || settings.ApizrSettings?.WithRequestOptions == true)
             return parameters;
@@ -125,10 +126,52 @@ internal static class ParameterExtractor
         for (int index = 0; index < parameters.Count; index++)
         {
             if (parameters[index].Contains("?"))
-                parameters[index] += " = default";
+            {
+                var parameterString = parameters[index];
+                var defaultValue = GetDefaultValueForParameter(parameterString, parameterModels);
+                parameters[index] = parameterString + " = " + defaultValue;
+            }
         }
 
         return parameters;
+    }
+
+    private static string GetDefaultValueForParameter(string parameterString, ICollection<CSharpParameterModel> parameterModels)
+    {
+        var parts = parameterString.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0)
+            return "default";
+
+        var variableName = parts[parts.Length - 1].TrimEnd(';', ',');
+
+        var parameterModel = parameterModels.FirstOrDefault(p => p.VariableName == variableName);
+        return parameterModel?.Schema?.Default != null
+            ? FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type)
+            : "default";
+    }
+
+    private static string FormatDefaultValue(object? defaultValue, string parameterType)
+    {
+        if (defaultValue == null)
+            return "default";
+
+        var type = parameterType.TrimEnd('?').Trim();
+
+        return type switch
+        {
+            "bool" => defaultValue.ToString()?.ToLowerInvariant() ?? "default",
+            "string" => $"\"{defaultValue}\"",
+            _ when IsNumericType(type) => defaultValue.ToString() ?? "default",
+            _ => "default"
+        };
+    }
+
+    private static bool IsNumericType(string type)
+    {
+        return type is "int" or "Int32" or "long" or "Int64" or "short" or "Int16"
+            or "byte" or "Byte" or "decimal" or "Decimal" or "float" or "Single"
+            or "double" or "Double" or "sbyte" or "SByte" or "uint" or "UInt32"
+            or "ulong" or "UInt64" or "ushort" or "UInt16";
     }
 
     private static string GetQueryAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
@@ -156,9 +199,11 @@ internal static class ParameterExtractor
 
     private static string JoinAttributes(params string[] attributes)
     {
-        var filteredAttributes = attributes.Where(a => !string.IsNullOrWhiteSpace(a));
+        var filteredAttributes = attributes
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .ToList();
 
-        if (!filteredAttributes.Any())
+        if (filteredAttributes.Count == 0)
             return string.Empty;
 
         return "[" + string.Join(", ", filteredAttributes) + "] ";
@@ -267,6 +312,12 @@ internal static class ParameterExtractor
                     {{attributes}}
                     {{modifier}} {{propertyType}} {{propertyName}} { get; {{setterStyle}}; }
             """);
+                    var defaultValue = operationParameter.Schema.Default;
+                    if (defaultValue != null)
+                    {
+                        var formattedDefaultValue = FormatDefaultValue(defaultValue, propertyType);
+                        propertiesCodeBuilder.Append($" = {formattedDefaultValue};");
+                    }
                     propertiesCodeBuilder.AppendLine();
                     operationModel.Parameters.Remove(operationParameter);
                 }
@@ -316,12 +367,12 @@ internal static class ParameterExtractor
     private static void AppendXmlDocComment(string description, StringBuilder codeBuilder)
     {
         codeBuilder.Append(
-$$"""
+"""
                 /// <summary>
 """);
 
         var lines = description.Split(
-            new[] { "\r\n", "\r", "\n" },
+            ["\r\n", "\r", "\n"],
             StringSplitOptions.None);
 
         foreach (var line in lines)
@@ -335,7 +386,7 @@ $$"""
 
         codeBuilder.AppendLine();
         codeBuilder.Append(
-$$"""
+"""
                 /// </summary>
 """);
         codeBuilder.AppendLine();
