@@ -145,9 +145,11 @@ internal static class ParameterExtractor
         var variableName = parts[parts.Length - 1].TrimEnd(';', ',');
 
         var parameterModel = parameterModels.FirstOrDefault(p => p.VariableName == variableName);
-        return parameterModel?.Schema?.Default != null && !string.IsNullOrEmpty(parameterModel?.Type)
-            ? FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type)
-            : "default";
+        if (parameterModel?.Schema?.Default != null && !string.IsNullOrEmpty(parameterModel.Type))
+        {
+            return FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type);
+        }
+        return "default";
     }
 
     private static string FormatDefaultValue(object? defaultValue, string parameterType)
@@ -168,12 +170,32 @@ internal static class ParameterExtractor
 
     private static string EscapeString(string value)
     {
-        return value
-            .Replace("\\", "\\\\")
-            .Replace("\"", "\\\"")
-            .Replace("\n", "\\n")
-            .Replace("\r", "\\r")
-            .Replace("\t", "\\t");
+        var sb = new StringBuilder(value.Length * 2);
+        foreach (var c in value)
+        {
+            switch (c)
+            {
+                case '\\':
+                    sb.Append("\\\\");
+                    break;
+                case '"':
+                    sb.Append("\\\"");
+                    break;
+                case '\n':
+                    sb.Append("\\n");
+                    break;
+                case '\r':
+                    sb.Append("\\r");
+                    break;
+                case '\t':
+                    sb.Append("\\t");
+                    break;
+                default:
+                    sb.Append(c);
+                    break;
+            }
+        }
+        return sb.ToString();
     }
 
     private static string FormatNumericValue(object defaultValue, string type)
