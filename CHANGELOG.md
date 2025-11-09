@@ -2,7 +2,20 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.5...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.0-preview.86...HEAD)
+
+**Implemented enhancements:**
+
+- Improved handling of optional parameters [\#448](https://github.com/christianhelle/refitter/issues/448)
+- Optional parameters with default values [\#803](https://github.com/christianhelle/refitter/pull/803) ([christianhelle](https://github.com/christianhelle))
+
+## [1.7.0-preview.86](https://github.com/christianhelle/refitter/tree/1.7.0-preview.86) (2025-11-06)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.0...1.7.0-preview.86)
+
+## [1.7.0](https://github.com/christianhelle/refitter/tree/1.7.0) (2025-11-06)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.6.5...1.7.0)
 
 **Implemented enhancements:**
 
