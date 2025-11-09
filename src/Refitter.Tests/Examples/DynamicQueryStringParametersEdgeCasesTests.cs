@@ -6,10 +6,10 @@ using Xunit;
 
 namespace Refitter.Tests.Examples;
 
-public class OptionalParametersWithDefaultValuesEdgeCasesTests
+public class DynamicQueryStringParametersEdgeCasesTests
 {
     [Fact]
-    public async Task String_Default_Values_Should_Be_Escaped()
+    public async Task Dynamic_QueryString_With_Escaped_String_Defaults()
     {
         const string openApiSpec =
             """
@@ -24,6 +24,14 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
                   "get": {
                     "operationId": "TestEscaping",
                     "parameters": [
+                      {
+                        "name": "requiredParam",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
                       {
                         "name": "quotedString",
                         "in": "query",
@@ -41,15 +49,6 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
                           "type": "string",
                           "default": "path\\to\\file"
                         }
-                      },
-                      {
-                        "name": "newlineString",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                          "type": "string",
-                          "default": "line1\nline2"
-                        }
                       }
                     ],
                     "responses": {
@@ -65,14 +64,13 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
 
         string generatedCode = await GenerateCode(openApiSpec);
 
-        // Verify strings are properly escaped
-        generatedCode.Should().Contain("string? quotedString = \"value with \\\"quotes\\\"\"");
-        generatedCode.Should().Contain("string? backslashString = \"path\\\\to\\\\file\"");
-        generatedCode.Should().Contain("string? newlineString = \"line1\\nline2\"");
+        // Verify strings are properly escaped in dynamic query string class
+        generatedCode.Should().Contain("string? QuotedString { get; set; } = \"value with \\\"quotes\\\"\"");
+        generatedCode.Should().Contain("string? BackslashString { get; set; } = \"path\\\\to\\\\file\"");
     }
 
     [Fact]
-    public async Task String_Default_Values_With_All_Escape_Characters_Should_Be_Escaped()
+    public async Task Dynamic_QueryString_With_All_Escape_Characters()
     {
         const string openApiSpec =
             """
@@ -87,6 +85,23 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
                   "get": {
                     "operationId": "TestAllEscapes",
                     "parameters": [
+                      {
+                        "name": "requiredParam",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "name": "newlineString",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "string",
+                          "default": "line1\nline2"
+                        }
+                      },
                       {
                         "name": "carriageReturnString",
                         "in": "query",
@@ -104,15 +119,6 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
                           "type": "string",
                           "default": "col1\tcol2"
                         }
-                      },
-                      {
-                        "name": "allSpecialChars",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                          "type": "string",
-                          "default": "test\n\r\t\\\""
-                        }
                       }
                     ],
                     "responses": {
@@ -129,13 +135,13 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         string generatedCode = await GenerateCode(openApiSpec);
 
         // Verify all special characters are properly escaped
-        generatedCode.Should().Contain("string? carriageReturnString = \"line1\\rline2\"");
-        generatedCode.Should().Contain("string? tabString = \"col1\\tcol2\"");
-        generatedCode.Should().Contain("string? allSpecialChars = \"test\\n\\r\\t\\\\\\\"\"");
+        generatedCode.Should().Contain("string? NewlineString { get; set; } = \"line1\\nline2\"");
+        generatedCode.Should().Contain("string? CarriageReturnString { get; set; } = \"line1\\rline2\"");
+        generatedCode.Should().Contain("string? TabString { get; set; } = \"col1\\tcol2\"");
     }
 
     [Fact]
-    public async Task Float_Default_Values_Should_Have_Type_Suffix()
+    public async Task Dynamic_QueryString_With_Float_And_Decimal_Defaults()
     {
         const string openApiSpec =
             """
@@ -148,137 +154,16 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
               "paths": {
                 "/api/test": {
                   "get": {
-                    "operationId": "TestFloat",
+                    "operationId": "TestNumeric",
                     "parameters": [
                       {
-                        "name": "floatValue",
+                        "name": "requiredParam",
                         "in": "query",
-                        "required": false,
+                        "required": true,
                         "schema": {
-                          "type": "number",
-                          "format": "float",
-                          "default": 1.5
+                          "type": "string"
                         }
-                      }
-                    ],
-                    "responses": {
-                      "200": {
-                        "description": "Success"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            """;
-
-        string generatedCode = await GenerateCode(openApiSpec);
-
-        // Verify float has 'f' suffix
-        generatedCode.Should().Contain("float? floatValue = 1.5f");
-    }
-
-    [Fact]
-    public async Task Decimal_Default_Values_Should_Have_Type_Suffix()
-    {
-        const string openApiSpec =
-            """
-            {
-              "openapi": "3.0.1",
-              "info": {
-                "title": "Test API",
-                "version": "v1"
-              },
-              "paths": {
-                "/api/test": {
-                  "get": {
-                    "operationId": "TestDecimal",
-                    "parameters": [
-                      {
-                        "name": "decimalValue",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                          "type": "number",
-                          "format": "decimal",
-                          "default": 99.99
-                        }
-                      }
-                    ],
-                    "responses": {
-                      "200": {
-                        "description": "Success"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            """;
-
-        string generatedCode = await GenerateCode(openApiSpec);
-
-        // Verify decimal has 'm' suffix
-        generatedCode.Should().Contain("decimal? decimalValue = 99.99m");
-    }
-
-    [Fact]
-    public async Task Generated_Code_With_Escaped_Strings_Should_Build()
-    {
-        const string openApiSpec =
-            """
-            {
-              "openapi": "3.0.1",
-              "info": {
-                "title": "Test API",
-                "version": "v1"
-              },
-              "paths": {
-                "/api/test": {
-                  "get": {
-                    "operationId": "TestBuild",
-                    "parameters": [
-                      {
-                        "name": "escapedString",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                          "type": "string",
-                          "default": "value with \"quotes\" and \\backslashes\\"
-                        }
-                      }
-                    ],
-                    "responses": {
-                      "200": {
-                        "description": "Success"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            """;
-
-        string generatedCode = await GenerateCode(openApiSpec);
-        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task Generated_Code_With_Float_Decimal_Should_Build()
-    {
-        const string openApiSpec =
-            """
-            {
-              "openapi": "3.0.1",
-              "info": {
-                "title": "Test API",
-                "version": "v1"
-              },
-              "paths": {
-                "/api/test": {
-                  "get": {
-                    "operationId": "TestBuild",
-                    "parameters": [
+                      },
                       {
                         "name": "floatValue",
                         "in": "query",
@@ -312,11 +197,75 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
             """;
 
         string generatedCode = await GenerateCode(openApiSpec);
-        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+
+        // Verify numeric types have proper suffixes
+        generatedCode.Should().Contain("float? FloatValue { get; set; } = 1.5f");
+        generatedCode.Should().Contain("decimal? DecimalValue { get; set; } = 99.99m");
     }
 
     [Fact]
-    public async Task Integer_Default_Values_Should_Not_Have_Suffix()
+    public async Task Dynamic_QueryString_With_Boolean_Defaults()
+    {
+        const string openApiSpec =
+            """
+            {
+              "openapi": "3.0.1",
+              "info": {
+                "title": "Test API",
+                "version": "v1"
+              },
+              "paths": {
+                "/api/test": {
+                  "get": {
+                    "operationId": "TestBool",
+                    "parameters": [
+                      {
+                        "name": "requiredParam",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "name": "isEnabled",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "boolean",
+                          "default": true
+                        }
+                      },
+                      {
+                        "name": "isDisabled",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "boolean",
+                          "default": false
+                        }
+                      }
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        string generatedCode = await GenerateCode(openApiSpec);
+
+        // Verify booleans are lowercase
+        generatedCode.Should().Contain("bool? IsEnabled { get; set; } = true");
+        generatedCode.Should().Contain("bool? IsDisabled { get; set; } = false");
+    }
+
+    [Fact]
+    public async Task Dynamic_QueryString_With_Integer_Defaults()
     {
         const string openApiSpec =
             """
@@ -331,6 +280,14 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
                   "get": {
                     "operationId": "TestInt",
                     "parameters": [
+                      {
+                        "name": "requiredParam",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
                       {
                         "name": "intValue",
                         "in": "query",
@@ -366,12 +323,12 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         string generatedCode = await GenerateCode(openApiSpec);
 
         // Verify integers don't have suffixes
-        generatedCode.Should().Contain("int? intValue = 42");
-        generatedCode.Should().Contain("long? longValue = 9999");
+        generatedCode.Should().Contain("int? IntValue { get; set; } = 42");
+        generatedCode.Should().Contain("long? LongValue { get; set; } = 9999");
     }
 
     [Fact]
-    public async Task Double_Default_Values_Should_Not_Have_Suffix()
+    public async Task Dynamic_QueryString_Generated_Code_Should_Build()
     {
         const string openApiSpec =
             """
@@ -384,112 +341,43 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
               "paths": {
                 "/api/test": {
                   "get": {
-                    "operationId": "TestDouble",
+                    "operationId": "TestBuild",
                     "parameters": [
                       {
-                        "name": "doubleValue",
+                        "name": "requiredParam",
                         "in": "query",
-                        "required": false,
+                        "required": true,
                         "schema": {
-                          "type": "number",
-                          "format": "double",
-                          "default": 3.14159
-                        }
-                      }
-                    ],
-                    "responses": {
-                      "200": {
-                        "description": "Success"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            """;
-
-        string generatedCode = await GenerateCode(openApiSpec);
-
-        // Verify double doesn't have suffix (default for floating point literals in C#)
-        generatedCode.Should().Contain("double? doubleValue = 3.14159");
-    }
-
-    [Fact]
-    public async Task Boolean_Default_Values_Should_Be_Lowercase()
-    {
-        const string openApiSpec =
-            """
-            {
-              "openapi": "3.0.1",
-              "info": {
-                "title": "Test API",
-                "version": "v1"
-              },
-              "paths": {
-                "/api/test": {
-                  "get": {
-                    "operationId": "TestBool",
-                    "parameters": [
-                      {
-                        "name": "isEnabled",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                          "type": "boolean",
-                          "default": true
+                          "type": "string"
                         }
                       },
                       {
-                        "name": "isDisabled",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                          "type": "boolean",
-                          "default": false
-                        }
-                      }
-                    ],
-                    "responses": {
-                      "200": {
-                        "description": "Success"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            """;
-
-        string generatedCode = await GenerateCode(openApiSpec);
-
-        // Verify booleans are lowercase
-        generatedCode.Should().Contain("bool? isEnabled = true");
-        generatedCode.Should().Contain("bool? isDisabled = false");
-    }
-
-    [Fact]
-    public async Task Empty_String_Default_Value_Should_Be_Handled()
-    {
-        const string openApiSpec =
-            """
-            {
-              "openapi": "3.0.1",
-              "info": {
-                "title": "Test API",
-                "version": "v1"
-              },
-              "paths": {
-                "/api/test": {
-                  "get": {
-                    "operationId": "TestEmpty",
-                    "parameters": [
-                      {
-                        "name": "emptyString",
+                        "name": "escapedString",
                         "in": "query",
                         "required": false,
                         "schema": {
                           "type": "string",
-                          "default": ""
+                          "default": "value with \"quotes\" and \\backslashes\\"
+                        }
+                      },
+                      {
+                        "name": "floatValue",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "number",
+                          "format": "float",
+                          "default": 1.5
+                        }
+                      },
+                      {
+                        "name": "decimalValue",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "number",
+                          "format": "decimal",
+                          "default": 99.99
                         }
                       }
                     ],
@@ -505,9 +393,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
             """;
 
         string generatedCode = await GenerateCode(openApiSpec);
-
-        // Verify empty string is properly quoted
-        generatedCode.Should().Contain("string? emptyString = \"\"");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
     private static async Task<string> GenerateCode(string openApiSpec)
@@ -516,7 +402,8 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
-            OptionalParameters = true
+            OptionalParameters = true,
+            UseDynamicQuerystringParameters = true
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
