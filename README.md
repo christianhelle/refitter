@@ -383,59 +383,29 @@ The following is an example `.refitter` file
 
 ## MSBuild
 
-A common scenario for generating code from OpenAPI specifications is to do it at build time. This can be achieved using MSBuild tasks. An example of such an approach would be to include a `.refitter` file in the projects directory and execute the Refitter CLI from pre-build events
+This is the recommended approach for generating code from OpenAPI specifications at build time. The MSBuild approach integrates seamlessly into your build pipeline, automatically generates code at build time
 
-```xml
-<Target Name="Refitter" AfterTargets="PreBuildEvent">
-    <Exec WorkingDirectory="$(ProjectDir)" Command="refitter --settings-file .refitter --skip-validation" />
-</Target>
-```
+### Why Choose MSBuild over Source Generator?
 
-The snippet above requires that Refitter is installed on the machine as a globally available dotnet tool. This might not be the case if you're running on a build agent from a CI/CD environment. In this case you might want to install Refitter as a local tool using a manifest file, as described in [this tutorial](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use?WT.mc_id=DT-MVP-5004822)
+The MSBuild task offers several advantages over the Source Generator:
 
-```xml
-<Target Name="Refitter" AfterTargets="PreBuildEvent">
-    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore" />
-    <Exec WorkingDirectory="$(ProjectDir)" Command="refitter --settings-file .refitter --skip-validation" />
-</Target>
-```
+- **Build-time Generation**: Code is generated during the pre-build process, which ensures that the Refit source generator will work without needing to rebuild a second time.
+- **No Manual Commits**: Generated files are created automatically during build, eliminating the need to commit generated code to source control
+- **No Additional Tools Required**: Works out of the box without requiring separate CLI tool installation
 
-The `dotnet build` process does will probably not have access to the package repository in which to download Refitter from, this is at least the case with Azure Pipelines and Azure Artifacts. To workaround this, you can provide a separate `nuget.config` that only uses `nuget.org` as a `<packageSource>`.
+### Installation
 
-Something like this:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageSources>
-    <clear />
-    <add key="NuGet" value="https://api.nuget.org/v3/index.json" />
-  </packageSources>
-</configuration>
-```
-
-You might want to place the `nuget.config` file in another folder to avoid using it to build the .NET project, then you can specify this when executing `dotnet tool restore`
-
-```xml
-<Target Name="Refitter" AfterTargets="PreBuildEvent">
-    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore --configfile refitter/nuget.config" />
-    <Exec WorkingDirectory="$(ProjectDir)" Command="refitter --settings-file .refitter --skip-validation" />
-</Target>
-```
-
-In the example above, the `nuget.config` file is placed under the `refitter` folder.
-
-### Refitter.MSBuild package
-
-Refitter ships with an MSBuild custom task that is distributed as a NuGet package and includes the Refitter CLI binary. This will simplify generating code from OpenAPI specifications at build time.
-
-To use the package, install `Refitter.MSBuild`
+The MSBuild task is distributed as a NuGet package:
 
 ```shell
 dotnet add package Refitter.MSBuild
 ```
 
-The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task and looks something like this:
+### Usage
+
+Once installed, the MSBuild task will automatically scan your project for `.refitter` files and generate code during build. Simply create a `.refitter` file in your project directory with your OpenAPI specification settings.
+
+The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task:
 
 ```xml
 <UsingTask TaskName="RefitterGenerateTask"
@@ -443,7 +413,8 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
            Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
 <Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
     <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
-                          DisableLogging="$(RefitterNoLogging)">
+                          DisableLogging="$(RefitterNoLogging)"
+                          SkipValidation="$(RefitterSkipValidation)">
         <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
     </RefitterGenerateTask>
     <ItemGroup>
@@ -452,9 +423,56 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
 </Target>
 ```
 
-The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and executes them all. By default, telemetry collection is enabled, and to opt-out of it you must specify `<RefitterNoLogging>true</RefitterNoLogging>` in the `.csproj` `<PropertyGroup>`
+The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and execute them all.
+
+### Configuration
+
+By default, telemetry collection is enabled. To opt-out, add the following to your `.csproj` file:
+
+```xml
+<PropertyGroup>
+  <RefitterNoLogging>true</RefitterNoLogging>
+</PropertyGroup>
+```
+
+You can also skip OpenAPI validation by setting:
+
+```xml
+<PropertyGroup>
+  <RefitterSkipValidation>true</RefitterSkipValidation>
+</PropertyGroup>
+```
+
+### Example
+
+Create a `.refitter` file in your project:
+
+```json
+{
+  "openApiPath": "https://petstore3.swagger.io/api/v3/openapi.json",
+  "namespace": "Petstore.Api",
+  "outputFolder": "./Generated"
+}
+```
+
+Now, every time you build your project, Refitter will automatically generate the API client code based on your OpenAPI specification.
+
+### Alternative: Using CLI with MSBuild Exec Task
+
+If you prefer more control or need to use the CLI tool directly, you can invoke the Refitter CLI from MSBuild pre-build events:
+
+```xml
+<Target Name="Refitter" AfterTargets="PreBuildEvent">
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore" />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="refitter --settings-file .refitter --skip-validation" />
+</Target>
+```
+
+This approach requires that Refitter is installed as a local tool using a manifest file, as described in [this tutorial](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use?WT.mc_id=DT-MVP-5004822).
 
 ## Source Generator
+
+> **Note:** We recommend using the [MSBuild](#msbuild) approach instead of the Source Generator because the code is generated at pre-compile, ensuring that the Refit source generator will generated code from the Refit interfaces added to the compilation
 
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
 
