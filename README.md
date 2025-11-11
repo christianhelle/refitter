@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-83-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-84-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1357,6 +1357,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://christophdebaene.be"><img src="https://avatars.githubusercontent.com/u/642207?v=4?s=100" width="100px;" alt="Christoph De Baene"/><br /><sub><b>Christoph De Baene</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Achristophdebaene" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/7amou3"><img src="https://avatars.githubusercontent.com/u/993610?v=4?s=100" width="100px;" alt="7amou3"/><br /><sub><b>7amou3</b></sub></a><br /><a href="#ideas-7amou3" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://haldencollier.com"><img src="https://avatars.githubusercontent.com/u/25365699?v=4?s=100" width="100px;" alt="Halden"/><br /><sub><b>Halden</b></sub></a><br /><a href="#ideas-HGCollier" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mhartmair-cubido"><img src="https://avatars.githubusercontent.com/u/164479174?v=4?s=100" width="100px;" alt="mhartmair-cubido"/><br /><sub><b>mhartmair-cubido</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amhartmair-cubido" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
