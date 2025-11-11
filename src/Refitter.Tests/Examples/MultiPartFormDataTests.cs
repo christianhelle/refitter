@@ -124,7 +124,9 @@ public class MultiPartFormDataTests
     public async Task Generated_Code_Contains_Correct_Parameters()
     {
         string generatedCode = await GenerateCode();
-        generatedCode.Should().Contain("string name, StreamPart animalClassFile, StreamPart animalCrowdFile");
+        generatedCode.Should().Contain("[AliasAs(\"Name\")] string name");
+        generatedCode.Should().Contain("[AliasAs(\"AnimalClassFile\")] StreamPart animalClassFile");
+        generatedCode.Should().Contain("[AliasAs(\"AnimalCrowdFile\")] StreamPart animalCrowdFile");
     }
 
     private static async Task<string> GenerateCode()
