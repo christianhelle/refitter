@@ -145,9 +145,11 @@ internal static class ParameterExtractor
         var variableName = parts[parts.Length - 1].TrimEnd(';', ',');
 
         var parameterModel = parameterModels.FirstOrDefault(p => p.VariableName == variableName);
-        return parameterModel?.Schema?.Default != null
-            ? FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type)
-            : "default";
+        if (parameterModel?.Schema?.Default != null && !string.IsNullOrEmpty(parameterModel.Type))
+        {
+            return FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type);
+        }
+        return "default";
     }
 
     private static string FormatDefaultValue(object? defaultValue, string parameterType)
@@ -160,10 +162,80 @@ internal static class ParameterExtractor
         return type switch
         {
             "bool" => defaultValue.ToString()?.ToLowerInvariant() ?? "default",
-            "string" => $"\"{defaultValue}\"",
-            _ when IsNumericType(type) => defaultValue.ToString() ?? "default",
+            "string" => $"\"{EscapeString(defaultValue.ToString() ?? string.Empty)}\"",
+            _ when IsNumericType(type) => FormatNumericValue(defaultValue, type),
             _ => "default"
         };
+    }
+
+    private static string EscapeString(string value)
+    {
+        var sb = new StringBuilder(value.Length + 10);
+        foreach (var c in value)
+        {
+            switch (c)
+            {
+                case '\\':
+                    sb.Append("\\\\");
+                    break;
+                case '"':
+                    sb.Append("\\\"");
+                    break;
+                case '\n':
+                    sb.Append("\\n");
+                    break;
+                case '\r':
+                    sb.Append("\\r");
+                    break;
+                case '\t':
+                    sb.Append("\\t");
+                    break;
+                case '\f':
+                    sb.Append("\\f");
+                    break;
+                case '\v':
+                    sb.Append("\\v");
+                    break;
+                case '\b':
+                    sb.Append("\\b");
+                    break;
+                case '\0':
+                    sb.Append("\\0");
+                    break;
+                default:
+                    sb.Append(c);
+                    break;
+            }
+        }
+        return sb.ToString();
+    }
+
+    private static string FormatNumericValue(object defaultValue, string type)
+    {
+        var numericString = defaultValue is IFormattable formattable
+            ? formattable.ToString(null, CultureInfo.InvariantCulture)
+            : (defaultValue.ToString() ?? "default");
+
+        return type switch
+        {
+            "float" or "Single" => $"{numericString}f",
+            "decimal" or "Decimal" => $"{numericString}m",
+            "double" or "Double" => FormatDoubleLiteral(numericString),
+            "long" or "Int64" => $"{numericString}L",
+            "ulong" or "UInt64" => $"{numericString}UL",
+            "uint" or "UInt32" => $"{numericString}U",
+            _ => numericString
+        };
+    }
+
+    private static string FormatDoubleLiteral(string numericString)
+    {
+        // If the string already contains a decimal point or exponent, return as-is
+        if (numericString.Contains('.') || numericString.Contains('e') || numericString.Contains('E'))
+            return numericString;
+
+        // Otherwise, append .0 to make it a double literal
+        return numericString + ".0";
     }
 
     private static bool IsNumericType(string type)
