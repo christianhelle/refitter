@@ -170,7 +170,7 @@ internal static class ParameterExtractor
 
     private static string EscapeString(string value)
     {
-        var sb = new StringBuilder(value.Length * 2);
+        var sb = new StringBuilder(value.Length + 10);
         foreach (var c in value)
         {
             switch (c)
@@ -190,6 +190,18 @@ internal static class ParameterExtractor
                 case '\t':
                     sb.Append("\\t");
                     break;
+                case '\f':
+                    sb.Append("\\f");
+                    break;
+                case '\v':
+                    sb.Append("\\v");
+                    break;
+                case '\b':
+                    sb.Append("\\b");
+                    break;
+                case '\0':
+                    sb.Append("\\0");
+                    break;
                 default:
                     sb.Append(c);
                     break;
@@ -208,8 +220,22 @@ internal static class ParameterExtractor
         {
             "float" or "Single" => $"{numericString}f",
             "decimal" or "Decimal" => $"{numericString}m",
+            "double" or "Double" => FormatDoubleLiteral(numericString),
+            "long" or "Int64" => $"{numericString}L",
+            "ulong" or "UInt64" => $"{numericString}UL",
+            "uint" or "UInt32" => $"{numericString}U",
             _ => numericString
         };
+    }
+
+    private static string FormatDoubleLiteral(string numericString)
+    {
+        // If the string already contains a decimal point or exponent, return as-is
+        if (numericString.Contains('.') || numericString.Contains('e') || numericString.Contains('E'))
+            return numericString;
+
+        // Otherwise, append .0 to make it a double literal
+        return numericString + ".0";
     }
 
     private static bool IsNumericType(string type)

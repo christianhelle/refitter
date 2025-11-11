@@ -371,7 +371,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
     }
 
     [Fact]
-    public async Task Double_Default_Values_Should_Not_Have_Suffix()
+    public async Task Double_Default_Values_Should_Have_Decimal_Point()
     {
         const string openApiSpec =
             """
@@ -395,6 +395,16 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
                           "format": "double",
                           "default": 3.14159
                         }
+                      },
+                      {
+                        "name": "doubleIntValue",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "number",
+                          "format": "double",
+                          "default": 10
+                        }
                       }
                     ],
                     "responses": {
@@ -410,8 +420,10 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
 
         string generatedCode = await GenerateCode(openApiSpec);
 
-        // Verify double doesn't have suffix (default for floating point literals in C#)
+        // Verify double with decimal point stays as-is
         generatedCode.Should().Contain("double? doubleValue = 3.14159");
+        // Verify double with integer value gets .0 appended
+        generatedCode.Should().Contain("double? doubleIntValue = 10.0");
     }
 
     [Fact]
@@ -509,6 +521,106 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         // Verify empty string is properly quoted
         generatedCode.Should().Contain("string? emptyString = \"\"");
     }
+
+    [Fact]
+    public async Task Mixed_Escape_Sequences_Should_Be_Handled()
+    {
+        const string openApiSpec =
+            """
+            {
+              "openapi": "3.0.1",
+              "info": {
+                "title": "Test API",
+                "version": "v1"
+              },
+              "paths": {
+                "/api/test": {
+                  "get": {
+                    "operationId": "TestMixedEscapes",
+                    "parameters": [
+                      {
+                        "name": "complexString",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "string",
+                          "default": "path\\to\\file with \"quotes\" and\nnewlines\tand tabs"
+                        }
+                      }
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        string generatedCode = await GenerateCode(openApiSpec);
+
+        // Verify all escape sequences are properly handled in combination
+        generatedCode.Should().Contain("string? complexString = \"path\\\\to\\\\file with \\\"quotes\\\" and\\nnewlines\\tand tabs\"");
+    }
+
+    [Fact]
+    public async Task Long_And_ULong_Default_Values_Should_Have_Suffixes()
+    {
+        const string openApiSpec =
+            """
+            {
+              "openapi": "3.0.1",
+              "info": {
+                "title": "Test API",
+                "version": "v1"
+              },
+              "paths": {
+                "/api/test": {
+                  "get": {
+                    "operationId": "TestLong",
+                    "parameters": [
+                      {
+                        "name": "longValue",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "integer",
+                          "format": "int64",
+                          "default": 3000000000
+                        }
+                      },
+                      {
+                        "name": "ulongValue",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "integer",
+                          "format": "uint64",
+                          "default": 5000000000
+                        }
+                      }
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        string generatedCode = await GenerateCode(openApiSpec);
+
+        // Verify long and ulong have proper suffixes
+        generatedCode.Should().Contain("long? longValue = 3000000000L");
+        generatedCode.Should().Contain("ulong? ulongValue = 5000000000UL");
+    }
+
+
 
     private static async Task<string> GenerateCode(string openApiSpec)
     {

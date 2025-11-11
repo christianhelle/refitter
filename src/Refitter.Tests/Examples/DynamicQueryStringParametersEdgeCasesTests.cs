@@ -396,6 +396,183 @@ public class DynamicQueryStringParametersEdgeCasesTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Fact]
+    public async Task Dynamic_QueryString_With_Mixed_Escape_Characters()
+    {
+        const string openApiSpec =
+            """
+            {
+              "openapi": "3.0.1",
+              "info": {
+                "title": "Test API",
+                "version": "v1"
+              },
+              "paths": {
+                "/api/test": {
+                  "get": {
+                    "operationId": "TestMixedEscapes",
+                    "parameters": [
+                      {
+                        "name": "requiredParam",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "name": "complexString",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "string",
+                          "default": "path\\to\\file with \"quotes\"\nand newlines"
+                        }
+                      }
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        string generatedCode = await GenerateCode(openApiSpec);
+
+        // Verify mixed escape sequences
+        generatedCode.Should().Contain("string? ComplexString { get; set; } = \"path\\\\to\\\\file with \\\"quotes\\\"\\nand newlines\"");
+    }
+
+    [Fact]
+    public async Task Dynamic_QueryString_With_Long_And_ULong_Defaults()
+    {
+        const string openApiSpec =
+            """
+            {
+              "openapi": "3.0.1",
+              "info": {
+                "title": "Test API",
+                "version": "v1"
+              },
+              "paths": {
+                "/api/test": {
+                  "get": {
+                    "operationId": "TestLongTypes",
+                    "parameters": [
+                      {
+                        "name": "requiredParam",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "name": "longValue",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "integer",
+                          "format": "int64",
+                          "default": 3000000000
+                        }
+                      },
+                      {
+                        "name": "ulongValue",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "integer",
+                          "format": "uint64",
+                          "default": 5000000000
+                        }
+                      }
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        string generatedCode = await GenerateCode(openApiSpec);
+
+        // Verify numeric type suffixes
+        generatedCode.Should().Contain("long? LongValue { get; set; } = 3000000000L");
+        generatedCode.Should().Contain("ulong? UlongValue { get; set; } = 5000000000UL");
+    }
+
+    [Fact]
+    public async Task Dynamic_QueryString_With_Double_Integer_Value()
+    {
+        const string openApiSpec =
+            """
+            {
+              "openapi": "3.0.1",
+              "info": {
+                "title": "Test API",
+                "version": "v1"
+              },
+              "paths": {
+                "/api/test": {
+                  "get": {
+                    "operationId": "TestDouble",
+                    "parameters": [
+                      {
+                        "name": "requiredParam",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "name": "doubleFloatValue",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "number",
+                          "format": "double",
+                          "default": 3.14
+                        }
+                      },
+                      {
+                        "name": "doubleIntValue",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "number",
+                          "format": "double",
+                          "default": 10
+                        }
+                      }
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        string generatedCode = await GenerateCode(openApiSpec);
+
+        // Verify double formatting
+        generatedCode.Should().Contain("double? DoubleFloatValue { get; set; } = 3.14");
+        generatedCode.Should().Contain("double? DoubleIntValue { get; set; } = 10.0");
+    }
+
     private static async Task<string> GenerateCode(string openApiSpec)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(openApiSpec);
