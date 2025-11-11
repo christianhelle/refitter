@@ -2,6 +2,14 @@
 
 Refitter is available as custom MSBuild tasks that includes the Refitter CLI executable for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
+## Installation
+
+```shell
+dotnet add package Refitter.MSBuild
+```
+
+## How It Works
+
 The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task and looks something like this:
 
 ```xml
@@ -20,7 +28,39 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
 </Target>
 ```
 
-The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and executes them all. By default, telemetry collection is enabled, and to opt-out of it you must specify `<RefitterNoLogging>true</RefitterNoLogging>` in the `.csproj` `<PropertyGroup>`
+The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and execute them all.
+
+## Configuration
+
+By default, telemetry collection is enabled. To opt-out, add the following to your `.csproj` file:
+
+```xml
+<PropertyGroup>
+  <RefitterNoLogging>true</RefitterNoLogging>
+</PropertyGroup>
+```
+
+You can also skip OpenAPI validation by setting:
+
+```xml
+<PropertyGroup>
+  <RefitterSkipValidation>true</RefitterSkipValidation>
+</PropertyGroup>
+```
+
+## Example
+
+Create a `.refitter` file in your project:
+
+```json
+{
+  "openApiPath": "https://petstore3.swagger.io/api/v3/openapi.json",
+  "namespace": "Petstore.Api",
+  "outputFolder": "./Generated"
+}
+```
+
+Now, every time you build your project, Refitter will automatically generate the API client code based on your OpenAPI specification.
 
 
 ### .Refitter File format
