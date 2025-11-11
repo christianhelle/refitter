@@ -9,6 +9,15 @@
 - Improved handling of optional parameters [\#448](https://github.com/christianhelle/refitter/issues/448)
 - Optional parameters with default values [\#803](https://github.com/christianhelle/refitter/pull/803) ([christianhelle](https://github.com/christianhelle))
 
+**Fixed bugs:**
+
+- Use of non generic `JsonStringEnumConverter` prohibits usage of Json-SourceGenerationContext [\#778](https://github.com/christianhelle/refitter/issues/778)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency microsoft.net.test.sdk to 18.0.1 [\#808](https://github.com/christianhelle/refitter/pull/808) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add mhartmair-cubido as a contributor for bug [\#807](https://github.com/christianhelle/refitter/pull/807) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
 ## [1.7.0-preview.86](https://github.com/christianhelle/refitter/tree/1.7.0-preview.86) (2025-11-06)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.0...1.7.0-preview.86)
