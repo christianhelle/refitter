@@ -17,10 +17,13 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency swashbuckle.aspnetcore to v10 [\#816](https://github.com/christianhelle/refitter/pull/816) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency microsoft.extensions.http.resilience to v10 [\#815](https://github.com/christianhelle/refitter/pull/815) ([renovate[bot]](https://github.com/apps/renovate))
 - Update Spectre.Console.Cli to 0.53.0 [\#814](https://github.com/christianhelle/refitter/pull/814) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - chore\(deps\): update dotnet monorepo to v10 \(major\) [\#813](https://github.com/christianhelle/refitter/pull/813) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.net.test.sdk to 18.0.1 [\#808](https://github.com/christianhelle/refitter/pull/808) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add mhartmair-cubido as a contributor for bug [\#807](https://github.com/christianhelle/refitter/pull/807) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Fix string escaping, null safety, and numeric literals in optional parameter default values [\#804](https://github.com/christianhelle/refitter/pull/804) ([Copilot](https://github.com/apps/copilot-swe-agent))
 
 ## [1.7.0-preview.86](https://github.com/christianhelle/refitter/tree/1.7.0-preview.86) (2025-11-06)
 
