@@ -7,10 +7,12 @@
 **Implemented enhancements:**
 
 - Improved handling of optional parameters [\#448](https://github.com/christianhelle/refitter/issues/448)
+- Fix incorrect casing on multi-part form data parameters [\#806](https://github.com/christianhelle/refitter/pull/806) ([christianhelle](https://github.com/christianhelle))
 - Optional parameters with default values [\#803](https://github.com/christianhelle/refitter/pull/803) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
+- Multipart form data parameters wrong casing [\#805](https://github.com/christianhelle/refitter/issues/805)
 - Use of non generic `JsonStringEnumConverter` prohibits usage of Json-SourceGenerationContext [\#778](https://github.com/christianhelle/refitter/issues/778)
 
 **Merged pull requests:**
