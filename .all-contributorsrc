@@ -774,6 +774,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "mhartmair-cubido",
+      "name": "mhartmair-cubido",
+      "avatar_url": "https://avatars.githubusercontent.com/u/164479174?v=4",
+      "profile": "https://github.com/mhartmair-cubido",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
