@@ -63,7 +63,7 @@ internal static class ParameterExtractor
         var formParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
             .Select(p =>
-                $"{GetParameterType(p, settings)} {p.VariableName}")
+                $"{JoinAttributes(GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var binaryBodyParameters = operationModel.Parameters
