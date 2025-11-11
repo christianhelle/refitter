@@ -24,7 +24,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return SettingsValidator.Validate(settings);
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         var refitGeneratorSettings = CreateRefitGeneratorSettings(settings);
         try
