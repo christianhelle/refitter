@@ -14,15 +14,22 @@ internal static class DependencyInjectionGenerator
             return string.Empty;
 
         var code = new StringBuilder();
-
+        const string indent = "    ";
         var xmlDocComments = settings.GenerateXmlDocCodeComments;
 
         var methodDocs = xmlDocComments
-            ? "/// <summary>\r\n        /// Configures the Refit clients for dependency injection.\r\n        /// </summary>\r\n        /// <param name=\"services\">The service collection to configure.</param>\r\n        "
-              + (string.IsNullOrEmpty(iocSettings.BaseUrl) ? "/// <param name=\"baseUrl\">The base URL for the API clients.</param>\r\n        " : "")
-              + "/// <param name=\"builder\">Optional action to configure the HTTP client builder.</param>\r\n        /// <param name=\"settings\">Optional Refit settings to customize serialization and other behaviors.</param>\r\n        /// <returns>The configured service collection.</returns>\r\n        "
+            ? $"""
+               /// <summary>
+                       /// Configures the Refit clients for dependency injection.
+                       /// </summary>
+                       /// <param name="services">The service collection to configure.</param>
+               {(string.IsNullOrEmpty(iocSettings.BaseUrl) ? "        /// <param name=\"baseUrl\">The base URL for the API clients.</param>\r\n        " : "")}/// <param name="builder">Optional action to configure the HTTP client builder.</param>
+                       /// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
+                       /// <returns>The configured service collection.</returns>
+               {indent}{indent}
+               """
             : "";
-        
+
         var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? $"{methodDocs}public static IServiceCollection {iocSettings.ExtensionMethodName}(\r\n            this IServiceCollection services, \r\n            Uri baseUrl, \r\n            Action<IHttpClientBuilder>? builder = default, \r\n            RefitSettings? settings = default)"
             : $"{methodDocs}public static IServiceCollection {iocSettings.ExtensionMethodName}(\r\n            this IServiceCollection services, \r\n            Action<IHttpClientBuilder>? builder = default, \r\n            RefitSettings? settings = default)";
@@ -36,11 +43,11 @@ internal static class DependencyInjectionGenerator
             TransientErrorHandler.Polly
                 => """
                     using System;
-                       using Microsoft.Extensions.DependencyInjection;
-                       using Polly;
-                       using Polly.Contrib.WaitAndRetry;
-                       using Polly.Extensions.Http;
-                       using Refit;
+                        using Microsoft.Extensions.DependencyInjection;
+                        using Polly;
+                        using Polly.Contrib.WaitAndRetry;
+                        using Polly.Extensions.Http;
+                        using Refit;
                     """,
             TransientErrorHandler.HttpResilience
                 => """
@@ -66,7 +73,7 @@ internal static class DependencyInjectionGenerator
               {
                   {{usings}}
               {{(xmlDocComments ? """
-              
+
                   /// <summary>
                   /// Extension methods for configuring Refit clients in the service collection.
                   /// </summary>
