@@ -3,6 +3,7 @@
   "namespace": "Refitter.Tests.AdditionalFiles.ByEndpoint",
   "generateContracts": false,
   "multipleInterfaces": "ByEndpoint",
+  "useCancellationTokens": true,
   "additionalNamespaces": ["Refitter.Tests.AdditionalFiles.SingeInterface"],
   "addAcceptHeaders": false,
   "dependencyInjectionSettings": {

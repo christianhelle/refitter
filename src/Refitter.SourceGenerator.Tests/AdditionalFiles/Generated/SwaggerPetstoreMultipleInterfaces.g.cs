@@ -6,6 +6,7 @@
 using Refit;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Refitter.Tests.AdditionalFiles.SingeInterface;
@@ -21,6 +22,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Update an existing pet</summary>
         /// <remarks>Update an existing pet by Id</remarks>
         /// <param name="body">Update an existent pet in the store</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>Successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -45,7 +47,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </exception>
         [Headers("Content-Type: application/json")]
         [Put("/pet")]
-        Task<Pet> Execute([Body] Pet body);
+        Task<Pet> Execute([Body] Pet body, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Add a new pet to the store</summary>
@@ -55,6 +57,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Add a new pet to the store</summary>
         /// <remarks>Add a new pet to the store</remarks>
         /// <param name="body">Create a new pet in the store</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>Successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -71,7 +74,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </exception>
         [Headers("Content-Type: application/json")]
         [Post("/pet")]
-        Task<Pet> Execute([Body] Pet body);
+        Task<Pet> Execute([Body] Pet body, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Finds Pets by status</summary>
@@ -81,6 +84,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Finds Pets by status</summary>
         /// <remarks>Multiple status values can be provided with comma separated strings</remarks>
         /// <param name="status">Status values that need to be considered for filter</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -96,7 +100,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Get("/pet/findByStatus")]
-        Task<ICollection<Pet>> Execute([Query] Status? status);
+        Task<ICollection<Pet>> Execute([Query] Status? status, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Finds Pets by tags</summary>
@@ -106,6 +110,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Finds Pets by tags</summary>
         /// <remarks>Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.</remarks>
         /// <param name="tags">Tags to filter by</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -121,7 +126,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Get("/pet/findByTags")]
-        Task<ICollection<Pet>> Execute([Query(CollectionFormat.Multi)] IEnumerable<string> tags);
+        Task<ICollection<Pet>> Execute([Query(CollectionFormat.Multi)] IEnumerable<string> tags, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Find pet by ID</summary>
@@ -131,6 +136,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Find pet by ID</summary>
         /// <remarks>Returns a single pet</remarks>
         /// <param name="petId">ID of pet to return</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -150,7 +156,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Get("/pet/{petId}")]
-        Task<Pet> Execute(long petId);
+        Task<Pet> Execute(long petId, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Updates a pet in the store with form data</summary>
@@ -161,6 +167,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <param name="petId">ID of pet that needs to be updated</param>
         /// <param name="name">Name of pet that needs to be updated</param>
         /// <param name="status">Status of pet that needs to be updated</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -176,7 +183,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Post("/pet/{petId}")]
-        Task Execute(long petId, [Query] string name, [Query] string status);
+        Task Execute(long petId, [Query] string name, [Query] string status, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Deletes a pet</summary>
@@ -185,6 +192,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Deletes a pet</summary>
         /// <param name="petId">Pet id to delete</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -200,7 +208,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Delete("/pet/{petId}")]
-        Task Execute(long petId, [Header("api_key")] string api_key);
+        Task Execute(long petId, [Header("api_key")] string api_key, CancellationToken cancellationToken = default);
     }
 
     /// <summary>uploads an image</summary>
@@ -210,6 +218,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>uploads an image</summary>
         /// <param name="petId">ID of pet to update</param>
         /// <param name="additionalMetadata">Additional Metadata</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>
         /// A <see cref="Task"/> representing the <see cref="IApiResponse"/> instance containing the result:
         /// <list type="table">
@@ -225,7 +234,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </returns>
         [Headers("Content-Type: application/octet-stream")]
         [Post("/pet/{petId}/uploadImage")]
-        Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata, StreamPart body);
+        Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata, StreamPart body, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Returns pet inventories by status</summary>
@@ -234,10 +243,11 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Returns pet inventories by status</summary>
         /// <remarks>Returns a map of status codes to quantities</remarks>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Get("/store/inventory")]
-        Task<IDictionary<string, int>> Execute();
+        Task<IDictionary<string, int>> Execute(CancellationToken cancellationToken = default);
     }
 
     /// <summary>Place an order for a pet</summary>
@@ -246,6 +256,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Place an order for a pet</summary>
         /// <remarks>Place a new order in the store</remarks>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -262,7 +273,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </exception>
         [Headers("Content-Type: application/json")]
         [Post("/store/order")]
-        Task<Order> Execute([Body] Order body);
+        Task<Order> Execute([Body] Order body, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Find purchase order by ID</summary>
@@ -272,6 +283,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Find purchase order by ID</summary>
         /// <remarks>For valid response try integer IDs with value &lt;= 5 or &gt; 10. Other values will generated exceptions</remarks>
         /// <param name="orderId">ID of order that needs to be fetched</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -291,7 +303,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Get("/store/order/{orderId}")]
-        Task<Order> Execute(long orderId);
+        Task<Order> Execute(long orderId, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Delete purchase order by ID</summary>
@@ -301,6 +313,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Delete purchase order by ID</summary>
         /// <remarks>For valid response try integer IDs with value &lt; 1000. Anything above 1000 or nonintegers will generate API errors</remarks>
         /// <param name="orderId">ID of the order that needs to be deleted</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -320,7 +333,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Delete("/store/order/{orderId}")]
-        Task Execute(long orderId);
+        Task Execute(long orderId, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Create user</summary>
@@ -330,11 +343,12 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Create user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
         /// <param name="body">Created user object</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Headers("Content-Type: application/json")]
         [Post("/user")]
-        Task<User> Execute([Body] User body);
+        Task<User> Execute([Body] User body, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Creates list of users with given input array</summary>
@@ -343,11 +357,12 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Creates list of users with given input array</summary>
         /// <remarks>Creates list of users with given input array</remarks>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>Successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Headers("Content-Type: application/json")]
         [Post("/user/createWithList")]
-        Task<User> Execute([Body] IEnumerable<User> body);
+        Task<User> Execute([Body] IEnumerable<User> body, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Logs user into the system</summary>
@@ -357,6 +372,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Logs user into the system</summary>
         /// <param name="username">The user name for login</param>
         /// <param name="password">The password for login in clear text</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -372,7 +388,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Get("/user/login")]
-        Task<string> Execute([Query] string username, [Query] string password);
+        Task<string> Execute([Query] string username, [Query] string password, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Logs out current logged in user session</summary>
@@ -380,10 +396,11 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     public partial interface ILogoutUserEndpoint
     {
         /// <summary>Logs out current logged in user session</summary>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Get("/user/logout")]
-        Task Execute();
+        Task Execute(CancellationToken cancellationToken = default);
     }
 
     /// <summary>Get user by user name</summary>
@@ -392,6 +409,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Get user by user name</summary>
         /// <param name="username">The name that needs to be fetched. Use user1 for testing.</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -411,7 +429,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Get("/user/{username}")]
-        Task<User> Execute(string username);
+        Task<User> Execute(string username, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Update user</summary>
@@ -422,11 +440,12 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <remarks>This can only be done by the logged in user.</remarks>
         /// <param name="username">name that need to be deleted</param>
         /// <param name="body">Update an existent user in the store</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Headers("Content-Type: application/json")]
         [Put("/user/{username}")]
-        Task Execute(string username, [Body] User body);
+        Task Execute(string username, [Body] User body, CancellationToken cancellationToken = default);
     }
 
     /// <summary>Delete user</summary>
@@ -436,6 +455,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// <summary>Delete user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
         /// <param name="username">The name that needs to be deleted</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -455,7 +475,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         /// </list>
         /// </exception>
         [Delete("/user/{username}")]
-        Task Execute(string username);
+        Task Execute(string username, CancellationToken cancellationToken = default);
     }
 
 }
@@ -470,8 +490,19 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     using Microsoft.Extensions.DependencyInjection;
     using Refit;
 
+    /// <summary>
+    /// Extension methods for configuring Refit clients in the service collection.
+    /// </summary>
     public static partial class IServiceCollectionExtensions
     {
+        /// <summary>
+        /// Configures the Refit clients for dependency injection.
+        /// </summary>
+        /// <param name="services">The service collection to configure.</param>
+        /// <param name="baseUrl">The base URL for the API clients.</param>
+        /// <param name="builder">Optional action to configure the HTTP client builder.</param>
+        /// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
+        /// <returns>The configured service collection.</returns>
         public static IServiceCollection ConfigureRefitClients(
             this IServiceCollection services, 
             Uri baseUrl, 
