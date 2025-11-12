@@ -366,7 +366,12 @@ internal static class ApizrRegistrationGenerator
                 {
                     {{packageCodeBuilder}}
                     {{usingsCodeBuilder}}
-                  
+                {{(settings.GenerateXmlDocCodeComments ? """
+                
+                    /// <summary>
+                    /// Extension methods for configuring Apizr managers in the service collection.
+                    /// </summary>
+                """ : "")}}
                     public static partial class IServiceCollectionExtensions
                     {
                 """);
@@ -447,7 +452,12 @@ internal static class ApizrRegistrationGenerator
                 {
                     {{packageCodeBuilder}}
                     {{usingsCodeBuilder}}
-
+                {{(settings.GenerateXmlDocCodeComments ? """
+                
+                    /// <summary>
+                    /// Extension methods for configuring Apizr managers in the service collection.
+                    /// </summary>
+                """ : "")}}
                     public static partial class IServiceCollectionExtensions
                     {
                 """);

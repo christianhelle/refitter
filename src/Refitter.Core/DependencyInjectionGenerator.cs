@@ -15,16 +15,37 @@ internal static class DependencyInjectionGenerator
 
         var code = new StringBuilder();
 
+        var xmlDocComments = settings.GenerateXmlDocCodeComments;
+
         var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? $"""
-               public static IServiceCollection {iocSettings.ExtensionMethodName}(
+               {(xmlDocComments ? """
+               /// <summary>
+               /// Configures the Refit clients for dependency injection.
+               /// </summary>
+               /// <param name="services">The service collection to configure.</param>
+               /// <param name="baseUrl">The base URL for the API clients.</param>
+               /// <param name="builder">Optional action to configure the HTTP client builder.</param>
+               /// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
+               /// <returns>The configured service collection.</returns>
+               
+               """ : "")}public static IServiceCollection {iocSettings.ExtensionMethodName}(
                            this IServiceCollection services, 
                            Uri baseUrl, 
                            Action<IHttpClientBuilder>? builder = default, 
                            RefitSettings? settings = default)
                """
             : $"""
-               public static IServiceCollection {iocSettings.ExtensionMethodName}(
+               {(xmlDocComments ? """
+               /// <summary>
+               /// Configures the Refit clients for dependency injection.
+               /// </summary>
+               /// <param name="services">The service collection to configure.</param>
+               /// <param name="builder">Optional action to configure the HTTP client builder.</param>
+               /// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
+               /// <returns>The configured service collection.</returns>
+               
+               """ : "")}public static IServiceCollection {iocSettings.ExtensionMethodName}(
                            this IServiceCollection services, 
                            Action<IHttpClientBuilder>? builder = default, 
                            RefitSettings? settings = default)
@@ -68,7 +89,12 @@ internal static class DependencyInjectionGenerator
               namespace {{settings.Namespace}}
               {
                   {{usings}}
-
+              {{(xmlDocComments ? """
+              
+                  /// <summary>
+                  /// Extension methods for configuring Refit clients in the service collection.
+                  /// </summary>
+              """ : "")}}
                   public static partial class IServiceCollectionExtensions
                   {
                       {{methodDeclaration}}
