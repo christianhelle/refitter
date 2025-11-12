@@ -476,18 +476,18 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     public static partial class IServiceCollectionExtensions
     {
         /// <summary>
-              /// Configures the Refit clients for dependency injection.
-              /// </summary>
-              /// <param name="services">The service collection to configure.</param>
-              /// <param name="baseUrl">The base URL for the API clients.</param>
-              /// <param name="builder">Optional action to configure the HTTP client builder.</param>
-              /// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
-              /// <returns>The configured service collection.</returns>
-              public static IServiceCollection ConfigureRefitClients(
-                  this IServiceCollection services, 
-                  Uri baseUrl, 
-                  Action<IHttpClientBuilder>? builder = default, 
-                  RefitSettings? settings = default)
+        /// Configures the Refit clients for dependency injection.
+        /// </summary>
+        /// <param name="services">The service collection to configure.</param>
+        /// <param name="baseUrl">The base URL for the API clients.</param>
+        /// <param name="builder">Optional action to configure the HTTP client builder.</param>
+        /// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
+        /// <returns>The configured service collection.</returns>
+        public static IServiceCollection ConfigureRefitClients(
+            this IServiceCollection services, 
+            Uri baseUrl, 
+            Action<IHttpClientBuilder>? builder = default, 
+            RefitSettings? settings = default)
         {
             var clientBuilderIUpdatePetEndpoint = services
                 .AddRefitClient<IUpdatePetEndpoint>(settings)
