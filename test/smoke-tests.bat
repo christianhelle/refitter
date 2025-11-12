@@ -73,8 +73,8 @@ if not "%csproj%"=="" (
     echo.
     echo Building ConsoleApp
     echo.
-    set "solution=.\ConsoleApp\ConsoleApp.sln"
-    if /i "%net_core%"=="true" set "solution=.\ConsoleApp\ConsoleApp.Core.sln"
+    set "solution=.\ConsoleApp\ConsoleApp.slnx"
+    if /i "%net_core%"=="true" set "solution=.\ConsoleApp\ConsoleApp.Core.slnx"
 )
 
 dotnet build %solution%
@@ -126,19 +126,19 @@ for %%v in (v3.0 v2.0) do (
         for /l %%i in (0,1,13) do (
             set "filename=!filename%%i!"
             set "file_path=.\OpenAPI\%%v\!filename!.%%f"
-            
+
             if exist "!file_path!" (
                 copy "!file_path!" ".\openapi.%%f" >nul
-                
+
                 :: Create output path and namespace
                 set "output_path=!filename!.generated.cs"
                 set "output_path=!output_path:~0,1!!output_path:~1!"
                 call :capitalize output_path
-                
+
                 set "namespace=!filename!"
                 set "namespace=!namespace:-=!"
                 call :capitalize namespace
-                
+
                 :: Generate different variants
                 call :generate_and_build "%%f" "!namespace!.Disposable" "Disposable!output_path!" "--disposable" "true" "" "%build_from_source_param%"
                 call :generate_and_build "%%f" "!namespace!.MultipleFiles" "" "--multiple-files" "" "" "%build_from_source_param%"
@@ -165,20 +165,20 @@ for %%v in (v3.0 v2.0) do (
 for %%u in ("https://petstore3.swagger.io/api/v3/openapi.json" "https://petstore3.swagger.io/api/v3/openapi.yaml") do (
     set "namespace=PetstoreFromUri"
     set "output_path=PetstoreFromUri.generated.cs"
-    
+
     del /q "*.generated.cs" 2>nul
-    
+
     set "process_path=.\bin\refitter"
     if /i "%build_from_source_param%"=="false" set "process_path=refitter"
-    
+
     echo !process_path! %%u --namespace !namespace! --output .\GeneratedCode\!output_path!
     !process_path! %%u --namespace !namespace! --output .\GeneratedCode\!output_path!
     call :throw_on_native_failure
-    
+
     echo.
     echo Building ConsoleApp
     echo.
-    dotnet build .\ConsoleApp\ConsoleApp.sln
+    dotnet build .\ConsoleApp\ConsoleApp.slnx
     call :throw_on_native_failure
 )
 
