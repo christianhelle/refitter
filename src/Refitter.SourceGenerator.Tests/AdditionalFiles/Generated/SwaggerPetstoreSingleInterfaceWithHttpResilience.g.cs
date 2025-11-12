@@ -740,9 +740,19 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
     using Microsoft.Extensions.Http.Resilience;
     using Refit;
 
+    /// <summary>
+    /// Extension methods for configuring Refit clients in the service collection.
+    /// </summary>
     public static partial class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureRefitClients(
+        /// <summary>
+/// Configures the Refit clients for dependency injection.
+/// </summary>
+/// <param name="services">The service collection to configure.</param>
+/// <param name="builder">Optional action to configure the HTTP client builder.</param>
+/// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
+/// <returns>The configured service collection.</returns>
+public static IServiceCollection ConfigureRefitClients(
             this IServiceCollection services, 
             Action<IHttpClientBuilder>? builder = default, 
             RefitSettings? settings = default)
