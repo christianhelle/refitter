@@ -71,12 +71,14 @@ public class XmlDocumentationGenerator
     /// <param name="hasApiResponse">Indicates whether the method returns an <c>ApiResponse</c>.</param>
     /// <param name="hasDynamicQuerystringParameter">Indicates whether the method gets a dynamic querystring parameter</param>
     /// <param name="hasApizrRequestOptionsParameter">Indicates whether the method gets an IApizrRequestOptions options final parameter</param>
+    /// <param name="hasCancellationToken">Indicates whether the method gets a cancellation token parameter</param>
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendMethodDocumentation(
         CSharpOperationModel method,
         bool hasApiResponse,
         bool hasDynamicQuerystringParameter,
         bool hasApizrRequestOptionsParameter,
+        bool hasCancellationToken,
         StringBuilder code)
     {
         if (!_settings.GenerateXmlDocCodeComments)
@@ -124,6 +126,18 @@ public class XmlDocumentationGenerator
                 new Dictionary<string, string>
                 {
                     ["name"] = "options"
+                });
+        }
+
+        if (hasCancellationToken)
+        {
+            this.AppendXmlCommentBlock(
+                "param",
+                "The cancellation token to cancel the request.",
+                code,
+                new Dictionary<string, string>
+                {
+                    ["name"] = "cancellationToken"
                 });
         }
 
