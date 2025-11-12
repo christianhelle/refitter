@@ -145,8 +145,8 @@ function RunTests
 
     if ($BuildFromSource)
     {
-        Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net8.0"
-        Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net8.0" -NoNewWindow -PassThru | Wait-Process
+        Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0"
+        Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0" -NoNewWindow -PassThru | Wait-Process
 
         Write-Host "refitter --version"
         $process = Start-Process "./bin/refitter" `
