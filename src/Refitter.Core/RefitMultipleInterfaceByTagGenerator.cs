@@ -80,8 +80,9 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
+                var hasCancellationToken = settings.UseCancellationTokens && !hasApizrRequestOptionsParameter;
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, sb);
+                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, hasCancellationToken, sb);
                 GenerateObsoleteAttribute(operation, sb);
                 GenerateForMultipartFormData(operationModel, sb);
                 GenerateHeaders(operations, operation, operationModel, sb);
@@ -92,7 +93,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
                 if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
                 {
-                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, sb);
+                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, hasCancellationToken, sb);
                     GenerateObsoleteAttribute(operation, sb);
                     GenerateForMultipartFormData(operationModel, sb);
                     GenerateHeaders(operations, operation, operationModel, sb);

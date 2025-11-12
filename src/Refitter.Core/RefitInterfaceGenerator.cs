@@ -70,10 +70,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
+                var hasCancellationToken = settings.UseCancellationTokens && !hasApizrRequestOptionsParameter;
 
                 if (settings.GenerateXmlDocCodeComments)
                 {
-                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
+                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, hasCancellationToken, code);
                 }
 
                 GenerateObsoleteAttribute(operation, code);
@@ -88,7 +89,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 {
                     if (settings.GenerateXmlDocCodeComments)
                     {
-                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
+                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, hasCancellationToken, code);
                     }
                     GenerateObsoleteAttribute(operation, code);
                     GenerateForMultipartFormData(operationModel, code);
