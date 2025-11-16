@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Build.Utilities.Core"
-                          Version="17.14.28"
+                          Version="18.0.2"
                           PrivateAssets="all"
                           ExcludeAssets="runtime"/>
     </ItemGroup>
