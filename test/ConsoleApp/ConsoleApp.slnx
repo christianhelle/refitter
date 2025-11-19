@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="Net462/Net462.csproj" />
+  <Project Path="Net472/Net472.csproj" />
+  <Project Path="Net48/Net48.csproj" />
+  <Project Path="Net481/Net481.csproj" />
+  <Project Path="Net8/Net8.csproj" />
+  <Project Path="Net9/Net9.csproj" />
+  <Project Path="Net10/Net10.csproj" />
+</Solution>
