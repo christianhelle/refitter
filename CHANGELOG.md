@@ -7,16 +7,24 @@
 **Implemented enhancements:**
 
 - Improved handling of optional parameters [\#448](https://github.com/christianhelle/refitter/issues/448)
+- Asana API specs strange naming [\#364](https://github.com/christianhelle/refitter/issues/364)
+- Add .NET 10 support [\#822](https://github.com/christianhelle/refitter/pull/822) ([christianhelle](https://github.com/christianhelle))
+- Fix missing XML doc for CancellationToken [\#819](https://github.com/christianhelle/refitter/pull/819) ([christianhelle](https://github.com/christianhelle))
 - Fix incorrect casing on multi-part form data parameters [\#806](https://github.com/christianhelle/refitter/pull/806) ([christianhelle](https://github.com/christianhelle))
 - Optional parameters with default values [\#803](https://github.com/christianhelle/refitter/pull/803) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
+- Using cancellation tokens with xml doc comments plus TreatWarningsAsErrors and documentation file [\#817](https://github.com/christianhelle/refitter/issues/817)
 - Multipart form data parameters wrong casing [\#805](https://github.com/christianhelle/refitter/issues/805)
 - Use of non generic `JsonStringEnumConverter` prohibits usage of Json-SourceGenerationContext [\#778](https://github.com/christianhelle/refitter/issues/778)
+- SourceGenerator 1.5 and newer causes build error with Visual Studio 2022 [\#627](https://github.com/christianhelle/refitter/issues/627)
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency microsoft.build.utilities.core to v18 [\#821](https://github.com/christianhelle/refitter/pull/821) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 10.0.1 [\#820](https://github.com/christianhelle/refitter/pull/820) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add karoberts as a contributor for bug [\#818](https://github.com/christianhelle/refitter/pull/818) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to v10 [\#816](https://github.com/christianhelle/refitter/pull/816) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.extensions.http.resilience to v10 [\#815](https://github.com/christianhelle/refitter/pull/815) ([renovate[bot]](https://github.com/apps/renovate))
 - Update Spectre.Console.Cli to 0.53.0 [\#814](https://github.com/christianhelle/refitter/pull/814) ([Copilot](https://github.com/apps/copilot-swe-agent))
