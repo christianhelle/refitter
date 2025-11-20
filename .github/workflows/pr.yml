@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 🛒 Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '9.0'
