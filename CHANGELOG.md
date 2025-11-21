@@ -22,6 +22,8 @@
 
 **Merged pull requests:**
 
+- Bump actions/checkout from 5 to 6 [\#825](https://github.com/christianhelle/refitter/pull/825) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): update nswag monorepo to 14.6.3 [\#824](https://github.com/christianhelle/refitter/pull/824) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.build.utilities.core to v18 [\#821](https://github.com/christianhelle/refitter/pull/821) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 10.0.1 [\#820](https://github.com/christianhelle/refitter/pull/820) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add karoberts as a contributor for bug [\#818](https://github.com/christianhelle/refitter/pull/818) ([allcontributors[bot]](https://github.com/apps/allcontributors))
