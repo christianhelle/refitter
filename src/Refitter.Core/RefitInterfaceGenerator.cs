@@ -113,7 +113,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     {
         if (settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
         {
-            return type is null or "void" ? GetAsyncOperationType(true) : $"{GetAsyncOperationType(false)}<{WellKnownNamesspaces.TrimImportedNamespaces(type)}>";
+            return type is null or "void" ? GetAsyncOperationType(true) : $"{GetAsyncOperationType(false)}<{WellKnownNamespaces.TrimImportedNamespaces(type)}>";
         }
 
         // First check for explicit success status codes
@@ -265,8 +265,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     {
         var asyncType = GetAsyncOperationType(false);
         return settings.ReturnIApiResponse
-            ? $"{asyncType}<IApiResponse<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>>"
-            : $"{asyncType}<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
+            ? $"{asyncType}<IApiResponse<{WellKnownNamespaces.TrimImportedNamespaces(returnTypeParameter)}>>"
+            : $"{asyncType}<{WellKnownNamespaces.TrimImportedNamespaces(returnTypeParameter)}>";
     }
 
     private string GetAsyncOperationType(bool withVoidReturnType)
