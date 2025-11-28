@@ -285,7 +285,7 @@ internal static class ParameterExtractor
         ParameterModelBase parameterModel,
         RefitGeneratorSettings settings)
     {
-        var type = WellKnownNamesspaces
+        var type = WellKnownNamespaces
             .TrimImportedNamespaces(
                 FindSupportedType(
                     parameterModel.Type));
