@@ -9,7 +9,7 @@
     <Product>Refit API Client Code Generator</Product>
     <Description>Refitter is a CLI tool for generating a C# REST API Client using the Refit library from OpenAPI specifications.</Description>
     <PackAsTool>true</PackAsTool>
-    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
