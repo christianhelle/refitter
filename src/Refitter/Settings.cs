@@ -254,7 +254,7 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool SimpleOutput { get; set; }
 
-    [Description("Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes")]
+    [Description("Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [[JsonConverter(typeof(JsonStringEnumConverter))]] attributes")]
     [CommandOption("--no-inline-json-converters")]
     [DefaultValue(false)]
     public bool NoInlineJsonConverters { get; set; }
