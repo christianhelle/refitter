@@ -8,6 +8,7 @@
 
 - Improved handling of optional parameters [\#448](https://github.com/christianhelle/refitter/issues/448)
 - Asana API specs strange naming [\#364](https://github.com/christianhelle/refitter/issues/364)
+- Refit v9.0.2 [\#829](https://github.com/christianhelle/refitter/pull/829) ([renovate[bot]](https://github.com/apps/renovate))
 - Add .NET 10 support [\#822](https://github.com/christianhelle/refitter/pull/822) ([christianhelle](https://github.com/christianhelle))
 - Fix missing XML doc for CancellationToken [\#819](https://github.com/christianhelle/refitter/pull/819) ([christianhelle](https://github.com/christianhelle))
 - Fix incorrect casing on multi-part form data parameters [\#806](https://github.com/christianhelle/refitter/pull/806) ([christianhelle](https://github.com/christianhelle))
@@ -22,6 +23,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency polly to 8.6.5 [\#826](https://github.com/christianhelle/refitter/pull/826) ([renovate[bot]](https://github.com/apps/renovate))
 - Bump actions/checkout from 5 to 6 [\#825](https://github.com/christianhelle/refitter/pull/825) ([dependabot[bot]](https://github.com/apps/dependabot))
 - chore\(deps\): update nswag monorepo to 14.6.3 [\#824](https://github.com/christianhelle/refitter/pull/824) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency microsoft.build.utilities.core to v18 [\#821](https://github.com/christianhelle/refitter/pull/821) ([renovate[bot]](https://github.com/apps/renovate))
