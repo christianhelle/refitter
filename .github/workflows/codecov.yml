@@ -41,8 +41,8 @@ jobs:
           10.0.x
     
     - name: 🧪 Test
-      run: dotnet test src/Refitter.Tests/Refitter.Tests.csproj -c Release --collect:"XPlat Code Coverage" -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}"
-    
+      run: dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --collect:"XPlat Code Coverage" -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}"
+
     - name: 🗳️ Upload
       uses: actions/upload-artifact@v5
       with:
