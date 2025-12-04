@@ -35,3 +35,7 @@ When contributing to the documentation:
 3. Test your changes locally before submitting
 4. Ensure all links are valid and working
 5. Update the table of contents if adding new articles
+
+## Testing Framework
+
+Refitter uses [TUnit](https://github.com/thomhurst/TUnit) for unit testing instead of xUnit. TUnit provides significantly faster test execution (at least 40% faster), which improves both local development and CI/CD pipeline performance. When writing tests for new features or bug fixes, use TUnit's `[Test]` attribute instead of xUnit's `[Fact]` or `[Theory]`.
