@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -46,21 +46,21 @@ components:
               type: 'string'
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Returns_IList()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("IList<JobResponse>");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

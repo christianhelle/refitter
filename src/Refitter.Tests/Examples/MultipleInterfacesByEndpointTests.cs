@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -104,42 +104,42 @@ paths:
           description: 'successful operation'
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_IGetAllFooEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IGetAllFoosEndpoint");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_IGetFooDetailsEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IGetFooDetailsEndpoint");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_IGetAllBarEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IGetAllBarsEndpoint");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_IGetBarDetailsEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IGetBarDetailsEndpoint");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
         string generatedCode = await GenerateCode(true);
@@ -148,7 +148,7 @@ paths:
         generatedCode.Should().Contain("GetBarDetailsQueryParams");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

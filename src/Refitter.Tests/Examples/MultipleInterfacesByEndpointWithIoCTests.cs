@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -38,35 +38,35 @@ paths:
           description: 'successful operation'
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_IDeleteFooEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IDeleteFooEndpoint");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_IDeleteBarEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IDeleteBarEndpoint");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_IServiceCollectionExtensions()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("static partial class IServiceCollectionExtensions");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

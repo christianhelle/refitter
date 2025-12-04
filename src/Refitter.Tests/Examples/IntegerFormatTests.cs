@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -189,35 +189,35 @@ public class IntegerFormatTests
         }
         """;
 
-    [Fact]
+    [Test]
     public async Task Default_Generates_Integer_Without_Format_As_Int()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("int IntegerWithoutFormat");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Integer_Without_Format_As_Long()
     {
         string generatedCode = await GenerateCodeWithLongIntegers();
         generatedCode.Should().Contain("long IntegerWithoutFormat");
     }
 
-    [Fact]
+    [Test]
     public async Task Always_Respects_Explicit_Int32_Format()
     {
         string generatedCode = await GenerateCodeWithLongIntegers();
         generatedCode.Should().Contain("int IntegerWithInt32Format");
     }
 
-    [Fact]
+    [Test]
     public async Task Always_Respects_Explicit_Int64_Format()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("long IntegerWithInt64Format");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code_With_Default()
     {
         string generatedCode = await GenerateCode();
@@ -227,7 +227,7 @@ public class IntegerFormatTests
             .BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code_With_Long()
     {
         string generatedCode = await GenerateCodeWithLongIntegers();

@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -60,28 +60,28 @@ public class FormDataParameterCasingTests
 }
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Contains_Multipart_Attribute()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[Multipart]");
     }
 
-    [Fact]
+    [Test]
     public async Task FormData_Parameters_Should_Have_AliasAs_Attribute()
     {
         string generatedCode = await GenerateCode();

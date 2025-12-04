@@ -3,7 +3,7 @@ using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -34,21 +34,21 @@ definitions:
           type: string
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Symbols_In_Description_Are_Escaped()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("&lt;test&gt; &gt;&gt; &lt;&lt; &lt;/test&gt;");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

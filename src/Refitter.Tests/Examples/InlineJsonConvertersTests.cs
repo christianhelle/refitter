@@ -3,7 +3,7 @@ using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -70,14 +70,14 @@ public class InlineJsonConvertersTests
 }
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -87,7 +87,7 @@ public class InlineJsonConvertersTests
             .BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Contains_JsonConverter_By_Default()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: true);
@@ -99,7 +99,7 @@ public class InlineJsonConvertersTests
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Does_Not_Contain_JsonConverter_When_Disabled()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: false);
@@ -112,7 +112,7 @@ public class InlineJsonConvertersTests
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Without_JsonConverter_Can_Build()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: false);

@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -187,14 +187,14 @@ components:
         propertyName: $type
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Use_Polymorphic_Serialization()
     {
         string generatedCode = await GenerateCode();
@@ -210,7 +210,7 @@ components:
         generatedCode.Should().Contain("[JsonDerivedType(typeof(UserComponent2), typeDiscriminator: \"UserComponent2\")]");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

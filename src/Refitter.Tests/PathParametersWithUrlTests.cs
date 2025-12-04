@@ -2,18 +2,18 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests;
 
 public class PathParametersWithUrlTests
 {
-    [Theory]
-    [InlineData("https://petstore3.swagger.io/api/v3/openapi.json")]
+    [Test]
+    [Arguments("https://petstore3.swagger.io/api/v3/openapi.json")]
 #if !DEBUG
-    [InlineData("https://petstore3.swagger.io/api/v3/openapi.yaml")]
-    [InlineData("https://petstore.swagger.io/v2/swagger.json")]
-    [InlineData("https://petstore.swagger.io/v2/swagger.yaml")]
+    [Arguments("https://petstore3.swagger.io/api/v3/openapi.yaml")]
+    [Arguments("https://petstore.swagger.io/v2/swagger.json")]
+    [Arguments("https://petstore.swagger.io/v2/swagger.yaml")]
 #endif
     public async Task Can_Generate_Code(string url)
     {
@@ -21,12 +21,12 @@ public class PathParametersWithUrlTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Theory]
-    [InlineData("https://petstore3.swagger.io/api/v3/openapi.json")]
+    [Test]
+    [Arguments("https://petstore3.swagger.io/api/v3/openapi.json")]
 #if !DEBUG
-    [InlineData("https://petstore3.swagger.io/api/v3/openapi.yaml")]
-    [InlineData("https://petstore.swagger.io/v2/swagger.json")]
-    [InlineData("https://petstore.swagger.io/v2/swagger.yaml")]
+    [Arguments("https://petstore3.swagger.io/api/v3/openapi.yaml")]
+    [Arguments("https://petstore.swagger.io/v2/swagger.json")]
+    [Arguments("https://petstore.swagger.io/v2/swagger.yaml")]
 #endif
     public async Task Can_Build_Generated_Code(string url)
     {

@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Refitter.Core;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests;
 
@@ -22,7 +22,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         }
     };
 
-    [Fact]
+    [Test]
     public void Can_Generate_For_Multiple_Interfaces()
     {
         string code = DependencyInjectionGenerator.Generate(
@@ -37,7 +37,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         code.Should().Contain("AddRefitClient<IStoreApi>(settings)");
     }
 
-    [Fact]
+    [Test]
     public void Can_Generate_With_HttpMessageHandlers()
     {
         string code = DependencyInjectionGenerator.Generate(
@@ -52,7 +52,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         code.Should().Contain("AddHttpMessageHandler<DiagnosticMessageHandler>()");
     }
 
-    [Fact]
+    [Test]
     public void Can_Generate_With_Polly()
     {
         string code = DependencyInjectionGenerator.Generate(
@@ -68,7 +68,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         code.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Fact]
+    [Test]
     public void Can_Generate_Without_Polly()
     {
         settings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
@@ -86,7 +86,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Fact]
+    [Test]
     public void Can_Generate_Without_BaseUrl()
     {
         settings.DependencyInjectionSettings!.BaseUrl = null;
