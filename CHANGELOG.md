@@ -8,6 +8,7 @@
 
 - Improved handling of optional parameters [\#448](https://github.com/christianhelle/refitter/issues/448)
 - Asana API specs strange naming [\#364](https://github.com/christianhelle/refitter/issues/364)
+- Migrate unit tests from xUnit to TUnit [\#830](https://github.com/christianhelle/refitter/pull/830) ([christianhelle](https://github.com/christianhelle))
 - Refit v9.0.2 [\#829](https://github.com/christianhelle/refitter/pull/829) ([renovate[bot]](https://github.com/apps/renovate))
 - Add .NET 10 support [\#822](https://github.com/christianhelle/refitter/pull/822) ([christianhelle](https://github.com/christianhelle))
 - Fix missing XML doc for CancellationToken [\#819](https://github.com/christianhelle/refitter/pull/819) ([christianhelle](https://github.com/christianhelle))
