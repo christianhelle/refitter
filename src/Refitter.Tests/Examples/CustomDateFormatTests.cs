@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -73,28 +73,28 @@ public class CustomDateFormatTests
 ";
 
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task GeneratedCode_Contains_Date_Format_String()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain(@"[Query(Format = ""yyyy-MM-ddThh:mm:ssZ"")] ");
     }
 
-    [Fact]
+    [Test]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

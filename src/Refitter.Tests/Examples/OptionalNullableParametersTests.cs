@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -46,45 +46,45 @@ paths:
           description: 'successful operation'
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_Nullable_Directive()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("#nullable");
     }
 
-    [Theory]
-    [InlineData("title")]
-    [InlineData("contact")]
-    [InlineData("description")]
+    [Test]
+    [Arguments("title")]
+    [Arguments("contact")]
+    [Arguments("description")]
     public async Task Generates_Nullable_Parameters(string parameterName)
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain($"string? {parameterName} = default");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_CancellationToken_Last()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("CancellationToken cancellationToken = default);");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_DynamicQuerystring_Param()
     {
         string generatedCode = await GenerateCode(true);
         generatedCode.Should().Contain("string id, [Query] UpdateJobDetailsQueryParams? queryParams = default, CancellationToken cancellationToken = default);");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

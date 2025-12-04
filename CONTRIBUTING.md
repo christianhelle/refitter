@@ -73,31 +73,38 @@ Feature requests are welcome! Please follow the feature request template in `.gi
   - Verify that the generated code builds successfully
 - Test coverage should be comprehensive, covering both normal operation and edge cases.
 - All tests must pass before submitting a pull request.
+- **Testing Framework**: The project uses [TUnit](https://github.com/thomhurst/TUnit) instead of xUnit for unit testing, which provides 3x faster test execution.
 
 Example test pattern:
 
 ```csharp
+using FluentAssertions;
+using Refitter.Core;
+using Refitter.Tests.Build;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
+
 public class MyFeatureTests
 {
     private const string OpenApiSpec = @"
     // Your OpenAPI specification here
     ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Contains_Expected_Pattern()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("ExpectedPattern");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -41,24 +41,24 @@ paths:
           description: 'successful operation'
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Theory]
-    [InlineData("Id")]
-    [InlineData("Title")]
-    [InlineData("Description")]
+    [Test]
+    [Arguments("Id")]
+    [Arguments("Title")]
+    [Arguments("Description")]
     public async Task Generates_AliasAs_For_Parameters(string parameterName)
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain($"AliasAs(\"{parameterName}\")");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

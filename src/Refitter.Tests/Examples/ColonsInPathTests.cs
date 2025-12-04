@@ -3,7 +3,7 @@ using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -44,14 +44,14 @@ parameters:
     format: uuid
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_OperationName_Without_Colons()
     {
         var generatedCode = await GenerateCode();
@@ -60,7 +60,7 @@ parameters:
         generatedCode.Should().Contain("\"/orders/{orderId}/:orderItems/{orderItemId}\"");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

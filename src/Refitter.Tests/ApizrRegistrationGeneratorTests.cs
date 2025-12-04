@@ -1,13 +1,13 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Core.Settings;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests;
 
 public class ApizrRegistrationGeneratorTests
 {
-    [Fact]
+    [Test]
     public void Generate_Returns_Empty_String_When_No_Interfaces()
     {
         var settings = new RefitGeneratorSettings
@@ -20,7 +20,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().BeEmpty();
     }
 
-    [Fact]
+    [Test]
     public void Generate_Returns_Empty_String_When_Registration_Helper_Disabled()
     {
         var settings = new RefitGeneratorSettings
@@ -33,7 +33,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().BeEmpty();
     }
 
-    [Fact]
+    [Test]
     public void Generate_Creates_Static_Builder_Without_DependencyInjection()
     {
         var settings = new RefitGeneratorSettings
@@ -49,7 +49,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().NotContain("IServiceCollection");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Creates_DependencyInjection_Extension_With_Settings()
     {
         var settings = new RefitGeneratorSettings
@@ -65,7 +65,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("IServiceCollectionExtensions");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Creates_Registry_For_Multiple_Interfaces()
     {
         var settings = new RefitGeneratorSettings
@@ -86,7 +86,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("IApizrExtendedCommonOptionsBuilder");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_BaseUrl_When_Configured()
     {
         var settings = new RefitGeneratorSettings
@@ -105,7 +105,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("ApizrDuplicateStrategy.Ignore");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_Polly_Configuration()
     {
         var settings = new RefitGeneratorSettings
@@ -126,7 +126,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("using Polly.Extensions.Http;");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_HttpResilience_Configuration()
     {
         var settings = new RefitGeneratorSettings
@@ -147,7 +147,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("using Microsoft.Extensions.Http.Resilience;");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_HttpMessageHandlers()
     {
         var settings = new RefitGeneratorSettings
@@ -166,7 +166,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("WithDelegatingHandler<LoggingHandler>");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_Akavache_Cache_Provider()
     {
         var settings = new RefitGeneratorSettings
@@ -186,7 +186,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("Apizr.Integrations.Akavache");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_MonkeyCache_Cache_Provider()
     {
         var settings = new RefitGeneratorSettings
@@ -206,7 +206,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("Apizr.Integrations.MonkeyCache");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_InMemory_Cache_Provider()
     {
         var settings = new RefitGeneratorSettings
@@ -226,7 +226,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("Apizr.Extensions.Microsoft.Caching");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_DistributedCache_String_Provider()
     {
         var settings = new RefitGeneratorSettings
@@ -245,7 +245,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("WithDistributedCacheHandler<string>");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_DistributedCache_ByteArray_Provider()
     {
         var settings = new RefitGeneratorSettings
@@ -264,7 +264,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("WithDistributedCacheHandler<byte[]>");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_AutoMapper_Mapping_Provider()
     {
         var settings = new RefitGeneratorSettings
@@ -285,7 +285,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("Apizr.Integrations.AutoMapper");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_Mapster_Mapping_Provider()
     {
         var settings = new RefitGeneratorSettings
@@ -306,7 +306,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("Apizr.Integrations.Mapster");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_Priority_Support()
     {
         var settings = new RefitGeneratorSettings
@@ -325,7 +325,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("Apizr.Integrations.Fusillade");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_Mediation_Support()
     {
         var settings = new RefitGeneratorSettings
@@ -346,7 +346,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("Apizr.Integrations.MediatR");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_FileTransfer_With_Mediation()
     {
         var settings = new RefitGeneratorSettings
@@ -367,7 +367,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("Apizr.Integrations.FileTransfer.MediatR");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_FileTransfer_Without_Mediation()
     {
         var settings = new RefitGeneratorSettings
@@ -386,7 +386,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("Apizr.Extensions.Microsoft.FileTransfer");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Uses_Custom_Extension_Method_Name()
     {
         var settings = new RefitGeneratorSettings
@@ -404,7 +404,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("RegisterMyCustomApi");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Includes_XmlDoc_Comments_When_Enabled()
     {
         var settings = new RefitGeneratorSettings
@@ -422,7 +422,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("/// <returns>");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Error_Message_For_Extended_Features_Without_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -441,7 +441,7 @@ public class ApizrRegistrationGeneratorTests
         result.Should().Contain("DependencyInjectionSettings");
     }
 
-    [Fact]
+    [Test]
     public void Generate_Sanitizes_Title_For_Method_Name()
     {
         var settings = new RefitGeneratorSettings

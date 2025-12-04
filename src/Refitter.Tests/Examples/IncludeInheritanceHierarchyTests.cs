@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples
 {
@@ -58,16 +58,16 @@ components:
       additionalProperties: false
 ";
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
+        [Test]
+        [Arguments(true)]
+        [Arguments(false)]
         public async Task Can_Generate_Code(bool includeHierarchy)
         {
             string generatedCode = await GenerateCode(includeHierarchy);
             generatedCode.Should().NotBeNullOrWhiteSpace();
         }
 
-        [Fact]
+        [Test]
         public async Task Removes_Unreferenced_Schema()
         {
             string generatedCode = await GenerateCode(includeHierarchy: false);
@@ -77,7 +77,7 @@ components:
             generatedCode.Should().Contain("class A");
         }
 
-        [Fact]
+        [Test]
         public async Task Keeps_All_Union_Cases_Schema()
         {
             string generatedCode = await GenerateCode(includeHierarchy: true);
@@ -87,9 +87,9 @@ components:
             generatedCode.Should().Contain("class A");
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
+        [Test]
+        [Arguments(true)]
+        [Arguments(false)]
         public async Task Can_Build_Generated_Code(bool includeHierarchy)
         {
             string generatedCode = await GenerateCode(includeHierarchy);

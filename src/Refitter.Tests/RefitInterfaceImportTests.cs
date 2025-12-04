@@ -1,12 +1,12 @@
 using FluentAssertions;
 using Refitter.Core;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests;
 
 public class RefitInterfaceImportTests
 {
-    [Fact]
+    [Test]
     public void Should_Contain_SystemThreading()
     {
         var settings = new RefitGeneratorSettings { UseCancellationTokens = true };
@@ -14,7 +14,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().Contain("System.Threading");
     }
 
-    [Fact]
+    [Test]
     public void Should_NotContain_SystemThreading()
     {
         var settings = new RefitGeneratorSettings { UseCancellationTokens = false };
@@ -22,7 +22,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().NotContain("System.Threading");
     }
 
-    [Fact]
+    [Test]
     public void Should_NotContain_Any_System_Excluded()
     {
         var settings = new RefitGeneratorSettings { UseCancellationTokens = true, ReturnIObservable = false, ExcludeNamespaces = new string[] { "^System[.].*" } };
@@ -33,7 +33,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().NotContain("System.Threading.Tasks");
     }
 
-    [Fact]
+    [Test]
     public void Should_NotContain_SystemThreading_Excluded()
     {
         var settings = new RefitGeneratorSettings { UseCancellationTokens = true, ReturnIObservable = false, ExcludeNamespaces = new string[] { "System.Threading$" } };
@@ -42,7 +42,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().Contain("System.Threading.Tasks");
     }
 
-    [Fact]
+    [Test]
     public void Should_Contain_ApizrConfiguringRequest()
     {
         var settings = new RefitGeneratorSettings { ApizrSettings = new ApizrSettings { WithRequestOptions = true, WithRegistrationHelper = true } };
@@ -50,7 +50,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().Contain("Apizr.Configuring.Request");
     }
 
-    [Fact]
+    [Test]
     public void Should_Contain_ApizrConfiguringRequest_And_NotContain_SystemThreading()
     {
         var settings = new RefitGeneratorSettings { ApizrSettings = new ApizrSettings { WithRequestOptions = true, WithRegistrationHelper = true }, UseCancellationTokens = true };

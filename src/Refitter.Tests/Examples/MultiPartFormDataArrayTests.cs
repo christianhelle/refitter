@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -57,14 +57,14 @@ public class MultiPartFormDataArrayTests
 }
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -74,7 +74,7 @@ public class MultiPartFormDataArrayTests
             .BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Contains_MultiPart_Attribute()
     {
         string generatedCode = await GenerateCode();
@@ -82,7 +82,7 @@ public class MultiPartFormDataArrayTests
         generatedCode.Should().NotContain("Content-Type: multipart/form-data");
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Uses_IEnumerable_StreamPart_For_File_Array()
     {
         string generatedCode = await GenerateCode();

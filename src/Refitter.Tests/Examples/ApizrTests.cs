@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -105,24 +105,24 @@ paths:
           description: 'successful operation'
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_Nullable_Directive()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("#nullable");
     }
 
-    [Theory]
-    [InlineData("title")]
-    [InlineData("contact")]
-    [InlineData("description")]
+    [Test]
+    [Arguments("title")]
+    [Arguments("contact")]
+    [Arguments("description")]
     public async Task Generates_Nullable_Parameters(string parameterName)
     {
         string generatedCode = await GenerateCode();
@@ -130,28 +130,28 @@ paths:
         generatedCode.Should().NotContain($"string? {parameterName} = default");
     }
 
-    [Fact]
+    [Test]
     public async Task DoesNot_Generate_CancellationToken()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotContain("CancellationToken cancellationToken");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_RequestOptions_Last()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[RequestOptions] IApizrRequestOptions options);");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_An_Overload_Without_Optional_Parameters()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("string id, [RequestOptions] IApizrRequestOptions options);");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
         string generatedCode = await GenerateCode(true);
@@ -168,7 +168,7 @@ paths:
         generatedCode.Should().Contain("Description = description;");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_Dynamic_Querystring_Parameters_ByTag()
     {
         string generatedCode = await GenerateCode(true, MultipleInterfaces.ByTag);
@@ -176,7 +176,7 @@ paths:
         generatedCode.Should().Contain("public record GetFooDetailsQueryParams");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_Dynamic_Querystring_Parameters_ByEndpoint()
     {
         string generatedCode = await GenerateCode(true, MultipleInterfaces.ByEndpoint);
@@ -184,7 +184,7 @@ paths:
         generatedCode.Should().Contain("public record GetFooDetailsQueryParams");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

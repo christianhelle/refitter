@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -90,14 +90,14 @@ public class DynamicQueryStringParametersWithDefaultValuesTests
         }
         """;
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Should_Have_Optional_Parameters_With_Default_Values()
     {
         string generatedCode = await GenerateCode();
@@ -106,7 +106,7 @@ public class DynamicQueryStringParametersWithDefaultValuesTests
         generatedCode.Should().Contain("string? Filter { get; set; } = \"active\"");
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Should_Have_Required_Parameters_Without_Defaults()
     {
         string generatedCode = await GenerateCode();
@@ -116,7 +116,7 @@ public class DynamicQueryStringParametersWithDefaultValuesTests
         generatedCode.Should().NotContain("System.DateTimeOffset  End { get; set; } =");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

@@ -3,7 +3,7 @@ using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -54,14 +54,14 @@ parameters:
     format: uuid
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_IApiResponse_For_NoContent()
     {
         var generatedCode = await GenerateCode();
@@ -69,7 +69,7 @@ parameters:
         generatedCode.Should().Contain("Task<IApiResponse>");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

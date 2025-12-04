@@ -2,7 +2,7 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -57,14 +57,14 @@ public class NewlineInParameterDescriptionJsonTests
         }
         """;
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Newlines_In_Parameter_Description_Are_Properly_Formatted()
     {
         var generatedCode = await GenerateCode();
@@ -74,7 +74,7 @@ public class NewlineInParameterDescriptionJsonTests
         generatedCode.Should().Contain("/// If set to 'only', the result will only include deleted dialogs");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
@@ -84,7 +84,7 @@ public class NewlineInParameterDescriptionJsonTests
             .BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Newlines_In_QueryParams_Class_Description_Are_Properly_Formatted()
     {
         var generatedCode = await GenerateCodeWithDynamicQuerystring();
@@ -96,7 +96,7 @@ public class NewlineInParameterDescriptionJsonTests
         generatedCode.Should().Contain("/// If set to 'only', the result will only include deleted dialogs");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code_With_DynamicQuerystring()
     {
         var generatedCode = await GenerateCodeWithDynamicQuerystring();

@@ -3,7 +3,7 @@ using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -61,14 +61,14 @@ public class CollectionFormatTests
 }
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -78,12 +78,12 @@ public class CollectionFormatTests
             .BeTrue();
     }
 
-    [Theory]
-    [InlineData(CollectionFormat.Multi, "Query(CollectionFormat.Multi)")]
-    [InlineData(CollectionFormat.Csv, "Query(CollectionFormat.Csv)")]
-    [InlineData(CollectionFormat.Ssv, "Query(CollectionFormat.Ssv)")]
-    [InlineData(CollectionFormat.Tsv, "Query(CollectionFormat.Tsv)")]
-    [InlineData(CollectionFormat.Pipes, "Query(CollectionFormat.Pipes)")]
+    [Test]
+    [Arguments(CollectionFormat.Multi, "Query(CollectionFormat.Multi)")]
+    [Arguments(CollectionFormat.Csv, "Query(CollectionFormat.Csv)")]
+    [Arguments(CollectionFormat.Ssv, "Query(CollectionFormat.Ssv)")]
+    [Arguments(CollectionFormat.Tsv, "Query(CollectionFormat.Tsv)")]
+    [Arguments(CollectionFormat.Pipes, "Query(CollectionFormat.Pipes)")]
     public async Task Generated_Code_Contains_Expected_Collection_Format(CollectionFormat format, string expectedAttribute)
     {
         string generatedCode = await GenerateCode(format);

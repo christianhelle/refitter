@@ -3,7 +3,7 @@ using FluentAssertions;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests
 {
@@ -25,7 +25,7 @@ namespace Refitter.Tests
             return generator.CreateOperationModel(operation);
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Interface_Doc_Without_Linebreaks()
         {
             var docs = new StringBuilder();
@@ -34,7 +34,7 @@ namespace Refitter.Tests
             docs.ToString().Trim().Should().Be("/// <summary>Test</summary>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Interface_Doc_With_Linebreaks()
         {
             var docs = new StringBuilder();
@@ -45,7 +45,7 @@ namespace Refitter.Tests
                 .And.Contain("Test");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_Summary()
         {
             var docs = new StringBuilder();
@@ -54,7 +54,7 @@ namespace Refitter.Tests
             docs.ToString().Trim().Should().StartWith("/// <summary>TestSummary</summary>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_Remarks()
         {
             var docs = new StringBuilder();
@@ -63,7 +63,7 @@ namespace Refitter.Tests
             docs.ToString().Should().Contain("/// <remarks>TestDescription</remarks>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_Param()
         {
             var docs = new StringBuilder();
@@ -75,7 +75,7 @@ namespace Refitter.Tests
             docs.ToString().Should().Contain("/// <param name=\"testParam\">TestParameter</param>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_ApizrRequestOptions_Param()
         {
             var docs = new StringBuilder();
@@ -87,7 +87,7 @@ namespace Refitter.Tests
             docs.ToString().Should().Contain("/// <param name=\"options\">The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.</param>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_DynamicQuerystring_Param()
         {
             var docs = new StringBuilder();
@@ -99,7 +99,7 @@ namespace Refitter.Tests
             docs.ToString().Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_CancellationToken_Param()
         {
             var docs = new StringBuilder();
@@ -111,7 +111,7 @@ namespace Refitter.Tests
             docs.ToString().Should().Contain("/// <param name=\"cancellationToken\">The cancellation token to cancel the request.</param>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_Returns()
         {
             var docs = new StringBuilder();
@@ -131,7 +131,7 @@ namespace Refitter.Tests
             docs.ToString().Should().Contain("/// <returns>TestResponse</returns>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_Returns_With_Empty_Result()
         {
             var docs = new StringBuilder();
@@ -148,7 +148,7 @@ namespace Refitter.Tests
                 .And.Contain("Task");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_Returns_Without_Result()
         {
             var docs = new StringBuilder();
@@ -158,7 +158,7 @@ namespace Refitter.Tests
                 .And.Contain("Task");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_Throws()
         {
             var docs = new StringBuilder();
@@ -167,7 +167,7 @@ namespace Refitter.Tests
             docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_Throws_With_Response_Code()
         {
             this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -185,7 +185,7 @@ namespace Refitter.Tests
                 .And.Contain("<term>400</term>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_Throws_Without_Response_Code()
         {
             this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -203,7 +203,7 @@ namespace Refitter.Tests
                 .And.NotContain("<term>400</term>");
         }
 
-        [Fact]
+        [Test]
         public void Can_Generate_Method_With_IApiResponse()
         {
             this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings

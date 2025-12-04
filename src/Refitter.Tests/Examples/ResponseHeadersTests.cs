@@ -3,7 +3,7 @@ using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -22,14 +22,14 @@ paths:
                 type: string
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Should_Not_Generate_ContentType_Header_Attribute()
     {
         var generatedCode = await GenerateCode();
@@ -37,7 +37,7 @@ paths:
         generatedCode.Should().NotContain("Content-Type: \")]");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_Accept_Header_Attribute()
     {
         var generatedCode = await GenerateCode();
@@ -45,7 +45,7 @@ paths:
         generatedCode.Should().Contain("Accept: application/json");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
