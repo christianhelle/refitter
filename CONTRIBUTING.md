@@ -73,7 +73,7 @@ Feature requests are welcome! Please follow the feature request template in `.gi
   - Verify that the generated code builds successfully
 - Test coverage should be comprehensive, covering both normal operation and edge cases.
 - All tests must pass before submitting a pull request.
-- **Testing Framework**: The project uses [TUnit](https://github.com/thomhurst/TUnit) instead of xUnit for unit testing, which provides at least 40% faster test execution.
+- **Testing Framework**: The project uses [TUnit](https://github.com/thomhurst/TUnit) instead of xUnit for unit testing, which provides 3x faster test execution.
 
 Example test pattern:
 

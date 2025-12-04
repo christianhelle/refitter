@@ -1261,7 +1261,7 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
 
 ## Testing
 
-Refitter uses [TUnit](https://github.com/thomhurst/TUnit) as its testing framework instead of xUnit. TUnit was chosen for its superior performance, providing at least 40% faster test execution compared to xUnit. This significantly improves the developer experience when running the test suite locally and in CI/CD pipelines.
+Refitter uses [TUnit](https://github.com/thomhurst/TUnit) as its testing framework instead of xUnit. TUnit was chosen for its superior performance, providing 3x faster test execution compared to xUnit. This significantly improves the developer experience when running the test suite locally and in CI/CD pipelines.
 
 To run the tests:
 
