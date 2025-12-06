@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.0-preview.86...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.0...HEAD)
 
 **Implemented enhancements:**
 
@@ -24,6 +24,7 @@
 
 **Merged pull requests:**
 
+- Update dependency TUnit to 1.5.0 [\#832](https://github.com/christianhelle/refitter/pull/832) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix typo in class name and Spectre.Console markup escaping issue [\#828](https://github.com/christianhelle/refitter/pull/828) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - chore\(deps\): update dependency spectre.console.cli to 0.53.1 [\#827](https://github.com/christianhelle/refitter/pull/827) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency polly to 8.6.5 [\#826](https://github.com/christianhelle/refitter/pull/826) ([renovate[bot]](https://github.com/apps/renovate))
@@ -39,10 +40,6 @@
 - chore\(deps\): update dependency microsoft.net.test.sdk to 18.0.1 [\#808](https://github.com/christianhelle/refitter/pull/808) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add mhartmair-cubido as a contributor for bug [\#807](https://github.com/christianhelle/refitter/pull/807) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Fix string escaping, null safety, and numeric literals in optional parameter default values [\#804](https://github.com/christianhelle/refitter/pull/804) ([Copilot](https://github.com/apps/copilot-swe-agent))
-
-## [1.7.0-preview.86](https://github.com/christianhelle/refitter/tree/1.7.0-preview.86) (2025-11-06)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.0...1.7.0-preview.86)
 
 ## [1.7.0](https://github.com/christianhelle/refitter/tree/1.7.0) (2025-11-06)
 
