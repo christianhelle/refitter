@@ -24,6 +24,7 @@
 
 **Merged pull requests:**
 
+- Update dependency TUnit to 1.5.6 [\#833](https://github.com/christianhelle/refitter/pull/833) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.5.0 [\#832](https://github.com/christianhelle/refitter/pull/832) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix typo in class name and Spectre.Console markup escaping issue [\#828](https://github.com/christianhelle/refitter/pull/828) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - chore\(deps\): update dependency spectre.console.cli to 0.53.1 [\#827](https://github.com/christianhelle/refitter/pull/827) ([renovate[bot]](https://github.com/apps/renovate))
