@@ -272,4 +272,18 @@ public class CodeGeneratorSettings
         "Gets or sets a value indicating whether to inline JsonConverter attributes for enum properties (default: true). When set to false, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes."
     )]
     public bool InlineJsonConverters { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets custom type mappings for OpenAPI type and format combinations.
+    /// Key format: "type:format" (e.g., "string:my-date-time")
+    /// Value: Fully qualified .NET type name (e.g., "Domain.Specific.DataType")
+    /// </summary>
+    [Description(
+        """
+        Gets or sets custom type mappings for OpenAPI type and format combinations.
+        Key format: 'type:format' (e.g., 'string:my-date-time')
+        Value: Fully qualified .NET type name (e.g., 'Domain.Specific.DataType')
+        """
+    )]
+    public Dictionary<string, string> CustomTypeMapping { get; set; } = new();
 }
