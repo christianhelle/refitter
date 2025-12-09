@@ -114,6 +114,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
+        contracts = ApplyCustomTypeMappings(contracts, generator);
 
         if (settings.GenerateClients)
         {
@@ -160,6 +161,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
+        contracts = ApplyCustomTypeMappings(contracts, generator);
 
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
@@ -224,6 +226,124 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                     TimeSpan.FromSeconds(1)))
             .ToArray();
         return string.Join(Environment.NewLine, filteredLines);
+    }
+
+    private string ApplyCustomTypeMappings(string contracts, CustomCSharpClientGenerator generator)
+    {
+        var customTypeMapping = settings.CodeGeneratorSettings?.CustomTypeMapping;
+        if (customTypeMapping == null || customTypeMapping.Count == 0)
+        {
+            return contracts;
+        }
+
+        // Build a mapping from property names to custom types by analyzing the schema
+        var propertyTypeReplacements = new Dictionary<string, (string originalType, string customType)>();
+
+        foreach (var schema in document.Components.Schemas.Values)
+        {
+            foreach (var property in schema.Properties)
+            {
+                var propertySchema = property.Value.ActualSchema;
+                if (string.IsNullOrEmpty(propertySchema.Format) || propertySchema.Type == NJsonSchema.JsonObjectType.None)
+                    continue;
+
+                var typeString = GetTypeStringFromJsonObjectType(propertySchema.Type);
+                var format = propertySchema.Format!; // Already checked for null above
+                var key = $"{typeString}:{format}";
+
+                if (customTypeMapping.TryGetValue(key, out var customType))
+                {
+                    var defaultType = GetDefaultTypeForFormat(typeString, format);
+                    var propertyName = ConvertToPascalCase(property.Key);
+                    propertyTypeReplacements[propertyName] = (defaultType, customType);
+                }
+            }
+        }
+
+        // Apply targeted replacements to the generated contracts
+        foreach (var replacement in propertyTypeReplacements)
+        {
+            var propertyName = replacement.Key;
+            var (originalType, customType) = replacement.Value;
+
+            // Replace property declarations (e.g., "string PropertyName {" -> "CustomType PropertyName {")
+            contracts = Regex.Replace(
+                contracts,
+                $@"\b{Regex.Escape(originalType)}\s+{Regex.Escape(propertyName)}\s*{{",
+                $"{customType} {propertyName} {{",
+                RegexOptions.None,
+                TimeSpan.FromSeconds(5));
+
+            // Replace nullable property declarations (e.g., "string? PropertyName {" -> "CustomType? PropertyName {")
+            contracts = Regex.Replace(
+                contracts,
+                $@"\b{Regex.Escape(originalType)}\?\s+{Regex.Escape(propertyName)}\s*{{",
+                $"{customType}? {propertyName} {{",
+                RegexOptions.None,
+                TimeSpan.FromSeconds(5));
+
+            // Replace parameter declarations (e.g., "[Query] string propertyName" -> "[Query] CustomType propertyName")
+            var parameterName = ConvertToCamelCase(propertyName);
+            contracts = Regex.Replace(
+                contracts,
+                $@"\[\w+\]\s+{Regex.Escape(originalType)}\s+{Regex.Escape(parameterName)}\b",
+                $"[Query] {customType} {parameterName}",
+                RegexOptions.None,
+                TimeSpan.FromSeconds(5));
+        }
+
+        return contracts;
+    }
+
+    private static string ConvertToPascalCase(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+        return char.ToUpper(input[0]) + input.Substring(1);
+    }
+
+    private static string ConvertToCamelCase(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+        return char.ToLower(input[0]) + input.Substring(1);
+    }
+
+    private static string GetTypeStringFromJsonObjectType(NJsonSchema.JsonObjectType type)
+    {
+        return type switch
+        {
+            NJsonSchema.JsonObjectType.String => "string",
+            NJsonSchema.JsonObjectType.Number => "number",
+            NJsonSchema.JsonObjectType.Integer => "integer",
+            NJsonSchema.JsonObjectType.Boolean => "boolean",
+            NJsonSchema.JsonObjectType.Object => "object",
+            NJsonSchema.JsonObjectType.Array => "array",
+            NJsonSchema.JsonObjectType.Null => "null",
+            _ => type.ToString().ToLowerInvariant()
+        };
+    }
+
+    private static string GetDefaultTypeForFormat(string schemaType, string format)
+    {
+        return (schemaType, format) switch
+        {
+            ("string", "date-time") => "System.DateTimeOffset",
+            ("string", "date") => "System.DateTimeOffset",
+            ("string", "time") => "System.TimeSpan",
+            ("string", "duration") => "System.TimeSpan",
+            ("string", "uuid") => "System.Guid",
+            ("string", "byte") => "byte[]",
+            ("string", "binary") => "byte[]",
+            ("integer", "int32") => "int",
+            ("integer", "int64") => "long",
+            ("number", "float") => "float",
+            ("number", "double") => "double",
+            // For unknown formats, NSwag generates the base type (string for string, int for integer, etc.)
+            ("string", _) => "string",
+            ("integer", _) => "int",
+            ("number", _) => "double",
+            ("boolean", _) => "bool",
+            _ => string.Empty
+        };
     }
 
     /// <summary>
