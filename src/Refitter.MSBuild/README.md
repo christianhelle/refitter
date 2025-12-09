@@ -249,4 +249,4 @@ The following is an example `.refitter` file
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
   - `excludedTypeNames` - Default is empty
-  - `typeOverrides` - A collection of custom type mappings for OpenAPI schema formats. Each override maps a format pattern (e.g., `string:my-custom-date`) to a .NET type name (e.g., `CustomTypes.CustomDateType`). This allows you to use domain-specific types for OpenAPI formats that don't have standard .NET equivalents. Default is empty
+  - `typeOverrides` - A collection of custom type mappings for OpenAPI schema formats. Each override maps a format pattern (e.g., `string:my-custom-date`) to a .NET type name (e.g., `CustomTypes.CustomDateType`). This allows you to use domain-specific types for OpenAPI formats that don't have standard .NET equivalents. Default is empty. See the [Custom Type Mapping guide](https://refitter.github.io/articles/custom-type-mapping.html) for detailed usage examples and best practices.
