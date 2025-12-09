@@ -10,6 +10,9 @@
 - name: .refitter file format
   href: refitter-file-format.md
 
+- name: Custom Type Mapping
+  href: custom-type-mapping.md
+
 - name: Using the generated code
   href: using-the-generated-code.md
 
