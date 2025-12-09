@@ -274,16 +274,16 @@ public class CodeGeneratorSettings
     public bool InlineJsonConverters { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets custom type mappings for OpenAPI type and format combinations.
+    /// Gets or sets type overrides for OpenAPI type and format combinations.
     /// Key format: "type:format" (e.g., "string:my-date-time")
     /// Value: Fully qualified .NET type name (e.g., "Domain.Specific.DataType")
     /// </summary>
     [Description(
         """
-        Gets or sets custom type mappings for OpenAPI type and format combinations.
+        Gets or sets type overrides for OpenAPI type and format combinations.
         Key format: 'type:format' (e.g., 'string:my-date-time')
         Value: Fully qualified .NET type name (e.g., 'Domain.Specific.DataType')
         """
     )]
-    public Dictionary<string, string> CustomTypeMapping { get; set; } = new();
+    public Dictionary<string, string> TypeOverrides { get; set; } = new();
 }

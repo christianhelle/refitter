@@ -273,7 +273,7 @@ The following is an example `.refitter` file
     "arrayBaseType": "System.Collections.ObjectModel.Collection",
     "dictionaryBaseType": "System.Collections.Generic.Dictionary",
     "integerType": "Int32", // Optional. Default="Int32". The .NET type for OpenAPI integers without a format. Possible values: "Int32", "Int64"
-    "customTypeMapping": { // Optional. Maps OpenAPI type:format combinations to custom .NET types
+    "typeOverrides": { // Optional. Overrides default .NET types for OpenAPI type:format combinations
       "string:my-custom-format": "MyNamespace.CustomType",
       "integer:custom-int": "MyNamespace.CustomInteger"
     },
@@ -365,7 +365,7 @@ The following is an example `.refitter` file
   - `arrayBaseType` - Default is `System.Collections.ObjectModel.Collection`,
   - `dictionaryBaseType` - Default is `System.Collections.Generic.Dictionary`,
   - `integerType` - Default is `Int32`. The .NET type to use for OpenAPI integer types without a format specifier. Possible values: `Int32`, `Int64`
-  - `customTypeMapping` - Custom mappings from OpenAPI `type:format` combinations to .NET types. This allows you to override the default type mappings for specific format values. The key format is `"type:format"` (e.g., `"string:my-date-time"`) and the value is the fully qualified .NET type name (e.g., `"MyNamespace.CustomDateTime"`). This is useful when your API uses custom format specifiers that should map to domain-specific types.
+  - `typeOverrides` - Overrides default .NET types for OpenAPI `type:format` combinations. This allows you to override the default type mappings for specific format values. The key format is `"type:format"` (e.g., `"string:my-date-time"`) and the value is the fully qualified .NET type name (e.g., `"MyNamespace.CustomDateTime"`). This is useful when your API uses custom format specifiers that should map to domain-specific types.
   - `propertySetterAccessModifier` - Default is ``,
   - `generateImmutableArrayProperties` - Default is false,
   - `generateImmutableDictionaryProperties` - Default is false,

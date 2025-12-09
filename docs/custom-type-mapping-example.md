@@ -4,7 +4,7 @@ This example demonstrates how to use custom type mappings to override the defaul
 
 ## Use Case
 
-When your API uses custom format specifiers (e.g., `format: my-date-time`) that should map to domain-specific types instead of the default .NET types, you can use the `customTypeMapping` setting in the `.refitter` file.
+When your API uses custom format specifiers (e.g., `format: my-date-time`) that should map to domain-specific types instead of the default .NET types, you can use the `typeOverrides` setting in the `.refitter` file.
 
 ## Example OpenAPI Specification
 
@@ -67,7 +67,7 @@ Create a `.refitter` file with custom type mappings:
   "openApiPath": "openapi.json",
   "namespace": "MyApi",
   "codeGeneratorSettings": {
-    "customTypeMapping": {
+    "typeOverrides": {
       "string:custom-datetime": "MyDomain.CustomDateTime",
       "integer:custom-id": "MyDomain.EntityId"
     }
@@ -145,7 +145,7 @@ namespace MyDomain
 
 ## Key Format
 
-The key format for `customTypeMapping` is `"type:format"` where:
+The key format for `typeOverrides` is `"type:format"` where:
 
 - **type**: The OpenAPI type (e.g., `string`, `integer`, `number`, `boolean`)
 - **format**: The format specifier from the OpenAPI schema (e.g., `custom-datetime`, `my-format`)

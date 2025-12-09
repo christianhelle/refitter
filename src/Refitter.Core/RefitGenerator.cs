@@ -230,7 +230,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private string ApplyCustomTypeMappings(string contracts, CustomCSharpClientGenerator generator)
     {
-        var customTypeMapping = settings.CodeGeneratorSettings?.CustomTypeMapping;
+        var customTypeMapping = settings.CodeGeneratorSettings?.TypeOverrides;
         if (customTypeMapping == null || customTypeMapping.Count == 0)
         {
             return contracts;

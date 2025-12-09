@@ -203,7 +203,7 @@ public class CustomTypeMappingTests
             OpenApiPath = swaggerFile,
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
-                CustomTypeMapping = new Dictionary<string, string>
+                TypeOverrides = new Dictionary<string, string>
                 {
                     { "string:my-date-time", "Domain.Specific.CustomDateTime" },
                     { "integer:custom-int", "Domain.Specific.CustomInteger" }
