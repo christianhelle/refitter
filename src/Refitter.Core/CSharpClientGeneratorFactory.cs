@@ -21,7 +21,29 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 
         ApplyCustomIntegerType();
 
-        var csharpClientGeneratorSettings = new CSharpClientGeneratorSettings
+        var csharpClientGeneratorSettings = CreateClientGeneratorSettings();
+        if (settings.ParameterNameGenerator != null)
+        {
+            csharpClientGeneratorSettings.ParameterNameGenerator = settings.ParameterNameGenerator;
+        }
+
+        csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(csharpClientGeneratorSettings.CSharpGeneratorSettings);
+
+        var generator = new CustomCSharpClientGenerator(
+            document,
+            csharpClientGeneratorSettings,
+            settings.CodeGeneratorSettings);
+
+        MapCSharpGeneratorSettings(
+            settings.CodeGeneratorSettings,
+            generator.Settings.CSharpGeneratorSettings);
+
+        return generator;
+    }
+
+    private CSharpClientGeneratorSettings CreateClientGeneratorSettings()
+    {
+        return new CSharpClientGeneratorSettings
         {
             GenerateClientClasses = false,
             GenerateDtoTypes = true,
@@ -51,23 +73,6 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                     : new DefaultTypeNameGenerator(),
             }
         };
-
-        if (settings.ParameterNameGenerator != null)
-        {
-            csharpClientGeneratorSettings.ParameterNameGenerator = settings.ParameterNameGenerator;
-        }
-
-        csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(csharpClientGeneratorSettings.CSharpGeneratorSettings);
-
-        var generator = new CustomCSharpClientGenerator(
-            document,
-            csharpClientGeneratorSettings);
-
-        MapCSharpGeneratorSettings(
-            settings.CodeGeneratorSettings,
-            generator.Settings.CSharpGeneratorSettings);
-
-        return generator;
     }
 
     private void ApplyCustomIntegerType()
