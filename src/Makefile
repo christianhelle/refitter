@@ -11,7 +11,7 @@ release:
 
 # Test target
 test:
-	dotnet test --configuration Debug Refitter.sln
+	dotnet test --configuration Debug --solution Refitter.sln
 
 # Clean target
 clean:
