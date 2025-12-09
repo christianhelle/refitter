@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Refitter.Core;
 
@@ -12,7 +12,7 @@ public class TypeOverride
     /// </summary>
     [Description("The format pattern to match (e.g., \"string:my-date-time\")")]
     public string FormatPattern { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the .NET type to use for this format (e.g., "Domain.Specific.DataType")
     /// </summary>

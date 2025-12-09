@@ -1,4 +1,4 @@
-﻿using NJsonSchema;
+using NJsonSchema;
 
 namespace Refitter.Core;
 
@@ -14,9 +14,21 @@ public class CustomTypeNameGenerator(
         string? typeNameHint,
         IEnumerable<string> reservedTypeNames)
     {
-        // TODO: 
-        // Implement custom logic to generate type names based on the schema and settings.
-        // This is a placeholder implementation that simply uses the default generator.
+        // Check if we have a type override for this schema's type and format combination
+        if (settings.TypeOverrides?.Length > 0 &&
+            !string.IsNullOrEmpty(schema.Format))
+        {
+            // Convert JsonObjectType enum to lowercase string (e.g., JsonObjectType.String -> "string")
+            var typeString = schema.Type.ToString().ToLowerInvariant();
+            var formatPattern = $"{typeString}:{schema.Format}";
+            var typeOverride = settings.TypeOverrides.FirstOrDefault(
+                to => to.FormatPattern?.Equals(formatPattern, StringComparison.OrdinalIgnoreCase) == true);
+
+            if (typeOverride != null && !string.IsNullOrEmpty(typeOverride.TypeName))
+            {
+                return typeOverride.TypeName;
+            }
+        }
 
         return defaultGenerator.Generate(schema, typeNameHint, reservedTypeNames);
     }
