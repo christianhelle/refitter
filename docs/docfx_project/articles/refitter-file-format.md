@@ -121,6 +121,16 @@ The following is an example `.refitter` file
     "excludedTypeNames": [
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
+    ],
+    "typeOverrides": [ // Optional. Custom type mappings for OpenAPI formats
+      {
+        "formatPattern": "string:my-custom-date",
+        "typeName": "CustomTypes.CustomDateType"
+      },
+      {
+        "formatPattern": "string:my-custom-datetime",
+        "typeName": "CustomTypes.CustomDateTimeType"
+      }
     ]
   }
 }
@@ -213,6 +223,7 @@ The following is an example `.refitter` file
   - `excludedTypeNames` - Default is empty
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
+  - `typeOverrides` - A collection of custom type mappings for OpenAPI schema formats. Each override maps a format pattern (e.g., `string:my-custom-date`) to a .NET type name (e.g., `CustomTypes.CustomDateType`). This allows you to use domain-specific types for OpenAPI formats that don't have standard .NET equivalents. Default is empty
 
 ### JSON Schema
 
@@ -583,6 +594,23 @@ The following is an example `.refitter` file
                 },
                 "propertyNameGenerator": {
                     "type": "object"
+                },
+                "typeOverrides": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "formatPattern": {
+                                "type": "string",
+                                "description": "The format pattern to match (e.g., 'string:my-custom-date')"
+                            },
+                            "typeName": {
+                                "type": "string",
+                                "description": "The .NET type to use for this format (e.g., 'CustomTypes.CustomDateType')"
+                            }
+                        }
+                    },
+                    "description": "Custom type mappings for OpenAPI schema formats"
                 }
             },
         }
