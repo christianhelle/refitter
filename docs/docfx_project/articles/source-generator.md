@@ -19,3 +19,7 @@ dotnet add package Refitter.SourceGenerator
 This source generator generates code based on any [.refitter](refitter-file-format.md) file included to the project as `AdditionalFiles`.
 
 The generator can automatically detect all [.refitter](refitter-file-format.md) files inside the project that referenced the `Refitter.SourceGenerator` package and there is no need to include them manually as `AdditionalFiles`
+
+#### Advanced Features
+
+- [Custom Type Mapping](custom-type-mapping.md) - Map custom OpenAPI formats to your own domain-specific .NET types

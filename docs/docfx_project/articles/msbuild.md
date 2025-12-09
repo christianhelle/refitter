@@ -72,3 +72,7 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
 ```
 
 The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and executes them all. By default, telemetry collection is enabled, and to opt-out of it you must specify `<RefitterNoLogging>true</RefitterNoLogging>` in the `.csproj` `<PropertyGroup>`
+
+### Advanced Features
+
+- [Custom Type Mapping](custom-type-mapping.md) - Map custom OpenAPI formats to your own domain-specific .NET types

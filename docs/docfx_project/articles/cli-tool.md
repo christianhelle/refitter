@@ -140,6 +140,10 @@ This will generate a file called `Output.cs` which contains the Refit interface 
 
 The settings file uses the [.refitter file format](refitter-file-format.md)
 
+## Advanced Features
+
+- [Custom Type Mapping](custom-type-mapping.md) - Map custom OpenAPI formats to your own domain-specific .NET types
+
 ## System requirements
 
 .NET 8.0

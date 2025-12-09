@@ -2,6 +2,8 @@
 
 Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) using the default settings
 
+> **See also:** [Custom Type Mapping](custom-type-mapping.md) - Learn how to map custom OpenAPI formats to your own domain-specific .NET types.
+
 **CLI Tool**
 
 ```bash

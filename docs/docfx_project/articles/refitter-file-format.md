@@ -2,6 +2,8 @@
 
 The `.refitter` file is a JSON serialized version of the [RefitGeneratorSettings](/api/Refitter.Core.RefitGeneratorSettings.html)
 
+> **Note:** For detailed information about custom type mapping, see the [Custom Type Mapping](custom-type-mapping.md) guide.
+
 The following is an example `.refitter` file
 
 ```json
@@ -223,7 +225,7 @@ The following is an example `.refitter` file
   - `excludedTypeNames` - Default is empty
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
-  - `typeOverrides` - A collection of custom type mappings for OpenAPI schema formats. Each override maps a format pattern (e.g., `string:my-custom-date`) to a .NET type name (e.g., `CustomTypes.CustomDateType`). This allows you to use domain-specific types for OpenAPI formats that don't have standard .NET equivalents. Default is empty
+  - `typeOverrides` - A collection of custom type mappings for OpenAPI schema formats. Each override maps a format pattern (e.g., `string:my-custom-date`) to a .NET type name (e.g., `CustomTypes.CustomDateType`). This allows you to use domain-specific types for OpenAPI formats that don't have standard .NET equivalents. Default is empty. See the [Custom Type Mapping](custom-type-mapping.md) guide for detailed usage examples and best practices.
 
 ### JSON Schema
 
