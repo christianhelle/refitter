@@ -24,6 +24,7 @@
 
 **Merged pull requests:**
 
+- Update dependency TUnit to 1.5.37 [\#836](https://github.com/christianhelle/refitter/pull/836) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dotnet monorepo [\#834](https://github.com/christianhelle/refitter/pull/834) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.5.6 [\#833](https://github.com/christianhelle/refitter/pull/833) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.5.0 [\#832](https://github.com/christianhelle/refitter/pull/832) ([renovate[bot]](https://github.com/apps/renovate))
