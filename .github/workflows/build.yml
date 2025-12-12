@@ -45,7 +45,7 @@ jobs:
     - name: 🧪 Test
       run: dotnet test --solution src/Refitter.sln -c Release
     - name: 🗳️ Upload
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: Packages
         path: |
