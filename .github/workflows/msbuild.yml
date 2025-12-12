@@ -48,7 +48,7 @@ jobs:
       working-directory: test/MSBuild
       run: cat msbuild.log   
     - name: 🗳️ Upload
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: Packages
         path: |
