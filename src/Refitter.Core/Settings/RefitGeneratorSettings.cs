@@ -130,6 +130,12 @@ public class RefitGeneratorSettings
     public bool GenerateOperationHeaders { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets a collection of headers to omit from operation signatures. (default: [])
+    /// </summary>
+    [Description("A collection of headers to omit from operation signatures.")]
+    public string[] IgnoredOperationHeaders { get; set; } = [];
+
+    /// <summary>
     /// Gets or sets the generated type accessibility. (default: Public)
     /// </summary>
     [Description("The generated type accessibility. Default is Public.")]

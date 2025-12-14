@@ -24,6 +24,7 @@ The following is an example `.refitter` file
     "File_Download": "System.Net.Http.HttpContent"
   },
   "generateOperationHeaders": true, // Optional. Default=true
+  "ignoredOperationHeaders": ["apiKey"], // Optional. Default=[]
   "typeAccessibility": "Public", // Optional. Values=Public|Internal. Default=Public
   "useCancellationTokens": false, // Optional. Default=false
   "useIsoDateFormat": false, // Optional. Default=false
@@ -140,6 +141,7 @@ The following is an example `.refitter` file
 - `returnIApiResponse` - a boolean indicating whether to return `IApiResponse<T>` objects. Default is `false`
 - `responseTypeOverride` - a dictionary with operation ids (as specified in the OpenAPI document) and a particular return type to use. The types are wrapped in a task, but otherwise unmodified (so make sure to specify or import their namespaces). Default is `{}`
 - `generateOperationHeaders` - a boolean indicating whether to use operation headers in the generated methods. Default is `true`
+- `ignoredOperationHeaders` - A collection of headers to omit from operation signatures. Default is `[]`
 - `typeAccessibility` - the generated type accessibility. Possible values are `Public` and `Internal`. Default is `Public`
 - `useCancellationTokens` - Use cancellation tokens in the generated methods. Default is `false`
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`

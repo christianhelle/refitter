@@ -87,6 +87,10 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool NoOperationHeaders { get; set; }
 
+    [Description("A collection of headers to omit from operation signatures.")]
+    [CommandOption("--ignored-operation-headers")]
+    public string[] IgnoredOperationHeaders { get; set; }
+
     [Description("Don't log errors or collect telemetry")]
     [CommandOption("--no-logging")]
     [DefaultValue(false)]
