@@ -792,6 +792,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "kmc059000",
+      "name": "Kenneth Crawford",
+      "avatar_url": "https://avatars.githubusercontent.com/u/660670?v=4",
+      "profile": "https://github.com/kmc059000",
+      "contributions": [
+        "ideas",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
