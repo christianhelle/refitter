@@ -34,8 +34,16 @@ internal static class ParameterExtractor
 
         if (settings.GenerateOperationHeaders)
         {
+            var ignoredHeaders = settings.IgnoredOperationHeaders
+                .Select(h => h.Trim())
+                .Where(h => !string.IsNullOrEmpty(h))
+                .ToArray();
+
+            var anyIgnoredHeaders = ignoredHeaders.Any();
+
             headerParameters = operationModel.Parameters
                 .Where(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader)
+                .Where(p => !anyIgnoredHeaders || !ignoredHeaders.Contains(p.Name, StringComparer.OrdinalIgnoreCase))
                 .Select(p =>
                     $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {p.VariableName}")
                 .ToList();

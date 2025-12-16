@@ -331,6 +331,13 @@
       "description": "Generate operation headers. Default is true.",
       "type": "boolean"
     },
+    "ignoredOperationHeaders": {
+        "description": "A collection of headers to omit from operation signatures. Default is `[]`",
+        "type": "array",
+        "items": {
+            "type": "string"
+        }
+    },
     "typeAccessibility": {
       "description": "The generated type accessibility. Default is Public.",
       "type": "string",
