@@ -8,6 +8,7 @@
 
 - Improved handling of optional parameters [\#448](https://github.com/christianhelle/refitter/issues/448)
 - Asana API specs strange naming [\#364](https://github.com/christianhelle/refitter/issues/364)
+- allow omitting certain operation headers \#840 [\#841](https://github.com/christianhelle/refitter/pull/841) ([kmc059000](https://github.com/kmc059000))
 - Migrate unit tests from xUnit to TUnit [\#830](https://github.com/christianhelle/refitter/pull/830) ([christianhelle](https://github.com/christianhelle))
 - Refit v9.0.2 [\#829](https://github.com/christianhelle/refitter/pull/829) ([renovate[bot]](https://github.com/apps/renovate))
 - Add .NET 10 support [\#822](https://github.com/christianhelle/refitter/pull/822) ([christianhelle](https://github.com/christianhelle))
@@ -24,6 +25,8 @@
 
 **Merged pull requests:**
 
+- docs: add kmc059000 as a contributor for ideas, and code [\#842](https://github.com/christianhelle/refitter/pull/842) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Bump actions/upload-artifact from 5 to 6 [\#838](https://github.com/christianhelle/refitter/pull/838) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Update dependency TUnit to 1.5.37 [\#836](https://github.com/christianhelle/refitter/pull/836) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dotnet monorepo [\#834](https://github.com/christianhelle/refitter/pull/834) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.5.6 [\#833](https://github.com/christianhelle/refitter/pull/833) ([renovate[bot]](https://github.com/apps/renovate))
