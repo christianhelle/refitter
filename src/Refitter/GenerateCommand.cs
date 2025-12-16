@@ -282,7 +282,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ReturnIObservable = settings.ReturnIObservable,
             UseCancellationTokens = settings.UseCancellationTokens,
             GenerateOperationHeaders = !settings.NoOperationHeaders,
-            IgnoredOperationHeaders = settings.IgnoredOperationHeaders,
+            IgnoredOperationHeaders = settings.IgnoredOperationHeaders ?? Array.Empty<string>(),
             UseIsoDateFormat = settings.UseIsoDateFormat,
             TypeAccessibility = settings.InternalTypeAccessibility
                 ? TypeAccessibility.Internal
