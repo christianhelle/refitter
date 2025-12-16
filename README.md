@@ -49,7 +49,7 @@ EXAMPLES:
     refitter ./openapi.json --use-api-response
     refitter ./openapi.json --cancellation-tokens
     refitter ./openapi.json --no-operation-headers
-    refitter ./openapi.json --no-operation-headers
+    refitter ./openapi.json --ignored-operation-headers "header-one" --ignored-operation-headers "Header-Two"
     refitter ./openapi.json --no-accept-headers
     refitter ./openapi.json --use-iso-date-format
     refitter ./openapi.json --additional-namespace "Your.Additional.Namespace" --additional-namespace "Your.Other.Additional.Namespace"

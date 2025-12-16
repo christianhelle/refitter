@@ -89,7 +89,8 @@ public sealed class Settings : CommandSettings
 
     [Description("A collection of headers to omit from operation signatures.")]
     [CommandOption("--ignored-operation-headers")]
-    public string[] IgnoredOperationHeaders { get; set; }
+    [DefaultValue(new string[0])]
+    public string[]? IgnoredOperationHeaders { get; set; }
 
     [Description("Don't log errors or collect telemetry")]
     [CommandOption("--no-logging")]
