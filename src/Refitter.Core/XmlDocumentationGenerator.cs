@@ -95,9 +95,9 @@ public class XmlDocumentationGenerator
             if (parameter == null)
                 continue;
 
-            var description = !parameter.HasDescription
-                ? $"{parameter.VariableName} parameter"
-                : parameter.Description;
+            var description = parameter.HasDescription
+                ? parameter.Description
+                : $"{parameter.VariableName} parameter";
 
             this.AppendXmlCommentBlock(
                 "param",
