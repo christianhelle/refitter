@@ -2,7 +2,21 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.1...HEAD)
+
+**Implemented enhancements:**
+
+- Omit certain operation headers and include all others [\#840](https://github.com/christianhelle/refitter/issues/840)
+
+**Merged pull requests:**
+
+- docs: add lilinus as a contributor for code [\#849](https://github.com/christianhelle/refitter/pull/849) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency ruby to v3.4.8 [\#845](https://github.com/christianhelle/refitter/pull/845) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.5.70 [\#837](https://github.com/christianhelle/refitter/pull/837) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.7.1](https://github.com/christianhelle/refitter/tree/1.7.1) (2025-12-16)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.0...1.7.1)
 
 **Implemented enhancements:**
 
