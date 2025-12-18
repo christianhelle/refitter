@@ -21,7 +21,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Update an existing pet</summary>
         /// <remarks>Update an existing pet by Id</remarks>
-        /// <param name="body">body parameter</param>
+        /// <param name="body">Update an existent pet in the store</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>Successful operation</returns>
         /// <exception cref="ApiException">
@@ -56,7 +56,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Add a new pet to the store</summary>
         /// <remarks>Add a new pet to the store</remarks>
-        /// <param name="body">body parameter</param>
+        /// <param name="body">Create a new pet in the store</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>Successful operation</returns>
         /// <exception cref="ApiException">
@@ -83,7 +83,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Finds Pets by status</summary>
         /// <remarks>Multiple status values can be provided with comma separated strings</remarks>
-        /// <param name="status">status parameter</param>
+        /// <param name="status">Status values that need to be considered for filter</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
@@ -109,7 +109,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Finds Pets by tags</summary>
         /// <remarks>Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.</remarks>
-        /// <param name="tags">tags parameter</param>
+        /// <param name="tags">Tags to filter by</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
@@ -135,7 +135,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Find pet by ID</summary>
         /// <remarks>Returns a single pet</remarks>
-        /// <param name="petId">petId parameter</param>
+        /// <param name="petId">ID of pet to return</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
@@ -164,9 +164,9 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     public partial interface IUpdatePetWithFormEndpoint
     {
         /// <summary>Updates a pet in the store with form data</summary>
-        /// <param name="petId">petId parameter</param>
-        /// <param name="name">name parameter</param>
-        /// <param name="status">status parameter</param>
+        /// <param name="petId">ID of pet that needs to be updated</param>
+        /// <param name="name">Name of pet that needs to be updated</param>
+        /// <param name="status">Status of pet that needs to be updated</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
@@ -191,8 +191,8 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     public partial interface IDeletePetEndpoint
     {
         /// <summary>Deletes a pet</summary>
-        /// <param name="api_key"></param>
-        /// <param name="petId">petId parameter</param>
+        /// <param name="api_key">api_key parameter</param>
+        /// <param name="petId">Pet id to delete</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
@@ -217,9 +217,9 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     public partial interface IUploadFileEndpoint
     {
         /// <summary>uploads an image</summary>
-        /// <param name="petId">petId parameter</param>
-        /// <param name="additionalMetadata">additionalMetadata parameter</param>
-        /// <param name="body"></param>
+        /// <param name="petId">ID of pet to update</param>
+        /// <param name="additionalMetadata">Additional Metadata</param>
+        /// <param name="body">body parameter</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>
         /// A <see cref="Task"/> representing the <see cref="IApiResponse"/> instance containing the result:
@@ -258,7 +258,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Place an order for a pet</summary>
         /// <remarks>Place a new order in the store</remarks>
-        /// <param name="body"></param>
+        /// <param name="body">body parameter</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
@@ -285,7 +285,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Find purchase order by ID</summary>
         /// <remarks>For valid response try integer IDs with value &lt;= 5 or &gt; 10. Other values will generated exceptions</remarks>
-        /// <param name="orderId">orderId parameter</param>
+        /// <param name="orderId">ID of order that needs to be fetched</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
@@ -315,7 +315,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Delete purchase order by ID</summary>
         /// <remarks>For valid response try integer IDs with value &lt; 1000. Anything above 1000 or nonintegers will generate API errors</remarks>
-        /// <param name="orderId">orderId parameter</param>
+        /// <param name="orderId">ID of the order that needs to be deleted</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
@@ -345,7 +345,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Create user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
-        /// <param name="body">body parameter</param>
+        /// <param name="body">Created user object</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
@@ -360,7 +360,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Creates list of users with given input array</summary>
         /// <remarks>Creates list of users with given input array</remarks>
-        /// <param name="body"></param>
+        /// <param name="body">body parameter</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>Successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
@@ -374,8 +374,8 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     public partial interface ILoginUserEndpoint
     {
         /// <summary>Logs user into the system</summary>
-        /// <param name="username">username parameter</param>
-        /// <param name="password">password parameter</param>
+        /// <param name="username">The user name for login</param>
+        /// <param name="password">The password for login in clear text</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
@@ -412,7 +412,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     public partial interface IGetUserByNameEndpoint
     {
         /// <summary>Get user by user name</summary>
-        /// <param name="username">username parameter</param>
+        /// <param name="username">The name that needs to be fetched. Use user1 for testing.</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
@@ -442,8 +442,8 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Update user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
-        /// <param name="username">username parameter</param>
-        /// <param name="body">body parameter</param>
+        /// <param name="username">name that need to be deleted</param>
+        /// <param name="body">Update an existent user in the store</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
@@ -458,7 +458,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     {
         /// <summary>Delete user</summary>
         /// <remarks>This can only be done by the logged in user.</remarks>
-        /// <param name="username">username parameter</param>
+        /// <param name="username">The name that needs to be deleted</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">

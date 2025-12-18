@@ -16,8 +16,8 @@ namespace Refitter.Tests.UseJsonInheritanceConverter
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IApiClient
     {
-        /// <param name="token">token parameter</param>
-        /// <param name="body"></param>
+        /// <param name="token">Some Token</param>
+        /// <param name="body">body parameter</param>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:

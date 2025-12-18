@@ -57,8 +57,8 @@ components:
     public async Task Generated_Code_Contains_Param_Tags_For_All_Parameters()
     {
         var generatedCode = await GenerateCode();
-        generatedCode.Should().Contain("/// <param name=\"userId\">Parameter</param>");
-        generatedCode.Should().Contain("/// <param name=\"includeDetails\">Parameter</param>");
+        generatedCode.Should().Contain("/// <param name=\"userId\">userId parameter</param>");
+        generatedCode.Should().Contain("/// <param name=\"includeDetails\">includeDetails parameter</param>");
     }
 
     [Test]
