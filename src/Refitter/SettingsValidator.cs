@@ -17,7 +17,6 @@ public static class SettingsValidator
             ? ValidateFilePath(settings)
             : ValidateOperationNameAndUrl(settings);
     }
-    }
 
     private static ValidationResult GetValidationErrorForNoInputNoSettings()
     {
