@@ -7,6 +7,11 @@
 **Implemented enhancements:**
 
 - Omit certain operation headers and include all others [\#840](https://github.com/christianhelle/refitter/issues/840)
+- Fix missing method parameter XML code-documentation [\#850](https://github.com/christianhelle/refitter/pull/850) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- CS1573 : Method parameter has no matching XML comment [\#846](https://github.com/christianhelle/refitter/issues/846)
 
 **Merged pull requests:**
 
