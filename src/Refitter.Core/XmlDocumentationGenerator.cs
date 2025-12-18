@@ -92,12 +92,16 @@ public class XmlDocumentationGenerator
 
         foreach (var parameter in method.Parameters)
         {
-            if (parameter == null || string.IsNullOrWhiteSpace(parameter.Description))
+            if (parameter == null)
                 continue;
+
+            var description = parameter.HasDescription
+                ? parameter.Description
+                : $"{parameter.VariableName} parameter";
 
             this.AppendXmlCommentBlock(
                 "param",
-                parameter.Description,
+                description,
                 code,
                 new Dictionary<string, string>
                 {
