@@ -214,7 +214,7 @@ components:
     {
         string generatedCode = await GenerateCode();
 
-        generatedCode.Should().Contain("/* Example Custom Template Texte */");
+        generatedCode.Should().Contain("/* Example Custom Template Text */");
     }
 
 

@@ -127,7 +127,7 @@ The following is an example `.refitter` file
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
     ],
-    "customTemplateDirectory": "./path/to/directory/" // Optional. See https://github.com/RicoSuter/NSwag/wiki/Templates
+    "customTemplateDirectory": "./path/to/directory/" // Optional. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
   }
 }
 ```

@@ -154,7 +154,7 @@ public class CustomCSharpGeneratorSettingsTests
         settings.ReturnIApiResponse = true;
         settings.CustomTemplateDirectory = "./Templates/";
         var generatedCode = await GenerateCode(version, filename, settings);
-        generatedCode.Should().Contain("/* Example Custom Template Texte */");
+        generatedCode.Should().Contain("/* Example Custom Template Text */");
         generatedCode.Should().Contain("public partial class Pet");
     }
 
