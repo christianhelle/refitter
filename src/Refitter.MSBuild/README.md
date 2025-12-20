@@ -165,7 +165,8 @@ The following is an example `.refitter` file
     "excludedTypeNames": [
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
-    ]
+    ],
+    "customTemplateDirectory": "./path/to/directory/" // Optional. See  https://github.com/RicoSuter/NSwag/wiki/Templates
   }
 }
 ```
@@ -241,3 +242,4 @@ The following is an example `.refitter` file
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
   - `excludedTypeNames` - Default is empty
+  - `customTemplateDirectory` - Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates

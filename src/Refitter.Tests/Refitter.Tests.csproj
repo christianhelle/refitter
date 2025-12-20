@@ -15,6 +15,9 @@
       <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.json" />
       <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.yaml" />
       <None Remove="README.md" />
+      <None Update="Templates\Class.Annotations.liquid">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
