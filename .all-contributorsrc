@@ -803,6 +803,15 @@
         "ideas",
         "code"
       ]
+    },
+    {
+      "login": "0x2badc0de",
+      "name": "0x2badc0de",
+      "avatar_url": "https://avatars.githubusercontent.com/u/173240018?v=4",
+      "profile": "https://github.com/0x2badc0de",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
