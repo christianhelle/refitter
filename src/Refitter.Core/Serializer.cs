@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using JsonSerializerOptions = System.Text.Json.JsonSerializerOptions;
 
 namespace Refitter.Core;
@@ -14,7 +15,8 @@ public static class Serializer
         ReadCommentHandling = JsonCommentHandling.Skip,
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
+        WriteIndented = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
 
     /// <summary>
