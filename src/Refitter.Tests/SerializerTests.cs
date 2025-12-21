@@ -72,4 +72,39 @@ public class SerializerTests
                 .Excluding(s => s.ParameterNameGenerator)
                 .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
     }
+
+    [Test]
+    public void Can_Deserialize_CodeGeneratorSettings_With_IntegerType_String_Int64()
+    {
+        const string json = """{"integerType": "Int64"}""";
+        var settings = Serializer.Deserialize<CodeGeneratorSettings>(json);
+        settings.Should().NotBeNull();
+        settings.IntegerType.Should().Be(IntegerType.Int64);
+    }
+
+    [Test]
+    public void Can_Deserialize_CodeGeneratorSettings_With_IntegerType_String_Int32()
+    {
+        const string json = """{"integerType": "Int32"}""";
+        var settings = Serializer.Deserialize<CodeGeneratorSettings>(json);
+        settings.Should().NotBeNull();
+        settings.IntegerType.Should().Be(IntegerType.Int32);
+    }
+
+    [Test]
+    public void Can_Deserialize_CodeGeneratorSettings_With_IntegerType_Numeric_Value()
+    {
+        const string json = """{"integerType": 1}""";
+        var settings = Serializer.Deserialize<CodeGeneratorSettings>(json);
+        settings.Should().NotBeNull();
+        settings.IntegerType.Should().Be(IntegerType.Int64);
+    }
+
+    [Test]
+    public void Can_Serialize_CodeGeneratorSettings_With_IntegerType()
+    {
+        var settings = new CodeGeneratorSettings { IntegerType = IntegerType.Int64 };
+        var json = Serializer.Serialize(settings);
+        json.Should().Contain("\"integerType\": \"Int64\"");
+    }
 }

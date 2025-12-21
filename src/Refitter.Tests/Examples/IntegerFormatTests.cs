@@ -266,4 +266,40 @@ public class IntegerFormatTests
         var generatedCode = sut.Generate();
         return generatedCode;
     }
+
+    [Test]
+    public void Can_Deserialize_IntegerType_From_String_Int64()
+    {
+        const string json = """{"integerType": "Int64"}""";
+        var settings = Serializer.Deserialize<CodeGeneratorSettings>(json);
+        settings.Should().NotBeNull();
+        settings!.IntegerType.Should().Be(IntegerType.Int64);
+    }
+
+    [Test]
+    public void Can_Deserialize_IntegerType_From_String_Int32()
+    {
+        const string json = """{"integerType": "Int32"}""";
+        var settings = Serializer.Deserialize<CodeGeneratorSettings>(json);
+        settings.Should().NotBeNull();
+        settings!.IntegerType.Should().Be(IntegerType.Int32);
+    }
+
+    [Test]
+    public void Can_Deserialize_IntegerType_From_Numeric_Value()
+    {
+        const string json = """{"integerType": 1}""";
+        var settings = Serializer.Deserialize<CodeGeneratorSettings>(json);
+        settings.Should().NotBeNull();
+        settings!.IntegerType.Should().Be(IntegerType.Int64);
+    }
+
+    [Test]
+    public void Deserializes_Default_IntegerType_When_Not_Specified()
+    {
+        const string json = """{}""";
+        var settings = Serializer.Deserialize<CodeGeneratorSettings>(json);
+        settings.Should().NotBeNull();
+        settings!.IntegerType.Should().Be(IntegerType.Int32);
+    }
 }
