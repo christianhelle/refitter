@@ -15,6 +15,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency tunit to 1.6.0 [\#852](https://github.com/christianhelle/refitter/pull/852) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add lilinus as a contributor for code [\#849](https://github.com/christianhelle/refitter/pull/849) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency ruby to v3.4.8 [\#845](https://github.com/christianhelle/refitter/pull/845) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.5.70 [\#837](https://github.com/christianhelle/refitter/pull/837) ([renovate[bot]](https://github.com/apps/renovate))
