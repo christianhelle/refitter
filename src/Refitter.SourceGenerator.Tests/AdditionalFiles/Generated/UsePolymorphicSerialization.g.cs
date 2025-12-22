@@ -17,6 +17,7 @@ namespace Refitter.Tests.UsePolymorphicSerialization
     public partial interface IApiClient
     {
         /// <param name="token">Some Token</param>
+        /// <param name="body">body parameter</param>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:

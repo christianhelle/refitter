@@ -62,6 +62,7 @@ public class CodeGeneratorSettings
     /// Gets or sets the .NET type for OpenAPI integers without a format specifier (default: Int32).
     /// </summary>
     [Description("Gets or sets the .NET type for OpenAPI integers without a format specifier (default: Int32).")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public IntegerType IntegerType { get; set; } = IntegerType.Int32;
 
     /// <summary>

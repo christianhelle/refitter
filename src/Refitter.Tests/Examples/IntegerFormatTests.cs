@@ -266,4 +266,5 @@ public class IntegerFormatTests
         var generatedCode = sut.Generate();
         return generatedCode;
     }
+
 }

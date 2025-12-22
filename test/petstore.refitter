@@ -19,7 +19,8 @@
   "codeGeneratorSettings": {
     "dateType": "System.DateTime",
     "dateTimeType": "System.DateTime",
-    "arrayType": "System.Collections.Generic.IList"
+    "arrayType": "System.Collections.Generic.IList",
+    "integerType": "Int64"
   },
   "operationNameGenerator": "default",
   "typeAccessibility": "public",

@@ -155,6 +155,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
         Task UpdatePetWithForm(long petId, [Query] string name, [Query] string status);
 
         /// <summary>Deletes a pet</summary>
+        /// <param name="api_key">api_key parameter</param>
         /// <param name="petId">Pet id to delete</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
@@ -176,6 +177,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
         /// <summary>uploads an image</summary>
         /// <param name="petId">ID of pet to update</param>
         /// <param name="additionalMetadata">Additional Metadata</param>
+        /// <param name="body">body parameter</param>
         /// <returns>
         /// A <see cref="Task"/> representing the <see cref="IApiResponse"/> instance containing the result:
         /// <list type="table">
@@ -203,6 +205,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
 
         /// <summary>Place an order for a pet</summary>
         /// <remarks>Place a new order in the store</remarks>
+        /// <param name="body">body parameter</param>
         /// <returns>successful operation</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -281,6 +284,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
 
         /// <summary>Creates list of users with given input array</summary>
         /// <remarks>Creates list of users with given input array</remarks>
+        /// <param name="body">body parameter</param>
         /// <returns>Successful operation</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Headers("Accept: application/xml, application/json", "Content-Type: application/json")]

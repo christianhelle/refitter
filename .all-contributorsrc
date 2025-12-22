@@ -707,7 +707,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/78953007?v=4",
       "profile": "https://github.com/lilinus",
       "contributions": [
-        "bug"
+        "bug",
+        "code"
       ]
     },
     {
@@ -801,6 +802,15 @@
       "contributions": [
         "ideas",
         "code"
+      ]
+    },
+    {
+      "login": "0x2badc0de",
+      "name": "0x2badc0de",
+      "avatar_url": "https://avatars.githubusercontent.com/u/173240018?v=4",
+      "profile": "https://github.com/0x2badc0de",
+      "contributions": [
+        "bug"
       ]
     }
   ],
