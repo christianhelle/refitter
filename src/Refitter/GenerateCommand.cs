@@ -105,6 +105,12 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
 
+            // Generate .refitter settings file if not using existing settings file
+            if (string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            {
+                await WriteRefitterSettingsFile(settings, refitGeneratorSettings);
+            }
+
             if (refitGeneratorSettings.IncludePathMatches.Length > 0 &&
                 generator.OpenApiDocument.Paths.Count == 0)
             {
@@ -830,5 +836,60 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             Console.ForegroundColor = originalColor;
         }
+    }
+
+    private static async Task WriteRefitterSettingsFile(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        var settingsFilePath = DetermineSettingsFilePath(settings);
+        var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
+
+        if (!string.IsNullOrWhiteSpace(settingsDirectory) && !Directory.Exists(settingsDirectory))
+            Directory.CreateDirectory(settingsDirectory);
+
+        var json = Serializer.Serialize(refitGeneratorSettings);
+        await File.WriteAllTextAsync(settingsFilePath, json);
+
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine($"Settings file written to: {settingsFilePath}");
+            Console.WriteLine();
+        }
+        else
+        {
+            var fileName = Path.GetFileName(settingsFilePath);
+            var directory = Path.GetDirectoryName(settingsFilePath) ?? "";
+
+            var panel = new Panel(
+                $"[bold white]📄 File:[/] [cyan]{fileName}[/]\n" +
+                $"[bold white]📂 Directory:[/] [dim]{directory}[/]"
+            )
+            .BorderColor(Color.Green)
+            .RoundedBorder()
+            .Header("[bold green]💾 Settings File Generated[/]")
+            .HeaderAlignment(Justify.Center);
+
+            AnsiConsole.Write(panel);
+            AnsiConsole.WriteLine();
+        }
+    }
+
+    private static string DetermineSettingsFilePath(Settings settings)
+    {
+        // If output path is specified and is a directory, put .refitter file there
+        if (!string.IsNullOrWhiteSpace(settings.OutputPath) &&
+            settings.OutputPath != Settings.DefaultOutputPath)
+        {
+            var outputDir = settings.GenerateMultipleFiles || !string.IsNullOrWhiteSpace(settings.ContractsOutputPath)
+                ? settings.OutputPath
+                : Path.GetDirectoryName(settings.OutputPath);
+
+            if (!string.IsNullOrWhiteSpace(outputDir))
+            {
+                return Path.Combine(outputDir, ".refitter");
+            }
+        }
+
+        // Default: put .refitter file in current directory
+        return ".refitter";
     }
 }
