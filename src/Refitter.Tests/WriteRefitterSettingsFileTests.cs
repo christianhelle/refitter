@@ -26,25 +26,28 @@ public class WriteRefitterSettingsFileTests
     public void DetermineSettingsFilePath_Returns_Custom_Path_When_Output_Path_Is_File()
     {
         // Arrange
+        var customPath = Path.Combine("custom", "output", "MyClient.cs");
+        var expectedDir = Path.Combine("custom", "output");
         var settings = new Settings
         {
-            OutputPath = "/custom/output/MyClient.cs"
+            OutputPath = customPath
         };
 
         // Act
         var result = GenerateCommand.DetermineSettingsFilePath(settings);
 
         // Assert
-        result.Should().Be(Path.Combine("/custom/output", ".refitter"));
+        result.Should().Be(Path.Combine(expectedDir, ".refitter"));
     }
 
     [Test]
     public void DetermineSettingsFilePath_Returns_Custom_Path_When_Output_Path_Is_Directory_And_GenerateMultipleFiles()
     {
         // Arrange
+        var customPath = Path.Combine("custom", "output");
         var settings = new Settings
         {
-            OutputPath = "/custom/output",
+            OutputPath = customPath,
             GenerateMultipleFiles = true
         };
 
@@ -52,24 +55,26 @@ public class WriteRefitterSettingsFileTests
         var result = GenerateCommand.DetermineSettingsFilePath(settings);
 
         // Assert
-        result.Should().Be(Path.Combine("/custom/output", ".refitter"));
+        result.Should().Be(Path.Combine(customPath, ".refitter"));
     }
 
     [Test]
     public void DetermineSettingsFilePath_Returns_Custom_Path_When_ContractsOutputPath_Is_Set()
     {
         // Arrange
+        var customPath = Path.Combine("custom", "output");
+        var contractsPath = Path.Combine("custom", "contracts");
         var settings = new Settings
         {
-            OutputPath = "/custom/output",
-            ContractsOutputPath = "/custom/contracts"
+            OutputPath = customPath,
+            ContractsOutputPath = contractsPath
         };
 
         // Act
         var result = GenerateCommand.DetermineSettingsFilePath(settings);
 
         // Assert
-        result.Should().Be(Path.Combine("/custom/output", ".refitter"));
+        result.Should().Be(Path.Combine(customPath, ".refitter"));
     }
 
     [Test]
