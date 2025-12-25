@@ -838,7 +838,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
     }
 
-    private static async Task WriteRefitterSettingsFile(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    internal static async Task WriteRefitterSettingsFile(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
     {
         var settingsFilePath = DetermineSettingsFilePath(settings);
         var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
@@ -873,7 +873,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
     }
 
-    private static string DetermineSettingsFilePath(Settings settings)
+    internal static string DetermineSettingsFilePath(Settings settings)
     {
         // If output path is specified and is a directory, put .refitter file there
         if (!string.IsNullOrWhiteSpace(settings.OutputPath) &&
