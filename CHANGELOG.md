@@ -18,6 +18,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency tunit to 1.7.7 [\#862](https://github.com/christianhelle/refitter/pull/862) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency ruby to v4 [\#858](https://github.com/christianhelle/refitter/pull/858) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.6.28 [\#857](https://github.com/christianhelle/refitter/pull/857) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add 0x2badc0de as a contributor for bug [\#856](https://github.com/christianhelle/refitter/pull/856) ([allcontributors[bot]](https://github.com/apps/allcontributors))
