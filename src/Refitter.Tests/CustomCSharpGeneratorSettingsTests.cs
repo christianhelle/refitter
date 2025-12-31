@@ -143,6 +143,22 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("[JsonConstructor]");
     }
 
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_With_CustomTemplates(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.ReturnIApiResponse = true;
+        settings.CustomTemplateDirectory = "./Templates/";
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("/* Example Custom Template Text */");
+        generatedCode.Should().Contain("public partial class Pet");
+    }
+
+
     private static async Task<string> GenerateCode(
         SampleOpenSpecifications version,
         string filename,

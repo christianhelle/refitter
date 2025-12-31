@@ -273,4 +273,11 @@ public class CodeGeneratorSettings
         "Gets or sets a value indicating whether to inline JsonConverter attributes for enum properties (default: true). When set to false, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes."
     )]
     public bool InlineJsonConverters { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
+    /// templates.
+    /// </summary>
+    [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
+    public string? CustomTemplateDirectory { get; set; }
 }
