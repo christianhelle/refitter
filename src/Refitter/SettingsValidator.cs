@@ -7,9 +7,10 @@ public static class SettingsValidator
 {
     public static ValidationResult Validate(Settings settings)
     {
-        if (BothSettingsFilesAreEmpty(settings) || BothSettingsFilesArePresent(settings))
+        if (string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
+            string.IsNullOrWhiteSpace(settings.SettingsFilePath))
         {
-            return GetValidationErrorForSettingsFiles();
+            return GetValidationErrorForNoInputNoSettings();
         }
 
         return !string.IsNullOrWhiteSpace(settings.SettingsFilePath)
@@ -17,19 +18,15 @@ public static class SettingsValidator
             : ValidateOperationNameAndUrl(settings);
     }
 
-    private static bool BothSettingsFilesAreEmpty(Settings settings)
+    private static ValidationResult GetValidationErrorForNoInputNoSettings()
     {
-        return string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
-               string.IsNullOrWhiteSpace(settings.SettingsFilePath);
+        return ValidationResult.Error(
+            "You should specify an input URL/file directly " +
+            "or use specify it in 'openApiPath' from the settings file");
     }
 
-    private static bool BothSettingsFilesArePresent(Settings settings)
-    {
-        return !string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
-               !string.IsNullOrWhiteSpace(settings.SettingsFilePath);
-    }
 
-    private static ValidationResult GetValidationErrorForSettingsFiles()
+    private static ValidationResult GetValidationErrorForTwoInputFiles()
     {
         return ValidationResult.Error(
             "You should either specify an input URL/file directly " +
@@ -41,7 +38,6 @@ public static class SettingsValidator
     {
         var json = File.ReadAllText(settings.SettingsFilePath!);
         var refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
-        settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
 
         return ValidateFileAndOutputSettings(settings, refitGeneratorSettings);
     }
@@ -50,6 +46,14 @@ public static class SettingsValidator
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings)
     {
+        if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
+            !string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
+        {
+            return GetValidationErrorForTwoInputFiles();
+        }
+
+        settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
+
         if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
         {
             return GetValidationErrorForOpenApiPath();
