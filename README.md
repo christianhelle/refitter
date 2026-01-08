@@ -137,6 +137,7 @@ OPTIONS:
         --disposable                                             Generate refit clients that implement IDisposable
         --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
+        --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -296,7 +297,8 @@ The following is an example `.refitter` file
     "excludedTypeNames": [
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
-    ]
+    ],
+    "customTemplateDirectory": "./path/to/directory/" // Optional. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
   }
 }
 ```
