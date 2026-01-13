@@ -6,9 +6,11 @@
 
 **Implemented enhancements:**
 
+- Improve Immutable Records ergonomics [\#844](https://github.com/christianhelle/refitter/issues/844)
 - Omit certain operation headers and include all others [\#840](https://github.com/christianhelle/refitter/issues/840)
 - Create .refitter settings file as part of output [\#859](https://github.com/christianhelle/refitter/pull/859) ([christianhelle](https://github.com/christianhelle))
 - Fix integerType enum deserialization issue [\#855](https://github.com/christianhelle/refitter/pull/855) ([christianhelle](https://github.com/christianhelle))
+- support custom nswag template directory \#844 [\#854](https://github.com/christianhelle/refitter/pull/854) ([kmc059000](https://github.com/kmc059000))
 - Fix missing method parameter XML code-documentation [\#850](https://github.com/christianhelle/refitter/pull/850) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
