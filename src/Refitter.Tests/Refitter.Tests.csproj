@@ -37,6 +37,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
+      <ProjectReference Include="..\Refitter\Refitter.csproj" />
     </ItemGroup>
 
 </Project>
