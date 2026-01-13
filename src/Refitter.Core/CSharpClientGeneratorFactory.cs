@@ -42,6 +42,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                 GenerateNativeRecords =
                     settings.ImmutableRecords ||
                     settings.CodeGeneratorSettings?.GenerateNativeRecords is true,
+                TemplateDirectory = settings.CustomTemplateDirectory,
             }
         };
 

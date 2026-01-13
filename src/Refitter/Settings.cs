@@ -268,4 +268,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--integer-type")]
     [DefaultValue(IntegerType.Int32)]
     public IntegerType IntegerType { get; set; } = IntegerType.Int32;
+
+    [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
+    [CommandOption("--custom-template-directory")]
+    [DefaultValue(null)]
+    public string? CustomTemplateDirectory { get; set; } = null;
 }

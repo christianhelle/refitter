@@ -92,21 +92,21 @@ All new code must include unit tests following the pattern used in `Refitter.Tes
 public class MyFeatureTests
 {
     private const string OpenApiSpec = @"..."; // OpenAPI specification
-    
+
     [Fact]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
-    
+
     [Fact]
     public async Task Generated_Code_Contains_Expected_Pattern()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("ExpectedPattern");
     }
-    
+
     [Fact]
     public async Task Can_Build_Generated_Code()
     {
@@ -146,12 +146,13 @@ dotnet run --project src/Refitter --configuration Release --framework net9.0 -- 
 
 ### Recent CLI Options Added
 - `--use-apizr`: Integration with Apizr library for request options
-- `--use-dynamic-querystring-parameters`: Enable dynamic query string parameter wrapping  
+- `--use-dynamic-querystring-parameters`: Enable dynamic query string parameter wrapping
 - `--use-polymorphic-serialization`: Use System.Text.Json polymorphic serialization
 - `--disposable`: Generate IDisposable clients
 - `--collection-format`: Control query parameter collection formatting (Multi/Csv/Ssv/Tsv/Pipes)
 - `--no-banner`: Hide donation banner in CLI output
 - `--integer-type`: Set the .NET type for OpenAPI integers without a format specifier (Int32/Int64)
+- `--custom-template-directory`: Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
 
 ### Working with OpenAPI Specifications
 - Test resources are located in `src/Refitter.Tests/Resources/V2/` and `src/Refitter.Tests/Resources/V3/`
@@ -187,7 +188,7 @@ dotnet run --project src/Refitter --configuration Release --framework net9.0 -- 
 
 ### Expected Build Times
 - Package restore: ~65 seconds
-- Debug build: ~15 seconds  
+- Debug build: ~15 seconds
 - Release build: ~22 seconds
 - Full test suite: ~284 seconds (4 minutes 44 seconds)
 - Code formatting: ~19-23 seconds
