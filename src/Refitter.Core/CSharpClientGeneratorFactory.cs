@@ -148,7 +148,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 
     private void FixSchemaTypeFromFormat(JsonSchema schema)
     {
-        // If type is not set but format indicates a numeric type, set the type based on format
+        // If type is not set but format indicates a numeric type (int32, int64, float, double), set the type based on format
         if ((schema.Type == JsonObjectType.None || schema.Type == JsonObjectType.Null) &&
             !string.IsNullOrEmpty(schema.Format))
         {
