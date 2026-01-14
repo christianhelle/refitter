@@ -58,11 +58,11 @@ components:
     public async Task Should_Generate_Int_For_Properties_With_Format_Int32_And_Pattern()
     {
         string generatedCode = await GenerateCode();
-        
+
         // Should generate int, not object
         generatedCode.Should().Contain("public int TemperatureC { get; set; }");
         generatedCode.Should().Contain("public int TemperatureF { get; set; }");
-        
+
         // Should not generate as object
         generatedCode.Should().NotContain("public object TemperatureC { get; set; }");
         generatedCode.Should().NotContain("public object TemperatureF { get; set; }");
