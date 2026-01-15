@@ -216,7 +216,7 @@ components:
 
         generatedCode.Should().Contain("/* Example Custom Template Text */");
     }
-    
+
     [Test]
     public async Task Can_Build_Generated_Code()
     {

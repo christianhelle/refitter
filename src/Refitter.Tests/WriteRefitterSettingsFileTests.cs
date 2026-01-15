@@ -147,9 +147,16 @@ public class WriteRefitterSettingsFileTests
         }
         finally
         {
-            Directory.SetCurrentDirectory(originalDir);
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
+            try
+            {
+                Directory.SetCurrentDirectory(originalDir);
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
         }
     }
 
