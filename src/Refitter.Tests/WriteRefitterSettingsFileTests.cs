@@ -268,7 +268,7 @@ public class WriteRefitterSettingsFileTests
 
             var content = await File.ReadAllTextAsync(settingsFile);
             content.Should().Contain("ContractsNamespace");
-            
+
             // Verify the deserialized settings contain the correct contracts path
             var deserializedSettings = Serializer.Deserialize<RefitGeneratorSettings>(content);
             deserializedSettings.ContractsOutputFolder.Should().Be(contractsDir);

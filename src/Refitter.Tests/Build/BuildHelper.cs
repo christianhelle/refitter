@@ -38,7 +38,7 @@ public static class BuildHelper
         process.WaitForExit();
 
         var result = startResult && process.ExitCode == 0;
-        
+
         // Clean up temporary directory
         try
         {
