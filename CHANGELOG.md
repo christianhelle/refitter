@@ -20,6 +20,7 @@
 
 **Merged pull requests:**
 
+- Fix issue with randomly failing tests to due parallel execution [\#872](https://github.com/christianhelle/refitter/pull/872) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency tunit to 1.9.2 [\#863](https://github.com/christianhelle/refitter/pull/863) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.7.7 [\#862](https://github.com/christianhelle/refitter/pull/862) ([renovate[bot]](https://github.com/apps/renovate))
 - Add unit tests for WriteRefitterSettingsFile functionality [\#860](https://github.com/christianhelle/refitter/pull/860) ([Copilot](https://github.com/apps/copilot-swe-agent))
