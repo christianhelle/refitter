@@ -1,5 +1,6 @@
 [![Build](https://github.com/christianhelle/refitter/actions/workflows/build.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/build.yml)
 [![Smoke Tests](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/christianhelle/refitter/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/christianhelle/refitter/tree/main)
 [![NuGet](https://img.shields.io/nuget/v/refitter?color=blue)](https://www.nuget.org/packages/refitter)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=christianhelle_refitter&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=christianhelle_refitter)
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
