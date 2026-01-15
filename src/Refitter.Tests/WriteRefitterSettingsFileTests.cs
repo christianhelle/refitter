@@ -113,7 +113,8 @@ public class WriteRefitterSettingsFileTests
     public async Task WriteRefitterSettingsFile_Creates_File_With_Default_Path()
     {
         // Arrange
-        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.GetDirectoryName(GetType().Assembly.Location) ?? Path.GetTempPath();
+        var tempDir = Path.Combine(folder, Guid.NewGuid().ToString());
         Directory.CreateDirectory(tempDir);
         var originalDir = Directory.GetCurrentDirectory();
 
@@ -268,7 +269,7 @@ public class WriteRefitterSettingsFileTests
 
             var content = await File.ReadAllTextAsync(settingsFile);
             content.Should().Contain("ContractsNamespace");
-            
+
             // Verify the deserialized settings contain the correct contracts path
             var deserializedSettings = Serializer.Deserialize<RefitGeneratorSettings>(content);
             deserializedSettings.ContractsOutputFolder.Should().Be(contractsDir);
