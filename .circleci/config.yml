@@ -31,6 +31,8 @@ jobs:
       - run:
           name: "Install .NET SDK 10.0"
           command: |
+            wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+            chmod +x dotnet-install.sh
             ./dotnet-install.sh --channel 10.0 --install-dir $HOME/.dotnet
             
       - run:
@@ -40,6 +42,7 @@ jobs:
       # Prepare the build (remove generated files)
       - run:
           name: "Prepare build"
+          no_output_timeout: 30m
           command: |
             rm -rf src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
             dotnet msbuild src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj || true
@@ -52,7 +55,7 @@ jobs:
       # Run tests
       - run:
           name: "Run tests"
-          command: dotnet test --solution src/Refitter.sln -c Release
+          command: dotnet test src/Refitter.sln -c Release
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
