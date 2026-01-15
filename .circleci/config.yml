@@ -21,19 +21,22 @@ jobs:
       
       # Install additional .NET SDK versions (9.0 and 10.0)
       - run:
-          name: "Install .NET SDK 9.0"
+          name: "Download dotnet-install script"
           command: |
             wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
             chmod +x dotnet-install.sh
+            
+      - run:
+          name: "Install .NET SDK 9.0"
+          command: |
             ./dotnet-install.sh --channel 9.0 --install-dir $HOME/.dotnet
             echo 'export PATH="$HOME/.dotnet:$PATH"' >> $BASH_ENV
             
       - run:
           name: "Install .NET SDK 10.0"
           command: |
-            wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
-            chmod +x dotnet-install.sh
             ./dotnet-install.sh --channel 10.0 --install-dir $HOME/.dotnet
+            echo 'export PATH="$HOME/.dotnet:$PATH"' >> $BASH_ENV
             
       - run:
           name: "Verify .NET SDKs"
