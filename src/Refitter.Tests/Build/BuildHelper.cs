@@ -7,7 +7,7 @@ public static class BuildHelper
 {
     public static bool BuildCSharp(params string[] generatedCode)
     {
-        var path = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString("N"));
+        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(path);
         var projectFile = Path.Combine(path, "Project.csproj");
         File.WriteAllText(projectFile, ProjectFileContents.Net80App);
@@ -38,6 +38,17 @@ public static class BuildHelper
         process.WaitForExit();
 
         var result = startResult && process.ExitCode == 0;
+        
+        // Clean up temporary directory
+        try
+        {
+            Directory.Delete(path, recursive: true);
+        }
+        catch
+        {
+            // Best effort cleanup - ignore failures
+        }
+
         if (!result)
             throw new BuildFailedException(errors.ToString(), output.ToString());
 
