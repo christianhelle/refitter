@@ -21,11 +21,20 @@ commands:
           command: |
             # .NET 10.0 is already installed in the base image
             # Install .NET 9.0
-            wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+            wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh || {
+              echo "Failed to download dotnet-install.sh"
+              exit 1
+            }
             chmod +x dotnet-install.sh
-            ./dotnet-install.sh --channel 9.0 --install-dir /usr/share/dotnet
+            ./dotnet-install.sh --channel 9.0 --install-dir /usr/share/dotnet || {
+              echo "Failed to install .NET 9.0 SDK"
+              exit 1
+            }
             # Install .NET 8.0
-            ./dotnet-install.sh --channel 8.0 --install-dir /usr/share/dotnet
+            ./dotnet-install.sh --channel 8.0 --install-dir /usr/share/dotnet || {
+              echo "Failed to install .NET 8.0 SDK"
+              exit 1
+            }
             # Verify installations
             dotnet --list-sdks
 
@@ -63,14 +72,16 @@ commands:
             # Install dotnet-trx2junit if needed for better CircleCI integration
             if ! command -v trx2junit &> /dev/null; then
               echo "Installing trx2junit..."
-              dotnet tool install -g trx2junit
+              if ! dotnet tool install -g trx2junit; then
+                echo "Warning: Failed to install trx2junit, test results will be in TRX format only"
+              fi
             fi
             export PATH="$PATH:$HOME/.dotnet/tools"
             # Find and convert all TRX files
             if command -v trx2junit &> /dev/null; then
               find . -name "*.trx" -exec trx2junit {} \;
             else
-              echo "Warning: trx2junit not available, skipping test result conversion"
+              echo "Note: trx2junit not available, test results will remain in TRX format"
             fi
           when: always
       - store_test_results:
@@ -101,9 +112,14 @@ jobs:
           name: Upload NuGet packages
           command: |
             mkdir -p ~/artifacts
-            find . -name "*.nupkg" -exec cp {} ~/artifacts/ \;
-            echo "Found NuGet packages:"
-            ls -lh ~/artifacts/
+            # Find and copy NuGet packages
+            if find . -name "*.nupkg" | grep -q .; then
+              find . -name "*.nupkg" -exec cp {} ~/artifacts/ \;
+              echo "Found NuGet packages:"
+              ls -lh ~/artifacts/
+            else
+              echo "No NuGet packages found"
+            fi
       - store_artifacts:
           path: ~/artifacts
           destination: nuget-packages
