@@ -40,18 +40,17 @@ public static class BuildHelper
 
         var result = startResult && process.ExitCode == 0;
 
-        // // Clean up temporary directory
-        // try
-        // {
-        //     Directory.Delete(path, true);
-        // }
-        // catch
-        // {
-        //     // Ignore cleanup errors
-        // }
-
         if (!result)
             throw new BuildFailedException(errors.ToString(), output.ToString());
+
+        try
+        {
+            Directory.Delete(path, true);
+        }
+        catch
+        {
+            // Ignore cleanup errors
+        }
 
         return result;
     }
