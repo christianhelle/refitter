@@ -1,0 +1,102 @@
+version: 2.1
+
+# Define reusable executors
+executors:
+  dotnet-executor:
+    docker:
+      # Using the official .NET SDK image with .NET 8.0, 9.0, and 10.0
+      - image: mcr.microsoft.com/dotnet/sdk:10.0
+    working_directory: ~/repo
+    environment:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+
+# Define reusable commands
+commands:
+  setup-dotnet:
+    description: "Setup .NET SDK environment"
+    steps:
+      - run:
+          name: Install .NET SDK versions
+          command: |
+            # .NET 10.0 is already installed in the base image
+            # Install .NET 9.0
+            wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+            chmod +x dotnet-install.sh
+            ./dotnet-install.sh --channel 9.0 --install-dir /usr/share/dotnet
+            # Install .NET 8.0
+            ./dotnet-install.sh --channel 8.0 --install-dir /usr/share/dotnet
+            # Verify installations
+            dotnet --list-sdks
+
+  restore-dependencies:
+    description: "Restore NuGet packages"
+    steps:
+      - run:
+          name: Restore dependencies
+          command: dotnet restore src/Refitter.sln
+
+  build-solution:
+    description: "Build the solution"
+    steps:
+      - run:
+          name: Build solution
+          command: |
+            dotnet build -c Release src/Refitter.sln \
+              -p:UseSourceLink=true \
+              -p:PackageVersion="1.0.0-ci.${CIRCLE_BUILD_NUM}" \
+              -p:Version="1.0.0-ci.${CIRCLE_BUILD_NUM}"
+
+  run-tests:
+    description: "Run unit tests"
+    steps:
+      - run:
+          name: Run tests
+          command: dotnet test --solution src/Refitter.sln -c Release --logger:"trx;LogFileName=test-results.trx"
+
+  store-results:
+    description: "Store test results and artifacts"
+    steps:
+      - run:
+          name: Convert test results to JUnit format
+          command: |
+            # Install dotnet-trx2junit if needed for better CircleCI integration
+            dotnet tool install -g trx2junit || true
+            export PATH="$PATH:$HOME/.dotnet/tools"
+            # Find and convert all TRX files
+            find . -name "*.trx" -exec trx2junit {} \; || echo "trx2junit not available, skipping conversion"
+          when: always
+      - store_test_results:
+          path: ~/repo
+      - store_artifacts:
+          path: ~/repo
+          destination: build-artifacts
+
+# Define workflows
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - build
+
+# Define jobs
+jobs:
+  build:
+    executor: dotnet-executor
+    steps:
+      - checkout
+      - setup-dotnet
+      - restore-dependencies
+      - build-solution
+      - run-tests
+      - store-results
+      - run:
+          name: Upload NuGet packages
+          command: |
+            mkdir -p ~/artifacts
+            find . -name "*.nupkg" -exec cp {} ~/artifacts/ \;
+            echo "Found NuGet packages:"
+            ls -lh ~/artifacts/
+      - store_artifacts:
+          path: ~/artifacts
+          destination: nuget-packages
