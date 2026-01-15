@@ -36,7 +36,7 @@ The pipeline executes the following steps:
 
 The following CircleCI environment variables are used:
 
-- `CIRCLE_BUILD_NUM`: Used for package versioning (e.g., `1.0.0-ci.123`)
+- `CIRCLE_BUILD_NUM`: Used for package versioning (e.g., `1.7.1.123`)
 - `DOTNET_SKIP_FIRST_TIME_EXPERIENCE`: Set to `true` to skip .NET first-time setup
 - `DOTNET_CLI_TELEMETRY_OPTOUT`: Set to `true` to disable telemetry
 

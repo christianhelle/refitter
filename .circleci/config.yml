@@ -44,8 +44,8 @@ commands:
           command: |
             dotnet build -c Release src/Refitter.sln \
               -p:UseSourceLink=true \
-              -p:PackageVersion="1.0.0-ci.${CIRCLE_BUILD_NUM}" \
-              -p:Version="1.0.0-ci.${CIRCLE_BUILD_NUM}"
+              -p:PackageVersion="1.7.1.${CIRCLE_BUILD_NUM}" \
+              -p:Version="1.7.1.${CIRCLE_BUILD_NUM}"
 
   run-tests:
     description: "Run unit tests"
@@ -61,10 +61,17 @@ commands:
           name: Convert test results to JUnit format
           command: |
             # Install dotnet-trx2junit if needed for better CircleCI integration
-            dotnet tool install -g trx2junit || true
+            if ! command -v trx2junit &> /dev/null; then
+              echo "Installing trx2junit..."
+              dotnet tool install -g trx2junit
+            fi
             export PATH="$PATH:$HOME/.dotnet/tools"
             # Find and convert all TRX files
-            find . -name "*.trx" -exec trx2junit {} \; || echo "trx2junit not available, skipping conversion"
+            if command -v trx2junit &> /dev/null; then
+              find . -name "*.trx" -exec trx2junit {} \;
+            else
+              echo "Warning: trx2junit not available, skipping test result conversion"
+            fi
           when: always
       - store_test_results:
           path: ~/repo
