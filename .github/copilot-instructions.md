@@ -15,12 +15,12 @@ Always reference these instructions first and fallback to search or bash command
   - `export PATH="/home/runner/.dotnet:$PATH"`
 
 ### Building and Testing
-- Restore packages: `dotnet restore src/Refitter.sln` -- takes 65 seconds. NEVER CANCEL. Set timeout to 90+ seconds.
-- Build solution: `dotnet build -c Release src/Refitter.sln` -- takes 22 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
-- Run tests: `dotnet test -c Release src/Refitter.sln` -- takes 284 seconds (4 minutes 44 seconds). NEVER CANCEL. Set timeout to 480+ seconds.
+- Restore packages: `dotnet restore src/Refitter.slnx` -- takes 65 seconds. NEVER CANCEL. Set timeout to 90+ seconds.
+- Build solution: `dotnet build -c Release src/Refitter.slnx` -- takes 22 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
+- Run tests: `dotnet test -c Release src/Refitter.slnx` -- takes 284 seconds (4 minutes 44 seconds). NEVER CANCEL. Set timeout to 480+ seconds.
   - NOTE: Some tests may fail in sandboxed environments due to network connectivity issues when downloading external OpenAPI specs. This is expected and does not indicate code issues.
-- Apply code formatting: `dotnet format src/Refitter.sln` -- takes 19 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
-- Verify formatting: `dotnet format --verify-no-changes src/Refitter.sln` -- takes 23 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
+- Apply code formatting: `dotnet format src/Refitter.slnx` -- takes 19 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
+- Verify formatting: `dotnet format --verify-no-changes src/Refitter.slnx` -- takes 23 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
 
 ### Running the CLI Tool
 - Run CLI with specific framework: `dotnet run --project src/Refitter --configuration Release --framework net9.0 -- [arguments]`
@@ -39,7 +39,7 @@ Always reference these instructions first and fallback to search or bash command
 - ALWAYS manually validate any new code by building and running tests after making changes.
 - For CLI changes: Test with a real OpenAPI specification to ensure generation works correctly.
 - For Core library changes: Run full test suite and verify generated code builds successfully.
-- ALWAYS run `dotnet format src/Refitter.sln` before committing or the CI (.github/workflows/build.yml) will fail.
+- ALWAYS run `dotnet format src/Refitter.slnx` before committing or the CI (.github/workflows/build.yml) will fail.
 - ALWAYS validate that EVERY command works before adding it to documentation or instructions.
 
 ## Repository Structure and Navigation
@@ -53,7 +53,7 @@ Always reference these instructions first and fallback to search or bash command
 - **Refitter.SourceGenerator.Tests**: Tests for source generator
 
 ### Important Files and Locations
-- Main solution: `src/Refitter.sln`
+- Main solution: `src/Refitter.slnx`
 - CLI entry point: `src/Refitter/Program.cs`
 - Core generation logic: `src/Refitter.Core/RefitInterfaceGenerator.cs`
 - Settings model: `src/Refitter.Core/Settings/RefitGeneratorSettings.cs`
@@ -74,7 +74,7 @@ src/                    # Source code and solution
   Refitter.Core/        # Core library
   Refitter.SourceGenerator/  # Source generator
   Refitter.Tests/       # Tests
-  Refitter.sln          # Main solution file
+  Refitter.slnx         # Main solution file
 images/                 # Project images and assets
 ```
 
