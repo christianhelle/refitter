@@ -6,8 +6,8 @@ dotnet build-server shutdown
 dotnet nuget locals global-packages --clear
 rm -f Refitter.MSBuild.*.nupkg
 rm -f Petstore.cs
-dotnet restore ../../src/Refitter.sln
-dotnet clean -c release ../../src/Refitter.sln
+dotnet restore ../../src/Refitter.slnx
+dotnet clean -c release ../../src/Refitter.slnx
 dotnet build -c release ../../src/Refitter/Refitter.csproj
 dotnet build -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .

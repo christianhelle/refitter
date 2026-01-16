@@ -41,9 +41,9 @@ jobs:
         rm -rf src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
         dotnet msbuild src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
     - name: 🛠️ Build
-      run: dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
+      run: dotnet build -c Release src/Refitter.slnx -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
     - name: 🧪 Test
-      run: dotnet test --solution src/Refitter.sln -c Release
+      run: dotnet test --solution src/Refitter.slnx -c Release
     - name: 🗳️ Upload
       uses: actions/upload-artifact@v6
       with:

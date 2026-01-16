@@ -1271,7 +1271,7 @@ Refitter uses [TUnit](https://github.com/thomhurst/TUnit) as its testing framewo
 To run the tests:
 
 ```bash
-dotnet test --solution src/Refitter.sln -c Release
+dotnet test --solution src/Refitter.slnx -c Release
 ```
 
 ## Contributing
