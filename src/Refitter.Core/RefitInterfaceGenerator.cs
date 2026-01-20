@@ -116,6 +116,12 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             return type is null or "void" ? GetAsyncOperationType(true) : $"{GetAsyncOperationType(false)}<{WellKnownNamespaces.TrimImportedNamespaces(type)}>";
         }
 
+        // Check if response is a file stream
+        if (IsFileStreamResponse(operation))
+        {
+            return $"{GetAsyncOperationType(false)}<HttpResponseMessage>";
+        }
+
         // First check for explicit success status codes
         var successCodes = new[] { "200", "201", "203", "206" };
         var returnTypeParameter = successCodes
@@ -136,6 +142,47 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         return GetReturnType(returnTypeParameter);
+    }
+
+    /// <summary>
+    /// Determines if the operation response is a file stream (binary content).
+    /// </summary>
+    /// <param name="operation">The OpenAPI operation to check.</param>
+    /// <returns>True if the response is a file stream, false otherwise.</returns>
+    private static bool IsFileStreamResponse(OpenApiOperation operation)
+    {
+        var successCodes = new[] { "200", "201", "203", "206", "2XX" };
+        
+        foreach (var code in successCodes)
+        {
+            if (!operation.Responses.ContainsKey(code))
+                continue;
+
+            var response = operation.Responses[code].ActualResponse;
+            
+            // Check if the response has content types that indicate binary/file data
+            if (response.Content?.Any() == true)
+            {
+                var hasFileContent = response.Content.Keys.Any(contentType =>
+                    contentType.StartsWith("application/octet-stream", StringComparison.OrdinalIgnoreCase) ||
+                    contentType.StartsWith("application/pdf", StringComparison.OrdinalIgnoreCase) ||
+                    contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase) ||
+                    contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase) ||
+                    contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase) ||
+                    contentType.StartsWith("application/zip", StringComparison.OrdinalIgnoreCase) ||
+                    contentType.StartsWith("application/x-", StringComparison.OrdinalIgnoreCase));
+
+                if (hasFileContent)
+                {
+                    // Also verify it's binary format
+                    var schema = response.Schema;
+                    if (schema?.Format == "binary" || schema?.Type == NJsonSchema.JsonObjectType.File)
+                        return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private string GetTypeName(string code, OpenApiOperation operation)
@@ -254,6 +301,16 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     /// <returns>True if the type is an ApiResponse Task or similar, false otherwise.</returns>
     protected static bool IsApiResponseType(string typeName)
     {
+        // Check for HttpResponseMessage
+        if (Regex.IsMatch(
+            typeName,
+            "(Task|IObservable)<HttpResponseMessage>",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(1)))
+        {
+            return true;
+        }
+
         return Regex.IsMatch(
             typeName,
             "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>",
