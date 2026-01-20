@@ -72,6 +72,26 @@ paths:
               schema:
                 type: string
                 format: binary
+  '/forms/{formId}/submit':
+    get:
+      operationId: submitForm
+      summary: Submit form data
+      parameters:
+        - name: formId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Form submission result
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
 ";
 
     [Test]
@@ -100,6 +120,14 @@ paths:
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<HttpResponseMessage> GetDocument(string docId");
+    }
+
+    [Test]
+    public async Task Does_Not_Generate_HttpResponseMessage_For_FormUrlEncoded()
+    {
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("submitForm");
+        generatedCode.Should().NotContain("Task<HttpResponseMessage> SubmitForm(");
     }
 
     [Test]

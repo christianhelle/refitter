@@ -152,30 +152,22 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     private static bool IsFileStreamResponse(OpenApiOperation operation)
     {
         var successCodes = new[] { "200", "201", "203", "206", "2XX" };
-        
+
         foreach (var code in successCodes)
         {
             if (!operation.Responses.ContainsKey(code))
                 continue;
 
             var response = operation.Responses[code].ActualResponse;
-            
-            // Check if the response has content types that indicate binary/file data
-            if (response.Content?.Any() == true)
-            {
-                var hasFileContent = response.Content.Keys.Any(contentType =>
-                    contentType.StartsWith("application/octet-stream", StringComparison.OrdinalIgnoreCase) ||
-                    contentType.StartsWith("application/pdf", StringComparison.OrdinalIgnoreCase) ||
-                    contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase) ||
-                    contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase) ||
-                    contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase) ||
-                    contentType.StartsWith("application/zip", StringComparison.OrdinalIgnoreCase) ||
-                    contentType.StartsWith("application/x-", StringComparison.OrdinalIgnoreCase));
 
-                if (hasFileContent)
+            if (response.Content?.Any() != true)
+                continue;
+
+            foreach (var contentEntry in response.Content)
+            {
+                if (IsFileContentType(contentEntry.Key))
                 {
-                    // Also verify it's binary format
-                    var schema = response.Schema;
+                    var schema = contentEntry.Value?.Schema;
                     if (schema?.Format == "binary" || schema?.Type == NJsonSchema.JsonObjectType.File)
                         return true;
                 }
@@ -183,6 +175,20 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         return false;
+    }
+
+    private static bool IsFileContentType(string contentType)
+    {
+        return
+            contentType.StartsWith("application/octet-stream", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("application/pdf", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("application/vnd", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("application/zip", StringComparison.OrdinalIgnoreCase) ||
+            (contentType.StartsWith("application/x-", StringComparison.OrdinalIgnoreCase) &&
+             !contentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase));
     }
 
     private string GetTypeName(string code, OpenApiOperation operation)
