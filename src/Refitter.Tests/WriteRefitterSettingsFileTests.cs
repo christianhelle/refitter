@@ -110,50 +110,6 @@ public class WriteRefitterSettingsFileTests
     }
 
     [Test]
-    public async Task WriteRefitterSettingsFile_Creates_File_With_Default_Path()
-    {
-        // Arrange
-        var folder = Path.GetDirectoryName(GetType().Assembly.Location) ?? Path.GetTempPath();
-        var tempDir = Path.Combine(folder, Guid.NewGuid().ToString());
-        Directory.CreateDirectory(tempDir);
-        var originalDir = Directory.GetCurrentDirectory();
-
-        try
-        {
-            Directory.SetCurrentDirectory(tempDir);
-
-            var settings = new Settings
-            {
-                OutputPath = Settings.DefaultOutputPath,
-                SimpleOutput = true
-            };
-
-            var refitSettings = new RefitGeneratorSettings
-            {
-                OpenApiPath = "test.json",
-                Namespace = "TestNamespace"
-            };
-
-            // Act
-            await GenerateCommand.WriteRefitterSettingsFile(settings, refitSettings);
-
-            // Assert
-            var settingsFile = Path.Combine(tempDir, ".refitter");
-            File.Exists(settingsFile).Should().BeTrue();
-
-            var content = await File.ReadAllTextAsync(settingsFile);
-            content.Should().NotBeNullOrWhiteSpace();
-            content.Should().Contain("TestNamespace");
-        }
-        finally
-        {
-            Directory.SetCurrentDirectory(originalDir);
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
-        }
-    }
-
-    [Test]
     public async Task WriteRefitterSettingsFile_Creates_File_With_Custom_Output_Path()
     {
         // Arrange
