@@ -155,10 +155,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
         foreach (var code in successCodes)
         {
-            if (!operation.Responses.ContainsKey(code))
+            if (!operation.Responses.TryGetValue(code, out var apiResponse))
                 continue;
 
-            var response = operation.Responses[code].ActualResponse;
+            var response = apiResponse.ActualResponse;
 
             if (response.Content?.Any() != true)
                 continue;
