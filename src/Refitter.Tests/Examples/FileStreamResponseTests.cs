@@ -126,7 +126,7 @@ paths:
     public async Task Does_Not_Generate_HttpResponseMessage_For_FormUrlEncoded()
     {
         string generatedCode = await GenerateCode();
-        generatedCode.Should().Contain("submitForm");
+        generatedCode.Should().Contain("SubmitForm");
         generatedCode.Should().NotContain("Task<HttpResponseMessage> SubmitForm(");
     }
 
