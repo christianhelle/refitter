@@ -187,6 +187,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase) ||
             contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase) ||
             contentType.StartsWith("application/zip", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("application/gzip", StringComparison.OrdinalIgnoreCase) ||
             (contentType.StartsWith("application/x-", StringComparison.OrdinalIgnoreCase) &&
              !contentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase));
     }
