@@ -155,10 +155,10 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
         foreach (var code in successCodes)
         {
-            if (!operation.Responses.ContainsKey(code))
+            if (!operation.Responses.TryGetValue(code, out var apiResponse))
                 continue;
 
-            var response = operation.Responses[code].ActualResponse;
+            var response = apiResponse.ActualResponse;
 
             if (response.Content?.Any() != true)
                 continue;
@@ -187,6 +187,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase) ||
             contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase) ||
             contentType.StartsWith("application/zip", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("application/gzip", StringComparison.OrdinalIgnoreCase) ||
             (contentType.StartsWith("application/x-", StringComparison.OrdinalIgnoreCase) &&
              !contentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase));
     }
