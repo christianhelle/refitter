@@ -6,6 +6,26 @@ namespace Refitter.Tests;
 
 public class WriteRefitterSettingsFileTests
 {
+    private static void DeleteDirectoryWithRetry(string path, int maxRetries = 3, int delayMs = 100)
+    {
+        if (!Directory.Exists(path))
+            return;
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            try
+            {
+                Directory.Delete(path, true);
+                return;
+            }
+            catch (IOException) when (i < maxRetries - 1)
+            {
+                // Wait a bit for file handles to be released
+                Thread.Sleep(delayMs);
+            }
+        }
+    }
+
     [Test]
     public void DetermineSettingsFilePath_Returns_Default_Path_When_No_Output_Path_Specified()
     {
@@ -148,8 +168,7 @@ public class WriteRefitterSettingsFileTests
         finally
         {
             Directory.SetCurrentDirectory(originalDir);
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
+            DeleteDirectoryWithRetry(tempDir);
         }
     }
 
@@ -187,8 +206,7 @@ public class WriteRefitterSettingsFileTests
         }
         finally
         {
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
+            DeleteDirectoryWithRetry(tempDir);
         }
     }
 
@@ -229,8 +247,7 @@ public class WriteRefitterSettingsFileTests
         }
         finally
         {
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
+            DeleteDirectoryWithRetry(tempDir);
         }
     }
 
@@ -276,8 +293,7 @@ public class WriteRefitterSettingsFileTests
         }
         finally
         {
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
+            DeleteDirectoryWithRetry(tempDir);
         }
     }
 
@@ -325,8 +341,7 @@ public class WriteRefitterSettingsFileTests
         }
         finally
         {
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
+            DeleteDirectoryWithRetry(tempDir);
         }
     }
 
@@ -361,8 +376,7 @@ public class WriteRefitterSettingsFileTests
         }
         finally
         {
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
+            DeleteDirectoryWithRetry(tempDir);
         }
     }
 }
