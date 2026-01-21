@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-87-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-88-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1397,6 +1397,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/karoberts"><img src="https://avatars.githubusercontent.com/u/7482126?v=4?s=100" width="100px;" alt="Keith Roberts"/><br /><sub><b>Keith Roberts</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Akaroberts" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kmc059000"><img src="https://avatars.githubusercontent.com/u/660670?v=4?s=100" width="100px;" alt="Kenneth Crawford"/><br /><sub><b>Kenneth Crawford</b></sub></a><br /><a href="#ideas-kmc059000" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=kmc059000" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/0x2badc0de"><img src="https://avatars.githubusercontent.com/u/173240018?v=4?s=100" width="100px;" alt="0x2badc0de"/><br /><sub><b>0x2badc0de</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3A0x2badc0de" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://meteion.ca"><img src="https://avatars.githubusercontent.com/u/6116333?v=4?s=100" width="100px;" alt="Tylor Pater"/><br /><sub><b>Tylor Pater</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=frogcrush" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
