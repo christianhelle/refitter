@@ -10,5 +10,5 @@ jobs:
   publish:
     uses: ./.github/workflows/release-template.yml
     with:
-      version: 1.7.1
+      version: 1.7.2
     secrets: inherit
