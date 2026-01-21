@@ -6,10 +6,15 @@ namespace Refitter.Tests;
 
 public class WriteRefitterSettingsFileTests
 {
-    private static void DeleteDirectoryWithRetry(string path, int maxRetries = 3, int delayMs = 100)
+    private static void DeleteDirectoryWithRetry(string path, int maxRetries = 5, int delayMs = 500)
     {
         if (!Directory.Exists(path))
             return;
+
+        // Force garbage collection to release any file handles
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
 
         for (int i = 0; i < maxRetries; i++)
         {
@@ -20,8 +25,12 @@ public class WriteRefitterSettingsFileTests
             }
             catch (IOException) when (i < maxRetries - 1)
             {
-                // Wait a bit for file handles to be released
+                // Wait for file handles to be released
                 Thread.Sleep(delayMs);
+                
+                // Force another GC cycle between retries
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
         }
     }
