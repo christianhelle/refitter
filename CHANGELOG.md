@@ -20,6 +20,7 @@
 
 **Merged pull requests:**
 
+- docs: add frogcrush as a contributor for code [\#878](https://github.com/christianhelle/refitter/pull/878) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Migrate solution files from .sln to .slnx format [\#876](https://github.com/christianhelle/refitter/pull/876) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Fix issue with randomly failing tests to due parallel execution [\#872](https://github.com/christianhelle/refitter/pull/872) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency tunit to 1.9.2 [\#863](https://github.com/christianhelle/refitter/pull/863) ([renovate[bot]](https://github.com/apps/renovate))
