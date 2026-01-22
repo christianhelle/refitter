@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.2...HEAD)
+
+**Implemented enhancements:**
+
+- Refitter.MSBuild Support .NET 10 [\#881](https://github.com/christianhelle/refitter/issues/881)
+- Add support for systems running only .NET 10.0 \(without .NET 8.0 or 9.0\) in Refitter.MSBuild [\#882](https://github.com/christianhelle/refitter/pull/882) ([christianhelle](https://github.com/christianhelle))
+
+## [1.7.2](https://github.com/christianhelle/refitter/tree/1.7.2) (2026-01-21)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.1...1.7.2)
 
 **Implemented enhancements:**
 
