@@ -12,6 +12,6 @@ dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
 dotnet add package .\Refitter.MSBuild.1.0.0.nupkg --source .
 dotnet restore
 dotnet add package Refitter.MSBuild --source .
-dotnet run -v d -filelogger
+dotnet run -v d -filelogger -c Release
 dotnet remove package Refitter.MSBuild
 Remove-Item Refitter.MSBuild.*.nupkg -Force

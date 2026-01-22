@@ -23,15 +23,9 @@ jobs:
   build:
     name: 👌 Verify build
     runs-on: windows-latest
-    steps:    
+    steps:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v6
-    - uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: |
-          8.0.x
-          9.0.x
-          10.0.x
     - name: 🛠️ Prepare
       working-directory: test/MSBuild
       run: |
@@ -46,7 +40,7 @@ jobs:
       run: dotnet build -v d -filelogger
     - name: 🧪 Build Output
       working-directory: test/MSBuild
-      run: cat msbuild.log   
+      run: cat msbuild.log
     - name: 🗳️ Upload
       uses: actions/upload-artifact@v6
       with:

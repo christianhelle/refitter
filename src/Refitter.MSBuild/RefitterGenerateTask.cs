@@ -69,7 +69,13 @@ public class RefitterGenerateTask : MSBuildTask
         var refitterDll = $"{packageFolder}{separator}..{separator}net8.0{separator}refitter.dll";
 
         List<string> installedRuntimes = GetInstalledDotnetRuntimes();
-        if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 9.")))
+        if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 10.")))
+        {
+            // Use .NET 10 version if available
+            refitterDll = $"{packageFolder}{separator}..{separator}net10.0{separator}refitter.dll";
+            TryLogCommandLine("Detected .NET 10 runtime. Using .NET 10 version of Refitter.");
+        }
+        else if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 9.")))
         {
             // Use .NET 9 version if available
             refitterDll = $"{packageFolder}{separator}..{separator}net9.0{separator}refitter.dll";
