@@ -8,19 +8,18 @@ COPY src/Directory.Build.props .
 COPY src/Refitter/Refitter.csproj ./Refitter/
 COPY src/Refitter.Core/Refitter.Core.csproj ./Refitter.Core/
 
-# Restore dependencies (targeting .NET 9.0 only)
-RUN dotnet restore Refitter/Refitter.csproj -p:TargetFrameworks=net9.0
+# Restore dependencies
+RUN dotnet restore Refitter/Refitter.csproj
 
 # Copy the rest of the source code
 COPY src/Refitter/ ./Refitter/
 COPY src/Refitter.Core/ ./Refitter.Core/
 
-# Build and publish the application (targeting .NET 9.0 only)
+# Build and publish the application targeting .NET 9.0
 RUN dotnet publish Refitter/Refitter.csproj \
     -c Release \
     -f net9.0 \
     -o /app/publish \
-    -p:TargetFrameworks=net9.0 \
     --no-restore
 
 # Runtime stage
