@@ -1,6 +1,7 @@
 [![Build](https://github.com/christianhelle/refitter/actions/workflows/build.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/build.yml)
 [![Smoke Tests](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml)
 [![NuGet](https://img.shields.io/nuget/v/refitter?color=blue)](https://www.nuget.org/packages/refitter)
+[![Docker Image Version](https://img.shields.io/docker/v/christianhelle/refitter?label=docker)](https://hub.docker.com/r/christianhelle/refitter)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=christianhelle_refitter&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=christianhelle_refitter)
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
@@ -26,6 +27,18 @@ The tool is packaged as a .NET Tool and is published to nuget.org. You can insta
 
 ```shell
 dotnet tool install --global Refitter
+```
+
+Alternatively, you can use the Docker image:
+
+```shell
+docker pull christianhelle/refitter
+```
+
+Or run it directly:
+
+```shell
+docker run --rm -v $(pwd):/src christianhelle/refitter ./openapi.json --output ./GeneratedCode.cs
 ```
 
 ### Usage

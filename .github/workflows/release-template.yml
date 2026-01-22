@@ -54,6 +54,26 @@ jobs:
           user: ${{ secrets.NUGET_USER }}
       - name: Push packages to NuGet
         run: dotnet nuget push **/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source ${{ env.NUGET_REPO_URL }} --no-symbols
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+      - name: Publish container to Docker Hub
+        run: |
+          dotnet publish src/Refitter/Refitter.csproj \
+            -c Release \
+            -f net10.0 \
+            -p:PublishProfile=DefaultContainer \
+            -p:ContainerImageName=christianhelle/refitter \
+            -p:ContainerImageTag="${{ inputs.version }}" \
+            -p:ContainerRegistry=docker.io \
+            -p:ContainerRepository=christianhelle/refitter
+          dotnet publish src/Refitter/Refitter.csproj \
+            -c Release \
+            -f net10.0 \
+            -p:PublishProfile=DefaultContainer \
+            -p:ContainerImageName=christianhelle/refitter \
+            -p:ContainerImageTag=latest \
+            -p:ContainerRegistry=docker.io \
+            -p:ContainerRepository=christianhelle/refitter
       - name: Create tag
         uses: actions/github-script@v8
         with:
