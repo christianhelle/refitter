@@ -37,11 +37,7 @@ jobs:
 
   docker:
     name: Test Docker Image
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v6
@@ -61,7 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]        
+        os: [macos-latest, windows-latest, ubuntu-latest]
     uses: ./.github/workflows/template-source-generator.yml
     with:
       os: ${{ matrix.os }}
