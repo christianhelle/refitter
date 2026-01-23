@@ -61,6 +61,9 @@ jobs:
           dotnet publish src/Refitter/Refitter.csproj \
             -c Release \
             -f net10.0 \
+            -p:UseSourceLink=true \
+            -p:PackageVersion="${{ inputs.version }}" \
+            -p:Version="${{ inputs.version }}" \
             -p:PublishProfile=DefaultContainer \
             -p:ContainerImageName=christianhelle/refitter \
             -p:ContainerImageTag="${{ inputs.version }}" \
@@ -69,6 +72,9 @@ jobs:
           dotnet publish src/Refitter/Refitter.csproj \
             -c Release \
             -f net10.0 \
+            -p:UseSourceLink=true \
+            -p:PackageVersion="${{ inputs.version }}" \
+            -p:Version="${{ inputs.version }}" \
             -p:PublishProfile=DefaultContainer \
             -p:ContainerImageName=christianhelle/refitter \
             -p:ContainerImageTag=latest \
