@@ -58,28 +58,17 @@ jobs:
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
       - name: Publish container to Docker Hub
         run: |
-          dotnet publish src/Refitter/Refitter.csproj \
-            -c Release \
-            -f net10.0 \
+          dotnet publish src/refitter/refitter.csproj \
+            --configuration release \
+            --framework net10.0 \
+            --os linux \
+            --arch x64 \
+            -t:PublishContainer \
             -p:UseSourceLink=true \
             -p:PackageVersion="${{ inputs.version }}" \
             -p:Version="${{ inputs.version }}" \
-            -p:PublishProfile=DefaultContainer \
-            -p:ContainerImageName=christianhelle/refitter \
-            -p:ContainerImageTag="${{ inputs.version }}" \
-            -p:ContainerRegistry=docker.io \
-            -p:ContainerRepository=christianhelle/refitter
-          dotnet publish src/Refitter/Refitter.csproj \
-            -c Release \
-            -f net10.0 \
-            -p:UseSourceLink=true \
-            -p:PackageVersion="${{ inputs.version }}" \
-            -p:Version="${{ inputs.version }}" \
-            -p:PublishProfile=DefaultContainer \
-            -p:ContainerImageName=christianhelle/refitter \
-            -p:ContainerImageTag=latest \
-            -p:ContainerRegistry=docker.io \
-            -p:ContainerRepository=christianhelle/refitter
+            -p:ContainerImageTag="${{ inputs.version }};latest" \
+            -p:ContainerRegistry=docker.io
       - name: Create tag
         uses: actions/github-script@v8
         with:
