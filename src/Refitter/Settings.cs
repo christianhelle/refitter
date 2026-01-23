@@ -20,7 +20,7 @@ public sealed class Settings : CommandSettings
     [Description("Default namespace to use for generated types")]
     [CommandOption("-n|--namespace")]
     [DefaultValue("GeneratedCode")]
-    public string? Namespace { get; set; }
+    public string? Namespace { get; set; } = "GeneratedCode";
 
     [Description("Default namespace to use for generated contracts")]
     [CommandOption("--contracts-namespace")]
