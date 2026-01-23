@@ -11,7 +11,7 @@
     <PackAsTool>true</PackAsTool>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-    <ContainerRepository>refitter</ContainerRepository>
+    <ContainerRepository>christianhelle/refitter</ContainerRepository>
   </PropertyGroup>
 
   <ItemGroup>
