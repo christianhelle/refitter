@@ -13,7 +13,8 @@ on:
 
 jobs:
 
-  script:
+  nuget:
+    name: Test NuGet Package
     strategy:
       fail-fast: false
       matrix:
@@ -29,8 +30,30 @@ jobs:
           9.0.x
           10.0.x
 
-    - name: 🛠️ Run smoke test script
+    - name: 🛠️ Run smoke test script (NuGet)
       run: ./smoke-tests.ps1 -UseProduction
+      working-directory: test
+      shell: pwsh
+
+  docker:
+    name: Test Docker Image
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: 🛒 Checkout repository
+      uses: actions/checkout@v6
+    - uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x
+          10.0.x
+
+    - name: 🛠️ Run smoke test script (Docker)
+      run: ./smoke-tests.ps1 -UseDocker
       working-directory: test
       shell: pwsh
 
