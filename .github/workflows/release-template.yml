@@ -65,9 +65,9 @@ jobs:
             --arch x64 \
             -t:PublishContainer \
             -p:UseSourceLink=true \
-            -p:PackageVersion="${{ inputs.version }}" \
-            -p:Version="${{ inputs.version }}" \
-            -p:ContainerImageTag="${{ inputs.version }};latest" \
+            -p:Version='${{ inputs.version }}' \
+            -p:PackageVersion='${{ inputs.version }}' \
+            -p:ContainerImageTag='${{ inputs.version }};latest' \
             -p:ContainerRegistry=docker.io
       - name: Create tag
         uses: actions/github-script@v8
