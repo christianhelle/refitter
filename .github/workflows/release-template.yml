@@ -67,7 +67,7 @@ jobs:
             -p:UseSourceLink=true \
             -p:Version='${{ inputs.version }}' \
             -p:PackageVersion='${{ inputs.version }}' \
-            -p:ContainerImageTag='${{ inputs.version }};latest' \
+            -p:ContainerImageTag='${{ inputs.version }}' \
             -p:ContainerRegistry=docker.io
       - name: Create tag
         uses: actions/github-script@v8
