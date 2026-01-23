@@ -58,7 +58,7 @@ jobs:
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
       - name: Publish container to Docker Hub
         run: |
-          dotnet publish src/refitter/refitter.csproj \
+          dotnet publish src/Refitter/Refitter.csproj \
             --configuration release \
             --framework net10.0 \
             --os linux \
