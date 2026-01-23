@@ -4,6 +4,7 @@ setlocal enabledelayedexpansion
 :: Parse command line arguments
 set "PARALLEL=true"
 set "USE_PRODUCTION=false"
+set "USE_DOCKER=false"
 
 :parse_args
 if "%~1"=="" goto :main
@@ -18,12 +19,18 @@ if /i "%~1"=="-useproduction" (
     shift
     goto :parse_args
 )
+if /i "%~1"=="-usedocker" (
+    set "USE_DOCKER=true"
+    shift
+    goto :parse_args
+)
 shift
 goto :parse_args
 
 :main
 echo Parallel: %PARALLEL%
 echo UseProduction: %USE_PRODUCTION%
+echo UseDocker: %USE_DOCKER%
 
 goto :run_tests
 
@@ -42,14 +49,36 @@ set "args=%~4"
 set "net_core=%~5"
 set "csproj=%~6"
 set "build_from_source=%~7"
+set "use_docker=%~8"
 
 if "%build_from_source%"=="" set "build_from_source=true"
+if "%use_docker%"=="" set "use_docker=false"
 
 :: Clean up generated files
 del /q /s ".\GeneratedCode\*.cs" 2>nul
 
 set "process_path=.\bin\refitter"
 if /i "%build_from_source%"=="false" set "process_path=refitter"
+if /i "%use_docker%"=="true" set "process_path=docker"
+
+:: Check if using docker
+if /i "%use_docker%"=="true" (
+    set "current_dir=%CD%"
+    set "current_dir=!current_dir:\=/!"
+    
+    :: Check if using settings file
+    echo %args% | findstr "settings-file" >nul
+    if %errorlevel%==0 (
+        echo docker run --rm -v "!current_dir!:/src" -w /src christianhelle/refitter --no-logging %args%
+        docker run --rm -v "!current_dir!:/src" -w /src christianhelle/refitter --no-logging %args%
+        call :throw_on_native_failure
+    ) else (
+        echo docker run --rm -v "!current_dir!:/src" -w /src christianhelle/refitter .\openapi.%format% --namespace %namespace% --output .\GeneratedCode\%output_path% --no-logging %args%
+        docker run --rm -v "!current_dir!:/src" -w /src christianhelle/refitter .\openapi.%format% --namespace %namespace% --output .\GeneratedCode\%output_path% --no-logging %args%
+        call :throw_on_native_failure
+    )
+    goto :build_project
+)
 
 :: Check if using settings file
 echo %args% | findstr "settings-file" >nul
@@ -62,6 +91,8 @@ if %errorlevel%==0 (
     %process_path% .\openapi.%format% --namespace %namespace% --output .\GeneratedCode\%output_path% --no-logging %args%
     call :throw_on_native_failure
 )
+
+:build_project
 
 :: Build the project
 if not "%csproj%"=="" (
@@ -85,8 +116,10 @@ goto :eof
 set "method=%~1"
 set "parallel_param=%~2"
 set "build_from_source_param=%~3"
+set "use_docker_param=%~4"
 
 if "%build_from_source_param%"=="" set "build_from_source_param=true"
+if "%use_docker_param%"=="" set "use_docker_param=false"
 
 :: Array of filenames (simulated using variables)
 set "filename0=weather"
@@ -106,19 +139,21 @@ set "filename13=hubspot-webhooks"
 set "filename_count=14"
 
 if /i "%build_from_source_param%"=="true" (
-    echo dotnet publish ..\src\Refitter\Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0
-    dotnet publish ..\src\Refitter\Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0
-    call :throw_on_native_failure
+    if /i "%use_docker_param%"=="false" (
+        echo dotnet publish ..\src\Refitter\Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0
+        dotnet publish ..\src\Refitter\Refitter.csproj -p:PublishReadyToRun=true -o bin -f net8.0
+        call :throw_on_native_failure
 
-    echo refitter --version
-    .\bin\refitter --version
-    call :throw_on_native_failure
+        echo refitter --version
+        .\bin\refitter --version
+        call :throw_on_native_failure
+    )
 )
 
 :: Generate with settings files
-call :generate_and_build " " " " "SwaggerPetstoreDirect.generated.cs" "--settings-file .\petstore.refitter" "" "" "%build_from_source_param%"
-call :generate_and_build " " " " "" "--settings-file .\Apizr\petstore.apizr.refitter" "" ".\Apizr\Sample.csproj" "%build_from_source_param%"
-call :generate_and_build " " " " "" "--settings-file .\MultipleFiles\petstore.refitter" "" "MultipleFiles\Client\Client.csproj" "%build_from_source_param%"
+call :generate_and_build " " " " "SwaggerPetstoreDirect.generated.cs" "--settings-file .\petstore.refitter" "" "" "%build_from_source_param%" "%use_docker_param%"
+call :generate_and_build " " " " "" "--settings-file .\Apizr\petstore.apizr.refitter" "" ".\Apizr\Sample.csproj" "%build_from_source_param%" "%use_docker_param%"
+call :generate_and_build " " " " "" "--settings-file .\MultipleFiles\petstore.refitter" "" "MultipleFiles\Client\Client.csproj" "%build_from_source_param%" "%use_docker_param%"
 
 :: Process versions and formats
 for %%v in (v3.0 v2.0) do (
@@ -140,22 +175,22 @@ for %%v in (v3.0 v2.0) do (
                 call :capitalize namespace
 
                 :: Generate different variants
-                call :generate_and_build "%%f" "!namespace!.Disposable" "Disposable!output_path!" "--disposable" "true" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.MultipleFiles" "" "--multiple-files" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.SeparateContractsFile" "" "--contracts-output GeneratedCode/Contracts --contracts-namespace !namespace!.SeparateContractsFile.Contracts" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.Cancellation" "WithCancellation!output_path!" "--cancellation-tokens" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.Internal" "Internal!output_path!" "--internal" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.UsingApiResponse" "IApi!output_path!" "--use-api-response" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.UsingIObservable" "IObservable!output_path!" "--use-observable-response" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.UsingIsoDateFormat" "UsingIsoDateFormat!output_path!" "--use-iso-date-format" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.MultipleInterfaces" "MultipleInterfaces!output_path!" "--multiple-interfaces ByEndpoint" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.MultipleInterfaces" "MultipleInterfacesWithCustomName!output_path!" "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.TagFiltered" "TagFiltered!output_path!" "--tag pet --tag user --tag store" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.MatchPathFiltered" "MatchPathFiltered!output_path!" "--match-path ^^/pet/.*" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.ContractOnly" "ContractOnly!output_path!" "--contract-only" "" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.ImmutableRecords" "ImmutableRecords!output_path!" "--immutable-records" "true" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.PolymorphicSerialization" "PolymorphicSerialization!output_path!" "--use-polymorphic-serialization" "true" "" "%build_from_source_param%"
-                call :generate_and_build "%%f" "!namespace!.CollectionFormatCsv" "CollectionFormatCsv!output_path!" "--collection-format csv" "true" "" "%build_from_source_param%"
+                call :generate_and_build "%%f" "!namespace!.Disposable" "Disposable!output_path!" "--disposable" "true" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.MultipleFiles" "" "--multiple-files" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.SeparateContractsFile" "" "--contracts-output GeneratedCode/Contracts --contracts-namespace !namespace!.SeparateContractsFile.Contracts" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.Cancellation" "WithCancellation!output_path!" "--cancellation-tokens" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.Internal" "Internal!output_path!" "--internal" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.UsingApiResponse" "IApi!output_path!" "--use-api-response" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.UsingIObservable" "IObservable!output_path!" "--use-observable-response" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.UsingIsoDateFormat" "UsingIsoDateFormat!output_path!" "--use-iso-date-format" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.MultipleInterfaces" "MultipleInterfaces!output_path!" "--multiple-interfaces ByEndpoint" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.MultipleInterfaces" "MultipleInterfacesWithCustomName!output_path!" "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.TagFiltered" "TagFiltered!output_path!" "--tag pet --tag user --tag store" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.MatchPathFiltered" "MatchPathFiltered!output_path!" "--match-path ^^/pet/.*" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.ContractOnly" "ContractOnly!output_path!" "--contract-only" "" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.ImmutableRecords" "ImmutableRecords!output_path!" "--immutable-records" "true" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.PolymorphicSerialization" "PolymorphicSerialization!output_path!" "--use-polymorphic-serialization" "true" "" "%build_from_source_param%" "%use_docker_param%"
+                call :generate_and_build "%%f" "!namespace!.CollectionFormatCsv" "CollectionFormatCsv!output_path!" "--collection-format csv" "true" "" "%build_from_source_param%" "%use_docker_param%"
             )
         )
     )
@@ -170,10 +205,19 @@ for %%u in ("https://petstore3.swagger.io/api/v3/openapi.json" "https://petstore
 
     set "process_path=.\bin\refitter"
     if /i "%build_from_source_param%"=="false" set "process_path=refitter"
+    if /i "%use_docker_param%"=="true" set "process_path=docker"
 
-    echo !process_path! %%u --namespace !namespace! --output .\GeneratedCode\!output_path!
-    !process_path! %%u --namespace !namespace! --output .\GeneratedCode\!output_path!
-    call :throw_on_native_failure
+    if /i "%use_docker_param%"=="true" (
+        set "current_dir=%CD%"
+        set "current_dir=!current_dir:\=/!"
+        echo docker run --rm -v "!current_dir!:/src" -w /src christianhelle/refitter %%u --namespace !namespace! --output .\GeneratedCode\!output_path!
+        docker run --rm -v "!current_dir!:/src" -w /src christianhelle/refitter %%u --namespace !namespace! --output .\GeneratedCode\!output_path!
+        call :throw_on_native_failure
+    ) else (
+        echo !process_path! %%u --namespace !namespace! --output .\GeneratedCode\!output_path!
+        !process_path! %%u --namespace !namespace! --output .\GeneratedCode\!output_path!
+        call :throw_on_native_failure
+    )
 
     echo.
     echo Building ConsoleApp
@@ -205,9 +249,25 @@ if /i "%USE_PRODUCTION%"=="true" (
     echo.
 )
 
+if /i "%USE_DOCKER%"=="true" (
+    echo Running smoke tests in Docker mode
+    echo docker pull christianhelle/refitter:latest
+    docker pull christianhelle/refitter:latest
+    call :throw_on_native_failure
+    echo.
+)
+
 echo Starting smoke tests...
 set "start_time=%time%"
-call :run_tests "dotnet-run" "%PARALLEL%" "!USE_PRODUCTION:true=false!"
+
+if /i "%USE_DOCKER%"=="true" (
+    call :run_tests "dotnet-run" "%PARALLEL%" "false" "true"
+) else if /i "%USE_PRODUCTION%"=="true" (
+    call :run_tests "dotnet-run" "%PARALLEL%" "false" "false"
+) else (
+    call :run_tests "dotnet-run" "%PARALLEL%" "true" "false"
+)
+
 set "end_time=%time%"
 echo.
 echo Smoke tests completed.
