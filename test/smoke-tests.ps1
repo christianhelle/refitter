@@ -77,20 +77,44 @@ function GenerateAndBuild
     if ($useDocker)
     {
         $currentDir = (Get-Location).Path.Replace('\', '/')
+        # Get current user ID and group ID for Linux/macOS
+        $userParam = ""
+        if ($IsLinux -or $IsMacOS) {
+            $uid = sh -c 'id -u'
+            $gid = sh -c 'id -g'
+            $userParam = "--user ${uid}:${gid}"
+        }
+        
         if ($args.Contains("settings-file"))
         {
-            Write-Host "docker run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter --no-logging $args"
-            $process = Start-Process $processPath `
-                -Args "run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter --no-logging $args" `
-                -NoNewWindow `
-                -PassThru
+            if ($userParam) {
+                Write-Host "docker run --rm -v ""${currentDir}:/src"" -w /src $userParam christianhelle/refitter --no-logging $args"
+                $process = Start-Process $processPath `
+                    -Args "run --rm -v ""${currentDir}:/src"" -w /src $userParam christianhelle/refitter --no-logging $args" `
+                    -NoNewWindow `
+                    -PassThru
+            } else {
+                Write-Host "docker run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter --no-logging $args"
+                $process = Start-Process $processPath `
+                    -Args "run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter --no-logging $args" `
+                    -NoNewWindow `
+                    -PassThru
+            }
         } else
         {
-            Write-Host "docker run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
-            $process = Start-Process $processPath `
-                -Args "run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
-                -NoNewWindow `
-                -PassThru
+            if ($userParam) {
+                Write-Host "docker run --rm -v ""${currentDir}:/src"" -w /src $userParam christianhelle/refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
+                $process = Start-Process $processPath `
+                    -Args "run --rm -v ""${currentDir}:/src"" -w /src $userParam christianhelle/refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
+                    -NoNewWindow `
+                    -PassThru
+            } else {
+                Write-Host "docker run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args"
+                $process = Start-Process $processPath `
+                    -Args "run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter ./openapi.$format --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging $args" `
+                    -NoNewWindow `
+                    -PassThru
+            }
         }
     }
     elseif ($args.Contains("settings-file"))
@@ -254,11 +278,27 @@ function RunTests
         if ($UseDocker)
         {
             $currentDir = (Get-Location).Path.Replace('\', '/')
-            Write-Host "docker run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath"
-            $process = Start-Process $processPath `
-                -Args "run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
-                -NoNewWindow `
-                -PassThru
+            # Get current user ID and group ID for Linux/macOS
+            $userParam = ""
+            if ($IsLinux -or $IsMacOS) {
+                $uid = sh -c 'id -u'
+                $gid = sh -c 'id -g'
+                $userParam = "--user ${uid}:${gid}"
+            }
+            
+            if ($userParam) {
+                Write-Host "docker run --rm -v ""${currentDir}:/src"" -w /src $userParam christianhelle/refitter ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath"
+                $process = Start-Process $processPath `
+                    -Args "run --rm -v ""${currentDir}:/src"" -w /src $userParam christianhelle/refitter ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
+                    -NoNewWindow `
+                    -PassThru
+            } else {
+                Write-Host "docker run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath"
+                $process = Start-Process $processPath `
+                    -Args "run --rm -v ""${currentDir}:/src"" -w /src christianhelle/refitter ""$_"" --namespace $namespace --output ./GeneratedCode/$outputPath" `
+                    -NoNewWindow `
+                    -PassThru
+            }
         }
         else
         {
