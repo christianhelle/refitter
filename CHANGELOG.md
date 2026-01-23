@@ -8,6 +8,11 @@
 
 - Refitter.MSBuild Support .NET 10 [\#881](https://github.com/christianhelle/refitter/issues/881)
 - Add support for systems running only .NET 10.0 \(without .NET 8.0 or 9.0\) in Refitter.MSBuild [\#882](https://github.com/christianhelle/refitter/pull/882) ([christianhelle](https://github.com/christianhelle))
+- Update to return HttpResponseMessage for file downloads [\#877](https://github.com/christianhelle/refitter/pull/877) ([frogcrush](https://github.com/frogcrush))
+
+**Merged pull requests:**
+
+- Add Docker Hub publishing to release workflow [\#883](https://github.com/christianhelle/refitter/pull/883) ([Copilot](https://github.com/apps/copilot-swe-agent))
 
 ## [1.7.2](https://github.com/christianhelle/refitter/tree/1.7.2) (2026-01-21)
 
