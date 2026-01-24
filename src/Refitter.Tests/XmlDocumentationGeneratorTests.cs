@@ -8,7 +8,7 @@ namespace Refitter.Tests;
 
 public class XmlDocumentationGeneratorTests
 {
-    private XmlDocumentationGenerator _generator = new(new() { GenerateXmlDocCodeComments = true });
+    private readonly XmlDocumentationGenerator _generator = new(new() { GenerateXmlDocCodeComments = true });
 
     private static CSharpOperationModel CreateOperationModel(OpenApiOperation operation)
     {

@@ -136,4 +136,127 @@ paths:
 
         document.Should().NotBeNull();
     }
+
+    [Test]
+    public async Task IsHttp_Detects_Http_Protocol()
+    {
+        var document = await OpenApiDocumentFactory.CreateAsync("http://petstore.swagger.io/v2/swagger.json");
+        document.Should().NotBeNull();
+    }
+
+    [Test]
+    public async Task IsHttp_Detects_Https_Protocol()
+    {
+        var document = await OpenApiDocumentFactory.CreateAsync("https://petstore.swagger.io/v2/swagger.json");
+        document.Should().NotBeNull();
+    }
+
+    [Test]
+    [Arguments("https://petstore.swagger.io/v2/swagger.yaml")]
+    public async Task Create_From_Yaml_Url_Returns_NotNull(string url)
+    {
+        var document = await OpenApiDocumentFactory.CreateAsync(url);
+        document.Should().NotBeNull();
+    }
+
+    [Test]
+    public async Task Create_From_Invalid_File_Falls_Back_To_NSwag()
+    {
+        var spec = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": {
+    ""title"": ""Fallback Test"",
+    ""version"": ""1.0.0""
+  },
+  ""paths"": {
+    ""/test"": {
+      ""get"": {
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success""
+          }
+        }
+      }
+    }
+  }
+}";
+        var swaggerFile = await TestFile.CreateSwaggerFile(spec, "fallback.json");
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        document.Should().NotBeNull();
+        document.Info.Title.Should().Be("Fallback Test");
+    }
+
+    [Test]
+    public async Task Create_From_Json_File_Without_External_References_Uses_NSwag()
+    {
+        var spec = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": {
+    ""title"": ""Direct NSwag Test"",
+    ""version"": ""1.0.0""
+  },
+  ""paths"": {
+    ""/users"": {
+      ""get"": {
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": {
+                  ""type"": ""array"",
+                  ""items"": {
+                    ""type"": ""object"",
+                    ""properties"": {
+                      ""id"": { ""type"": ""integer"" },
+                      ""name"": { ""type"": ""string"" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}";
+        var swaggerFile = await TestFile.CreateSwaggerFile(spec, "no-external-refs.json");
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        document.Should().NotBeNull();
+        document.Info.Title.Should().Be("Direct NSwag Test");
+    }
+
+    [Test]
+    public async Task Create_From_Yaml_File_Without_External_References_Uses_NSwag()
+    {
+        var spec = @"openapi: 3.0.0
+info:
+  title: YAML NSwag Test
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string";
+        var swaggerFile = await TestFile.CreateSwaggerFile(spec, "no-external-refs.yaml");
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        document.Should().NotBeNull();
+        document.Info.Title.Should().Be("YAML NSwag Test");
+    }
 }
