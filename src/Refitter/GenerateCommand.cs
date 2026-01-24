@@ -888,11 +888,11 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             if (!string.IsNullOrWhiteSpace(outputDir))
             {
-                return Path.Combine(outputDir, ".refitter");
+                return Path.Combine(outputDir, FileExtensionConstants.Refitter);
             }
         }
 
         // Default: put .refitter file in current directory
-        return ".refitter";
+        return FileExtensionConstants.Refitter;
     }
 }
