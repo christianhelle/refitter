@@ -30,7 +30,7 @@ public sealed class Settings : CommandSettings
     [Description("Path to Output file or folder (if multiple files are generated)")]
     [CommandOption("-o|--output")]
     [DefaultValue(DefaultOutputPath)]
-    public string? OutputPath { get; set; }
+    public string? OutputPath { get; set; } = DefaultOutputPath;
 
     [Description("Output path for generated contracts. Enabling this automatically enables generating multiple files")]
     [CommandOption("--contracts-output")]
@@ -90,7 +90,7 @@ public sealed class Settings : CommandSettings
     [Description("A collection of headers to omit from operation signatures.")]
     [CommandOption("--ignored-operation-headers")]
     [DefaultValue(new string[0])]
-    public string[]? IgnoredOperationHeaders { get; set; }
+    public string[]? IgnoredOperationHeaders { get; set; } = [];
 
     [Description("Don't log errors or collect telemetry")]
     [CommandOption("--no-logging")]
@@ -100,12 +100,12 @@ public sealed class Settings : CommandSettings
     [Description("Add additional namespace to generated types")]
     [CommandOption("--additional-namespace")]
     [DefaultValue(new string[0])]
-    public string[]? AdditionalNamespaces { get; set; }
+    public string[]? AdditionalNamespaces { get; set; } = [];
 
     [Description("Exclude namespace on generated types")]
     [CommandOption("--exclude-namespace")]
     [DefaultValue(new string[0])]
-    public string[]? ExcludeNamespaces { get; set; }
+    public string[]? ExcludeNamespaces { get; set; } = [];
 
     [Description("Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)")]
     [CommandOption("--use-iso-date-format")]
@@ -132,12 +132,12 @@ public sealed class Settings : CommandSettings
     [Description("Only include Paths that match the provided regular expression. May be set multiple times.")]
     [CommandOption("--match-path")]
     [DefaultValue(new string[0])]
-    public string[]? MatchPaths { get; set; }
+    public string[]? MatchPaths { get; set; } = [];
 
     [Description("Only include Endpoints that contain this tag. May be set multiple times and result in OR'ed evaluation.")]
     [CommandOption("--tag")]
     [DefaultValue(new string[0])]
-    public string[]? Tags { get; set; }
+    public string[]? Tags { get; set; } = [];
 
     [Description("Skip validation of the OpenAPI specification")]
     [CommandOption("--skip-validation")]
@@ -166,7 +166,7 @@ public sealed class Settings : CommandSettings
     [Description("Force to keep matching schema, uses regular expressions. Use together with \"--trim-unused-schema\". Can be set multiple times.")]
     [CommandOption("--keep-schema")]
     [DefaultValue(new string[0])]
-    public string[]? KeepSchemaPatterns { get; set; }
+    public string[]? KeepSchemaPatterns { get; set; } = [];
 
     [Description("Keep all possible inherited types/union types even if they are not directly used.")]
     [CommandOption("--include-inheritance-hierarchy")]
