@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers.Exceptions;
 using Refitter.Core;
@@ -8,6 +9,7 @@ using Spectre.Console.Cli;
 
 namespace Refitter;
 
+[ExcludeFromCodeCoverage]
 public sealed class GenerateCommand : AsyncCommand<Settings>
 {
     private static readonly string Crlf = Environment.NewLine;
