@@ -3,20 +3,12 @@ using FluentAssertions;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests
 {
-    /// <summary>
-    /// Unit tests for the <see cref="XmlDocumentationGenerator"/> class.
-    /// </summary>
     public class XmlDocumentationGeneratorTests
     {
-        /// <summary>
-        /// The generator to use for testing.
-        /// </summary>
-        private XmlDocumentationGenerator _generator =
-            new(new RefitGeneratorSettings { GenerateXmlDocCodeComments = true });
+        private XmlDocumentationGenerator _generator = new(new() { GenerateXmlDocCodeComments = true });
 
         private static CSharpOperationModel CreateOperationModel(OpenApiOperation operation)
         {
@@ -170,7 +162,7 @@ namespace Refitter.Tests
         [Test]
         public void Can_Generate_Method_Throws_With_Response_Code()
         {
-            this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+            var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
             {
                 GenerateXmlDocCodeComments = true,
                 GenerateStatusCodeComments = true,
@@ -180,7 +172,7 @@ namespace Refitter.Tests
             {
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
-            this._generator.AppendMethodDocumentation(method, false, false, false, false, docs);
+            generator.AppendMethodDocumentation(method, false, false, false, false, docs);
             docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">")
                 .And.Contain("<term>400</term>");
         }
@@ -188,7 +180,7 @@ namespace Refitter.Tests
         [Test]
         public void Can_Generate_Method_Throws_Without_Response_Code()
         {
-            this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+            var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
             {
                 GenerateXmlDocCodeComments = true,
                 GenerateStatusCodeComments = false,
@@ -198,7 +190,7 @@ namespace Refitter.Tests
             {
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
-            this._generator.AppendMethodDocumentation(method, false, false, false, false, docs);
+            generator.AppendMethodDocumentation(method, false, false, false, false, docs);
             docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">")
                 .And.NotContain("<term>400</term>");
         }
@@ -206,7 +198,7 @@ namespace Refitter.Tests
         [Test]
         public void Can_Generate_Method_With_IApiResponse()
         {
-            this._generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+            var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
             {
                 GenerateXmlDocCodeComments = true,
                 ReturnIApiResponse = true,
@@ -216,7 +208,7 @@ namespace Refitter.Tests
             {
                 Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
             });
-            this._generator.AppendMethodDocumentation(method, true, false, false, false, docs);
+            generator.AppendMethodDocumentation(method, true, false, false, false, docs);
             docs.ToString().Should().NotContain("/// <exception cref=\"ApiException\">")
                 .And.Contain("/// <returns>")
                 .And.Contain("<term>400</term>");
