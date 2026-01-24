@@ -1,4 +1,5 @@
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -11,6 +12,7 @@ public class SettingsTests
     {
         var settings = new Settings();
 
+        using var scope = new AssertionScope();
         settings.OpenApiPath.Should().BeNull();
         settings.SettingsFilePath.Should().BeNull();
         settings.Namespace.Should().Be("GeneratedCode");
