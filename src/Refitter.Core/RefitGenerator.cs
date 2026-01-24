@@ -92,7 +92,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
 
         // compile all expressions here once, as we will use them more than once
-        var regexes = pathMatchExpressions.Select(x => new Regex(x, RegexOptions.Compiled)).ToList();
+        var regexes = pathMatchExpressions.Select(x => new Regex(x, RegexOptions.Compiled, TimeSpan.FromSeconds(1))).ToList();
         var paths = document.Paths.Keys
             .Where(pathKey => regexes.TrueForAll(regex => !regex.IsMatch(pathKey)))
             .ToArray();

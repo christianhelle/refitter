@@ -276,7 +276,7 @@ public class RefitterGenerateTask : MSBuildTask
         // Simple regex to extract string values from JSON
         // Pattern: "propertyName": "value" or "propertyName":"value"
         var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*""([^""]*)""";
-        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase);
+        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
         return match.Success ? match.Groups[1].Value : null;
     }
 
@@ -291,7 +291,7 @@ public class RefitterGenerateTask : MSBuildTask
         // Simple regex to extract boolean values from JSON
         // Pattern: "propertyName": true or "propertyName":false
         var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*(true|false)";
-        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase);
+        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
         return match.Success && string.Equals(match.Groups[1].Value, "true", StringComparison.OrdinalIgnoreCase);
     }
 }

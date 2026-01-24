@@ -72,7 +72,7 @@ public class SchemaCleaner
                 x => x.Key);
 
         var keepSchemaRegexes = keepSchemaPatterns
-            .Select(x => new Regex(x, RegexOptions.Compiled))
+            .Select(x => new Regex(x, RegexOptions.Compiled, TimeSpan.FromSeconds(1)))
             .ToList();
 
         if (doc.Components?.Schemas != null)
