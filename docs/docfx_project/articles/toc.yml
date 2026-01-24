@@ -1,6 +1,9 @@
 - name: CLI Tool
   href: cli-tool.md
 
+- name: Docker CLI
+  href: docker.md
+
 - name: Source Generator
   href: source-generator.md
 
