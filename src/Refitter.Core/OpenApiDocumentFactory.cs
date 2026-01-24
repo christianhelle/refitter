@@ -36,8 +36,9 @@ public static class OpenApiDocumentFactory
             var json = readResult.OpenApiDocument.SerializeAsJson(specificationVersion);
             return await OpenApiDocument.FromJsonAsync(json);
         }
-        catch
+        catch (Exception)
         {
+            // Fallback to NSwag if OpenApiMultiFileReader fails (e.g., for files without external references)
             return await CreateUsingNSwagAsync(openApiPath);
         }
     }
