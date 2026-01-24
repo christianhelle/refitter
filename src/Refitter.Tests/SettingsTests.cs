@@ -1,7 +1,6 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
