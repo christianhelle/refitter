@@ -12,6 +12,7 @@
 
 **Merged pull requests:**
 
+- Add comprehensive Docker CLI documentation [\#884](https://github.com/christianhelle/refitter/pull/884) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Add Docker Hub publishing to release workflow [\#883](https://github.com/christianhelle/refitter/pull/883) ([Copilot](https://github.com/apps/copilot-swe-agent))
 
 ## [1.7.2](https://github.com/christianhelle/refitter/tree/1.7.2) (2026-01-21)
