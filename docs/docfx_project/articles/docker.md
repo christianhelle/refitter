@@ -1,4 +1,4 @@
-# Docker CLI
+# Docker Usage
 
 Refitter is a CLI tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter can format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
@@ -464,7 +464,7 @@ function Invoke-Refitter {
         [Parameter(ValueFromRemainingArguments)]
         [string[]]$Arguments
     )
-    
+
     docker run --rm -v ${PWD}:/src -w /src christianhelle/refitter $Arguments
 }
 
