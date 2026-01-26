@@ -19,6 +19,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             }
         }
 
+        FixMissingTypesWithIntegerFormat();
         ApplyCustomIntegerType();
 
         var csharpClientGeneratorSettings = new CSharpClientGeneratorSettings
@@ -62,6 +63,104 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             generator.Settings.CSharpGeneratorSettings);
 
         return generator;
+    }
+
+    private void FixMissingTypesWithIntegerFormat()
+    {
+        ProcessSchemasForMissingTypes(document.Components.Schemas);
+
+        foreach (var path in document.Paths)
+        {
+            if (path.Value == null) continue;
+
+            foreach (var operation in path.Value.Values)
+            {
+                if (operation == null) continue;
+
+                foreach (var parameter in operation.Parameters)
+                {
+                    FixSchemaTypeFromFormat(parameter.ActualSchema);
+                }
+
+                if (operation.RequestBody?.Content != null)
+                {
+                    foreach (var content in operation.RequestBody.Content.Values)
+                    {
+                        ProcessSchemaForMissingTypes(content.Schema);
+                    }
+                }
+
+                foreach (var response in operation.Responses.Values)
+                {
+                    if (response.Content != null)
+                    {
+                        foreach (var content in response.Content.Values)
+                        {
+                            ProcessSchemaForMissingTypes(content.Schema);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void ProcessSchemasForMissingTypes(IDictionary<string, JsonSchema> schemas)
+    {
+        foreach (var schema in schemas.Values)
+        {
+            ProcessSchemaForMissingTypes(schema);
+        }
+    }
+
+    private void ProcessSchemaForMissingTypes(JsonSchema? schema)
+    {
+        if (schema == null) return;
+
+        var actualSchema = schema.ActualSchema;
+
+        FixSchemaTypeFromFormat(actualSchema);
+
+        foreach (var property in actualSchema.Properties.Values)
+        {
+            ProcessSchemaForMissingTypes(property);
+        }
+
+        if (actualSchema.Item != null)
+        {
+            ProcessSchemaForMissingTypes(actualSchema.Item);
+        }
+
+        if (actualSchema.AdditionalPropertiesSchema != null)
+        {
+            ProcessSchemaForMissingTypes(actualSchema.AdditionalPropertiesSchema);
+        }
+
+        var subSchemas = actualSchema.AllOf
+            .Concat(actualSchema.OneOf)
+            .Concat(actualSchema.AnyOf)
+            .ToArray();
+
+        foreach (var subSchema in subSchemas)
+        {
+            ProcessSchemaForMissingTypes(subSchema);
+        }
+    }
+
+    private void FixSchemaTypeFromFormat(JsonSchema schema)
+    {
+        // If type is not set but format indicates a numeric type (int32, int64, float, double), set the type based on format
+        if ((schema.Type == JsonObjectType.None || schema.Type == JsonObjectType.Null) &&
+            !string.IsNullOrEmpty(schema.Format))
+        {
+            if (schema.Format == "int32" || schema.Format == "int64")
+            {
+                schema.Type = JsonObjectType.Integer;
+            }
+            else if (schema.Format == "float" || schema.Format == "double")
+            {
+                schema.Type = JsonObjectType.Number;
+            }
+        }
     }
 
     private void ApplyCustomIntegerType()
