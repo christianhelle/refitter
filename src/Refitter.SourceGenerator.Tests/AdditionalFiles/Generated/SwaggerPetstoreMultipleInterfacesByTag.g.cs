@@ -14,7 +14,7 @@ using Refitter.Tests.AdditionalFiles.SingeInterface;
 
 namespace Refitter.Tests.AdditionalFiles.ByTag
 {
-    /// <summary>Update an existing pet</summary>
+    /// <summary>Everything about your Pets</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IPetApi
     {
@@ -195,7 +195,7 @@ namespace Refitter.Tests.AdditionalFiles.ByTag
         Task<ApiResponse> UploadFile(long petId, [Query] string additionalMetadata, StreamPart body);
     }
 
-    /// <summary>Returns pet inventories by status</summary>
+    /// <summary>Operations about user</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IStoreApi
     {
@@ -276,7 +276,7 @@ namespace Refitter.Tests.AdditionalFiles.ByTag
         Task DeleteOrder(long orderId);
     }
 
-    /// <summary>Create user</summary>
+    /// <summary>Access to Petstore orders</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IUserApi
     {

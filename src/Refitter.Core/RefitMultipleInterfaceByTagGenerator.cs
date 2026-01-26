@@ -49,7 +49,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 if (!interfacesByGroup.TryGetValue(kv.Key, out var sb))
                 {
                     interfacesByGroup[kv.Key] = sb = new StringBuilder();
-                    this.docGenerator.AppendInterfaceDocumentation(operation, sb);
+                    this.docGenerator.AppendInterfaceDocumentation(document, operation, sb);
 
                     interfaceName = GetInterfaceName(kv.Key);
                     sb.AppendLine($$"""

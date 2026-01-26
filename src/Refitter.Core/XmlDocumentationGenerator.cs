@@ -32,16 +32,24 @@ public class XmlDocumentationGenerator
     /// Appends XML docs for the given interface definition to the given code builder.
     /// This uses the OpenAPI operation info to generate the summary and remarks.
     /// </summary>
+    /// <param name="document">The parent document of the group.</param>
     /// <param name="group">The OpenAPI definition of the interface.</param>
     /// <param name="code">The builder to append the documentation to.</param>
-    public void AppendInterfaceDocumentation(OpenApiOperation group, StringBuilder code)
+    public void AppendInterfaceDocumentation(OpenApiDocument document, OpenApiOperation group, StringBuilder code)
     {
         if (!_settings.GenerateXmlDocCodeComments)
         {
             return;
         }
 
-        this.AppendXmlCommentBlock("summary", group?.Summary ?? "No summary available", code, indent: Separator);
+        var controllerTag = document.Tags.FirstOrDefault(tag => group?.Tags.Contains(tag.Name) ?? false);
+        var content = controllerTag?.Description;
+        if (string.IsNullOrEmpty(content))
+        {
+            content = group?.Summary;
+        }
+
+        this.AppendXmlCommentBlock("summary", content ?? "No summary available", code, indent: Separator);
     }
 
     /// <summary>
