@@ -2,7 +2,6 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.Resources;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
@@ -21,7 +20,7 @@ public class SwaggerPetstoreMultipleFileTests
             assert: generatorOutput =>
             {
                 generatorOutput.Files.Should().NotBeNullOrEmpty();
-                generatorOutput.Files.Should().HaveCountGreaterOrEqualTo(2);
+                generatorOutput.Files.Should().HaveCountGreaterThanOrEqualTo(2);
                 foreach ((_, string content) in generatorOutput.Files)
                 {
                     content.Should().NotBeNullOrWhiteSpace();
@@ -43,7 +42,7 @@ public class SwaggerPetstoreMultipleFileTests
             generatorOutput =>
             {
                 generatorOutput.Files.Should().NotBeNullOrEmpty();
-                generatorOutput.Files.Should().HaveCountGreaterOrEqualTo(3);
+                generatorOutput.Files.Should().HaveCountGreaterThanOrEqualTo(3);
                 foreach ((_, string content) in generatorOutput.Files)
                 {
                     content.Should().NotBeNullOrWhiteSpace();
@@ -65,7 +64,7 @@ public class SwaggerPetstoreMultipleFileTests
             generatorOutput =>
             {
                 generatorOutput.Files.Should().NotBeNullOrEmpty();
-                generatorOutput.Files.Should().HaveCountGreaterOrEqualTo(3);
+                generatorOutput.Files.Should().HaveCountGreaterThanOrEqualTo(3);
                 foreach ((_, string content) in generatorOutput.Files)
                 {
                     content.Should().NotBeNullOrWhiteSpace();

@@ -21,7 +21,7 @@ public class SchemaCleanerTests
         var cleaner = new SchemaCleaner(document, []);
         cleaner.RemoveUnreferencedSchema();
 
-        document.Components.Schemas.Count.Should().BeLessOrEqualTo(initialCount);
+        document.Components.Schemas.Count.Should().BeLessThanOrEqualTo(initialCount);
     }
 
     [Test]
