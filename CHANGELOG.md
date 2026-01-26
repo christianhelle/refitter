@@ -4,9 +4,18 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.3...HEAD)
 
+**Implemented enhancements:**
+
+- Fix numeric format with pattern quirk - infer type from format for all numeric types [\#869](https://github.com/christianhelle/refitter/pull/869) ([Copilot](https://github.com/apps/copilot-swe-agent))
+
+**Fixed bugs:**
+
+- format: int32 quirk =\> Serializes to "object" when open api spec contains pattern [\#867](https://github.com/christianhelle/refitter/issues/867)
+
 **Merged pull requests:**
 
 - Update Dependencies [\#886](https://github.com/christianhelle/refitter/pull/886) ([christianhelle](https://github.com/christianhelle))
+- Update dotnet monorepo [\#835](https://github.com/christianhelle/refitter/pull/835) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.7.3](https://github.com/christianhelle/refitter/tree/1.7.3) (2026-01-24)
 
