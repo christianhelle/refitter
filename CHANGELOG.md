@@ -15,6 +15,7 @@
 **Merged pull requests:**
 
 - Update Dependencies [\#886](https://github.com/christianhelle/refitter/pull/886) ([christianhelle](https://github.com/christianhelle))
+- Update dependency ruby to v4.0.1 [\#866](https://github.com/christianhelle/refitter/pull/866) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dotnet monorepo [\#835](https://github.com/christianhelle/refitter/pull/835) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.7.3](https://github.com/christianhelle/refitter/tree/1.7.3) (2026-01-24)
