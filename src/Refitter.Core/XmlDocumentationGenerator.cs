@@ -42,11 +42,11 @@ public class XmlDocumentationGenerator
             return;
         }
 
-        var controllerTag = document.Tags.FirstOrDefault(tag => group?.Tags.Contains(tag.Name) ?? false);
+        var controllerTag = document.Tags.FirstOrDefault(tag => group.Tags.Contains(tag.Name));
         var content = controllerTag?.Description;
         if (string.IsNullOrEmpty(content))
         {
-            content = group?.Summary;
+            content = group.Summary;
         }
 
         this.AppendXmlCommentBlock("summary", content ?? "No summary available", code, indent: Separator);
