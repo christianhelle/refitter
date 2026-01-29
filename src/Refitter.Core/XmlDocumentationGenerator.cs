@@ -49,7 +49,8 @@ public class XmlDocumentationGenerator
             content = group.Summary;
         }
 
-        this.AppendXmlCommentBlock("summary", content ?? "No summary available", code, indent: Separator);
+        content ??= "No summary available";
+        this.AppendXmlCommentBlock("summary", EscapeSymbols(content), code, indent: Separator);
     }
 
     /// <summary>
