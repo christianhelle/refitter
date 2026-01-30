@@ -1,6 +1,6 @@
 {
     "sdk": {
-        "version": "10.0.102",
+        "version": "9.0.310",
         "rollForward": "latestFeature",
         "testingPlatform": true
     },
