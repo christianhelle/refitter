@@ -20,6 +20,11 @@ public class XmlDocumentationGenerator
     private const string Separator = "    ";
 
     /// <summary>
+    /// The name of the XML documentation tag used for summaries.
+    /// </summary>
+    private const string SummaryTag = "summary";
+
+    /// <summary>
     /// Instantiates a new instance of the <see cref="XmlDocumentationGenerator"/> class.
     /// </summary>
     /// <param name="settings">The code generation settings to use.</param>
@@ -45,7 +50,7 @@ public class XmlDocumentationGenerator
         var controllerDescription = controllerTag?.Description;
         if (!string.IsNullOrEmpty(controllerDescription))
         {
-            this.AppendXmlCommentBlock("summary", EscapeSymbols(controllerDescription), code, indent: Separator);
+            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(controllerDescription), code, indent: Separator);
         }
     }
 
@@ -64,7 +69,7 @@ public class XmlDocumentationGenerator
         var summary = endpoint.Summary;
         if (!string.IsNullOrEmpty(summary))
         {
-            this.AppendXmlCommentBlock("summary", EscapeSymbols(summary), code, indent: Separator);
+            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(summary), code, indent: Separator);
         }
     }
 
@@ -83,7 +88,7 @@ public class XmlDocumentationGenerator
         var title = document.Info?.Title;
         if (!string.IsNullOrEmpty(title))
         {
-            this.AppendXmlCommentBlock("summary", EscapeSymbols(title), code, indent: Separator);
+            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title), code, indent: Separator);
         }
     }
 
@@ -108,7 +113,7 @@ public class XmlDocumentationGenerator
             return;
 
         if (!string.IsNullOrWhiteSpace(method.Summary))
-            this.AppendXmlCommentBlock("summary", EscapeSymbols(method.Summary), code);
+            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(method.Summary), code);
 
         if (!string.IsNullOrWhiteSpace(method.Description))
             this.AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
