@@ -15,7 +15,7 @@ using Refitter.Tests.AdditionalFiles.SingeInterface;
 
 namespace Refitter.Tests.AdditionalFiles.ByEndpoint
 {
-    /// <summary>Everything about your Pets</summary>
+    /// <summary>Update an existing pet</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IUpdatePetEndpoint
     {
@@ -50,7 +50,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<Pet> Execute([Body] Pet body, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Everything about your Pets</summary>
+    /// <summary>Add a new pet to the store</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IAddPetEndpoint
     {
@@ -77,7 +77,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<Pet> Execute([Body] Pet body, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Everything about your Pets</summary>
+    /// <summary>Finds Pets by status</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IFindPetsByStatusEndpoint
     {
@@ -103,7 +103,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<ICollection<Pet>> Execute([Query] Status? status, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Everything about your Pets</summary>
+    /// <summary>Finds Pets by tags</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IFindPetsByTagsEndpoint
     {
@@ -129,7 +129,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<ICollection<Pet>> Execute([Query(CollectionFormat.Multi)] IEnumerable<string> tags, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Everything about your Pets</summary>
+    /// <summary>Find pet by ID</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IGetPetByIdEndpoint
     {
@@ -159,7 +159,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<Pet> Execute(long petId, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Everything about your Pets</summary>
+    /// <summary>Updates a pet in the store with form data</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IUpdatePetWithFormEndpoint
     {
@@ -186,7 +186,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task Execute(long petId, [Query] string name, [Query] string status, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Everything about your Pets</summary>
+    /// <summary>Deletes a pet</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IDeletePetEndpoint
     {
@@ -211,7 +211,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task Execute(long petId, [Header("api_key")] string api_key, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Everything about your Pets</summary>
+    /// <summary>uploads an image</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IUploadFileEndpoint
     {
@@ -237,7 +237,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<ApiResponse> Execute(long petId, [Query] string additionalMetadata, StreamPart body, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Operations about user</summary>
+    /// <summary>Returns pet inventories by status</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IGetInventoryEndpoint
     {
@@ -250,7 +250,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<IDictionary<string, int>> Execute(CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Operations about user</summary>
+    /// <summary>Place an order for a pet</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IPlaceOrderEndpoint
     {
@@ -276,7 +276,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<Order> Execute([Body] Order body, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Operations about user</summary>
+    /// <summary>Find purchase order by ID</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IGetOrderByIdEndpoint
     {
@@ -306,7 +306,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<Order> Execute(long orderId, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Operations about user</summary>
+    /// <summary>Delete purchase order by ID</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IDeleteOrderEndpoint
     {
@@ -336,7 +336,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task Execute(long orderId, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Access to Petstore orders</summary>
+    /// <summary>Create user</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface ICreateUserEndpoint
     {
@@ -351,7 +351,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<User> Execute([Body] User body, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Access to Petstore orders</summary>
+    /// <summary>Creates list of users with given input array</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface ICreateUsersWithListInputEndpoint
     {
@@ -365,7 +365,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<User> Execute([Body] IEnumerable<User> body, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Access to Petstore orders</summary>
+    /// <summary>Logs user into the system</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface ILoginUserEndpoint
     {
@@ -391,7 +391,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<string> Execute([Query] string username, [Query] string password, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Access to Petstore orders</summary>
+    /// <summary>Logs out current logged in user session</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface ILogoutUserEndpoint
     {
@@ -403,7 +403,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task Execute(CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Access to Petstore orders</summary>
+    /// <summary>Get user by user name</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IGetUserByNameEndpoint
     {
@@ -432,7 +432,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task<User> Execute(string username, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Access to Petstore orders</summary>
+    /// <summary>Update user</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IUpdateUserEndpoint
     {
@@ -448,7 +448,7 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
         Task Execute(string username, [Body] User body, CancellationToken cancellationToken = default);
     }
 
-    /// <summary>Access to Petstore orders</summary>
+    /// <summary>Delete user</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IDeleteUserEndpoint
     {

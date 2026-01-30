@@ -363,7 +363,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         var code = new StringBuilder();
-        docGenerator.AppendInterfaceDocumentation(document, code);
+        docGenerator.AppendSingleInterfaceDocumentation(document, code);
         code.Append($"""
                 {Separator}{GetGeneratedCodeAttribute()}
                 {Separator}{modifier} partial interface {interfaceName}{inheritance}

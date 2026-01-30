@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace Refitter.Tests.UsePolymorphicSerialization
 {
-    /// <summary>Refit interface - no description available</summary>
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial interface IApiClient
     {

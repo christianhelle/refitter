@@ -22,7 +22,7 @@ public class XmlDocumentationGeneratorTests
     {
         var docs = new StringBuilder();
         var interfaceDefinition = new OpenApiOperation { Summary = "Test", };
-        this._generator.AppendInterfaceDocumentation(new OpenApiDocument(), interfaceDefinition, docs);
+        this._generator.AppendInterfaceDocumentationByEndpoint(interfaceDefinition, docs);
         docs.ToString().Trim().Should().Be("/// <summary>Test</summary>");
     }
 
@@ -31,7 +31,7 @@ public class XmlDocumentationGeneratorTests
     {
         var docs = new StringBuilder();
         var interfaceDefinition = new OpenApiOperation { Summary = "Test\n", };
-        this._generator.AppendInterfaceDocumentation(new OpenApiDocument(), interfaceDefinition, docs);
+        this._generator.AppendInterfaceDocumentationByEndpoint(interfaceDefinition, docs);
         docs.ToString().Trim().Should().NotBe("/// <summary>Test</summary>");
         docs.ToString().Trim().Should().Contain("<summary>")
             .And.Contain("Test");
@@ -41,11 +41,10 @@ public class XmlDocumentationGeneratorTests
     public void Can_Generate_Interface_Doc_From_Controller_Tag()
     {
         var docs = new StringBuilder();
-        var interfaceDefinition = new OpenApiOperation { Summary = "Test", Tags = ["TestController"] };
         var controllerTag =  new OpenApiTag { Name = "TestController", Description = "TestControllerDescription" };
         var document =  new OpenApiDocument { Tags = [controllerTag] };
 
-        this._generator.AppendInterfaceDocumentation(document, interfaceDefinition, docs);
+        this._generator.AppendInterfaceDocumentationByTag(document, "TestController", docs);
 
         docs.ToString().Trim().Should().Be("/// <summary>TestControllerDescription</summary>");
     }

@@ -29,48 +29,62 @@ public class XmlDocumentationGenerator
     }
 
     /// <summary>
-    /// Appends XML docs for the given interface definition to the given code builder.
-    /// This uses the OpenAPI operation info to generate the summary and remarks.
+    /// Generates an interface description from the tags of the given OpenAPI document and appends it to the builder.
     /// </summary>
-    /// <param name="document">The parent document of the group.</param>
-    /// <param name="group">The OpenAPI definition of the interface.</param>
+    /// <param name="document">The parent document of the controller.</param>
+    /// <param name="tag">The controller tag that the endpoints were grouped by.</param>
     /// <param name="code">The builder to append the documentation to.</param>
-    public void AppendInterfaceDocumentation(OpenApiDocument document, OpenApiOperation group, StringBuilder code)
+    public void AppendInterfaceDocumentationByTag(OpenApiDocument document, string tag, StringBuilder code)
     {
         if (!_settings.GenerateXmlDocCodeComments)
         {
             return;
         }
 
-        var controllerTag = document.Tags.FirstOrDefault(tag => group.Tags.Contains(tag.Name));
-        var content = controllerTag?.Description;
-        if (string.IsNullOrEmpty(content))
+        var controllerTag = document.Tags.FirstOrDefault(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
+        var controllerDescription = controllerTag?.Description;
+        if (!string.IsNullOrEmpty(controllerDescription))
         {
-            content = group.Summary;
+            this.AppendXmlCommentBlock("summary", EscapeSymbols(controllerDescription), code, indent: Separator);
         }
-
-        content ??= "No summary available";
-        this.AppendXmlCommentBlock("summary", EscapeSymbols(content), code, indent: Separator);
     }
 
     /// <summary>
-    /// Appends XML docs for the given interface definition to the given code builder.
-    /// This uses the OpenAPI document's info description as the summary.
+    /// Generates an interface description from the summary of the given endpoint and appends it to the builder.
     /// </summary>
-    /// <param name="document">The OpenAPI definition of the interface.</param>
+    /// <param name="endpoint">The OpenAPI definition of the endpoint.</param>
     /// <param name="code">The builder to append the documentation to.</param>
-    public void AppendInterfaceDocumentation(OpenApiDocument document, StringBuilder code)
+    public void AppendInterfaceDocumentationByEndpoint(OpenApiOperation endpoint, StringBuilder code)
     {
         if (!_settings.GenerateXmlDocCodeComments)
         {
             return;
         }
 
-        this.AppendXmlCommentBlock(
-            "summary",
-            document.Info?.Title ?? "Refit interface - no description available",
-            code,
-            indent: Separator);
+        var summary = endpoint.Summary;
+        if (!string.IsNullOrEmpty(summary))
+        {
+            this.AppendXmlCommentBlock("summary", EscapeSymbols(summary), code, indent: Separator);
+        }
+    }
+
+    /// <summary>
+    /// Generates an interface description from the title of the given document and appends it to the builder.
+    /// </summary>
+    /// <param name="document">The OpenAPI definition of the document.</param>
+    /// <param name="code">The builder to append the documentation to.</param>
+    public void AppendSingleInterfaceDocumentation(OpenApiDocument document, StringBuilder code)
+    {
+        if (!_settings.GenerateXmlDocCodeComments)
+        {
+            return;
+        }
+
+        var title = document.Info?.Title;
+        if (!string.IsNullOrEmpty(title))
+        {
+            this.AppendXmlCommentBlock("summary", EscapeSymbols(title), code, indent: Separator);
+        }
     }
 
     /// <summary>

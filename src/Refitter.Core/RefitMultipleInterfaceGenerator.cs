@@ -36,7 +36,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                     : "Execute";
                 var code = new StringBuilder();
 
-                this.docGenerator.AppendInterfaceDocumentation(document, operation, code);
+                this.docGenerator.AppendInterfaceDocumentationByEndpoint(operation, code);
 
                 var interfaceName = GetInterfaceName(kv, verb, operation);
                 code.AppendLine($$"""
