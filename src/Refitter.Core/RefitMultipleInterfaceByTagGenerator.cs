@@ -131,8 +131,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
     {
         if (operation.Tags.FirstOrDefault() is string group && !string.IsNullOrWhiteSpace(group))
         {
-            return IdentifierUtils.Sanitize(group)
-                .CapitalizeFirstCharacter();
+            return group.SanitizeControllerTag();
         }
 
         return ungroupedTitle;

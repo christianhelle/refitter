@@ -53,4 +53,14 @@ internal static class IdentifierUtils
         return string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries))
                 .Trim(dash);
     }
+
+    /// <summary>
+    /// Sanitizes and formats controller tags for identifier usage.
+    /// </summary>
+    /// <param name="tag">The tag to sanitize.</param>
+    /// <returns>A sanitized, title-cased identifier string.</returns>
+    public static string SanitizeControllerTag(this string tag)
+    {
+        return tag.Sanitize().CapitalizeFirstCharacter();
+    }
 }

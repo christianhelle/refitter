@@ -46,7 +46,7 @@ public class XmlDocumentationGenerator
             return;
         }
 
-        var controllerTag = document.Tags.FirstOrDefault(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
+        var controllerTag = document.Tags.FirstOrDefault(t => t.Name.SanitizeControllerTag() == tag);
         var controllerDescription = controllerTag?.Description;
         if (!string.IsNullOrEmpty(controllerDescription))
         {
