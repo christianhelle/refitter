@@ -78,7 +78,7 @@ public static class SettingsValidator
     {
         return ValidationResult.Error(
             "You should either specify an output path directly from --output " +
-            "or use specify it in 'outputFolder' and 'outputFilename' from the settings file, " +
+            "or specify it in 'outputFolder' and 'outputFilename' from the settings file, " +
             "not both");
     }
 
