@@ -49,7 +49,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 if (!interfacesByGroup.TryGetValue(kv.Key, out var sb))
                 {
                     interfacesByGroup[kv.Key] = sb = new StringBuilder();
-                    this.docGenerator.AppendInterfaceDocumentation(operation, sb);
+                    this.docGenerator.AppendInterfaceDocumentationByTag(document, kv.Key, sb);
 
                     interfaceName = GetInterfaceName(kv.Key);
                     sb.AppendLine($$"""
@@ -131,8 +131,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
     {
         if (operation.Tags.FirstOrDefault() is string group && !string.IsNullOrWhiteSpace(group))
         {
-            return IdentifierUtils.Sanitize(group)
-                .CapitalizeFirstCharacter();
+            return group.SanitizeControllerTag();
         }
 
         return ungroupedTitle;
