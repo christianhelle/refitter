@@ -6,11 +6,13 @@
 
 **Implemented enhancements:**
 
+- Read group documentation from document tags. [\#887](https://github.com/christianhelle/refitter/pull/887) ([DJ4ddi](https://github.com/DJ4ddi))
 - Fix numeric format with pattern quirk - infer type from format for all numeric types [\#869](https://github.com/christianhelle/refitter/pull/869) ([Copilot](https://github.com/apps/copilot-swe-agent))
 
 **Fixed bugs:**
 
 - format: int32 quirk =\> Serializes to "object" when open api spec contains pattern [\#867](https://github.com/christianhelle/refitter/issues/867)
+- Failing CLI example with confusing error message [\#847](https://github.com/christianhelle/refitter/issues/847)
 
 **Merged pull requests:**
 
