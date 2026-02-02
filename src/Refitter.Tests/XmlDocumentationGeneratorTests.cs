@@ -41,12 +41,44 @@ public class XmlDocumentationGeneratorTests
     public void Can_Generate_Interface_Doc_From_Controller_Tag()
     {
         var docs = new StringBuilder();
-        var controllerTag =  new OpenApiTag { Name = "TestController", Description = "TestControllerDescription" };
-        var document =  new OpenApiDocument { Tags = [controllerTag] };
+        var controllerTag = new OpenApiTag { Name = "TestController", Description = "TestControllerDescription" };
+        var document = new OpenApiDocument { Tags = [controllerTag] };
 
         this._generator.AppendInterfaceDocumentationByTag(document, "TestController", docs);
 
         docs.ToString().Trim().Should().Be("/// <summary>TestControllerDescription</summary>");
+    }
+
+    [Test]
+    public void Can_Handle_Null_Document_Tags()
+    {
+        var docs = new StringBuilder();
+        var document = new OpenApiDocument { Tags = null };
+
+        this._generator.AppendInterfaceDocumentationByTag(document, "TestController", docs);
+
+        docs.ToString().Trim().Should().BeEmpty();
+    }
+
+    [Test]
+    public void Can_Escape_Xml_Special_Characters_In_Interface_Doc()
+    {
+        var docs = new StringBuilder();
+        var controllerTag = new OpenApiTag { Name = "TestController", Description = "Test <tag> & content" };
+        var document = new OpenApiDocument { Tags = [controllerTag] };
+
+        this._generator.AppendInterfaceDocumentationByTag(document, "TestController", docs);
+
+        docs.ToString().Trim().Should().Be("/// <summary>Test &lt;tag&gt; &amp; content</summary>");
+    }
+
+    [Test]
+    public void Can_Escape_Xml_Special_Characters_In_Method_Summary()
+    {
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation { Summary = "Test <tag> & content", });
+        this._generator.AppendMethodDocumentation(method, false, false, false, false, docs);
+        docs.ToString().Trim().Should().StartWith("/// <summary>Test &lt;tag&gt; &amp; content</summary>");
     }
 
     [Test]

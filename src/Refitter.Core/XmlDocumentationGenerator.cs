@@ -46,11 +46,11 @@ public class XmlDocumentationGenerator
             return;
         }
 
-        var controllerTag = document.Tags.FirstOrDefault(t => t.Name.SanitizeControllerTag() == tag);
+        var controllerTag = document.Tags?.FirstOrDefault(t => t.Name.SanitizeControllerTag() == tag);
         var controllerDescription = controllerTag?.Description;
         if (!string.IsNullOrEmpty(controllerDescription))
         {
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(controllerDescription), code, indent: Separator);
+            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(controllerDescription!), code, indent: Separator);
         }
     }
 
@@ -88,7 +88,7 @@ public class XmlDocumentationGenerator
         var title = document.Info?.Title;
         if (!string.IsNullOrEmpty(title))
         {
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title), code, indent: Separator);
+            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title!), code, indent: Separator);
         }
     }
 
@@ -334,6 +334,7 @@ public class XmlDocumentationGenerator
     private string EscapeSymbols(string input)
     {
         return input
+            .Replace("&", "&amp;")
             .Replace("<", "&lt;")
             .Replace(">", "&gt;");
     }
