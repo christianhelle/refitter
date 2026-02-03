@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Fix null reference and XML escaping in XmlDocumentationGenerator [\#890](https://github.com/christianhelle/refitter/pull/890) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Read group documentation from document tags. [\#887](https://github.com/christianhelle/refitter/pull/887) ([DJ4ddi](https://github.com/DJ4ddi))
 - Fix numeric format with pattern quirk - infer type from format for all numeric types [\#869](https://github.com/christianhelle/refitter/pull/869) ([Copilot](https://github.com/apps/copilot-swe-agent))
 
