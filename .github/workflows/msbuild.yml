@@ -22,7 +22,7 @@ on:
 jobs:
   build:
     name: 👌 Verify build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v6
