@@ -281,7 +281,7 @@ public class SwaggerPetstoreApizrTests
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithUnsafeAuthenticationHeaders, "SwaggerPetstoreWithUnsafeAuthenticationHeaders.yaml")]
     public async Task Can_Generate_Code_With_Unsafe_AuthenticationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings { GenerateAuthenticationHeader = true };
+        var settings = new ApizrGeneratorSettings { AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter };
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().Contain("[Header(\"auth.key\")] string auth_key");
     }
@@ -293,7 +293,7 @@ public class SwaggerPetstoreApizrTests
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
     public async Task Can_Generate_Code_With_AuthenticationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings { GenerateAuthenticationHeader = true };
+        var settings = new ApizrGeneratorSettings { AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter };
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
     }
@@ -305,7 +305,7 @@ public class SwaggerPetstoreApizrTests
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
     public async Task Can_Generate_Code_With_AuthenticationHeaders_Without_OperationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings { GenerateOperationHeaders = false, GenerateAuthenticationHeader = true };
+        var settings = new ApizrGeneratorSettings { GenerateOperationHeaders = false, AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter };
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
     }
@@ -317,7 +317,7 @@ public class SwaggerPetstoreApizrTests
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_AuthenticationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings { GenerateAuthenticationHeader = false };
+        var settings = new ApizrGeneratorSettings { AuthenticationHeaderStyle = AuthenticationHeaderStyle.None };
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().NotContain("[Header(\"auth_key\")] string? auth_key");
     }

@@ -280,6 +280,28 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             }
         }
 
+        if (settings.AuthenticationHeaderStyle == AuthenticationHeaderStyle.Method) 
+        {
+            foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
+            {
+                if (!document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
+                {
+                    continue;
+                }
+
+                if (securityScheme is { Type: OpenApiSecuritySchemeType.ApiKey, In: OpenApiSecurityApiKeyLocation.Header }
+                    && !operationModel.Parameters.Any(p => p is { Kind: OpenApiParameterKind.Header, IsHeader: true } && p.Name == securityScheme.Name))
+                {
+                    headers.Add($"\"{securityScheme.Name}\"");
+                }
+                else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: "bearer" })
+                {
+                    headers.Add("\"Authorization: Bearer\"");
+                }
+            }
+            
+        }
+
         if (headers.Any())
         {
             code.AppendLine($"{Separator}{Separator}[Headers({string.Join(", ", headers)})]");
