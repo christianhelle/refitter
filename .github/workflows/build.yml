@@ -39,6 +39,7 @@ jobs:
       continue-on-error: true
       run: |
         rm -rf src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
+        dotnet restore src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
         dotnet msbuild src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
     - name: 🛠️ Build
       run: dotnet build -c Release src/Refitter.slnx -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
