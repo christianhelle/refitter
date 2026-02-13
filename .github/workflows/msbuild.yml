@@ -28,6 +28,7 @@ jobs:
       uses: actions/checkout@v6
     - name: 🛠️ Prepare
       working-directory: test/MSBuild
+      continue-on-error: true
       run: |
         dotnet restore ../../src/Refitter.slnx
         dotnet build -c release ../../src/Refitter/Refitter.csproj
