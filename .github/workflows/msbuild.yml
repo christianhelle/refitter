@@ -8,16 +8,12 @@ on:
       - '!.github/workflows/msbuild.yml'
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
-    branches:
-      - 'main'
   pull_request:
     paths-ignore:
       - '**/*'
       - '!.github/workflows/msbuild.yml'
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
-    branches:
-      - '*'
 
 jobs:
   build:
