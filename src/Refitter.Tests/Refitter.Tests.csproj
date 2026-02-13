@@ -24,7 +24,7 @@
         <PackageReference Include="FluentAssertions" Version="8.8.0" />
         <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.28" />
         <PackageReference Include="System.Text.Json" Version="10.0.2" />
-        <PackageReference Include="TUnit" Version="1.12.53" />
+        <PackageReference Include="TUnit" Version="1.13.60" />
         <PackageReference Include="coverlet.collector" Version="6.0.4">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
