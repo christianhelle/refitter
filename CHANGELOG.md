@@ -17,8 +17,12 @@
 
 **Merged pull requests:**
 
+- Fix MSBuild workflow [\#898](https://github.com/christianhelle/refitter/pull/898) ([christianhelle](https://github.com/christianhelle))
+- Update ghcr.io/devcontainers/features/powershell Docker tag to v2 [\#895](https://github.com/christianhelle/refitter/pull/895) ([renovate[bot]](https://github.com/apps/renovate))
+- Fix build workflow: add dotnet restore before dotnet msbuild in Prepare step [\#892](https://github.com/christianhelle/refitter/pull/892) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Update Dependencies [\#886](https://github.com/christianhelle/refitter/pull/886) ([christianhelle](https://github.com/christianhelle))
 - Update dependency ruby to v4.0.1 [\#866](https://github.com/christianhelle/refitter/pull/866) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.13.60 [\#865](https://github.com/christianhelle/refitter/pull/865) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dotnet monorepo [\#835](https://github.com/christianhelle/refitter/pull/835) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.7.3](https://github.com/christianhelle/refitter/tree/1.7.3) (2026-01-24)
