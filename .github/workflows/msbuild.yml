@@ -8,21 +8,17 @@ on:
       - '!.github/workflows/msbuild.yml'
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
-    branches:
-      - 'main'
   pull_request:
     paths-ignore:
       - '**/*'
       - '!.github/workflows/msbuild.yml'
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
-    branches:
-      - '*'
 
 jobs:
   build:
     name: 👌 Verify build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - name: 🛒 Checkout repository
       uses: actions/checkout@v6
