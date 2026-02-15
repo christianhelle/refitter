@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Update refit monorepo to v10 \(major\) [\#893](https://github.com/christianhelle/refitter/pull/893) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix null reference and XML escaping in XmlDocumentationGenerator [\#890](https://github.com/christianhelle/refitter/pull/890) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Read group documentation from document tags. [\#887](https://github.com/christianhelle/refitter/pull/887) ([DJ4ddi](https://github.com/DJ4ddi))
 - Fix numeric format with pattern quirk - infer type from format for all numeric types [\#869](https://github.com/christianhelle/refitter/pull/869) ([Copilot](https://github.com/apps/copilot-swe-agent))
@@ -17,8 +18,10 @@
 
 **Merged pull requests:**
 
+- Update dependency coverlet.collector to v8 [\#901](https://github.com/christianhelle/refitter/pull/901) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix MSBuild workflow [\#898](https://github.com/christianhelle/refitter/pull/898) ([christianhelle](https://github.com/christianhelle))
 - Update ghcr.io/devcontainers/features/powershell Docker tag to v2 [\#895](https://github.com/christianhelle/refitter/pull/895) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency FluentAssertions to 7.2.1 [\#894](https://github.com/christianhelle/refitter/pull/894) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix build workflow: add dotnet restore before dotnet msbuild in Prepare step [\#892](https://github.com/christianhelle/refitter/pull/892) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Update dotnet monorepo [\#891](https://github.com/christianhelle/refitter/pull/891) ([renovate[bot]](https://github.com/apps/renovate))
 - Update Dependencies [\#886](https://github.com/christianhelle/refitter/pull/886) ([christianhelle](https://github.com/christianhelle))
