@@ -378,7 +378,7 @@ public class RefitGeneratorSettings
     /// Gets or sets a value indicating whether to generate Security Schema Authentication headers.
     /// </summary>
     [Description("Generate Security Schema Authentication headers")]
-    public bool GenerateAuthenticationHeader { get; set; }
+    public AuthenticationHeaderStyle AuthenticationHeaderStyle { get; set; }
 
     /// <summary>
     /// Gets or sets the collection format to use for array query parameters.

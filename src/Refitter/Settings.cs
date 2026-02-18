@@ -273,4 +273,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--custom-template-directory")]
     [DefaultValue(null)]
     public string? CustomTemplateDirectory { get; set; } = null;
+
+    [Description("Generate Authorization header method 'Method' or 'Parameter'. Default value is None")]
+    [CommandOption("--generate-authentication-header")]
+    [DefaultValue(AuthenticationHeaderStyle.None)]
+    public AuthenticationHeaderStyle GenerateAuthenticationHeader { get; set; } = AuthenticationHeaderStyle.None;
 }
