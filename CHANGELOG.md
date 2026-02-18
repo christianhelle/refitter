@@ -19,6 +19,7 @@
 **Merged pull requests:**
 
 - Update dependency coverlet.collector to v8 [\#901](https://github.com/christianhelle/refitter/pull/901) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.15.11 [\#899](https://github.com/christianhelle/refitter/pull/899) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix MSBuild workflow [\#898](https://github.com/christianhelle/refitter/pull/898) ([christianhelle](https://github.com/christianhelle))
 - Update ghcr.io/devcontainers/features/powershell Docker tag to v2 [\#895](https://github.com/christianhelle/refitter/pull/895) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency FluentAssertions to 7.2.1 [\#894](https://github.com/christianhelle/refitter/pull/894) ([renovate[bot]](https://github.com/apps/renovate))
