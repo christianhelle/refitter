@@ -12,6 +12,68 @@ namespace Refitter.Core;
 public static class OpenApiDocumentFactory
 {
     /// <summary>
+    /// Creates a merged <see cref="NSwag.OpenApiDocument"/> from multiple paths or URLs.
+    /// The first document serves as the base; paths and schemas from subsequent documents are merged in.
+    /// </summary>
+    /// <param name="openApiPaths">The paths or URLs to the OpenAPI specifications.</param>
+    /// <returns>A merged <see cref="NSwag.OpenApiDocument"/>.</returns>
+    public static async Task<OpenApiDocument> CreateAsync(IEnumerable<string> openApiPaths)
+    {
+        var paths = openApiPaths.ToArray();
+        if (paths.Length == 1)
+            return await CreateAsync(paths[0]);
+
+        var documents = new OpenApiDocument[paths.Length];
+        for (var i = 0; i < paths.Length; i++)
+            documents[i] = await CreateAsync(paths[i]);
+
+        return Merge(documents);
+    }
+
+    private static OpenApiDocument Merge(OpenApiDocument[] documents)
+    {
+        var baseDocument = documents[0];
+        foreach (var document in documents.Skip(1))
+        {
+            foreach (var path in document.Paths)
+            {
+                if (!baseDocument.Paths.ContainsKey(path.Key))
+                    baseDocument.Paths[path.Key] = path.Value;
+            }
+
+            if (document.Components?.Schemas != null)
+            {
+                foreach (var schema in document.Components.Schemas)
+                {
+                    if (!baseDocument.Components.Schemas.ContainsKey(schema.Key))
+                        baseDocument.Components.Schemas[schema.Key] = schema.Value;
+                }
+            }
+
+            if (document.Definitions != null)
+            {
+                foreach (var definition in document.Definitions)
+                {
+                    if (!baseDocument.Definitions.ContainsKey(definition.Key))
+                        baseDocument.Definitions[definition.Key] = definition.Value;
+                }
+            }
+
+            if (document.Tags != null)
+            {
+                baseDocument.Tags ??= [];
+                foreach (var tag in document.Tags)
+                {
+                    if (baseDocument.Tags.All(t => t.Name != tag.Name))
+                        baseDocument.Tags.Add(tag);
+                }
+            }
+        }
+
+        return baseDocument;
+    }
+
+    /// <summary>
     /// Creates a new instance of the <see cref="NSwag.OpenApiDocument"/> class asynchronously.
     /// </summary>
     /// <param name="openApiPath">The path or URL to the OpenAPI specification.</param>

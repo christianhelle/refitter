@@ -196,7 +196,11 @@ The following is an example `.refitter` file
 
 ```js
 {
-  "openApiPath": "/path/to/your/openAPI", // Required
+  "openApiPath": "/path/to/your/openAPI", // Required if openApiPaths is not specified
+  "openApiPaths": [ // Required if openApiPath is not specified. Multiple OpenAPI specs are merged into a single client
+    "/path/to/your/openAPI/v1",
+    "/path/to/your/openAPI/v2"
+  ],
   "namespace": "Org.System.Service.Api.GeneratedCode", // Optional. Default=GeneratedCode
   "contractsNamespace": "Org.System.Service.Api.GeneratedCode.Contracts", // Optional. Default=GeneratedCode
   "naming": {
@@ -316,7 +320,8 @@ The following is an example `.refitter` file
 }
 ```
 
-- `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS
+- `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS. Required if `openApiPaths` is not specified.
+- `openApiPaths` - an array of paths to multiple OpenAPI Specifications files. When specified, the documents are merged into a single client. Paths and schemas from all documents are combined; when duplicates exist, the first document takes precedence. Required if `openApiPath` is not specified.
 - `namespace` - the namespace used in the generated code. If not specified, this defaults to `GeneratedCode`
 - `naming.useOpenApiTitle` - a boolean indicating whether the OpenApi title should be used. Default is `true`
 - `naming.interfaceName` - the name of the generated interface. The generated code will automatically prefix this with `I` so if this set to `MyApiClient` then the generated interface is called `IMyApiClient`. Default is `ApiClient`

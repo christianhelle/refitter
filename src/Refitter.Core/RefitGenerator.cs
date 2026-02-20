@@ -32,6 +32,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private static async Task<OpenApiDocument> GetOpenApiDocument(RefitGeneratorSettings settings)
     {
+        if (settings.OpenApiPaths.Length > 0)
+            return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPaths);
         return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath);
     }
 
