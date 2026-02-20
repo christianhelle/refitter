@@ -321,7 +321,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
                 InlineJsonConverters = !settings.NoInlineJsonConverters,
-                IntegerType = settings.IntegerType
+                IntegerType = settings.IntegerType,
+                EnumJsonConverter = settings.EnumJsonConverter
             },
             CustomTemplateDirectory = settings.CustomTemplateDirectory,
         };
