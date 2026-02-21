@@ -275,6 +275,22 @@ public class CodeGeneratorSettings
     public bool InlineJsonConverters { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets a custom enum JSON converter type name to use instead of JsonStringEnumConverter.
+    /// When set, replaces [JsonConverter(typeof(JsonStringEnumConverter))] with [JsonConverter(typeof({EnumJsonConverter}))].
+    /// This is useful when enum values contain characters not supported by JsonStringEnumConverter, such as hyphens.
+    /// Example: "Macross.Json.Extensions.JsonStringEnumMemberConverter"
+    /// </summary>
+    [Description(
+        """
+        Gets or sets a custom enum JSON converter type name to use instead of JsonStringEnumConverter.
+        When set, replaces [JsonConverter(typeof(JsonStringEnumConverter))] with [JsonConverter(typeof({EnumJsonConverter}))].
+        This is useful when enum values contain characters not supported by JsonStringEnumConverter, such as hyphens.
+        Example: "Macross.Json.Extensions.JsonStringEnumMemberConverter"
+        """
+    )]
+    public string? EnumJsonConverter { get; set; }
+
+    /// <summary>
     /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
     /// templates.
     /// </summary>

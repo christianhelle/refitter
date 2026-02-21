@@ -264,6 +264,11 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool NoInlineJsonConverters { get; set; }
 
+    [Description("Use a custom JSON converter for enum types instead of JsonStringEnumConverter. Useful for enum values with special characters (e.g., hyphens). Example: Macross.Json.Extensions.JsonStringEnumMemberConverter")]
+    [CommandOption("--enum-json-converter")]
+    [DefaultValue(null)]
+    public string? EnumJsonConverter { get; set; }
+
     [Description("The .NET type to use for OpenAPI integers without a format specifier. May be one of: Int32, Int64")]
     [CommandOption("--integer-type")]
     [DefaultValue(IntegerType.Int32)]
