@@ -42,8 +42,7 @@ public static class SettingsValidator
         var json = File.ReadAllText(settings.SettingsFilePath!);
         var refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
 
-        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath) &&
-            refitGeneratorSettings.OpenApiPaths.Length > 0)
+        if (refitGeneratorSettings.OpenApiPaths is { Length: > 0 })
         {
             settings.OpenApiPath = refitGeneratorSettings.OpenApiPaths[0];
         }
@@ -60,7 +59,7 @@ public static class SettingsValidator
         RefitGeneratorSettings refitGeneratorSettings)
     {
         if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath) &&
-            refitGeneratorSettings.OpenApiPaths.Length == 0)
+            (refitGeneratorSettings.OpenApiPaths?.Length ?? 0) == 0)
         {
             return GetValidationErrorForOpenApiPath();
         }

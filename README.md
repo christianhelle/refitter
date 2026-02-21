@@ -192,15 +192,11 @@ This is particularly useful when:
 
 ## .Refitter File format
 
-The following is an example `.refitter` file
+The following is an example `.refitter` file using a single OpenAPI specification
 
 ```js
 {
   "openApiPath": "/path/to/your/openAPI", // Required if openApiPaths is not specified
-  "openApiPaths": [ // Required if openApiPath is not specified. Multiple OpenAPI specs are merged into a single client
-    "/path/to/your/openAPI/v1",
-    "/path/to/your/openAPI/v2"
-  ],
   "namespace": "Org.System.Service.Api.GeneratedCode", // Optional. Default=GeneratedCode
   "contractsNamespace": "Org.System.Service.Api.GeneratedCode.Contracts", // Optional. Default=GeneratedCode
   "naming": {
@@ -320,8 +316,20 @@ The following is an example `.refitter` file
 }
 ```
 
+The following is an example `.refitter` file using multiple OpenAPI specifications that are merged into a single client
+
+```js
+{
+  "openApiPaths": [ // Required if openApiPath is not specified. Documents are merged; first spec wins on duplicates
+    "/path/to/your/openAPI/v1",
+    "/path/to/your/openAPI/v2"
+  ],
+  "namespace": "Org.System.Service.Api.GeneratedCode"
+}
+```
+
 - `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS. Required if `openApiPaths` is not specified.
-- `openApiPaths` - an array of paths to multiple OpenAPI Specifications files. When specified, the documents are merged into a single client. Paths and schemas from all documents are combined; when duplicates exist, the first document takes precedence. Required if `openApiPath` is not specified.
+- `openApiPaths` - an array of paths to multiple OpenAPI Specifications files. When specified, the documents are merged into a single client. The first document in the array serves as the base; paths, component schemas, definitions (OpenAPI 2.x), and tags from subsequent documents are merged in. When duplicates exist (same path key or schema name), the first document's entry is preserved. Use this instead of `openApiPath` when you want to generate a single client from multiple API versions. Required if `openApiPath` is not specified.
 - `namespace` - the namespace used in the generated code. If not specified, this defaults to `GeneratedCode`
 - `naming.useOpenApiTitle` - a boolean indicating whether the OpenApi title should be used. Default is `true`
 - `naming.interfaceName` - the name of the generated interface. The generated code will automatically prefix this with `I` so if this set to `MyApiClient` then the generated interface is called `IMyApiClient`. Default is `ApiClient`

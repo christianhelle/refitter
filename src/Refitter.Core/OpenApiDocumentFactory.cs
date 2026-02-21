@@ -17,9 +17,13 @@ public static class OpenApiDocumentFactory
     /// </summary>
     /// <param name="openApiPaths">The paths or URLs to the OpenAPI specifications.</param>
     /// <returns>A merged <see cref="NSwag.OpenApiDocument"/>.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="openApiPaths"/> is null or empty.</exception>
     public static async Task<OpenApiDocument> CreateAsync(IEnumerable<string> openApiPaths)
     {
-        var paths = openApiPaths.ToArray();
+        var paths = openApiPaths?.ToArray() ?? throw new ArgumentException("At least one OpenAPI path must be specified.", nameof(openApiPaths));
+        if (paths.Length == 0)
+            throw new ArgumentException("At least one OpenAPI path must be specified.", nameof(openApiPaths));
+
         if (paths.Length == 1)
             return await CreateAsync(paths[0]);
 
@@ -45,7 +49,8 @@ public static class OpenApiDocumentFactory
             {
                 foreach (var schema in document.Components.Schemas)
                 {
-                    if (!baseDocument.Components.Schemas.ContainsKey(schema.Key))
+                    if (baseDocument.Components?.Schemas != null &&
+                        !baseDocument.Components.Schemas.ContainsKey(schema.Key))
                         baseDocument.Components.Schemas[schema.Key] = schema.Value;
                 }
             }

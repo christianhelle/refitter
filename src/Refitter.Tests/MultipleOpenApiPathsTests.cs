@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Refitter.Core;
+using Refitter.Tests.Build;
 using TUnit.Core;
 
 namespace Refitter.Tests;
@@ -69,6 +70,24 @@ components:
         breed:
           type: string
 ";
+
+    [Test]
+    public async Task Can_Build_Generated_Code_From_Multiple_Paths()
+    {
+        var (file1, file2) = await CreateTestSpecFiles();
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPaths = [file1, file2]
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
 
     [Test]
     public async Task Can_Generate_Code_From_Multiple_Paths()
@@ -178,6 +197,13 @@ components:
 
         merged.Components.Schemas.Should().ContainKey("PetV1");
         merged.Components.Schemas.Should().ContainKey("PetV2");
+    }
+
+    [Test]
+    public async Task OpenApiDocumentFactory_Throws_For_Empty_Paths()
+    {
+        var act = async () => await OpenApiDocumentFactory.CreateAsync(Array.Empty<string>());
+        await act.Should().ThrowAsync<ArgumentException>();
     }
 
     private static async Task<(string file1, string file2)> CreateTestSpecFiles()
