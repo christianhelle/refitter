@@ -270,8 +270,15 @@
   "type": "object",
   "properties": {
     "openApiPath": {
-      "description": "The path to the OpenAPI document.",
+      "description": "The path to the OpenAPI document. Required if openApiPaths is not specified.",
       "type": "string"
+    },
+    "openApiPaths": {
+      "description": "The paths to multiple OpenAPI documents. When specified, the documents are merged into a single client. The first document in the array serves as the base; paths, component schemas, definitions (OpenAPI 2.x), and tags from subsequent documents are merged in. When duplicates exist, the first document's entry is preserved. Required if openApiPath is not specified.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "namespace": {
       "description": "The namespace for the generated code. Default is GeneratedCode.",
