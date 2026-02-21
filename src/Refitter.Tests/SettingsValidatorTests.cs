@@ -195,7 +195,7 @@ public class SettingsValidatorTests
             var result = SettingsValidator.Validate(settings);
 
             result.Successful.Should().BeFalse();
-            result.Message.Should().Contain("'openApiPath' in settings file is required");
+            result.Message.Should().Contain("'openApiPath' or 'openApiPaths' in settings file is required");
         }
         finally
         {
@@ -293,5 +293,101 @@ public class SettingsValidatorTests
         var result = SettingsValidator.Validate(settings);
 
         result.Successful.Should().BeTrue();
+    }
+
+    [Test]
+    public void Validate_Should_Succeed_With_Valid_OpenApiPaths_In_Settings_File()
+    {
+        var tempSettingsFile = Path.GetTempFileName();
+        try
+        {
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPaths = ["https://petstore3.swagger.io/api/v3/openapi.yaml"]
+            };
+            File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Settings
+            {
+                SettingsFilePath = tempSettingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings);
+
+            result.Successful.Should().BeTrue();
+            settings.OpenApiPath.Should().Be("https://petstore3.swagger.io/api/v3/openapi.yaml");
+        }
+        finally
+        {
+            if (File.Exists(tempSettingsFile))
+                File.Delete(tempSettingsFile);
+        }
+    }
+
+    [Test]
+    public void Validate_Should_Succeed_With_Multiple_OpenApiPaths_In_Settings_File()
+    {
+        var tempSettingsFile = Path.GetTempFileName();
+        var tempApiFile1 = Path.GetTempFileName();
+        var tempApiFile2 = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(tempApiFile1, "{}");
+            File.WriteAllText(tempApiFile2, "{}");
+
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPaths = [tempApiFile1, tempApiFile2]
+            };
+            File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Settings
+            {
+                SettingsFilePath = tempSettingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings);
+
+            result.Successful.Should().BeTrue();
+            settings.OpenApiPath.Should().Be(tempApiFile1);
+        }
+        finally
+        {
+            if (File.Exists(tempSettingsFile))
+                File.Delete(tempSettingsFile);
+            if (File.Exists(tempApiFile1))
+                File.Delete(tempApiFile1);
+            if (File.Exists(tempApiFile2))
+                File.Delete(tempApiFile2);
+        }
+    }
+
+    [Test]
+    public void Validate_Should_Fail_When_Settings_File_Has_Empty_OpenApiPaths()
+    {
+        var tempSettingsFile = Path.GetTempFileName();
+        try
+        {
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPaths = []
+            };
+            File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Settings
+            {
+                SettingsFilePath = tempSettingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings);
+
+            result.Successful.Should().BeFalse();
+            result.Message.Should().Contain("'openApiPath' or 'openApiPaths' in settings file is required");
+        }
+        finally
+        {
+            if (File.Exists(tempSettingsFile))
+                File.Delete(tempSettingsFile);
+        }
     }
 }

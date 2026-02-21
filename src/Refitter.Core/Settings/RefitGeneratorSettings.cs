@@ -28,6 +28,13 @@ public class RefitGeneratorSettings
     public string OpenApiPath { get; set; } = null!;
 
     /// <summary>
+    /// Gets or sets the paths to multiple Open API documents. When specified, the documents are merged.
+    /// This takes precedence over <see cref="OpenApiPath"/> when non-empty.
+    /// </summary>
+    [Description("The paths to multiple OpenAPI documents. When specified, the documents are merged into a single client.")]
+    public string[] OpenApiPaths { get; set; } = Array.Empty<string>();
+
+    /// <summary>
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
     /// </summary>
     [Description("The namespace for the generated code. Default is GeneratedCode.")]
