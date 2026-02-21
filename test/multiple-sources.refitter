@@ -1,0 +1,8 @@
+{
+  "openApiPaths": [
+    "OpenAPI/v3.0/weather.json",
+    "OpenAPI/v3.0/petstore.json",
+    "OpenAPI/v3.0/api-with-examples.json"
+  ],
+  "multipleInterfaces": "bytag"
+}
