@@ -39,13 +39,16 @@ internal static class IdentifierUtils
     /// </summary>
     public static string Sanitize(this string value)
     {
+        if (string.IsNullOrEmpty(value))
+            return value;
+
         const char dash = '-';
 
-        // @ can be used and still make valid methode names. but this should make most use cases safe
+        // @ can be used and still make valid method names. but this should make most use cases safe
         if (
-            (value.First() < 'A' || value.First() > 'Z') &&
-            (value.First() < 'a' || value.First() > 'z') &&
-            value.First() != '_'
+            (value[0] < 'A' || value[0] > 'Z') &&
+            (value[0] < 'a' || value[0] > 'z') &&
+            value[0] != '_'
             )
         {
             value = "_" + value;

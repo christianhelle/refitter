@@ -188,4 +188,19 @@ public class IdentifierUtilsTests
         var result = "123-Test Name!@#Value".Sanitize();
         result.Should().Be("_123TestNameValue");
     }
+
+    [Test]
+    public void Sanitize_Handles_Empty_String()
+    {
+        var result = "".Sanitize();
+        result.Should().Be("");
+    }
+
+    [Test]
+    public void Sanitize_Handles_Null_String()
+    {
+        string? input = null;
+        var result = input!.Sanitize();
+        result.Should().BeNull();
+    }
 }

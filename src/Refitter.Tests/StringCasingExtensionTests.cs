@@ -18,12 +18,12 @@ public class StringCasingExtensionTests
 
     [Test]
     [Arguments("abcd", "Abcd")]
-    public void CanCaptilalizeFirstLetter(string input, string expected)
+    public void CanCapitalizeFirstLetter(string input, string expected)
         => input.CapitalizeFirstCharacter().Should().Be(expected);
 
     [Test]
     [Arguments("", "")]
-    public void CaptilalizeFirstLetterHandlesEmptyStrings(string input, string expected)
+    public void CapitalizeFirstLetterHandlesEmptyStrings(string input, string expected)
         => input.CapitalizeFirstCharacter().Should().Be(expected);
 
     [Test]
