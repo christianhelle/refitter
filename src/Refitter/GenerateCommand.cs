@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Readers.Exceptions;
+using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Validation;
 using Spectre.Console;
@@ -675,7 +674,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (settings.SimpleOutput)
         {
             Console.WriteLine("Validating OpenAPI specification...");
-            validationResult = await OpenApiValidator.Validate(openApiPath);
+            validationResult = await Validation.OpenApiValidator.Validate(openApiPath);
         }
         else
         {
@@ -684,7 +683,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 .SpinnerStyle(Style.Parse("cyan bold"))
                 .StartAsync("[cyan]🔍 Validating OpenAPI specification...[/]", async _ =>
                 {
-                    return await OpenApiValidator.Validate(openApiPath);
+                    return await Validation.OpenApiValidator.Validate(openApiPath);
                 });
         }
 
