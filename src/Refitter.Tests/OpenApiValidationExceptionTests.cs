@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Microsoft.OpenApi.Readers;
+using Microsoft.OpenApi.Reader;
 using Refitter.Validation;
 using TUnit.Core;
 

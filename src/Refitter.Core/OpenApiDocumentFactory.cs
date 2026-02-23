@@ -1,6 +1,6 @@
 using System.Net;
-using Microsoft.OpenApi.Extensions;
-using Microsoft.OpenApi.Readers;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Reader;
 using NSwag;
 using OpenApiDocument = NSwag.OpenApiDocument;
 
@@ -96,11 +96,11 @@ public static class OpenApiDocumentFactory
 
             if (IsYaml(openApiPath))
             {
-                var yaml = readResult.OpenApiDocument.SerializeAsYaml(specificationVersion);
+                var yaml = await readResult.OpenApiDocument.SerializeAsYamlAsync(specificationVersion);
                 return await OpenApiYamlDocument.FromYamlAsync(yaml);
             }
 
-            var json = readResult.OpenApiDocument.SerializeAsJson(specificationVersion);
+            var json = await readResult.OpenApiDocument.SerializeAsJsonAsync(specificationVersion);
             return await OpenApiDocument.FromJsonAsync(json);
         }
         catch (Exception)
@@ -132,7 +132,7 @@ public static class OpenApiDocumentFactory
         var document = readResult.OpenApiDocument;
         if (document.Info is null)
         {
-            document.Info = new Microsoft.OpenApi.Models.OpenApiInfo
+            document.Info = new Microsoft.OpenApi.OpenApiInfo
             {
                 Title = Path.GetFileNameWithoutExtension(openApiPath),
                 Version = readResult.OpenApiDiagnostic.SpecificationVersion.GetDisplayName()

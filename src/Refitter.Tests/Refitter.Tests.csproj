@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <OutputType>Exe</OutputType>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -22,7 +22,8 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="8.8.0" />
-        <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.28" />
+        <PackageReference Include="Microsoft.OpenApi" Version="3.3.1" />
+        <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="3.3.1" />
         <PackageReference Include="System.Text.Json" Version="10.0.3" />
         <PackageReference Include="TUnit" Version="1.15.11" />
         <PackageReference Include="coverlet.collector" Version="8.0.0">

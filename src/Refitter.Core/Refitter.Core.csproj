@@ -14,7 +14,7 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103" PrivateAssets="all" />
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.6.3" />
     <PackageReference Include="NSwag.Core.Yaml" Version="14.6.3" />
-    <PackageReference Include="OasReader" Version="1.6.16.16" />
+    <PackageReference Include="OasReader" Version="3.3.1.17" />
   </ItemGroup>
 
   <ItemGroup>
