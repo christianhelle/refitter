@@ -107,6 +107,7 @@ public class InlineJsonConvertersTests
         using (new AssertionScope())
         {
             generatedCode.Should().NotContain("[JsonConverter(typeof(JsonStringEnumConverter))]");
+            generatedCode.Should().NotContain("[JsonConverter(typeof(JsonStringEnumConverter<");
             generatedCode.Should().Contain("Status { get; set; }");
             generatedCode.Should().Contain("public enum PetStatus");
         }

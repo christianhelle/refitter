@@ -208,24 +208,46 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         return new GeneratorOutput(generatedFiles);
     }
 
+    private const string RemoveJsonConverterPattern =
+        @"^\s*\[(?:System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((?:System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter(?:<[^>]+>)?\)\)\]\s*$";
+
+    private const string ReplaceJsonConverterPattern =
+        @"(?<=typeof\()(?:System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter(?:<[^>]+>)?(?=\))";
+
     private string SanitizeGeneratedContracts(string contracts)
     {
-        if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
+        var codeGenSettings = settings.CodeGeneratorSettings;
+        if (codeGenSettings is null)
         {
             return contracts;
         }
 
-        const string pattern = @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*$";
-        var lines = contracts.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-        var filteredLines = lines
-            .Where(
-                line => !Regex.IsMatch(
-                    line,
-                    pattern,
-                    RegexOptions.None,
-                    TimeSpan.FromSeconds(1)))
-            .ToArray();
-        return string.Join(Environment.NewLine, filteredLines);
+        if (!codeGenSettings.InlineJsonConverters)
+        {
+            var lines = contracts.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
+            var filteredLines = lines
+                .Where(
+                    line => !Regex.IsMatch(
+                        line,
+                        RemoveJsonConverterPattern,
+                        RegexOptions.None,
+                        TimeSpan.FromSeconds(1)))
+                .ToArray();
+            return string.Join(Environment.NewLine, filteredLines);
+        }
+
+        if (!string.IsNullOrEmpty(codeGenSettings.EnumJsonConverter))
+        {
+            var customConverter = codeGenSettings.EnumJsonConverter;
+            return Regex.Replace(
+                contracts,
+                ReplaceJsonConverterPattern,
+                _ => customConverter,
+                RegexOptions.None,
+                TimeSpan.FromSeconds(1));
+        }
+
+        return contracts;
     }
 
     /// <summary>
