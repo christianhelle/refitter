@@ -19,6 +19,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             }
         }
 
+        ConvertOneOfWithDiscriminatorToAllOf();
         FixMissingTypesWithIntegerFormat();
         ApplyCustomIntegerType();
 
@@ -63,6 +64,48 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             generator.Settings.CSharpGeneratorSettings);
 
         return generator;
+    }
+
+    /// <summary>
+    /// Converts schemas that use oneOf/anyOf with a discriminator to use the allOf inheritance
+    /// pattern that NSwag's C# code generator understands. Without this transformation,
+    /// NSwag generates undefined anonymous types (e.g., "IdentityProvider2") instead of
+    /// proper base class references.
+    /// </summary>
+    private void ConvertOneOfWithDiscriminatorToAllOf()
+    {
+        foreach (var kvp in document.Components.Schemas)
+        {
+            var schema = kvp.Value.ActualSchema;
+
+            if (schema.DiscriminatorObject == null)
+                continue;
+
+            var unionSchemas = schema.OneOf.Concat(schema.AnyOf).ToArray();
+            if (unionSchemas.Length == 0)
+                continue;
+
+            // Ensure the base schema is typed as an object
+            if (schema.Type == JsonObjectType.None || schema.Type == JsonObjectType.Null)
+                schema.Type = JsonObjectType.Object;
+
+            // For each subtype, add allOf pointing to the base schema if not already present
+            foreach (var subSchemaRef in unionSchemas)
+            {
+                var subSchema = subSchemaRef.ActualSchema;
+                bool alreadyInherits = subSchema.AllOf.Any(
+                    a => a.HasReference && a.ActualSchema == schema);
+                if (!alreadyInherits)
+                {
+                    var reference = new JsonSchema { Reference = schema };
+                    subSchema.AllOf.Add(reference);
+                }
+            }
+
+            // Remove the oneOf/anyOf from the base schema now that subtypes use allOf
+            schema.OneOf.Clear();
+            schema.AnyOf.Clear();
+        }
     }
 
     private void FixMissingTypesWithIntegerFormat()
