@@ -143,7 +143,7 @@ public class RefitterGenerateTask : MSBuildTask
             using (var reader = process.StandardOutput)
             {
                 var output = reader.ReadToEnd();
-                installedRuntimes.AddRange(output?.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries));
+                installedRuntimes.AddRange(output?.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries) ?? []);
             }
             process.WaitForExit();
         }

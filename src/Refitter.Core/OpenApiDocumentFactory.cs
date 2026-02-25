@@ -162,8 +162,10 @@ public static class OpenApiDocumentFactory
     /// <returns>The content of the HTTP request.</returns>
     private static async Task<string> GetHttpContent(string openApiPath)
     {
-        var httpMessageHandler = new HttpClientHandler();
-        httpMessageHandler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+        using var httpMessageHandler = new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        };
         using var http = new HttpClient(httpMessageHandler);
         var content = await http.GetStringAsync(openApiPath);
         return content;

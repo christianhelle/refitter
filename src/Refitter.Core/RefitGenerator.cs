@@ -286,6 +286,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         code.Append("}");
 
+        if (generatedCodes.Length == 0)
+        {
+            return new[] { new GeneratedCode(TypenameConstants.RefitInterfaces, code.ToString()) };
+        }
+
         return new[] { new GeneratedCode(generatedCodes.First().TypeName, code.ToString()) }
             .Union(
                 generatedCodes
