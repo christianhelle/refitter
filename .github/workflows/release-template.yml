@@ -41,7 +41,7 @@ jobs:
         shell: pwsh
         run: Get-ChildItem -Filter *.nupkg -Recurse | ForEach-Object { Move-Item -Path $_ -Destination . }
       - name: Publish artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Packages
           path: |
