@@ -49,12 +49,13 @@ internal static class ParameterExtractor
                 .ToList();
         }
 
-        if (settings.GenerateAuthenticationHeader)
+        if (settings.AuthenticationHeaderStyle == AuthenticationHeaderStyle.Parameter)
         {
             var document = operation.Parent.Parent;
             foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
             {
-                if (!document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
+                if ((settings.SecurityScheme != null && securitySchemeName != settings.SecurityScheme) ||
+                    !document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
                 {
                     continue;
                 }
@@ -64,6 +65,10 @@ internal static class ParameterExtractor
                     && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
                 {
                     headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {ReplaceUnsafeCharacters(securityScheme.Name)}");
+                }
+                else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: "bearer" })
+                {
+                    headerParameters.Add($@"[Header(""Authorization: Bearer"" )] string bearerToken");
                 }
             }
         }
