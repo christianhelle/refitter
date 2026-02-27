@@ -284,22 +284,17 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         {
             foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
             {
-                if (!document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
+                if ((settings.SecurityScheme != null && securitySchemeName != settings.SecurityScheme) ||
+                    !document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
                 {
                     continue;
                 }
 
-                if (securityScheme is { Type: OpenApiSecuritySchemeType.ApiKey, In: OpenApiSecurityApiKeyLocation.Header }
-                    && !operationModel.Parameters.Any(p => p is { Kind: OpenApiParameterKind.Header, IsHeader: true } && p.Name == securityScheme.Name))
-                {
-                    headers.Add($"\"{securityScheme.Name}\"");
-                }
-                else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: "bearer" })
+                if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: "bearer" })
                 {
                     headers.Add("\"Authorization: Bearer\"");
                 }
             }
-            
         }
 
         if (headers.Any())

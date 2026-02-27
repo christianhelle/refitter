@@ -325,6 +325,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             },
             CustomTemplateDirectory = settings.CustomTemplateDirectory,
             AuthenticationHeaderStyle = settings.GenerateAuthenticationHeader,
+            SecurityScheme = settings.SecurityScheme,
         };
     }
     private static async Task WriteSingleFile(

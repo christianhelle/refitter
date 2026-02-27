@@ -394,4 +394,7 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
     public string? CustomTemplateDirectory { get; set; }
+
+    [Description("Security scheme for which to generate authentication headers.")]
+    public string? SecurityScheme { get; set; }
 }

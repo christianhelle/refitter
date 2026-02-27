@@ -54,7 +54,8 @@ internal static class ParameterExtractor
             var document = operation.Parent.Parent;
             foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
             {
-                if (!document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
+                if ((settings.SecurityScheme != null && securitySchemeName != settings.SecurityScheme) ||
+                    !document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
                 {
                     continue;
                 }
