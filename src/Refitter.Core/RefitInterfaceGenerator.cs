@@ -109,6 +109,9 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         return code.ToString();
     }
 
+    private static readonly string[] SuccessCodes = ["200", "201", "203", "206"];
+    private static readonly string[] SuccessCodesWithRange = ["200", "201", "203", "206", "2XX"];
+
     protected string GetTypeName(OpenApiOperation operation)
     {
         if (settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
@@ -123,8 +126,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         // First check for explicit success status codes
-        var successCodes = new[] { "200", "201", "203", "206" };
-        var returnTypeParameter = successCodes
+        var returnTypeParameter = SuccessCodes
             .Where(operation.Responses.ContainsKey)
             .Select(code => GetTypeName(code, operation))
             .FirstOrDefault();
@@ -151,9 +153,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     /// <returns>True if the response is a file stream, false otherwise.</returns>
     private static bool IsFileStreamResponse(OpenApiOperation operation)
     {
-        var successCodes = new[] { "200", "201", "203", "206", "2XX" };
-
-        foreach (var code in successCodes)
+        foreach (var code in SuccessCodesWithRange)
         {
             if (!operation.Responses.TryGetValue(code, out var apiResponse))
                 continue;
@@ -309,21 +309,23 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     protected static bool IsApiResponseType(string typeName)
     {
         // Check for HttpResponseMessage
-        if (Regex.IsMatch(
-            typeName,
-            "(Task|IObservable)<HttpResponseMessage>",
-            RegexOptions.None,
-            TimeSpan.FromSeconds(1)))
+        if (HttpResponseMessageRegex.IsMatch(typeName))
         {
             return true;
         }
 
-        return Regex.IsMatch(
-            typeName,
-            "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>",
-            RegexOptions.None,
-            TimeSpan.FromSeconds(1));
+        return ApiResponseRegex.IsMatch(typeName);
     }
+
+    private static readonly Regex HttpResponseMessageRegex = new(
+        "(Task|IObservable)<HttpResponseMessage>",
+        RegexOptions.Compiled,
+        TimeSpan.FromSeconds(1));
+
+    private static readonly Regex ApiResponseRegex = new(
+        "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>",
+        RegexOptions.Compiled,
+        TimeSpan.FromSeconds(1));
 
     private string GetConfiguredReturnType(string returnTypeParameter)
     {

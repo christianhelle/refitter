@@ -208,6 +208,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         return new GeneratorOutput(generatedFiles);
     }
 
+    private static readonly Regex JsonConverterAttributeRegex = new(
+        @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*$",
+        RegexOptions.Compiled,
+        TimeSpan.FromSeconds(1));
+
     private string SanitizeGeneratedContracts(string contracts)
     {
         if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
@@ -215,15 +220,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             return contracts;
         }
 
-        const string pattern = @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*$";
         var lines = contracts.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
         var filteredLines = lines
-            .Where(
-                line => !Regex.IsMatch(
-                    line,
-                    pattern,
-                    RegexOptions.None,
-                    TimeSpan.FromSeconds(1)))
+            .Where(line => !JsonConverterAttributeRegex.IsMatch(line))
             .ToArray();
         return string.Join(Environment.NewLine, filteredLines);
     }
@@ -242,7 +241,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .AppendLine(RefitInterfaceImports.GenerateNamespaceImports(settings))
             .AppendLine();
 
-        if (settings.AdditionalNamespaces.Any())
+        if (settings.AdditionalNamespaces.Length > 0)
         {
             foreach (var ns in settings.AdditionalNamespaces)
             {

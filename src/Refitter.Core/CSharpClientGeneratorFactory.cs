@@ -19,8 +19,50 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             }
         }
 
-        FixMissingTypesWithIntegerFormat();
-        ApplyCustomIntegerType();
+        var customIntegerType = settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32;
+        var applyIntegerType = customIntegerType != IntegerType.Int32;
+
+        ProcessSchemas(document.Components.Schemas, applyIntegerType);
+
+        foreach (var path in document.Paths)
+        {
+            if (path.Value == null) continue;
+
+            foreach (var operation in path.Value.Values)
+            {
+                if (operation == null) continue;
+
+                foreach (var parameter in operation.Parameters)
+                {
+                    FixSchemaTypeFromFormat(parameter.ActualSchema);
+                    if (applyIntegerType &&
+                        parameter.ActualSchema.Type == JsonObjectType.Integer &&
+                        string.IsNullOrEmpty(parameter.ActualSchema.Format))
+                    {
+                        parameter.ActualSchema.Format = "int64";
+                    }
+                }
+
+                if (operation.RequestBody?.Content != null)
+                {
+                    foreach (var content in operation.RequestBody.Content.Values)
+                    {
+                        ProcessSchema(content.Schema, applyIntegerType);
+                    }
+                }
+
+                foreach (var response in operation.Responses.Values)
+                {
+                    if (response.Content != null)
+                    {
+                        foreach (var content in response.Content.Values)
+                        {
+                            ProcessSchema(content.Schema, applyIntegerType);
+                        }
+                    }
+                }
+            }
+        }
 
         var csharpClientGeneratorSettings = new CSharpClientGeneratorSettings
         {
@@ -65,54 +107,15 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         return generator;
     }
 
-    private void FixMissingTypesWithIntegerFormat()
-    {
-        ProcessSchemasForMissingTypes(document.Components.Schemas);
-
-        foreach (var path in document.Paths)
-        {
-            if (path.Value == null) continue;
-
-            foreach (var operation in path.Value.Values)
-            {
-                if (operation == null) continue;
-
-                foreach (var parameter in operation.Parameters)
-                {
-                    FixSchemaTypeFromFormat(parameter.ActualSchema);
-                }
-
-                if (operation.RequestBody?.Content != null)
-                {
-                    foreach (var content in operation.RequestBody.Content.Values)
-                    {
-                        ProcessSchemaForMissingTypes(content.Schema);
-                    }
-                }
-
-                foreach (var response in operation.Responses.Values)
-                {
-                    if (response.Content != null)
-                    {
-                        foreach (var content in response.Content.Values)
-                        {
-                            ProcessSchemaForMissingTypes(content.Schema);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void ProcessSchemasForMissingTypes(IDictionary<string, JsonSchema> schemas)
+    private void ProcessSchemas(IDictionary<string, JsonSchema> schemas, bool applyIntegerType)
     {
         foreach (var schema in schemas.Values)
         {
-            ProcessSchemaForMissingTypes(schema);
+            ProcessSchema(schema, applyIntegerType);
         }
     }
 
-    private void ProcessSchemaForMissingTypes(JsonSchema? schema)
+    private void ProcessSchema(JsonSchema? schema, bool applyIntegerType)
     {
         if (schema == null) return;
 
@@ -120,29 +123,41 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 
         FixSchemaTypeFromFormat(actualSchema);
 
+        if (applyIntegerType &&
+            actualSchema.Type == JsonObjectType.Integer &&
+            string.IsNullOrEmpty(actualSchema.Format))
+        {
+            actualSchema.Format = "int64";
+        }
+
         foreach (var property in actualSchema.Properties.Values)
         {
-            ProcessSchemaForMissingTypes(property);
+            ProcessSchema(property, applyIntegerType);
         }
 
         if (actualSchema.Item != null)
         {
-            ProcessSchemaForMissingTypes(actualSchema.Item);
+            ProcessSchema(actualSchema.Item, applyIntegerType);
         }
 
         if (actualSchema.AdditionalPropertiesSchema != null)
         {
-            ProcessSchemaForMissingTypes(actualSchema.AdditionalPropertiesSchema);
+            ProcessSchema(actualSchema.AdditionalPropertiesSchema, applyIntegerType);
         }
 
-        var subSchemas = actualSchema.AllOf
-            .Concat(actualSchema.OneOf)
-            .Concat(actualSchema.AnyOf)
-            .ToArray();
-
-        foreach (var subSchema in subSchemas)
+        foreach (var subSchema in actualSchema.AllOf)
         {
-            ProcessSchemaForMissingTypes(subSchema);
+            ProcessSchema(subSchema, applyIntegerType);
+        }
+
+        foreach (var subSchema in actualSchema.OneOf)
+        {
+            ProcessSchema(subSchema, applyIntegerType);
+        }
+
+        foreach (var subSchema in actualSchema.AnyOf)
+        {
+            ProcessSchema(subSchema, applyIntegerType);
         }
     }
 
@@ -163,98 +178,9 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         }
     }
 
-    private void ApplyCustomIntegerType()
-    {
-        var customIntegerType = settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32;
-        if (customIntegerType == IntegerType.Int32)
-            return;
-
-        ProcessSchemasForIntegerType(document.Components.Schemas);
-
-        foreach (var path in document.Paths)
-        {
-            if (path.Value == null) continue;
-
-            foreach (var operation in path.Value.Values)
-            {
-                if (operation == null) continue;
-
-                foreach (var parameter in operation.Parameters)
-                {
-                    if (parameter.ActualSchema.Type == JsonObjectType.Integer &&
-                        string.IsNullOrEmpty(parameter.ActualSchema.Format))
-                    {
-                        parameter.ActualSchema.Format = "int64";
-                    }
-                }
-
-                if (operation.RequestBody?.Content != null)
-                {
-                    foreach (var content in operation.RequestBody.Content.Values)
-                    {
-                        ProcessSchemaForIntegerType(content.Schema);
-                    }
-                }
-
-                foreach (var response in operation.Responses.Values)
-                {
-                    if (response.Content != null)
-                    {
-                        foreach (var content in response.Content.Values)
-                        {
-                            ProcessSchemaForIntegerType(content.Schema);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void ProcessSchemasForIntegerType(IDictionary<string, JsonSchema> schemas)
-    {
-        foreach (var schema in schemas.Values)
-        {
-            ProcessSchemaForIntegerType(schema);
-        }
-    }
-
-    private void ProcessSchemaForIntegerType(JsonSchema? schema)
-    {
-        if (schema == null) return;
-
-        var actualSchema = schema.ActualSchema;
-
-        if (actualSchema.Type == JsonObjectType.Integer &&
-            string.IsNullOrEmpty(actualSchema.Format))
-        {
-            actualSchema.Format = "int64";
-        }
-
-        foreach (var property in actualSchema.Properties.Values)
-        {
-            ProcessSchemaForIntegerType(property);
-        }
-
-        if (actualSchema.Item != null)
-        {
-            ProcessSchemaForIntegerType(actualSchema.Item);
-        }
-
-        if (actualSchema.AdditionalPropertiesSchema != null)
-        {
-            ProcessSchemaForIntegerType(actualSchema.AdditionalPropertiesSchema);
-        }
-
-        var subSchemas = actualSchema.AllOf
-            .Concat(actualSchema.OneOf)
-            .Concat(actualSchema.AnyOf)
-            .ToArray();
-
-        foreach (var subSchema in subSchemas)
-        {
-            ProcessSchemaForIntegerType(subSchema);
-        }
-    }
+    private static readonly PropertyInfo[] SourceProperties = typeof(CodeGeneratorSettings).GetProperties();
+    private static readonly CodeGeneratorSettings DefaultCodeGeneratorSettings = new();
+    private static readonly Dictionary<string, PropertyInfo?> DestinationPropertyCache = new();
 
     private static void MapCSharpGeneratorSettings(
         CodeGeneratorSettings? source,
@@ -265,8 +191,8 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             return;
         }
 
-        var defaultInstance = new CodeGeneratorSettings();
-        foreach (var property in source.GetType().GetProperties())
+        var destinationType = destination.GetType();
+        foreach (var property in SourceProperties)
         {
             var value = property.GetValue(source);
             if (value == null)
@@ -274,12 +200,17 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                 continue;
             }
 
-            if (value.Equals(property.GetValue(defaultInstance)))
+            if (value.Equals(property.GetValue(DefaultCodeGeneratorSettings)))
             {
                 continue;
             }
 
-            var settingsProperty = destination.GetType().GetProperty(property.Name);
+            if (!DestinationPropertyCache.TryGetValue(property.Name, out var settingsProperty))
+            {
+                settingsProperty = destinationType.GetProperty(property.Name);
+                DestinationPropertyCache[property.Name] = settingsProperty;
+            }
+
             if (settingsProperty == null ||
                 !settingsProperty.PropertyType.IsAssignableFrom(property.PropertyType))
             {
