@@ -207,6 +207,8 @@ public class XmlDocumentationGenerator
         }
     }
 
+    private static readonly string[] NewLineSeparators = ["\r\n", "\r", "\n"];
+
     /// <summary>
     /// Append a single XML element to the given code builder.
     /// If the content includes line breaks, it is placed on a new line and the existing breaks are preserved.
@@ -231,22 +233,12 @@ public class XmlDocumentationGenerator
 
         code.Append(">");
 
-        var lines = content.Split(
-            new[]
-            {
-                "\r\n", "\r", "\n"
-            },
-            StringSplitOptions.None);
+        var lines = content.Split(NewLineSeparators, StringSplitOptions.None);
         if (lines.Length > 1)
         {
             // When working with multiple lines, place the content on a separate line with normalized linebreaks.
             code.AppendLine();
-            foreach (var line in content.Split(
-                new[]
-                {
-                    "\r\n", "\r", "\n"
-                },
-                StringSplitOptions.None))
+            foreach (var line in lines)
                 code.AppendLine($"{indent}/// {line.Trim()}");
 
             code.AppendLine($"{indent}/// </{tagName}>");

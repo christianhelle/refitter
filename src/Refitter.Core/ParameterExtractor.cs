@@ -279,14 +279,38 @@ internal static class ParameterExtractor
 
     private static string JoinAttributes(params string[] attributes)
     {
-        var filteredAttributes = attributes
-            .Where(a => !string.IsNullOrWhiteSpace(a))
-            .ToList();
+        var count = 0;
+        for (int i = 0; i < attributes.Length; i++)
+        {
+            if (!string.IsNullOrWhiteSpace(attributes[i]))
+                count++;
+        }
 
-        if (filteredAttributes.Count == 0)
+        if (count == 0)
             return string.Empty;
 
-        return "[" + string.Join(", ", filteredAttributes) + "] ";
+        if (count == 1)
+        {
+            for (int i = 0; i < attributes.Length; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(attributes[i]))
+                    return "[" + attributes[i] + "] ";
+            }
+        }
+
+        var sb = new StringBuilder("[");
+        var first = true;
+        for (int i = 0; i < attributes.Length; i++)
+        {
+            if (string.IsNullOrWhiteSpace(attributes[i]))
+                continue;
+            if (!first)
+                sb.Append(", ");
+            sb.Append(attributes[i]);
+            first = false;
+        }
+        sb.Append("] ");
+        return sb.ToString();
     }
 
     private static string GetParameterType(

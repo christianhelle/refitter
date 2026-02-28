@@ -57,7 +57,7 @@ internal static class RefitInterfaceImports
         "RS1035:Do not use APIs banned for analyzers",
         Justification = "This tool is cross platform")]
     public static string GenerateNamespaceImports(RefitGeneratorSettings settings) =>
-        GetImportedNamespaces(settings)
-            .Select(ns => $"using {ns};")
-            .Aggregate((a, b) => $"{a}{Environment.NewLine}{b}");
+        string.Join(
+            Environment.NewLine,
+            GetImportedNamespaces(settings).Select(ns => $"using {ns};"));
 }

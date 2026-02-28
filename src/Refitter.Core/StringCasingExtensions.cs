@@ -41,8 +41,10 @@ internal static class StringCasingExtensions
         if (string.IsNullOrEmpty(str))
             return str;
 
-        return str.Substring(0, 1).ToUpperInvariant() +
-               str.Substring(1, str.Length - 1);
+        if (char.IsUpper(str[0]))
+            return str;
+
+        return char.ToUpperInvariant(str[0]) + str.Substring(1);
     }
 
     public static string ConvertSpacesToPascalCase(this string str)
