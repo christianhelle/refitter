@@ -25,7 +25,7 @@
         <PackageReference Include="Microsoft.OpenApi" Version="3.3.1" />
         <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="3.3.1" />
         <PackageReference Include="System.Text.Json" Version="10.0.3" />
-        <PackageReference Include="TUnit" Version="1.15.11" />
+        <PackageReference Include="TUnit" Version="1.17.54" />
         <PackageReference Include="coverlet.collector" Version="8.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
