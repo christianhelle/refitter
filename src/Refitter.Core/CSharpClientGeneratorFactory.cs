@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Reflection;
 using NJsonSchema;
 using NJsonSchema.CodeGeneration;
@@ -180,7 +181,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 
     private static readonly PropertyInfo[] SourceProperties = typeof(CodeGeneratorSettings).GetProperties();
     private static readonly CodeGeneratorSettings DefaultCodeGeneratorSettings = new();
-    private static readonly Dictionary<string, PropertyInfo?> DestinationPropertyCache = new();
+    private static readonly ConcurrentDictionary<(Type, string), PropertyInfo?> DestinationPropertyCache = new();
 
     private static void MapCSharpGeneratorSettings(
         CodeGeneratorSettings? source,
@@ -205,11 +206,10 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                 continue;
             }
 
-            if (!DestinationPropertyCache.TryGetValue(property.Name, out var settingsProperty))
-            {
-                settingsProperty = destinationType.GetProperty(property.Name);
-                DestinationPropertyCache[property.Name] = settingsProperty;
-            }
+            var cacheKey = (destinationType, property.Name);
+            var settingsProperty = DestinationPropertyCache.GetOrAdd(
+                cacheKey,
+                _ => destinationType.GetProperty(property.Name));
 
             if (settingsProperty == null ||
                 !settingsProperty.PropertyType.IsAssignableFrom(property.PropertyType))

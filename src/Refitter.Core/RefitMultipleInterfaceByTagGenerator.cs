@@ -113,9 +113,12 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
             var key = keyValuePair.Key;
             var value = keyValuePair.Value;
 
-            var trimmedValue = value.ToString().TrimEnd();
+            while (value.Length > 0 && char.IsWhiteSpace(value[value.Length - 1]))
+            {
+                value.Length--;
+            }
 
-            code.AppendLine(trimmedValue);
+            code.AppendLine(value.ToString());
             code.AppendLine($"{Separator}}}");
 
             yield return new GeneratedCode(
