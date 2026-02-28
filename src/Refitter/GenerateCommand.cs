@@ -845,11 +845,26 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         var settingsFilePath = DetermineSettingsFilePath(settings);
         var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
 
-        if (!string.IsNullOrWhiteSpace(settingsDirectory) && !Directory.Exists(settingsDirectory))
-            Directory.CreateDirectory(settingsDirectory);
-
         var json = Serializer.Serialize(refitGeneratorSettings);
-        await File.WriteAllTextAsync(settingsFilePath, json);
+
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(settingsDirectory) && !Directory.Exists(settingsDirectory))
+            {
+                Directory.CreateDirectory(settingsDirectory);
+            }
+
+            await File.WriteAllTextAsync(settingsFilePath, json);
+        }
+        catch (Exception ex) when (ex is IOException ||
+                                    ex is UnauthorizedAccessException ||
+                                    ex is System.Security.SecurityException ||
+                                    ex is NotSupportedException)
+        {
+            throw new InvalidOperationException(
+                $"Failed to write Refitter settings file to '{settingsFilePath}'. See inner exception for details.",
+                ex);
+        }
 
         if (settings.SimpleOutput)
         {
@@ -877,13 +892,36 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     internal static string DetermineSettingsFilePath(Settings settings)
     {
-        // If output path is specified and is a directory, put .refitter file there
+        // If a custom output path is specified, place the .refitter file in the corresponding directory:
+        // - For multiple files or when a contracts output path is set, use OutputPath as a directory.
+        // - Otherwise, use the directory containing the single output file.
         if (!string.IsNullOrWhiteSpace(settings.OutputPath) &&
             settings.OutputPath != Settings.DefaultOutputPath)
         {
-            var outputDir = settings.GenerateMultipleFiles || !string.IsNullOrWhiteSpace(settings.ContractsOutputPath)
-                ? settings.OutputPath
-                : Path.GetDirectoryName(settings.OutputPath);
+            string? outputDir;
+
+            // In multi-file/contracts mode, OutputPath is typically a directory, but normalize
+            // to handle cases where a file path is provided instead.
+            if (settings.GenerateMultipleFiles || !string.IsNullOrWhiteSpace(settings.ContractsOutputPath))
+            {
+                var outputPath = settings.OutputPath;
+
+                // If OutputPath clearly looks like a file (has an extension), use its directory.
+                // Otherwise, treat it as a directory (even if it does not yet exist).
+                if (Path.HasExtension(outputPath))
+                {
+                    outputDir = Path.GetDirectoryName(outputPath);
+                }
+                else
+                {
+                    outputDir = outputPath;
+                }
+            }
+            else
+            {
+                // Single-file mode: OutputPath is expected to be a file path; use its directory.
+                outputDir = Path.GetDirectoryName(settings.OutputPath);
+            }
 
             if (!string.IsNullOrWhiteSpace(outputDir))
             {
