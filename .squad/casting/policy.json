@@ -1,0 +1,6 @@
+{
+  "universe_allowlist": ["The Usual Suspects"],
+  "max_team_size": 10,
+  "allow_overflow": true,
+  "overflow_strategy": "diegetic_expansion"
+}
