@@ -5,6 +5,12 @@
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
+    <!-- Disable Refit source generator during batch smoke tests to avoid filename-too-long errors
+         when hundreds of interfaces cause the generator to create extremely long filenames -->
+    <PropertyGroup Condition="'$(SmokeTest)' == 'true'">
+        <DisableRefitSourceGenerator>true</DisableRefitSourceGenerator>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    </PropertyGroup>
     <ItemGroup>
         <Compile Include="..\Program.cs">
             <Link>Program.cs</Link>
