@@ -44,7 +44,7 @@ internal static class IdentifierUtils
         if (string.IsNullOrEmpty(value))
             return value;
 
-        // @ can be used and still make valid methode names. but this should make most use cases safe
+        // @ can be used and still make valid method names. but this should make most use cases safe
         if (
             (value.First() < 'A' || value.First() > 'Z') &&
             (value.First() < 'a' || value.First() > 'z') &&

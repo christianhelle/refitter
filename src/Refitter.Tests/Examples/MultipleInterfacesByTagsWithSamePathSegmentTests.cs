@@ -7,7 +7,7 @@ using TUnit.Core;
 namespace Refitter.Tests.Examples;
 
 /// <summary>
-/// Regression tests for https://github.com/christianhelle/refitter/issues/XXX
+/// Regression tests for https://github.com/christianhelle/refitter/issues/
 /// When using ByTag, method names should not have numeric suffixes added for
 /// cross-interface uniqueness - deduplication should be per-interface.
 /// </summary>
