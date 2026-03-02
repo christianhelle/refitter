@@ -45,7 +45,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
 
-                string interfaceName = null!;
+                string interfaceName;
                 if (!interfacesByGroup.TryGetValue(kv.Key, out var sb))
                 {
                     interfacesByGroup[kv.Key] = sb = new StringBuilder();
@@ -58,6 +58,10 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                                     """);
 
                     interfacesNamesByGroup[kv.Key] = interfaceName;
+                }
+                else
+                {
+                    interfaceName = interfacesNamesByGroup[kv.Key];
                 }
 
                 var operationName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);

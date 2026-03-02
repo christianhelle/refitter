@@ -45,6 +45,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     {
         var code = new StringBuilder();
         var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
+        var knownIdentifiers = new HashSet<string>();
         foreach (var kv in document.Paths)
         {
             foreach (var operations in kv.Value)
@@ -58,7 +59,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
                 var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
-                var operationName = GenerateOperationName(kv.Key, verb, operation);
+                var operationName = IdentifierUtils.Counted(knownIdentifiers, GenerateOperationName(kv.Key, verb, operation));
+                knownIdentifiers.Add(operationName);
                 var dynamicQuerystringParameterType = operationName + "QueryParams";
 
                 var operationModel = generator.CreateOperationModel(operation);
