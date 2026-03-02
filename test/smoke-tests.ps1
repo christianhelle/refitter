@@ -204,7 +204,9 @@ function RunTests
     if ($BuildFromSource -and -not $UseDocker)
     {
         Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net9.0"
-        Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net9.0" -NoNewWindow -PassThru | Wait-Process
+        $publishProcess = Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net9.0" -NoNewWindow -PassThru
+        $publishProcess | Wait-Process
+        if ($publishProcess.ExitCode -ne 0) { throw "dotnet publish failed!" }
 
         Write-Host "refitter --version"
         $p = Start-Process "./bin/refitter" -Args "--version" -NoNewWindow -PassThru
@@ -216,9 +218,15 @@ function RunTests
     # Phase 1: Pre-restore packages
     # ==========================================
     Write-Host "`r`n=== Pre-restoring packages ===`r`n"
-    Start-Process "dotnet" -Args "restore ./ConsoleApp/ConsoleApp.slnx --nologo -v q" -NoNewWindow -PassThru | Wait-Process
-    Start-Process "dotnet" -Args "restore ./ConsoleApp/ConsoleApp.Core.slnx --nologo -v q" -NoNewWindow -PassThru | Wait-Process
-    Start-Process "dotnet" -Args "restore ./Apizr/Sample.csproj --nologo -v q" -NoNewWindow -PassThru | Wait-Process
+    $p = Start-Process "dotnet" -Args "restore ./ConsoleApp/ConsoleApp.slnx --nologo -v q" -NoNewWindow -PassThru
+    $p | Wait-Process
+    if ($p.ExitCode -ne 0) { throw "dotnet restore ./ConsoleApp/ConsoleApp.slnx failed!" }
+    $p = Start-Process "dotnet" -Args "restore ./ConsoleApp/ConsoleApp.Core.slnx --nologo -v q" -NoNewWindow -PassThru
+    $p | Wait-Process
+    if ($p.ExitCode -ne 0) { throw "dotnet restore ./ConsoleApp/ConsoleApp.Core.slnx failed!" }
+    $p = Start-Process "dotnet" -Args "restore ./Apizr/Sample.csproj --nologo -v q" -NoNewWindow -PassThru
+    $p | Wait-Process
+    if ($p.ExitCode -ne 0) { throw "dotnet restore ./Apizr/Sample.csproj failed!" }
 
     # ==========================================
     # Phase 2: Settings-file tests (individual generate + build)
@@ -379,7 +387,7 @@ function RunTests
     Write-Host "Standard generation tasks: $($standardTasks.Count)"
     Write-Host "NetCore generation tasks: $($netCoreTasks.Count)"
 
-    # Execute standard generation in parallel batches
+    # Execute standard generation tasks sequentially
     RunGenerationTasks -tasks $standardTasks -processPath $processPath -useDocker $UseDocker
 
     # ==========================================
@@ -397,9 +405,9 @@ function RunTests
     $customNameSpec = "./OpenAPI/v3.0/petstore.json"
     $customNameArgs = "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync"
     $customNameOutput = "./GeneratedCode/MultipleInterfacesWithCustomName_generateonly.cs"
-    $customNameCmd = "$processPath $customNameSpec --namespace GenerateOnly.MultipleInterfacesWithCustomName --output $customNameOutput --no-logging $customNameArgs"
-    Write-Host $customNameCmd
-    Invoke-Expression $customNameCmd
+    $customNameCmdArgs = "$customNameSpec --namespace GenerateOnly.MultipleInterfacesWithCustomName --output $customNameOutput --no-logging $customNameArgs"
+    Write-Host "$processPath $customNameCmdArgs"
+    StartRefitter -processPath $processPath -arguments $customNameCmdArgs -useDocker:$UseDocker
     if (-not (Test-Path $customNameOutput)) { throw "Generate-only test failed: MultipleInterfacesWithCustomName" }
     Remove-Item $customNameOutput -Force
     Write-Host "Generate-only test passed: MultipleInterfacesWithCustomName"
@@ -425,7 +433,6 @@ function RunTests
 
     @("https://petstore3.swagger.io/api/v3/openapi.json", "https://petstore3.swagger.io/api/v3/openapi.yaml") | ForEach-Object {
         $url = $_
-        $urlFormat = if ($url.EndsWith(".json")) { "json" } else { "yaml" }
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.generated.cs"
 

@@ -2,14 +2,13 @@
 setlocal enabledelayedexpansion
 
 :: Parse command line arguments
-set "THROTTLE_LIMIT=4"
 set "USE_PRODUCTION=false"
 set "USE_DOCKER=false"
 
 :parse_args
 if "%~1"=="" goto :main
 if /i "%~1"=="-throttlelimit" (
-    set "THROTTLE_LIMIT=%~2"
+    :: Accepted for compatibility but not used (script runs sequentially)
     shift
     shift
     goto :parse_args
@@ -34,7 +33,6 @@ shift
 goto :parse_args
 
 :main
-echo ThrottleLimit: %THROTTLE_LIMIT%
 echo UseProduction: %USE_PRODUCTION%
 echo UseDocker: %USE_DOCKER%
 
@@ -164,8 +162,11 @@ echo.
 echo === Pre-restoring packages ===
 echo.
 dotnet restore .\ConsoleApp\ConsoleApp.slnx --nologo -v q
+call :throw_on_native_failure
 dotnet restore .\ConsoleApp\ConsoleApp.Core.slnx --nologo -v q
+call :throw_on_native_failure
 dotnet restore .\Apizr\Sample.csproj --nologo -v q
+call :throw_on_native_failure
 
 :: ==========================================
 :: Phase 2: Settings-file tests
