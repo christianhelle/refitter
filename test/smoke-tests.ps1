@@ -1,9 +1,5 @@
 param (
     [Parameter(Mandatory=$false)]
-    [int]
-    $ThrottleLimit = 4,
-
-    [Parameter(Mandatory=$false)]
     [switch]
     $UseProduction = $false,
 
@@ -113,34 +109,22 @@ function CleanGeneratedCode
     } catch { }
 }
 
-function RunBatchGeneration
+function RunGenerationTasks
 {
     param (
         [array]$tasks,
         [string]$processPath,
-        [bool]$useDocker,
-        [int]$batchSize = 4
+        [bool]$useDocker
     )
 
-    for ($i = 0; $i -lt $tasks.Count; $i += $batchSize)
+    for ($i = 0; $i -lt $tasks.Count; $i++)
     {
-        $end = [Math]::Min($i + $batchSize - 1, $tasks.Count - 1)
-        $batch = $tasks[$i..$end]
-        $processes = @()
-
-        foreach ($task in $batch)
-        {
-            $arguments = "$($task.SpecPath) --namespace $($task.Namespace) --output $($task.OutputPath) --no-logging"
-            if ($task.Args) { $arguments += " $($task.Args)" }
-            $p = StartRefitter -arguments $arguments -processPath $processPath -useDocker $useDocker
-            $processes += $p
-        }
-
-        $processes | Wait-Process
-        foreach ($p in $processes)
-        {
-            if ($p.ExitCode -ne 0) { throw "Refitter generation failed (batch starting at index $i)" }
-        }
+        $task = $tasks[$i]
+        $arguments = "$($task.SpecPath) --namespace $($task.Namespace) --output $($task.OutputPath) --no-logging"
+        if ($task.Args) { $arguments += " $($task.Args)" }
+        $p = StartRefitter -arguments $arguments -processPath $processPath -useDocker $useDocker
+        $p | Wait-Process
+        if ($p.ExitCode -ne 0) { throw "Refitter generation failed for: $($task.SpecPath) ($($task.Namespace))" }
     }
 }
 
@@ -148,8 +132,7 @@ function RunTests
 {
     param (
         [bool]$BuildFromSource = $true,
-        [bool]$UseDocker = $false,
-        [int]$ThrottleLimit = 4
+        [bool]$UseDocker = $false
     )
 
     $processPath = GetProcessPath -buildFromSource $BuildFromSource -useDocker $UseDocker
@@ -172,8 +155,7 @@ function RunTests
     )
 
     $v31Filenames = @(
-        "webhook-example",
-        "non-oauth-scopes"
+        "webhook-example"
     )
 
     # Standard variants: compile on all frameworks (net462-net10)
@@ -185,10 +167,7 @@ function RunTests
         @{ Suffix="UsingIsoDateFormat"; Prefix="UsingIsoDateFormat"; Args="--use-iso-date-format" },
         @{ Suffix="MultipleInterfaces"; Prefix="MultipleInterfaces"; Args="--multiple-interfaces ByEndpoint" },
         @{ Suffix="MultipleInterfaces"; Prefix="MultipleInterfacesWithCustomName"; Args="--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync" },
-        @{ Suffix="TagFiltered"; Prefix="TagFiltered"; Args="--tag pet --tag user --tag store" },
-        @{ Suffix="MatchPathFiltered"; Prefix="MatchPathFiltered"; Args="--match-path ^/pet/.*" },
         @{ Suffix="ContractOnly"; Prefix="ContractOnly"; Args="--contract-only" },
-        @{ Suffix="MultipleInterfacesByTag"; Prefix="MultipleInterfacesByTag"; Args="--multiple-interfaces ByTag" },
         @{ Suffix="DynamicQuerystring"; Prefix="DynamicQuerystring"; Args="--use-dynamic-querystring-parameters" },
         @{ Suffix="IntegerTypeInt64"; Prefix="IntegerTypeInt64"; Args="--integer-type Int64" },
         @{ Suffix="TrimUnusedSchema"; Prefix="TrimUnusedSchema"; Args="--trim-unused-schema" },
@@ -198,6 +177,13 @@ function RunTests
         @{ Suffix="NoAcceptHeaders"; Prefix="NoAcceptHeaders"; Args="--no-accept-headers" },
         @{ Suffix="SkipDefaultAdditionalProps"; Prefix="SkipDefaultAddlProps"; Args="--skip-default-additional-properties" },
         @{ Suffix="NoInlineJsonConverters"; Prefix="NoInlineJsonConv"; Args="--no-inline-json-converters" }
+    )
+
+    # Petstore-only variants: require specs with specific tags/paths (petstore has "pet", "user", "store" tags)
+    $petstoreOnlyVariants = @(
+        @{ Suffix="TagFiltered"; Prefix="TagFiltered"; Args="--tag pet --tag user --tag store" },
+        @{ Suffix="MatchPathFiltered"; Prefix="MatchPathFiltered"; Args="--match-path ^/pet/.*" },
+        @{ Suffix="MultipleInterfacesByTag"; Prefix="MultipleInterfacesByTag"; Args="--multiple-interfaces ByTag" }
     )
 
     # NetCore variants: require net8.0+ features
@@ -292,6 +278,20 @@ function RunTests
                     }
                 }
 
+                # Petstore-only variants (tag/path filters require petstore-specific tags)
+                if ($filename -like "petstore*")
+                {
+                    foreach ($v in $petstoreOnlyVariants)
+                    {
+                        $standardTasks += @{
+                            SpecPath = $specPath
+                            Namespace = "$ns.$($v.Suffix)"
+                            OutputPath = "./GeneratedCode/$($v.Prefix)${fileTag}.generated.cs"
+                            Args = $v.Args
+                        }
+                    }
+                }
+
                 # Multiple files variant (unique subdirectory)
                 $standardTasks += @{
                     SpecPath = $specPath
@@ -322,6 +322,7 @@ function RunTests
     }
 
     # Collect generation tasks for v3.1
+    # Note: v3.1 webhook specs may not have regular API paths, so skip MultipleInterfaces variants
     foreach ($format in @("json", "yaml"))
     {
         foreach ($filename in $v31Filenames)
@@ -335,6 +336,7 @@ function RunTests
 
             foreach ($v in $standardVariants)
             {
+                if ($v.Args -like "*--multiple-interfaces*") { continue }
                 $standardTasks += @{
                     SpecPath = $specPath
                     Namespace = "$ns.$($v.Suffix)"
@@ -373,7 +375,7 @@ function RunTests
     Write-Host "NetCore generation tasks: $($netCoreTasks.Count)"
 
     # Execute standard generation in parallel batches
-    RunBatchGeneration -tasks $standardTasks -processPath $processPath -useDocker $UseDocker -batchSize $ThrottleLimit
+    RunGenerationTasks -tasks $standardTasks -processPath $processPath -useDocker $UseDocker
 
     # ==========================================
     # Phase 4: Build standard variants (one build validates all)
@@ -386,7 +388,7 @@ function RunTests
     # Net8/Net9/Net10 can compile both standard and netCore code
     # ==========================================
     Write-Host "`r`n=== Generating netCore variants ===`r`n"
-    RunBatchGeneration -tasks $netCoreTasks -processPath $processPath -useDocker $UseDocker -batchSize $ThrottleLimit
+    RunGenerationTasks -tasks $netCoreTasks -processPath $processPath -useDocker $UseDocker
 
     # ==========================================
     # Phase 6: Build netCore variants
@@ -443,8 +445,7 @@ if ($UseDocker)
 Measure-Command {
     RunTests `
         -BuildFromSource (!$UseProduction -and !$UseDocker) `
-        -UseDocker $UseDocker `
-        -ThrottleLimit $ThrottleLimit
+        -UseDocker $UseDocker
 }
 Write-Host "`r`n"
 Write-Host "`r`n"

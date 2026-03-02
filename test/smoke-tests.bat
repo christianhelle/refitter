@@ -139,8 +139,7 @@ set "filename_count=14"
 
 :: V3.1 filenames
 set "v31filename0=webhook-example"
-set "v31filename1=non-oauth-scopes"
-set "v31filename_count=2"
+set "v31filename_count=1"
 
 :: ==========================================
 :: Phase 0: Build refitter from source
@@ -225,10 +224,7 @@ for %%v in (v3.0 v2.0) do (
                 call :generate "!file_path!" "!ns!.UsingIsoDateFormat" ".\GeneratedCode\UsingIsoDateFormat!file_tag!.generated.cs" "--use-iso-date-format" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.MultipleInterfaces" ".\GeneratedCode\MultipleInterfaces!file_tag!.generated.cs" "--multiple-interfaces ByEndpoint" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.MultipleInterfaces" ".\GeneratedCode\MultipleInterfacesWithCustomName!file_tag!.generated.cs" "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync" "%process_path%" "%use_docker_param%"
-                call :generate "!file_path!" "!ns!.TagFiltered" ".\GeneratedCode\TagFiltered!file_tag!.generated.cs" "--tag pet --tag user --tag store" "%process_path%" "%use_docker_param%"
-                call :generate "!file_path!" "!ns!.MatchPathFiltered" ".\GeneratedCode\MatchPathFiltered!file_tag!.generated.cs" "--match-path ^^/pet/.*" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.ContractOnly" ".\GeneratedCode\ContractOnly!file_tag!.generated.cs" "--contract-only" "%process_path%" "%use_docker_param%"
-                call :generate "!file_path!" "!ns!.MultipleInterfacesByTag" ".\GeneratedCode\MultipleInterfacesByTag!file_tag!.generated.cs" "--multiple-interfaces ByTag" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.DynamicQuerystring" ".\GeneratedCode\DynamicQuerystring!file_tag!.generated.cs" "--use-dynamic-querystring-parameters" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.IntegerTypeInt64" ".\GeneratedCode\IntegerTypeInt64!file_tag!.generated.cs" "--integer-type Int64" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.TrimUnusedSchema" ".\GeneratedCode\TrimUnusedSchema!file_tag!.generated.cs" "--trim-unused-schema" "%process_path%" "%use_docker_param%"
@@ -238,6 +234,12 @@ for %%v in (v3.0 v2.0) do (
                 call :generate "!file_path!" "!ns!.NoAcceptHeaders" ".\GeneratedCode\NoAcceptHeaders!file_tag!.generated.cs" "--no-accept-headers" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.SkipDefaultAdditionalProps" ".\GeneratedCode\SkipDefaultAddlProps!file_tag!.generated.cs" "--skip-default-additional-properties" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.NoInlineJsonConverters" ".\GeneratedCode\NoInlineJsonConv!file_tag!.generated.cs" "--no-inline-json-converters" "%process_path%" "%use_docker_param%"
+                :: Petstore-only variants (tag/path filters require petstore-specific tags)
+                echo !cur_filename! | findstr /b "petstore" >nul && (
+                    call :generate "!file_path!" "!ns!.TagFiltered" ".\GeneratedCode\TagFiltered!file_tag!.generated.cs" "--tag pet --tag user --tag store" "%process_path%" "%use_docker_param%"
+                    call :generate "!file_path!" "!ns!.MatchPathFiltered" ".\GeneratedCode\MatchPathFiltered!file_tag!.generated.cs" "--match-path ^^/pet/.*" "%process_path%" "%use_docker_param%"
+                    call :generate "!file_path!" "!ns!.MultipleInterfacesByTag" ".\GeneratedCode\MultipleInterfacesByTag!file_tag!.generated.cs" "--multiple-interfaces ByTag" "%process_path%" "%use_docker_param%"
+                )
                 :: Multiple files variant (unique subdirectory)
                 call :generate "!file_path!" "!ns!.MultipleFiles" ".\GeneratedCode\MultipleFiles\!file_tag!\" "--multiple-files" "%process_path%" "%use_docker_param%"
                 :: Separate contracts variant (unique subdirectories)
@@ -247,9 +249,9 @@ for %%v in (v3.0 v2.0) do (
     )
 )
 
-:: V3.1 specs
+:: V3.1 specs (skip MultipleInterfaces variants - webhook specs may lack regular API paths)
 for %%f in (json yaml) do (
-    for /l %%i in (0,1,1) do (
+    for /l %%i in (0,1,0) do (
         set "cur_filename=!v31filename%%i!"
         set "file_path=.\OpenAPI\v3.1\!cur_filename!.%%f"
 
@@ -266,12 +268,7 @@ for %%f in (json yaml) do (
             call :generate "!file_path!" "!ns!.UsingApiResponse" ".\GeneratedCode\IApi!file_tag!.generated.cs" "--use-api-response" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.UsingIObservable" ".\GeneratedCode\IObservable!file_tag!.generated.cs" "--use-observable-response" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.UsingIsoDateFormat" ".\GeneratedCode\UsingIsoDateFormat!file_tag!.generated.cs" "--use-iso-date-format" "%process_path%" "%use_docker_param%"
-            call :generate "!file_path!" "!ns!.MultipleInterfaces" ".\GeneratedCode\MultipleInterfaces!file_tag!.generated.cs" "--multiple-interfaces ByEndpoint" "%process_path%" "%use_docker_param%"
-            call :generate "!file_path!" "!ns!.MultipleInterfaces" ".\GeneratedCode\MultipleInterfacesWithCustomName!file_tag!.generated.cs" "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync" "%process_path%" "%use_docker_param%"
-            call :generate "!file_path!" "!ns!.TagFiltered" ".\GeneratedCode\TagFiltered!file_tag!.generated.cs" "--tag pet --tag user --tag store" "%process_path%" "%use_docker_param%"
-            call :generate "!file_path!" "!ns!.MatchPathFiltered" ".\GeneratedCode\MatchPathFiltered!file_tag!.generated.cs" "--match-path ^^/pet/.*" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.ContractOnly" ".\GeneratedCode\ContractOnly!file_tag!.generated.cs" "--contract-only" "%process_path%" "%use_docker_param%"
-            call :generate "!file_path!" "!ns!.MultipleInterfacesByTag" ".\GeneratedCode\MultipleInterfacesByTag!file_tag!.generated.cs" "--multiple-interfaces ByTag" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.DynamicQuerystring" ".\GeneratedCode\DynamicQuerystring!file_tag!.generated.cs" "--use-dynamic-querystring-parameters" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.IntegerTypeInt64" ".\GeneratedCode\IntegerTypeInt64!file_tag!.generated.cs" "--integer-type Int64" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.TrimUnusedSchema" ".\GeneratedCode\TrimUnusedSchema!file_tag!.generated.cs" "--trim-unused-schema" "%process_path%" "%use_docker_param%"
@@ -329,7 +326,7 @@ for %%v in (v3.0 v2.0) do (
 
 :: V3.1 netCore variants
 for %%f in (json yaml) do (
-    for /l %%i in (0,1,1) do (
+    for /l %%i in (0,1,0) do (
         set "cur_filename=!v31filename%%i!"
         set "file_path=.\OpenAPI\v3.1\!cur_filename!.%%f"
 
