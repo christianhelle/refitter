@@ -84,24 +84,24 @@ internal static class ParameterExtractor
                 foreach (var property in schema.Properties)
                 {
                     var propertySchema = property.Value;
-                    
+
                     // Skip binary fields (files) as they're already handled as StreamPart
-                    var isBinary = propertySchema.Type == JsonObjectType.String && 
+                    var isBinary = propertySchema.Type == JsonObjectType.String &&
                                    propertySchema.Format == "binary";
-                    
+
                     if (!isBinary)
                     {
                         // Generate proper C# type for the property
                         var propertyType = GetCSharpType(propertySchema, settings);
                         var variableName = ConvertToVariableName(property.Key);
-                        
+
                         // Add AliasAs attribute if property name differs from variable name
-                        var aliasAttribute = property.Key != variableName 
-                            ? $"AliasAs(""{property.Key}"")" 
+                        var aliasAttribute = property.Key != variableName
+                            ? $"AliasAs(""{property.Key}"")"
                             : string.Empty;
-                        
+
                         var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
-                        
+
                         // Only add if not already present (avoid duplicates)
                         if (!formParameters.Contains(parameter))
                         {
