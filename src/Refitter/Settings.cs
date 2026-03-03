@@ -283,4 +283,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--security-scheme")]
     [DefaultValue(null)]
     public string? SecurityScheme { get; set; } = null;
+
+    [Description("Generate JsonSerializerContext for AOT compilation support")]
+    [CommandOption("--json-serializer-context")]
+    [DefaultValue(false)]
+    public bool GenerateJsonSerializerContext { get; set; }
 }

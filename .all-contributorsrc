@@ -821,6 +821,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "vgmello",
+      "name": "Vitor M",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4777793?v=4",
+      "profile": "https://github.com/vgmello",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

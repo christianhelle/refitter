@@ -41,7 +41,15 @@ public static class SettingsValidator
     {
         var json = File.ReadAllText(settings.SettingsFilePath!);
         var refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
-        settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
+
+        if (refitGeneratorSettings.OpenApiPaths is { Length: > 0 })
+        {
+            settings.OpenApiPath = refitGeneratorSettings.OpenApiPaths[0];
+        }
+        else
+        {
+            settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
+        }
 
         return ValidateFileAndOutputSettings(settings, refitGeneratorSettings);
     }
@@ -50,7 +58,8 @@ public static class SettingsValidator
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings)
     {
-        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
+        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath) &&
+            (refitGeneratorSettings.OpenApiPaths?.Length ?? 0) == 0)
         {
             return GetValidationErrorForOpenApiPath();
         }
@@ -69,7 +78,7 @@ public static class SettingsValidator
     private static ValidationResult GetValidationErrorForOpenApiPath()
     {
         return ValidationResult.Error(
-            "The 'openApiPath' in settings file is required when " +
+            "The 'openApiPath' or 'openApiPaths' in settings file is required when " +
             "URL or file path to OpenAPI Specification file " +
             "is not specified in command line argument");
     }

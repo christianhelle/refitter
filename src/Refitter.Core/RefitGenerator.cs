@@ -32,6 +32,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private static async Task<OpenApiDocument> GetOpenApiDocument(RefitGeneratorSettings settings)
     {
+        if (settings.OpenApiPaths is { Length: > 0 })
+            return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPaths);
         return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath);
     }
 
@@ -137,7 +139,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
             ? document.Info!.Title.Sanitize()
             : settings.Naming.InterfaceName;
-        return new StringBuilder()
+        var result = new StringBuilder()
             .AppendLine(settings.GenerateClients ? refitInterfacesCode : string.Empty)
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
@@ -147,6 +149,13 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                     : DependencyInjectionGenerator.Generate(settings, interfaceNames))
             .ToString()
             .TrimEnd();
+
+        if (!string.IsNullOrWhiteSpace(settings.ContractTypeSuffix))
+        {
+            result = ContractTypeSuffixApplier.ApplySuffix(result, settings.ContractTypeSuffix);
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -201,6 +210,16 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                         TypenameConstants.DependencyInjection,
                         configurationCode));
             }
+        }
+
+        if (!string.IsNullOrWhiteSpace(settings.ContractTypeSuffix))
+        {
+            generatedFiles = generatedFiles
+                .Select(f => f with
+                {
+                    Content = ContractTypeSuffixApplier.ApplySuffix(f.Content, settings.ContractTypeSuffix)
+                })
+                .ToList();
         }
 
         return new GeneratorOutput(generatedFiles);

@@ -28,6 +28,13 @@ public class RefitGeneratorSettings
     public string OpenApiPath { get; set; } = null!;
 
     /// <summary>
+    /// Gets or sets the paths to multiple Open API documents. When specified, the documents are merged.
+    /// This takes precedence over <see cref="OpenApiPath"/> when non-empty.
+    /// </summary>
+    [Description("The paths to multiple OpenAPI documents. When specified, the documents are merged into a single client.")]
+    public string[] OpenApiPaths { get; set; } = Array.Empty<string>();
+
+    /// <summary>
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
     /// </summary>
     [Description("The namespace for the generated code. Default is GeneratedCode.")]
@@ -397,4 +404,15 @@ public class RefitGeneratorSettings
 
     [Description("Security scheme for which to generate authentication headers.")]
     public string? SecurityScheme { get; set; }
+    /// <summary>
+    /// Gets or sets a value indicating whether to generate JsonSerializerContext for AOT compilation support.
+    /// </summary>
+    [Description("Generate JsonSerializerContext for AOT compilation support")]
+    public bool GenerateJsonSerializerContext { get; set; }
+
+    /// <summary>
+    /// Gets or sets a suffix to append to all generated contract type names.
+    /// </summary>
+    [Description("Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.")]
+    public string? ContractTypeSuffix { get; set; }
 }

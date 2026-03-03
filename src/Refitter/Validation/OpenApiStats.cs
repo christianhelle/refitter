@@ -1,5 +1,4 @@
-using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Services;
+using Microsoft.OpenApi;
 
 namespace Refitter.Validation;
 
@@ -15,30 +14,30 @@ public class OpenApiStats : OpenApiVisitorBase
     public int LinkCount { get; set; } = 0;
     public int CallbackCount { get; set; } = 0;
 
-    public override void Visit(OpenApiParameter parameter)
+    public override void Visit(IOpenApiParameter parameter)
     {
         ParameterCount++;
     }
 
-    public override void Visit(OpenApiSchema schema)
+    public override void Visit(IOpenApiSchema schema)
     {
         SchemaCount++;
     }
 
 
-    public override void Visit(IDictionary<string, OpenApiHeader> headers)
+    public override void Visit(IDictionary<string, IOpenApiHeader> headers)
     {
         HeaderCount++;
     }
 
 
-    public override void Visit(OpenApiPathItem pathItem)
+    public override void Visit(IOpenApiPathItem pathItem)
     {
         PathItemCount++;
     }
 
 
-    public override void Visit(OpenApiRequestBody requestBody)
+    public override void Visit(IOpenApiRequestBody requestBody)
     {
         RequestBodyCount++;
     }
@@ -56,12 +55,12 @@ public class OpenApiStats : OpenApiVisitorBase
     }
 
 
-    public override void Visit(OpenApiLink link)
+    public override void Visit(IOpenApiLink link)
     {
         LinkCount++;
     }
 
-    public override void Visit(OpenApiCallback callback)
+    public override void Visit(IOpenApiCallback callback)
     {
         CallbackCount++;
     }

@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-88-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-89-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -192,11 +192,11 @@ This is particularly useful when:
 
 ## .Refitter File format
 
-The following is an example `.refitter` file
+The following is an example `.refitter` file using a single OpenAPI specification
 
 ```js
 {
-  "openApiPath": "/path/to/your/openAPI", // Required
+  "openApiPath": "/path/to/your/openAPI", // Required if openApiPaths is not specified
   "namespace": "Org.System.Service.Api.GeneratedCode", // Optional. Default=GeneratedCode
   "contractsNamespace": "Org.System.Service.Api.GeneratedCode.Contracts", // Optional. Default=GeneratedCode
   "naming": {
@@ -316,7 +316,20 @@ The following is an example `.refitter` file
 }
 ```
 
-- `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS
+The following is an example `.refitter` file using multiple OpenAPI specifications that are merged into a single client
+
+```js
+{
+  "openApiPaths": [ // Required if openApiPath is not specified. Documents are merged; first spec wins on duplicates
+    "/path/to/your/openAPI/v1",
+    "/path/to/your/openAPI/v2"
+  ],
+  "namespace": "Org.System.Service.Api.GeneratedCode"
+}
+```
+
+- `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS. Required if `openApiPaths` is not specified.
+- `openApiPaths` - an array of paths to multiple OpenAPI Specifications files. When specified, the documents are merged into a single client. The first document in the array serves as the base; paths, component schemas, definitions (OpenAPI 2.x), and tags from subsequent documents are merged in. When duplicates exist (same path key or schema name), the first document's entry is preserved. Use this instead of `openApiPath` when you want to generate a single client from multiple API versions. Required if `openApiPath` is not specified.
 - `namespace` - the namespace used in the generated code. If not specified, this defaults to `GeneratedCode`
 - `naming.useOpenApiTitle` - a boolean indicating whether the OpenApi title should be used. Default is `true`
 - `naming.interfaceName` - the name of the generated interface. The generated code will automatically prefix this with `I` so if this set to `MyApiClient` then the generated interface is called `IMyApiClient`. Default is `ApiClient`
@@ -1411,6 +1424,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kmc059000"><img src="https://avatars.githubusercontent.com/u/660670?v=4?s=100" width="100px;" alt="Kenneth Crawford"/><br /><sub><b>Kenneth Crawford</b></sub></a><br /><a href="#ideas-kmc059000" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=kmc059000" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/0x2badc0de"><img src="https://avatars.githubusercontent.com/u/173240018?v=4?s=100" width="100px;" alt="0x2badc0de"/><br /><sub><b>0x2badc0de</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3A0x2badc0de" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://meteion.ca"><img src="https://avatars.githubusercontent.com/u/6116333?v=4?s=100" width="100px;" alt="Tylor Pater"/><br /><sub><b>Tylor Pater</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=frogcrush" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/vgmello"><img src="https://avatars.githubusercontent.com/u/4777793?v=4?s=100" width="100px;" alt="Vitor M"/><br /><sub><b>Vitor M</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=vgmello" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

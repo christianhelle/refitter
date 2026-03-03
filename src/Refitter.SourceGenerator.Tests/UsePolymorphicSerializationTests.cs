@@ -8,17 +8,15 @@ namespace Refitter.SourceGenerators.Tests;
 public class UsePolymorphicSerializationTests
 {
     [Test]
-    [Arguments(typeof(SomeComponent))]
-    public void Should_Generate_JsonPolymorphicAttribute_Usage(Type type) =>
-        type
+    public void Should_Generate_JsonPolymorphicAttribute_Usage() =>
+        typeof(SomeComponent)
             .GetCustomAttributes(typeof(JsonPolymorphicAttribute), false)
             .Should()
             .HaveCount(1);
 
     [Test]
-    [Arguments(typeof(SomeComponent))]
-    public void Should_Generate_JsonDerivedTypeAttribute_Usage(Type type) =>
-        type
+    public void Should_Generate_JsonDerivedTypeAttribute_Usage() =>
+        typeof(SomeComponent)
             .GetCustomAttributes(typeof(JsonDerivedTypeAttribute), false)
             .Should()
             .HaveCount(5);

@@ -62,6 +62,12 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             settings.CodeGeneratorSettings,
             generator.Settings.CSharpGeneratorSettings);
 
+        // Auto-enable optional properties as nullable when nullable reference types enabled
+        if (generator.Settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes)
+        {
+            generator.Settings.CSharpGeneratorSettings.GenerateOptionalPropertiesAsNullable = true;
+        }
+
         return generator;
     }
 

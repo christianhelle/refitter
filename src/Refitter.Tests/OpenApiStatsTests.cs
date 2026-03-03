@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Refitter.Validation;
 using TUnit.Core;
 
@@ -27,9 +27,8 @@ public class OpenApiStatsTests
     public void Visit_Parameter_Should_Increment_ParameterCount()
     {
         var stats = new OpenApiStats();
-        var parameter = new OpenApiParameter();
 
-        stats.Visit(parameter);
+        stats.Visit((IOpenApiParameter)new OpenApiParameter());
 
         stats.ParameterCount.Should().Be(1);
     }
@@ -38,9 +37,8 @@ public class OpenApiStatsTests
     public void Visit_Schema_Should_Increment_SchemaCount()
     {
         var stats = new OpenApiStats();
-        var schema = new OpenApiSchema();
 
-        stats.Visit(schema);
+        stats.Visit((IOpenApiSchema)new OpenApiSchema());
 
         stats.SchemaCount.Should().Be(1);
     }
@@ -49,7 +47,7 @@ public class OpenApiStatsTests
     public void Visit_Headers_Should_Increment_HeaderCount()
     {
         var stats = new OpenApiStats();
-        var headers = new Dictionary<string, OpenApiHeader>();
+        var headers = new Dictionary<string, IOpenApiHeader>();
 
         stats.Visit(headers);
 
@@ -60,9 +58,8 @@ public class OpenApiStatsTests
     public void Visit_PathItem_Should_Increment_PathItemCount()
     {
         var stats = new OpenApiStats();
-        var pathItem = new OpenApiPathItem();
 
-        stats.Visit(pathItem);
+        stats.Visit((IOpenApiPathItem)new OpenApiPathItem());
 
         stats.PathItemCount.Should().Be(1);
     }
@@ -71,9 +68,8 @@ public class OpenApiStatsTests
     public void Visit_RequestBody_Should_Increment_RequestBodyCount()
     {
         var stats = new OpenApiStats();
-        var requestBody = new OpenApiRequestBody();
 
-        stats.Visit(requestBody);
+        stats.Visit((IOpenApiRequestBody)new OpenApiRequestBody());
 
         stats.RequestBodyCount.Should().Be(1);
     }
@@ -104,9 +100,8 @@ public class OpenApiStatsTests
     public void Visit_Link_Should_Increment_LinkCount()
     {
         var stats = new OpenApiStats();
-        var link = new OpenApiLink();
 
-        stats.Visit(link);
+        stats.Visit((IOpenApiLink)new OpenApiLink());
 
         stats.LinkCount.Should().Be(1);
     }
@@ -115,9 +110,8 @@ public class OpenApiStatsTests
     public void Visit_Callback_Should_Increment_CallbackCount()
     {
         var stats = new OpenApiStats();
-        var callback = new OpenApiCallback();
 
-        stats.Visit(callback);
+        stats.Visit((IOpenApiCallback)new OpenApiCallback());
 
         stats.CallbackCount.Should().Be(1);
     }
@@ -126,10 +120,10 @@ public class OpenApiStatsTests
     public void ToString_Should_Return_Formatted_Statistics()
     {
         var stats = new OpenApiStats();
-        stats.Visit(new OpenApiPathItem());
+        stats.Visit((IOpenApiPathItem)new OpenApiPathItem());
         stats.Visit(new OpenApiOperation());
-        stats.Visit(new OpenApiParameter());
-        stats.Visit(new OpenApiSchema());
+        stats.Visit((IOpenApiParameter)new OpenApiParameter());
+        stats.Visit((IOpenApiSchema)new OpenApiSchema());
 
         var output = stats.ToString();
 
@@ -144,9 +138,9 @@ public class OpenApiStatsTests
     {
         var stats = new OpenApiStats();
 
-        stats.Visit(new OpenApiParameter());
-        stats.Visit(new OpenApiParameter());
-        stats.Visit(new OpenApiParameter());
+        stats.Visit((IOpenApiParameter)new OpenApiParameter());
+        stats.Visit((IOpenApiParameter)new OpenApiParameter());
+        stats.Visit((IOpenApiParameter)new OpenApiParameter());
 
         stats.ParameterCount.Should().Be(3);
     }

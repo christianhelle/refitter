@@ -6,6 +6,7 @@ namespace Refitter.Core;
 internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 {
     private readonly HashSet<string> knownIdentifiers = new();
+    private Dictionary<string, HashSet<string>>? _methodIdentifiersByInterface;
 
     internal RefitMultipleInterfaceByTagGenerator(
         RefitGeneratorSettings settings,
@@ -29,6 +30,8 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
         Dictionary<string, StringBuilder> interfacesByGroup = new();
         Dictionary<string, string> interfacesNamesByGroup = new();
+
+        _methodIdentifiersByInterface = new();
 
         foreach (var kv in byGroup)
         {
@@ -58,6 +61,10 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                                     """);
 
                     interfacesNamesByGroup[kv.Key] = interfaceName;
+                }
+                else
+                {
+                    interfaceName = interfacesNamesByGroup[kv.Key];
                 }
 
                 var operationName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
@@ -155,8 +162,19 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
         string verb,
         OpenApiOperation operation)
     {
-        var generatedName = IdentifierUtils.Counted(knownIdentifiers, GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true), parent: interfaceName);
-        knownIdentifiers.Add($"{interfaceName}.{generatedName}");
+        // Initialize per-interface tracking if needed
+        if (!_methodIdentifiersByInterface!.ContainsKey(interfaceName))
+        {
+            _methodIdentifiersByInterface[interfaceName] = new HashSet<string>();
+        }
+
+        var interfaceIdentifiers = _methodIdentifiersByInterface[interfaceName];
+        var generatedName = IdentifierUtils.Counted(
+            interfaceIdentifiers,
+            GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true),
+            parent: interfaceName);
+
+        interfaceIdentifiers.Add(generatedName);
         return generatedName;
     }
 

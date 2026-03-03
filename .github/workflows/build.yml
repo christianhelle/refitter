@@ -20,7 +20,7 @@ on:
       - '*'
 
 env:
-  VERSION: 1.7.3.${{ github.run_number }}
+  VERSION: 1.7.4.${{ github.run_number }}
 
 jobs:
   build:
@@ -46,7 +46,7 @@ jobs:
     - name: 🧪 Test
       run: dotnet test --solution src/Refitter.slnx -c Release
     - name: 🗳️ Upload
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: Packages
         path: |

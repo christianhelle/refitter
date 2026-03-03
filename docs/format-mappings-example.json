@@ -1,0 +1,6 @@
+{
+  "int32": "int",
+  "int64": "ulong",
+  "float": "float",
+  "double": "double"
+}
