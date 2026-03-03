@@ -132,7 +132,7 @@ public class JsonSerializerContextTests
     public async Task Generated_Code_Contains_All_DTO_Types()
     {
         string generatedCode = await GenerateCode();
-        
+
         // Verify all types are registered
         generatedCode.Should().MatchRegex(@"\[JsonSerializable\(typeof\(Pet\)\)\]");
         generatedCode.Should().MatchRegex(@"\[JsonSerializable\(typeof\(PetRequest\)\)\]");

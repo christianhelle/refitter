@@ -258,14 +258,14 @@ internal static class ParameterExtractor
     {
         var anyType = settings.CodeGeneratorSettings?.AnyType ?? "object";
         var parameterType = WellKnownNamespaces.TrimImportedNamespaces(FindSupportedType(parameter.Type));
-        
+
         // Check if the parameter type matches AnyType (e.g., "object" or custom type like "System.Text.Json.JsonElement")
         if (parameterType.Equals(anyType, StringComparison.OrdinalIgnoreCase) ||
             parameterType.Contains("JsonElement", StringComparison.OrdinalIgnoreCase))
         {
             return "Body(BodySerializationMethod.Serialized)";
         }
-        
+
         return "Body";
     }
 
