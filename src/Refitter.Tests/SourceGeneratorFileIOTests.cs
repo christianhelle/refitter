@@ -64,11 +64,11 @@ components:
         // Assert - Verify no new .g.cs files were created
         var finalOutputFiles = Directory.GetFiles(outputDir, "*.g.cs");
         var finalFileCount = finalOutputFiles.Length;
-        
+
         // No new files should have been written to disk during generation
-        finalFileCount.Should().Be(initialFileCount, 
+        finalFileCount.Should().Be(initialFileCount,
             "source generator should use context.AddSource() not File.WriteAllText()");
-        
+
         // But generated code should exist in memory
         generatedCode.Should().NotBeNullOrWhiteSpace();
         generatedCode.Should().Contain("partial interface ITestApi");
@@ -79,7 +79,7 @@ components:
     {
         // This tests that concurrent generation doesn't cause file I/O conflicts
         // When using context.AddSource(), multiple generators can run in parallel safely
-        
+
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
@@ -123,7 +123,7 @@ components:
         // Assert - Generated code should compile
         generatedCode.Should().Contain("partial interface ITestApi");
         generatedCode.Should().Contain("Task<IApiResponse<System.Collections.Generic.ICollection<User>>> GetUsers(");
-        
+
         BuildHelper
             .BuildCSharp(generatedCode)
             .Should()
@@ -153,7 +153,7 @@ components:
         // Assert - The OutputFilename should NOT create a file on disk
         File.Exists(expectedFilePath).Should().BeFalse(
             "OutputFilename should be used as hint name for context.AddSource(), not as a file path");
-        
+
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 }
