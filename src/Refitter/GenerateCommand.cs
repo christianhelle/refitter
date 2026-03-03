@@ -323,6 +323,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 IntegerType = settings.IntegerType
             },
             CustomTemplateDirectory = settings.CustomTemplateDirectory,
+            GenerateJsonSerializerContext = settings.GenerateJsonSerializerContext,
         };
     }
     private static async Task WriteSingleFile(
