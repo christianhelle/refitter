@@ -8,8 +8,11 @@ namespace Refitter.SourceGenerators.Tests;
 public class CustomOutputFolderGeneratorTests
 {
     [Test]
-    public void Can_Create_File_In_Custom_Path() =>
-        File.Exists("../../../CustomGenerated/CustomGenerated.cs").Should().BeTrue();
+    public void Should_Generate_Interface_Type() =>
+        typeof(IApiInCustomGeneratedFolder)
+            .Namespace
+            .Should()
+            .Be("Refitter.Tests.CustomGenerated");
 
     [Test]
     public void Can_Resolve_Refit_Interface() =>
