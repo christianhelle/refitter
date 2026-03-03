@@ -74,6 +74,43 @@ internal static class ParameterExtractor
                 $"{JoinAttributes(GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
+        // Manually extract non-binary properties from multipart/form-data in OpenAPI 3.x
+        // NSwag doesn't populate these in operationModel.Parameters
+        if (operation.RequestBody?.Content?.TryGetValue("multipart/form-data", out var multipartContent) == true)
+        {
+            var schema = multipartContent.Schema;
+            if (schema?.Properties != null)
+            {
+                foreach (var property in schema.Properties)
+                {
+                    var propertySchema = property.Value;
+                    
+                    // Skip binary fields (files) as they're already handled as StreamPart
+                    var isBinary = propertySchema.Type == JsonObjectType.String && 
+                                   propertySchema.Format == "binary";
+                    
+                    if (!isBinary)
+                    {
+                        // Generate proper C# type for the property
+                        var propertyType = GetCSharpType(propertySchema, settings);
+                        var variableName = ConvertToVariableName(property.Key);
+                        
+                        // Add AliasAs attribute if property name differs from variable name
+                        var aliasAttribute = property.Key != variableName 
+                            ? $"AliasAs(""{property.Key}"")" 
+                            : string.Empty;
+                        
+                        var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
+                        
+                        // Only add if not already present (avoid duplicates)
+                        if (!formParameters.Contains(parameter))
+                        {
+                            formParameters.Add(parameter);
+                        }
+                    }
+                }
+            }
+        }
         var binaryBodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
             .Select(p =>
