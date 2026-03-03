@@ -193,7 +193,7 @@ components:
         string generatedCode = await GenerateCode(OpenApiSpecWithNullableProperties);
 
         // Assert - Verify Address class has correct mix of nullable and non-nullable
-        var addressClassStart = generatedCode.IndexOf("class Address", StringComparison.Ordinal);
+        var addressClassStart = generatedCode.IndexOf("record Address", StringComparison.Ordinal);
         addressClassStart.Should().BeGreaterThan(0);
 
         var addressClassEnd = generatedCode.IndexOf("}", addressClassStart);

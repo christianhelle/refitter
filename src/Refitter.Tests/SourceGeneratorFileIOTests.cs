@@ -122,7 +122,7 @@ components:
 
         // Assert - Generated code should compile
         generatedCode.Should().Contain("partial interface ITestAPI");
-        generatedCode.Should().Contain("Task<IApiResponse<System.Collections.Generic.ICollection<User>>> GetUsers(");
+        generatedCode.Should().Contain("Task<IApiResponse<ICollection<User>>> GetUsers(");
 
         BuildHelper
             .BuildCSharp(generatedCode)

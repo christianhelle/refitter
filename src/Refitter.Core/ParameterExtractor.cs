@@ -86,8 +86,11 @@ internal static class ParameterExtractor
                     var propertySchema = property.Value;
 
                     // Skip binary fields (files) as they're already handled as StreamPart
-                    var isBinary = propertySchema.Type == JsonObjectType.String &&
-                                   propertySchema.Format == "binary";
+                    var isBinary = (propertySchema.Type == JsonObjectType.String &&
+                                   propertySchema.Format == "binary") ||
+                                  (propertySchema.Type == JsonObjectType.Array &&
+                                   propertySchema.Item?.Type == JsonObjectType.String &&
+                                   propertySchema.Item?.Format == "binary");
 
                     if (!isBinary)
                     {

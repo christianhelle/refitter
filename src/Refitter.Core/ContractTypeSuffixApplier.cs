@@ -5,7 +5,7 @@ namespace Refitter.Core;
 internal static class ContractTypeSuffixApplier
 {
     private static readonly Regex TypeDeclarationRegex =
-        new(@"(?:public|internal)\s+(?:partial\s+)?(?:class|record|struct|interface)\s+(\w+)", RegexOptions.Multiline | RegexOptions.Compiled);
+        new(@"(?:public|internal)\s+(?:partial\s+)?(?:class|record|struct)\s+(\w+)", RegexOptions.Multiline | RegexOptions.Compiled);
 
     private static readonly Regex EnumDeclarationRegex =
         new(@"(?:public|internal)\s+(?:partial\s+)?enum\s+(\w+)", RegexOptions.Multiline | RegexOptions.Compiled);
