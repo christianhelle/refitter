@@ -273,4 +273,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--custom-template-directory")]
     [DefaultValue(null)]
     public string? CustomTemplateDirectory { get; set; } = null;
+
+    [Description("Generate JsonSerializerContext for AOT compilation support")]
+    [CommandOption("--json-serializer-context")]
+    [DefaultValue(false)]
+    public bool GenerateJsonSerializerContext { get; set; }
 }

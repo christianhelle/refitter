@@ -401,4 +401,10 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
     public string? CustomTemplateDirectory { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to generate JsonSerializerContext for AOT compilation support.
+    /// </summary>
+    [Description("Generate JsonSerializerContext for AOT compilation support")]
+    public bool GenerateJsonSerializerContext { get; set; }
 }

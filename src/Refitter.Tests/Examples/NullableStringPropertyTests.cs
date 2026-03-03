@@ -113,7 +113,7 @@ components:
             "state property is marked nullable: true");
         generatedCode.Should().Contain("public string? Country { get; init; }",
             "country property is marked nullable: true");
-        
+
         // Street and PostalCode should be non-nullable string (nullable: false)
         generatedCode.Should().Contain("public string Street { get; init; }",
             "street property is marked nullable: false");
@@ -157,7 +157,7 @@ components:
         // Should STILL generate as string? (nullable: true takes precedence)
         generatedCode.Should().Contain("public string? MiddleName { get; init; }",
             "middleName is in required array but marked nullable: true - nullable should take precedence");
-        
+
         // FirstName is in required AND nullable: false
         generatedCode.Should().Contain("public string FirstName { get; init; }",
             "firstName is in required array and marked nullable: false");
@@ -195,14 +195,14 @@ components:
         // Assert - Verify Address class has correct mix of nullable and non-nullable
         var addressClassStart = generatedCode.IndexOf("class Address", StringComparison.Ordinal);
         addressClassStart.Should().BeGreaterThan(0);
-        
+
         var addressClassEnd = generatedCode.IndexOf("}", addressClassStart);
         var addressClass = generatedCode.Substring(addressClassStart, addressClassEnd - addressClassStart);
-        
+
         // Count nullable properties
         var nullableStringCount = System.Text.RegularExpressions.Regex.Matches(addressClass, @"string\?").Count;
         nullableStringCount.Should().Be(3, "Address should have 3 nullable string properties (City, State, Country)");
-        
+
         var nullableDoubleCount = System.Text.RegularExpressions.Regex.Matches(addressClass, @"double\?").Count;
         nullableDoubleCount.Should().Be(2, "Address should have 2 nullable double properties (Latitude, Longitude)");
     }

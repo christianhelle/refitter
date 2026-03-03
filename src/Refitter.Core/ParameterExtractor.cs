@@ -27,7 +27,7 @@ internal static class ParameterExtractor
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
             .Select(p =>
-                $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
+                $"{JoinAttributes(GetBodyAttribute(p, settings), GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var headerParameters = new List<string>();
@@ -74,6 +74,43 @@ internal static class ParameterExtractor
                 $"{JoinAttributes(GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
+        // Manually extract non-binary properties from multipart/form-data in OpenAPI 3.x
+        // NSwag doesn't populate these in operationModel.Parameters
+        if (operation.RequestBody?.Content?.TryGetValue("multipart/form-data", out var multipartContent) == true)
+        {
+            var schema = multipartContent.Schema;
+            if (schema?.Properties != null)
+            {
+                foreach (var property in schema.Properties)
+                {
+                    var propertySchema = property.Value;
+
+                    // Skip binary fields (files) as they're already handled as StreamPart
+                    var isBinary = propertySchema.Type == JsonObjectType.String &&
+                                   propertySchema.Format == "binary";
+
+                    if (!isBinary)
+                    {
+                        // Generate proper C# type for the property
+                        var propertyType = GetCSharpType(propertySchema, settings);
+                        var variableName = ConvertToVariableName(property.Key);
+
+                        // Add AliasAs attribute if property name differs from variable name
+                        var aliasAttribute = property.Key != variableName
+                            ? $"AliasAs(""{property.Key}"")"
+                            : string.Empty;
+
+                        var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
+
+                        // Only add if not already present (avoid duplicates)
+                        if (!formParameters.Contains(parameter))
+                        {
+                            formParameters.Add(parameter);
+                        }
+                    }
+                }
+            }
+        }
         var binaryBodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
             .Select(p =>
@@ -252,6 +289,21 @@ internal static class ParameterExtractor
             or "byte" or "Byte" or "decimal" or "Decimal" or "float" or "Single"
             or "double" or "Double" or "sbyte" or "SByte" or "uint" or "UInt32"
             or "ulong" or "UInt64" or "ushort" or "UInt16";
+    }
+
+    private static string GetBodyAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
+    {
+        var anyType = settings.CodeGeneratorSettings?.AnyType ?? "object";
+        var parameterType = WellKnownNamespaces.TrimImportedNamespaces(FindSupportedType(parameter.Type));
+
+        // Check if the parameter type matches AnyType (e.g., "object" or custom type like "System.Text.Json.JsonElement")
+        if (parameterType.Equals(anyType, StringComparison.OrdinalIgnoreCase) ||
+            parameterType.Contains("JsonElement", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Body(BodySerializationMethod.Serialized)";
+        }
+
+        return "Body";
     }
 
     private static string GetQueryAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
@@ -470,5 +522,71 @@ $$"""
                 /// </summary>
 """);
         codeBuilder.AppendLine();
+    }
+
+    private static string GetCSharpType(JsonSchema propertySchema, RefitGeneratorSettings settings)
+    {
+        var type = propertySchema.Type switch
+        {
+            JsonObjectType.String => "string",
+            JsonObjectType.Integer => GetIntegerTypeName(propertySchema, settings),
+            JsonObjectType.Number => "double",
+            JsonObjectType.Boolean => "bool",
+            JsonObjectType.Array => GetArrayType(propertySchema, settings),
+            JsonObjectType.Object => "object",
+            _ => "object"
+        };
+
+        // Add nullable modifier if needed
+        if (settings.OptionalParameters && propertySchema.IsNullable(SchemaType.OpenApi3))
+        {
+            type += "?";
+        }
+
+        return type;
+    }
+
+    private static string GetIntegerTypeName(JsonSchema schema, RefitGeneratorSettings settings)
+    {
+        // Check the format first
+        if (schema.Format == "int64")
+            return "long";
+        if (schema.Format == "int32")
+            return "int";
+
+        // Fall back to settings
+        var integerType = settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32;
+        return integerType == IntegerType.Int64 ? "long" : "int";
+    }
+
+    private static string GetArrayType(JsonSchema arraySchema, RefitGeneratorSettings settings)
+    {
+        if (arraySchema.Item != null)
+        {
+            var itemType = GetCSharpType(arraySchema.Item, settings);
+            return $"{itemType}[]";
+        }
+        return "object[]";
+    }
+
+    private static string ConvertToVariableName(string propertyName)
+    {
+        if (string.IsNullOrEmpty(propertyName))
+            return "value";
+
+        // Convert first character to lowercase for camelCase
+        var variableName = char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
+
+        // Replace invalid characters with underscore
+        var safeVariableName = new StringBuilder(variableName.Length);
+        foreach (var c in variableName)
+        {
+            if (char.IsLetterOrDigit(c) || c == '_')
+                safeVariableName.Append(c);
+            else
+                safeVariableName.Append('_');
+        }
+
+        return safeVariableName.ToString();
     }
 }

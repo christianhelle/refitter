@@ -166,14 +166,14 @@ paths:
     public async Task Users_Interface_Should_Not_Have_Numbered_Method_Names()
     {
         string generatedCode = await GenerateCode();
-        
+
         // Users interface should have method names WITHOUT numeric suffixes
         generatedCode.Should().Contain("Task<IApiResponse> GetAllUsers(");
         generatedCode.Should().Contain("Task<IApiResponse> CreateUser(");
         generatedCode.Should().Contain("Task<IApiResponse> GetUserById(");
         generatedCode.Should().Contain("Task<IApiResponse> UpdateUser(");
         generatedCode.Should().Contain("Task<IApiResponse> DeleteUser(");
-        
+
         // Should NOT contain numbered versions in Users interface
         generatedCode.Should().NotContain("GetAllUsers2");
         generatedCode.Should().NotContain("CreateUser2");
@@ -184,14 +184,14 @@ paths:
     public async Task Products_Interface_Should_Not_Have_Numbered_Method_Names()
     {
         string generatedCode = await GenerateCode();
-        
+
         // Products interface should have method names WITHOUT numeric suffixes
         generatedCode.Should().Contain("Task<IApiResponse> GetAllProducts(");
         generatedCode.Should().Contain("Task<IApiResponse> CreateProduct(");
         generatedCode.Should().Contain("Task<IApiResponse> GetProductById(");
         generatedCode.Should().Contain("Task<IApiResponse> UpdateProduct(");
         generatedCode.Should().Contain("Task<IApiResponse> DeleteProduct(");
-        
+
         // Should NOT contain numbered versions
         generatedCode.Should().NotContain("GetAllProducts2");
         generatedCode.Should().NotContain("CreateProduct2");
@@ -201,12 +201,12 @@ paths:
     public async Task Orders_Interface_Should_Not_Have_Numbered_Method_Names()
     {
         string generatedCode = await GenerateCode();
-        
+
         // Orders interface should have method names WITHOUT numeric suffixes
         generatedCode.Should().Contain("Task<IApiResponse> GetAllOrders(");
         generatedCode.Should().Contain("Task<IApiResponse> CreateOrder(");
         generatedCode.Should().Contain("Task<IApiResponse> GetOrderById(");
-        
+
         // Should NOT contain numbered versions
         generatedCode.Should().NotContain("GetAllOrders2");
         generatedCode.Should().NotContain("CreateOrder2");
@@ -216,30 +216,30 @@ paths:
     public async Task Method_Names_Should_Be_Identical_Across_Different_Interfaces()
     {
         string generatedCode = await GenerateCode();
-        
+
         // All interfaces have similar patterns (GetAll*, Create*, Get*ById)
         // These should NOT have global numbering
-        
+
         // Extract just the method signatures to analyze
         var lines = generatedCode.Split('\n');
-        
+
         // Look for method declarations with Task<IApiResponse>
         var methodDeclarations = lines
             .Where(l => l.Contains("Task<IApiResponse>") && l.Contains("("))
             .Select(l => l.Trim())
             .ToList();
-        
+
         // Check that we have the expected method names without numeric suffixes
         methodDeclarations.Should().Contain(m => m.Contains("GetAllUsers("));
         methodDeclarations.Should().Contain(m => m.Contains("GetAllProducts("));
         methodDeclarations.Should().Contain(m => m.Contains("GetAllOrders("));
-        
+
         // Verify NO methods have numeric suffixes like GetAll*2, Create*2, etc.
-        methodDeclarations.Should().NotContain(m => 
+        methodDeclarations.Should().NotContain(m =>
             m.Contains("GetAll") && (m.Contains("2(") || m.Contains("3(")));
-        methodDeclarations.Should().NotContain(m => 
+        methodDeclarations.Should().NotContain(m =>
             m.Contains("Create") && (m.Contains("2(") || m.Contains("3(")));
-        methodDeclarations.Should().NotContain(m => 
+        methodDeclarations.Should().NotContain(m =>
             m.Contains("GetById") && (m.Contains("2(") || m.Contains("3(")));
     }
 
@@ -249,20 +249,20 @@ paths:
         // This is the core bug test: operationIds are identical across tags
         // but method names should NOT have global numbering
         string generatedCode = await GenerateCode();
-        
+
         // Parse the code to find all method names
         var lines = generatedCode.Split('\n');
         var methodNames = lines
             .Where(l => l.Contains("Task<IApiResponse>") && l.Contains("("))
             .Select(l => l.Trim())
             .ToList();
-        
+
         // CRITICAL: No method should have numeric suffixes from global counter
         // Each interface should have clean method names based on their operationIds
         methodNames.Should().Contain(m => m.Contains("GetAllUsers("));
         methodNames.Should().Contain(m => m.Contains("GetAllProducts("));
         methodNames.Should().Contain(m => m.Contains("GetAllOrders("));
-        
+
         // The bug would manifest as GetAllUsers, GetAllProducts2, GetAllOrders3
         // We should NOT see this:
         methodNames.Should().NotContain(m => m.Contains("GetAllProducts2("),
@@ -278,7 +278,7 @@ paths:
     {
         // Test that a single operation in an interface doesn't get numbered
         string generatedCode = await GenerateCode();
-        
+
         // GetOrderById appears only once in Orders interface
         // Should NOT be GetOrderById1
         generatedCode.Should().Contain("Task<IApiResponse> GetOrderById(");
@@ -291,24 +291,24 @@ paths:
     {
         // Verify method naming is scoped per interface, not globally
         string generatedCode = await GenerateCode();
-        
+
         // Extract interfaces
         var usersInterfaceStart = generatedCode.IndexOf("partial interface IUsersApi", StringComparison.Ordinal);
         var productsInterfaceStart = generatedCode.IndexOf("partial interface IProductsApi", StringComparison.Ordinal);
         var ordersInterfaceStart = generatedCode.IndexOf("partial interface IOrdersApi", StringComparison.Ordinal);
-        
+
         usersInterfaceStart.Should().BeGreaterThan(0);
         productsInterfaceStart.Should().BeGreaterThan(0);
         ordersInterfaceStart.Should().BeGreaterThan(0);
-        
+
         // Each interface should have its own clean set of methods
         var usersInterface = generatedCode.Substring(usersInterfaceStart, productsInterfaceStart - usersInterfaceStart);
         var productsInterface = generatedCode.Substring(productsInterfaceStart, ordersInterfaceStart - productsInterfaceStart);
-        
+
         // Users interface should have GetAllUsers without any suffix
         usersInterface.Should().Contain("GetAllUsers(");
         usersInterface.Should().NotContain("GetAllUsers2");
-        
+
         // Products interface should have GetAllProducts without any suffix
         productsInterface.Should().Contain("GetAllProducts(");
         productsInterface.Should().NotContain("GetAllProducts2");
