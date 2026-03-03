@@ -37,7 +37,7 @@ internal static class RefitInterfaceImports
         {
             var exclusionNamespacesRegexes = settings.ExcludeNamespaces
                 .Where(n => !string.IsNullOrWhiteSpace(n))
-                .Select(x => new Regex(x, RegexOptions.Compiled))
+                .Select(x => new Regex(x, RegexOptions.Compiled, TimeSpan.FromSeconds(1)))
                 .ToList();
 
             var excludedNamespaces = exclusionNamespacesRegexes.SelectMany(k => namespaces.Where(x => k.IsMatch(x)));

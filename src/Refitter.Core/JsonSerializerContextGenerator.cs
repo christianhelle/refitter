@@ -47,7 +47,8 @@ internal static class JsonSerializerContextGenerator
         // Match class declarations: public class TypeName, internal class TypeName
         var classPattern = new Regex(
             @"^\s*(?:public|internal)\s+(?:partial\s+)?(?:class|record)\s+([A-Za-z_][A-Za-z0-9_]*)",
-            RegexOptions.Multiline);
+            RegexOptions.Multiline,
+            TimeSpan.FromSeconds(1));
 
         foreach (Match match in classPattern.Matches(contracts))
         {
@@ -60,7 +61,8 @@ internal static class JsonSerializerContextGenerator
         // Match enum declarations: public enum TypeName, internal enum TypeName
         var enumPattern = new Regex(
             @"^\s*(?:public|internal)\s+enum\s+([A-Za-z_][A-Za-z0-9_]*)",
-            RegexOptions.Multiline);
+            RegexOptions.Multiline,
+            TimeSpan.FromSeconds(1));
 
         foreach (Match match in enumPattern.Matches(contracts))
         {

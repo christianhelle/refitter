@@ -235,9 +235,9 @@ public class RefitterGenerateTask : MSBuildTask
         {
             Log.LogErrorFromException(e);
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore
+            Debug.WriteLine($"Failed to log error from exception: {ex}");
         }
     }
 
@@ -247,9 +247,9 @@ public class RefitterGenerateTask : MSBuildTask
         {
             Log.LogCommandLine(text);
         }
-        catch
+        catch (Exception ex)
         {
-            // ignore
+            Debug.WriteLine($"Failed to log command line: {ex}");
         }
     }
 
@@ -259,9 +259,9 @@ public class RefitterGenerateTask : MSBuildTask
         {
             Log.LogError(text);
         }
-        catch
+        catch (Exception ex)
         {
-            // ignore
+            Debug.WriteLine($"Failed to log error: {ex}");
         }
     }
 
