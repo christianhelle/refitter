@@ -407,4 +407,10 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Generate JsonSerializerContext for AOT compilation support")]
     public bool GenerateJsonSerializerContext { get; set; }
+
+    /// <summary>
+    /// Gets or sets a suffix to append to all generated contract type names.
+    /// </summary>
+    [Description("Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.")]
+    public string? ContractTypeSuffix { get; set; }
 }

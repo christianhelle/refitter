@@ -1,7 +1,8 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -49,14 +50,14 @@ public class AnyTypeBodySerializationTests
 }
 ";
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Contains_BodySerializationMethod_For_Object_Parameter()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[Body(BodySerializationMethod.Serialized)] object body");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -65,14 +66,13 @@ public class AnyTypeBodySerializationTests
 
     private static async Task<string> GenerateCode()
     {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
-            OpenApiPath = "petstore.json"
+            OpenApiPath = swaggerFile
         };
 
-        return await RefitGenerator.Generate(
-            new OpenApiSpecification(OpenApiSpec),
-            settings
-        );
+        var generator = await RefitGenerator.CreateAsync(settings);
+        return generator.Generate();
     }
 }

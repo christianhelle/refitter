@@ -30,7 +30,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
         Dictionary<string, StringBuilder> interfacesByGroup = new();
         Dictionary<string, string> interfacesNamesByGroup = new();
-        
+
         _methodIdentifiersByInterface = new();
 
         foreach (var kv in byGroup)
@@ -167,13 +167,13 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
         {
             _methodIdentifiersByInterface[interfaceName] = new HashSet<string>();
         }
-        
+
         var interfaceIdentifiers = _methodIdentifiersByInterface[interfaceName];
         var generatedName = IdentifierUtils.Counted(
             interfaceIdentifiers,
             GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true),
             parent: interfaceName);
-        
+
         interfaceIdentifiers.Add(generatedName);
         return generatedName;
     }
