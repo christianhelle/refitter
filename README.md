@@ -1286,6 +1286,16 @@ var result = await petstoreManager.ExecuteAsync((api, opt) => api.GetPetById(1, 
 
 Please head to the [Apizr documentation](https://www.apizr.net) to get more.
 
+## Common Issues and Workarounds
+
+### Enum Names with Hyphens
+
+OpenAPI specifications often contain enum values with hyphens (e.g., `"foo-bar"`, `"application/json"`). System.Text.Json's built-in `JsonStringEnumConverter` doesn't respect the `[EnumMember]` attribute, causing serialization issues.
+
+**Solution**: Use the `--no-inline-json-converters` flag and configure a third-party converter that properly handles `[EnumMember]` attributes.
+
+📖 See the detailed guide: [docs/enum-hyphens-workaround.md](docs/enum-hyphens-workaround.md)
+
 ## System requirements
 
 .NET 8.0 or .NET 9.0
