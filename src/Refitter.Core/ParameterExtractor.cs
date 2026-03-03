@@ -539,7 +539,7 @@ $$"""
 
         // Convert first character to lowercase for camelCase
         var variableName = char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
-        
+
         // Replace invalid characters with underscore
         var safeVariableName = new StringBuilder(variableName.Length);
         foreach (var c in variableName)
@@ -549,7 +549,7 @@ $$"""
             else
                 safeVariableName.Append('_');
         }
-        
+
         return safeVariableName.ToString();
     }
 }
