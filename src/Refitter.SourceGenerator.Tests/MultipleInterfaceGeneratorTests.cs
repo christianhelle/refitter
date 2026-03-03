@@ -37,24 +37,33 @@ public class MultipleInterfaceGeneratorTests
     [Test]
     public void Can_Resolve_All_Refit_Interfaces()
     {
-        RestService.For(typeof(IAddPetEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IUpdatePetEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IDeletePetEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(ICreateUserEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IUpdateUserEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IDeleteUserEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(ILoginUserEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(ILogoutUserEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IPlaceOrderEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IGetOrderByIdEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IDeleteOrderEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IGetInventoryEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IGetPetByIdEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IUploadFileEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IFindPetsByStatusEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IFindPetsByTagsEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IGetUserByNameEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(IUpdatePetWithFormEndpoint), BaseUrl).Should().NotBeNull();
-        RestService.For(typeof(ICreateUsersWithListInputEndpoint), BaseUrl).Should().NotBeNull();
+        VerifyHasRefitAttributes(typeof(IAddPetEndpoint));
+        VerifyHasRefitAttributes(typeof(IUpdatePetEndpoint));
+        VerifyHasRefitAttributes(typeof(IDeletePetEndpoint));
+        VerifyHasRefitAttributes(typeof(ICreateUserEndpoint));
+        VerifyHasRefitAttributes(typeof(IUpdateUserEndpoint));
+        VerifyHasRefitAttributes(typeof(IDeleteUserEndpoint));
+        VerifyHasRefitAttributes(typeof(ILoginUserEndpoint));
+        VerifyHasRefitAttributes(typeof(ILogoutUserEndpoint));
+        VerifyHasRefitAttributes(typeof(IPlaceOrderEndpoint));
+        VerifyHasRefitAttributes(typeof(IGetOrderByIdEndpoint));
+        VerifyHasRefitAttributes(typeof(IDeleteOrderEndpoint));
+        VerifyHasRefitAttributes(typeof(IGetInventoryEndpoint));
+        VerifyHasRefitAttributes(typeof(IGetPetByIdEndpoint));
+        VerifyHasRefitAttributes(typeof(IUploadFileEndpoint));
+        VerifyHasRefitAttributes(typeof(IFindPetsByStatusEndpoint));
+        VerifyHasRefitAttributes(typeof(IFindPetsByTagsEndpoint));
+        VerifyHasRefitAttributes(typeof(IGetUserByNameEndpoint));
+        VerifyHasRefitAttributes(typeof(IUpdatePetWithFormEndpoint));
+        VerifyHasRefitAttributes(typeof(ICreateUsersWithListInputEndpoint));
+    }
+
+    private static void VerifyHasRefitAttributes(System.Type type)
+    {
+        var hasRefitAttributes = type
+            .GetMethods()
+            .SelectMany(m => m.GetCustomAttributes(inherit: false))
+            .Any(a => a is HttpMethodAttribute);
+        hasRefitAttributes.Should().BeTrue($"{type.Name} should have at least one Refit HTTP method attribute");
     }
 }

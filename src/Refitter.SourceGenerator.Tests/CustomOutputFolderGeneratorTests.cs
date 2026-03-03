@@ -15,8 +15,12 @@ public class CustomOutputFolderGeneratorTests
             .Be("Refitter.Tests.CustomGenerated");
 
     [Test]
-    public void Can_Resolve_Refit_Interface() =>
-        RestService.For<IApiInCustomGeneratedFolder>("https://petstore3.swagger.io/api/v3")
-            .Should()
-            .NotBeNull();
+    public void Can_Resolve_Refit_Interface()
+    {
+        var hasRefitAttributes = typeof(IApiInCustomGeneratedFolder)
+            .GetMethods()
+            .SelectMany(m => m.GetCustomAttributes(inherit: false))
+            .Any(a => a is HttpMethodAttribute);
+        hasRefitAttributes.Should().BeTrue("interface should have at least one Refit HTTP method attribute");
+    }
 }

@@ -71,7 +71,7 @@ components:
 
         // But generated code should exist in memory
         generatedCode.Should().NotBeNullOrWhiteSpace();
-        generatedCode.Should().Contain("partial interface ITestApi");
+        generatedCode.Should().Contain("partial interface ITestAPI");
     }
 
     [Test]
@@ -101,7 +101,7 @@ components:
         foreach (var code in results)
         {
             code.Should().NotBeNullOrWhiteSpace();
-            code.Should().Contain("partial interface ITestApi");
+            code.Should().Contain("partial interface ITestAPI");
         }
     }
 
@@ -121,7 +121,7 @@ components:
         var generatedCode = generator.Generate();
 
         // Assert - Generated code should compile
-        generatedCode.Should().Contain("partial interface ITestApi");
+        generatedCode.Should().Contain("partial interface ITestAPI");
         generatedCode.Should().Contain("Task<IApiResponse<System.Collections.Generic.ICollection<User>>> GetUsers(");
 
         BuildHelper

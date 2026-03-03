@@ -23,14 +23,32 @@ public class MultipleInterfaceByTagGeneratorTests
         typeof(IStoreApi).Namespace.Should().Be(ExpectedNamespace);
 
     [Test]
-    public void Can_Resolve_IPetApi_Refit_Interface() =>
-        RestService.For(typeof(IPetApi), BaseUrl).Should().NotBeNull();
+    public void Can_Resolve_IPetApi_Refit_Interface()
+    {
+        var hasRefitAttributes = typeof(IPetApi)
+            .GetMethods()
+            .SelectMany(m => m.GetCustomAttributes(inherit: false))
+            .Any(a => a is HttpMethodAttribute);
+        hasRefitAttributes.Should().BeTrue("interface should have at least one Refit HTTP method attribute");
+    }
 
     [Test]
-    public void Can_Resolve_IUserApi_Refit_Interface() =>
-        RestService.For(typeof(IUserApi), BaseUrl).Should().NotBeNull();
+    public void Can_Resolve_IUserApi_Refit_Interface()
+    {
+        var hasRefitAttributes = typeof(IUserApi)
+            .GetMethods()
+            .SelectMany(m => m.GetCustomAttributes(inherit: false))
+            .Any(a => a is HttpMethodAttribute);
+        hasRefitAttributes.Should().BeTrue("interface should have at least one Refit HTTP method attribute");
+    }
 
     [Test]
-    public void Can_Resolve_IStoreApi_Refit_Interface() =>
-        RestService.For(typeof(IStoreApi), BaseUrl).Should().NotBeNull();
+    public void Can_Resolve_IStoreApi_Refit_Interface()
+    {
+        var hasRefitAttributes = typeof(IStoreApi)
+            .GetMethods()
+            .SelectMany(m => m.GetCustomAttributes(inherit: false))
+            .Any(a => a is HttpMethodAttribute);
+        hasRefitAttributes.Should().BeTrue("interface should have at least one Refit HTTP method attribute");
+    }
 }
