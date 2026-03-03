@@ -6,32 +6,18 @@
 
 **Implemented enhancements:**
 
+- Support custom format-mappings via Key-Value configuration [\#438](https://github.com/christianhelle/refitter/issues/438)
 - Generate the client from multiple versions [\#350](https://github.com/christianhelle/refitter/issues/350)
-- Add support for generating a single client from multiple OpenAPI specifications [\#904](https://github.com/christianhelle/refitter/pull/904) ([Copilot](https://github.com/apps/copilot-swe-agent))
-- Update refit monorepo to v10 \(major\) [\#893](https://github.com/christianhelle/refitter/pull/893) ([renovate[bot]](https://github.com/apps/renovate))
-- Fix null reference and XML escaping in XmlDocumentationGenerator [\#890](https://github.com/christianhelle/refitter/pull/890) ([Copilot](https://github.com/apps/copilot-swe-agent))
-- Read group documentation from document tags. [\#887](https://github.com/christianhelle/refitter/pull/887) ([DJ4ddi](https://github.com/DJ4ddi))
-- Fix numeric format with pattern quirk - infer type from format for all numeric types [\#869](https://github.com/christianhelle/refitter/pull/869) ([Copilot](https://github.com/apps/copilot-swe-agent))
 
 **Fixed bugs:**
 
 - format: int32 quirk =\> Serializes to "object" when open api spec contains pattern [\#867](https://github.com/christianhelle/refitter/issues/867)
 - Failing CLI example with confusing error message [\#847](https://github.com/christianhelle/refitter/issues/847)
-
-**Merged pull requests:**
-
-- Update dependency coverlet.collector to v8 [\#901](https://github.com/christianhelle/refitter/pull/901) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency TUnit to 1.15.11 [\#899](https://github.com/christianhelle/refitter/pull/899) ([renovate[bot]](https://github.com/apps/renovate))
-- Fix MSBuild workflow [\#898](https://github.com/christianhelle/refitter/pull/898) ([christianhelle](https://github.com/christianhelle))
-- Update ghcr.io/devcontainers/features/powershell Docker tag to v2 [\#895](https://github.com/christianhelle/refitter/pull/895) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency FluentAssertions to 7.2.1 [\#894](https://github.com/christianhelle/refitter/pull/894) ([renovate[bot]](https://github.com/apps/renovate))
-- Fix build workflow: add dotnet restore before dotnet msbuild in Prepare step [\#892](https://github.com/christianhelle/refitter/pull/892) ([Copilot](https://github.com/apps/copilot-swe-agent))
-- Update dotnet monorepo [\#891](https://github.com/christianhelle/refitter/pull/891) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency Swashbuckle.AspNetCore to 10.1.3 [\#889](https://github.com/christianhelle/refitter/pull/889) ([renovate[bot]](https://github.com/apps/renovate))
-- Update Dependencies [\#886](https://github.com/christianhelle/refitter/pull/886) ([christianhelle](https://github.com/christianhelle))
-- Update dependency ruby to v4.0.1 [\#866](https://github.com/christianhelle/refitter/pull/866) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency TUnit to 1.13.60 [\#865](https://github.com/christianhelle/refitter/pull/865) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dotnet monorepo [\#835](https://github.com/christianhelle/refitter/pull/835) ([renovate[bot]](https://github.com/apps/renovate))
+- .refitter - "mutipleInterfaces": "ByTag" increments number at the end of Method Name globally instead of being related to its interface [\#672](https://github.com/christianhelle/refitter/issues/672)
+- Build errors when combined with `Microsoft.Extensions.ApiDescription.Server` [\#635](https://github.com/christianhelle/refitter/issues/635)
+- Nullable Strings not being marked correctly [\#580](https://github.com/christianhelle/refitter/issues/580)
+- The client parameter type's names occur wrong when multipart is include. [\#231](https://github.com/christianhelle/refitter/issues/231)
+- Multipart endpoint \[FromForm\] decorated argument is missing from signature [\#222](https://github.com/christianhelle/refitter/issues/222)
 
 ## [1.7.3](https://github.com/christianhelle/refitter/tree/1.7.3) (2026-01-24)
 
