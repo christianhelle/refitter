@@ -117,6 +117,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
 
+        if (!string.IsNullOrWhiteSpace(settings.ContractTypeSuffix))
+        {
+            contracts = ContractTypeSuffixApplier.ApplySuffix(contracts, settings.ContractTypeSuffix);
+        }
+
         if (settings.GenerateClients)
         {
             contracts = RefitInterfaceImports
@@ -162,6 +167,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
+
+        if (!string.IsNullOrWhiteSpace(settings.ContractTypeSuffix))
+        {
+            contracts = ContractTypeSuffixApplier.ApplySuffix(contracts, settings.ContractTypeSuffix);
+        }
 
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {

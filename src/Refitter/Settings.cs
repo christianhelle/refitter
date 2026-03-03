@@ -273,4 +273,9 @@ public sealed class Settings : CommandSettings
     [CommandOption("--custom-template-directory")]
     [DefaultValue(null)]
     public string? CustomTemplateDirectory { get; set; } = null;
+
+    [Description("Suffix to append to all generated contract type names (e.g., 'Dto', 'Contract', 'Model')")]
+    [CommandOption("--contract-type-suffix")]
+    [DefaultValue(null)]
+    public string? ContractTypeSuffix { get; set; }
 }

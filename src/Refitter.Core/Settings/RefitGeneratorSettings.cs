@@ -401,4 +401,10 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
     public string? CustomTemplateDirectory { get; set; }
+
+    /// <summary>
+    /// Gets or sets a suffix to append to all generated contract type names (e.g., "Dto", "Contract", "Model").
+    /// </summary>
+    [Description("Suffix to append to all generated contract type names (e.g., 'Dto', 'Contract', 'Model')")]
+    public string? ContractTypeSuffix { get; set; }
 }

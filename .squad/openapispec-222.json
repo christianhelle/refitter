@@ -1,0 +1,852 @@
+{
+    "components": {
+        "schemas": {
+            "Document": {
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "format": "int64",
+                        "type": "integer"
+                    },
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    }
+                },
+                "type": "object"
+            },
+            "FileInfo": {
+                "additionalProperties": false,
+                "properties": {
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "createdBy": {
+                        "nullable": true,
+                        "type": "string"
+                    },
+                    "organizationalUnitIds": {
+                        "items": {
+                            "format": "int64",
+                            "type": "integer"
+                        },
+                        "nullable": true,
+                        "type": "array"
+                    }
+                },
+                "type": "object"
+            },
+            "Metadata": {
+                "additionalProperties": false,
+                "properties": {
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "createdBy": {
+                        "nullable": true,
+                        "type": "string"
+                    },
+                    "lastModifiedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "lastModifiedBy": {
+                        "nullable": true,
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "ProblemDetails": {
+                "additionalProperties": {
+                },
+                "properties": {
+                    "detail": {
+                        "nullable": true,
+                        "type": "string"
+                    },
+                    "instance": {
+                        "nullable": true,
+                        "type": "string"
+                    },
+                    "status": {
+                        "format": "int32",
+                        "nullable": true,
+                        "type": "integer"
+                    },
+                    "title": {
+                        "nullable": true,
+                        "type": "string"
+                    },
+                    "type": {
+                        "nullable": true,
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "Bearer": {
+                "bearerFormat": "JWT",
+                "description": "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token in the text input below.\r\n\r\nExample: \"eyJhbGciOiJS...\"",
+                "scheme": "Bearer",
+                "type": "http"
+            }
+        }
+    },
+    "info": {
+        "description": "API providing documents services.",
+        "title": "Dbh.Fiduz.Documents API",
+        "version": "1"
+    },
+    "openapi": "3.0.1",
+    "paths": {
+        "/v1/Directory/{bucketName}/{directory}": {
+            "delete": {
+                "operationId": "DeleteDirectoryAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "bucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "directory",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Deletes directory",
+                "tags": [
+                    "Directory"
+                ]
+            },
+            "get": {
+                "operationId": "ListDirectoryAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "bucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "directory",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "query",
+                        "name": "recursive",
+                        "schema": {
+                            "default": true,
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "query",
+                        "name": "versions",
+                        "schema": {
+                            "default": false,
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "Lists content of the directory",
+                "tags": [
+                    "Directory"
+                ]
+            },
+            "post": {
+                "operationId": "CreateDirectoryAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "bucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "directory",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Creates directory",
+                "tags": [
+                    "Directory"
+                ]
+            }
+        },
+        "/v1/Directory/{fromBucketName}/{fromDirectory}/{toDirectory}": {
+            "post": {
+                "operationId": "CopyDirectoryAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "fromBucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "fromDirectory",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "query",
+                        "name": "toBucketName",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "toDirectory",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "Copies directory",
+                "tags": [
+                    "Directory"
+                ]
+            }
+        },
+        "/v1/Documents": {
+            "get": {
+                "operationId": "GetDocuments",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Document"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                },
+                "tags": [
+                    "Documents"
+                ]
+            },
+            "post": {
+                "operationId": "CreateDocument",
+                "requestBody": {
+                    "content": {
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Document"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Document"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Document"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Document"
+                                }
+                            }
+                        },
+                        "description": "Created"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                },
+                "tags": [
+                    "Documents"
+                ]
+            }
+        },
+        "/v1/Documents/{id}": {
+            "delete": {
+                "operationId": "DeleteDocument",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                },
+                "tags": [
+                    "Documents"
+                ]
+            },
+            "get": {
+                "operationId": "GetDocumentById",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Document"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                },
+                "tags": [
+                    "Documents"
+                ]
+            },
+            "put": {
+                "operationId": "UpdateDocument",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "format": "int64",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Document"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Document"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Document"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                },
+                "tags": [
+                    "Documents"
+                ]
+            }
+        },
+        "/v1/File/CopyFile/{fromBucketName}/{filePath}/{toDirectory}": {
+            "post": {
+                "operationId": "CopyFileAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "fromBucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "filePath",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "query",
+                        "name": "toBucketName",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "toDirectory",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "Copies file",
+                "tags": [
+                    "File"
+                ]
+            }
+        },
+        "/v1/File/DeleteFile/{bucketName}/{filePath}": {
+            "delete": {
+                "operationId": "DeleteFileAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "bucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "filePath",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Deletes File",
+                "tags": [
+                    "File"
+                ]
+            }
+        },
+        "/v1/File/DownloadFile/{bucketName}/{objectName}": {
+            "get": {
+                "operationId": "DownloadFileAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "bucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "objectName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "query",
+                        "name": "versionId",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "Downloads file",
+                "tags": [
+                    "File"
+                ]
+            }
+        },
+        "/v1/File/GetFileInfo/{bucketName}/{objectName}": {
+            "get": {
+                "operationId": "GetFileInfoAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "bucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "objectName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FileInfo"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "Returns information about file",
+                "tags": [
+                    "File"
+                ]
+            }
+        },
+        "/v1/File/MoveFile/{fromBucketName}/{fromFilePath}/{toFilePath}": {
+            "post": {
+                "operationId": "MoveFileAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "fromBucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "fromFilePath",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "query",
+                        "name": "toBucketName",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "toFilePath",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "Moves File",
+                "tags": [
+                    "File"
+                ]
+            }
+        },
+        "/v1/File/UploadFile/{bucketName}/{directory}": {
+            "post": {
+                "operationId": "UploadFileAsync",
+                "parameters": [
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "bucketName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "",
+                        "in": "path",
+                        "name": "directory",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "encoding": {
+                                "file": {
+                                    "style": "form"
+                                },
+                                "OrganizationalUnitIds": {
+                                    "style": "form"
+                                }
+                            },
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "format": "binary",
+                                        "type": "string"
+                                    },
+                                    "OrganizationalUnitIds": {
+                                        "items": {
+                                            "format": "int64",
+                                            "type": "integer"
+                                        },
+                                        "type": "array"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    }
+                },
+                "summary": "Uploads file",
+                "tags": [
+                    "File"
+                ]
+            }
+        }
+    },
+    "security": [
+        {
+            "Bearer": [
+            ]
+        }
+    ]
+}
