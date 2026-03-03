@@ -27,7 +27,7 @@ internal static class ParameterExtractor
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
             .Select(p =>
-                $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
+                $"{JoinAttributes(GetBodyAttribute(p, settings), GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var headerParameters = new List<string>();
@@ -252,6 +252,21 @@ internal static class ParameterExtractor
             or "byte" or "Byte" or "decimal" or "Decimal" or "float" or "Single"
             or "double" or "Double" or "sbyte" or "SByte" or "uint" or "UInt32"
             or "ulong" or "UInt64" or "ushort" or "UInt16";
+    }
+
+    private static string GetBodyAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
+    {
+        var anyType = settings.CodeGeneratorSettings?.AnyType ?? "object";
+        var parameterType = WellKnownNamespaces.TrimImportedNamespaces(FindSupportedType(parameter.Type));
+        
+        // Check if the parameter type matches AnyType (e.g., "object" or custom type like "System.Text.Json.JsonElement")
+        if (parameterType.Equals(anyType, StringComparison.OrdinalIgnoreCase) ||
+            parameterType.Contains("JsonElement", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Body(BodySerializationMethod.Serialized)";
+        }
+        
+        return "Body";
     }
 
     private static string GetQueryAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
