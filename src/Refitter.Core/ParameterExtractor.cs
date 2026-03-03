@@ -27,7 +27,7 @@ internal static class ParameterExtractor
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
             .Select(p =>
-                $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
+                $"{JoinAttributes(GetBodyAttribute(p, settings), GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var headerParameters = new List<string>();
@@ -254,6 +254,21 @@ internal static class ParameterExtractor
             or "ulong" or "UInt64" or "ushort" or "UInt16";
     }
 
+    private static string GetBodyAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
+    {
+        var anyType = settings.CodeGeneratorSettings?.AnyType ?? "object";
+        var parameterType = WellKnownNamespaces.TrimImportedNamespaces(FindSupportedType(parameter.Type));
+
+        // Check if the parameter type matches AnyType (e.g., "object" or custom type like "System.Text.Json.JsonElement")
+        if (parameterType.Equals(anyType, StringComparison.OrdinalIgnoreCase) ||
+            parameterType.Contains("JsonElement", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Body(BodySerializationMethod.Serialized)";
+        }
+
+        return "Body";
+    }
+
     private static string GetQueryAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
     {
         return (parameter, settings) switch
@@ -470,5 +485,71 @@ $$"""
                 /// </summary>
 """);
         codeBuilder.AppendLine();
+    }
+
+    private static string GetCSharpType(JsonSchema propertySchema, RefitGeneratorSettings settings)
+    {
+        var type = propertySchema.Type switch
+        {
+            JsonObjectType.String => "string",
+            JsonObjectType.Integer => GetIntegerTypeName(propertySchema, settings),
+            JsonObjectType.Number => "double",
+            JsonObjectType.Boolean => "bool",
+            JsonObjectType.Array => GetArrayType(propertySchema, settings),
+            JsonObjectType.Object => "object",
+            _ => "object"
+        };
+
+        // Add nullable modifier if needed
+        if (settings.OptionalParameters && propertySchema.IsNullable(SchemaType.OpenApi3))
+        {
+            type += "?";
+        }
+
+        return type;
+    }
+
+    private static string GetIntegerTypeName(JsonSchema schema, RefitGeneratorSettings settings)
+    {
+        // Check the format first
+        if (schema.Format == "int64")
+            return "long";
+        if (schema.Format == "int32")
+            return "int";
+
+        // Fall back to settings
+        var integerType = settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32;
+        return integerType == IntegerType.Int64 ? "long" : "int";
+    }
+
+    private static string GetArrayType(JsonSchema arraySchema, RefitGeneratorSettings settings)
+    {
+        if (arraySchema.Item != null)
+        {
+            var itemType = GetCSharpType(arraySchema.Item, settings);
+            return $"{itemType}[]";
+        }
+        return "object[]";
+    }
+
+    private static string ConvertToVariableName(string propertyName)
+    {
+        if (string.IsNullOrEmpty(propertyName))
+            return "value";
+
+        // Convert first character to lowercase for camelCase
+        var variableName = char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
+        
+        // Replace invalid characters with underscore
+        var safeVariableName = new StringBuilder(variableName.Length);
+        foreach (var c in variableName)
+        {
+            if (char.IsLetterOrDigit(c) || c == '_')
+                safeVariableName.Append(c);
+            else
+                safeVariableName.Append('_');
+        }
+        
+        return safeVariableName.ToString();
     }
 }
