@@ -30,3 +30,6 @@
 - Use `[CommandOption("--option-name")]` attribute pattern for new CLI options
 - Follow existing C# coding conventions in `.editorconfig`
 - Multi-target: .NET 8.0, 9.0, 10.0 — test with `--framework net9.0` for CLI runs
+
+## PR Gate
+Before creating any PR: `dotnet build -c Release src/Refitter.slnx` → `dotnet test -c Release src/Refitter.slnx` → `dotnet format --verify-no-changes src/Refitter.slnx`. All three must pass. No exceptions.

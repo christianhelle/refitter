@@ -31,3 +31,6 @@
 
 ## Reviewer Gate
 Keaton may approve or reject work from other agents. On rejection, Keaton designates a *different* agent for revision.
+
+## PR Gate
+Before creating any PR: `dotnet build -c Release src/Refitter.slnx` → `dotnet test -c Release src/Refitter.slnx` → `dotnet format --verify-no-changes src/Refitter.slnx`. All three must pass. No exceptions.

@@ -47,6 +47,20 @@ Always reference these instructions first and fallback to search or bash command
 - ALWAYS run `dotnet format src/Refitter.slnx` before committing or the CI (.github/workflows/build.yml) will fail.
 - ALWAYS validate that EVERY command works before adding it to documentation or instructions.
 
+## Pull Request Requirements
+
+Before creating ANY pull request, you MUST complete ALL of the following steps in order:
+
+1. **Build**: Run `dotnet build -c Release src/Refitter.slnx` — MUST succeed with zero errors
+2. **Test**: Run `dotnet test -c Release src/Refitter.slnx` — ALL tests MUST pass
+   - Network-related test failures in sandboxed environments are acceptable
+   - All other test failures MUST be fixed before creating the PR
+3. **Format**: Run `dotnet format --verify-no-changes src/Refitter.slnx` — MUST pass with no formatting violations
+
+If ANY step fails, DO NOT create the pull request. Fix the issues first and re-run all three steps.
+
+NEVER create a pull request with known build failures or test failures. This is a hard requirement, not a suggestion.
+
 ## Repository Structure and Navigation
 
 ### Key Projects

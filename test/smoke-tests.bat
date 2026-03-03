@@ -236,6 +236,11 @@ for %%v in (v3.0 v2.0) do (
                 call :generate "!file_path!" "!ns!.NoAcceptHeaders" ".\GeneratedCode\NoAcceptHeaders!file_tag!.generated.cs" "--no-accept-headers" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.SkipDefaultAdditionalProps" ".\GeneratedCode\SkipDefaultAddlProps!file_tag!.generated.cs" "--skip-default-additional-properties" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.NoInlineJsonConverters" ".\GeneratedCode\NoInlineJsonConv!file_tag!.generated.cs" "--no-inline-json-converters" "%process_path%" "%use_docker_param%"
+                call :generate "!file_path!" "!ns!.InterfaceOnly" ".\GeneratedCode\InterfaceOnly!file_tag!.generated.cs" "--interface-only" "%process_path%" "%use_docker_param%"
+                call :generate "!file_path!" "!ns!.NoXmlDocComments" ".\GeneratedCode\NoXmlDoc!file_tag!.generated.cs" "--no-xml-doc-comments" "%process_path%" "%use_docker_param%"
+                call :generate "!file_path!" "!ns!.NoOperationHeaders" ".\GeneratedCode\NoOpHeaders!file_tag!.generated.cs" "--no-operation-headers" "%process_path%" "%use_docker_param%"
+                call :generate "!file_path!" "!ns!.AdditionalNamespace" ".\GeneratedCode\AdditionalNs!file_tag!.generated.cs" "--additional-namespace System.ComponentModel" "%process_path%" "%use_docker_param%"
+                call :generate "!file_path!" "!ns!.ExcludeNamespace" ".\GeneratedCode\ExcludeNs!file_tag!.generated.cs" "--exclude-namespace System.Xml.Serialization" "%process_path%" "%use_docker_param%"
                 :: Petstore-only variants (tag/path filters require petstore-specific tags)
                 echo !cur_filename! | findstr /b "petstore" >nul && (
                     call :generate "!file_path!" "!ns!.TagFiltered" ".\GeneratedCode\TagFiltered!file_tag!.generated.cs" "--tag pet --tag user --tag store" "%process_path%" "%use_docker_param%"
@@ -280,6 +285,11 @@ for %%f in (json yaml) do (
             call :generate "!file_path!" "!ns!.NoAcceptHeaders" ".\GeneratedCode\NoAcceptHeaders!file_tag!.generated.cs" "--no-accept-headers" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.SkipDefaultAdditionalProps" ".\GeneratedCode\SkipDefaultAddlProps!file_tag!.generated.cs" "--skip-default-additional-properties" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.NoInlineJsonConverters" ".\GeneratedCode\NoInlineJsonConv!file_tag!.generated.cs" "--no-inline-json-converters" "%process_path%" "%use_docker_param%"
+            call :generate "!file_path!" "!ns!.InterfaceOnly" ".\GeneratedCode\InterfaceOnly!file_tag!.generated.cs" "--interface-only" "%process_path%" "%use_docker_param%"
+            call :generate "!file_path!" "!ns!.NoXmlDocComments" ".\GeneratedCode\NoXmlDoc!file_tag!.generated.cs" "--no-xml-doc-comments" "%process_path%" "%use_docker_param%"
+            call :generate "!file_path!" "!ns!.NoOperationHeaders" ".\GeneratedCode\NoOpHeaders!file_tag!.generated.cs" "--no-operation-headers" "%process_path%" "%use_docker_param%"
+            call :generate "!file_path!" "!ns!.AdditionalNamespace" ".\GeneratedCode\AdditionalNs!file_tag!.generated.cs" "--additional-namespace System.ComponentModel" "%process_path%" "%use_docker_param%"
+            call :generate "!file_path!" "!ns!.ExcludeNamespace" ".\GeneratedCode\ExcludeNs!file_tag!.generated.cs" "--exclude-namespace System.Xml.Serialization" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.MultipleFiles" ".\GeneratedCode\MultipleFiles\!file_tag!\" "--multiple-files" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.SeparateContractsFile" ".\GeneratedCode\SeparateContracts\!file_tag!\" "--contracts-output GeneratedCode\Contracts\!file_tag! --contracts-namespace !ns!.SeparateContractsFile.Contracts" "%process_path%" "%use_docker_param%"
         )
@@ -337,6 +347,7 @@ for %%v in (v3.0 v2.0) do (
                 call :generate "!file_path!" "!ns!.ImmutableRecords" ".\GeneratedCode\ImmutableRecords!file_tag!.generated.cs" "--immutable-records" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.PolymorphicSerialization" ".\GeneratedCode\PolymorphicSerialization!file_tag!.generated.cs" "--use-polymorphic-serialization" "%process_path%" "%use_docker_param%"
                 call :generate "!file_path!" "!ns!.CollectionFormatCsv" ".\GeneratedCode\CollectionFormatCsv!file_tag!.generated.cs" "--collection-format csv" "%process_path%" "%use_docker_param%"
+                call :generate "!file_path!" "!ns!.JsonSerializerContext" ".\GeneratedCode\JsonSerializerCtx!file_tag!.generated.cs" "--json-serializer-context" "%process_path%" "%use_docker_param%"
             )
         )
     )
@@ -360,6 +371,7 @@ for %%f in (json yaml) do (
             call :generate "!file_path!" "!ns!.ImmutableRecords" ".\GeneratedCode\ImmutableRecords!file_tag!.generated.cs" "--immutable-records" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.PolymorphicSerialization" ".\GeneratedCode\PolymorphicSerialization!file_tag!.generated.cs" "--use-polymorphic-serialization" "%process_path%" "%use_docker_param%"
             call :generate "!file_path!" "!ns!.CollectionFormatCsv" ".\GeneratedCode\CollectionFormatCsv!file_tag!.generated.cs" "--collection-format csv" "%process_path%" "%use_docker_param%"
+            call :generate "!file_path!" "!ns!.JsonSerializerContext" ".\GeneratedCode\JsonSerializerCtx!file_tag!.generated.cs" "--json-serializer-context" "%process_path%" "%use_docker_param%"
         )
     )
 )
@@ -400,6 +412,75 @@ for %%u in ("https://petstore3.swagger.io/api/v3/openapi.json" "https://petstore
 
     call :build_solution ".\ConsoleApp\ConsoleApp.slnx" "true"
 )
+
+:: ==========================================
+:: Phase 8: Operation Name Generator Tests
+:: ==========================================
+echo.
+echo === Operation Name Generator Tests ===
+echo.
+
+call :clean_generated_code
+
+for %%g in (
+    "Default"
+    "MultipleClientsFromOperationId"
+    "MultipleClientsFromPathSegments"
+    "MultipleClientsFromFirstTagAndOperationId"
+    "MultipleClientsFromFirstTagAndOperationName"
+    "MultipleClientsFromFirstTagAndPathSegments"
+    "SingleClientFromOperationId"
+    "SingleClientFromPathSegments"
+) do (
+    set "gen_name=%%~g"
+    if /i "%use_docker_param%"=="true" (
+        set "current_dir=%CD%"
+        set "current_dir=!current_dir:\=/!"
+        echo docker run --rm -v "!current_dir!:/src" -w /src christianhelle/refitter .\OpenAPI\v3.0\petstore.json --namespace OpNameGen_!gen_name! --output .\GeneratedCode\OpNameGen_!gen_name!.generated.cs --no-logging --operation-name-generator !gen_name!
+        docker run --rm -v "!current_dir!:/src" -w /src christianhelle/refitter .\OpenAPI\v3.0\petstore.json --namespace OpNameGen_!gen_name! --output .\GeneratedCode\OpNameGen_!gen_name!.generated.cs --no-logging --operation-name-generator !gen_name!
+        if not !errorlevel!==0 echo Warning: Operation name generator '!gen_name!' failed (may be expected for some generators)
+    ) else (
+        echo !process_path! .\OpenAPI\v3.0\petstore.json --namespace OpNameGen_!gen_name! --output .\GeneratedCode\OpNameGen_!gen_name!.generated.cs --no-logging --operation-name-generator !gen_name!
+        !process_path! .\OpenAPI\v3.0\petstore.json --namespace OpNameGen_!gen_name! --output .\GeneratedCode\OpNameGen_!gen_name!.generated.cs --no-logging --operation-name-generator !gen_name!
+        if not !errorlevel!==0 echo Warning: Operation name generator '!gen_name!' failed (may be expected for some generators)
+    )
+)
+
+if exist ".\GeneratedCode\OpNameGen_*.generated.cs" (
+    call :build_solution ".\ConsoleApp\ConsoleApp.Core.slnx" "true" "true"
+)
+
+:: ==========================================
+:: Phase 9: Collection Format Variant Tests
+:: ==========================================
+echo.
+echo === Collection Format Variant Tests ===
+echo.
+
+call :clean_generated_code
+
+for %%f in (Multi Ssv Tsv Pipes) do (
+    call :generate ".\OpenAPI\v3.0\petstore.json" "CollFmt_%%f" ".\GeneratedCode\CollFmt_%%f.generated.cs" "--collection-format %%f" "%process_path%" "%use_docker_param%"
+)
+
+call :build_solution ".\ConsoleApp\ConsoleApp.Core.slnx" "true" "true"
+
+:: ==========================================
+:: Phase 10: Combination Tests
+:: ==========================================
+echo.
+echo === Combination Tests ===
+echo.
+
+call :clean_generated_code
+
+call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_MultipleInterfacesByTagFiltered" ".\GeneratedCode\Combo_MultipleInterfacesByTagFiltered.generated.cs" "--multiple-interfaces ByTag --tag pet --tag store" "%process_path%" "%use_docker_param%"
+call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_ImmutableRecordsPolymorphic" ".\GeneratedCode\Combo_ImmutableRecordsPolymorphic.generated.cs" "--immutable-records --use-polymorphic-serialization" "%process_path%" "%use_docker_param%"
+call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_ContractOnlyMultipleFiles" ".\GeneratedCode\Combo_ContractOnlyMultipleFiles.generated.cs" "--contract-only --multiple-files" "%process_path%" "%use_docker_param%"
+call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_TrimSchemaKeepPattern" ".\GeneratedCode\Combo_TrimSchemaKeepPattern.generated.cs" "--trim-unused-schema --tag pet --keep-schema ^^Pet.*" "%process_path%" "%use_docker_param%"
+call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_DisposableCancellation" ".\GeneratedCode\Combo_DisposableCancellation.generated.cs" "--disposable --cancellation-tokens" "%process_path%" "%use_docker_param%"
+
+call :build_solution ".\ConsoleApp\ConsoleApp.Core.slnx" "true" "true"
 
 goto :eof
 

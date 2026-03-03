@@ -1132,6 +1132,23 @@ Humans can join the Squad roster alongside AI agents. They appear in routing, ca
 - Reviewer rejection lockout applies normally when human rejects.
 - Multiple humans supported — tracked independently.
 
+---
+
+## PR Gate Requirements
+
+All agents creating pull requests MUST complete these checks in order. Failure at any step means the PR is NOT created. This is a hard requirement from the Refitter team.
+
+**Pre-PR Checklist:**
+1. **Build**: `dotnet build -c Release src/Refitter.slnx` — must succeed with zero errors
+2. **Test**: `dotnet test -c Release src/Refitter.slnx` — all tests must pass
+   - Network-related test failures in sandboxed environments are acceptable
+   - All other failures must be fixed before opening the PR
+3. **Format**: `dotnet format --verify-no-changes src/Refitter.slnx` — must pass with no violations
+
+If ANY step fails: Fix the issues and re-run all three checks. DO NOT open a PR with known failures.
+
+See `.github/copilot-instructions.md` for detailed validation guidance.
+
 ## Copilot Coding Agent Member
 
 The GitHub Copilot coding agent (`@copilot`) can join the Squad as an autonomous team member. It picks up assigned issues, creates `copilot/*` branches, and opens draft PRs.

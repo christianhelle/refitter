@@ -45,3 +45,6 @@ Hockney reviews generated code and implementation quality. May reject and design
 - Tests live in `src/Refitter.Tests/Examples/` namespace pattern
 - Use FluentAssertions (`Should().Contain(...)`, `Should().NotBeNullOrWhiteSpace()`)
 - Use xUnit (`[Fact]`, `[Theory]`)
+
+## PR Gate
+Before creating any PR: `dotnet build -c Release src/Refitter.slnx` → `dotnet test -c Release src/Refitter.slnx` → `dotnet format --verify-no-changes src/Refitter.slnx`. All three must pass. No exceptions.

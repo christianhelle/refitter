@@ -34,3 +34,6 @@
 - CI runs on Windows (primary environment)
 - Code formatting must pass: `dotnet format --verify-no-changes src/Refitter.slnx`
 - Multi-target: .NET 8.0, 9.0, and 10.0
+
+## PR Gate
+Before creating any PR: `dotnet build -c Release src/Refitter.slnx` → `dotnet test -c Release src/Refitter.slnx` → `dotnet format --verify-no-changes src/Refitter.slnx`. All three must pass. No exceptions.
