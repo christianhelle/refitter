@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Refitter Format Mappings",
+  "description": "Custom format-to-type mappings for OpenAPI schema formats. Use this to override the default C# type mappings for specific OpenAPI formats.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "string",
+    "description": "The .NET type name to use for this format"
+  },
+  "examples": [
+    {
+      "int32": "int",
+      "int64": "ulong",
+      "float": "float",
+      "double": "double",
+      "byte": "byte",
+      "binary": "byte[]",
+      "date": "System.DateTime",
+      "date-time": "System.DateTime",
+      "password": "string",
+      "uuid": "System.Guid"
+    }
+  ]
+}
