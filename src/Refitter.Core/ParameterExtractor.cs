@@ -97,7 +97,7 @@ internal static class ParameterExtractor
 
                         // Add AliasAs attribute if property name differs from variable name
                         var aliasAttribute = property.Key != variableName
-                            ? $"AliasAs(""{property.Key}"")"
+                            ? $"AliasAs(\"{property.Key}\")"
                             : string.Empty;
 
                         var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
