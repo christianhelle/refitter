@@ -184,6 +184,39 @@ public static class EmbeddedResources
         }
     }
 
+    public static string SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders
+    {
+        get
+        {
+            using var stream = GetStream("V3.SwaggerPetstoreWithBearerAuthenticationHeaders.json");
+            using var reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
+        }
+    }
+
+    public static string SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders
+    {
+        get
+        {
+            using var stream = GetStream("V3.SwaggerPetstoreWithBearerAuthenticationHeaders.yaml");
+            using var reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
+        }
+    }
+
+    public static string SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders
+    {
+        get
+        {
+            using var stream = GetStream("V3.SwaggerPetstoreWithMixedAuthenticationHeaders.json");
+            using var reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
+        }
+    }
+
     public static string SwaggerIllegalPathsJsonV3
     {
         get
@@ -238,6 +271,12 @@ public static class EmbeddedResources
                 SwaggerPetstoreYamlV2WithUnsafeAuthenticationHeaders,
             SampleOpenSpecifications.SwaggerPetstoreYamlV3WithUnsafeAuthenticationHeaders =>
                 SwaggerPetstoreYamlV3WithUnsafeAuthenticationHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders =>
+                SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders =>
+                SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders,
+            SampleOpenSpecifications.SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders =>
+                SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders,
             _ => throw new ArgumentOutOfRangeException(nameof(version), version, null)
         };
     }

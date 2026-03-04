@@ -66,9 +66,10 @@ internal static class ParameterExtractor
                 {
                     headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {ReplaceUnsafeCharacters(securityScheme.Name)}");
                 }
-                else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: "bearer" })
+                else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http }
+                    && string.Equals(securityScheme.Scheme, "bearer", StringComparison.OrdinalIgnoreCase))
                 {
-                    headerParameters.Add($@"[Header(""Authorization: Bearer"" )] string bearerToken");
+                    headerParameters.Add($@"[Header(""Authorization: Bearer"")] string bearerToken");
                 }
             }
         }

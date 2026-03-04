@@ -6,7 +6,8 @@ namespace Refitter.Core;
 /// The Authentication header style to use.
 /// </summary>
 [Description("The Authentication header style to use")]
-public enum AuthenticationHeaderStyle {
+public enum AuthenticationHeaderStyle
+{
     /// <summary>
     /// Do not generate any "Authorization" header attributes.
     /// </summary>

@@ -323,6 +323,65 @@ public class SwaggerPetstoreApizrTests
     }
 
     [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.yaml")]
+    public async Task Can_Generate_Code_With_Bearer_AuthenticationHeaders_Method_Style(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new ApizrGeneratorSettings { AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Headers(\"Authorization: Bearer\")]");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.yaml")]
+    public async Task Can_Generate_Code_With_Bearer_AuthenticationHeaders_Parameter_Style(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new ApizrGeneratorSettings { AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"Authorization: Bearer\")] string bearerToken");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.yaml")]
+    public async Task Can_Build_Generated_Code_With_Bearer_AuthenticationHeaders_Method_Style(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new ApizrGeneratorSettings { AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders, "SwaggerPetstoreWithMixedAuthenticationHeaders.json")]
+    public async Task SecurityScheme_Filter_With_Method_Style_Only_Generates_Bearer_When_Specified(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new ApizrGeneratorSettings
+        {
+            AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method,
+            SecurityScheme = "bearerAuth"
+        };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Headers(\"Authorization: Bearer\")]");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders, "SwaggerPetstoreWithMixedAuthenticationHeaders.json")]
+    public async Task SecurityScheme_Filter_With_Method_Style_Ignores_NonMatching_Scheme(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new ApizrGeneratorSettings
+        {
+            AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method,
+            SecurityScheme = "auth_key"
+        };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Headers(\"Authorization: Bearer\")]");
+    }
+
+    [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]

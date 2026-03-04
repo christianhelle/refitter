@@ -151,6 +151,11 @@ OPTIONS:
         --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
         --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+        --generate-authentication-header          None            Controls generation of Authorization header support.
+                                                                  Options: None (no authentication code is generated),
+                                                                  Parameter (adds method parameters for authentication),
+                                                                  Method (generates a Refit [Headers] attribute for bearer token authentication)
+        --security-scheme                                        Generate Authorization header for a specific security scheme. When omitted, authentication headers will be generated for all security schemes
 ```
 
 To generate code from an OpenAPI specifications file, run the following:

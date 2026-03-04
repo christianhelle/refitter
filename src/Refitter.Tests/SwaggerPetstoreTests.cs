@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
@@ -328,6 +329,124 @@ public class SwaggerPetstoreTests
         settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.None;
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().NotContain("[Header(\"auth_key\")] string? auth_key");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.yaml")]
+    public async Task Can_Generate_Code_With_Bearer_AuthenticationHeaders_Method_Style(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method;
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Headers(\"Authorization: Bearer\")]");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.yaml")]
+    public async Task Can_Generate_Code_With_Bearer_AuthenticationHeaders_Parameter_Style(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter;
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"Authorization: Bearer\")] string bearerToken");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.yaml")]
+    public async Task Can_Build_Generated_Code_With_Bearer_AuthenticationHeaders_Method_Style(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method;
+        var generatedCode = await GenerateCode(version, filename, settings);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.yaml")]
+    public async Task Can_Build_Generated_Code_With_Bearer_AuthenticationHeaders_Parameter_Style(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter;
+        var generatedCode = await GenerateCode(version, filename, settings);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders, "SwaggerPetstoreWithBearerAuthenticationHeaders.json")]
+    public async Task Method_Style_Does_Not_Generate_Parameter_For_Bearer(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method;
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("string bearerToken");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.json")]
+    public async Task Method_Style_Does_Not_Generate_Header_For_ApiKey(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method;
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Headers(\"auth_key\")]");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders, "SwaggerPetstoreWithMixedAuthenticationHeaders.json")]
+    public async Task SecurityScheme_Filter_With_Parameter_Style_Only_Generates_Specified_Scheme(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter;
+        settings.SecurityScheme = "auth_key";
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
+        generatedCode.Should().NotContain("string bearerToken");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders, "SwaggerPetstoreWithMixedAuthenticationHeaders.json")]
+    public async Task SecurityScheme_Filter_With_Parameter_Style_Only_Generates_Bearer_When_Specified(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter;
+        settings.SecurityScheme = "bearerAuth";
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"Authorization: Bearer\")] string bearerToken");
+        // auth_key only appears once (as a regular operation parameter on DeletePet),
+        // not on every operation (which would indicate the security filter is not working)
+        Regex.Matches(generatedCode, @"\[Header\(""auth_key""\)\]").Count.Should().BeLessThanOrEqualTo(1);
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders, "SwaggerPetstoreWithMixedAuthenticationHeaders.json")]
+    public async Task SecurityScheme_Filter_With_Method_Style_Only_Generates_Bearer_When_Specified(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method;
+        settings.SecurityScheme = "bearerAuth";
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Headers(\"Authorization: Bearer\")]");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders, "SwaggerPetstoreWithMixedAuthenticationHeaders.json")]
+    public async Task SecurityScheme_Filter_With_Method_Style_Ignores_NonMatching_Scheme(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method;
+        settings.SecurityScheme = "auth_key";
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Headers(\"Authorization: Bearer\")]");
     }
 
     [Test]
