@@ -19,6 +19,7 @@
 - Nullable Strings not being marked correctly [\#580](https://github.com/christianhelle/refitter/issues/580)
 - The client parameter type's names occur wrong when multipart is include. [\#231](https://github.com/christianhelle/refitter/issues/231)
 - Multipart endpoint \[FromForm\] decorated argument is missing from signature [\#222](https://github.com/christianhelle/refitter/issues/222)
+- Base type not generated for types specified by oneOf in the schema [\#175](https://github.com/christianhelle/refitter/issues/175)
 
 ## [1.7.3](https://github.com/christianhelle/refitter/tree/1.7.3) (2026-01-24)
 
