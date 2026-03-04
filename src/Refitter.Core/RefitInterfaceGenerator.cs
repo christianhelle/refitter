@@ -280,7 +280,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             }
         }
 
-        if (settings.AuthenticationHeaderStyle == AuthenticationHeaderStyle.Method) 
+        if (settings.AuthenticationHeaderStyle == AuthenticationHeaderStyle.Method)
         {
             foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
             {
@@ -290,7 +290,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     continue;
                 }
 
-                if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: "bearer" })
+                if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: var scheme }
+                    && string.Equals(scheme, "bearer", StringComparison.OrdinalIgnoreCase))
                 {
                     headers.Add("\"Authorization: Bearer\"");
                 }

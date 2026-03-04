@@ -18,5 +18,8 @@ public enum SampleOpenSpecifications
     SwaggerPetstoreJsonV3WithUnsafeAuthenticationHeaders,
     SwaggerPetstoreYamlV2WithUnsafeAuthenticationHeaders,
     SwaggerPetstoreYamlV3WithUnsafeAuthenticationHeaders,
+    SwaggerPetstoreJsonV3WithBearerAuthenticationHeaders,
+    SwaggerPetstoreYamlV3WithBearerAuthenticationHeaders,
+    SwaggerPetstoreJsonV3WithMixedAuthenticationHeaders,
     IllegalPathsJsonV3
 }

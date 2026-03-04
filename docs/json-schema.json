@@ -486,6 +486,19 @@
     },
     "parameterNameGenerator": {
       "$ref": "#/definitions/IParameterNameGenerator"
+    },
+    "authenticationHeaderStyle": {
+      "description": "Controls generation of Authorization header support. Options: None (no authentication code is generated), Parameter (adds method parameters for authentication), Method (generates a Refit [Headers] attribute for bearer token authentication). Default is None.",
+      "type": "string",
+      "enum": [
+        "None",
+        "Method",
+        "Parameter"
+      ]
+    },
+    "securityScheme": {
+      "description": "Security scheme for which to generate authentication headers. When omitted, authentication headers will be generated for all security schemes.",
+      "type": "string"
     }
   }
 }
