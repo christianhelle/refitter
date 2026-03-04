@@ -281,11 +281,17 @@ function RunTests
 
                 foreach ($v in $standardVariants)
                 {
+                    $args = $v.Args
+                    # InterfaceOnly variant needs contracts-namespace so generated interfaces
+                    # can reference contract types from the SeparateContracts variant
+                    if ($v.Suffix -eq "InterfaceOnly") {
+                        $args += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
+                    }
                     $standardTasks += @{
                         SpecPath = $specPath
                         Namespace = "$ns.$($v.Suffix)"
                         OutputPath = "./GeneratedCode/$($v.Prefix)${fileTag}.generated.cs"
-                        Args = $v.Args
+                        Args = $args
                     }
                 }
 
@@ -348,11 +354,17 @@ function RunTests
             foreach ($v in $standardVariants)
             {
                 if ($v.Args -like "*--multiple-interfaces*") { continue }
+                $args = $v.Args
+                # InterfaceOnly variant needs contracts-namespace so generated interfaces
+                # can reference contract types from the SeparateContracts variant
+                if ($v.Suffix -eq "InterfaceOnly") {
+                    $args += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
+                }
                 $standardTasks += @{
                     SpecPath = $specPath
                     Namespace = "$ns.$($v.Suffix)"
                     OutputPath = "./GeneratedCode/$($v.Prefix)${fileTag}.generated.cs"
-                    Args = $v.Args
+                    Args = $args
                 }
             }
 
