@@ -385,7 +385,7 @@ public class RefitGeneratorSettings
     /// Gets or sets a value indicating whether to generate Security Schema Authentication headers.
     /// </summary>
     [Description("Generate Security Schema Authentication headers")]
-    public bool GenerateAuthenticationHeader { get; set; }
+    public AuthenticationHeaderStyle AuthenticationHeaderStyle { get; set; }
 
     /// <summary>
     /// Gets or sets the collection format to use for array query parameters.
@@ -402,6 +402,8 @@ public class RefitGeneratorSettings
     [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
     public string? CustomTemplateDirectory { get; set; }
 
+    [Description("Security scheme for which to generate authentication headers.")]
+    public string? SecurityScheme { get; set; }
     /// <summary>
     /// Gets or sets a value indicating whether to generate JsonSerializerContext for AOT compilation support.
     /// </summary>

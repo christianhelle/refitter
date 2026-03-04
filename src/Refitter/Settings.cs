@@ -274,6 +274,16 @@ public sealed class Settings : CommandSettings
     [DefaultValue(null)]
     public string? CustomTemplateDirectory { get; set; } = null;
 
+    [Description("Generate Authorization header method 'Method' or 'Parameter'. Default value is None. Method only works in combination with 'Authorization: Bearer'. Also see 'security-scheme' option" )]
+    [CommandOption("--generate-authentication-header")]
+    [DefaultValue(AuthenticationHeaderStyle.None)]
+    public AuthenticationHeaderStyle GenerateAuthenticationHeader { get; set; } = AuthenticationHeaderStyle.None;
+
+    [Description("Generate Authorization header for the given security scheme. When omitted all generation will attempt to generate all.")]
+    [CommandOption("--security-scheme")]
+    [DefaultValue(null)]
+    public string? SecurityScheme { get; set; } = null;
+
     [Description("Generate JsonSerializerContext for AOT compilation support")]
     [CommandOption("--json-serializer-context")]
     [DefaultValue(false)]

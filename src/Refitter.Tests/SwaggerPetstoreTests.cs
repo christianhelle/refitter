@@ -285,7 +285,7 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_With_Unsafe_AuthenticationHeaders(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.GenerateAuthenticationHeader = true;
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter;
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().Contain("[Header(\"auth.key\")] string auth_key");
     }
@@ -298,7 +298,7 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_With_AuthenticationHeaders(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.GenerateAuthenticationHeader = true;
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter;
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
     }
@@ -312,7 +312,7 @@ public class SwaggerPetstoreTests
     {
         var settings = new RefitGeneratorSettings();
         settings.GenerateOperationHeaders = false;
-        settings.GenerateAuthenticationHeader = true;
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter;
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
     }
@@ -325,7 +325,7 @@ public class SwaggerPetstoreTests
     public async Task Can_Generate_Code_Without_AuthenticationHeaders(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();
-        settings.GenerateAuthenticationHeader = false;
+        settings.AuthenticationHeaderStyle = AuthenticationHeaderStyle.None;
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().NotContain("[Header(\"auth_key\")] string? auth_key");
     }

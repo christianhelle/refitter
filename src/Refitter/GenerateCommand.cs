@@ -323,6 +323,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 IntegerType = settings.IntegerType
             },
             CustomTemplateDirectory = settings.CustomTemplateDirectory,
+            AuthenticationHeaderStyle = settings.GenerateAuthenticationHeader,
+            SecurityScheme = settings.SecurityScheme,
             GenerateJsonSerializerContext = settings.GenerateJsonSerializerContext,
         };
     }
