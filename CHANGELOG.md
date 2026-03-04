@@ -11,6 +11,7 @@
 
 **Fixed bugs:**
 
+- Resolve SonarCloud Code Quality Issues [\#931](https://github.com/christianhelle/refitter/issues/931)
 - format: int32 quirk =\> Serializes to "object" when open api spec contains pattern [\#867](https://github.com/christianhelle/refitter/issues/867)
 - Failing CLI example with confusing error message [\#847](https://github.com/christianhelle/refitter/issues/847)
 - .refitter - "mutipleInterfaces": "ByTag" increments number at the end of Method Name globally instead of being related to its interface [\#672](https://github.com/christianhelle/refitter/issues/672)
