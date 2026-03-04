@@ -5,10 +5,10 @@ namespace Refitter.Core;
 internal static class ContractTypeSuffixApplier
 {
     private static readonly Regex TypeDeclarationRegex =
-        new(@"(?:public|internal)\s+(?:partial\s+)?(?:class|record|struct)\s+(\w+)", RegexOptions.Multiline | RegexOptions.Compiled);
+        new(@"(?:public|internal)\s+(?:partial\s+)?(?:class|record|struct)\s+(\w+)", RegexOptions.Multiline | RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     private static readonly Regex EnumDeclarationRegex =
-        new(@"(?:public|internal)\s+(?:partial\s+)?enum\s+(\w+)", RegexOptions.Multiline | RegexOptions.Compiled);
+        new(@"(?:public|internal)\s+(?:partial\s+)?enum\s+(\w+)", RegexOptions.Multiline | RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     public static string ApplySuffix(string generatedCode, string suffix)
     {
@@ -42,14 +42,17 @@ internal static class ContractTypeSuffixApplier
                 result,
                 $@"(?:public|internal)\s+((?:partial\s+)?(?:class|record|struct|enum))\s+\b{Regex.Escape(typeName)}\b",
                 m => $"{m.Groups[0].Value.Replace(typeName, suffixedName)}",
-                RegexOptions.Multiline);
+                RegexOptions.Multiline,
+                TimeSpan.FromSeconds(1));
 
             // Replace type references in inheritance, properties, parameters, etc.
             // Match word boundaries to avoid partial replacements
             result = Regex.Replace(
                 result,
                 $@"\b{Regex.Escape(typeName)}\b(?![a-zA-Z0-9_])",
-                suffixedName);
+                suffixedName,
+                RegexOptions.None,
+                TimeSpan.FromSeconds(1));
         }
 
         return result;
