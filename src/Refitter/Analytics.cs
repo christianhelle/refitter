@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Exceptionless;
 using Exceptionless.Plugins;
@@ -8,6 +9,7 @@ using Spectre.Console.Cli;
 
 namespace Refitter;
 
+[ExcludeFromCodeCoverage]
 public static class Analytics
 {
     // API keys are stored in the source code because I'm interested in how forks of this project are used.

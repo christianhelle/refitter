@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Refitter.Core;
 
@@ -50,31 +49,34 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         context.RegisterImplementationSourceOutput(refitterFiles.Select(GenerateCode), ProcessResults);
     }
 
-
-    private static void ProcessResults(SourceProductionContext context, List<Diagnostic> diagnostics)
+    private static void ProcessResults(SourceProductionContext context, GeneratedCode result)
     {
-        foreach (var diagnostic in diagnostics)
+        foreach (var diagnostic in result.Diagnostics)
         {
             context.ReportDiagnostic(diagnostic);
         }
 
-        context.ReportDiagnostic(
-            Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    "REFITTER001",
-                    "Refitter",
-                    "Refitter generated code successfully",
-                    "Refitter",
-                    DiagnosticSeverity.Info,
-                    true),
-                Location.None));
+        if (result.Code is not null && result.HintName is not null)
+        {
+            context.AddSource(result.HintName, result.Code);
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "REFITTER001",
+                        "Refitter",
+                        $"Refitter generated {result.HintName} successfully",
+                        "Refitter",
+                        DiagnosticSeverity.Info,
+                        true),
+                    Location.None));
+        }
     }
 
     [SuppressMessage(
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
         Justification = "By design")]
-    private static List<Diagnostic> GenerateCode(
+    private static GeneratedCode GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
     {
@@ -111,7 +113,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var settings = TryDeserialize(json, diagnostics);
             if (settings is null)
             {
-                return diagnostics;
+                return new GeneratedCode(diagnostics);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -143,43 +145,21 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var refit = generator.Generate();
 
             cancellationToken.ThrowIfCancellationRequested();
-            try
+            var filename = settings.OutputFilename ?? Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
+            if (filename == ".g.cs")
             {
-                var filename = settings.OutputFilename ?? Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
-                if (filename == ".g.cs")
-                {
-                    filename = "Refitter.g.cs";
-                }
-
-                var folder = Path.Combine(Path.GetDirectoryName(file.Path)!, settings.OutputFolder);
-                var output = Path.Combine(folder, filename);
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-
-                File.WriteAllText(
-                    output,
-                    refit,
-                    Encoding.UTF8);
-
-                return diagnostics;
-            }
-            catch (Exception e)
-            {
-                diagnostics.Add(
-                    Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "REFITTER000",
-                            "Error",
-                            $"Refitter failed to write generated code: {e}",
-                            "Refitter",
-                            DiagnosticSeverity.Error,
-                            true),
-                        Location.None));
+                filename = "Refitter.g.cs";
             }
 
-            return diagnostics;
+            // Create unique hint name based on the .refitter file path to avoid collisions
+            var hintName = Path.GetFileNameWithoutExtension(file.Path);
+            if (string.IsNullOrEmpty(hintName) || hintName == ".")
+            {
+                hintName = "Refitter";
+            }
+            hintName = hintName + ".g.cs";
+
+            return new GeneratedCode(diagnostics, refit, hintName);
         }
         catch (Exception e)
         {
@@ -194,7 +174,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                         true),
                     Location.None));
 
-            return diagnostics;
+            return new GeneratedCode(diagnostics);
         }
     }
 
@@ -223,4 +203,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             return null;
         }
     }
+
+    private record GeneratedCode(List<Diagnostic> Diagnostics, string? Code = null, string? HintName = null);
 }

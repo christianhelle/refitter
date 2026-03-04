@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Readers.Exceptions;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Validation;
 using Spectre.Console;
@@ -8,8 +8,19 @@ using Spectre.Console.Cli;
 
 namespace Refitter;
 
+[ExcludeFromCodeCoverage]
 public sealed class GenerateCommand : AsyncCommand<Settings>
 {
+    private const string AsciiArt =
+"""
+  ██████╗ ███████╗███████╗██╗████████╗████████╗███████╗██████╗
+  ██╔══██╗██╔════╝██╔════╝██║╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
+  ██████╔╝█████╗  █████╗  ██║   ██║      ██║   █████╗  ██████╔╝
+  ██╔══██╗██╔══╝  ██╔══╝  ██║   ██║      ██║   ██╔══╝  ██╔══██╗
+  ██║  ██║███████╗██║     ██║   ██║      ██║   ███████╗██║  ██║
+  ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
+""";
+
     private static readonly string Crlf = Environment.NewLine;
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
@@ -24,7 +35,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return SettingsValidator.Validate(settings);
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         var refitGeneratorSettings = CreateRefitGeneratorSettings(settings);
         try
@@ -34,31 +45,40 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (version == "1.0.0.0")
                 version += " (local build)";
 
-            const string asciiArt =
-"""
-  ██████╗ ███████╗███████╗██╗████████╗████████╗███████╗██████╗
-  ██╔══██╗██╔════╝██╔════╝██║╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
-  ██████╔╝█████╗  █████╗  ██║   ██║      ██║   █████╗  ██████╔╝
-  ██╔══██╗██╔══╝  ██╔══╝  ██║   ██║      ██║   ██╔══╝  ██╔══██╗
-  ██║  ██║███████╗██║     ██║   ██║      ██║   ███████╗██║  ██║
-  ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
-""";
-
             // Header with branding
-            AnsiConsole.WriteLine();
-            AnsiConsole.MarkupLine($"[bold cyan]{asciiArt}[/]");
-            AnsiConsole.MarkupLine($"[bold cyan]╔═══════════════════════════════════════════════════════════════╗[/]");
-            AnsiConsole.MarkupLine($"[bold cyan]║[/] [bold white]🚀 Refitter v{version,-48}[/] [bold cyan]║[/]");
-            AnsiConsole.MarkupLine($"[bold cyan]║[/] [dim]   OpenAPI to Refit Interface Generator[/]{new string(' ', 22)} [bold cyan]║[/]");
-            AnsiConsole.MarkupLine($"[bold cyan]╚═══════════════════════════════════════════════════════════════╝[/]");
-            AnsiConsole.WriteLine();
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Refitter v{version}");
+                Console.WriteLine("OpenAPI to Refit Interface Generator");
+                Console.WriteLine();
+            }
+            else
+            {
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine($"[bold cyan]{AsciiArt}[/]");
+                AnsiConsole.MarkupLine($"[bold cyan]╔═══════════════════════════════════════════════════════════════╗[/]");
+                AnsiConsole.MarkupLine($"[bold cyan]║[/] [bold white]🚀 Refitter v{version,-48}[/] [bold cyan]║[/]");
+                AnsiConsole.MarkupLine($"[bold cyan]║[/] [dim]   OpenAPI to Refit Interface Generator[/]{new string(' ', 22)} [bold cyan]║[/]");
+                AnsiConsole.MarkupLine($"[bold cyan]╚═══════════════════════════════════════════════════════════════╝[/]");
+                AnsiConsole.WriteLine();
+            }
 
             // Support information
             var supportKey = settings.NoLogging
                 ? "Unavailable when logging is disabled"
                 : SupportInformation.GetSupportKey();
-            AnsiConsole.MarkupLine($"[dim]🔑 Support key: {supportKey}[/]");
-            AnsiConsole.WriteLine();
+
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine($"Support key: {supportKey}");
+                Console.WriteLine();
+            }
+            else
+            {
+                AnsiConsole.MarkupLine($"[dim]🔑 Support key: {supportKey}[/]");
+                AnsiConsole.WriteLine();
+            }
 
             if (context.Arguments.Any(a => a.Equals("--version", StringComparison.OrdinalIgnoreCase)) ||
                 context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase)))
@@ -78,13 +98,19 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             if (!settings.SkipValidation)
-                await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath);
+                await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath, settings);
 
             await (refitGeneratorSettings.GenerateMultipleFiles
                 ? WriteMultipleFiles(generator, settings, refitGeneratorSettings)
                 : WriteSingleFile(generator, settings, refitGeneratorSettings));
 
             Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
+
+            // Generate .refitter settings file if not using existing settings file
+            if (string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            {
+                await WriteRefitterSettingsFile(settings, refitGeneratorSettings);
+            }
 
             if (refitGeneratorSettings.IncludePathMatches.Length > 0 &&
                 generator.OpenApiDocument.Paths.Count == 0)
@@ -109,79 +135,140 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             // Success summary with performance metrics
             stopwatch.Stop();
-            var successPanel = new Panel(
-                $"[bold green]✅ Generation completed successfully![/]\n\n" +
-                $"[dim]📊 Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
-                $"[dim]🚀 Performance:[/] [green]{(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation[/]"
-            )
-            .BorderColor(Color.Green)
-            .RoundedBorder()
-            .Header("[bold green]🎉 Success[/]")
-            .HeaderAlignment(Justify.Center);
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine("Generation completed successfully!");
+                Console.WriteLine($"Duration: {stopwatch.Elapsed:mm\\:ss\\.ffff}");
+                Console.WriteLine($"Performance: {(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation");
+                Console.WriteLine();
+            }
+            else
+            {
+                var successPanel = new Panel(
+                    $"[bold green]✅ Generation completed successfully![/]\n\n" +
+                    $"[dim]📊 Duration:[/] [green]{stopwatch.Elapsed:mm\\:ss\\.ffff}[/]\n" +
+                    $"[dim]🚀 Performance:[/] [green]{(refitGeneratorSettings.GenerateMultipleFiles ? "Multi-file" : "Single-file")} generation[/]"
+                )
+                .BorderColor(Color.Green)
+                .RoundedBorder()
+                .Header("[bold green]🎉 Success[/]")
+                .HeaderAlignment(Justify.Center);
 
-            AnsiConsole.Write(successPanel);
-            AnsiConsole.WriteLine();
+                AnsiConsole.Write(successPanel);
+                AnsiConsole.WriteLine();
+            }
 
             if (!settings.NoBanner)
-                DonationBanner();
+            {
+                if (settings.SimpleOutput)
+                    SimpleDonationBanner();
+                else
+                    DonationBanner();
+            }
 
-            ShowWarnings(refitGeneratorSettings);
+            ShowWarnings(refitGeneratorSettings, settings);
             return 0;
         }
         catch (Exception exception)
         {
             // Error summary panel
-            var errorPanel = new Panel("[bold red]❌ Generation failed![/]")
-                .BorderColor(Color.Red)
-                .RoundedBorder()
-                .Header("[bold red]🚨 Error[/]")
-                .HeaderAlignment(Justify.Center);
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine("Generation failed!");
+                Console.WriteLine();
+            }
+            else
+            {
+                var errorPanel = new Panel("[bold red]❌ Generation failed![/]")
+                    .BorderColor(Color.Red)
+                    .RoundedBorder()
+                    .Header("[bold red]🚨 Error[/]")
+                    .HeaderAlignment(Justify.Center);
 
-            AnsiConsole.Write(errorPanel);
-            AnsiConsole.WriteLine();
+                AnsiConsole.Write(errorPanel);
+                AnsiConsole.WriteLine();
+            }
 
             if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
             {
-                var versionPanel = new Panel(
-                    $"[bold red]🚫 Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]"
-                )
-                .BorderColor(Color.Red)
-                .RoundedBorder();
+                if (settings.SimpleOutput)
+                {
+                    Console.WriteLine($"Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}");
+                    Console.WriteLine();
+                }
+                else
+                {
+                    var versionPanel = new Panel(
+                        $"[bold red]🚫 Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}[/]"
+                    )
+                    .BorderColor(Color.Red)
+                    .RoundedBorder();
 
-                AnsiConsole.Write(versionPanel);
-                AnsiConsole.WriteLine();
+                    AnsiConsole.Write(versionPanel);
+                    AnsiConsole.WriteLine();
+                }
             }
 
             if (exception is not OpenApiValidationException)
             {
-                AnsiConsole.MarkupLine("[bold red]🐛 Exception Details:[/]");
-                AnsiConsole.WriteException(exception);
-                AnsiConsole.WriteLine();
+                if (settings.SimpleOutput)
+                {
+                    Console.WriteLine("Exception Details:");
+                    Console.WriteLine(exception.ToString());
+                    Console.WriteLine();
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[bold red]🐛 Exception Details:[/]");
+                    AnsiConsole.WriteException(exception);
+                    AnsiConsole.WriteLine();
+                }
             }
 
             if (!settings.SkipValidation)
             {
-                var suggestionPanel = new Panel(
-                    "💡 Try using the --skip-validation argument."
+                if (settings.SimpleOutput)
+                {
+                    Console.WriteLine("Suggestion");
+                    Console.WriteLine("Try using the --skip-validation argument.");
+                    Console.WriteLine();
+                }
+                else
+                {
+                    var suggestionPanel = new Panel(
+                        "💡 Try using the --skip-validation argument."
+                    )
+                    .BorderColor(Color.Yellow)
+                    .RoundedBorder()
+                    .Header("Suggestion");
+
+                    AnsiConsole.Write(suggestionPanel);
+                    AnsiConsole.WriteLine();
+                }
+            }
+
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine("Support");
+                Console.WriteLine("Need Help?");
+                Console.WriteLine();
+                Console.WriteLine("Report an issue: https://github.com/christianhelle/refitter/issues");
+                Console.WriteLine();
+            }
+            else
+            {
+                var helpPanel = new Panel(
+                    "🆘 Need Help?\n\n" +
+                    "🐛 Report an issue: https://github.com/christianhelle/refitter/issues"
                 )
                 .BorderColor(Color.Yellow)
                 .RoundedBorder()
-                .Header("Suggestion");
+                .Header("Support")
+                .HeaderAlignment(Justify.Center);
 
-                AnsiConsole.Write(suggestionPanel);
+                AnsiConsole.Write(helpPanel);
                 AnsiConsole.WriteLine();
             }
-            var helpPanel = new Panel(
-                "🆘 Need Help?\n\n" +
-                "🐛 Report an issue: https://github.com/christianhelle/refitter/issues"
-            )
-            .BorderColor(Color.Yellow)
-            .RoundedBorder()
-            .Header("Support")
-            .HeaderAlignment(Justify.Center);
-
-            AnsiConsole.Write(helpPanel);
-            AnsiConsole.WriteLine();
 
             await Analytics.LogError(exception, settings);
             return exception.HResult;
@@ -202,6 +289,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ReturnIObservable = settings.ReturnIObservable,
             UseCancellationTokens = settings.UseCancellationTokens,
             GenerateOperationHeaders = !settings.NoOperationHeaders,
+            IgnoredOperationHeaders = settings.IgnoredOperationHeaders ?? Array.Empty<string>(),
             UseIsoDateFormat = settings.UseIsoDateFormat,
             TypeAccessibility = settings.InternalTypeAccessibility
                 ? TypeAccessibility.Internal
@@ -228,7 +316,14 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             UsePolymorphicSerialization = settings.UsePolymorphicSerialization,
             GenerateDisposableClients = settings.GenerateDisposableClients,
             CollectionFormat = settings.CollectionFormat,
-            GenerateXmlDocCodeComments = !settings.NoXmlDocCodeComments
+            GenerateXmlDocCodeComments = !settings.NoXmlDocCodeComments,
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                InlineJsonConverters = !settings.NoInlineJsonConverters,
+                IntegerType = settings.IntegerType
+            },
+            CustomTemplateDirectory = settings.CustomTemplateDirectory,
+            GenerateJsonSerializerContext = settings.GenerateJsonSerializerContext,
         };
     }
     private static async Task WriteSingleFile(
@@ -237,35 +332,54 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         RefitGeneratorSettings refitGeneratorSettings)
     {
         // Show progress while generating
-        await AnsiConsole.Status()
-            .Spinner(Spinner.Known.Dots)
-            .SpinnerStyle(Style.Parse("green bold"))
-            .StartAsync("[yellow]🔧 Generating code...[/]", async _ =>
-            {
-                await Task.Delay(100); // Brief delay to show spinner
-            });
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine("Generating code...");
+        }
+        else
+        {
+            await AnsiConsole.Status()
+                .Spinner(Spinner.Known.Dots)
+                .SpinnerStyle(Style.Parse("green bold"))
+                .StartAsync("[yellow]🔧 Generating code...[/]", async _ =>
+                {
+                    await Task.Delay(100); // Brief delay to show spinner
+                });
+        }
 
         var code = generator.Generate().ReplaceLineEndings();
         var outputPath = GetOutputPath(settings, refitGeneratorSettings);
-
-        // Create a table for better formatting
-        var table = new Table()
-            .RoundedBorder()
-            .BorderColor(Color.Yellow)
-            .AddColumn(new TableColumn("[bold yellow]📁 Generated Output[/]").Centered());
 
         var fileName = Path.GetFileName(outputPath);
         var directory = Path.GetDirectoryName(outputPath) ?? "";
         var sizeFormatted = FormatFileSize(code.Length);
         var lines = code.Split('\n').Length;
 
-        table.AddRow($"[bold white]📄 File:[/] [cyan]{fileName}[/]");
-        table.AddRow($"[bold white]📂 Directory:[/] [dim]{directory}[/]");
-        table.AddRow($"[bold white]📊 Size:[/] [green]{sizeFormatted}[/]");
-        table.AddRow($"[bold white]📝 Lines:[/] [green]{lines:N0}[/]");
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine("Generated Output");
+            Console.WriteLine($"File: {fileName}");
+            Console.WriteLine($"Directory: {directory}");
+            Console.WriteLine($"Size: {sizeFormatted}");
+            Console.WriteLine($"Lines: {lines:N0}");
+            Console.WriteLine();
+        }
+        else
+        {
+            // Create a table for better formatting
+            var table = new Table()
+                .RoundedBorder()
+                .BorderColor(Color.Yellow)
+                .AddColumn(new TableColumn("[bold yellow]📁 Generated Output[/]").Centered());
 
-        AnsiConsole.Write(table);
-        AnsiConsole.WriteLine();
+            table.AddRow($"[bold white]📄 File:[/] [cyan]{fileName}[/]");
+            table.AddRow($"[bold white]📂 Directory:[/] [dim]{directory}[/]");
+            table.AddRow($"[bold white]📊 Size:[/] [green]{sizeFormatted}[/]");
+            table.AddRow($"[bold white]📝 Lines:[/] [green]{lines:N0}[/]");
+
+            AnsiConsole.Write(table);
+            AnsiConsole.WriteLine();
+        }
 
         var outputDirectory = Path.GetDirectoryName(outputPath);
         if (!string.IsNullOrWhiteSpace(outputDirectory) && !Directory.Exists(outputDirectory))
@@ -294,28 +408,48 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         RefitGeneratorSettings refitGeneratorSettings)
     {
         // Show progress while generating
-        var generatorOutput = await AnsiConsole.Status()
-            .Spinner(Spinner.Known.Dots)
-            .SpinnerStyle(Style.Parse("green bold"))
-            .StartAsync("[yellow]🔧 Generating multiple files...[/]", async _ =>
-            {
-                await Task.Delay(100); // Brief delay to show spinner
-                return generator.GenerateMultipleFiles();
-            });
-
-        // Create a table for better formatting
-        var table = new Table()
-            .RoundedBorder()
-            .BorderColor(Color.Yellow)
-            .AddColumn(new TableColumn("[bold white]📄 File[/]").LeftAligned())
-            .AddColumn(new TableColumn("[bold white]📂 Directory[/]").LeftAligned())
-            .AddColumn(new TableColumn("[bold white]📊 Size[/]").RightAligned())
-            .AddColumn(new TableColumn("[bold white]📝 Lines[/]").RightAligned());
-
-        table.Title = new TableTitle("[bold yellow]📁 Generated Output Files[/]");
+        GeneratorOutput generatorOutput;
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine("Generating multiple files...");
+            generatorOutput = generator.GenerateMultipleFiles();
+        }
+        else
+        {
+            generatorOutput = await AnsiConsole.Status()
+                .Spinner(Spinner.Known.Dots)
+                .SpinnerStyle(Style.Parse("green bold"))
+                .StartAsync("[yellow]🔧 Generating multiple files...[/]", async _ =>
+                {
+                    await Task.Delay(100); // Brief delay to show spinner
+                    return generator.GenerateMultipleFiles();
+                });
+        }
 
         var totalSize = 0L;
         var totalLines = 0;
+
+        Table? table = null;
+
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine("Generated Output Files");
+            Console.WriteLine($"{"File",-30} {"Size",-10} {"Lines",-10}");
+            Console.WriteLine(new string('-', 55));
+        }
+        else
+        {
+            // Create a table for better formatting
+            table = new Table()
+                .RoundedBorder()
+                .BorderColor(Color.Yellow)
+                .AddColumn(new TableColumn("[bold white]📄 File[/]").LeftAligned())
+                .AddColumn(new TableColumn("[bold white]📂 Directory[/]").LeftAligned())
+                .AddColumn(new TableColumn("[bold white]📊 Size[/]").RightAligned())
+                .AddColumn(new TableColumn("[bold white]📝 Lines[/]").RightAligned());
+
+            table.Title = new TableTitle("[bold yellow]📁 Generated Output Files[/]");
+        }
 
         foreach (var outputFile in generatorOutput.Files)
         {
@@ -338,12 +472,19 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 var contractsDir = Path.GetDirectoryName(contractsFile) ?? "";
                 var lines = outputFile.Content.Split('\n').Length;
 
-                table.AddRow(
-                    $"[cyan]{outputFile.Filename}[/]",
-                    $"[dim]{contractsDir}[/]",
-                    $"[green]{sizeFormatted}[/]",
-                    $"[green]{lines:N0}[/]"
-                );
+                if (settings.SimpleOutput)
+                {
+                    Console.WriteLine($"{outputFile.Filename,-30} {sizeFormatted,-10} {lines,-10:N0}");
+                }
+                else
+                {
+                    table?.AddRow(
+                        $"[cyan]{outputFile.Filename}[/]",
+                        $"[dim]{contractsDir}[/]",
+                        $"[green]{sizeFormatted}[/]",
+                        $"[green]{lines:N0}[/]"
+                    );
+                }
 
                 totalSize += outputFile.Content.Length;
                 totalLines += lines;
@@ -358,12 +499,19 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var outputDirectory = Path.GetDirectoryName(outputPath) ?? "";
             var fileLines = code.Split('\n').Length;
 
-            table.AddRow(
-                $"[cyan]{outputFile.Filename}[/]",
-                $"[dim]{outputDirectory}[/]",
-                $"[green]{formattedSize}[/]",
-                $"[green]{fileLines:N0}[/]"
-            );
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine($"{outputFile.Filename,-30} {formattedSize,-10} {fileLines,-10:N0}");
+            }
+            else
+            {
+                table?.AddRow(
+                    $"[cyan]{outputFile.Filename}[/]",
+                    $"[dim]{outputDirectory}[/]",
+                    $"[green]{formattedSize}[/]",
+                    $"[green]{fileLines:N0}[/]"
+                );
+            }
 
             totalSize += code.Length;
             totalLines += fileLines;
@@ -375,19 +523,31 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             await File.WriteAllTextAsync(outputPath, code);
         }
 
-        // Add summary row
-        table.AddEmptyRow();
-        table.AddRow(
-            $"[bold yellow]📊 Total ({generatorOutput.Files.Count} files)[/]",
-            "[dim]---[/]",
-            $"[bold green]{FormatFileSize(totalSize)}[/]",
-            $"[bold green]{totalLines:N0}[/]"
-        );
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine(new string('-', 55));
+            Console.WriteLine($"{"Total (" + generatorOutput.Files.Count + " files)",-30} {FormatFileSize(totalSize),-10} {totalLines,-10:N0}");
+            Console.WriteLine();
+        }
+        else
+        {
+            // Add summary row
+            table?.AddEmptyRow();
+            table?.AddRow(
+                $"[bold yellow]📊 Total ({generatorOutput.Files.Count} files)[/]",
+                "[dim]---[/]",
+                $"[bold green]{FormatFileSize(totalSize)}[/]",
+                $"[bold green]{totalLines:N0}[/]"
+            );
 
-        AnsiConsole.Write(table);
-        AnsiConsole.WriteLine();
+            if (table != null)
+            {
+                AnsiConsole.Write(table);
+                AnsiConsole.WriteLine();
+            }
+        }
     }
-    private static void ShowWarnings(RefitGeneratorSettings refitGeneratorSettings)
+    private static void ShowWarnings(RefitGeneratorSettings refitGeneratorSettings, Settings settings)
     {
         var warnings = new List<(string title, string description)>();
 
@@ -412,24 +572,37 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         if (warnings.Any())
         {
-            var table = new Table()
-                .RoundedBorder()
-                .BorderColor(Color.Orange3)
-                .AddColumn(new TableColumn("[bold white]Warning[/]").LeftAligned())
-                .AddColumn(new TableColumn("[bold white]Description[/]").LeftAligned());
-
-            table.Title = new TableTitle("[bold yellow]⚠️ Configuration Warnings[/]");
-
-            foreach (var (title, description) in warnings)
+            if (settings.SimpleOutput)
             {
-                table.AddRow(
-                    $"[bold orange3]{title}[/]",
-                    $"[orange3]{description}[/]"
-                );
+                Console.WriteLine("Configuration Warnings");
+                foreach (var (title, description) in warnings)
+                {
+                    Console.WriteLine($"Warning: {title}");
+                    Console.WriteLine($"Description: {description}");
+                    Console.WriteLine();
+                }
             }
+            else
+            {
+                var table = new Table()
+                    .RoundedBorder()
+                    .BorderColor(Color.Orange3)
+                    .AddColumn(new TableColumn("[bold white]Warning[/]").LeftAligned())
+                    .AddColumn(new TableColumn("[bold white]Description[/]").LeftAligned());
 
-            AnsiConsole.Write(table);
-            AnsiConsole.WriteLine();
+                table.Title = new TableTitle("[bold yellow]⚠️ Configuration Warnings[/]");
+
+                foreach (var (title, description) in warnings)
+                {
+                    table.AddRow(
+                        $"[bold orange3]{title}[/]",
+                        $"[orange3]{description}[/]"
+                    );
+                }
+
+                AnsiConsole.Write(table);
+                AnsiConsole.WriteLine();
+            }
         }
     }
     private static void DonationBanner()
@@ -447,6 +620,18 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         AnsiConsole.Write(panel);
         AnsiConsole.WriteLine();
+    }
+
+    private static void SimpleDonationBanner()
+    {
+        Console.WriteLine("Support");
+        Console.WriteLine("Enjoying Refitter? Consider supporting the project!");
+        Console.WriteLine();
+        Console.WriteLine("Sponsor: https://github.com/sponsors/christianhelle");
+        Console.WriteLine("Buy me a coffee: https://www.buymeacoffee.com/christianhelle");
+        Console.WriteLine();
+        Console.WriteLine("Found an issue? https://github.com/christianhelle/refitter/issues");
+        Console.WriteLine();
     }
 
     private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
@@ -484,72 +669,113 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ? Path.Combine(root, settings.OutputPath, outputFile.Filename)
             : outputFile.Filename;
     }
-    private static async Task ValidateOpenApiSpec(string openApiPath)
+    private static async Task ValidateOpenApiSpec(string openApiPath, Settings settings)
     {
-        var validationResult = await AnsiConsole.Status()
-            .Spinner(Spinner.Known.Dots)
-            .SpinnerStyle(Style.Parse("cyan bold"))
-            .StartAsync("[cyan]🔍 Validating OpenAPI specification...[/]", async _ =>
-            {
-                return await OpenApiValidator.Validate(openApiPath);
-            });
+        OpenApiValidationResult validationResult;
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine("Validating OpenAPI specification...");
+            validationResult = await Validation.OpenApiValidator.Validate(openApiPath);
+        }
+        else
+        {
+            validationResult = await AnsiConsole.Status()
+                .Spinner(Spinner.Known.Dots)
+                .SpinnerStyle(Style.Parse("cyan bold"))
+                .StartAsync("[cyan]🔍 Validating OpenAPI specification...[/]", async _ =>
+                {
+                    return await Validation.OpenApiValidator.Validate(openApiPath);
+                });
+        }
 
         if (!validationResult.IsValid)
         {
-            AnsiConsole.WriteLine();
-            var errorPanel = new Panel("[red]❌ OpenAPI validation failed![/]")
-                .BorderColor(Color.Red)
-                .RoundedBorder();
-            AnsiConsole.Write(errorPanel);
-            AnsiConsole.WriteLine();
+            if (settings.SimpleOutput)
+            {
+                Console.WriteLine();
+                Console.WriteLine("OpenAPI validation failed!");
+                Console.WriteLine();
+            }
+            else
+            {
+                AnsiConsole.WriteLine();
+                var errorPanel = new Panel("[red]❌ OpenAPI validation failed![/]")
+                    .BorderColor(Color.Red)
+                    .RoundedBorder();
+                AnsiConsole.Write(errorPanel);
+                AnsiConsole.WriteLine();
+            }
 
             foreach (var error in validationResult.Diagnostics.Errors)
             {
-                TryWriteLine(error, "red", "Error");
+                TryWriteLine(error, "red", "Error", settings.SimpleOutput);
             }
 
             foreach (var warning in validationResult.Diagnostics.Warnings)
             {
-                TryWriteLine(warning, "yellow", "Warning");
+                TryWriteLine(warning, "yellow", "Warning", settings.SimpleOutput);
             }
 
             validationResult.ThrowIfInvalid();
         }
 
-        // Create statistics table
-        var table = new Table()
-            .RoundedBorder()
-            .BorderColor(Color.Blue)
-            .AddColumn(new TableColumn("[bold white]📊 Metric[/]").LeftAligned())
-            .AddColumn(new TableColumn("[bold white]📈 Count[/]").RightAligned())
-            .AddColumn(new TableColumn("[bold white]📝 Details[/]").LeftAligned());
-
-        table.Title = new TableTitle("[bold cyan]📊 OpenAPI Analysis Results[/]");
-
-        var stats = validationResult.Statistics.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-        foreach (var line in stats)
+        if (settings.SimpleOutput)
         {
-            if (line.Trim().StartsWith("-"))
+            Console.WriteLine("OpenAPI Analysis Results");
+            var stats = validationResult.Statistics.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in stats)
             {
-                var parts = line.Trim().TrimStart('-').Trim().Split(':', 2);
-                if (parts.Length == 2)
+                if (line.Trim().StartsWith("-"))
                 {
-                    var label = parts[0].Trim();
-                    var value = parts[1].Trim();
-                    var icon = GetStatsIcon(label);
-                    var description = GetStatsDescription(label);
-
-                    table.AddRow(
-                        $"{icon} [bold]{label}[/]",
-                        $"[green]{value}[/]",
-                        $"[dim]{description}[/]"
-                    );
+                    var parts = line.Trim().TrimStart('-').Trim().Split(':', 2);
+                    if (parts.Length == 2)
+                    {
+                        var label = parts[0].Trim();
+                        var value = parts[1].Trim();
+                        var description = GetStatsDescription(label);
+                        Console.WriteLine($"{label}: {value} - {description}");
+                    }
                 }
             }
+            Console.WriteLine();
         }
+        else
+        {
+            // Create statistics table
+            var table = new Table()
+                .RoundedBorder()
+                .BorderColor(Color.Blue)
+                .AddColumn(new TableColumn("[bold white]📊 Metric[/]").LeftAligned())
+                .AddColumn(new TableColumn("[bold white]📈 Count[/]").RightAligned())
+                .AddColumn(new TableColumn("[bold white]📝 Details[/]").LeftAligned());
 
-        AnsiConsole.Write(table);
-        AnsiConsole.WriteLine();
+            table.Title = new TableTitle("[bold cyan]📊 OpenAPI Analysis Results[/]");
+
+            var stats = validationResult.Statistics.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in stats)
+            {
+                if (line.Trim().StartsWith("-"))
+                {
+                    var parts = line.Trim().TrimStart('-').Trim().Split(':', 2);
+                    if (parts.Length == 2)
+                    {
+                        var label = parts[0].Trim();
+                        var value = parts[1].Trim();
+                        var icon = GetStatsIcon(label);
+                        var description = GetStatsDescription(label);
+
+                        table.AddRow(
+                            $"{icon} [bold]{label}[/]",
+                            $"[green]{value}[/]",
+                            $"[dim]{description}[/]"
+                        );
+                    }
+                }
+            }
+
+            AnsiConsole.Write(table);
+            AnsiConsole.WriteLine();
+        }
     }
     private static string GetStatsIcon(string label)
     {
@@ -586,8 +812,15 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     private static void TryWriteLine(
         OpenApiError error,
         string color,
-        string label)
+        string label,
+        bool simpleOutput = false)
     {
+        if (simpleOutput)
+        {
+            Console.WriteLine($"{label}:{Crlf}{error}{Crlf}");
+            return;
+        }
+
         try
         {
             AnsiConsole.MarkupLine($"[{color}]{label}:{Crlf}{error}{Crlf}[/]");
@@ -606,5 +839,60 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             Console.ForegroundColor = originalColor;
         }
+    }
+
+    internal static async Task WriteRefitterSettingsFile(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        var settingsFilePath = DetermineSettingsFilePath(settings);
+        var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
+
+        if (!string.IsNullOrWhiteSpace(settingsDirectory) && !Directory.Exists(settingsDirectory))
+            Directory.CreateDirectory(settingsDirectory);
+
+        var json = Serializer.Serialize(refitGeneratorSettings);
+        await File.WriteAllTextAsync(settingsFilePath, json);
+
+        if (settings.SimpleOutput)
+        {
+            Console.WriteLine($"Settings file written to: {settingsFilePath}");
+            Console.WriteLine();
+        }
+        else
+        {
+            var fileName = Path.GetFileName(settingsFilePath);
+            var directory = Path.GetDirectoryName(settingsFilePath) ?? "";
+
+            var panel = new Panel(
+                $"[bold white]📄 File:[/] [cyan]{fileName}[/]\n" +
+                $"[bold white]📂 Directory:[/] [dim]{directory}[/]"
+            )
+            .BorderColor(Color.Green)
+            .RoundedBorder()
+            .Header("[bold green]💾 Settings File Generated[/]")
+            .HeaderAlignment(Justify.Center);
+
+            AnsiConsole.Write(panel);
+            AnsiConsole.WriteLine();
+        }
+    }
+
+    internal static string DetermineSettingsFilePath(Settings settings)
+    {
+        // If output path is specified and is a directory, put .refitter file there
+        if (!string.IsNullOrWhiteSpace(settings.OutputPath) &&
+            settings.OutputPath != Settings.DefaultOutputPath)
+        {
+            var outputDir = settings.GenerateMultipleFiles || !string.IsNullOrWhiteSpace(settings.ContractsOutputPath)
+                ? settings.OutputPath
+                : Path.GetDirectoryName(settings.OutputPath);
+
+            if (!string.IsNullOrWhiteSpace(outputDir))
+            {
+                return Path.Combine(outputDir, FileExtensionConstants.Refitter);
+            }
+        }
+
+        // Default: put .refitter file in current directory
+        return FileExtensionConstants.Refitter;
     }
 }

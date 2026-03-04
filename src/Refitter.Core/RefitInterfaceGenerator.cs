@@ -70,10 +70,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
+                var hasCancellationToken = settings.UseCancellationTokens && !hasApizrRequestOptionsParameter;
 
                 if (settings.GenerateXmlDocCodeComments)
                 {
-                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, code);
+                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, hasCancellationToken, code);
                 }
 
                 GenerateObsoleteAttribute(operation, code);
@@ -84,11 +85,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                     .AppendLine();
 
-                if (parametersString.Contains("?") && settings is {OptionalParameters: true, ApizrSettings: not null})
+                if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
                 {
                     if (settings.GenerateXmlDocCodeComments)
                     {
-                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, code);
+                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, hasCancellationToken, code);
                     }
                     GenerateObsoleteAttribute(operation, code);
                     GenerateForMultipartFormData(operationModel, code);
@@ -112,7 +113,13 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     {
         if (settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
         {
-            return type is null or "void" ? GetAsyncOperationType(true) : $"{GetAsyncOperationType(false)}<{WellKnownNamesspaces.TrimImportedNamespaces(type)}>";
+            return type is null or "void" ? GetAsyncOperationType(true) : $"{GetAsyncOperationType(false)}<{WellKnownNamespaces.TrimImportedNamespaces(type)}>";
+        }
+
+        // Check if response is a file stream
+        if (IsFileStreamResponse(operation))
+        {
+            return $"{GetAsyncOperationType(false)}<HttpResponseMessage>";
         }
 
         // First check for explicit success status codes
@@ -135,6 +142,54 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         return GetReturnType(returnTypeParameter);
+    }
+
+    /// <summary>
+    /// Determines if the operation response is a file stream (binary content).
+    /// </summary>
+    /// <param name="operation">The OpenAPI operation to check.</param>
+    /// <returns>True if the response is a file stream, false otherwise.</returns>
+    private static bool IsFileStreamResponse(OpenApiOperation operation)
+    {
+        var successCodes = new[] { "200", "201", "203", "206", "2XX" };
+
+        foreach (var code in successCodes)
+        {
+            if (!operation.Responses.TryGetValue(code, out var apiResponse))
+                continue;
+
+            var response = apiResponse.ActualResponse;
+
+            if (response.Content?.Any() != true)
+                continue;
+
+            foreach (var contentEntry in response.Content)
+            {
+                if (IsFileContentType(contentEntry.Key))
+                {
+                    var schema = contentEntry.Value?.Schema;
+                    if (schema?.Format == "binary" || schema?.Type == NJsonSchema.JsonObjectType.File)
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsFileContentType(string contentType)
+    {
+        return
+            contentType.StartsWith("application/octet-stream", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("application/pdf", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("application/vnd", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("application/zip", StringComparison.OrdinalIgnoreCase) ||
+            contentType.StartsWith("application/gzip", StringComparison.OrdinalIgnoreCase) ||
+            (contentType.StartsWith("application/x-", StringComparison.OrdinalIgnoreCase) &&
+             !contentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase));
     }
 
     private string GetTypeName(string code, OpenApiOperation operation)
@@ -253,6 +308,16 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     /// <returns>True if the type is an ApiResponse Task or similar, false otherwise.</returns>
     protected static bool IsApiResponseType(string typeName)
     {
+        // Check for HttpResponseMessage
+        if (Regex.IsMatch(
+            typeName,
+            "(Task|IObservable)<HttpResponseMessage>",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(1)))
+        {
+            return true;
+        }
+
         return Regex.IsMatch(
             typeName,
             "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>",
@@ -264,8 +329,8 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     {
         var asyncType = GetAsyncOperationType(false);
         return settings.ReturnIApiResponse
-            ? $"{asyncType}<IApiResponse<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>>"
-            : $"{asyncType}<{WellKnownNamesspaces.TrimImportedNamespaces(returnTypeParameter)}>";
+            ? $"{asyncType}<IApiResponse<{WellKnownNamespaces.TrimImportedNamespaces(returnTypeParameter)}>>"
+            : $"{asyncType}<{WellKnownNamespaces.TrimImportedNamespaces(returnTypeParameter)}>";
     }
 
     private string GetAsyncOperationType(bool withVoidReturnType)
@@ -298,7 +363,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
         var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         var code = new StringBuilder();
-        docGenerator.AppendInterfaceDocumentation(document, code);
+        docGenerator.AppendSingleInterfaceDocumentation(document, code);
         code.Append($"""
                 {Separator}{GetGeneratedCodeAttribute()}
                 {Separator}{modifier} partial interface {interfaceName}{inheritance}

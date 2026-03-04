@@ -1,7 +1,8 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -45,51 +46,42 @@ components:
               type: 'string'
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Returns_IList()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("IList<JobResponse>");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("IList<JobResponse>");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings 
-        { 
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var settings = new RefitGeneratorSettings
+        {
             OpenApiPath = swaggerFile,
             CodeGeneratorSettings = new CodeGeneratorSettings { ArrayType = "System.Collections.Generic.IList" }
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

@@ -2,7 +2,8 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.Resources;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests;
 
@@ -30,125 +31,125 @@ public class SwaggerPetstoreApizrTests
         }
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(version, filename);
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode(version, filename);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Partial_Interfaces(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(version, filename);
-        generateCode.Should().Contain("partial interface");
+        var generatedCode = await GenerateCode(version, filename);
+        generatedCode.Should().Contain("partial interface");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_Contracts(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(
+        var generatedCode = await GenerateCode(
             version,
             filename,
             new ApizrGeneratorSettings { GenerateXmlDocCodeComments = false, GenerateContracts = false });
-        generateCode.Should().NotContain("class Pet");
+        generatedCode.Should().NotContain("class Pet");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_XmlDoc_Code_Comments(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(
+        var generatedCode = await GenerateCode(
             version,
             filename,
             new ApizrGeneratorSettings { GenerateXmlDocCodeComments = true, GenerateContracts = false });
-        generateCode.Should().Contain("<summary>");
+        generatedCode.Should().Contain("<summary>");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_XmlDoc_Code_Comments(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(
+        var generatedCode = await GenerateCode(
             version,
             filename,
             new ApizrGeneratorSettings { GenerateXmlDocCodeComments = false, GenerateContracts = false });
-        generateCode.Should().NotContain("<summary>");
+        generatedCode.Should().NotContain("<summary>");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Default_Namespace(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(
+        var generatedCode = await GenerateCode(
             version,
             filename,
             new ApizrGeneratorSettings { Namespace = "Some.Other.Namespace" });
-        generateCode.Should().Contain("namespace Some.Other.Namespace");
+        generatedCode.Should().Contain("namespace Some.Other.Namespace");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Fixed_Interface_Name(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {Naming = {UseOpenApiTitle = false, InterfaceName = "SomeOtherName"}};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("interface ISomeOtherName");
+        var settings = new ApizrGeneratorSettings { Naming = { UseOpenApiTitle = false, InterfaceName = "SomeOtherName" } };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("interface ISomeOtherName");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_AutoGenerated_Header(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {AddAutoGeneratedHeader = false};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("This code was generated by Refitter");
+        var settings = new ApizrGeneratorSettings { AddAutoGeneratedHeader = false };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("This code was generated by Refitter");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_That_Returns_IApiResponse(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {ReturnIApiResponse = true};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("Task<IApiResponse<Pet>>");
+        var settings = new ApizrGeneratorSettings { ReturnIApiResponse = true };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("Task<IApiResponse<Pet>>");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Type_Override(SampleOpenSpecifications version, string filename)
     {
         var settings = new ApizrGeneratorSettings
@@ -161,193 +162,208 @@ public class SwaggerPetstoreApizrTests
                 ["addPet"] = "void", // Remove type
             },
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("Task<IApiResponse<Pet>> GetPetById");
-        generateCode.Should().Contain("Task<Pet> DeletePet");
-        generateCode.Should().Contain("Task AddPet");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("Task<IApiResponse<Pet>> GetPetById");
+        generatedCode.Should().Contain("Task<Pet> DeletePet");
+        generatedCode.Should().Contain("Task AddPet");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Internal_Contract_Types(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {TypeAccessibility = TypeAccessibility.Internal};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("internal partial class");
+        var settings = new ApizrGeneratorSettings { TypeAccessibility = TypeAccessibility.Internal };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("internal partial class");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Internal_Interface(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {TypeAccessibility = TypeAccessibility.Internal};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("internal partial interface");
+        var settings = new ApizrGeneratorSettings { TypeAccessibility = TypeAccessibility.Internal };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("internal partial interface");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_CancellationToken(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {UseCancellationTokens = true};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("CancellationToken cancellationToken = default"); // Handled by Apizr request options
+        var settings = new ApizrGeneratorSettings { UseCancellationTokens = true };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("CancellationToken cancellationToken = default"); // Handled by Apizr request options
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", true)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", true)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", true)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", true)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", false)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", false)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", false)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", false)]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", true)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", true)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", true)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", true)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", false)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", false)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", false)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", false)]
     public async Task Can_Generate_Code_With_Correct_Usings(
         SampleOpenSpecifications version,
         string filename,
         bool cancellationTokens)
     {
-        var settings = new ApizrGeneratorSettings {UseCancellationTokens = cancellationTokens};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("CancellationToken cancellationToken = default"); // Handled by Apizr request options
+        var settings = new ApizrGeneratorSettings { UseCancellationTokens = cancellationTokens };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("CancellationToken cancellationToken = default"); // Handled by Apizr request options
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithDifferentHeaders, "SwaggerPetstoreWithDifferentHeaders.yaml")]
     public async Task Can_Generate_Code_With_OperationHeaders_With_Different_Headers(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {GenerateOperationHeaders = true};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"api-key\")] string api_key");
+        var settings = new ApizrGeneratorSettings { GenerateOperationHeaders = true };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"api-key\")] string api_key");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_With_OperationHeadersAndWithIgnoredHeaders(SampleOpenSpecifications version, string filename)
+    {
+        var settings = new ApizrGeneratorSettings();
+        settings.GenerateOperationHeaders = true;
+        settings.IgnoredOperationHeaders = ["api_key"];
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Header(\"api_key\")] string api_key");
+        generatedCode.Should().NotContain("[Header(");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_OperationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {GenerateOperationHeaders = true};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"api_key\")] string api_key");
+        var settings = new ApizrGeneratorSettings { GenerateOperationHeaders = true };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"api_key\")] string api_key");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_OperationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {GenerateOperationHeaders = false};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("[Header(\"api_key\")] string? api_key");
+        var settings = new ApizrGeneratorSettings { GenerateOperationHeaders = false };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Header(\"api_key\")] string? api_key");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithUnsafeAuthenticationHeaders, "SwaggerPetstoreWithUnsafeAuthenticationHeaders.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithUnsafeAuthenticationHeaders, "SwaggerPetstoreWithUnsafeAuthenticationHeaders.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2WithUnsafeAuthenticationHeaders, "SwaggerPetstoreWithUnsafeAuthenticationHeaders.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithUnsafeAuthenticationHeaders, "SwaggerPetstoreWithUnsafeAuthenticationHeaders.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithUnsafeAuthenticationHeaders, "SwaggerPetstoreWithUnsafeAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithUnsafeAuthenticationHeaders, "SwaggerPetstoreWithUnsafeAuthenticationHeaders.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2WithUnsafeAuthenticationHeaders, "SwaggerPetstoreWithUnsafeAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithUnsafeAuthenticationHeaders, "SwaggerPetstoreWithUnsafeAuthenticationHeaders.yaml")]
     public async Task Can_Generate_Code_With_Unsafe_AuthenticationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {GenerateAuthenticationHeader = true};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"auth.key\")] string auth_key");
+        var settings = new ApizrGeneratorSettings { GenerateAuthenticationHeader = true };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"auth.key\")] string auth_key");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
     public async Task Can_Generate_Code_With_AuthenticationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {GenerateAuthenticationHeader = true};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
+        var settings = new ApizrGeneratorSettings { GenerateAuthenticationHeader = true };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2WithAuthenticationHeaders, "SwaggerPetstoreWithAuthenticationHeaders.yaml")]
     public async Task Can_Generate_Code_With_AuthenticationHeaders_Without_OperationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {GenerateOperationHeaders = false, GenerateAuthenticationHeader = true};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
+        var settings = new ApizrGeneratorSettings { GenerateOperationHeaders = false, GenerateAuthenticationHeader = true };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[Header(\"auth_key\")] string auth_key");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_AuthenticationHeaders(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {GenerateAuthenticationHeader = false};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("[Header(\"auth_key\")] string? auth_key");
+        var settings = new ApizrGeneratorSettings { GenerateAuthenticationHeader = false };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Header(\"auth_key\")] string? auth_key");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Accept_Request_Header(SampleOpenSpecifications version, string filename)
     {
         var settings = new ApizrGeneratorSettings();
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
         if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
-            generateCode.Should().Contain("[Headers(\"Accept: application/json\"");
+            generatedCode.Should().Contain("[Headers(\"Accept: application/json\"");
         else if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV2 or SampleOpenSpecifications.SwaggerPetstoreYamlV2)
-            generateCode.Should().NotContain("[Headers(\"Accept: application/json\"");
+            generatedCode.Should().NotContain("[Headers(\"Accept: application/json\"");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_No_Accept_Request_Header(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {AddAcceptHeaders = false};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("[Headers(\"Accept");
+        var settings = new ApizrGeneratorSettings { AddAcceptHeaders = false };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("[Headers(\"Accept");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Multiple_Interfaces(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {MultipleInterfaces = MultipleInterfaces.ByEndpoint};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var settings = new ApizrGeneratorSettings { MultipleInterfaces = MultipleInterfaces.ByEndpoint };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Dependency_Injection_Setup(SampleOpenSpecifications version, string filename)
     {
         var settings = new ApizrGeneratorSettings
@@ -358,15 +374,15 @@ public class SwaggerPetstoreApizrTests
                 TransientErrorHandler = TransientErrorHandler.Polly
             }
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("AddApizrManagerFor");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("AddApizrManagerFor");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Dependency_Injection_Setup_With_Polly(SampleOpenSpecifications version, string filename)
     {
         var settings = new ApizrGeneratorSettings
@@ -377,17 +393,17 @@ public class SwaggerPetstoreApizrTests
                 TransientErrorHandler = TransientErrorHandler.Polly
             }
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("using Polly");
-        generateCode.Should().Contain("AddPolicyHandler");
-        generateCode.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("using Polly");
+        generatedCode.Should().Contain("AddPolicyHandler");
+        generatedCode.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Dependency_Injection_Setup_Without_Polly(SampleOpenSpecifications version, string filename)
     {
         var settings = new ApizrGeneratorSettings
@@ -398,40 +414,40 @@ public class SwaggerPetstoreApizrTests
                 TransientErrorHandler = TransientErrorHandler.None
             }
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("using Polly");
-        generateCode.Should().NotContain("AddPolicyHandler");
-        generateCode.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("using Polly");
+        generatedCode.Should().NotContain("AddPolicyHandler");
+        generatedCode.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.Unset)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.Unset)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.Unset)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", MultipleInterfaces.Unset)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.ByTag)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.ByTag)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.ByTag)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", MultipleInterfaces.ByTag)]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.Unset)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.Unset)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.Unset)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", MultipleInterfaces.Unset)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.ByTag)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.ByTag)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.ByTag)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", MultipleInterfaces.ByTag)]
     public async Task Can_Generate_Code_GeneratedCode_Attribute(
         SampleOpenSpecifications version,
         string filename,
         MultipleInterfaces multipleInterfaces)
     {
-        var settings = new ApizrGeneratorSettings {MultipleInterfaces = multipleInterfaces};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("[System.CodeDom.Compiler.GeneratedCode(\"Refitter\"");
+        var settings = new ApizrGeneratorSettings { MultipleInterfaces = multipleInterfaces };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("[System.CodeDom.Compiler.GeneratedCode(\"Refitter\"");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json", MultipleInterfaces.ByEndpoint)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml", MultipleInterfaces.ByEndpoint)]
     public async Task Can_Generate_Code_With_Multiple_Interfaces_And_OperationNameTemplate(
         SampleOpenSpecifications version,
         string filename,
@@ -439,154 +455,155 @@ public class SwaggerPetstoreApizrTests
     {
         var settings = new ApizrGeneratorSettings
         {
-            MultipleInterfaces = multipleInterfaces, OperationNameTemplate = "ExecuteAsync"
+            MultipleInterfaces = multipleInterfaces,
+            OperationNameTemplate = "ExecuteAsync"
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("ExecuteAsync(");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("ExecuteAsync(");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
 #if !DEBUG
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
 #endif
     public async Task Can_Build_Generated_Code(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(version, filename);
+        var generatedCode = await GenerateCode(version, filename);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
 #if !DEBUG
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
 #endif
     public async Task Can_Build_Generated_Code_With_IApiResponse(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {ReturnIApiResponse = true};
-        var generateCode = await GenerateCode(version, filename, settings);
+        var settings = new ApizrGeneratorSettings { ReturnIApiResponse = true };
+        var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     public async Task Can_Build_Generated_Code_With_IObservableResponse(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {ReturnIObservable = true};
-        var generateCode = await GenerateCode(version, filename, settings);
+        var settings = new ApizrGeneratorSettings { ReturnIObservable = true };
+        var generatedCode = await GenerateCode(version, filename, settings);
 
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
 #if !DEBUG
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
 #endif
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {MultipleInterfaces = MultipleInterfaces.ByEndpoint};
-        var generateCode = await GenerateCode(version, filename, settings);
+        var settings = new ApizrGeneratorSettings { MultipleInterfaces = MultipleInterfaces.ByEndpoint };
+        var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
 #if !DEBUG
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
 #endif
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_ByTag(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {MultipleInterfaces = MultipleInterfaces.ByTag};
-        var generateCode = await GenerateCode(version, filename, settings);
+        var settings = new ApizrGeneratorSettings { MultipleInterfaces = MultipleInterfaces.ByTag };
+        var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
 #if !DEBUG
-    [Theory]
-    [InlineData("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
-    [InlineData("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.yaml")]
-    [InlineData("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
-    [InlineData("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.yaml")]
+    [Test]
+    [Arguments("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
+    [Arguments("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.yaml")]
+    [Arguments("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
+    [Arguments("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.yaml")]
     public async Task Can_Build_Generated_Code_From_Url(string url)
     {
         var settings = new ApizrGeneratorSettings { OpenApiPath = url };
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
+        var generatedCode = sut.Generate();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 #endif
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Obsolete_Attribute(SampleOpenSpecifications version, string filename)
     {
-        var generateCode = await GenerateCode(version, filename);
-        generateCode.Should().Contain("[System.Obsolete]");
+        var generatedCode = await GenerateCode(version, filename);
+        generatedCode.Should().Contain("[System.Obsolete]");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_Obsolete_Operations(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {GenerateDeprecatedOperations = false};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain(@"/pet/findByTags");
+        var settings = new ApizrGeneratorSettings { GenerateDeprecatedOperations = false };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain(@"/pet/findByTags");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_Operation_Name_Template(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {OperationNameTemplate = "{operationName}Async"};
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("FindPetsByStatusAsync");
+        var settings = new ApizrGeneratorSettings { OperationNameTemplate = "{operationName}Async" };
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("FindPetsByStatusAsync");
     }
 
-    [Theory]
-    [InlineData(OperationNameGeneratorTypes.Default)]
-    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromOperationId)]
-    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromPathSegments)]
-    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationName)]
-    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndPathSegments)]
-    [InlineData(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationId)]
-    [InlineData(OperationNameGeneratorTypes.SingleClientFromOperationId)]
-    [InlineData(OperationNameGeneratorTypes.SingleClientFromPathSegments)]
+    [Test]
+    [Arguments(OperationNameGeneratorTypes.Default)]
+    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromOperationId)]
+    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromPathSegments)]
+    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationName)]
+    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndPathSegments)]
+    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationId)]
+    [Arguments(OperationNameGeneratorTypes.SingleClientFromOperationId)]
+    [Arguments(OperationNameGeneratorTypes.SingleClientFromPathSegments)]
     public async Task Can_Generate_Code_With_OperationNameGenerator(OperationNameGeneratorTypes type)
     {
         var version = SampleOpenSpecifications.SwaggerPetstoreJsonV3;
@@ -595,92 +612,97 @@ public class SwaggerPetstoreApizrTests
         {
             OperationNameGenerator = type
         };
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_Without_AdditionalProperties(SampleOpenSpecifications version, string filename)
     {
         var settings = new ApizrGeneratorSettings
         {
-            GenerateDefaultAdditionalProperties = false, OperationNameTemplate = "{operationName}Async"
+            GenerateDefaultAdditionalProperties = false,
+            OperationNameTemplate = "{operationName}Async"
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().NotContain("Dictionary<string, object> AdditionalProperties");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().NotContain("Dictionary<string, object> AdditionalProperties");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_NonNullable_Return_Types(SampleOpenSpecifications version, string filename)
     {
         var settings = new ApizrGeneratorSettings
         {
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
-                GenerateNullableReferenceTypes = true, GenerateOptionalPropertiesAsNullable = true
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = true
             }
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("Task<Pet>");
-        generateCode.Should().NotContain("Task<Pet?>");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("Task<Pet>");
+        generatedCode.Should().NotContain("Task<Pet?>");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_NonNullable_Return_Types_In_ApiResponse(SampleOpenSpecifications version, string filename)
     {
-        var settings = new ApizrGeneratorSettings {ReturnIApiResponse = true, CodeGeneratorSettings = new CodeGeneratorSettings
+        var settings = new ApizrGeneratorSettings
+        {
+            ReturnIApiResponse = true,
+            CodeGeneratorSettings = new CodeGeneratorSettings
             {
                 GenerateNullableReferenceTypes = true,
                 GenerateOptionalPropertiesAsNullable = true
             }
         };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("Task<IApiResponse<Pet>>");
-        generateCode.Should().NotContain("Task<IApiResponse<Pet?>>");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("Task<IApiResponse<Pet>>");
+        generatedCode.Should().NotContain("Task<IApiResponse<Pet?>>");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_ImmutableRecords(SampleOpenSpecifications version, string filename)
     {
         var settings = new ApizrGeneratorSettings { ImmutableRecords = true };
-        var generateCode = await GenerateCode(version, filename, settings);
-        generateCode.Should().Contain("record Pet");
+        var generatedCode = await GenerateCode(version, filename, settings);
+        generatedCode.Should().Contain("record Pet");
     }
 
-    [Theory]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [InlineData(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Code_With_DynamicQuerystringParameter(SampleOpenSpecifications version, string filename)
     {
         var settings = new ApizrGeneratorSettings { UseDynamicQuerystringParameters = true };
-        var generateCode = await GenerateCode(version, filename, settings);
+        var generatedCode = await GenerateCode(version, filename, settings);
 
-        if(version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
-            generateCode.Should().Contain("long petId, [Query] UpdatePetWithFormQueryParams queryParams, [RequestOptions] IApizrRequestOptions options);")
+        if (version is SampleOpenSpecifications.SwaggerPetstoreJsonV3 or SampleOpenSpecifications.SwaggerPetstoreYamlV3)
+            generatedCode.Should().Contain("long petId, [Query] UpdatePetWithFormQueryParams queryParams, [RequestOptions] IApizrRequestOptions options);")
                 .And.Contain("public class UpdatePetWithFormQueryParams");
 
-        generateCode.Should().Contain("[Query] LoginUserQueryParams queryParams, [RequestOptions] IApizrRequestOptions options);")
+        generatedCode.Should().Contain("[Query] LoginUserQueryParams queryParams, [RequestOptions] IApizrRequestOptions options);")
             .And.Contain("public class LoginUserQueryParams");
     }
 

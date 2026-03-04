@@ -1,21 +1,23 @@
 [![Build](https://github.com/christianhelle/refitter/actions/workflows/build.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/build.yml)
 [![Smoke Tests](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml/badge.svg)](https://github.com/christianhelle/refitter/actions/workflows/smoke-tests.yml)
 [![NuGet](https://img.shields.io/nuget/v/refitter?color=blue)](https://www.nuget.org/packages/refitter)
+[![Docker Image Version](https://img.shields.io/docker/v/christianhelle/refitter?label=docker)](https://hub.docker.com/r/christianhelle/refitter)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=christianhelle_refitter&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=christianhelle_refitter)
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-76-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-89-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
 
 Refitter is a tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface and contracts from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
-Refitter comes in 2 forms:
+Refitter comes in 3 forms:
 
 - A [.NET CLI Tool](#cli-tool) distributed via [nuget.org](http://www.nuget.org/packages/refitter) that outputs a single C# file on disk
-- A [C# Source Generator](#source-generator) via the [Refitter.SourceGenerator](http://www.nuget.org/packages/refitter.sourcegenerator) package that generates code on compile time based on a [.refitter](#.refitter-file-format) within the project directory.
+- An [MSBuild Task](#msbuild) via the [Refitter.MSBuild](http://www.nuget.org/packages/refitter.msbuild) package that integrates seamlessly into your build pipeline and automatically generates code at build time based on [.refitter](#.refitter-file-format) files within the project directory
+- A [C# Source Generator](#source-generator) via the [Refitter.SourceGenerator](http://www.nuget.org/packages/refitter.sourcegenerator) package that generates code on compile time based on a [.refitter](#.refitter-file-format) within the project directory
 
 ## CLI Tool
 
@@ -25,6 +27,18 @@ The tool is packaged as a .NET Tool and is published to nuget.org. You can insta
 
 ```shell
 dotnet tool install --global Refitter
+```
+
+Alternatively, you can use the Docker image:
+
+```shell
+docker pull christianhelle/refitter
+```
+
+Or run it directly:
+
+```shell
+docker run --rm -v $(pwd):/src christianhelle/refitter ./openapi.json --output ./GeneratedCode.cs
 ```
 
 ### Usage
@@ -48,6 +62,7 @@ EXAMPLES:
     refitter ./openapi.json --use-api-response
     refitter ./openapi.json --cancellation-tokens
     refitter ./openapi.json --no-operation-headers
+    refitter ./openapi.json --ignored-operation-headers "header-one" --ignored-operation-headers "Header-Two"
     refitter ./openapi.json --no-accept-headers
     refitter ./openapi.json --use-iso-date-format
     refitter ./openapi.json --additional-namespace "Your.Additional.Namespace" --additional-namespace "Your.Other.Additional.Namespace"
@@ -61,6 +76,8 @@ EXAMPLES:
     refitter ./openapi.json --optional-nullable-parameters
     refitter ./openapi.json --use-polymorphic-serialization
     refitter ./openapi.json --collection-format Csv
+    refitter ./openapi.json --simple-output
+    refitter ./openapi.json --no-inline-json-converters
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -97,12 +114,13 @@ OPTIONS:
         --tag                                                    Only include Endpoints that contain this tag. May be set multiple times and result in OR'ed evaluation
         --skip-validation                                        Skip validation of the OpenAPI specification
         --no-deprecated-operations                               Don't generate deprecated operations
-        --operation-name-template                                Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface
+        --operation-name-template                                Generate operation names using pattern. When using --multiple-interfaces ByEndpoint, this is name of the Execute() method in the interface where all instances of the string '{operationName}' is replaced with 'Execute'
         --optional-nullable-parameters                           Generate nullable parameters as optional parameters
         --trim-unused-schema                                     Removes unreferenced components schema to keep the generated output to a minimum
         --keep-schema                                            Force to keep matching schema, uses regular expressions. Use together with "--trim-unused-schema". Can be set multiple times
         --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used
         --no-banner                                              Don't show donation banner
+        --simple-output                                          Generate simple, plain-text console output without ASCII art, tables, emojis, or color formatting (suitable for IDE output windows)
         --skip-default-additional-properties                     Set to true to skip default additional properties
         --collection-format                      Multi           Determines the format of collection parameters. May be one of Multi, Csv, Ssv, Tsv, Pipes
         --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
@@ -130,6 +148,9 @@ OPTIONS:
                                                                  payloads with (yet) unknown types are offered by newer versions of an API
                                                                  See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
         --disposable                                             Generate refit clients that implement IDisposable
+        --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
+        --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
+        --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -146,40 +167,36 @@ Here's what the console output looks like when running the Refitter CLI tool:
 
 ![Console Output](images/console-output.png)
 
-## Source Generator
+### Simple Output Mode
 
-Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
-
-The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `--outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code
-
-***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
-
-### Installation
-
-The source generator is distributed as a NuGet package and should be installed to the project that will contain the generated code
+For integration with IDEs and build tools that don't support rich console formatting, Refitter provides a `--simple-output` option:
 
 ```shell
-dotnet add package Refitter.SourceGenerator
+refitter ./openapi.json --simple-output
 ```
 
-### Usage
+This mode generates plain text output without:
 
-This source generator generates code based on any `.refitter` file included to the project as `AdditionalFiles`:
+- ASCII art and banners
+- Colored text and rich formatting
+- Unicode characters and emojis
+- Tables and panels
 
-```markdown
-<ItemGroup>
-    <AdditionalFiles Include="Petstore.refitter" />
-</ItemGroup>
-```
+This is particularly useful when:
+
+- Running Refitter from Visual Studio extensions
+- Integrating with build systems that capture console output
+- Using tools that don't support ANSI escape sequences
+- Running in environments with limited console capabilities
 
 
-### .Refitter File format
+## .Refitter File format
 
-The following is an example `.refitter` file
+The following is an example `.refitter` file using a single OpenAPI specification
 
 ```js
 {
-  "openApiPath": "/path/to/your/openAPI", // Required
+  "openApiPath": "/path/to/your/openAPI", // Required if openApiPaths is not specified
   "namespace": "Org.System.Service.Api.GeneratedCode", // Optional. Default=GeneratedCode
   "contractsNamespace": "Org.System.Service.Api.GeneratedCode.Contracts", // Optional. Default=GeneratedCode
   "naming": {
@@ -199,12 +216,13 @@ The following is an example `.refitter` file
     "File_Download": "System.Net.Http.HttpContent"
   },
   "generateOperationHeaders": true, // Optional. Default=true
+  "ignoredOperationHeaders": ["apiKey"], // Optional. Default=[]
   "typeAccessibility": "Public", // Optional. Values=Public|Internal. Default=Public
   "useCancellationTokens": false, // Optional. Default=false
   "useIsoDateFormat": false, // Optional. Default=false
   "multipleInterfaces": "ByEndpoint", // Optional. May be one of "ByEndpoint" or "ByTag"
   "generateDeprecatedOperations": false, // Optional. Default=true
-  "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName} when multipleInterfaces != ByEndpoint
+  "operationNameTemplate": "{operationName}Async", // Optional. Must contain {operationName}. When multipleInterfaces == "ByEndpoint", this is name of the Execute() method in the interface where all instances of the string '{operationName}' is replaced with 'Execute'
   "optionalParameters": false, // Optional. Default=false
   "outputFolder": "../CustomOutput" // Optional. Default=./Generated
   "outputFilename": "RefitInterface.cs", // Optional. Default=Output.cs for CLI tool
@@ -270,6 +288,7 @@ The following is an example `.refitter` file
     "dictionaryInstanceType": "System.Collections.Generic.Dictionary",
     "arrayBaseType": "System.Collections.ObjectModel.Collection",
     "dictionaryBaseType": "System.Collections.Generic.Dictionary",
+    "integerType": "Int32", // Optional. Default="Int32". The .NET type for OpenAPI integers without a format. Possible values: "Int32", "Int64"
     "propertySetterAccessModifier": "",
     "generateImmutableArrayProperties": false,
     "generateImmutableDictionaryProperties": false,
@@ -285,17 +304,32 @@ The following is an example `.refitter` file
     "generateNativeRecords": false,
     "generateDefaultValues": true,
     "inlineNamedAny": false,
+    "inlineJsonConverters": true, // Optional. Default=true. Set to false to not generate JsonConverter attributes for enum properties
     "dateFormat": "yyyy-MM-dd",
     "dateTimeFormat": "yyyy-MM-dd",
     "excludedTypeNames": [
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
-    ]
+    ],
+    "customTemplateDirectory": "./path/to/directory/" // Optional. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
   }
 }
 ```
 
-- `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS
+The following is an example `.refitter` file using multiple OpenAPI specifications that are merged into a single client
+
+```js
+{
+  "openApiPaths": [ // Required if openApiPath is not specified. Documents are merged; first spec wins on duplicates
+    "/path/to/your/openAPI/v1",
+    "/path/to/your/openAPI/v2"
+  ],
+  "namespace": "Org.System.Service.Api.GeneratedCode"
+}
+```
+
+- `openApiPath` - points to the OpenAPI Specifications file. This can be the path to a file stored on disk, relative to the `.refitter` file. This can also be a URL to a remote file that will be downloaded over HTTP/HTTPS. Required if `openApiPaths` is not specified.
+- `openApiPaths` - an array of paths to multiple OpenAPI Specifications files. When specified, the documents are merged into a single client. The first document in the array serves as the base; paths, component schemas, definitions (OpenAPI 2.x), and tags from subsequent documents are merged in. When duplicates exist (same path key or schema name), the first document's entry is preserved. Use this instead of `openApiPath` when you want to generate a single client from multiple API versions. Required if `openApiPath` is not specified.
 - `namespace` - the namespace used in the generated code. If not specified, this defaults to `GeneratedCode`
 - `naming.useOpenApiTitle` - a boolean indicating whether the OpenApi title should be used. Default is `true`
 - `naming.interfaceName` - the name of the generated interface. The generated code will automatically prefix this with `I` so if this set to `MyApiClient` then the generated interface is called `IMyApiClient`. Default is `ApiClient`
@@ -308,6 +342,7 @@ The following is an example `.refitter` file
 - `returnIApiResponse` - a boolean indicating whether to return `IApiResponse<T>` objects. Default is `false`
 - `responseTypeOverride` - a dictionary with operation ids (as specified in the OpenAPI document) and a particular return type to use. The types are wrapped in a task, but otherwise unmodified (so make sure to specify or import their namespaces). Default is `{}`
 - `generateOperationHeaders` - a boolean indicating whether to use operation headers in the generated methods. Default is `true`
+- `ignoredOperationHeaders` - A collection of headers to omit from operation signatures. Default is `[]`
 - `typeAccessibility` - the generated type accessibility. Possible values are `Public` and `Internal`. Default is `Public`
 - `useCancellationTokens` - Use cancellation tokens in the generated methods. Default is `false`
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
@@ -318,7 +353,7 @@ The following is an example `.refitter` file
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
 - `includePathMatches` - A collection of regular expressions used to filter paths.
 - `generateDeprecatedOperations` - a boolean indicating whether deprecated operations should be generated or skipped. Default is `true`
-- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async
+- `operationNameTemplate` - Generate operation names using pattern. This must contain the string {operationName}. An example usage of this could be `{operationName}Async` to suffix all method names with Async. When using multiple interfaces with `ByEndpoint`, this is name of the Execute() method in the interface where all instances of the string '{operationName}' is replaced with 'Execute'
 - `optionalParameters` - Generate non-required parameters as nullable optional parameters
 - `trimUnusedSchema` - Removes unreferenced components schema to keep the generated output to a minimum
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
@@ -356,6 +391,7 @@ The following is an example `.refitter` file
   - `dictionaryInstanceType` - Default is `System.Collections.Generic.Dictionary`,
   - `arrayBaseType` - Default is `System.Collections.ObjectModel.Collection`,
   - `dictionaryBaseType` - Default is `System.Collections.Generic.Dictionary`,
+  - `integerType` - Default is `Int32`. The .NET type to use for OpenAPI integer types without a format specifier. Possible values: `Int32`, `Int64`
   - `propertySetterAccessModifier` - Default is ``,
   - `generateImmutableArrayProperties` - Default is false,
   - `generateImmutableDictionaryProperties` - Default is false,
@@ -371,21 +407,90 @@ The following is an example `.refitter` file
   - `generateNativeRecords` - Default is false
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
+  - `inlineJsonConverters` - Default is true. When set to false, enum properties will not have `[JsonConverter(typeof(JsonStringEnumConverter))]` attributes
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
   - `excludedTypeNames` - Default is empty
 
 ## MSBuild
 
-A common scenario for generating code from OpenAPI specifications is to do it at build time. This can be achieved using MSBuild tasks. An example of such an approach would be to include a `.refitter` file in the projects directory and execute the Refitter CLI from pre-build events
+This is the recommended approach for generating code from OpenAPI specifications at build time. The MSBuild approach integrates seamlessly into your build pipeline, automatically generates code at build time
+
+### Why Choose MSBuild over Source Generator?
+
+The MSBuild task offers several advantages over the Source Generator:
+
+- **Build-time Generation**: Code is generated during the pre-build process, which ensures that the Refit source generator will work without needing to rebuild a second time.
+- **No Manual Commits**: Generated files are created automatically during build, eliminating the need to commit generated code to source control
+- **No Additional Tools Required**: Works out of the box without requiring separate CLI tool installation
+
+### Installation
+
+The MSBuild task is distributed as a NuGet package:
+
+```shell
+dotnet add package Refitter.MSBuild
+```
+
+### Usage
+
+Once installed, the MSBuild task will automatically scan your project for `.refitter` files and generate code during build. Simply create a `.refitter` file in your project directory with your OpenAPI specification settings.
+
+The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task:
 
 ```xml
-<Target Name="Refitter" AfterTargets="PreBuildEvent">
-    <Exec WorkingDirectory="$(ProjectDir)" Command="refitter --settings-file .refitter --skip-validation" />
+<UsingTask TaskName="RefitterGenerateTask"
+           AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll"
+           Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
+<Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
+    <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
+                          DisableLogging="$(RefitterNoLogging)"
+                          SkipValidation="$(RefitterSkipValidation)">
+        <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
+    </RefitterGenerateTask>
+    <ItemGroup>
+        <Compile Include="@(RefitterGeneratedFiles)" />
+    </ItemGroup>
 </Target>
 ```
 
-The snippet above requires that Refitter is installed on the machine as a globally available dotnet tool. This might not be the case if you're running on a build agent from a CI/CD environment. In this case you might want to install Refitter as a local tool using a manifest file, as described in [this tutorial](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use?WT.mc_id=DT-MVP-5004822)
+The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and execute them all.
+
+### Configuration
+
+By default, telemetry collection is enabled. To opt-out, add the following to your `.csproj` file:
+
+```xml
+<PropertyGroup>
+  <RefitterNoLogging>true</RefitterNoLogging>
+</PropertyGroup>
+```
+
+You can also skip OpenAPI validation by setting:
+
+```xml
+<PropertyGroup>
+  <RefitterSkipValidation>true</RefitterSkipValidation>
+</PropertyGroup>
+```
+
+### Example
+
+Create a `.refitter` file in your project:
+
+```json
+{
+  "openApiPath": "https://petstore3.swagger.io/api/v3/openapi.json",
+  "namespace": "Petstore.Api",
+  "outputFolder": "./Generated"
+}
+```
+
+Now, every time you build your project, Refitter will automatically generate the API client code based on your OpenAPI specification.
+
+### Alternative: Using CLI with MSBuild Exec Task
+
+If you prefer more control or need to use the CLI tool directly, you can invoke the Refitter CLI from MSBuild pre-build events:
 
 ```xml
 <Target Name="Refitter" AfterTargets="PreBuildEvent">
@@ -394,56 +499,31 @@ The snippet above requires that Refitter is installed on the machine as a global
 </Target>
 ```
 
-The `dotnet build` process does will probably not have access to the package repository in which to download Refitter from, this is at least the case with Azure Pipelines and Azure Artifacts. To workaround this, you can provide a separate `nuget.config` that only uses `nuget.org` as a `<packageSource>`.
+This approach requires that Refitter is installed as a local tool using a manifest file, as described in [this tutorial](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use?WT.mc_id=DT-MVP-5004822).
 
-Something like this:
+## Source Generator
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageSources>
-    <clear />
-    <add key="NuGet" value="https://api.nuget.org/v3/index.json" />
-  </packageSources>
-</configuration>
+> **Note:** We recommend using the [MSBuild](#msbuild) approach instead of the Source Generator because the code is generated at pre-compile, ensuring that the Refit source generator will generated code from the Refit interfaces added to the compilation
+
+Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
+
+The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `--outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code
+
+***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
+
+### Installation
+
+The source generator is distributed as a NuGet package and should be installed to the project that will contain the generated code
+
+```shell
+dotnet add package Refitter.SourceGenerator
 ```
 
-You might want to place the `nuget.config` file in another folder to avoid using it to build the .NET project, then you can specify this when executing `dotnet tool restore`
+### Usage
 
-```xml
-<Target Name="Refitter" AfterTargets="PreBuildEvent">
-    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore --configfile refitter/nuget.config" />
-    <Exec WorkingDirectory="$(ProjectDir)" Command="refitter --settings-file .refitter --skip-validation" />
-</Target>
-```
+This source generator generates code based on any `.refitter` file included to the project as `AdditionalFiles`.
 
-In the example above, the `nuget.config` file is placed under the `refitter` folder.
-
-### Refitter.MSBuild package
-
-Refitter ships with an MSBuild custom task that is distributed as a NuGet package and includes the Refitter CLI binary. This will simplify generating code from OpenAPI specifications at build time.
-
-To use the package, install `Refitter.MSBuild`
-
-```xml
-<ItemGroup>
-    <PackageReference Include="Refitter.MSBuild" Version="1.5.0" />
-</ItemGroup>
-```
-
-The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task and looks something like this:
-
-```xml
-<Target Name="Refitter" BeforeTargets="BeforeBuild">
-    <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
-                          DisableLogging="$(RefitterNoLogging)"/>
-    <ItemGroup>
-        <Compile Include="**/*.cs" />
-    </ItemGroup>
-  </Target>
-```
-
-The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and executes them all. By default, telemetry collection is enabled, and to opt-out of it you must specify `<RefitterNoLogging>true</RefitterNoLogging>` in the `.csproj` `<PropertyGroup>`
+The generator can automatically detect all `.refitter` files inside the project that referenced the `Refitter.SourceGenerator` package and there is no need to include them manually as `AdditionalFiles`
 
 # Using the generated code
 
@@ -1210,6 +1290,16 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
 
 .NET 8.0 or .NET 9.0
 
+## Testing
+
+Refitter uses [TUnit](https://github.com/thomhurst/TUnit) as its testing framework instead of xUnit. TUnit was chosen for its superior performance, providing 3x faster test execution compared to xUnit. This significantly improves the developer experience when running the test suite locally and in CI/CD pipelines.
+
+To run the tests:
+
+```bash
+dotnet test --solution src/Refitter.slnx -c Release
+```
+
 ## Contributing
 
 Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to contribute to the project.
@@ -1317,7 +1407,24 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MrScottyTay"><img src="https://avatars.githubusercontent.com/u/24463321?v=4?s=100" width="100px;" alt="Scott Taylor"/><br /><sub><b>Scott Taylor</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AMrScottyTay" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sb-chericks"><img src="https://avatars.githubusercontent.com/u/160796564?v=4?s=100" width="100px;" alt="sb-chericks"/><br /><sub><b>sb-chericks</b></sub></a><br /><a href="#ideas-sb-chericks" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/issues?q=author%3Asb-chericks" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/SWarnberg"><img src="https://avatars.githubusercontent.com/u/26246346?v=4?s=100" width="100px;" alt="Staffan Wärnberg"/><br /><sub><b>Staffan Wärnberg</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3ASWarnberg" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lilinus"><img src="https://avatars.githubusercontent.com/u/78953007?v=4?s=100" width="100px;" alt="Linus Hamlin"/><br /><sub><b>Linus Hamlin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Alilinus" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lilinus"><img src="https://avatars.githubusercontent.com/u/78953007?v=4?s=100" width="100px;" alt="Linus Hamlin"/><br /><sub><b>Linus Hamlin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Alilinus" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=lilinus" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://marcohern.com/en/#about"><img src="https://avatars.githubusercontent.com/u/5376517?v=4?s=100" width="100px;" alt="Marco Hernandez"/><br /><sub><b>Marco Hernandez</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amarcohern" title="Bug reports">🐛</a> <a href="#ideas-marcohern" title="Ideas, Planning, & Feedback">🤔</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/david-pw"><img src="https://avatars.githubusercontent.com/u/178433875?v=4?s=100" width="100px;" alt="david-pw"/><br /><sub><b>david-pw</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adavid-pw" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=david-pw" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/eoma-knowit"><img src="https://avatars.githubusercontent.com/u/150660175?v=4?s=100" width="100px;" alt="eoma-knowit"/><br /><sub><b>eoma-knowit</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=eoma-knowit" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/0xced"><img src="https://avatars.githubusercontent.com/u/51363?v=4?s=100" width="100px;" alt="Cédric Luthi"/><br /><sub><b>Cédric Luthi</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=0xced" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://christophdebaene.be"><img src="https://avatars.githubusercontent.com/u/642207?v=4?s=100" width="100px;" alt="Christoph De Baene"/><br /><sub><b>Christoph De Baene</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Achristophdebaene" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/7amou3"><img src="https://avatars.githubusercontent.com/u/993610?v=4?s=100" width="100px;" alt="7amou3"/><br /><sub><b>7amou3</b></sub></a><br /><a href="#ideas-7amou3" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://haldencollier.com"><img src="https://avatars.githubusercontent.com/u/25365699?v=4?s=100" width="100px;" alt="Halden"/><br /><sub><b>Halden</b></sub></a><br /><a href="#ideas-HGCollier" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mhartmair-cubido"><img src="https://avatars.githubusercontent.com/u/164479174?v=4?s=100" width="100px;" alt="mhartmair-cubido"/><br /><sub><b>mhartmair-cubido</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amhartmair-cubido" title="Bug reports">🐛</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/karoberts"><img src="https://avatars.githubusercontent.com/u/7482126?v=4?s=100" width="100px;" alt="Keith Roberts"/><br /><sub><b>Keith Roberts</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Akaroberts" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kmc059000"><img src="https://avatars.githubusercontent.com/u/660670?v=4?s=100" width="100px;" alt="Kenneth Crawford"/><br /><sub><b>Kenneth Crawford</b></sub></a><br /><a href="#ideas-kmc059000" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=kmc059000" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/0x2badc0de"><img src="https://avatars.githubusercontent.com/u/173240018?v=4?s=100" width="100px;" alt="0x2badc0de"/><br /><sub><b>0x2badc0de</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3A0x2badc0de" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://meteion.ca"><img src="https://avatars.githubusercontent.com/u/6116333?v=4?s=100" width="100px;" alt="Tylor Pater"/><br /><sub><b>Tylor Pater</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=frogcrush" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/vgmello"><img src="https://avatars.githubusercontent.com/u/4777793?v=4?s=100" width="100px;" alt="Vitor M"/><br /><sub><b>Vitor M</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=vgmello" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

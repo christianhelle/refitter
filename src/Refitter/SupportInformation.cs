@@ -19,8 +19,9 @@ public static class SupportInformation
         {
             return Environment.MachineName;
         }
-        catch
+        catch (Exception)
         {
+            // Fallback to localhost if machine name cannot be retrieved (e.g., in restricted environments)
             return "localhost";
         }
     }

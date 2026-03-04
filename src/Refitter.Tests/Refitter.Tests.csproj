@@ -1,8 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework> 
-        <IsPackable>false</IsPackable>       
+        <TargetFramework>net10.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <OutputType>Exe</OutputType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateProgramFile>false</GenerateProgramFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,17 +15,18 @@
       <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.json" />
       <None Remove="Resources\V3\SwaggerPetstoreWithDifferentHeaders.yaml" />
       <None Remove="README.md" />
+      <None Update="Templates\Class.Annotations.liquid">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Atc.Test" Version="1.1.18" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-        <PackageReference Include="xunit" Version="2.9.3" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="6.0.4">
+        <PackageReference Include="FluentAssertions" Version="8.8.0" />
+        <PackageReference Include="Microsoft.OpenApi" Version="3.3.1" />
+        <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="3.3.1" />
+        <PackageReference Include="System.Text.Json" Version="10.0.3" />
+        <PackageReference Include="TUnit" Version="1.18.21" />
+        <PackageReference Include="coverlet.collector" Version="8.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -34,6 +39,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
+      <ProjectReference Include="..\Refitter\Refitter.csproj" />
     </ItemGroup>
 
 </Project>

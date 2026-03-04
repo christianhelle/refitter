@@ -2,7 +2,8 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -60,45 +61,45 @@ public class CollectionFormatTests
 }
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    [Theory]
-    [InlineData(CollectionFormat.Multi, "Query(CollectionFormat.Multi)")]
-    [InlineData(CollectionFormat.Csv, "Query(CollectionFormat.Csv)")]
-    [InlineData(CollectionFormat.Ssv, "Query(CollectionFormat.Ssv)")]
-    [InlineData(CollectionFormat.Tsv, "Query(CollectionFormat.Tsv)")]
-    [InlineData(CollectionFormat.Pipes, "Query(CollectionFormat.Pipes)")]
+    [Test]
+    [Arguments(CollectionFormat.Multi, "Query(CollectionFormat.Multi)")]
+    [Arguments(CollectionFormat.Csv, "Query(CollectionFormat.Csv)")]
+    [Arguments(CollectionFormat.Ssv, "Query(CollectionFormat.Ssv)")]
+    [Arguments(CollectionFormat.Tsv, "Query(CollectionFormat.Tsv)")]
+    [Arguments(CollectionFormat.Pipes, "Query(CollectionFormat.Pipes)")]
     public async Task Generated_Code_Contains_Expected_Collection_Format(CollectionFormat format, string expectedAttribute)
     {
-        string generateCode = await GenerateCode(format);
-        
+        string generatedCode = await GenerateCode(format);
+
         using (new AssertionScope())
         {
-            generateCode.Should().Contain(expectedAttribute);
+            generatedCode.Should().Contain(expectedAttribute);
             // Check both array parameters use the same format
-            generateCode.Should().Contain($"[{expectedAttribute}] IEnumerable<int> ids");
-            generateCode.Should().Contain($"[{expectedAttribute}] IEnumerable<string> tags");
+            generatedCode.Should().Contain($"[{expectedAttribute}] IEnumerable<int> ids");
+            generatedCode.Should().Contain($"[{expectedAttribute}] IEnumerable<string> tags");
         }
     }
 
     private static async Task<string> GenerateCode(CollectionFormat format = CollectionFormat.Multi)
     {
-        string swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         try
         {
             var settings = new RefitGeneratorSettings
@@ -124,13 +125,4 @@ public class CollectionFormatTests
         }
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.json";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

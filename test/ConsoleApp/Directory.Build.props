@@ -5,6 +5,12 @@
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
+    <!-- Disable Refit source generator during batch smoke tests to avoid filename-too-long errors
+         when hundreds of interfaces cause the generator to create extremely long filenames -->
+    <PropertyGroup Condition="'$(SmokeTest)' == 'true'">
+        <DisableRefitSourceGenerator>true</DisableRefitSourceGenerator>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    </PropertyGroup>
     <ItemGroup>
         <Compile Include="..\Program.cs">
             <Link>Program.cs</Link>
@@ -13,16 +19,14 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-        <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.8" />
-        <PackageReference Include="Refit" Version="8.0.0" />
-        <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
-        <PackageReference Include="Polly" Version="8.6.3" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.3" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.3" />
+        <PackageReference Include="Refit" Version="10.0.1" />
+        <PackageReference Include="Refit.HttpClientFactory" Version="10.0.1" />
+        <PackageReference Include="Polly" Version="8.6.5" />
         <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
         <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
-        <PackageReference Include="System.Reactive" Version="6.0.2" />
-        <PackageReference Include="System.Text.Json" Version="9.0.8" />
+        <PackageReference Include="System.Reactive" Version="6.1.0" />
     </ItemGroup>
 </Project>

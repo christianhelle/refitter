@@ -1,7 +1,8 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -72,40 +73,40 @@ public class CustomDateFormatTests
 ";
 
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task GeneratedCode_Contains_Date_Format_String()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain(@"[Query(Format = ""yyyy-MM-ddThh:mm:ssZ"")] ");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain(@"[Query(Format = ""yyyy-MM-ddThh:mm:ssZ"")] ");
     }
 
-    [Fact]
+    [Test]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("[Query] System.TimeSpan");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
@@ -116,17 +117,8 @@ public class CustomDateFormatTests
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.json";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

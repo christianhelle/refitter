@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="Refitter.Core/Refitter.Core.csproj" />
+  <Project Path="Refitter.MSBuild/Refitter.MSBuild.csproj" />
+  <Project Path="Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj" />
+  <Project Path="Refitter.SourceGenerator/Refitter.SourceGenerator.csproj" />
+  <Project Path="Refitter.Tests/Refitter.Tests.csproj" />
+  <Project Path="Refitter/Refitter.csproj" />
+</Solution>

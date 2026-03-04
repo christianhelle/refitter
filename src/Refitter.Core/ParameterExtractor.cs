@@ -27,15 +27,23 @@ internal static class ParameterExtractor
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
             .Select(p =>
-                $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
+                $"{JoinAttributes(GetBodyAttribute(p, settings), GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
         var headerParameters = new List<string>();
 
         if (settings.GenerateOperationHeaders)
         {
+            var ignoredHeaders = settings.IgnoredOperationHeaders
+                .Select(h => h.Trim())
+                .Where(h => !string.IsNullOrEmpty(h))
+                .ToArray();
+
+            var anyIgnoredHeaders = ignoredHeaders.Any();
+
             headerParameters = operationModel.Parameters
                 .Where(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader)
+                .Where(p => !anyIgnoredHeaders || !ignoredHeaders.Contains(p.Name, StringComparer.OrdinalIgnoreCase))
                 .Select(p =>
                     $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {p.VariableName}")
                 .ToList();
@@ -63,9 +71,49 @@ internal static class ParameterExtractor
         var formParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
             .Select(p =>
-                $"{GetParameterType(p, settings)} {p.VariableName}")
+                $"{JoinAttributes(GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
             .ToList();
 
+        // Manually extract non-binary properties from multipart/form-data in OpenAPI 3.x
+        // NSwag doesn't populate these in operationModel.Parameters
+        if (operation.RequestBody?.Content?.TryGetValue("multipart/form-data", out var multipartContent) == true)
+        {
+            var schema = multipartContent.Schema;
+            if (schema?.Properties != null)
+            {
+                foreach (var property in schema.Properties)
+                {
+                    var propertySchema = property.Value;
+
+                    // Skip binary fields (files) as they're already handled as StreamPart
+                    var isBinary = (propertySchema.Type == JsonObjectType.String &&
+                                   propertySchema.Format == "binary") ||
+                                  (propertySchema.Type == JsonObjectType.Array &&
+                                   propertySchema.Item?.Type == JsonObjectType.String &&
+                                   propertySchema.Item?.Format == "binary");
+
+                    if (!isBinary)
+                    {
+                        // Generate proper C# type for the property
+                        var propertyType = GetCSharpType(propertySchema, settings);
+                        var variableName = ConvertToVariableName(property.Key);
+
+                        // Add AliasAs attribute if property name differs from variable name
+                        var aliasAttribute = property.Key != variableName
+                            ? $"AliasAs(\"{property.Key}\")"
+                            : string.Empty;
+
+                        var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
+
+                        // Only add if not already present (avoid duplicates)
+                        if (!formParameters.Contains(parameter))
+                        {
+                            formParameters.Add(parameter);
+                        }
+                    }
+                }
+            }
+        }
         var binaryBodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
             .Select(p =>
@@ -86,7 +134,7 @@ internal static class ParameterExtractor
         parameters.AddRange(formParameters);
         parameters.AddRange(binaryBodyParameters);
 
-        parameters = ReOrderNullableParameters(parameters, settings);
+        parameters = ReOrderNullableParameters(parameters, settings, operationModel.Parameters);
 
         if (settings.ApizrSettings?.WithRequestOptions == true)
             parameters.Add("[RequestOptions] IApizrRequestOptions options");
@@ -99,7 +147,7 @@ internal static class ParameterExtractor
     private static string ReplaceUnsafeCharacters(
         string unsafeText)
     {
-        var safeText = string.Empty;
+        var safeText = new StringBuilder(unsafeText.Length);
         foreach (var character in unsafeText)
         {
             var safeCharacter = character;
@@ -108,15 +156,16 @@ internal static class ParameterExtractor
                 safeCharacter = '_';
             }
 
-            safeText += safeCharacter;
+            safeText.Append(safeCharacter);
         }
 
-        return safeText;
+        return safeText.ToString();
     }
 
     private static List<string> ReOrderNullableParameters(
         List<string> parameters,
-        RefitGeneratorSettings settings)
+        RefitGeneratorSettings settings,
+        ICollection<CSharpParameterModel> parameterModels)
     {
         if (!settings.OptionalParameters || settings.ApizrSettings?.WithRequestOptions == true)
             return parameters;
@@ -125,10 +174,139 @@ internal static class ParameterExtractor
         for (int index = 0; index < parameters.Count; index++)
         {
             if (parameters[index].Contains("?"))
-                parameters[index] += " = default";
+            {
+                var parameterString = parameters[index];
+                var defaultValue = GetDefaultValueForParameter(parameterString, parameterModels);
+                parameters[index] = parameterString + " = " + defaultValue;
+            }
         }
 
         return parameters;
+    }
+
+    private static string GetDefaultValueForParameter(string parameterString, ICollection<CSharpParameterModel> parameterModels)
+    {
+        var parts = parameterString.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0)
+            return "default";
+
+        var variableName = parts[parts.Length - 1].TrimEnd(';', ',');
+
+        var parameterModel = parameterModels.FirstOrDefault(p => p.VariableName == variableName);
+        if (parameterModel?.Schema?.Default != null && !string.IsNullOrEmpty(parameterModel.Type))
+        {
+            return FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type);
+        }
+        return "default";
+    }
+
+    private static string FormatDefaultValue(object? defaultValue, string parameterType)
+    {
+        if (defaultValue == null)
+            return "default";
+
+        var type = parameterType.TrimEnd('?').Trim();
+
+        return type switch
+        {
+            "bool" => defaultValue.ToString()?.ToLowerInvariant() ?? "default",
+            "string" => $"\"{EscapeString(defaultValue.ToString() ?? string.Empty)}\"",
+            _ when IsNumericType(type) => FormatNumericValue(defaultValue, type),
+            _ => "default"
+        };
+    }
+
+    private static string EscapeString(string value)
+    {
+        var sb = new StringBuilder(value.Length + 10);
+        foreach (var c in value)
+        {
+            switch (c)
+            {
+                case '\\':
+                    sb.Append("\\\\");
+                    break;
+                case '"':
+                    sb.Append("\\\"");
+                    break;
+                case '\n':
+                    sb.Append("\\n");
+                    break;
+                case '\r':
+                    sb.Append("\\r");
+                    break;
+                case '\t':
+                    sb.Append("\\t");
+                    break;
+                case '\f':
+                    sb.Append("\\f");
+                    break;
+                case '\v':
+                    sb.Append("\\v");
+                    break;
+                case '\b':
+                    sb.Append("\\b");
+                    break;
+                case '\0':
+                    sb.Append("\\0");
+                    break;
+                default:
+                    sb.Append(c);
+                    break;
+            }
+        }
+        return sb.ToString();
+    }
+
+    private static string FormatNumericValue(object defaultValue, string type)
+    {
+        var numericString = defaultValue is IFormattable formattable
+            ? formattable.ToString(null, CultureInfo.InvariantCulture)
+            : (defaultValue.ToString() ?? "default");
+
+        return type switch
+        {
+            "float" or "Single" => $"{numericString}f",
+            "decimal" or "Decimal" => $"{numericString}m",
+            "double" or "Double" => FormatDoubleLiteral(numericString),
+            "long" or "Int64" => $"{numericString}L",
+            "ulong" or "UInt64" => $"{numericString}UL",
+            "uint" or "UInt32" => $"{numericString}U",
+            _ => numericString
+        };
+    }
+
+    private static string FormatDoubleLiteral(string numericString)
+    {
+        // If the string already contains a decimal point or exponent, return as-is
+        if (numericString.Contains('.') || numericString.Contains('e') || numericString.Contains('E'))
+            return numericString;
+
+        // Otherwise, append .0 to make it a double literal
+        return numericString + ".0";
+    }
+
+    private static bool IsNumericType(string type)
+    {
+        return type is "int" or "Int32" or "long" or "Int64" or "short" or "Int16"
+            or "byte" or "Byte" or "decimal" or "Decimal" or "float" or "Single"
+            or "double" or "Double" or "sbyte" or "SByte" or "uint" or "UInt32"
+            or "ulong" or "UInt64" or "ushort" or "UInt16";
+    }
+
+    private static string GetBodyAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
+    {
+        var anyType = settings.CodeGeneratorSettings?.AnyType ?? "object";
+        var parameterType = WellKnownNamespaces.TrimImportedNamespaces(FindSupportedType(parameter.Type));
+
+        // Check if the parameter type matches AnyType (e.g., "object" or custom type like "System.Text.Json.JsonElement")
+        if (parameterType.Equals(anyType, StringComparison.OrdinalIgnoreCase) ||
+            parameterType.Contains("JsonElement", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Body(BodySerializationMethod.Serialized)";
+        }
+
+        return "Body";
     }
 
     private static string GetQueryAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
@@ -142,9 +320,9 @@ internal static class ParameterExtractor
             { parameter.IsDate: true, settings.CodeGeneratorSettings.DateFormat: not null }
                 => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateFormat}\")",
             {
-                    parameter.IsDateOrDateTime: true, parameter.Schema.Format: "date-time",
-                    settings.CodeGeneratorSettings.DateTimeFormat: not null
-                } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateTimeFormat}\")",
+                parameter.IsDateOrDateTime: true, parameter.Schema.Format: "date-time",
+                settings.CodeGeneratorSettings.DateTimeFormat: not null
+            } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateTimeFormat}\")",
             _ => "Query",
         };
     }
@@ -156,9 +334,11 @@ internal static class ParameterExtractor
 
     private static string JoinAttributes(params string[] attributes)
     {
-        var filteredAttributes = attributes.Where(a => !string.IsNullOrWhiteSpace(a));
+        var filteredAttributes = attributes
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .ToList();
 
-        if (!filteredAttributes.Any())
+        if (filteredAttributes.Count == 0)
             return string.Empty;
 
         return "[" + string.Join(", ", filteredAttributes) + "] ";
@@ -168,7 +348,7 @@ internal static class ParameterExtractor
         ParameterModelBase parameterModel,
         RefitGeneratorSettings settings)
     {
-        var type = WellKnownNamesspaces
+        var type = WellKnownNamespaces
             .TrimImportedNamespaces(
                 FindSupportedType(
                     parameterModel.Type));
@@ -194,8 +374,21 @@ internal static class ParameterExtractor
         return type;
     }
 
-    private static string FindSupportedType(string typeName) =>
-        typeName is "FileResponse" or "FileParameter" ? "StreamPart" : typeName;
+    private static string FindSupportedType(string typeName)
+    {
+        if (typeName is "FileResponse" or "FileParameter")
+            return "StreamPart";
+
+        // Handle collections of FileParameter/FileResponse
+        if (typeName.Contains("FileParameter") || typeName.Contains("FileResponse"))
+        {
+            return typeName
+                .Replace("FileParameter", "StreamPart")
+                .Replace("FileResponse", "StreamPart");
+        }
+
+        return typeName;
+    }
 
     private static List<string> GetQueryParameters(CSharpOperationModel operationModel, RefitGeneratorSettings settings, string dynamicQuerystringParameterType, out string? dynamicQuerystringParameters)
     {
@@ -246,13 +439,7 @@ internal static class ParameterExtractor
                     propertiesCodeBuilder.AppendLine();
                     if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
                     {
-                        propertiesCodeBuilder.Append(
-            $$"""
-                    /// <summary>
-                    /// {{operationParameter.Description}}
-                    /// </summary>
-            """);
-                        propertiesCodeBuilder.AppendLine();
+                        AppendXmlDocComment(operationParameter.Description, propertiesCodeBuilder);
                     }
 
                     propertiesCodeBuilder.Append(
@@ -260,6 +447,12 @@ internal static class ParameterExtractor
                     {{attributes}}
                     {{modifier}} {{propertyType}} {{propertyName}} { get; {{setterStyle}}; }
             """);
+                    var defaultValue = operationParameter.Schema.Default;
+                    if (defaultValue != null)
+                    {
+                        var formattedDefaultValue = FormatDefaultValue(defaultValue, propertyType);
+                        propertiesCodeBuilder.Append($" = {formattedDefaultValue};");
+                    }
                     propertiesCodeBuilder.AppendLine();
                     operationModel.Parameters.Remove(operationParameter);
                 }
@@ -304,5 +497,99 @@ internal static class ParameterExtractor
             .ToList();
 
         return parameters;
+    }
+
+    private static void AppendXmlDocComment(string description, StringBuilder codeBuilder)
+    {
+        codeBuilder.Append(
+"""
+                /// <summary>
+""");
+
+        var lines = description.Split(
+            ["\r\n", "\r", "\n"],
+            StringSplitOptions.None);
+
+        foreach (var line in lines)
+        {
+            codeBuilder.AppendLine();
+            codeBuilder.Append(
+$$"""
+                /// {{line.Trim()}}
+""");
+        }
+
+        codeBuilder.AppendLine();
+        codeBuilder.Append(
+"""
+                /// </summary>
+""");
+        codeBuilder.AppendLine();
+    }
+
+    private static string GetCSharpType(JsonSchema propertySchema, RefitGeneratorSettings settings)
+    {
+        var type = propertySchema.Type switch
+        {
+            JsonObjectType.String => "string",
+            JsonObjectType.Integer => GetIntegerTypeName(propertySchema, settings),
+            JsonObjectType.Number => "double",
+            JsonObjectType.Boolean => "bool",
+            JsonObjectType.Array => GetArrayType(propertySchema, settings),
+            JsonObjectType.Object => "object",
+            _ => "object"
+        };
+
+        // Add nullable modifier if needed
+        if (settings.OptionalParameters && propertySchema.IsNullable(SchemaType.OpenApi3))
+        {
+            type += "?";
+        }
+
+        return type;
+    }
+
+    private static string GetIntegerTypeName(JsonSchema schema, RefitGeneratorSettings settings)
+    {
+        // Check the format first
+        if (schema.Format == "int64")
+            return "long";
+        if (schema.Format == "int32")
+            return "int";
+
+        // Fall back to settings
+        var integerType = settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32;
+        return integerType == IntegerType.Int64 ? "long" : "int";
+    }
+
+    private static string GetArrayType(JsonSchema arraySchema, RefitGeneratorSettings settings)
+    {
+        if (arraySchema.Item != null)
+        {
+            var itemType = GetCSharpType(arraySchema.Item, settings);
+            return $"{itemType}[]";
+        }
+        return "object[]";
+    }
+
+    private static string ConvertToVariableName(string propertyName)
+    {
+        if (string.IsNullOrEmpty(propertyName))
+            return "value";
+
+        // Convert first character to lowercase for camelCase
+        var variableName = char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
+
+        // Replace invalid characters with underscore
+        var safeVariableName = new StringBuilder(variableName.Length);
+        foreach (var c in variableName)
+        {
+            if (char.IsLetterOrDigit(c) || c == '_')
+                safeVariableName.Append(c);
+            else
+                safeVariableName.Append('_');
+        }
+
+        return safeVariableName.ToString();
     }
 }

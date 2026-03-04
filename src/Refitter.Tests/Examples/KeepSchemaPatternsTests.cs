@@ -1,7 +1,8 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -113,52 +114,42 @@ components:
       additionalProperties: false
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Keeps_Unreferenced_Schema()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
 
-        generateCode.Should().NotContain("class UserComponent2");
-        generateCode.Should().Contain("class UserComponent");
-        generateCode.Should().Contain("class SomeComponent");
-        generateCode.Should().Contain("class Component");
-        generateCode.Should().Contain("class Metadata");
+        generatedCode.Should().NotContain("class UserComponent2");
+        generatedCode.Should().Contain("class UserComponent");
+        generatedCode.Should().Contain("class SomeComponent");
+        generatedCode.Should().Contain("class Component");
+        generatedCode.Should().Contain("class Metadata");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings {OpenApiPath = swaggerFile, TrimUnusedSchema = true, KeepSchemaPatterns = new[] {"^UserComponent$"},};
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, TrimUnusedSchema = true, KeepSchemaPatterns = new[] { "^UserComponent$" }, };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
-    }
-
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 }

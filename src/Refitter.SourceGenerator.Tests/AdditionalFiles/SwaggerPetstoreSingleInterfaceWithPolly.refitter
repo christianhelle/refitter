@@ -1,6 +1,7 @@
 {
   "openApiPath": "../Resources/V3/SwaggerPetstore.json",
   "namespace": "Refitter.Tests.AdditionalFiles.SingeInterface",
+  "generateXmlDocCodeComments": false,
   "naming": {
     "useOpenApiTitle": false,
     "interfaceName": "SwaggerPetstoreInterface",

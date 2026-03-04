@@ -1,37 +1,38 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests;
 
 public class PathParametersWithUrlTests
 {
-    [Theory]
-    [InlineData("https://petstore3.swagger.io/api/v3/openapi.json")]
+    [Test]
+    [Arguments("https://petstore3.swagger.io/api/v3/openapi.json")]
 #if !DEBUG
-    [InlineData("https://petstore3.swagger.io/api/v3/openapi.yaml")]
-    [InlineData("https://petstore.swagger.io/v2/swagger.json")]
-    [InlineData("https://petstore.swagger.io/v2/swagger.yaml")]
+    [Arguments("https://petstore3.swagger.io/api/v3/openapi.yaml")]
+    [Arguments("https://petstore.swagger.io/v2/swagger.json")]
+    [Arguments("https://petstore.swagger.io/v2/swagger.yaml")]
 #endif
     public async Task Can_Generate_Code(string url)
     {
-        var generateCode = await GenerateCode(url);
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode(url);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Theory]
-    [InlineData("https://petstore3.swagger.io/api/v3/openapi.json")]
+    [Test]
+    [Arguments("https://petstore3.swagger.io/api/v3/openapi.json")]
 #if !DEBUG
-    [InlineData("https://petstore3.swagger.io/api/v3/openapi.yaml")]
-    [InlineData("https://petstore.swagger.io/v2/swagger.json")]
-    [InlineData("https://petstore.swagger.io/v2/swagger.yaml")]
+    [Arguments("https://petstore3.swagger.io/api/v3/openapi.yaml")]
+    [Arguments("https://petstore.swagger.io/v2/swagger.json")]
+    [Arguments("https://petstore.swagger.io/v2/swagger.yaml")]
 #endif
     public async Task Can_Build_Generated_Code(string url)
     {
-        var generateCode = await GenerateCode(url);
+        var generatedCode = await GenerateCode(url);
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
@@ -40,7 +41,7 @@ public class PathParametersWithUrlTests
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 }

@@ -32,32 +32,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private static async Task<OpenApiDocument> GetOpenApiDocument(RefitGeneratorSettings settings)
     {
-        var specialCharacters = new[]
-        {
-            ":"
-        };
-
-        return specialCharacters.Aggregate(
-            await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath),
-            SanitizePath);
-    }
-
-    private static OpenApiDocument SanitizePath(
-        OpenApiDocument openApiDocument,
-        string stringToRemove)
-    {
-        var paths = openApiDocument.Paths.Keys
-            .Where(pathKey => pathKey.Contains(stringToRemove))
-            .ToArray();
-
-        foreach (var path in paths)
-        {
-            var value = openApiDocument.Paths[path];
-            openApiDocument.Paths.Remove(path);
-            openApiDocument.Paths.Add(path.Replace(stringToRemove, string.Empty), value);
-        }
-
-        return openApiDocument;
+        if (settings.OpenApiPaths is { Length: > 0 })
+            return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPaths);
+        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath);
     }
 
     private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches,
@@ -86,11 +63,15 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .ToArray();
         foreach (var path in clonedPaths)
         {
+            if (path.Value == null) continue;
+
             var methods = path.Value.Where(pair => pair.Value != null)
                 // same reason as with document.Paths
                 .ToArray();
             foreach (var method in methods)
             {
+                if (method.Value == null) continue;
+
                 var exclude = method.Value.Tags?.Exists(includeTags.Contains) != true;
                 if (exclude)
                 {
@@ -113,7 +94,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
 
         // compile all expressions here once, as we will use them more than once
-        var regexes = pathMatchExpressions.Select(x => new Regex(x, RegexOptions.Compiled)).ToList();
+        var regexes = pathMatchExpressions.Select(x => new Regex(x, RegexOptions.Compiled, TimeSpan.FromSeconds(1))).ToList();
         var paths = document.Paths.Keys
             .Where(pathKey => regexes.TrueForAll(regex => !regex.IsMatch(pathKey)))
             .ToArray();
@@ -134,6 +115,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = generator.GenerateFile();
+        contracts = SanitizeGeneratedContracts(contracts);
+
         if (settings.GenerateClients)
         {
             contracts = RefitInterfaceImports
@@ -156,7 +139,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
             ? document.Info!.Title.Sanitize()
             : settings.Naming.InterfaceName;
-        return new StringBuilder()
+        var result = new StringBuilder()
             .AppendLine(settings.GenerateClients ? refitInterfacesCode : string.Empty)
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
@@ -166,6 +149,13 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                     : DependencyInjectionGenerator.Generate(settings, interfaceNames))
             .ToString()
             .TrimEnd();
+
+        if (!string.IsNullOrWhiteSpace(settings.ContractTypeSuffix))
+        {
+            result = ContractTypeSuffixApplier.ApplySuffix(result, settings.ContractTypeSuffix);
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -178,6 +168,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
         var contracts = generator.GenerateFile();
+        contracts = SanitizeGeneratedContracts(contracts);
 
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
@@ -221,7 +212,37 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             }
         }
 
+        if (!string.IsNullOrWhiteSpace(settings.ContractTypeSuffix))
+        {
+            generatedFiles = generatedFiles
+                .Select(f => f with
+                {
+                    Content = ContractTypeSuffixApplier.ApplySuffix(f.Content, settings.ContractTypeSuffix)
+                })
+                .ToList();
+        }
+
         return new GeneratorOutput(generatedFiles);
+    }
+
+    private string SanitizeGeneratedContracts(string contracts)
+    {
+        if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
+        {
+            return contracts;
+        }
+
+        const string pattern = @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*$";
+        var lines = contracts.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
+        var filteredLines = lines
+            .Where(
+                line => !Regex.IsMatch(
+                    line,
+                    pattern,
+                    RegexOptions.None,
+                    TimeSpan.FromSeconds(1)))
+            .ToArray();
+        return string.Join(Environment.NewLine, filteredLines);
     }
 
     /// <summary>

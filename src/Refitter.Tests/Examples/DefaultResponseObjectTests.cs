@@ -1,7 +1,8 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -111,14 +112,14 @@ components:
           type: 'string'
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -128,7 +129,7 @@ components:
             .BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Should_Generate_Default_Response_Return_Types()
     {
         string generatedCode = await GenerateCode();
@@ -136,7 +137,7 @@ components:
         generatedCode.Should().Contain("Task<ICollection<User>> GetUsersWithDefault();");
     }
 
-    [Fact]
+    [Test]
     public async Task Should_Generate_Range_Response_Return_Types()
     {
         string generatedCode = await GenerateCode();
@@ -144,7 +145,7 @@ components:
         generatedCode.Should().Contain("Task<ICollection<Category>> GetCategoriesWithRange();");
     }
 
-    [Fact]
+    [Test]
     public async Task Should_Generate_User_Contract()
     {
         string generatedCode = await GenerateCode();
@@ -154,7 +155,7 @@ components:
         generatedCode.Should().Contain("public string Email { get; set; }");
     }
 
-    [Fact]
+    [Test]
     public async Task Should_Generate_Category_Contract()
     {
         string generatedCode = await GenerateCode();
@@ -165,7 +166,7 @@ components:
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
@@ -177,13 +178,4 @@ components:
         return generatedCode;
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

@@ -2,7 +2,8 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -27,56 +28,47 @@ paths:
                 type: string
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
-        var generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_ContentType_Header_Attribute()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         using var scope = new AssertionScope();
-        generateCode.Should().Contain("Content-Type: application/json");
+        generatedCode.Should().Contain("Content-Type: application/json");
     }
 
-    [Fact]
+    [Test]
     public async Task Generates_Accept_Header_Attribute()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         using var scope = new AssertionScope();
-        generateCode.Should().Contain("Accept: application/json");
+        generatedCode.Should().Contain("Accept: application/json");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
-        var generateCode = await GenerateCode();
+        var generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, AddAcceptHeaders = true };
 
         var sut = await RefitGenerator.CreateAsync(settings);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

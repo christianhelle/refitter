@@ -45,7 +45,7 @@ jobs:
 
     steps:
     - name: 🛒 Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: 🛠️ Prepare OpenAPI Spec
       id: prepare_openapi_spec
@@ -78,7 +78,7 @@ jobs:
       if: steps.prepare_openapi_spec.outputs.exists == 'True'
     
     - name: 🛠️ Publish generated code as Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Generated Code (${{ inputs.openapi }}.${{ inputs.format }}, ${{ inputs.version }}, ${{ inputs.os }})
         path: test/*.cs

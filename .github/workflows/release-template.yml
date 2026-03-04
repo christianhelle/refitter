@@ -10,12 +10,17 @@ on:
 env:
   NUGET_REPO_URL: "https://api.nuget.org/v3/index.json"
 
+permissions:
+  id-token: write  # enable GitHub OIDC token issuance for this job
+  contents: write
+  packages: write
+
 jobs:
   CLI:
     name: 🚚 Prepare new release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Sets environment variables - branch-name
         uses: nelonoel/branch-name@v1.0.1
       - name: Sets environment variables - Nerdbank.GitVersioning
@@ -27,22 +32,43 @@ jobs:
           dotnet-version: |
             8.0.x
             9.0.x
+            10.0.x
       - name: Build
         run: |
-          dotnet build -c Release src/Refitter.sln -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}" -p:Version="${{ inputs.version }}"
+          dotnet build -c Release src/Refitter.slnx -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}" -p:Version="${{ inputs.version }}"
           dotnet pack -c Release src/Refitter.MSBuild/Refitter.MSBuild.csproj -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}" -p:Version="${{ inputs.version }}"
       - name: Move packages
         shell: pwsh
         run: Get-ChildItem -Filter *.nupkg -Recurse | ForEach-Object { Move-Item -Path $_ -Destination . }
       - name: Publish artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Packages
           path: |
             **/*.nupkg
             README.md
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
       - name: Push packages to NuGet
-        run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_KEY }} --source ${{ env.NUGET_REPO_URL }} --no-symbols
+        run: dotnet nuget push **/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source ${{ env.NUGET_REPO_URL }} --no-symbols
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+      - name: Publish container to Docker Hub
+        run: |
+          dotnet publish src/Refitter/Refitter.csproj \
+            --configuration release \
+            --framework net10.0 \
+            --os linux \
+            --arch x64 \
+            -t:PublishContainer \
+            -p:UseSourceLink=true \
+            -p:Version="${{ inputs.version }}" \
+            -p:PackageVersion="${{ inputs.version }}" \
+            -p:ContainerImageTags=\"${{ inputs.version }}\;latest\" \
+            -p:ContainerRegistry=docker.io
       - name: Create tag
         uses: actions/github-script@v8
         with:

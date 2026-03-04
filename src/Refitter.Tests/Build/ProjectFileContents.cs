@@ -9,6 +9,7 @@ public static class ProjectFileContents
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include=""Refit.HttpClientFactory"" Version=""8.0.0"" />
     <PackageReference Include=""System.Text.Json"" Version=""8.0.5"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""4.5.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />

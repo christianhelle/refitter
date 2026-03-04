@@ -1,7 +1,8 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using Xunit;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests.Examples;
 
@@ -59,33 +60,33 @@ public class AdditionalNamespacesTests
 }
 ";
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().NotBeNullOrWhiteSpace();
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
-        string generateCode = await GenerateCode();
+        string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generateCode)
+            .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Types_Contains_Additional_Namespaces()
     {
-        string generateCode = await GenerateCode();
-        generateCode.Should().Contain("using System.Diagnostics.CodeAnalysis;");
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("using System.Diagnostics.CodeAnalysis;");
     }
 
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var foo = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
@@ -93,17 +94,8 @@ public class AdditionalNamespacesTests
         };
 
         var sut = await RefitGenerator.CreateAsync(foo);
-        var generateCode = sut.Generate();
-        return generateCode;
+        var generatedCode = sut.Generate();
+        return generatedCode;
     }
 
-    private static async Task<string> CreateSwaggerFile(string contents)
-    {
-        var filename = $"{Guid.NewGuid()}.yml";
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(folder);
-        var swaggerFile = Path.Combine(folder, filename);
-        await File.WriteAllTextAsync(swaggerFile, contents);
-        return swaggerFile;
-    }
 }

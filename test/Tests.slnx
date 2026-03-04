@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="../src/Refitter.SourceGenerator/Refitter.SourceGenerator.csproj" />
+  <Project Path="MauiExample/MauiExample.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="MinimalApi/MinimalApi.csproj" />
+</Solution>

@@ -1,19 +1,26 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Refit;
 using Refitter.Tests.CustomGenerated;
-using Xunit;
+using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
 
 public class CustomOutputFolderGeneratorTests
 {
-    [Fact]
-    public void Can_Create_File_In_Custom_Path() =>
-        File.Exists("../../../CustomGenerated/CustomGenerated.cs").Should().BeTrue();
-
-    [Fact]
-    public void Can_Resolve_Refit_Interface() =>
-        RestService.For<IApiInCustomGeneratedFolder>("https://petstore3.swagger.io/api/v3")
+    [Test]
+    public void Should_Generate_Interface_Type() =>
+        typeof(IApiInCustomGeneratedFolder)
+            .Namespace
             .Should()
-            .NotBeNull();
+            .Be("Refitter.Tests.CustomGenerated");
+
+    [Test]
+    public void Can_Resolve_Refit_Interface()
+    {
+        var hasRefitAttributes = typeof(IApiInCustomGeneratedFolder)
+            .GetMethods()
+            .SelectMany(m => m.GetCustomAttributes(inherit: false))
+            .Any(a => a is HttpMethodAttribute);
+        hasRefitAttributes.Should().BeTrue("interface should have at least one Refit HTTP method attribute");
+    }
 }

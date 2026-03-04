@@ -59,6 +59,13 @@ public class CodeGeneratorSettings
     public string TimeSpanType { get; set; } = "System.TimeSpan";
 
     /// <summary>
+    /// Gets or sets the .NET type for OpenAPI integers without a format specifier (default: Int32).
+    /// </summary>
+    [Description("Gets or sets the .NET type for OpenAPI integers without a format specifier (default: Int32).")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public IntegerType IntegerType { get; set; } = IntegerType.Int32;
+
+    /// <summary>
     /// Gets or sets the generic array .NET type (default: 'ICollection').
     /// </summary>
     [Description("Gets or sets the generic array .NET type (default: 'ICollection').")]
@@ -257,4 +264,20 @@ public class CodeGeneratorSettings
     [Description("Gets or sets a custom IPropertyNameGenerator.")]
     [JsonIgnore]
     public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to inline JsonConverter attributes for enum properties (default: true).
+    /// When set to false, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes.
+    /// </summary>
+    [Description(
+        "Gets or sets a value indicating whether to inline JsonConverter attributes for enum properties (default: true). When set to false, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes."
+    )]
+    public bool InlineJsonConverters { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
+    /// templates.
+    /// </summary>
+    [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
+    public string? CustomTemplateDirectory { get; set; }
 }

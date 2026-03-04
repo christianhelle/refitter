@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Refitter.Core;
 
+[ExcludeFromCodeCoverage]
 internal record RefitGeneratedCode(
     string SourceCode,
     params string[] InterfaceNames)

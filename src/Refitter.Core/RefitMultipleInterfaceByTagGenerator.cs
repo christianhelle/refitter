@@ -6,6 +6,7 @@ namespace Refitter.Core;
 internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 {
     private readonly HashSet<string> knownIdentifiers = new();
+    private Dictionary<string, HashSet<string>>? _methodIdentifiersByInterface;
 
     internal RefitMultipleInterfaceByTagGenerator(
         RefitGeneratorSettings settings,
@@ -30,6 +31,8 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
         Dictionary<string, StringBuilder> interfacesByGroup = new();
         Dictionary<string, string> interfacesNamesByGroup = new();
 
+        _methodIdentifiersByInterface = new();
+
         foreach (var kv in byGroup)
         {
             foreach (var op in kv.Combined)
@@ -49,7 +52,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 if (!interfacesByGroup.TryGetValue(kv.Key, out var sb))
                 {
                     interfacesByGroup[kv.Key] = sb = new StringBuilder();
-                    this.docGenerator.AppendInterfaceDocumentation(operation, sb);
+                    this.docGenerator.AppendInterfaceDocumentationByTag(document, kv.Key, sb);
 
                     interfaceName = GetInterfaceName(kv.Key);
                     sb.AppendLine($$"""
@@ -58,6 +61,10 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                                     """);
 
                     interfacesNamesByGroup[kv.Key] = interfaceName;
+                }
+                else
+                {
+                    interfaceName = interfacesNamesByGroup[kv.Key];
                 }
 
                 var operationName = GetOperationName(interfaceName, op.PathItem.Key, operations.Key, operation);
@@ -80,8 +87,9 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
+                var hasCancellationToken = settings.UseCancellationTokens && !hasApizrRequestOptionsParameter;
 
-                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, sb);
+                this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, hasCancellationToken, sb);
                 GenerateObsoleteAttribute(operation, sb);
                 GenerateForMultipartFormData(operationModel, sb);
                 GenerateHeaders(operations, operation, operationModel, sb);
@@ -92,7 +100,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
                 if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
                 {
-                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, sb);
+                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, hasCancellationToken, sb);
                     GenerateObsoleteAttribute(operation, sb);
                     GenerateForMultipartFormData(operationModel, sb);
                     GenerateHeaders(operations, operation, operationModel, sb);
@@ -130,8 +138,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
     {
         if (operation.Tags.FirstOrDefault() is string group && !string.IsNullOrWhiteSpace(group))
         {
-            return IdentifierUtils.Sanitize(group)
-                .CapitalizeFirstCharacter();
+            return group.SanitizeControllerTag();
         }
 
         return ungroupedTitle;
@@ -155,8 +162,19 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
         string verb,
         OpenApiOperation operation)
     {
-        var generatedName = IdentifierUtils.Counted(knownIdentifiers, GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true), parent: interfaceName);
-        knownIdentifiers.Add($"{interfaceName}.{generatedName}");
+        // Initialize per-interface tracking if needed
+        if (!_methodIdentifiersByInterface!.ContainsKey(interfaceName))
+        {
+            _methodIdentifiersByInterface[interfaceName] = new HashSet<string>();
+        }
+
+        var interfaceIdentifiers = _methodIdentifiersByInterface[interfaceName];
+        var generatedName = IdentifierUtils.Counted(
+            interfaceIdentifiers,
+            GenerateOperationName(name, verb, operation, capitalizeFirstCharacter: true),
+            parent: interfaceName);
+
+        interfaceIdentifiers.Add(generatedName);
         return generatedName;
     }
 

@@ -34,7 +34,7 @@ internal static class ApizrRegistrationGenerator
                 .CapitalizeFirstCharacter()
                 : string.Empty;
 
-            if(isDependencyInjectionExtension)
+            if (isDependencyInjectionExtension)
                 methodName = hasManyApis ? $"Configure{formatedTitle}ApizrManagers" : $"Configure{formatedTitle}ApizrManager";
             else
                 methodName = hasManyApis ? $"Build{formatedTitle}ApizrManagers" : $"Build{formatedTitle}ApizrManager";
@@ -209,7 +209,7 @@ internal static class ApizrRegistrationGenerator
                 $$"""
                     using Mapster;
                 """);
-                if(isDependencyInjectionExtension)
+                if (isDependencyInjectionExtension)
                     usingsCodeBuilder.AppendLine(
                 $$"""
                     using MapsterMapper;
@@ -225,7 +225,7 @@ internal static class ApizrRegistrationGenerator
                 break;
         }
 
-        if(settings.ApizrSettings.WithPriority)
+        if (settings.ApizrSettings.WithPriority)
         {
             apizrPackages.Add(ApizrPackages.Apizr_Integrations_Fusillade);
             optionsCodeBuilder.AppendLine();
@@ -366,7 +366,12 @@ internal static class ApizrRegistrationGenerator
                 {
                     {{packageCodeBuilder}}
                     {{usingsCodeBuilder}}
-                  
+                {{(settings.GenerateXmlDocCodeComments ? """
+                
+                    /// <summary>
+                    /// Extension methods for configuring Apizr managers in the service collection.
+                    /// </summary>
+                """ : "")}}
                     public static partial class IServiceCollectionExtensions
                     {
                 """);
@@ -381,7 +386,7 @@ internal static class ApizrRegistrationGenerator
                         /// </summary>
                         /// <param name="optionsBuilder">Adjust common shared options</param>
                         /// <returns></returns>
-                """); 
+                """);
                 }
 
                 code.AppendLine(
@@ -409,7 +414,7 @@ internal static class ApizrRegistrationGenerator
                 """);
                 for (int i = 0; i < interfaceNames.Length; i++)
                 {
-                    if(i > 0)
+                    if (i > 0)
                         code.AppendLine();
 
                     code.Append(
@@ -447,7 +452,12 @@ internal static class ApizrRegistrationGenerator
                 {
                     {{packageCodeBuilder}}
                     {{usingsCodeBuilder}}
-
+                {{(settings.GenerateXmlDocCodeComments ? """
+                
+                    /// <summary>
+                    /// Extension methods for configuring Apizr managers in the service collection.
+                    /// </summary>
+                """ : "")}}
                     public static partial class IServiceCollectionExtensions
                     {
                 """);
@@ -462,7 +472,7 @@ internal static class ApizrRegistrationGenerator
                         /// </summary>
                         /// <param name="optionsBuilder">Adjust common shared options</param>
                         /// <returns></returns>
-                """); 
+                """);
                 }
 
                 code.AppendLine(
@@ -471,11 +481,11 @@ internal static class ApizrRegistrationGenerator
                             this IServiceCollection services,
                 """);
 
-                code.AppendLine(hasBaseUrl ? 
+                code.AppendLine(hasBaseUrl ?
                 $$"""
                             Action<IApizrExtendedManagerOptionsBuilder>? optionsBuilder = null)
                         {
-                """ : 
+                """ :
                 $$"""
                             Action<IApizrExtendedManagerOptionsBuilder> optionsBuilder)
                         {
@@ -491,7 +501,7 @@ internal static class ApizrRegistrationGenerator
 #pragma warning disable RS1035
                 code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
 #pragma warning restore RS1035
-            } 
+            }
 
             #endregion
         }
@@ -533,7 +543,7 @@ internal static class ApizrRegistrationGenerator
                         /// </summary>
                         /// <param name="optionsBuilder">Adjust common shared options</param>
                         /// <returns></returns>
-                """); 
+                """);
                 }
 
                 code.AppendLine(
@@ -599,7 +609,7 @@ internal static class ApizrRegistrationGenerator
                         /// </summary>
                         /// <param name="optionsBuilder">Adjust common shared options</param>
                         /// <returns></returns>
-                """); 
+                """);
                 }
 
                 code.AppendLine(
@@ -614,7 +624,7 @@ internal static class ApizrRegistrationGenerator
 #pragma warning disable RS1035
                 code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
 #pragma warning restore RS1035
-            } 
+            }
 
             #endregion
         }

@@ -15,7 +15,7 @@ public class RefitGeneratorSettings
     /// Default output folder for generated files.
     /// </summary>
     public const string DefaultOutputFolder = "./Generated";
-    
+
     /// <summary>
     /// Default namespace for generated code.
     /// </summary>
@@ -26,6 +26,13 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("The path to the OpenAPI document.")]
     public string OpenApiPath { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the paths to multiple Open API documents. When specified, the documents are merged.
+    /// This takes precedence over <see cref="OpenApiPath"/> when non-empty.
+    /// </summary>
+    [Description("The paths to multiple OpenAPI documents. When specified, the documents are merged into a single client.")]
+    public string[] OpenApiPaths { get; set; } = Array.Empty<string>();
 
     /// <summary>
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
@@ -128,6 +135,12 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Generate operation headers. Default is true.")]
     public bool GenerateOperationHeaders { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a collection of headers to omit from operation signatures. (default: [])
+    /// </summary>
+    [Description("A collection of headers to omit from operation signatures.")]
+    public string[] IgnoredOperationHeaders { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the generated type accessibility. (default: Public)
@@ -365,7 +378,7 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Gets or sets the parameter name generator for customizing parameter names.
     /// </summary>
-    [JsonIgnore] 
+    [JsonIgnore]
     public IParameterNameGenerator? ParameterNameGenerator { get; set; }
 
     /// <summary>
@@ -381,4 +394,23 @@ public class RefitGeneratorSettings
     [Description("The collection format to use for array query parameters. Default is CollectionFormat.Multi.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public CollectionFormat CollectionFormat { get; set; } = CollectionFormat.Multi;
+
+    /// <summary>
+    /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
+    /// templates.
+    /// </summary>
+    [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
+    public string? CustomTemplateDirectory { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to generate JsonSerializerContext for AOT compilation support.
+    /// </summary>
+    [Description("Generate JsonSerializerContext for AOT compilation support")]
+    public bool GenerateJsonSerializerContext { get; set; }
+
+    /// <summary>
+    /// Gets or sets a suffix to append to all generated contract type names.
+    /// </summary>
+    [Description("Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.")]
+    public string? ContractTypeSuffix { get; set; }
 }

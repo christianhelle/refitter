@@ -8,33 +8,24 @@ on:
       - '!.github/workflows/msbuild.yml'
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
-    branches:
-      - 'main'
   pull_request:
     paths-ignore:
       - '**/*'
       - '!.github/workflows/msbuild.yml'
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
-    branches:
-      - '*'
 
 jobs:
   build:
     name: 👌 Verify build
     runs-on: windows-latest
-    steps:    
+    steps:
     - name: 🛒 Checkout repository
-      uses: actions/checkout@v5
-    - uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: |
-          8.0.x
-          9.0.x
+      uses: actions/checkout@v6
     - name: 🛠️ Prepare
       working-directory: test/MSBuild
       run: |
-        dotnet restore ../../src/Refitter.sln
+        dotnet restore ../../src/Refitter.slnx
         dotnet build -c release ../../src/Refitter/Refitter.csproj
         dotnet build -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
         dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
@@ -45,9 +36,9 @@ jobs:
       run: dotnet build -v d -filelogger
     - name: 🧪 Build Output
       working-directory: test/MSBuild
-      run: cat msbuild.log   
+      run: cat msbuild.log
     - name: 🗳️ Upload
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Packages
         path: |
