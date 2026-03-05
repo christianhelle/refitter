@@ -114,6 +114,19 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var factory = new CSharpClientGeneratorFactory(settings, document);
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
+
+        // Create the interface generator before calling GenerateFile() so that
+        // OperationNameGenerator.CheckForDuplicateOperationIds() sees the original
+        // (pre-generation) operation IDs. GenerateFile() auto-populates operation IDs
+        // with globally unique names which would prevent the switch to the path segments
+        // generator, causing unnecessary numeric suffixes in ByTag mode.
+        IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
+        {
+            MultipleInterfaces.ByEndpoint => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
+            MultipleInterfaces.ByTag => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
+            _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
+        };
+
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
 
@@ -125,13 +138,6 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                     contracts,
                     (current, import) => current.Replace($"{import}.", string.Empty));
         }
-
-        IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
-        {
-            MultipleInterfaces.ByEndpoint => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
-            MultipleInterfaces.ByTag => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
-            _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
-        };
 
         var refitInterfaces = GenerateClient(interfaceGenerator);
         var interfaceNames = refitInterfaces.Select(c => c.TypeName).ToArray();
@@ -167,9 +173,12 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var factory = new CSharpClientGeneratorFactory(settings, document);
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
-        var contracts = generator.GenerateFile();
-        contracts = SanitizeGeneratedContracts(contracts);
 
+        // Create the interface generator before calling GenerateFile() so that
+        // OperationNameGenerator.CheckForDuplicateOperationIds() sees the original
+        // (pre-generation) operation IDs. GenerateFile() auto-populates operation IDs
+        // with globally unique names which would prevent the switch to the path segments
+        // generator, causing unnecessary numeric suffixes in ByTag mode.
         IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
         {
             MultipleInterfaces.ByEndpoint
@@ -178,6 +187,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                 => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
             _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
         };
+
+        var contracts = generator.GenerateFile();
+        contracts = SanitizeGeneratedContracts(contracts);
 
         var generatedFiles = new List<GeneratedCode>();
 
