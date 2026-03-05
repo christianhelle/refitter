@@ -177,11 +177,8 @@ public static class OpenApiDocumentFactory
     /// </summary>
     /// <param name="openApiPath">The path to the OpenAPI document.</param>
     /// <returns>The content of the HTTP request.</returns>
-    private static async Task<string> GetHttpContent(string openApiPath)
-    {
-        var content = await HttpClient.GetStringAsync(openApiPath);
-        return content;
-    }
+    private static Task<string> GetHttpContent(string openApiPath)
+        => HttpClient.GetStringAsync(openApiPath);
 
 
     /// <summary>
