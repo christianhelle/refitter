@@ -266,11 +266,17 @@ public class CodeGeneratorSettings
     public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to inline JsonConverter attributes for enum properties (default: true).
-    /// When set to false, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes.
+    /// Gets or sets a value indicating whether to inline JsonConverter attributes for enum types (default: true).
+    /// When set to true (default), the <c>[JsonConverter(typeof(JsonStringEnumConverter))]</c> attribute is placed
+    /// on the enum type declaration instead of on individual enum properties, allowing users to override the
+    /// converter via <c>JsonSerializerOptions.Converters</c> (e.g. to use <c>JsonStringEnumMemberConverter</c>
+    /// for enums whose values contain hyphens or other special characters via <c>[EnumMember]</c>).
+    /// When set to false, no <c>[JsonConverter]</c> attribute is emitted at all.
     /// </summary>
     [Description(
-        "Gets or sets a value indicating whether to inline JsonConverter attributes for enum properties (default: true). When set to false, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes."
+        "Gets or sets a value indicating whether to inline JsonConverter attributes for enum types (default: true). " +
+        "When set to true (default), [JsonConverter(typeof(JsonStringEnumConverter))] is placed on the enum type declaration " +
+        "so users can override it via JsonSerializerOptions.Converters. When set to false, no [JsonConverter] is emitted."
     )]
     public bool InlineJsonConverters { get; set; } = true;
 

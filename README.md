@@ -148,7 +148,7 @@ OPTIONS:
                                                                  payloads with (yet) unknown types are offered by newer versions of an API
                                                                  See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
         --disposable                                             Generate refit clients that implement IDisposable
-        --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
+        --no-inline-json-converters                              Don't inline JsonConverter attributes for enum types. When disabled, no [JsonConverter(typeof(JsonStringEnumConverter))] attributes are emitted. By default (enabled), the attribute is placed on the enum type declaration (not on properties), allowing custom converters to be registered via JsonSerializerOptions.Converters
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
         --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
         --generate-authentication-header          None            Controls generation of Authorization header support.
