@@ -8,6 +8,7 @@
 
 - Support custom format-mappings via Key-Value configuration [\#438](https://github.com/christianhelle/refitter/issues/438)
 - Generate the client from multiple versions [\#350](https://github.com/christianhelle/refitter/issues/350)
+- Add SourceGenerator support to the standalone tool [\#179](https://github.com/christianhelle/refitter/issues/179)
 
 **Fixed bugs:**
 
@@ -18,8 +19,10 @@
 - Build errors when combined with `Microsoft.Extensions.ApiDescription.Server` [\#635](https://github.com/christianhelle/refitter/issues/635)
 - Nullable Strings not being marked correctly [\#580](https://github.com/christianhelle/refitter/issues/580)
 - Code Generator adds numeric suffix to Interface method name when not needed [\#361](https://github.com/christianhelle/refitter/issues/361)
+- Source generator does not work in .Net 8 [\#310](https://github.com/christianhelle/refitter/issues/310)
 - The client parameter type's names occur wrong when multipart is include. [\#231](https://github.com/christianhelle/refitter/issues/231)
 - Multipart endpoint \[FromForm\] decorated argument is missing from signature [\#222](https://github.com/christianhelle/refitter/issues/222)
+- The using of StringEnumConverter end up generating unserializable data when different NamingPolicy is needed [\#178](https://github.com/christianhelle/refitter/issues/178)
 - Base type not generated for types specified by oneOf in the schema [\#175](https://github.com/christianhelle/refitter/issues/175)
 
 ## [1.7.3](https://github.com/christianhelle/refitter/tree/1.7.3) (2026-01-24)
