@@ -36,6 +36,8 @@ public class OpenApiDocumentFactoryTests
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "petstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yaml")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YAML")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YML")]
     public async Task Create_From_File_Detects_Format_Correctly(SampleOpenSpecifications version, string filename)
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);

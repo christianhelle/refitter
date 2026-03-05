@@ -10,7 +10,7 @@ namespace Refitter.Core;
 public class SchemaCleaner
 {
     private readonly OpenApiDocument document;
-    private readonly string[] keepSchemaPatterns;
+    private readonly Regex[] keepSchemaRegexes;
 
     /// <summary>
     /// Gets or sets a value indicating whether to include inheritance hierarchy in the schema cleaning process.
@@ -25,7 +25,9 @@ public class SchemaCleaner
     public SchemaCleaner(OpenApiDocument document, string[] keepSchemaPatterns)
     {
         this.document = document;
-        this.keepSchemaPatterns = keepSchemaPatterns;
+        keepSchemaRegexes = keepSchemaPatterns
+            .Select(x => new Regex(x, RegexOptions.Compiled, TimeSpan.FromSeconds(1)))
+            .ToArray();
     }
 
     /// <summary>
@@ -71,16 +73,12 @@ public class SchemaCleaner
             .ToDictionary(x => x.Value,
                 x => x.Key);
 
-        var keepSchemaRegexes = keepSchemaPatterns
-            .Select(x => new Regex(x, RegexOptions.Compiled, TimeSpan.FromSeconds(1)))
-            .ToList();
-
         if (doc.Components?.Schemas != null)
         {
             foreach (var kvp in doc.Components.Schemas)
             {
                 var schema = kvp.Key;
-                if (keepSchemaRegexes.Exists(x => x.IsMatch(schema)))
+                if (keepSchemaRegexes.Any(x => x.IsMatch(schema)))
                 {
                     TryPush(kvp.Value, toProcess);
                 }

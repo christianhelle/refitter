@@ -8,6 +8,8 @@ namespace Refitter.Core;
 internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 {
     protected const string Separator = "    ";
+    private static readonly Regex HttpResponseMessageTypeRegex = new("(Task|IObservable)<HttpResponseMessage>", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+    private static readonly Regex ApiResponseTypeRegex = new("(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     protected readonly RefitGeneratorSettings settings;
     protected readonly OpenApiDocument document;
@@ -73,15 +75,16 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 var parametersString = string.Join(", ", parameters);
                 var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
                 var hasCancellationToken = settings.UseCancellationTokens && !hasApizrRequestOptionsParameter;
+                var isApiResponseType = IsApiResponseType(returnType);
 
                 if (settings.GenerateXmlDocCodeComments)
                 {
-                    this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, hasCancellationToken, code);
+                    this.docGenerator.AppendMethodDocumentation(operationModel, isApiResponseType, hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, hasCancellationToken, code);
                 }
 
                 GenerateObsoleteAttribute(operation, code);
                 GenerateForMultipartFormData(operationModel, code);
-                GenerateHeaders(operations, operation, operationModel, code);
+                GenerateHeaders(operations, operationModel, code);
 
                 code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
@@ -91,11 +94,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 {
                     if (settings.GenerateXmlDocCodeComments)
                     {
-                        this.docGenerator.AppendMethodDocumentation(operationModel, IsApiResponseType(returnType), false, hasApizrRequestOptionsParameter, hasCancellationToken, code);
+                        this.docGenerator.AppendMethodDocumentation(operationModel, isApiResponseType, false, hasApizrRequestOptionsParameter, hasCancellationToken, code);
                     }
                     GenerateObsoleteAttribute(operation, code);
                     GenerateForMultipartFormData(operationModel, code);
-                    GenerateHeaders(operations, operation, operationModel, code);
+                    GenerateHeaders(operations, operationModel, code);
 
                     parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
@@ -245,7 +248,6 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
     protected void GenerateHeaders(
         KeyValuePair<string, OpenApiOperation> operations,
-        OpenApiOperation operation,
         CSharpOperationModel operationModel,
         StringBuilder code)
     {
@@ -254,14 +256,14 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
         {
             //Generate header "Accept"
-            var contentTypes = operations.Value.Responses.Select(pair => operation.Responses[pair.Key].Content.Keys);
-
-            //remove duplicates
-            var uniqueContentTypes = contentTypes
-                .GroupBy(x => x)
-                .SelectMany(y => y.First())
-                .Distinct()
-                .ToList();
+            var uniqueContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var response in operations.Value.Responses.Values)
+            {
+                foreach (var contentType in response.Content.Keys)
+                {
+                    uniqueContentTypes.Add(contentType);
+                }
+            }
 
             if (uniqueContentTypes.Any())
             {
@@ -328,21 +330,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     /// <returns>True if the type is an ApiResponse Task or similar, false otherwise.</returns>
     protected static bool IsApiResponseType(string typeName)
     {
-        // Check for HttpResponseMessage
-        if (Regex.IsMatch(
-            typeName,
-            "(Task|IObservable)<HttpResponseMessage>",
-            RegexOptions.None,
-            TimeSpan.FromSeconds(1)))
-        {
-            return true;
-        }
-
-        return Regex.IsMatch(
-            typeName,
-            "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>",
-            RegexOptions.None,
-            TimeSpan.FromSeconds(1));
+        return HttpResponseMessageTypeRegex.IsMatch(typeName) || ApiResponseTypeRegex.IsMatch(typeName);
     }
 
     private string GetConfiguredReturnType(string returnTypeParameter)

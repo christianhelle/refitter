@@ -9,6 +9,11 @@ namespace Refitter.Core;
 /// </summary>
 public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
 {
+    private static readonly Regex JsonStringEnumConverterAttributeRegex = new(
+        @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*\r?\n?",
+        RegexOptions.Compiled | RegexOptions.Multiline,
+        TimeSpan.FromSeconds(1));
+
     /// <summary>
     /// OpenAPI specifications used to generate Refit clients and interfaces.
     /// </summary>
@@ -94,9 +99,21 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
 
         // compile all expressions here once, as we will use them more than once
-        var regexes = pathMatchExpressions.Select(x => new Regex(x, RegexOptions.Compiled, TimeSpan.FromSeconds(1))).ToList();
+        var regexes = pathMatchExpressions
+            .Select(x => new Regex(x, RegexOptions.Compiled, TimeSpan.FromSeconds(1)))
+            .ToArray();
         var paths = document.Paths.Keys
-            .Where(pathKey => regexes.TrueForAll(regex => !regex.IsMatch(pathKey)))
+            .Where(
+                pathKey =>
+                {
+                    for (var i = 0; i < regexes.Length; i++)
+                    {
+                        if (regexes[i].IsMatch(pathKey))
+                            return false;
+                    }
+
+                    return true;
+                })
             .ToArray();
 
         foreach (string pathKey in paths)
@@ -244,17 +261,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             return contracts;
         }
 
-        const string pattern = @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*$";
-        var lines = contracts.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-        var filteredLines = lines
-            .Where(
-                line => !Regex.IsMatch(
-                    line,
-                    pattern,
-                    RegexOptions.None,
-                    TimeSpan.FromSeconds(1)))
-            .ToArray();
-        return string.Join(Environment.NewLine, filteredLines);
+        return JsonStringEnumConverterAttributeRegex
+            .Replace(contracts, string.Empty)
+            .TrimEnd();
     }
 
     /// <summary>
