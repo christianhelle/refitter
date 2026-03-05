@@ -17,6 +17,7 @@
 - .refitter - "mutipleInterfaces": "ByTag" increments number at the end of Method Name globally instead of being related to its interface [\#672](https://github.com/christianhelle/refitter/issues/672)
 - Build errors when combined with `Microsoft.Extensions.ApiDescription.Server` [\#635](https://github.com/christianhelle/refitter/issues/635)
 - Nullable Strings not being marked correctly [\#580](https://github.com/christianhelle/refitter/issues/580)
+- Code Generator adds numeric suffix to Interface method name when not needed [\#361](https://github.com/christianhelle/refitter/issues/361)
 - The client parameter type's names occur wrong when multipart is include. [\#231](https://github.com/christianhelle/refitter/issues/231)
 - Multipart endpoint \[FromForm\] decorated argument is missing from signature [\#222](https://github.com/christianhelle/refitter/issues/222)
 - Base type not generated for types specified by oneOf in the schema [\#175](https://github.com/christianhelle/refitter/issues/175)
