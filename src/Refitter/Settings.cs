@@ -277,7 +277,7 @@ public sealed class Settings : CommandSettings
     /// <summary>
     /// Controls how authorization headers are generated for authenticated operations.
     /// </summary>
-    [Description("Controls generation of Authorization header support. Options: None (no authentication code is generated), Parameter (adds method parameters for authentication), Method (generates a Refit [Headers] attribute for bearer token authentication). Also see 'security-scheme' option")]
+    [Description("Controls generation of Authorization header support. Options: None (no authentication code is generated), Parameter (adds method parameters for authentication), Method (generates a Refit [[Headers]] attribute for bearer token authentication). Also see 'security-scheme' option")]
     [CommandOption("--generate-authentication-header")]
     [DefaultValue(AuthenticationHeaderStyle.None)]
     public AuthenticationHeaderStyle GenerateAuthenticationHeader { get; set; } = AuthenticationHeaderStyle.None;
