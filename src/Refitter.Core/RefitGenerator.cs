@@ -10,7 +10,12 @@ namespace Refitter.Core;
 public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
 {
     private static readonly Regex JsonStringEnumConverterAttributeRegex = new(
-        @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter\)\)\]\s*\r?\n?",
+        @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter(?:<[\w.]+>)?\)\)\]\s*\r?\n?",
+        RegexOptions.Compiled | RegexOptions.Multiline,
+        TimeSpan.FromSeconds(1));
+
+    private static readonly Regex EnumDeclarationRegex = new(
+        @"^(\s*)(public\s+(?:partial\s+)?enum\s+\w+\b)",
         RegexOptions.Compiled | RegexOptions.Multiline,
         TimeSpan.FromSeconds(1));
 
@@ -258,9 +263,18 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     {
         if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
         {
-            return contracts;
+            // InlineJsonConverters = true (default): move [JsonConverter] from enum properties to enum type declarations.
+            // This allows users to override the converter via JsonSerializerOptions.Converters (e.g. to use
+            // JsonStringEnumMemberConverter for enums with [EnumMember] values containing special characters).
+            contracts = JsonStringEnumConverterAttributeRegex.Replace(contracts, string.Empty);
+            return EnumDeclarationRegex
+                .Replace(
+                    contracts,
+                    "$1[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]\n$1$2")
+                .TrimEnd();
         }
 
+        // InlineJsonConverters = false: remove all [JsonConverter(typeof(JsonStringEnumConverter))] attributes.
         return JsonStringEnumConverterAttributeRegex
             .Replace(contracts, string.Empty)
             .TrimEnd();
