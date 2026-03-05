@@ -56,3 +56,44 @@ Build: `dotnet build -c Release src/Refitter.slnx` (~22s). Tests: `dotnet test -
 6. **No interface for `RefitGenerator`:** The public entry point `RefitGenerator` is a concrete class with no interface, limiting testability and extensibility.
 7. **Large `ParameterExtractor`:** 470+ line static class handling all parameter kinds — could benefit from decomposition.
 8. **`GenerateCommand` is 500+ lines** mixing orchestration, file I/O, console output, analytics, validation, and settings mapping.
+
+### Documentation Audit (2025-03-02)
+
+Performed comprehensive audit of Refitter documentation vs actual codebase features. Cross-referenced:
+- CLI options in `src/Refitter/Settings.cs` (45 total with `[CommandOption]` attributes)
+- Core settings in `src/Refitter.Core/Settings/RefitGeneratorSettings.cs` (~50 properties)
+- Main documentation in `README.md` (98.2KB, comprehensive)
+- `.refitter` format documentation (lines 198-419 in README)
+- `docs/` directory structure and JSON schema
+- Mapping logic in `src/Refitter/GenerateCommand.cs:CreateRefitGeneratorSettings()`
+
+**Documentation Quality: 8.5/10** — Strong overall, minor gaps identified.
+
+**Gaps Found:**
+1. **CLI options missing from README:** `--no-xml-doc-comments` (line 46 in Settings.cs) and `--json-serializer-context` (line 294 in Settings.cs) are implemented and visible in `--help` but not documented in README examples or usage sections. Both have Core mappings verified in GenerateCommand.cs.
+2. **Settings-only property:** `ContractTypeSuffix` (line 423 in RefitGeneratorSettings.cs) exists in Core but has no CLI equivalent. Not documented in README .refitter format section.
+3. **JSON schema potentially outdated:** `docs/json-schema.json` needs validation against latest RefitGeneratorSettings properties (specifically: generateJsonSerializerContext, contractTypeSuffix, authenticationHeaderStyle, securityScheme).
+
+**Well-Documented:**
+- All 43 other CLI options have examples and clear descriptions
+- .refitter format comprehensively documented with JSON examples
+- Advanced features (Apizr, DI, multiple interfaces, dynamic querystrings) have detailed sections
+- Integration examples (RestService, ASP.NET Core) are clear and complete
+- Output examples show different generation modes
+
+**Key Findings:**
+- CLI to Core mapping is correct and complete (verified all 45 options in CreateRefitGeneratorSettings)
+- Boolean inversions properly handled (e.g., `--no-xml-doc-comments` → `GenerateXmlDocCodeComments = !settings.NoXmlDocCodeComments`)
+- README structure is excellent: installation → usage → .refitter format → examples → advanced features
+- Docker documentation is separate and clear
+- Simple output mode (`--simple-output`) well documented for IDE integration
+- Authentication header generation (`--generate-authentication-header`, `--security-scheme`) properly documented
+
+**Recommendations:**
+1. HIGH: Add `--no-xml-doc-comments` and `--json-serializer-context` to README CLI usage examples
+2. MEDIUM: Document `contractTypeSuffix` in .refitter format section with example
+3. MEDIUM: Update JSON schema to include all recent settings for IDE autocomplete
+4. LOW: Consider adding `--contract-type-suffix` CLI option for consistency
+5. POLICY: Establish "all new CLI options must have README examples" and "all new settings must have .refitter format docs"
+
+**Full Report:** Written to `.squad/temp-docs-audit.md` (15KB detailed analysis). Report includes verification of all mappings, example snippets for missing docs, and prioritized recommendations. No breaking changes needed — all gaps are documentation-only.

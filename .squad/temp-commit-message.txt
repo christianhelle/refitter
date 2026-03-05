@@ -1,0 +1,8 @@
+docs: add missing CLI options and .refitter settings to documentation
+
+- Add --no-xml-doc-comments, --ignored-operation-headers, --json-serializer-context to OPTIONS section
+- Add generateJsonSerializerContext, returnIObservable, collectionFormat, contractTypeSuffix to .refitter example
+- Add missing description entries for addContentTypeHeaders, returnIObservable, generateJsonSerializerContext, generateDisposableClients, usePolymorphicSerialization, collectionFormat, contractTypeSuffix
+- Add generateJsonSerializerContext, contractTypeSuffix, collectionFormat to docs/json-schema.json
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

@@ -59,3 +59,44 @@ Format REQUIRED before commit: `dotnet format src/Refitter.slnx`
 - `RefitInterfaceImports.defaultNamespases` — typo persists (has been there since initial code).
 - XML doc on `XmlDocumentationGenerator` constructor is `internal` but the class itself is `public` — minor inconsistency.
 - `IdentifierUtils.Sanitize` comment says "@ can be used and still make valid methode names" — typo ("methode").
+
+### Comprehensive Feature Analysis — 2025-01-XX
+
+Conducted deep source code analysis covering:
+- **All 56 CLI options** from `Settings.cs` with types, defaults, descriptions
+- **All 70+ .refitter settings** from `RefitGeneratorSettings.cs` including sub-objects (DependencyInjectionSettings, ApizrSettings, CodeGeneratorSettings, NamingSettings)
+- **9 enumerations** with all values documented (MultipleInterfaces, OperationNameGeneratorTypes, TypeAccessibility, IntegerType, CollectionFormat, AuthenticationHeaderStyle, CacheProviderType, MappingProviderType, TransientErrorHandler)
+- **README.md analysis** - identified 4 undocumented CLI flags and 2 inaccuracies in documentation
+- **Feature gaps** - 10 major features available ONLY via .refitter file (no CLI exposure): multiple OpenAPI merge, naming settings, status code comments, content-type headers toggle, response type override, optional parameters ordering, full DI config, most Apizr config, most NSwag code generator settings, contract type suffix
+
+**Key Findings:**
+1. CLI has 56 options but .refitter file has 70+ settings - significant feature gap
+2. `--json-serializer-context`, `--security-scheme` implemented but not in README
+3. Format-mappings feature exists (schema files in `docs/`) but undocumented
+4. Code quality issues: 2 copy-paste errors in XML docs, 1 logic bug in `GenerateCommand.cs` line 314
+5. Deprecated features (`usePolly`, `pollyMaxRetryCount`) still shown in README without deprecation notice
+
+**Output:** Complete catalog written to `.squad/temp-fenster-feature-catalog.md` - 700+ lines covering every setting, enum value, and documentation gap.
+
+### Documentation Updates — 2025-01-XX
+
+Applied 9 specific changes to `README.md` and `docs/json-schema.json` based on feature audit:
+
+**README.md changes:**
+1. Added `--no-xml-doc-comments` CLI option to OPTIONS section
+2. Added `--ignored-operation-headers` CLI option to OPTIONS section
+3. Added `--json-serializer-context` CLI option to OPTIONS section
+4. Added `generateJsonSerializerContext` to .refitter JSON example
+5. Added `returnIObservable` to .refitter JSON example
+6. Added `collectionFormat` and `contractTypeSuffix` to .refitter JSON example
+7. Added 7 missing entries to .refitter settings description list: `addContentTypeHeaders`, `returnIObservable`, `generateJsonSerializerContext`, `generateDisposableClients`, `usePolymorphicSerialization`, `collectionFormat`, `contractTypeSuffix`
+
+**json-schema.json changes:**
+1. Added `generateJsonSerializerContext` property definition
+2. Added `contractTypeSuffix` and `collectionFormat` property definitions with proper JSON Schema validation (enum for collectionFormat, nullable string for contractTypeSuffix)
+
+All changes validated:
+- README .refitter JSON example remains valid JSON
+- json-schema.json validated with PowerShell ConvertFrom-Json
+- All whitespace/indentation preserved matching existing style
+

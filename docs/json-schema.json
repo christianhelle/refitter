@@ -307,6 +307,10 @@
       "description": "Generate XML doc comments. Default is true.",
       "type": "boolean"
     },
+    "generateJsonSerializerContext": {
+      "description": "Generate JsonSerializerContext for AOT compilation support. Default is false.",
+      "type": "boolean"
+    },
     "generateStatusCodeComments": {
       "description": "Indicating whether <c>ApiException</c> and <c>IApiResponse</c> should be documented with\r\nthe relevant status codes specified in the OpenAPI document.",
       "type": "boolean"
@@ -483,6 +487,15 @@
     "usePolymorphicSerialization": {
       "description": "Use System.Text.Json polymorphic serialization. Default is false.\r\nReplace NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.\r\nTo have the native support of inheritance (de)serialization and fallback to base types when\r\npayloads with (yet) unknown types are offered by newer versions of an API\r\nSee https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information",
       "type": "boolean"
+    },
+    "contractTypeSuffix": {
+      "description": "Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.",
+      "type": [ "string", "null" ]
+    },
+    "collectionFormat": {
+      "description": "The collection format to use for array query parameters. Default is Multi.",
+      "type": "string",
+      "enum": [ "Multi", "Csv", "Ssv", "Tsv", "Pipes" ]
     },
     "parameterNameGenerator": {
       "$ref": "#/definitions/IParameterNameGenerator"

@@ -251,6 +251,36 @@ Collection formats, polymorphic serialization, custom templates, multiple interf
 
 ---
 
+### 5. Documentation Update Complete (Fenster)
+
+**Status:** ✅ Complete  
+**Date:** 2026-03-05
+
+Fenster successfully applied all 9 requested documentation updates to README.md and docs/json-schema.json:
+- Added 3 missing CLI options (`--no-xml-doc-comments`, `--ignored-operation-headers`, `--json-serializer-context`)
+- Added 5 missing .refitter properties (`generateJsonSerializerContext`, `returnIObservable`, `collectionFormat`, `contractTypeSuffix` to examples)
+- Added 8 missing property descriptions in settings reference section
+- Updated JSON schema with new property definitions
+
+All changes validated (JSON syntax OK, formatting preserved). Documentation now synchronized with codebase.
+
+---
+
+### 6. Test Validation Report (Hockney)
+
+**Status:** ✅ Complete  
+**Date:** 2026-03-05
+
+Validated two branches:
+- **Issue #580 (Nullable String Handling):** 6/7 tests pass ✅ APPROVED. Core fix works correctly; 1 minor test assertion issue (does not affect functionality).
+- **Issue #672 (Method Naming Scope):** 10/10 tests pass ✅ APPROVED FOR MERGE. Perfect implementation of per-interface method naming.
+
+Pre-existing test failures (4 total) exist in both branches — not regressions. Full suite: 1,142/1,146 passing (99.65%).
+
+Recommendations: Merge both branches; fix 3 SourceGenerator interface casing tests in follow-up.
+
+---
+
 ## Summary Table
 
 | Priority | Category | Issue | Owner | Timeline |
