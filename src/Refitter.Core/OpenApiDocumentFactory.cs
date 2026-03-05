@@ -11,6 +11,12 @@ namespace Refitter.Core;
 /// </summary>
 public static class OpenApiDocumentFactory
 {
+    private static readonly HttpClient HttpClient = new(
+        new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        });
+
     /// <summary>
     /// Creates a merged <see cref="NSwag.OpenApiDocument"/> from multiple paths or URLs.
     /// The first document serves as the base; paths and schemas from subsequent documents are merged in.
@@ -37,8 +43,17 @@ public static class OpenApiDocumentFactory
     private static OpenApiDocument Merge(OpenApiDocument[] documents)
     {
         var baseDocument = documents[0];
-        foreach (var document in documents.Skip(1))
+        var tags = baseDocument.Tags;
+        HashSet<string>? tagNames = null;
+
+        if (tags != null)
         {
+            tagNames = new HashSet<string>(tags.Select(t => t.Name), StringComparer.Ordinal);
+        }
+
+        for (var i = 1; i < documents.Length; i++)
+        {
+            var document = documents[i];
             foreach (var path in document.Paths)
             {
                 if (!baseDocument.Paths.ContainsKey(path.Key))
@@ -67,9 +82,10 @@ public static class OpenApiDocumentFactory
             if (document.Tags != null)
             {
                 baseDocument.Tags ??= [];
+                tagNames ??= new HashSet<string>(baseDocument.Tags.Select(t => t.Name), StringComparer.Ordinal);
                 foreach (var tag in document.Tags)
                 {
-                    if (baseDocument.Tags.All(t => t.Name != tag.Name))
+                    if (tagNames.Add(tag.Name))
                         baseDocument.Tags.Add(tag);
                 }
             }
@@ -152,7 +168,8 @@ public static class OpenApiDocumentFactory
     /// <returns>True if the path is an HTTP URL, otherwise false.</returns>
     private static bool IsHttp(string path)
     {
-        return path.StartsWith("http://") || path.StartsWith("https://");
+        return path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+               path.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -162,10 +179,7 @@ public static class OpenApiDocumentFactory
     /// <returns>The content of the HTTP request.</returns>
     private static async Task<string> GetHttpContent(string openApiPath)
     {
-        var httpMessageHandler = new HttpClientHandler();
-        httpMessageHandler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-        using var http = new HttpClient(httpMessageHandler);
-        var content = await http.GetStringAsync(openApiPath);
+        var content = await HttpClient.GetStringAsync(openApiPath);
         return content;
     }
 
@@ -177,6 +191,7 @@ public static class OpenApiDocumentFactory
     /// <returns>True if the path is a YAML file, otherwise false.</returns>
     private static bool IsYaml(string path)
     {
-        return path.EndsWith("yaml") || path.EndsWith("yml");
+        return path.EndsWith("yaml", StringComparison.OrdinalIgnoreCase) ||
+               path.EndsWith("yml", StringComparison.OrdinalIgnoreCase);
     }
 }
