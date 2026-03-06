@@ -289,7 +289,7 @@ public class ParameterExtractorEdgeCaseTests
         string generatedCode = await GenerateCodeWithApizrRequestOptions();
         // Both GET and DELETE should have the parameter
         var occurrences = System.Text.RegularExpressions.Regex.Matches(
-            generatedCode, 
+            generatedCode,
             @"\[RequestOptions\] IApizrRequestOptions options");
         occurrences.Count.Should().BeGreaterThanOrEqualTo(2);
     }
@@ -386,7 +386,7 @@ public class ParameterExtractorEdgeCaseTests
         string generatedCode = await GenerateCodeWithCancellationToken();
         // Both GET and POST should have the parameter
         var occurrences = System.Text.RegularExpressions.Regex.Matches(
-            generatedCode, 
+            generatedCode,
             @"CancellationToken cancellationToken = default");
         occurrences.Count.Should().BeGreaterThanOrEqualTo(2);
     }
@@ -484,19 +484,19 @@ public class ParameterExtractorEdgeCaseTests
     public async Task Complex_Multipart_With_Special_Characters_And_Mixed_Types()
     {
         string generatedCode = await GenerateCodeComplexMultipart();
-        
+
         // Text fields with special characters
         generatedCode.Should().Contain("user_name");
         generatedCode.Should().Contain("[AliasAs(\"user-name\")]");
         generatedCode.Should().Contain("is_active");
         generatedCode.Should().Contain("[AliasAs(\"is-active\")]");
-        
+
         // Integer field
         generatedCode.Should().Contain("int age");
-        
+
         // Boolean field
         generatedCode.Should().Contain("bool is_active");
-        
+
         // Binary fields with special characters
         generatedCode.Should().Contain("StreamPart avatar");
         generatedCode.Should().Contain("profile_pic");

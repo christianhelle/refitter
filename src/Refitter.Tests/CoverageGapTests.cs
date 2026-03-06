@@ -91,7 +91,7 @@ public class CoverageGapTests
         {
             IncludeInheritanceHierarchy = false
         };
-        
+
         cleaner.RemoveUnreferencedSchema();
 
         // When IncludeInheritanceHierarchy is false, only directly referenced schemas are kept
@@ -179,13 +179,13 @@ public class CoverageGapTests
         {
             IncludeInheritanceHierarchy = false
         };
-        
+
         cleaner.RemoveUnreferencedSchema();
 
         var animalSchemaAfter = document.Components.Schemas["Animal"];
         animalSchemaAfter.DiscriminatorObject.Should().NotBeNull();
         var finalMappingCount = animalSchemaAfter.DiscriminatorObject!.Mapping.Count;
-        
+
         finalMappingCount.Should().BeLessThanOrEqualTo(initialMappingCount);
     }
 
@@ -256,13 +256,13 @@ public class CoverageGapTests
         {
             GenerateXmlDocCodeComments = false
         });
-        
+
         var code = new StringBuilder();
         var tag = new OpenApiTag { Name = "TestTag", Description = "Test Description" };
         var document = new OpenApiDocument { Tags = [tag] };
-        
+
         generator.AppendInterfaceDocumentationByTag(document, "TestTag", code);
-        
+
         code.ToString().Should().BeEmpty();
     }
 
@@ -273,12 +273,12 @@ public class CoverageGapTests
         {
             GenerateXmlDocCodeComments = false
         });
-        
+
         var code = new StringBuilder();
         var endpoint = new OpenApiOperation { Summary = "Test Summary" };
-        
+
         generator.AppendInterfaceDocumentationByEndpoint(endpoint, code);
-        
+
         code.ToString().Should().BeEmpty();
     }
 
@@ -289,15 +289,15 @@ public class CoverageGapTests
         {
             GenerateXmlDocCodeComments = false
         });
-        
+
         var code = new StringBuilder();
         var factory = new CSharpClientGeneratorFactory(new RefitGeneratorSettings(), new OpenApiDocument());
         var csharpGenerator = factory.Create();
         var operation = new OpenApiOperation { Summary = "Test Summary", Description = "Test Description" };
         var method = csharpGenerator.CreateOperationModel(operation);
-        
+
         generator.AppendMethodDocumentation(method, false, false, false, false, code);
-        
+
         code.ToString().Should().BeEmpty();
     }
 
@@ -324,9 +324,9 @@ namespace TestNamespace
         Sold
     }
 }";
-        
+
         var result = ContractTypeSuffixApplier.ApplySuffix(code, null!);
-        
+
         result.Should().Be(code);
     }
 
@@ -349,9 +349,9 @@ namespace TestNamespace
         Sold
     }
 }";
-        
+
         var result = ContractTypeSuffixApplier.ApplySuffix(code, string.Empty);
-        
+
         result.Should().Be(code);
     }
 
@@ -374,9 +374,9 @@ namespace TestNamespace
         Sold
     }
 }";
-        
+
         var result = ContractTypeSuffixApplier.ApplySuffix(code, "   ");
-        
+
         result.Should().Be(code);
     }
 
@@ -399,9 +399,9 @@ namespace TestNamespace
         Sold
     }
 }";
-        
+
         var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
-        
+
         result.Should().Contain("public partial class PetDto");
         result.Should().Contain("public enum PetStatusDto");
         result.Should().NotContain("public partial class Pet\r\n");
@@ -436,7 +436,7 @@ paths:
         '200':
           description: 'Success'
 ";
-        
+
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
         var settings = new RefitGeneratorSettings
         {
@@ -446,7 +446,7 @@ paths:
 
         var sut = await RefitGenerator.CreateAsync(settings);
         var generatedCode = sut.Generate();
-        
+
         generatedCode.Should().Contain("interface ITestTagApi");
         generatedCode.Should().Contain("GetTaggedResource");
         generatedCode.Should().Contain("GetUntaggedResource");
@@ -479,7 +479,7 @@ paths:
         '200':
           description: 'Success'
 ";
-        
+
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
         var settings = new RefitGeneratorSettings
         {
@@ -489,7 +489,7 @@ paths:
 
         var sut = await RefitGenerator.CreateAsync(settings);
         var generatedCode = sut.Generate();
-        
+
         generatedCode.Should().Contain("interface IFooApi");
         generatedCode.Should().Contain("interface IBarApi");
         generatedCode.Should().Contain("GetFoo");
@@ -520,7 +520,7 @@ paths:
         '200':
           description: 'Success'
 ";
-        
+
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
         var settings = new RefitGeneratorSettings
         {
@@ -530,7 +530,7 @@ paths:
 
         var sut = await RefitGenerator.CreateAsync(settings);
         var generatedCode = sut.Generate();
-        
+
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 

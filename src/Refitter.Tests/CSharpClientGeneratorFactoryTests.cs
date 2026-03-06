@@ -288,13 +288,13 @@ public class CSharpClientGeneratorFactoryTests
     public async Task Create_WithGenerateDefaultAdditionalPropertiesFalse_AppliesToAllSchemas()
     {
         string generatedCode = await GenerateCodeWithAdditionalProperties(false);
-        
+
         // Verify no additional properties generated for any schema
         var lines = generatedCode.Split('\n');
-        var additionalPropsLines = lines.Where(l => 
+        var additionalPropsLines = lines.Where(l =>
             l.Contains("IDictionary<string, object> AdditionalProperties") ||
             l.Contains("Dictionary<string, object> AdditionalProperties")).ToList();
-        
+
         additionalPropsLines.Should().BeEmpty();
     }
 
