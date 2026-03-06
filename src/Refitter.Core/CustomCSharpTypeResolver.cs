@@ -29,7 +29,7 @@ internal class CustomCSharpTypeResolver : CSharpTypeResolver
             formatMappings.TryGetValue(format, out var mappedType))
         {
             // Return the custom mapped type with nullability
-            return isNullable && !mappedType.EndsWith("?") && !mappedType.Contains("<")
+            return isNullable && !mappedType.EndsWith("?") && !mappedType.Contains("Nullable<")
                 ? $"{mappedType}?"
                 : mappedType;
         }
