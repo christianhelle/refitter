@@ -830,6 +830,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "send0xx",
+      "name": "send0xx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31574812?v=4",
+      "profile": "https://github.com/send0xx",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
