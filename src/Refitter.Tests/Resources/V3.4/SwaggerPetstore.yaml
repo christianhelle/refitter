@@ -196,6 +196,9 @@ paths:
         '200':
           description: successful operation
           content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Pet'
             application/json:
               schema:
                 $ref: '#/components/schemas/Pet'
