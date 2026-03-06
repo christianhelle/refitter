@@ -44,7 +44,9 @@ jobs:
     - name: 🛠️ Build
       run: dotnet build -c Release src/Refitter.slnx -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
     - name: 🧪 Test
-      run: dotnet test --solution src/Refitter.slnx -c Release
+      run: dotnet test src/Refitter.slnx -c Release --no-build
+    - name: 🔍 Verify help output
+      run: dotnet run --project src/Refitter --configuration Release --framework net10.0
     - name: 🗳️ Upload
       uses: actions/upload-artifact@v7
       with:
