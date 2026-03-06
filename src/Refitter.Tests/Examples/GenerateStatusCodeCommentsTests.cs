@@ -55,6 +55,22 @@ components:
           type: string
 ";
 
+    private const string CyrillicOpenApiSpec = @"
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+paths:
+  /test:
+    get:
+      operationId: TestGet
+      responses:
+        '200':
+          description: Возвращает список.
+        '400':
+          description: Возвращает ошибку.
+";
+
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -102,9 +118,18 @@ components:
         generatedCode.Should().Contain("Bad request");
     }
 
-    private static async Task<string> GenerateCode(bool generateStatusCodeComments)
+    [Test]
+    public async Task Generated_Code_Contains_Non_Ascii_Response_Descriptions_Without_Unicode_Escapes()
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        string generatedCode = await GenerateCode(generateStatusCodeComments: true, useCyrillicDescriptions: true);
+        generatedCode.Should().Contain("Возвращает ошибку.");
+        generatedCode.Should().NotMatchRegex(@"\\u[0-9a-fA-F]{4}");
+    }
+
+    private static async Task<string> GenerateCode(bool generateStatusCodeComments, bool useCyrillicDescriptions = false)
+    {
+        var spec = useCyrillicDescriptions ? CyrillicOpenApiSpec : OpenApiSpec;
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
         try
         {
             var settings = new RefitGeneratorSettings

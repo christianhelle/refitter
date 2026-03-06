@@ -240,6 +240,42 @@ public class XmlDocumentationGeneratorTests
     }
 
     [Test]
+    public void Can_Generate_Method_Throws_With_Non_Ascii_Response_Description()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = true,
+            GenerateStatusCodeComments = true,
+        });
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Responses = { ["400"] = new OpenApiResponse { Description = "Возвращает список." } },
+        });
+        generator.AppendMethodDocumentation(method, false, false, false, false, docs);
+        docs.ToString().Should().Contain("Возвращает список.")
+            .And.NotMatchRegex(@"\\u[0-9a-fA-F]{4}");
+    }
+
+    [Test]
+    public void Can_Generate_Method_IApiResponse_With_Non_Ascii_Response_Description()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = true,
+            GenerateStatusCodeComments = true,
+        });
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Responses = { ["200"] = new OpenApiResponse { Description = "Возвращает список." } },
+        });
+        generator.AppendMethodDocumentation(method, true, false, false, false, docs);
+        docs.ToString().Should().Contain("Возвращает список.")
+            .And.NotMatchRegex(@"\\u[0-9a-fA-F]{4}");
+    }
+
+    [Test]
     public void Can_Generate_Method_With_IApiResponse()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings

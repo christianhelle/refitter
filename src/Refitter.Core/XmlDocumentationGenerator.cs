@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 
@@ -318,7 +319,7 @@ public class XmlDocumentationGenerator
             {
                 description
                     .Append("<description>")
-                    .Append(response.ExceptionDescription)
+                    .Append(DecodeUnicodeEscapes(response.ExceptionDescription))
                     .AppendLine("</description>");
             }
 
@@ -337,5 +338,16 @@ public class XmlDocumentationGenerator
             .Replace("&", "&amp;")
             .Replace("<", "&lt;")
             .Replace(">", "&gt;");
+    }
+
+    private static string DecodeUnicodeEscapes(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        return Regex.Replace(
+            input,
+            @"\\u([0-9a-fA-F]{4})",
+            match => ((char)Convert.ToInt32(match.Groups[1].Value, 16)).ToString());
     }
 }
