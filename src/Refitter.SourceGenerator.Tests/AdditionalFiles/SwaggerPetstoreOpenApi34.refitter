@@ -1,0 +1,8 @@
+{
+  "openApiPath": "../Resources/V3.4/SwaggerPetstore.json",
+  "namespace": "Refitter.Tests.AdditionalFiles.OpenApi34",
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstoreOpenApi34"
+  }
+}

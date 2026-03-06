@@ -756,6 +756,47 @@ public class SwaggerPetstoreTests
             .BeTrue();
     }
 
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV34, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV34, "SwaggerPetstore.yaml")]
+    public async Task Can_Generate_Code_From_OpenApi_34_Fixtures(SampleOpenSpecifications version, string filename)
+    {
+        var generatedCode = await GenerateCode(version, filename);
+        generatedCode.Should().Contain("GetPetById");
+        generatedCode.Should().Contain("Swagger Petstore - OpenAPI 3.4");
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV34, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV34, "SwaggerPetstore.yaml")]
+    public async Task Can_Build_Generated_Code_From_OpenApi_34_Fixtures(SampleOpenSpecifications version, string filename)
+    {
+        var generatedCode = await GenerateCode(version, filename);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV34, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV34, "SwaggerPetstore.yaml")]
+    public async Task Can_Build_Generated_Code_From_OpenApi_34_Fixtures_With_Multiple_Interfaces_ByTag(
+        SampleOpenSpecifications version,
+        string filename)
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            MultipleInterfaces = MultipleInterfaces.ByTag
+        };
+        var generatedCode = await GenerateCode(version, filename, settings);
+
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
 #if !DEBUG
     [Test]
     [Arguments("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
