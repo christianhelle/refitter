@@ -178,9 +178,10 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .ToString()
             .TrimEnd();
 
-        if (!string.IsNullOrWhiteSpace(settings.ContractTypeSuffix))
+        var contractTypeSuffix = settings.ContractTypeSuffix;
+        if (contractTypeSuffix is not null && !string.IsNullOrWhiteSpace(contractTypeSuffix))
         {
-            result = ContractTypeSuffixApplier.ApplySuffix(result, settings.ContractTypeSuffix);
+            result = ContractTypeSuffixApplier.ApplySuffix(result, contractTypeSuffix);
         }
 
         return result;
@@ -246,12 +247,13 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             }
         }
 
-        if (!string.IsNullOrWhiteSpace(settings.ContractTypeSuffix))
+        var contractTypeSuffix = settings.ContractTypeSuffix;
+        if (contractTypeSuffix is not null && !string.IsNullOrWhiteSpace(contractTypeSuffix))
         {
             generatedFiles = generatedFiles
                 .Select(f => f with
                 {
-                    Content = ContractTypeSuffixApplier.ApplySuffix(f.Content, settings.ContractTypeSuffix)
+                    Content = ContractTypeSuffixApplier.ApplySuffix(f.Content, contractTypeSuffix)
                 })
                 .ToList();
         }
