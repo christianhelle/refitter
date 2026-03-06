@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
@@ -141,6 +142,7 @@ public static class OpenApiDocumentFactory
             : await OpenApiDocument.FromFileAsync(openApiPath);
     }
 
+    [ExcludeFromCodeCoverage]
     private static void PopulateMissingRequiredFields(
         string openApiPath,
         Result readResult)

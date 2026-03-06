@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using NJsonSchema;
@@ -222,6 +223,7 @@ internal static class ParameterExtractor
         };
     }
 
+    [ExcludeFromCodeCoverage]
     private static string EscapeString(string value)
     {
         var sb = new StringBuilder(value.Length + 10);

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace Refitter.Core;
@@ -43,6 +44,7 @@ public class DependencyInjectionSettings
             """
     )]
     [Obsolete("Use TransientErrorHandler instead")]
+    [ExcludeFromCodeCoverage]
     public bool UsePolly
     {
         get => TransientErrorHandler == TransientErrorHandler.Polly;
@@ -79,6 +81,7 @@ public class DependencyInjectionSettings
             """
     )]
     [Obsolete("Use MaxRetryCount instead")]
+    [ExcludeFromCodeCoverage]
     public int PollyMaxRetryCount
     {
         get => MaxRetryCount;
