@@ -283,6 +283,65 @@ paths:
     }
 
     [Test]
+    public async Task Create_From_OpenApi_34_File_With_External_References_Returns_NotNull()
+    {
+        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(folder);
+
+        var mainSpec = @"{
+  ""openapi"": ""3.4.0"",
+  ""info"": {
+    ""title"": ""External Ref API 3.4"",
+    ""version"": ""1.0.0""
+  },
+  ""paths"": {
+    ""/pets"": {
+      ""get"": {
+        ""operationId"": ""listPets"",
+        ""responses"": {
+          ""200"": {
+            ""description"": ""A list of pets"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": {
+                  ""$ref"": ""./schemas.json#/components/schemas/Pet""
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}";
+
+        var schemasSpec = @"{
+  ""components"": {
+    ""schemas"": {
+      ""Pet"": {
+        ""type"": ""object"",
+        ""required"": [""id"", ""name""],
+        ""properties"": {
+          ""id"": { ""type"": ""integer"", ""format"": ""int64"" },
+          ""name"": { ""type"": ""string"" }
+        }
+      }
+    }
+  }
+}";
+
+        var mainFile = Path.Combine(folder, "api34-ext.json");
+        var schemasFile = Path.Combine(folder, "schemas.json");
+        await File.WriteAllTextAsync(mainFile, mainSpec);
+        await File.WriteAllTextAsync(schemasFile, schemasSpec);
+
+        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+
+        document.Should().NotBeNull();
+        document.Info.Title.Should().Be("External Ref API 3.4");
+    }
+
+    [Test]
     public async Task Create_From_Json_File_With_External_References_Serializes_As_Json()
     {
         // Create a test folder for both files
