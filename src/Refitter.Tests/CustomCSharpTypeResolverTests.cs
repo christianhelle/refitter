@@ -66,7 +66,7 @@ public class CustomCSharpTypeResolverTests
     }
 
     [Test]
-    public void Resolve_With_Generic_Mapping_Skips_Nullable_Suffix()
+    public void Resolve_With_Generic_Mapping_Returns_Nullable_Suffix()
     {
         // Arrange
         var settings = new CSharpGeneratorSettings();
@@ -80,8 +80,8 @@ public class CustomCSharpTypeResolverTests
         // Act
         var result = resolver.Resolve(schema, isNullable: true, typeNameHint: null);
 
-        // Assert
-        result.Should().Be("List<int>");
+        // Assert - generic reference types can be nullable (List<int>? is valid C#)
+        result.Should().Be("List<int>?");
     }
 
     [Test]

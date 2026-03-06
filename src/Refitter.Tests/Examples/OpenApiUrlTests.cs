@@ -45,5 +45,6 @@ public class OpenApiUrlTests
             .Should()
             .BeTrue(url);
     }
+
 }
 #endif

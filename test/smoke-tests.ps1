@@ -160,6 +160,10 @@ function RunTests
         "webhook-example"
     )
 
+    $v34WebhookFilenames = @(
+        "webhook-example"
+    )
+
     # Standard variants: compile on all frameworks (net462-net10)
     $standardVariants = @(
         @{ Suffix="Cancellation"; Prefix="WithCancellation"; Args="--cancellation-tokens" },
@@ -265,8 +269,8 @@ function RunTests
         return @{ Tag = "${vTag}_${format}_${base}"; Namespace = $nsBase }
     }
 
-    # Collect generation tasks for v2.0 and v3.0
-    foreach ($version in @("v3.0", "v2.0"))
+    # Collect generation tasks for v3.4, v3.0, and v2.0
+    foreach ($version in @("v3.4", "v3.0", "v2.0"))
     {
         foreach ($format in @("json", "yaml"))
         {
@@ -357,6 +361,60 @@ function RunTests
                 $args = $v.Args
                 # InterfaceOnly variant needs contracts-namespace so generated interfaces
                 # can reference contract types from the SeparateContracts variant
+                if ($v.Suffix -eq "InterfaceOnly") {
+                    $args += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
+                }
+                $standardTasks += @{
+                    SpecPath = $specPath
+                    Namespace = "$ns.$($v.Suffix)"
+                    OutputPath = "./GeneratedCode/$($v.Prefix)${fileTag}.generated.cs"
+                    Args = $args
+                }
+            }
+
+            $standardTasks += @{
+                SpecPath = $specPath
+                Namespace = "$ns.MultipleFiles"
+                OutputPath = "./GeneratedCode/MultipleFiles/$fileTag/"
+                Args = "--multiple-files"
+            }
+
+            $standardTasks += @{
+                SpecPath = $specPath
+                Namespace = "$ns.SeparateContractsFile"
+                OutputPath = "./GeneratedCode/SeparateContracts/$fileTag/"
+                Args = "--contracts-output GeneratedCode/Contracts/$fileTag --contracts-namespace $ns.SeparateContractsFile.Contracts"
+            }
+
+            foreach ($v in $netCoreVariants)
+            {
+                $netCoreTasks += @{
+                    SpecPath = $specPath
+                    Namespace = "$ns.$($v.Suffix)"
+                    OutputPath = "./GeneratedCode/$($v.Prefix)${fileTag}.generated.cs"
+                    Args = $v.Args
+                }
+            }
+        }
+    }
+
+    # Collect generation tasks for v3.4 webhook specs
+    # Note: webhook specs may not have regular API paths, so skip MultipleInterfaces variants
+    foreach ($format in @("json", "yaml"))
+    {
+        foreach ($filename in $v34WebhookFilenames)
+        {
+            $specPath = "./OpenAPI/v3.4/$filename.$format"
+            if (-not (Test-Path -Path $specPath -PathType Leaf)) { continue }
+
+            $info = MakeFileTag "v3.4" $format $filename
+            $fileTag = $info.Tag
+            $ns = $info.Namespace
+
+            foreach ($v in $standardVariants)
+            {
+                if ($v.Args -like "*--multiple-interfaces*") { continue }
+                $args = $v.Args
                 if ($v.Suffix -eq "InterfaceOnly") {
                     $args += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
                 }

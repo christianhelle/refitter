@@ -21,13 +21,15 @@ internal class CustomCSharpTypeResolver : CSharpTypeResolver
         bool isNullable,
         string? typeNameHint)
     {
+        var format = schema.Format;
+
         // Check if this schema has a format with a custom mapping
         if (formatMappings != null &&
-            !string.IsNullOrEmpty(schema.Format) &&
-            formatMappings.TryGetValue(schema.Format, out var mappedType))
+            format is { Length: > 0 } &&
+            formatMappings.TryGetValue(format, out var mappedType))
         {
             // Return the custom mapped type with nullability
-            return isNullable && !mappedType.EndsWith("?") && !mappedType.Contains("<")
+            return isNullable && !mappedType.EndsWith("?") && !mappedType.Contains("Nullable<")
                 ? $"{mappedType}?"
                 : mappedType;
         }

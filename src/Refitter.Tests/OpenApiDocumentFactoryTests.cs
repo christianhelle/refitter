@@ -19,8 +19,25 @@ public class OpenApiDocumentFactoryTests
     }
 
     [Test]
+    [Arguments("petstore.json")]
+    [Arguments("petstore.yaml")]
+    [Arguments("webhook-example.json")]
+    [Arguments("webhook-example.yaml")]
+    public async Task Create_From_OpenApi_34_Repo_Samples_Returns_NotNull(string filename)
+    {
+        var specPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "test", "OpenAPI", "v3.4", filename));
+        File.Exists(specPath).Should().BeTrue();
+
+        (await OpenApiDocumentFactory.CreateAsync(specPath))
+            .Should()
+            .NotBeNull();
+    }
+
+    [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV34, "SwaggerPetstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV34, "SwaggerPetstore.yaml")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Create_From_File_Returns_NotNull(SampleOpenSpecifications version, string filename)
@@ -38,6 +55,9 @@ public class OpenApiDocumentFactoryTests
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yml")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YAML")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YML")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV34, "petstore.json")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV34, "petstore.yaml")]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV34, "petstore.yml")]
     public async Task Create_From_File_Detects_Format_Correctly(SampleOpenSpecifications version, string filename)
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
@@ -260,6 +280,65 @@ paths:
 
         document.Should().NotBeNull();
         document.Info.Title.Should().Be("YAML NSwag Test");
+    }
+
+    [Test]
+    public async Task Create_From_OpenApi_34_File_With_External_References_Returns_NotNull()
+    {
+        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(folder);
+
+        var mainSpec = @"{
+  ""openapi"": ""3.4.0"",
+  ""info"": {
+    ""title"": ""External Ref API 3.4"",
+    ""version"": ""1.0.0""
+  },
+  ""paths"": {
+    ""/pets"": {
+      ""get"": {
+        ""operationId"": ""listPets"",
+        ""responses"": {
+          ""200"": {
+            ""description"": ""A list of pets"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": {
+                  ""$ref"": ""./schemas.json#/components/schemas/Pet""
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}";
+
+        var schemasSpec = @"{
+  ""components"": {
+    ""schemas"": {
+      ""Pet"": {
+        ""type"": ""object"",
+        ""required"": [""id"", ""name""],
+        ""properties"": {
+          ""id"": { ""type"": ""integer"", ""format"": ""int64"" },
+          ""name"": { ""type"": ""string"" }
+        }
+      }
+    }
+  }
+}";
+
+        var mainFile = Path.Combine(folder, "api34-ext.json");
+        var schemasFile = Path.Combine(folder, "schemas.json");
+        await File.WriteAllTextAsync(mainFile, mainSpec);
+        await File.WriteAllTextAsync(schemasFile, schemasSpec);
+
+        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+
+        document.Should().NotBeNull();
+        document.Info.Title.Should().Be("External Ref API 3.4");
     }
 
     [Test]
