@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using NJsonSchema;
@@ -221,6 +222,7 @@ internal static class ParameterExtractor
             _ => "default"
         };
     }
+
 
     private static string EscapeString(string value)
     {

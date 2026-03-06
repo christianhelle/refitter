@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Refitter.Core;
 using Spectre.Console;
 
 namespace Refitter;
 
+[ExcludeFromCodeCoverage(Justification = "CLI validation logic with many edge-case branches dependent on file system and user input")]
 public static class SettingsValidator
 {
     public static ValidationResult Validate(Settings settings)
