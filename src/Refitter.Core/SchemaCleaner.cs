@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using NJsonSchema;
 using NSwag;
@@ -7,6 +8,7 @@ namespace Refitter.Core;
 /// <summary>
 /// Cleans up OpenAPI schema by removing unreferenced schemas and handling inheritance hierarchies.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class SchemaCleaner
 {
     private readonly OpenApiDocument document;
