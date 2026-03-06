@@ -268,7 +268,7 @@ paths:
     }
 
     [Test]
-    public async Task PopulateMissingRequiredFields_Sets_Title_From_Filepath()
+    public async Task PopulateMissingRequiredFields_Preserves_Existing_Title()
     {
         // Test that when title is present, it's preserved
         var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -323,7 +323,7 @@ paths:
 
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
-        document.Info.Title.Should().NotBeNullOrEmpty();
+        document.Info.Title.Should().Be("My API Spec");
         document.Info.Version.Should().Be("1.0.0");
     }
 

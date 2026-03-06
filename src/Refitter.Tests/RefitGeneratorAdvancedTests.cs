@@ -219,14 +219,7 @@ public class RefitGeneratorAdvancedTests
             {
                 OpenApiPath = swaggerFile,
                 GenerateMultipleFiles = true,
-                DependencyInjectionSettings = new DependencyInjectionSettings
-                {
-                    BaseUrl = "",
-                    HttpMessageHandlers = [],
-                    TransientErrorHandler = TransientErrorHandler.None,
-                    MaxRetryCount = 0,
-                    FirstBackoffRetryInSeconds = 0
-                }
+                DependencyInjectionSettings = null,
             };
             var generator = await RefitGenerator.CreateAsync(settings);
             var result = generator.GenerateMultipleFiles();
@@ -236,12 +229,7 @@ public class RefitGeneratorAdvancedTests
             // as the DependencyInjectionGenerator might still produce some boilerplate
             var diFile = result.Files.FirstOrDefault(f => f.TypeName == "DependencyInjection");
 
-            // If DI file exists, it should have substantial content or not exist at all
-            if (diFile != null)
-            {
-                // If we get a DI file, it should have meaningful content
-                diFile.Content.Should().NotBeNullOrWhiteSpace();
-            }
+            diFile.Should().BeNull();
         }
         finally
         {

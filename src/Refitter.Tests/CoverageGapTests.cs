@@ -404,8 +404,8 @@ namespace TestNamespace
 
         result.Should().Contain("public partial class PetDto");
         result.Should().Contain("public enum PetStatusDto");
-        result.Should().NotContain("public partial class Pet\r\n");
-        result.Should().NotContain("public enum PetStatus\r\n");
+        result.Should().NotContain($"public partial class Pet{Environment.NewLine}");
+        result.Should().NotContain($"public enum PetStatus{Environment.NewLine}");
     }
 
     #endregion
