@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
@@ -184,7 +185,14 @@ public class XmlDocumentationGenerator
                 // Document the result with a fallback description.
                 var description = method.ResultDescription;
                 if (string.IsNullOrWhiteSpace(description))
+                {
                     description = "A <see cref=\"Task\"/> representing the result of the request.";
+                }
+                else
+                {
+                    description = this.SanitizeResponseDescription(description);
+                }
+
                 this.AppendXmlCommentBlock("returns", description, code);
             }
             else
@@ -316,9 +324,11 @@ public class XmlDocumentationGenerator
 
             if (!string.IsNullOrWhiteSpace(response.ExceptionDescription))
             {
+                var responseDescription = this.SanitizeResponseDescription(response.ExceptionDescription);
+
                 description
                     .Append("<description>")
-                    .Append(response.ExceptionDescription)
+                    .Append(responseDescription)
                     .AppendLine("</description>");
             }
 
@@ -337,5 +347,76 @@ public class XmlDocumentationGenerator
             .Replace("&", "&amp;")
             .Replace("<", "&lt;")
             .Replace(">", "&gt;");
+    }
+
+    private string SanitizeResponseDescription(string input)
+    {
+        return this.EscapeSymbols(this.DecodeJsonEscapedText(input));
+    }
+
+    private string DecodeJsonEscapedText(string input)
+    {
+        if (string.IsNullOrEmpty(input) || input.IndexOf('\\') < 0)
+        {
+            return input;
+        }
+
+        var result = new StringBuilder(input.Length);
+
+        for (var index = 0; index < input.Length; index++)
+        {
+            var current = input[index];
+            if (current != '\\' || index == input.Length - 1)
+            {
+                result.Append(current);
+                continue;
+            }
+
+            var escapedCharacter = input[++index];
+
+            if (escapedCharacter == 'u' && index + 4 < input.Length)
+            {
+                var hexValue = input.Substring(index + 1, 4);
+                if (int.TryParse(hexValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var unicodeCodePoint))
+                {
+                    result.Append((char)unicodeCodePoint);
+                    index += 4;
+                    continue;
+                }
+            }
+
+            switch (escapedCharacter)
+            {
+                case '"':
+                    result.Append('"');
+                    break;
+                case '\\':
+                    result.Append('\\');
+                    break;
+                case '/':
+                    result.Append('/');
+                    break;
+                case 'b':
+                    result.Append('\b');
+                    break;
+                case 'f':
+                    result.Append('\f');
+                    break;
+                case 'n':
+                    result.Append('\n');
+                    break;
+                case 'r':
+                    result.Append('\r');
+                    break;
+                case 't':
+                    result.Append('\t');
+                    break;
+                default:
+                    result.Append('\\').Append(escapedCharacter);
+                    break;
+            }
+        }
+
+        return result.ToString();
     }
 }

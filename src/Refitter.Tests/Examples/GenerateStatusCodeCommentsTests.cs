@@ -55,6 +55,26 @@ components:
           type: string
 ";
 
+    private const string OpenApiSpecWithUnicodeStatusCodeComments = @"
+openapi: 3.0.0
+info:
+  title: Unicode Test API
+  version: 1.0.0
+paths:
+  /directories:
+    get:
+      operationId: getDirectories
+      responses:
+        '200':
+          description: Возвращает список справочников.
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Ошибка запроса
+";
+
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -102,9 +122,32 @@ components:
         generatedCode.Should().Contain("Bad request");
     }
 
+    [Test]
+    public async Task Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments()
+    {
+        string generatedCode = await GenerateCode(OpenApiSpecWithUnicodeStatusCodeComments, generateStatusCodeComments: true);
+
+        generatedCode.Should().Contain("/// <term>400</term>")
+            .And.Contain("/// <description>Ошибка запроса</description>")
+            .And.NotContain(@"\u041e\u0448");
+    }
+
+    [Test]
+    public async Task Generated_Code_With_Unicode_Status_Code_Comments_Can_Build()
+    {
+        string generatedCode = await GenerateCode(OpenApiSpecWithUnicodeStatusCodeComments, generateStatusCodeComments: true);
+
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
     private static async Task<string> GenerateCode(bool generateStatusCodeComments)
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        return await GenerateCode(OpenApiSpec, generateStatusCodeComments);
+    }
+
+    private static async Task<string> GenerateCode(string openApiSpec, bool generateStatusCodeComments)
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(openApiSpec);
         try
         {
             var settings = new RefitGeneratorSettings

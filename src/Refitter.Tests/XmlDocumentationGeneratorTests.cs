@@ -222,6 +222,28 @@ public class XmlDocumentationGeneratorTests
     }
 
     [Test]
+    public void Can_Generate_Method_Throws_With_Readable_Unicode_Status_Code_Comments()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = true,
+            GenerateStatusCodeComments = true,
+        });
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Responses = { ["400"] = new OpenApiResponse { Description = "Ошибка запроса" } },
+        });
+
+        generator.AppendMethodDocumentation(method, false, false, false, false, docs);
+
+        docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">")
+            .And.Contain("<term>400</term>")
+            .And.Contain("<description>Ошибка запроса</description>")
+            .And.NotContain(@"\u041e\u0448");
+    }
+
+    [Test]
     public void Can_Generate_Method_Throws_Without_Response_Code()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
