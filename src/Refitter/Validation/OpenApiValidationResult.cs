@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 
 namespace Refitter.Validation;
 
+[ExcludeFromCodeCoverage(Justification = "Simple data record used for CLI validation result passing")]
 public record OpenApiValidationResult(
     OpenApiDiagnostic Diagnostics,
     OpenApiStats Statistics)
