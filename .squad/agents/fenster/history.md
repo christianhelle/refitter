@@ -110,3 +110,17 @@ Applied `[ExcludeFromCodeCoverage]` to genuinely untestable code following exist
 
 These properties are pass-through wrappers marked `[Obsolete]` that exist purely for backward compatibility. They contain no testable logic and cannot be meaningfully covered in isolation from the properties they wrap. Exclusion improves the coverage denominator while preserving accurate metrics.
 
+### Issue #944 — Unicode XML documentation sanitization — 2026-03-06
+
+- `src\Refitter.Core\XmlDocumentationGenerator.cs` is the shared production sink for OpenAPI response descriptions: normal `<returns>` docs use `method.ResultDescription`, while status-code tables render `response.ExceptionDescription` through `BuildResponseDescription()`.
+- Response descriptions can reach the generator in JSON-escaped form (`\uXXXX`, `\"`, `\n`) even when the original OpenAPI document contains readable Unicode, so generator code should decode JSON-style escapes before emitting XML comments.
+- Only sanitize user-sourced response description text; keep hardcoded XML doc fragments like `<see cref="Task"/>` and `<list>` markup untouched, then XML-escape reserved characters (`&`, `<`, `>`) at the point where response text is inserted.
+- Focused Refitter tests are fastest through `src\Refitter.Tests\bin\Release\net10.0\Refitter.Tests.exe` with `--treenode-filter`, since `dotnet test --filter ...` is not supported by this TUnit/Microsoft.Testing.Platform setup.
+
+### Issue #944 Implementation — 2026-03-06
+
+Successfully implemented fix for non-ASCII characters in XML status-code comments:
+- Added `DecodeJsonEscapedText()` method to decode `\uXXXX` escapes before XML-escaping in response descriptions
+- Tests confirmed: Cyrillic Unicode renders correctly, escape sequences absent, compilation succeeds
+- All 1415 tests pass with no regressions
+

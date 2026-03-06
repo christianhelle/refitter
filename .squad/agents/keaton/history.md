@@ -97,3 +97,22 @@ Performed comprehensive audit of Refitter documentation vs actual codebase featu
 5. POLICY: Establish "all new CLI options must have README examples" and "all new settings must have .refitter format docs"
 
 **Full Report:** Written to `.squad/temp-docs-audit.md` (15KB detailed analysis). Report includes verification of all mappings, example snippets for missing docs, and prioritized recommendations. No breaking changes needed — all gaps are documentation-only.
+
+### Issue #944 Review — Non-ASCII in XML Status-Code Comments (2026-03-06)
+
+**Reviewed and APPROVED** the patch for issue #944. Root cause: NSwag's `CSharpResponseModel.ExceptionDescription` calls `ConversionUtilities.ConvertToStringLiteral()` which encodes non-ASCII characters as `\uXXXX` C# string literal escapes. The fix adds a `DecodeJsonEscapedText()` method in `XmlDocumentationGenerator` that decodes these before XML-escaping. Key validation points:
+
+1. **Scope is correctly narrow:** Only `ExceptionDescription` uses `ConvertToStringLiteral`; other NSwag model fields (Summary, Description) surface raw strings. No other call sites need the fix.
+2. **Ordering matters:** `EscapeSymbols(DecodeJsonEscapedText(...))` — decode first, then XML-escape — prevents decoded `<`, `>`, `&` from breaking XML.
+3. **Bounds checking correct:** `index + 4 < input.Length` guard on `\uXXXX` parsing matches `Substring(index + 1, 4)` requirements.
+4. **Surrogate pairs work:** Each `\uXXXX` decoded to `(char)` is valid C# UTF-16, so surrogate pairs naturally compose.
+5. **Tests prove the fix:** Unit test against generator directly + integration test from YAML spec through full pipeline + compilation check. All 1415 tests pass.
+
+**Key learning:** When NSwag model properties use `ConvertToStringLiteral` (designed for C# code generation), the output contains escape sequences unsuitable for XML documentation. Any future properties that exhibit this pattern will need similar decode-before-escape treatment.
+
+### Issue #944 Test Coverage — 2026-03-06
+
+Added comprehensive regression testing for non-ASCII XML documentation fix:
+- Unit test in `XmlDocumentationGeneratorTests.cs` validates readable Unicode and absence of `\uXXXX` escape sequences
+- Integration test in `GenerateStatusCodeCommentsTests.cs` confirms full pipeline compilation success with Unicode content
+- Tests follow existing pattern: direct assertion + compilation verification

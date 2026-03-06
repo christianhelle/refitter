@@ -302,4 +302,56 @@ Recommendations: Merge both branches; fix 3 SourceGenerator interface casing tes
 
 ---
 
+### 7. Issue #944 — Non-ASCII XML Status-Code Comments (2026-03-06)
+
+**Status:** ✅ APPROVED FOR MERGE  
+**Date:** 2026-03-06
+
+#### Summary
+
+Fixed XML documentation generation to properly handle non-ASCII characters in OpenAPI response descriptions. Root cause: NSwag's `CSharpResponseModel.ExceptionDescription` encodes non-ASCII characters as JSON-style escape sequences (`\uXXXX`), which were being written raw into XML comments, rendering as literal backslash sequences instead of Unicode characters.
+
+#### Solution
+
+**Production Fix (Fenster):**
+- File: `src/Refitter.Core/XmlDocumentationGenerator.cs`
+- Added `DecodeJsonEscapedText()` method that safely decodes `\uXXXX`, `\"`, `\\`, `\n`, `\r`, `\t` sequences
+- Applied decoding in `BuildResponseDescription()` before XML-escaping, preventing both escape sequence leakage and XML injection
+- Preserves hardcoded XML markup (`<see cref="..."/>`, `<list>` elements)
+
+**Test Coverage (Hockney):**
+- Unit test: `XmlDocumentationGeneratorTests.cs` — validates readable Unicode output and absence of raw escape sequences
+- Integration test: `GenerateStatusCodeCommentsTests.cs` — end-to-end spec→generation→compilation verification
+
+**Review (Keaton):**
+- Scope correctly narrow: only `ExceptionDescription` affected
+- Ordering correct: decode first, then XML-escape (prevents injection)
+- Bounds checking valid for `\uXXXX` parsing
+- Surrogate pairs handled naturally via C# UTF-16
+- All 1415 tests pass; no regressions
+
+#### Files Modified
+
+- `src/Refitter.Core/XmlDocumentationGenerator.cs` — decode logic
+- `src/Refitter.Tests/XmlDocumentationGeneratorTests.cs` — unit tests
+- `src/Refitter.Tests/Examples/GenerateStatusCodeCommentsTests.cs` — integration tests
+
+#### Gates
+
+✅ Build passing  
+✅ All tests passing (1415/1415)  
+✅ Code formatting verified
+
+---
+
+### 8. User Directive: Commit Message Style (2026-03-06)
+
+**Status:** ℹ️ Process Update  
+**Date:** 2026-03-06  
+**By:** Christian Helle (via Copilot)
+
+Commit changes in small logical groups with one-liner commit messages without a co-author trailer.
+
+---
+
 *Maintained by Scribe. Agents write to `.squad/decisions/inbox/` and Scribe merges, deduplicates, and consolidates here.*
