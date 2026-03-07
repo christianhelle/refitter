@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
@@ -184,7 +185,14 @@ public class XmlDocumentationGenerator
                 // Document the result with a fallback description.
                 var description = method.ResultDescription;
                 if (string.IsNullOrWhiteSpace(description))
+                {
                     description = "A <see cref=\"Task\"/> representing the result of the request.";
+                }
+                else
+                {
+                    description = this.SanitizeResponseDescription(description);
+                }
+
                 this.AppendXmlCommentBlock("returns", description, code);
             }
             else
@@ -316,9 +324,11 @@ public class XmlDocumentationGenerator
 
             if (!string.IsNullOrWhiteSpace(response.ExceptionDescription))
             {
+                var responseDescription = this.SanitizeResponseDescription(response.ExceptionDescription);
+
                 description
                     .Append("<description>")
-                    .Append(response.ExceptionDescription)
+                    .Append(responseDescription)
                     .AppendLine("</description>");
             }
 
@@ -337,5 +347,109 @@ public class XmlDocumentationGenerator
             .Replace("&", "&amp;")
             .Replace("<", "&lt;")
             .Replace(">", "&gt;");
+    }
+
+    private string SanitizeResponseDescription(string input)
+    {
+        return this.EscapeSymbols(this.DecodeJsonEscapedText(input));
+    }
+
+    private string DecodeJsonEscapedText(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        // Fast path: if no backslashes and no invalid control characters, return as is.
+        // Invalid XML chars: < 0x20 except 0x09, 0x0A, 0x0D.
+        bool needsDecoding = input.IndexOf('\\') >= 0;
+        bool needsSanitization = false;
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            char c = input[i];
+            if (!IsValidXmlChar(c))
+            {
+                needsSanitization = true;
+                break;
+            }
+        }
+
+        if (!needsDecoding && !needsSanitization)
+        {
+            return input;
+        }
+
+        var result = new StringBuilder(input.Length);
+
+        for (var index = 0; index < input.Length; index++)
+        {
+            var current = input[index];
+            if (current != '\\' || index == input.Length - 1)
+            {
+                if (IsValidXmlChar(current))
+                {
+                    result.Append(current);
+                }
+                continue;
+            }
+
+            var escapedCharacter = input[++index];
+
+            if (escapedCharacter == 'u' && index + 4 < input.Length)
+            {
+                var hexValue = input.Substring(index + 1, 4);
+                if (int.TryParse(hexValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var unicodeCodePoint))
+                {
+                    char decodedChar = (char)unicodeCodePoint;
+                    if (IsValidXmlChar(decodedChar))
+                    {
+                        result.Append(decodedChar);
+                    }
+                    index += 4;
+                    continue;
+                }
+            }
+
+            char? decodedSimpleChar = escapedCharacter switch
+            {
+                '"' => '"',
+                '\\' => '\\',
+                '/' => '/',
+                'b' => '\b',
+                'f' => '\f',
+                'n' => '\n',
+                'r' => '\r',
+                't' => '\t',
+                _ => null
+            };
+
+            if (decodedSimpleChar.HasValue)
+            {
+                if (IsValidXmlChar(decodedSimpleChar.Value))
+                {
+                    result.Append(decodedSimpleChar.Value);
+                }
+            }
+            else
+            {
+                // Fallback for unknown escape sequences: keep as is (e.g. \z -> \z)
+                // But we must sanitize the backslash and the char
+                if (IsValidXmlChar('\\')) result.Append('\\');
+                if (IsValidXmlChar(escapedCharacter)) result.Append(escapedCharacter);
+            }
+        }
+
+        return result.ToString();
+    }
+
+    private static bool IsValidXmlChar(char c)
+    {
+        // XML 1.0 allowed characters:
+        // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        // C# char is UTF-16, so we handle surrogate pairs at string level if needed,
+        // but here we check single char validity for simple control codes.
+        return c == 0x09 || c == 0x0A || c == 0x0D || c >= 0x20;
     }
 }

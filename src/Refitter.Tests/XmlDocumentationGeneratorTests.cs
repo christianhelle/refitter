@@ -1,5 +1,6 @@
 using System.Text;
 using FluentAssertions;
+using NJsonSchema;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
@@ -222,6 +223,28 @@ public class XmlDocumentationGeneratorTests
     }
 
     [Test]
+    public void Can_Generate_Method_Throws_With_Readable_Unicode_Status_Code_Comments()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = true,
+            GenerateStatusCodeComments = true,
+        });
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Responses = { ["400"] = new OpenApiResponse { Description = "Ошибка запроса" } },
+        });
+
+        generator.AppendMethodDocumentation(method, false, false, false, false, docs);
+
+        docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">")
+            .And.Contain("<term>400</term>")
+            .And.Contain("<description>Ошибка запроса</description>")
+            .And.NotContain(@"\u041e\u0448");
+    }
+
+    [Test]
     public void Can_Generate_Method_Throws_Without_Response_Code()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -256,5 +279,41 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().NotContain("/// <exception cref=\"ApiException\">")
             .And.Contain("/// <returns>")
             .And.Contain("<term>400</term>");
+    }
+
+    [Test]
+    public void Can_Generate_Method_Returns_With_Readable_Unicode_Description()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = true,
+        });
+        var docs = new StringBuilder();
+
+        // Create an operation with a success response that has a description and a schema (so it has a result)
+        var operation = new OpenApiOperation
+        {
+            Responses =
+            {
+                ["200"] = new OpenApiResponse
+                {
+                    Description = "Ошибка ответа",
+                    Schema = new JsonSchema { Type = JsonObjectType.String }
+                }
+            },
+            Produces = ["application/json"]
+        };
+
+        var method = CreateOperationModel(operation);
+
+        // Verify that ResultDescription picked up the description (NSwag might escape it, which is what we want to test)
+        // If NSwag escapes it, it will look like "\u..."
+        // Our generator should decode it back.
+
+        generator.AppendMethodDocumentation(method, false, false, false, false, docs);
+
+        docs.ToString().Should().Contain("/// <returns>")
+            .And.Contain("Ошибка ответа")
+            .And.NotContain(@"\u041e\u0448");
     }
 }

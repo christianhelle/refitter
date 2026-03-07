@@ -1,11 +1,10 @@
 ---
-updated_at: 2026-03-02T15:49:46Z
-focus_area: Post-review backlog — bugs, tests, CI fixes
-active_issues: []
+updated_at: 2026-03-06T16:09:05.259Z
+focus_area: Issue #944 implementation and validation
+active_issues:
+  - 944
 ---
 
 # What We're Focused On
 
-Full codebase review completed (2026-03-02). Keaton, Fenster, Hockney, McManus all ran. Findings are in `.squad/decisions.md` and `.squad/identity/backlog.md`.
-
-Next session: pick from the backlog in priority order. Start with the security fix (Codecov token), then the bug trio (GetInterfaceName, ContractsOutputFolder, ParameterExtractor mutation), then test gaps.
+Implementing and validating the fix for issue #944. The patch is in `src\Refitter.Core\XmlDocumentationGenerator.cs` with regression coverage in `src\Refitter.Tests\XmlDocumentationGeneratorTests.cs` and `src\Refitter.Tests\Examples\GenerateStatusCodeCommentsTests.cs`; full PR-gate validation is now running.

@@ -61,3 +61,25 @@ Key workflows: `build.yml` (main), `smoke-tests.yml` (quick), `release.yml` + `r
 **Grade:** B+ (87%) — Production-ready, but token exposure and non-functional squad-ci.yml are immediate concerns.
 
 Full assessment written to `.squad/decisions/inbox/mcmanus-cicd-review.md`
+
+## Validation Gate: Issue #944 (2026-03-06)
+
+**Objective:** Validate patch for non-ASCII XML comment handling via the 3-step PR gate.
+
+**Results:**
+
+1. **Build (`dotnet build -c Release src/Refitter.slnx`):** ✅ PASS
+   - All projects compiled successfully
+   - Exit code: 0
+
+2. **Tests (`dotnet test --solution src/Refitter.slnx -c Release`):** ✅ PASS
+   - **1,451 tests total:** 1,415 (Refitter.Tests) + 18 (SourceGenerator net8.0) + 18 (SourceGenerator net10.0)
+   - **Failed:** 0, **Skipped:** 0
+   - Duration: 38s 178ms
+   - Exit code: 0
+
+3. **Format Verification (`dotnet format --verify-no-changes src/Refitter.slnx`):** ✅ PASS
+   - No violations detected
+   - Exit code: 0
+
+**Conclusion:** Issue #944 patch is **READY FOR MERGE**. All validation gates passed.
