@@ -356,7 +356,27 @@ public class XmlDocumentationGenerator
 
     private string DecodeJsonEscapedText(string input)
     {
-        if (string.IsNullOrEmpty(input) || input.IndexOf('\\') < 0)
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        // Fast path: if no backslashes and no invalid control characters, return as is.
+        // Invalid XML chars: < 0x20 except 0x09, 0x0A, 0x0D.
+        bool needsDecoding = input.IndexOf('\\') >= 0;
+        bool needsSanitization = false;
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            char c = input[i];
+            if (!IsValidXmlChar(c))
+            {
+                needsSanitization = true;
+                break;
+            }
+        }
+
+        if (!needsDecoding && !needsSanitization)
         {
             return input;
         }
@@ -368,7 +388,10 @@ public class XmlDocumentationGenerator
             var current = input[index];
             if (current != '\\' || index == input.Length - 1)
             {
-                result.Append(current);
+                if (IsValidXmlChar(current))
+                {
+                    result.Append(current);
+                }
                 continue;
             }
 
@@ -379,44 +402,54 @@ public class XmlDocumentationGenerator
                 var hexValue = input.Substring(index + 1, 4);
                 if (int.TryParse(hexValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var unicodeCodePoint))
                 {
-                    result.Append((char)unicodeCodePoint);
+                    char decodedChar = (char)unicodeCodePoint;
+                    if (IsValidXmlChar(decodedChar))
+                    {
+                        result.Append(decodedChar);
+                    }
                     index += 4;
                     continue;
                 }
             }
 
-            switch (escapedCharacter)
+            char? decodedSimpleChar = escapedCharacter switch
             {
-                case '"':
-                    result.Append('"');
-                    break;
-                case '\\':
-                    result.Append('\\');
-                    break;
-                case '/':
-                    result.Append('/');
-                    break;
-                case 'b':
-                    result.Append('\b');
-                    break;
-                case 'f':
-                    result.Append('\f');
-                    break;
-                case 'n':
-                    result.Append('\n');
-                    break;
-                case 'r':
-                    result.Append('\r');
-                    break;
-                case 't':
-                    result.Append('\t');
-                    break;
-                default:
-                    result.Append('\\').Append(escapedCharacter);
-                    break;
+                '"' => '"',
+                '\\' => '\\',
+                '/' => '/',
+                'b' => '\b',
+                'f' => '\f',
+                'n' => '\n',
+                'r' => '\r',
+                't' => '\t',
+                _ => null
+            };
+
+            if (decodedSimpleChar.HasValue)
+            {
+                if (IsValidXmlChar(decodedSimpleChar.Value))
+                {
+                    result.Append(decodedSimpleChar.Value);
+                }
+            }
+            else
+            {
+                // Fallback for unknown escape sequences: keep as is (e.g. \z -> \z)
+                // But we must sanitize the backslash and the char
+                if (IsValidXmlChar('\\')) result.Append('\\');
+                if (IsValidXmlChar(escapedCharacter)) result.Append(escapedCharacter);
             }
         }
 
         return result.ToString();
+    }
+
+    private static bool IsValidXmlChar(char c)
+    {
+        // XML 1.0 allowed characters:
+        // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        // C# char is UTF-16, so we handle surrogate pairs at string level if needed,
+        // but here we check single char validity for simple control codes.
+        return c == 0x09 || c == 0x0A || c == 0x0D || c >= 0x20;
     }
 }

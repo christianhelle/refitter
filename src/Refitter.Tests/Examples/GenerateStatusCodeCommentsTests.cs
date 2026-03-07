@@ -55,6 +55,24 @@ components:
           type: string
 ";
 
+    private const string Swagger20SpecWithUnicodeStatusCodeComments = @"
+swagger: '2.0'
+info:
+  title: Unicode Test API 2.0
+  version: 1.0.0
+paths:
+  /directories:
+    get:
+      operationId: getDirectories
+      responses:
+        '200':
+          description: Возвращает список справочников.
+          schema:
+            type: string
+        '400':
+          description: Ошибка запроса
+";
+
     private const string OpenApiSpecWithUnicodeStatusCodeComments = @"
 openapi: 3.0.0
 info:
@@ -74,6 +92,7 @@ paths:
         '400':
           description: Ошибка запроса
 ";
+
 
     [Test]
     public async Task Can_Generate_Code()
@@ -126,6 +145,16 @@ paths:
     public async Task Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithUnicodeStatusCodeComments, generateStatusCodeComments: true);
+
+        generatedCode.Should().Contain("/// <term>400</term>")
+            .And.Contain("/// <description>Ошибка запроса</description>")
+            .And.NotContain(@"\u041e\u0448");
+    }
+
+    [Test]
+    public async Task Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments_Swagger20()
+    {
+        string generatedCode = await GenerateCode(Swagger20SpecWithUnicodeStatusCodeComments, generateStatusCodeComments: true);
 
         generatedCode.Should().Contain("/// <term>400</term>")
             .And.Contain("/// <description>Ошибка запроса</description>")
