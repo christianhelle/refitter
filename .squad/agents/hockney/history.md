@@ -10,7 +10,7 @@
 
 My domain: src/Refitter.Tests/, src/Refitter.SourceGenerator.Tests/.
 
-Test pattern: class in Refitter.Tests.Examples, const OpenAPI spec string, async [Fact] methods using GenerateCode(), assertions via FluentAssertions, BuildHelper.BuildCSharp(code).Should().BeTrue() to verify generated code compiles.
+Test pattern: class in Refitter.Tests.Examples, const OpenAPI spec string, async [Test] methods using GenerateCode(), assertions via FluentAssertions, BuildHelper.BuildCSharp(code).Should().BeTrue() to verify generated code compiles.
 
 Test resources (OpenAPI specs): src/Refitter.Tests/Resources/V2/ and V3/. Use SwaggerPetstore.json for general testing.
 
