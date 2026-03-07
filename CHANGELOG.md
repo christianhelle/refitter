@@ -8,6 +8,7 @@
 
 - Support custom format-mappings via Key-Value configuration [\#438](https://github.com/christianhelle/refitter/issues/438)
 - Generate the client from multiple versions [\#350](https://github.com/christianhelle/refitter/issues/350)
+- Config parameter to add suffix to contract types [\#193](https://github.com/christianhelle/refitter/issues/193)
 - Add SourceGenerator support to the standalone tool [\#179](https://github.com/christianhelle/refitter/issues/179)
 
 **Fixed bugs:**
