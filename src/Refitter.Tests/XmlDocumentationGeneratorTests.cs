@@ -244,6 +244,49 @@ public class XmlDocumentationGeneratorTests
     }
 
     [Test]
+    public void Can_Generate_Method_Throws_With_No_Xml_Invalid_Control_Chars_In_Comments()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = true,
+            GenerateStatusCodeComments = true,
+        });
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            // \b (backspace U+0008) and \f (form-feed U+000C) are invalid in XML 1.0
+            Responses = { ["400"] = new OpenApiResponse { Description = @"Bad\brequest\f" } },
+        });
+
+        generator.AppendMethodDocumentation(method, false, false, false, false, docs);
+
+        var result = docs.ToString();
+        result.Should().Contain(@"\b").And.Contain(@"\f").And.NotContain("\b").And.NotContain("\f");
+    }
+
+    [Test]
+    public void Can_Generate_Method_Throws_Strips_Xml_Invalid_Unicode_Codepoints_From_Comments()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = true,
+            GenerateStatusCodeComments = true,
+        });
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            // \u0007 (bell) and \u001F are invalid in XML 1.0 and must be stripped
+            Responses = { ["400"] = new OpenApiResponse { Description = @"Bad \u0007 request \u001F end" } },
+        });
+
+        generator.AppendMethodDocumentation(method, false, false, false, false, docs);
+
+        var result = docs.ToString();
+        result.Should().NotContain("\u0007").And.NotContain("\u001F");
+        result.Should().Contain("Bad").And.Contain("request").And.Contain("end");
+    }
+
+    [Test]
     public void Can_Generate_Method_Throws_Without_Response_Code()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings

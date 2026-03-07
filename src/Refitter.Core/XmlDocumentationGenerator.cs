@@ -397,10 +397,10 @@ public class XmlDocumentationGenerator
                     result.Append('/');
                     break;
                 case 'b':
-                    result.Append('\b');
+                    result.Append('\\').Append('b'); // \b (U+0008) is invalid in XML 1.0; keep as literal
                     break;
                 case 'f':
-                    result.Append('\f');
+                    result.Append('\\').Append('f'); // \f (U+000C) is invalid in XML 1.0; keep as literal
                     break;
                 case 'n':
                     result.Append('\n');
@@ -417,6 +417,34 @@ public class XmlDocumentationGenerator
             }
         }
 
-        return result.ToString();
+        return StripXmlInvalidChars(result.ToString());
     }
+
+    /// <summary>
+    /// Removes characters that are not valid in XML 1.0 documents.
+    /// Valid XML 1.0 characters: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
+    /// </summary>
+    private static string StripXmlInvalidChars(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        var sb = new StringBuilder(text.Length);
+        foreach (var ch in text)
+        {
+            if (IsValidXml10Character(ch))
+            {
+                sb.Append(ch);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private static bool IsValidXml10Character(char ch) =>
+        ch == '\t' || ch == '\n' || ch == '\r' ||
+        (ch >= '\x20' && ch <= '\xD7FF') ||
+        (ch >= '\xE000' && ch <= '\xFFFD');
 }
