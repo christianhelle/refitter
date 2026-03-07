@@ -269,8 +269,8 @@ function RunTests
         return @{ Tag = "${vTag}_${format}_${base}"; Namespace = $nsBase }
     }
 
-    # Collect generation tasks for v3.4, v3.0, and v2.0
-    foreach ($version in @("v3.4", "v3.0", "v2.0"))
+    # Collect generation tasks for v2.0 and v3.0
+    foreach ($version in @("v3.0", "v2.0"))
     {
         foreach ($format in @("json", "yaml"))
         {

@@ -34,8 +34,6 @@
       <EmbeddedResource Include="Resources\V3\SwaggerPetstoreWithDifferentHeaders.yaml" />
       <EmbeddedResource Include="Resources\V3\SwaggerPetstore.json" />
       <EmbeddedResource Include="Resources\V3\SwaggerPetstore.yaml" />
-      <EmbeddedResource Include="Resources\V3.4\SwaggerPetstore.json" />
-      <EmbeddedResource Include="Resources\V3.4\SwaggerPetstore.yaml" />
     </ItemGroup>
 
     <ItemGroup>

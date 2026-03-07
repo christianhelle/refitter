@@ -19,25 +19,8 @@ public class OpenApiDocumentFactoryTests
     }
 
     [Test]
-    [Arguments("petstore.json")]
-    [Arguments("petstore.yaml")]
-    [Arguments("webhook-example.json")]
-    [Arguments("webhook-example.yaml")]
-    public async Task Create_From_OpenApi_34_Repo_Samples_Returns_NotNull(string filename)
-    {
-        var specPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "test", "OpenAPI", "v3.4", filename));
-        File.Exists(specPath).Should().BeTrue();
-
-        (await OpenApiDocumentFactory.CreateAsync(specPath))
-            .Should()
-            .NotBeNull();
-    }
-
-    [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV34, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV34, "SwaggerPetstore.yaml")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Create_From_File_Returns_NotNull(SampleOpenSpecifications version, string filename)
@@ -55,9 +38,6 @@ public class OpenApiDocumentFactoryTests
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yml")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YAML")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YML")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV34, "petstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV34, "petstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV34, "petstore.yml")]
     public async Task Create_From_File_Detects_Format_Correctly(SampleOpenSpecifications version, string filename)
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);

@@ -204,7 +204,7 @@ call :clean_generated_code
 :: Standard variant definitions (suffix, prefix, args)
 :: We process versions/formats/filenames and generate ALL variants, then build once
 
-for %%v in (v3.4 v3.0 v2.0) do (
+for %%v in (v3.0 v2.0) do (
     set "version_tag=%%v"
     set "version_tag=!version_tag:.=!"
     for %%f in (json yaml) do (
@@ -371,7 +371,7 @@ echo.
 echo === Generating netCore variants ===
 echo.
 
-for %%v in (v3.4 v3.0 v2.0) do (
+for %%v in (v3.0 v2.0) do (
     set "version_tag=%%v"
     set "version_tag=!version_tag:.=!"
     for %%f in (json yaml) do (

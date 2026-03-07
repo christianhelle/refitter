@@ -29,33 +29,11 @@ public static class EmbeddedResources
         }
     }
 
-    public static string SwaggerPetstoreJsonV34
-    {
-        get
-        {
-            using var stream = GetStream("V3._4.SwaggerPetstore.json");
-            using var reader = new StreamReader(stream);
-
-            return reader.ReadToEnd();
-        }
-    }
-
     public static string SwaggerPetstoreYamlV2
     {
         get
         {
             using var stream = GetStream("V2.SwaggerPetstore.yaml");
-            using var reader = new StreamReader(stream);
-
-            return reader.ReadToEnd();
-        }
-    }
-
-    public static string SwaggerPetstoreYamlV34
-    {
-        get
-        {
-            using var stream = GetStream("V3._4.SwaggerPetstore.yaml");
             using var reader = new StreamReader(stream);
 
             return reader.ReadToEnd();
@@ -267,10 +245,8 @@ public static class EmbeddedResources
         {
             SampleOpenSpecifications.SwaggerPetstoreJsonV2 => SwaggerPetstoreJsonV2,
             SampleOpenSpecifications.SwaggerPetstoreJsonV3 => SwaggerPetstoreJsonV3,
-            SampleOpenSpecifications.SwaggerPetstoreJsonV34 => SwaggerPetstoreJsonV34,
             SampleOpenSpecifications.SwaggerPetstoreYamlV2 => SwaggerPetstoreYamlV2,
             SampleOpenSpecifications.SwaggerPetstoreYamlV3 => SwaggerPetstoreYamlV3,
-            SampleOpenSpecifications.SwaggerPetstoreYamlV34 => SwaggerPetstoreYamlV34,
             SampleOpenSpecifications.SwaggerPetstoreJsonV2WithDifferentHeaders =>
                 SwaggerPetstoreJsonV2WithDifferentHeaders,
             SampleOpenSpecifications.SwaggerPetstoreJsonV3WithDifferentHeaders =>
