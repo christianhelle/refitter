@@ -151,8 +151,8 @@ set "v34wfilename_count=1"
 :: ==========================================
 if /i "%build_from_source%"=="true" (
     if /i "%use_docker_param%"=="false" (
-        echo dotnet publish ..\src\Refitter\Refitter.csproj -c Release -o bin -f net9.0
-        dotnet publish ..\src\Refitter\Refitter.csproj -c Release -o bin -f net9.0
+        echo dotnet publish ..\src\Refitter\Refitter.csproj -c Release -o bin -f net10.0
+        dotnet publish ..\src\Refitter\Refitter.csproj -c Release -o bin -f net10.0
         call :throw_on_native_failure
 
         echo refitter --version

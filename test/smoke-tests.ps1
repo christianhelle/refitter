@@ -213,8 +213,8 @@ function RunTests
     # ==========================================
     if ($BuildFromSource -and -not $UseDocker)
     {
-        Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net9.0"
-        Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net9.0" -NoNewWindow -PassThru | Wait-Process
+        Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0"
+        Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0" -NoNewWindow -PassThru | Wait-Process
 
         Write-Host "refitter --version"
         $p = Start-Process "./bin/refitter" -Args "--version" -NoNewWindow -PassThru
@@ -550,7 +550,7 @@ function RunTests
     }
 
     # ==========================================
-    # Phase 9: Collection Format Variant Tests  
+    # Phase 9: Collection Format Variant Tests
     # ==========================================
     Write-Host "`r`n=== Collection Format Variant Tests ===`r`n"
 
