@@ -13,6 +13,7 @@ Refitter test projects use TUnit on Microsoft.Testing.Platform. In this repo, `d
 
 ### Use the compiled test executable
 - Test app path: `src\Refitter.Tests\bin\Release\net10.0\Refitter.Tests.exe`
+- Note: The examples use Windows-style backslashes (`\`). On Linux/macOS or in bash/zsh, use forward slashes (`/`), e.g., `src/Refitter.Tests/bin/Release/net10.0/Refitter.Tests.exe`.
 - Source-generator test discovery means you should build the test project first if you added or renamed tests.
 
 ### Tree filter syntax
