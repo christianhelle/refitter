@@ -12,6 +12,7 @@
 
 **Fixed bugs:**
 
+- Non-ASCII response descriptions become \uXXXX in XML comments [\#944](https://github.com/christianhelle/refitter/issues/944)
 - Resolve SonarCloud Code Quality Issues [\#931](https://github.com/christianhelle/refitter/issues/931)
 - format: int32 quirk =\> Serializes to "object" when open api spec contains pattern [\#867](https://github.com/christianhelle/refitter/issues/867)
 - Failing CLI example with confusing error message [\#847](https://github.com/christianhelle/refitter/issues/847)
