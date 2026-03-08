@@ -421,4 +421,12 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.")]
     public string? ContractTypeSuffix { get; set; }
+
+    /// <summary>
+    /// Gets or sets the body serialization method to use for AnyType body parameters.
+    /// Default is <see cref="BodySerializationMethod.Serialized"/>.
+    /// </summary>
+    [Description("The body serialization method to use for AnyType body parameters. Default is Serialized.")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public BodySerializationMethod AnyTypeBodySerializationMethod { get; set; } = BodySerializationMethod.Serialized;
 }
