@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency fluentassertions to 7.2.2 [\#956](https://github.com/christianhelle/refitter/pull/956) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.19.74 [\#951](https://github.com/christianhelle/refitter/pull/951) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.8.0-preview.99](https://github.com/christianhelle/refitter/tree/1.8.0-preview.99) (2026-03-08)
