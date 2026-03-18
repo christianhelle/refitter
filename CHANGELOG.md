@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.3...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.99...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency tunit to 1.19.74 [\#951](https://github.com/christianhelle/refitter/pull/951) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.8.0-preview.99](https://github.com/christianhelle/refitter/tree/1.8.0-preview.99) (2026-03-08)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.3...1.8.0-preview.99)
 
 **Implemented enhancements:**
 
@@ -10,6 +18,21 @@
 - Generate the client from multiple versions [\#350](https://github.com/christianhelle/refitter/issues/350)
 - Config parameter to add suffix to contract types [\#193](https://github.com/christianhelle/refitter/issues/193)
 - Add SourceGenerator support to the standalone tool [\#179](https://github.com/christianhelle/refitter/issues/179)
+- Add Unicode support for XML doc comment generation [\#948](https://github.com/christianhelle/refitter/pull/948) ([christianhelle](https://github.com/christianhelle))
+- Fix broken CLI tool help text [\#940](https://github.com/christianhelle/refitter/pull/940) ([christianhelle](https://github.com/christianhelle))
+- Move \[JsonConverter\] from enum properties to enum types [\#938](https://github.com/christianhelle/refitter/pull/938) ([christianhelle](https://github.com/christianhelle))
+- Fix PR \#897 review feedback and add comprehensive bearer auth tests [\#936](https://github.com/christianhelle/refitter/pull/936) ([christianhelle](https://github.com/christianhelle))
+- Fix SonarCloud Code Quality Issues [\#932](https://github.com/christianhelle/refitter/pull/932) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Fix numeric suffix added to interface method names in ByTag mode [\#914](https://github.com/christianhelle/refitter/pull/914) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Migrate from Microsoft.OpenApi.Readers 1.x to Microsoft.OpenApi 3.x [\#907](https://github.com/christianhelle/refitter/pull/907) ([vgmello](https://github.com/vgmello))
+- Fix: Base type not generated for types using oneOf with discriminator [\#906](https://github.com/christianhelle/refitter/pull/906) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Add support for generating a single client from multiple OpenAPI specifications [\#904](https://github.com/christianhelle/refitter/pull/904) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Add option for Method Level Authorization header attribute [\#897](https://github.com/christianhelle/refitter/pull/897) ([Roflincopter](https://github.com/Roflincopter))
+- Update refit monorepo to v10 \(major\) [\#893](https://github.com/christianhelle/refitter/pull/893) ([renovate[bot]](https://github.com/apps/renovate))
+- Fix null reference and XML escaping in XmlDocumentationGenerator [\#890](https://github.com/christianhelle/refitter/pull/890) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Read group documentation from document tags. [\#887](https://github.com/christianhelle/refitter/pull/887) ([DJ4ddi](https://github.com/DJ4ddi))
+- Fix numeric format with pattern quirk - infer type from format for all numeric types [\#869](https://github.com/christianhelle/refitter/pull/869) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Add debug logging for source generator when searching for .refitter files [\#743](https://github.com/christianhelle/refitter/pull/743) ([codymullins](https://github.com/codymullins))
 
 **Fixed bugs:**
 
@@ -28,6 +51,42 @@
 - Multipart endpoint \[FromForm\] decorated argument is missing from signature [\#222](https://github.com/christianhelle/refitter/issues/222)
 - The using of StringEnumConverter end up generating unserializable data when different NamingPolicy is needed [\#178](https://github.com/christianhelle/refitter/issues/178)
 - Base type not generated for types specified by oneOf in the schema [\#175](https://github.com/christianhelle/refitter/issues/175)
+
+**Merged pull requests:**
+
+- docs: add send0xx as a contributor for bug [\#946](https://github.com/christianhelle/refitter/pull/946) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Microsoft.OpenApi v3.4 [\#945](https://github.com/christianhelle/refitter/pull/945) ([christianhelle](https://github.com/christianhelle))
+- chore\(deps\): update dependency tunit to 1.19.0 [\#942](https://github.com/christianhelle/refitter/pull/942) ([renovate[bot]](https://github.com/apps/renovate))
+- Improve code coverage to \>90% [\#941](https://github.com/christianhelle/refitter/pull/941) ([christianhelle](https://github.com/christianhelle))
+- Improve OpenAPI parse + codegen throughput by removing avoidable allocations and repeated regex work [\#937](https://github.com/christianhelle/refitter/pull/937) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- chore\(deps\): update dependency polly to 8.6.6 [\#935](https://github.com/christianhelle/refitter/pull/935) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.18.21 [\#934](https://github.com/christianhelle/refitter/pull/934) ([renovate[bot]](https://github.com/apps/renovate))
+- Fix smoke tests: --interface-only variant missing using directive for contract types [\#933](https://github.com/christianhelle/refitter/pull/933) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Fix multipart form-data parameter extraction [\#928](https://github.com/christianhelle/refitter/pull/928) ([christianhelle](https://github.com/christianhelle))
+- Add custom format mappings configuration [\#927](https://github.com/christianhelle/refitter/pull/927) ([christianhelle](https://github.com/christianhelle))
+- Fix \#635: Refactor source generator to use context.AddSource\(\) [\#923](https://github.com/christianhelle/refitter/pull/923) ([christianhelle](https://github.com/christianhelle))
+- Fix \#672: MultipleInterfaces ByTag method naming scoped per-interface [\#922](https://github.com/christianhelle/refitter/pull/922) ([christianhelle](https://github.com/christianhelle))
+- Fix \#580: Nullable strings marked correctly [\#921](https://github.com/christianhelle/refitter/pull/921) ([christianhelle](https://github.com/christianhelle))
+- Bump actions/github-script from 7 to 8 [\#920](https://github.com/christianhelle/refitter/pull/920) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/checkout from 4 to 6 [\#919](https://github.com/christianhelle/refitter/pull/919) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Improve Smoke Tests execution time [\#915](https://github.com/christianhelle/refitter/pull/915) ([christianhelle](https://github.com/christianhelle))
+- Bump actions/upload-artifact from 6 to 7 [\#912](https://github.com/christianhelle/refitter/pull/912) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): update actions/upload-artifact action to v7 - autoclosed [\#911](https://github.com/christianhelle/refitter/pull/911) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add vgmello as a contributor for code [\#909](https://github.com/christianhelle/refitter/pull/909) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency tunit to 1.18.9 [\#903](https://github.com/christianhelle/refitter/pull/903) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 10.1.4 [\#902](https://github.com/christianhelle/refitter/pull/902) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency coverlet.collector to v8 [\#901](https://github.com/christianhelle/refitter/pull/901) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.15.11 [\#899](https://github.com/christianhelle/refitter/pull/899) ([renovate[bot]](https://github.com/apps/renovate))
+- Fix MSBuild workflow [\#898](https://github.com/christianhelle/refitter/pull/898) ([christianhelle](https://github.com/christianhelle))
+- Update ghcr.io/devcontainers/features/powershell Docker tag to v2 [\#895](https://github.com/christianhelle/refitter/pull/895) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency FluentAssertions to 7.2.1 [\#894](https://github.com/christianhelle/refitter/pull/894) ([renovate[bot]](https://github.com/apps/renovate))
+- Fix build workflow: add dotnet restore before dotnet msbuild in Prepare step [\#892](https://github.com/christianhelle/refitter/pull/892) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Update dotnet monorepo [\#891](https://github.com/christianhelle/refitter/pull/891) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Swashbuckle.AspNetCore to 10.1.3 [\#889](https://github.com/christianhelle/refitter/pull/889) ([renovate[bot]](https://github.com/apps/renovate))
+- Update Dependencies [\#886](https://github.com/christianhelle/refitter/pull/886) ([christianhelle](https://github.com/christianhelle))
+- Update dependency ruby to v4.0.1 [\#866](https://github.com/christianhelle/refitter/pull/866) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.13.60 [\#865](https://github.com/christianhelle/refitter/pull/865) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dotnet monorepo [\#835](https://github.com/christianhelle/refitter/pull/835) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.7.3](https://github.com/christianhelle/refitter/tree/1.7.3) (2026-01-24)
 
