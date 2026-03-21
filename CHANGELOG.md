@@ -10,6 +10,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update refit monorepo to 10.1.6 [\#961](https://github.com/christianhelle/refitter/pull/961) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency coverlet.collector to 8.0.1 [\#959](https://github.com/christianhelle/refitter/pull/959) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency ruby to v4.0.2 [\#958](https://github.com/christianhelle/refitter/pull/958) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency fluentassertions to 7.2.2 [\#956](https://github.com/christianhelle/refitter/pull/956) ([renovate[bot]](https://github.com/apps/renovate))
