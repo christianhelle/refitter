@@ -19,7 +19,7 @@
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.6.3" PrivateAssets="all" />
     <PackageReference Include="NSwag.Core.Yaml" Version="14.6.3" PrivateAssets="all" />
     <PackageReference Include="OasReader" Version="3.4.0.18" />
-    <PackageReference Include="Refit" Version="10.0.1" />
+    <PackageReference Include="Refit" Version="10.1.6" />
   </ItemGroup>
 
   <ItemGroup>
