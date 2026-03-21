@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.99...HEAD)
 
+**Implemented enhancements:**
+
+- chore\(deps\): update dependency tunit to 1.20.0 [\#962](https://github.com/christianhelle/refitter/pull/962) ([renovate[bot]](https://github.com/apps/renovate))
+
 **Merged pull requests:**
 
 - chore\(deps\): update dependency coverlet.collector to 8.0.1 [\#959](https://github.com/christianhelle/refitter/pull/959) ([renovate[bot]](https://github.com/apps/renovate))
@@ -27,6 +31,11 @@
 - Move \[JsonConverter\] from enum properties to enum types [\#938](https://github.com/christianhelle/refitter/pull/938) ([christianhelle](https://github.com/christianhelle))
 - Fix PR \#897 review feedback and add comprehensive bearer auth tests [\#936](https://github.com/christianhelle/refitter/pull/936) ([christianhelle](https://github.com/christianhelle))
 - Fix SonarCloud Code Quality Issues [\#932](https://github.com/christianhelle/refitter/pull/932) ([Copilot](https://github.com/apps/copilot-swe-agent))
+- Fix multipart form-data parameter extraction [\#928](https://github.com/christianhelle/refitter/pull/928) ([christianhelle](https://github.com/christianhelle))
+- Add custom format mappings configuration [\#927](https://github.com/christianhelle/refitter/pull/927) ([christianhelle](https://github.com/christianhelle))
+- Fix \#635: Refactor source generator to use context.AddSource\(\) [\#923](https://github.com/christianhelle/refitter/pull/923) ([christianhelle](https://github.com/christianhelle))
+- Fix \#672: MultipleInterfaces ByTag method naming scoped per-interface [\#922](https://github.com/christianhelle/refitter/pull/922) ([christianhelle](https://github.com/christianhelle))
+- Fix \#580: Nullable strings marked correctly [\#921](https://github.com/christianhelle/refitter/pull/921) ([christianhelle](https://github.com/christianhelle))
 - Fix numeric suffix added to interface method names in ByTag mode [\#914](https://github.com/christianhelle/refitter/pull/914) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Migrate from Microsoft.OpenApi.Readers 1.x to Microsoft.OpenApi 3.x [\#907](https://github.com/christianhelle/refitter/pull/907) ([vgmello](https://github.com/vgmello))
 - Fix: Base type not generated for types using oneOf with discriminator [\#906](https://github.com/christianhelle/refitter/pull/906) ([Copilot](https://github.com/apps/copilot-swe-agent))
@@ -66,11 +75,6 @@
 - chore\(deps\): update dependency polly to 8.6.6 [\#935](https://github.com/christianhelle/refitter/pull/935) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.18.21 [\#934](https://github.com/christianhelle/refitter/pull/934) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix smoke tests: --interface-only variant missing using directive for contract types [\#933](https://github.com/christianhelle/refitter/pull/933) ([Copilot](https://github.com/apps/copilot-swe-agent))
-- Fix multipart form-data parameter extraction [\#928](https://github.com/christianhelle/refitter/pull/928) ([christianhelle](https://github.com/christianhelle))
-- Add custom format mappings configuration [\#927](https://github.com/christianhelle/refitter/pull/927) ([christianhelle](https://github.com/christianhelle))
-- Fix \#635: Refactor source generator to use context.AddSource\(\) [\#923](https://github.com/christianhelle/refitter/pull/923) ([christianhelle](https://github.com/christianhelle))
-- Fix \#672: MultipleInterfaces ByTag method naming scoped per-interface [\#922](https://github.com/christianhelle/refitter/pull/922) ([christianhelle](https://github.com/christianhelle))
-- Fix \#580: Nullable strings marked correctly [\#921](https://github.com/christianhelle/refitter/pull/921) ([christianhelle](https://github.com/christianhelle))
 - Bump actions/github-script from 7 to 8 [\#920](https://github.com/christianhelle/refitter/pull/920) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/checkout from 4 to 6 [\#919](https://github.com/christianhelle/refitter/pull/919) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Improve Smoke Tests execution time [\#915](https://github.com/christianhelle/refitter/pull/915) ([christianhelle](https://github.com/christianhelle))
