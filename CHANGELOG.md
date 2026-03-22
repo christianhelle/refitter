@@ -10,6 +10,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency tunit to 1.21.0 [\#964](https://github.com/christianhelle/refitter/pull/964) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency oasreader to 3.5.0.19 [\#963](https://github.com/christianhelle/refitter/pull/963) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update refit monorepo to 10.1.6 [\#961](https://github.com/christianhelle/refitter/pull/961) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency coverlet.collector to 8.0.1 [\#959](https://github.com/christianhelle/refitter/pull/959) ([renovate[bot]](https://github.com/apps/renovate))
