@@ -53,6 +53,13 @@ public class RefitGeneratorSettings
     public NamingSettings Naming { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets how generated contract properties are named.
+    /// </summary>
+    [Description("Controls how generated contract properties are named. Default is PascalCase. Possible values: PascalCase, PreserveOriginal.")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public PropertyNamingPolicy PropertyNamingPolicy { get; set; } = PropertyNamingPolicy.PascalCase;
+
+    /// <summary>
     /// Gets or sets a value indicating whether contracts should be generated.
     /// </summary>
     [Description("Generate contracts. Default is true.")]

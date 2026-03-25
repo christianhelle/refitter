@@ -30,7 +30,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             GenerateDtoTypes = true,
             GenerateClientInterfaces = false,
             GenerateExceptionClasses = false,
-            CodeGeneratorSettings = { PropertyNameGenerator = settings.CodeGeneratorSettings?.PropertyNameGenerator ?? new CustomCSharpPropertyNameGenerator() },
+            CodeGeneratorSettings = { PropertyNameGenerator = CreatePropertyNameGenerator() },
             CSharpGeneratorSettings =
             {
                 Namespace = settings.ContractsNamespace ?? settings.Namespace,
@@ -71,6 +71,20 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         }
 
         return generator;
+    }
+
+    private IPropertyNameGenerator CreatePropertyNameGenerator()
+    {
+        if (settings.CodeGeneratorSettings?.PropertyNameGenerator is { } propertyNameGenerator)
+        {
+            return propertyNameGenerator;
+        }
+
+        return settings.PropertyNamingPolicy switch
+        {
+            PropertyNamingPolicy.PreserveOriginal => new PreserveOriginalPropertyNameGenerator(),
+            _ => new CustomCSharpPropertyNameGenerator(),
+        };
     }
 
     /// <summary>

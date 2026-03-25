@@ -9,6 +9,7 @@ The following is an example `.refitter` file
   "openApiPath": "/path/to/your/openAPI", // Required if openApiPaths is not specified
   "namespace": "Org.System.Service.Api.GeneratedCode", // Optional. Default=GeneratedCode
   "contractsNamespace": "Org.System.Service.Api.GeneratedCode.Contracts", // Optional. Default=GeneratedCode
+  "propertyNamingPolicy": "PascalCase", // Optional. Values=PascalCase|PreserveOriginal. Default=PascalCase
   "naming": {
     "useOpenApiTitle": false, // Optional. Default=true
     "interfaceName": "MyApiClient" // Optional. Default=ApiClient
@@ -150,6 +151,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
 - `openApiPaths` - a collection of paths to multiple OpenAPI Specifications files. When specified, the documents are merged into a single generated client. The first document wins on schema conflicts. Required if `openApiPath` is not specified
 - `namespace` - the namespace used in the generated code. If not specified, this defaults to `GeneratedCode`
 - `contractsNamespace` - the namespace used in the generated contracts. If not specified, this defaults to what `namespace` is set to
+- `propertyNamingPolicy` - controls how generated contract properties are named. Possible values are `PascalCase` (default) and `PreserveOriginal`. `PreserveOriginal` keeps valid identifiers as-is, escapes reserved C# keywords with `@`, and minimally sanitizes invalid names into compilable identifiers while still emitting `[JsonPropertyName]`
 - `naming.useOpenApiTitle` - a boolean indicating whether the OpenApi title should be used. Default is `true`
 - `naming.interfaceName` - the name of the generated interface. The generated code will automatically prefix this with `I` so if this set to `MyApiClient` then the generated interface is called `IMyApiClient`. Default is `ApiClient`
 - `generateContracts` - a boolean indicating whether contracts should be generated. A use case for this is several API clients use the same contracts. Default is `true`
@@ -614,9 +616,6 @@ When using `openApiPaths`, the documents are merged into a single generated clie
                 },
                 "dateTimeFormat": {
                     "type": "string"
-                },
-                "propertyNameGenerator": {
-                    "type": "object"
                 }
             },
         }

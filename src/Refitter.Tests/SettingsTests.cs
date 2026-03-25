@@ -57,6 +57,7 @@ public class SettingsTests
         settings.NoInlineJsonConverters.Should().BeFalse();
         settings.IntegerType.Should().Be(IntegerType.Int32);
         settings.CustomTemplateDirectory.Should().BeNull();
+        settings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PascalCase);
     }
 
     [Test]
@@ -191,6 +192,16 @@ public class SettingsTests
 
         settings.IntegerType = IntegerType.Int32;
         settings.IntegerType.Should().Be(IntegerType.Int32);
+    }
+
+    [Test]
+    public void Should_Allow_Setting_PropertyNamingPolicy()
+    {
+        var settings = new Settings { PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal };
+        settings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PreserveOriginal);
+
+        settings.PropertyNamingPolicy = PropertyNamingPolicy.PascalCase;
+        settings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PascalCase);
     }
 
     [Test]

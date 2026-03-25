@@ -49,6 +49,24 @@ Format REQUIRED before commit: `dotnet format src/Refitter.slnx`
 - `CSharpClientGeneratorFactory` has two near-identical recursive schema traversal methods: `FixMissingTypesWithIntegerFormat` and `ApplyCustomIntegerType` — should share a generic schema visitor.
 - `RefitGenerator.GenerateClient` single-file path returns an array where only the first item has content, remaining items have empty strings — subtle and confusing to future maintainers.
 
+---
+
+## Issue #967 — Property Naming Implementation (2026-03-25)
+
+**Status:** ✅ DELIVERED & APPROVED
+
+Implemented property naming policy feature across product surfaces:
+- Created `PropertyNamingPolicy` enum (`PascalCase`, `PreserveOriginal`) on `RefitGeneratorSettings`
+- Built `PreserveOriginalPropertyNameGenerator` with edge-case handling (reserved keywords, invalid identifiers)
+- Exposed via CLI (`--property-naming-policy`), `.refitter` file, and updated schema
+- All validation gates pass: build, 1468 tests, format
+
+**Collaborators:**
+- Hockney provided comprehensive regression coverage
+- Keaton reviewed and approved for merge
+
+**Known Follow-up:** IdentifierUtils contains three public methods with zero external callers (Keaton flagged as non-blocking; consolidate or remove in next PR).
+
 #### CLI Option Gaps
 - `GenerateAuthenticationHeader` — present in `RefitGeneratorSettings`, NO CLI option in `Settings.cs`.
 - `AddContentTypeHeaders` — `AddAcceptHeaders` has `--no-accept-headers` but `AddContentTypeHeaders` has NO CLI option.
@@ -124,3 +142,154 @@ Successfully implemented fix for non-ASCII characters in XML status-code comment
 - Tests confirmed: Cyrillic Unicode renders correctly, escape sequences absent, compilation succeeds
 - All 1415 tests pass with no regressions
 
+### Issue #967 Investigation — Snake_case Property Names — 2026-03-06
+
+**Feasibility: TECHNICALLY FEASIBLE, requires product surface changes**
+
+Investigated whether Refitter can generate snake_case C# property names instead of mandatory PascalCase conversion.
+
+**Key Findings:**
+
+1. **Current Access Paths:**
+   - NOT accessible via CLI (no `--property-name-generator` option)
+   - NOT accessible via `.refitter` files (`CodeGeneratorSettings.PropertyNameGenerator` marked `[JsonIgnore]`)
+   - NOT accessible via source generator
+   - Only accessible programmatically by injecting custom `IPropertyNameGenerator` into core settings
+
+2. **Root Cause:**
+   - `CustomCSharpPropertyNameGenerator` is hardcoded in `CSharpClientGeneratorFactory.Create()` line 33
+   - Performs mandatory `ConvertToUpperCamelCase()` + `ConvertSnakeCaseToPascalCase()` (line 46)
+   - Falls back to this generator when user doesn't provide custom one
+   - `CodeGeneratorSettings.PropertyNameGenerator` explicitly marked `[JsonIgnore]` to prevent `.refitter` deserialization
+   - Historical #516 added support for custom generators but never exposed to end users
+
+3. **Edge Cases Requiring Handling:**
+   - Invalid C# identifiers (spaces → `_`, hyphens → `_`, leading digits → prepend `_`)
+   - C# reserved keywords (detect & add `@` prefix or `_` suffix)
+   - **Critical:** `[JsonPropertyName]` attribute MUST still be generated for deserialization to work; user's example omitted it, would require `PropertyNameCaseInsensitive = true` to avoid binding failures
+   - Potential name collisions when sanitization produces duplicates
+
+4. **Schema/Serialization Complexity:**
+   - `IPropertyNameGenerator` is an external NJsonSchema interface, difficult to expose via JSON without type discriminator
+   - Creating polymorphic deserialization for `.refitter` files would require either whitelist strategy or reflection-based instantiation
+   - Recommenda­tion: CLI-only implementation to avoid schema complexity
+
+5. **Product Surfaces Requiring Changes (if approved):**
+   - Add `--use-property-name-as-is` CLI option to `Settings.cs`
+   - Map option in `GenerateCommand.cs` to inject `PreservingPropertyNameGenerator`
+   - Create `PreservingPropertyNameGenerator` in core (sanitizes invalid identifiers & reserved keywords)
+   - Update README.md with new option and behavior description
+
+**Full detailed feasibility report written to `.squad/decisions/inbox/fenster-issue-967-investigation.md`**
+
+
+## 2026-03-25: Issue #967 Team Assessment
+
+Team consensus reached on GitHub issue #967 (Preserve Original Property Names):
+- ✅ APPROVED FOR IMPLEMENTATION
+- Recommended surface: CLI option --property-naming-policy with enum values
+- Implementation surfaces identified: CLI, settings mapper, new generator class
+- Edge-case handling: reserved keywords, hyphens, leading digits, collisions
+- No .refitter file support in Phase 1 (defer polymorphic deserialization)
+
+Consolidated decision entry created in decisions.md. See orchestration logs for full team assessment.
+
+### Issue #967 Implementation Planning — 2026-03-25
+
+Completed comprehensive implementation plan (`.squad/implementation-plan-issue-967.md`) covering:
+
+**Recommended Implementation Shape:**
+- CLI surface: `--property-naming-policy [PascalCase|Preserve|CamelCase|SnakeCase]`
+- Architecture: Pluggable `IPropertyNameGenerator` hierarchy; factory-based routing
+- Scope: Phase 1 = CLI only; Phase 2 = .refitter/.refitter files (defer polymorphic JSON deserialization)
+- Default: PascalCase (backward compatible)
+
+**File Changes (13 tasks, ~5 hours estimated):**
+
+**New Files (5):**
+1. `PropertyNamingPolicy.cs` — Enum (PascalCase, Preserve, CamelCase, SnakeCase)
+2. `IdentifierUtils.cs` — Shared validation: `IsValidIdentifier()`, `SanitizeInvalidIdentifier()`, `EscapeReservedKeyword()`
+3. `PreservingPropertyNameGenerator.cs` — Generator: use exact OpenAPI names, sanitize invalid identifiers
+4. `CamelCasePropertyNameGenerator.cs` — Generator (optional MVP)
+5. `PropertyNamingPolicyTests.cs` — 10+ test cases per SKILL validation checklist
+
+**Modified Files (6):**
+1. `src/Refitter/Settings.cs` — Add `[CommandOption("--property-naming-policy")]`
+2. `src/Refitter/GenerateCommand.cs` — Map setting in `CreateRefitGeneratorSettings()`
+3. `src/Refitter.Core/Settings/RefitGeneratorSettings.cs` — Add property + serialization
+4. `src/Refitter.Core/CSharpClientGeneratorFactory.cs` — Update line 33 generator routing logic
+5. `README.md` — Document new option with examples
+6. `docs/json-schema.json` — Add `propertyNamingPolicy` definition
+
+**Work Breakdown (Ordered):**
+
+*Phase 1: Core Infrastructure* (1 hour)
+- Task 1.1: PropertyNamingPolicy enum (5 min)
+- Task 1.2: IdentifierUtils sanitization (30 min)
+- Task 1.3: PreservingPropertyNameGenerator (15 min)
+- Task 1.4: CamelCasePropertyNameGenerator (15 min, optional)
+
+*Phase 2: Settings & Routing* (45 min)
+- Task 2.1: RefitGeneratorSettings property (10 min)
+- Task 2.2: CSharpClientGeneratorFactory routing (15 min)
+- Task 2.3: Settings.cs CLI option (5 min)
+- Task 2.4: GenerateCommand mapper (5 min)
+
+*Phase 3: Testing* (2.5 hours)
+- Task 3.1: PropertyNamingPolicyTests (10+ tests, 2 hours)
+- Task 3.2: Regression validation (15 min)
+
+*Phase 4: Documentation* (1 hour)
+- Task 4.1: README updates (30 min)
+- Task 4.2: json-schema.json (15 min)
+- Task 4.3: Format validation (5 min)
+
+**Critical Edge Cases & Mitigations:**
+
+| Case | Risk | Mitigation |
+|------|------|-----------|
+| Hyphens (`pay-method`) | Invalid C# | Reject in Preserve mode + clear error |
+| Reserved keywords (`class`) | Compilation error | Auto-escape → `@class` |
+| Leading digits (`123abc`) | Invalid C# | Prepend underscore → `_123abc` |
+| Collisions (`Class`, `_class`) | Silent errors | Detect + warn; use sequential suffix |
+| No `[JsonPropertyName]` | Deserialization fails | Always emit regardless of mode |
+
+**Test Strategy:**
+- 5+ core unit tests: basic, PascalCase regression, invalid handling, keyword escaping, compilation
+- Integration: CLI help, generation, serialization roundtrip
+- Regression: Full 1415+ test suite must pass
+
+**Success Criteria:**
+- ✅ CLI option functional and documented
+- ✅ Preserve mode generates exact property names (snake_case example)
+- ✅ All edge cases handled safely
+- ✅ 10+ unit tests pass; 0 regressions
+- ✅ Code compiles; serialization verified
+- ✅ Format validation passes
+
+**Phase 2 (Deferred):**
+- `.refitter` file support: Add `propertyNamingPolicy` to schema; implement enum-based factory in SourceGenerator/MSBuild
+- Complexity: JSON polymorphic deserialization deferred; enum routing sufficient
+
+**Key Design Decisions Ratified:**
+1. CLI-only Phase 1 (simpler than polymorphic .refitter deserialization)
+2. Enum-based routing (cleaner than interface discriminator pattern)
+3. Reject invalid identifiers in Preserve mode (safer UX)
+4. Use `@` prefix for reserved keywords (standard C# pattern)
+5. Default to PascalCase (backward compatible)
+6. Always emit `[JsonPropertyName]` (ensures correct binding)
+
+**Documentation Plan:**
+- README: Add "Property Naming Policies" section with use cases for each enum value
+- Examples: PascalCase vs Preserve side-by-side output
+- Schema: Note that `[JsonPropertyName]` is auto-generated for binding
+
+**Implementation Ready:** ✅ Plan complete, approved by team, ready for Phase 1 execution.
+
+### Issue #967 Implementation — 2026-03-25
+
+- Added a top-level `PropertyNamingPolicy` enum to `RefitGeneratorSettings` and wired it through the CLI, `.refitter` JSON surface, Source Generator, and MSBuild/shared serializer flow with `PascalCase` as the default.
+- `CSharpClientGeneratorFactory` now resolves property name generation by precedence: programmatic `CodeGeneratorSettings.PropertyNameGenerator` first, then the user-facing `PropertyNamingPolicy`.
+- `PreserveOriginalPropertyNameGenerator` preserves valid identifiers, escapes reserved C# keywords with `@`, minimally sanitizes invalid shapes with underscores, and de-duplicates sibling collisions with `IdentifierUtils.Counted` against `ParentSchema.Properties`.
+- Removed the dead `propertyNameGenerator` JSON schema surface and documented the replacement setting in `README.md`.
+- Validation that succeeded on this slice: CLI `--help` shows `--property-naming-policy`; direct CLI generation and `.refitter` generation both preserved raw property names and kept `[JsonPropertyName]`; full repo gate passed with `dotnet build -c Release src\Refitter.slnx`, `dotnet test -c Release --solution src\Refitter.slnx`, and `dotnet format --verify-no-changes src\Refitter.slnx`.
