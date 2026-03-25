@@ -124,3 +124,55 @@ Successfully implemented fix for non-ASCII characters in XML status-code comment
 - Tests confirmed: Cyrillic Unicode renders correctly, escape sequences absent, compilation succeeds
 - All 1415 tests pass with no regressions
 
+### Issue #967 Investigation — Snake_case Property Names — 2026-03-06
+
+**Feasibility: TECHNICALLY FEASIBLE, requires product surface changes**
+
+Investigated whether Refitter can generate snake_case C# property names instead of mandatory PascalCase conversion.
+
+**Key Findings:**
+
+1. **Current Access Paths:**
+   - NOT accessible via CLI (no `--property-name-generator` option)
+   - NOT accessible via `.refitter` files (`CodeGeneratorSettings.PropertyNameGenerator` marked `[JsonIgnore]`)
+   - NOT accessible via source generator
+   - Only accessible programmatically by injecting custom `IPropertyNameGenerator` into core settings
+
+2. **Root Cause:**
+   - `CustomCSharpPropertyNameGenerator` is hardcoded in `CSharpClientGeneratorFactory.Create()` line 33
+   - Performs mandatory `ConvertToUpperCamelCase()` + `ConvertSnakeCaseToPascalCase()` (line 46)
+   - Falls back to this generator when user doesn't provide custom one
+   - `CodeGeneratorSettings.PropertyNameGenerator` explicitly marked `[JsonIgnore]` to prevent `.refitter` deserialization
+   - Historical #516 added support for custom generators but never exposed to end users
+
+3. **Edge Cases Requiring Handling:**
+   - Invalid C# identifiers (spaces → `_`, hyphens → `_`, leading digits → prepend `_`)
+   - C# reserved keywords (detect & add `@` prefix or `_` suffix)
+   - **Critical:** `[JsonPropertyName]` attribute MUST still be generated for deserialization to work; user's example omitted it, would require `PropertyNameCaseInsensitive = true` to avoid binding failures
+   - Potential name collisions when sanitization produces duplicates
+
+4. **Schema/Serialization Complexity:**
+   - `IPropertyNameGenerator` is an external NJsonSchema interface, difficult to expose via JSON without type discriminator
+   - Creating polymorphic deserialization for `.refitter` files would require either whitelist strategy or reflection-based instantiation
+   - Recommenda­tion: CLI-only implementation to avoid schema complexity
+
+5. **Product Surfaces Requiring Changes (if approved):**
+   - Add `--use-property-name-as-is` CLI option to `Settings.cs`
+   - Map option in `GenerateCommand.cs` to inject `PreservingPropertyNameGenerator`
+   - Create `PreservingPropertyNameGenerator` in core (sanitizes invalid identifiers & reserved keywords)
+   - Update README.md with new option and behavior description
+
+**Full detailed feasibility report written to `.squad/decisions/inbox/fenster-issue-967-investigation.md`**
+
+
+## 2026-03-25: Issue #967 Team Assessment
+
+Team consensus reached on GitHub issue #967 (Preserve Original Property Names):
+- ✅ APPROVED FOR IMPLEMENTATION
+- Recommended surface: CLI option --property-naming-policy with enum values
+- Implementation surfaces identified: CLI, settings mapper, new generator class
+- Edge-case handling: reserved keywords, hyphens, leading digits, collisions
+- No .refitter file support in Phase 1 (defer polymorphic deserialization)
+
+Consolidated decision entry created in decisions.md. See orchestration logs for full team assessment.
+

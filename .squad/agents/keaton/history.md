@@ -116,3 +116,33 @@ Added comprehensive regression testing for non-ASCII XML documentation fix:
 - Unit test in `XmlDocumentationGeneratorTests.cs` validates readable Unicode and absence of `\uXXXX` escape sequences
 - Integration test in `GenerateStatusCodeCommentsTests.cs` confirms full pipeline compilation success with Unicode content
 - Tests follow existing pattern: direct assertion + compilation verification
+
+### Issue #967 Feasibility — Preserve Original Property Names (2025)
+
+**Investigated** whether users can preserve raw OpenAPI property names (e.g., `payMethod_SumBank`) instead of PascalCase conversion (`PayMethodSumBank`).
+
+**Key findings:**
+- **Not possible today** from CLI or `.refitter` config. `CustomCSharpPropertyNameGenerator` always PascalCases via `ConvertToUpperCamelCase` + `ConvertSnakeCaseToPascalCase`.
+- **Possible programmatically** — `CSharpClientGeneratorFactory.cs:33` respects `settings.CodeGeneratorSettings.PropertyNameGenerator` if provided, but `[JsonIgnore]` on the property blocks all config-file users.
+- **Valid C# with correct serialization** — underscores are legal in C# identifiers; NSwag already emits `[JsonPropertyName]` attributes.
+- **Recommended approach:** New `PropertyNamingPolicy` enum setting (PascalCase/PreserveOriginal) on `RefitGeneratorSettings` + new passthrough `IPropertyNameGenerator` implementation.
+- **Schema inconsistency:** `docs/json-schema.json` exposes `propertyNameGenerator` with `$ref: IPropertyNameGenerator` but the C# property is `[JsonIgnore]` — dead surface that misleads IDE users.
+
+**Key files:**
+- `CustomCSharpPropertyNameGenerator.cs` — current PascalCase conversion logic
+- `StringCasingExtensions.cs:70-79` — `ConvertSnakeCaseToPascalCase` implementation
+- `CSharpClientGeneratorFactory.cs:33` — generator selection with fallback
+- `CodeGeneratorSettings.cs:265` — `[JsonIgnore]` on `PropertyNameGenerator`
+- `docs/json-schema.json:193,251` — misleading schema entries
+
+## 2026-03-25: Issue #967 Team Assessment
+
+Team consensus reached on GitHub issue #967 (Preserve Original Property Names):
+- ✅ APPROVED FOR IMPLEMENTATION
+- Product shape: PropertyNamingPolicy enum (PascalCase, PreserveOriginal)
+- Implementation effort: 6-7 hours
+- No breaking changes
+- Safety verdict: Safe with proper edge-case testing
+
+Consolidated decision entry created in decisions.md. See orchestration logs for full team assessment.
+

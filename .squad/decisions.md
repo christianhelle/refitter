@@ -354,4 +354,101 @@ Commit changes in small logical groups with one-liner commit messages without a 
 
 ---
 
+### 9. Issue #967 — Preserve Original Property Names (2026-03-25)
+
+**Status:** ✅ TEAM CONSENSUS — APPROVED FOR IMPLEMENTATION  
+**Date:** 2026-03-25  
+**Assessors:** Keaton (Architect), Fenster (.NET Dev), Hockney (Tester)
+
+#### Problem Statement
+
+User requests the ability to generate C# properties that preserve the original OpenAPI property name (e.g., `payMethod_SumBank`) instead of converting to PascalCase (`PayMethodSumBank`).
+
+**Current output:**
+```csharp
+[System.Text.Json.Serialization.JsonPropertyName("payMethod_SumBank")]
+public double? PayMethodSumBank { get; set; }
+```
+
+**Desired output:**
+```csharp
+public double? payMethod_SumBank { get; set; }
+```
+
+#### Key Findings
+
+**Keaton (Architect):**
+- ✅ Architecture supports pluggable `IPropertyNameGenerator` at factory level
+- ❌ Property generation hardcoded; users cannot access without code changes
+- 🔧 Recommended shape: `PropertyNamingPolicy` enum (`PascalCase`, `PreserveOriginal`)
+- Effort: 1-2 days
+
+**Fenster (.NET Dev):**
+- 📍 Hardcoded in `CustomCSharpPropertyNameGenerator.cs:45-47`
+- ❌ No CLI option; `.refitter` file blocked by `[JsonIgnore]`
+- 🔨 Required surfaces: CLI option, settings mapping, new generator class
+- Recommendation: CLI-only initially (defer `.refitter` support due to polymorphic deserialization complexity)
+- Effort: 4-6 hours
+
+**Hockney (Tester):**
+- ✅ C# compilation safe; `payMethod_SumBank` is valid identifier
+- ✅ System.Text.Json works correctly with `[JsonPropertyName]` attribute
+- ⚠️ Edge cases require mitigation: reserved keywords, hyphens, leading digits, name collisions
+- 📋 Comprehensive tests needed for edge-case coverage
+- Verdict: Safe to implement with proper validation
+
+#### Recommended Product Shape
+
+1. **New enum:** `PropertyNamingPolicy` on `RefitGeneratorSettings`
+   - Values: `PascalCase` (default), `PreserveOriginal`
+   
+2. **New generator class:** `PreserveOriginalPropertyNameGenerator : IPropertyNameGenerator`
+   - Sanitizes invalid C# identifiers only; preserves casing/underscores
+   - Handles reserved keywords (e.g., `@class`)
+   - Validates against name collisions
+
+3. **CLI option:** `--property-naming-policy`
+   - Example: `--property-naming-policy PreserveOriginal`
+
+4. **Edge-case handling:**
+   - Reserved keywords → add `@` prefix or suffix
+   - Spaces/hyphens → replace with underscore
+   - Leading digits → prepend underscore
+   - Name collisions → validation error
+
+5. **Testing:**
+   - Unit tests for `PreserveOriginalPropertyNameGenerator` (reserved keywords, invalid identifiers)
+   - Integration tests (CLI generation + code compilation)
+   - Serialization round-trip validation
+
+6. **Documentation:**
+   - Update README with new CLI option
+   - Update JSON schema
+   - Clarify that `[JsonPropertyName]` still generated for correct deserialization
+
+#### Implementation Roadmap
+
+| Phase | Task | Effort | Dependencies |
+|-------|------|--------|---|
+| Phase 1 | Create `PreserveOriginalPropertyNameGenerator` | 1h | None |
+| | Add CLI option `--property-naming-policy` | 1h | None |
+| | Wire settings mapping | 1h | Phase 1 |
+| Phase 2 | Add unit tests (edge cases) | 1-2h | Phase 1 |
+| | Add integration tests | 1h | Phase 1 |
+| Phase 3 | Update README + schema | 1h | Phase 2 |
+| **Total** | | **6-7h** | |
+
+#### Future Work (Deferred)
+
+- `.refitter` file support via whitelist strategy (requires polymorphic serialization design)
+- Schema cleanup: remove dead `propertyNameGenerator` references
+
+#### Consensus
+
+✅ **PROCEED WITH IMPLEMENTATION**
+
+Issue #967 is **technically feasible**, addresses a **real use case** (snake_case JSON APIs), carries **low risk** (no breaking changes), and has **clean product shape** (simple enum).
+
+---
+
 *Maintained by Scribe. Agents write to `.squad/decisions/inbox/` and Scribe merges, deduplicates, and consolidates here.*

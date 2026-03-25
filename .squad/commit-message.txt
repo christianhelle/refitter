@@ -1,0 +1,11 @@
+Issue #967 team assessment: Preserve Original Property Names
+
+Keaton (Architect): Feasibility confirmed. Recommend PropertyNamingPolicy enum.
+Fenster (.NET Dev): Implementation path identified. CLI-only Phase 1, defer .refitter.
+Hockney (Tester): Safety verified. Raw property names compile; edge-case tests required.
+
+Consensus: APPROVED FOR IMPLEMENTATION. 6-7 hour effort, zero breaking changes.
+
+Orchestration logs: 2026-03-25T08-07-15Z-{keaton,fenster,hockney}.md
+Session log: 2026-03-25T08-07-15Z-issue-967-feasibility.md
+Decision entry: decisions.md#9 (consolidated from inbox, inbox files deleted)
