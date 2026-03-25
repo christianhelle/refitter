@@ -27,6 +27,14 @@ public sealed class Settings : CommandSettings
     [DefaultValue(null)]
     public string? ContractsNamespace { get; set; }
 
+    private const string PropertyNamingPolicyValues =
+        $"{nameof(Core.PropertyNamingPolicy.PascalCase)}, {nameof(Core.PropertyNamingPolicy.PreserveOriginal)}";
+
+    [Description($"Controls how generated contract properties are named. May be one of {PropertyNamingPolicyValues}")]
+    [CommandOption("--property-naming-policy")]
+    [DefaultValue(Core.PropertyNamingPolicy.PascalCase)]
+    public Core.PropertyNamingPolicy PropertyNamingPolicy { get; set; } = Core.PropertyNamingPolicy.PascalCase;
+
     [Description("Path to Output file or folder (if multiple files are generated)")]
     [CommandOption("-o|--output")]
     [DefaultValue(DefaultOutputPath)]
