@@ -83,6 +83,15 @@ public class SerializerTests
     }
 
     [Test]
+    public void Can_Deserialize_RefitGeneratorSettings_With_PropertyNamingPolicy_String_PreserveOriginal()
+    {
+        const string json = """{"propertyNamingPolicy": "PreserveOriginal"}""";
+        var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+        settings.Should().NotBeNull();
+        settings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PreserveOriginal);
+    }
+
+    [Test]
     public void Can_Deserialize_CodeGeneratorSettings_With_IntegerType_String_Int32()
     {
         const string json = """{"integerType": "Int32"}""";
@@ -106,5 +115,16 @@ public class SerializerTests
         var settings = new CodeGeneratorSettings { IntegerType = IntegerType.Int64 };
         var json = Serializer.Serialize(settings);
         json.Should().Contain("\"integerType\": \"Int64\"");
+    }
+
+    [Test]
+    public void Can_Serialize_RefitGeneratorSettings_With_PropertyNamingPolicy()
+    {
+        var settings = CreateTestSettings();
+        settings.PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal;
+
+        var json = Serializer.Serialize(settings);
+
+        json.Should().Contain("\"propertyNamingPolicy\": \"PreserveOriginal\"");
     }
 }

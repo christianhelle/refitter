@@ -1,3 +1,4 @@
+using System.Reflection;
 using FluentAssertions;
 using Refitter.Core;
 using TUnit.Core;
@@ -97,6 +98,30 @@ public class GenerateCommandTests
         var result = SettingsValidator.Validate(settings);
 
         result.Successful.Should().BeTrue();
+    }
+
+    [Test]
+    public void CreateRefitGeneratorSettings_Should_Map_PropertyNamingPolicy()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "CreateRefitGeneratorSettings",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+
+        var refitSettings = method!
+            .Invoke(null, [settings])
+            .Should()
+            .BeOfType<RefitGeneratorSettings>()
+            .Subject;
+
+        refitSettings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PreserveOriginal);
     }
 
     [Test]
