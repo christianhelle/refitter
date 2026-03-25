@@ -6,10 +6,16 @@
 
 **Implemented enhancements:**
 
+- Add PropertyNamingPolicy support for JSON property naming [\#969](https://github.com/christianhelle/refitter/pull/969) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency tunit to 1.20.0 [\#962](https://github.com/christianhelle/refitter/pull/962) ([renovate[bot]](https://github.com/apps/renovate))
+
+**Closed issues:**
+
+- how to keep contract Property Name as original name without Serialization ? [\#967](https://github.com/christianhelle/refitter/issues/967)
 
 **Merged pull requests:**
 
+- docs: add naji-makhoul as a contributor for ideas [\#968](https://github.com/christianhelle/refitter/pull/968) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency tunit to 1.21.0 [\#964](https://github.com/christianhelle/refitter/pull/964) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency oasreader to 3.5.0.19 [\#963](https://github.com/christianhelle/refitter/pull/963) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update refit monorepo to 10.1.6 [\#961](https://github.com/christianhelle/refitter/pull/961) ([renovate[bot]](https://github.com/apps/renovate))
