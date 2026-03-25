@@ -48,6 +48,30 @@ Build: `dotnet build -c Release src/Refitter.slnx` (~22s). Tests: `dotnet test -
 - `partial interface` generation allows user extension.
 
 **Architectural concerns identified:**
+
+---
+
+## Issue #967 — Review & Approval (2026-03-25)
+
+**Status:** ✅ APPROVED FOR MERGE
+
+Reviewed implementation, validated test coverage, approved feature for PR creation.
+
+**Validation:** All three gates pass — build (0 errors), tests (1468/1468), format (clean)
+
+**Findings:**
+- Feature correctness verified: PreserveOriginalPropertyNameGenerator handles valid identifiers, reserved keywords, invalid chars correctly
+- Test coverage is comprehensive across CLI, serializer, settings, and Source Generator
+- Root-caused previous test failures: `dotnet test` CLI syntax (positional solution arg → `--solution` flag), not code defect
+
+**Known Follow-up (non-blocking):**
+- IdentifierUtils contains three public methods with zero external callers
+- PreserveOriginalPropertyNameGenerator reimplements equivalent logic
+- Action: Consolidate or remove in follow-up PR, assign to Fenster
+
+**Collaborators:**
+- Fenster delivered implementation
+- Hockney provided test coverage
 1. **SourceGenerator sync-over-async:** `RefitGenerator.CreateAsync(...).GetAwaiter().GetResult()` in source generator can deadlock in certain IDE hosts.
 2. **Duplicated source compilation:** SourceGenerator includes Core `.cs` files via `<Compile Include>` rather than IL reference — changes to Core files compile twice and can drift.
 3. **MSBuild JSON parsing with regex:** `RefitterGenerateTask` uses regex to parse JSON config (`ExtractJsonStringValue`/`ExtractJsonBoolValue`) instead of a JSON parser, which is fragile.
@@ -145,4 +169,28 @@ Team consensus reached on GitHub issue #967 (Preserve Original Property Names):
 - Safety verdict: Safe with proper edge-case testing
 
 Consolidated decision entry created in decisions.md. See orchestration logs for full team assessment.
+
+### Issue #967 PRD Authoring — 2026-03-25
+
+Drafted comprehensive PRD for the "Preserve Original Property Names" feature. Key learnings:
+
+- **Enum placement matters:** `PropertyNamingPolicy` belongs on `RefitGeneratorSettings` (top-level), not nested in `CodeGeneratorSettings`, because it controls a Refitter-specific behavioral choice, not an NSwag passthrough setting. The `CodeGeneratorSettings.PropertyNameGenerator` (`[JsonIgnore]`) is the implementation mechanism, not the user-facing config.
+- **`.refitter` support is trivial for enums:** Previous team assessment suggested deferring `.refitter` file support due to polymorphic serialization concerns. This was overcautious — `PropertyNamingPolicy` is a simple enum, not an `IPropertyNameGenerator` interface. Standard `System.Text.Json` enum deserialization handles it. All three surfaces (CLI, `.refitter`, JSON schema) can ship together.
+- **Sanitize-not-reject for edge cases:** Rejecting invalid property names (hyphens, spaces) would be a breaking behavior change for specs that work today with PascalCase. The safer approach is minimal sanitization (replace with underscore) so the feature adds capability without removing it.
+- **`[JsonPropertyName]` must always emit:** Even when the C# property name matches the JSON key, the attribute should still be present for correctness — NSwag already does this, so no change needed, but the PRD must call it out to prevent future "optimization" that removes "redundant" attributes.
+
+### Issue #967 Implementation Review — 2026-07-09
+
+**Reviewed and APPROVED** the full implementation of issue #967 (Preserve Original Property Names). All three PR gates pass: build (0 errors, 0 warnings), tests (1468/1468 pass), format (clean).
+
+**Previous non-zero test exits:** Most likely caused by the `dotnet test` CLI syntax change — positional solution argument now requires `--solution` flag. Running `dotnet test -c Release src/Refitter.slnx` exits 1 without executing any tests. The correct invocation is `dotnet test -c Release --solution src/Refitter.slnx`.
+
+**Implementation fully aligns with agreed plan.** All five phases are complete:
+- Phase 2 (Core): `PropertyNamingPolicy` enum, `PreserveOriginalPropertyNameGenerator`, `CSharpClientGeneratorFactory` wiring with correct precedence (programmatic override → policy → default).
+- Phase 3 (User-facing): `--property-naming-policy` CLI option, GenerateCommand mapping, JSON schema updated (stale `propertyNameGenerator`/`IPropertyNameGenerator` removed, new `propertyNamingPolicy` enum added).
+- Phase 4 (Tests): SerializerTests, SettingsTests, GenerateCommandTests, PropertyNamingPolicyTests (core + source generator). Source generator tests validate full pipeline through `.refitter` → compilation → reflection.
+- Phase 5 (Docs): README updated with examples, `.refitter` format, and reference docs.
+
+**Follow-up recommendation (non-blocking):**
+- `IdentifierUtils` has three new public methods (`ToCompilableIdentifier`, `IsValidIdentifier`, `EscapeReservedKeyword`) with zero external callers — dead code. `PreserveOriginalPropertyNameGenerator` reimplements the same logic with a broader keyword list (130 vs 78 keywords). Future cleanup should either refactor the generator to delegate to `IdentifierUtils` (merging keyword lists) or remove the unused methods.
 

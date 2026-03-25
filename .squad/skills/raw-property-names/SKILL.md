@@ -143,3 +143,30 @@ public async Task Reserved_Keywords_Are_Escaped()
 - [ ] JSON serialization roundtrip tested
 - [ ] README updated with feature description and limitations
 - [ ] All 1400+ existing tests still pass
+
+---
+
+## Reusable Pattern — Refitter Setting Parity
+
+When a new `.refitter` enum setting lands, cover it in three layers:
+
+1. **Serializer binding:** add `SerializerTests` coverage for string enum serialization/deserialization.
+2. **CLI mapping:** if the CLI mapping helper is private (for example `GenerateCommand.CreateRefitGeneratorSettings`), use reflection in tests to verify `Settings` → `RefitGeneratorSettings` mapping without changing production visibility.
+3. **Source Generator parity:** add `AdditionalFiles\FeatureName.refitter` plus a focused resource spec, then assert generated members via reflection on compiled types instead of snapshotting entire files.
+
+For generated property-name assertions, prefer checking the identifier itself (string containment or reflection) over over-specifying nullability, because NSwag may emit non-nullable value types where tests might otherwise assume `?`.
+
+## Implemented Pattern — Issue #967
+
+For user-facing property-name customization in Refitter:
+
+1. Expose a **serializable enum** (`PropertyNamingPolicy`) on `RefitGeneratorSettings` for CLI + `.refitter` parity instead of trying to serialize `IPropertyNameGenerator`.
+2. Resolve precedence in `CSharpClientGeneratorFactory` as:
+   - `CodeGeneratorSettings.PropertyNameGenerator` (programmatic override),
+   - otherwise `PropertyNamingPolicy`.
+3. For preserve-original behavior, generate identifiers by:
+   - returning already-valid identifiers unchanged,
+   - escaping reserved keywords with `@`,
+   - replacing invalid character runs with `_` and prefixing `_` when needed for compilable output,
+   - de-duplicating sibling collisions with `IdentifierUtils.Counted`.
+4. Remove any JSON schema entry that exposes a non-serializable interface-based setting (`propertyNameGenerator`) once the enum replacement exists.

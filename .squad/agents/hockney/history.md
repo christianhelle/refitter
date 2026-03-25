@@ -48,6 +48,25 @@ Added regression test coverage for non-ASCII XML documentation fix:
 - Can_Generate_Code_With_Raw_Property_Names()
 - Generated_Code_Uses_Raw_Property_Names (assertion: no PascalCase)
 - Can_Build_Generated_Code_With_Raw_Names
+
+---
+
+## Issue #967 — Test Coverage Implementation (2026-03-25)
+
+**Status:** ✅ DELIVERED & APPROVED
+
+Added comprehensive regression coverage for property naming feature:
+- Core unit tests: PascalCase regression, PreserveOriginal identifiers, keyword escaping, invalid identifier sanitization, compilation checks
+- CLI binding: `--property-naming-policy` argument parsing
+- Serializer round-trip: Settings deserialization from JSON
+- Settings defaults: `PropertyNamingPolicy.PascalCase` verified
+- Source Generator end-to-end: `.refitter` file generation matches CLI output
+
+**Test Coverage:** 1468/1468 tests pass (4 issue #967 test files, 4 issue #967 test classes, 30+ test cases)
+
+**Collaborators:**
+- Fenster built the implementation
+- Keaton reviewed and approved for merge
 - Serialization_Preserves_Mapping_With_Raw_Names (JSON roundtrip)
 - Invalid_Property_Names_Are_Rejected (hyphens, spaces, etc.)
 
@@ -63,4 +82,15 @@ Team consensus reached on GitHub issue #967 (Preserve Original Property Names):
 - Sanitization strategy: preserve casing/underscores, validate C# identifier legality
 
 Consolidated decision entry created in decisions.md. See orchestration logs for full team assessment.
+
+### 2026-03-25 — Issue #967 Regression Coverage Executed
+
+Implemented end-to-end regression coverage for the shipped `PropertyNamingPolicy` surface:
+- `src\Refitter.Tests\Examples\PropertyNamingPolicyTests.cs` verifies default PascalCase output, `PreserveOriginal` raw valid identifiers, reserved keyword escaping, invalid identifier sanitization, and `BuildHelper.BuildCSharp()` compilation.
+- `SerializerTests`, `SettingsTests`, and `GenerateCommandTests` now cover enum serialization plus CLI/settings binding for `PropertyNamingPolicy`.
+- Source Generator parity is covered with `src\Refitter.SourceGenerator.Tests\AdditionalFiles\PropertyNamingPolicy.refitter` and reflection-based assertions over the generated `PaymentResponse` contract.
+
+**Landed behavior worth remembering:** the preserving generator keeps valid identifiers as-is, prefixes reserved keywords with `@`, and minimally sanitizes invalid names by replacing invalid characters with `_` and prefixing invalid starts with `_`.
+
+**Validation:** `dotnet build -c Release src\Refitter.slnx`, `dotnet test --solution src\Refitter.slnx -c Release --no-build`, and `dotnet format --verify-no-changes src\Refitter.slnx` all passed; full suite count reached 1468 tests.
 
