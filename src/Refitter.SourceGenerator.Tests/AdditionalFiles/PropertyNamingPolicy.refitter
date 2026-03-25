@@ -1,0 +1,9 @@
+{
+  "openApiPath": "../Resources/PropertyNamingPolicy.json",
+  "namespace": "Refitter.Tests.AdditionalFiles.PropertyNamingPolicy",
+  "propertyNamingPolicy": "PreserveOriginal",
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "PropertyNamingPolicyApi"
+  }
+}

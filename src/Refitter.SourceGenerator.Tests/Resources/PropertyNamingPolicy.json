@@ -1,0 +1,39 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Property Naming Policy API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/payments": {
+      "get": {
+        "operationId": "GetPayment",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PaymentResponse": {
+        "type": "object",
+        "properties": {
+          "payMethod_SumBank": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      }
+    }
+  }
+}
