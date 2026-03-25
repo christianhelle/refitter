@@ -582,3 +582,9 @@ Implementation is **approved for merge** pending PR creation. All three gates pa
 ## Follow-up (non-blocking)
 
 - **Dead code in IdentifierUtils:** Three new public methods (`ToCompilableIdentifier`, `IsValidIdentifier`, `EscapeReservedKeyword`) have zero external callers. `PreserveOriginalPropertyNameGenerator` reimplements equivalent logic with a broader keyword list. Consolidate or remove in a follow-up PR. Assign to Fenster.
+
+## Decision: Commit changes in small logical groups
+### 2026-03-25T09:23:40Z: User directive
+**By:** Christian Helle (via Copilot)
+**What:** Commit changes in small logical groups automatically for all agent work.
+**Why:** User request — captured for team memory

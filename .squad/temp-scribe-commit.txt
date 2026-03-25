@@ -1,0 +1,5 @@
+.squad: Merge decisions inbox and finalize session state
+
+Merged user directive from Coordinator to always commit changes in small logical groups. Processed and deleted inbox file. Added session and orchestration logs documenting final .squad/ state after issue #967 implementation phase.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
