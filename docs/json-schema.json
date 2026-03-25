@@ -190,9 +190,6 @@
           "description": "Gets or sets the date-time string format to use",
           "type": "string"
         },
-        "propertyNameGenerator": {
-          "$ref": "#/definitions/IPropertyNameGenerator"
-        },
         "customTemplateDirectory": {
           "description": "Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates",
           "type": "string"
@@ -248,10 +245,6 @@
     "IParameterNameGenerator": {
       "type": "object"
     },
-    "IPropertyNameGenerator": {
-      "description": "Gets or sets a custom IPropertyNameGenerator.",
-      "type": "object"
-    },
     "NamingSettings": {
       "description": "The naming settings.",
       "type": "object",
@@ -290,6 +283,14 @@
     },
     "naming": {
       "$ref": "#/definitions/NamingSettings"
+    },
+    "propertyNamingPolicy": {
+      "description": "Controls how generated contract properties are named. Default is PascalCase. Possible values: PascalCase, PreserveOriginal.",
+      "type": "string",
+      "enum": [
+        "PascalCase",
+        "PreserveOriginal"
+      ]
     },
     "generateContracts": {
       "description": "Generate contracts. Default is true.",
