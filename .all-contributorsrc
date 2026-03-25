@@ -839,6 +839,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "naji-makhoul",
+      "name": "Naji Makhoul",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5232373?v=4",
+      "profile": "https://github.com/naji-makhoul",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,

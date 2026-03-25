@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-90-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-91-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1445,6 +1445,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://meteion.ca"><img src="https://avatars.githubusercontent.com/u/6116333?v=4?s=100" width="100px;" alt="Tylor Pater"/><br /><sub><b>Tylor Pater</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=frogcrush" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vgmello"><img src="https://avatars.githubusercontent.com/u/4777793?v=4?s=100" width="100px;" alt="Vitor M"/><br /><sub><b>Vitor M</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=vgmello" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/send0xx"><img src="https://avatars.githubusercontent.com/u/31574812?v=4?s=100" width="100px;" alt="send0xx"/><br /><sub><b>send0xx</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Asend0xx" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/naji-makhoul"><img src="https://avatars.githubusercontent.com/u/5232373?v=4?s=100" width="100px;" alt="Naji Makhoul"/><br /><sub><b>Naji Makhoul</b></sub></a><br /><a href="#ideas-naji-makhoul" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
