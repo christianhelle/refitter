@@ -15,6 +15,33 @@ Build: `dotnet build -c Release src/Refitter.slnx` (~22s). Tests: `dotnet test -
 
 ## Learnings
 
+### Recursive Schema Stack Overflow Tracking Issue (2026-03-27)
+
+**Context:** After discovering a pre-existing `StackOverflowException` bug in recursive schema traversal during investigation of #967, created tracking issue #973 to document the broader problem, root cause, and resolution path via PR #971.
+
+**Linkage established:**
+- **Issue #973:** "Fix StackOverflowException in recursive schema traversal"
+  - Assigned to: `@christianhelle`
+  - Label: `bug`
+  - URL: `https://github.com/christianhelle/refitter/issues/973`
+
+- **PR #971** (open): Implements fix with visited-set cycle detection + comprehensive regression coverage
+  - Linked via comment: "Resolves #973 — Stack overflow in recursive schema traversal"
+  - Comment ID: 4139054720
+
+- **PR #969** (merged): PropertyNamingPolicy support; surfaced the vulnerability
+  - Cross-referenced via comment: "Related to #973 — the PreserveOriginal property naming policy introduced in this PR surfaced an underlying stack overflow bug..."
+  - Comment ID: 4139055020
+
+**Key insights:**
+- Root cause: `CSharpClientGeneratorFactory.ProcessSchemaForMissingTypes()` and `ProcessSchemaForIntegerType()` recursively traverse NJsonSchema without cycle detection
+- Pre-existing bug (introduced Jan 2026), NOT caused by #969
+- Affects all surfaces: CLI, Source Generator, MSBuild
+- Fix uses `Stack<JsonSchema>` + visited-set, matches established `SchemaCleaner.FindUsedJsonSchema()` pattern
+- Real-world validation: 666KB customer spec (59 paths, 22 excluded types) now completes in 2.17s vs prior crash
+
+---
+
 ### Architecture Review (2025)
 
 **Solution structure:** 6 projects in `src/Refitter.slnx`. Clean separation: `Refitter.Core` (netstandard2.0) is the engine, `Refitter` (CLI, net8.0/9.0/10.0) is one consumer, `Refitter.SourceGenerator` (netstandard2.0, IIncrementalGenerator) is another, and `Refitter.MSBuild` (netstandard2.0) shells out to the CLI via `Process.Start`. Tests split into `Refitter.Tests` (core) and `Refitter.SourceGenerator.Tests`.
@@ -231,3 +258,25 @@ Both traverse `Properties`, `Item`, `AdditionalPropertiesSchema`, `AllOf`/`OneOf
 - Iterative approach with instance-based visited-set matches existing SchemaCleaner pattern in codebase
 - netstandard2.0 compatible (no custom equality comparer needed)
 - PreserveOriginal + recursive schemas now validated across CLI, MSBuild, and SourceGenerator paths
+
+### Public Tracking Issue #973 Creation (2026-03-27)
+
+**Context:** After discovering pre-existing StackOverflowException bug in recursive schema traversal during #967 investigation, created GitHub tracking issue #973 to document the broader problem, root cause, and resolution path.
+
+**Actions Taken:**
+- Issue #973 created: "Fix StackOverflowException in recursive schema traversal"
+- Assigned to: @christianhelle
+- Label: bug
+- PR #971 linked via "Resolves #973" comment (auto-closes on merge)
+- PR #969 linked via "Related to #973" cross-reference
+
+**Key Findings:**
+- Root cause: ProcessSchemaForMissingTypes() and ProcessSchemaForIntegerType() recurse without cycle detection
+- Pre-existing (Jan 2026), NOT caused by PR #969
+- Affects all surfaces: CLI, Source Generator, MSBuild
+- Real-world validation: 666KB customer spec completes in 2.17s, 1,473/1,473 tests pass
+
+**GitHub Links:**
+- Issue #973: https://github.com/christianhelle/refitter/issues/973
+- PR #971 (fix): Resolves #973 on merge
+- PR #969 (context): Related to #973

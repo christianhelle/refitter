@@ -106,3 +106,54 @@ Stack overflow occurs in CSharpClientGeneratorFactory.ProcessSchemaForMissingTyp
 
 **APPROVED FOR RELEASE:** Fix root cause with visited-set cycle detection. Minimal, safe, matches established pattern. Real-world repro validates iterative visitor handles edge cases beyond synthetic fixtures. Production-ready. Include in preview release 1.8.0-preview.101.
 
+---
+
+### 12. Create GitHub Tracking Issue #973 for Recursive Schema Stack Overflow (2026-03-27)
+
+**Status:** ✅ IMPLEMENTED  
+**Owner:** Keaton (Lead/Architect)  
+**Related:** PR #969, PR #971, Issue #967
+
+#### Summary
+
+After discovering pre-existing `StackOverflowException` bug in recursive schema traversal during #967 investigation, created public GitHub tracking issue #973 to document broader problem, root cause, and resolution path.
+
+#### Decision Rationale
+
+**Why public tracking issue?**
+- Improves visibility for end users with circular schema specs
+- Documents root cause for maintainability
+- Links to resolution (PR #971) and contributing factor (PR #969)
+- Establishes clear problem-solution narrative in git history
+
+**Root Cause (Pre-existing, Jan 2026):**
+- Methods `ProcessSchemaForMissingTypes()` and `ProcessSchemaForIntegerType()` in `CSharpClientGeneratorFactory` recursively traverse NJsonSchema without cycle detection
+- Any spec with circular `$ref` references triggers infinite recursion → `StackOverflowException`
+- Existing safe pattern available in `SchemaCleaner.FindUsedJsonSchema()` using `HashSet<JsonSchema>`
+
+#### Implementation
+
+**Issue #973:**
+- **Title:** "Fix StackOverflowException in recursive schema traversal"
+- **Assigned to:** @christianhelle
+- **Labels:** bug
+- **URL:** https://github.com/christianhelle/refitter/issues/973
+- **Status:** Open
+
+**PR Linkage:**
+- **PR #971** (fix): "Resolves #973" comment (auto-closes issue on merge)
+- **PR #969** (contributed): "Related to #973" cross-reference (surfaces the vulnerability)
+- **PR #971 body:** Updated with "Closes #973" for GitHub auto-linking
+
+#### Validation
+
+- Real-world customer 666KB OpenAPI 3.0.4 spec (59 paths, 22 excluded types)
+- Before fix: StackOverflowException crash
+- After fix: Completes in 2.17 seconds, generates 18 files (53.3 KB, 1,426 lines)
+- Regression suite: 1,473/1,473 tests pass (net8.0 + net10.0)
+- All surfaces tested: CLI, Source Generator, MSBuild
+
+#### Decision
+
+**APPROVED:** Public tracking issue establishes maintainability, improves user visibility, links fix to context. PR #971 auto-closes issue on merge. Clear problem-solution narrative in git history.
+
