@@ -282,3 +282,6 @@ test/MSBuild/refitter.msbuild/
 # Install scripts
 dotnet-install.sh
 install.sh
+
+# Confidential temporary files — must not reach public repository
+tmp/

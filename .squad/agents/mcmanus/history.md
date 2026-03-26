@@ -218,3 +218,45 @@ Full assessment written to `.squad/decisions/inbox/mcmanus-cicd-review.md`
 **Next Steps:**
 - Include fix in preview release 1.8.0-preview.101
 - Notify user Naji Makhoul via GitHub issue #967
+
+## Protecting Confidential `tmp/` Folder (2026-03-26)
+
+**Objective:** Secure `tmp/` directory to prevent accidental exposure of confidential files.
+
+**Work Done:**
+
+1. **Analyzed User Request**
+   - Directive: "files in tmp/ are confidential and should never reach the public"
+   - Conservative interpretation: keep tmp/ out of git history entirely
+
+2. **Verified Current State**
+   - `tmp/` folder exists with 1 file (email.txt)
+   - Never committed to git (verified via `git log`)
+   - Not in `.gitignore` — vulnerable to `git add .`
+
+3. **Implemented Two-Layer Protection**
+   - **Layer 1:** Added `tmp/` to repo root `.gitignore` with comment
+   - **Layer 2:** Created `tmp/.gitignore` with wildcard `*` pattern
+   - Matches existing codebase pattern (nested ignores for sensitive paths)
+
+4. **Verified Protection**
+   - `git check-ignore` confirms all paths under `tmp/` are ignored
+   - Confidential files remain local; cannot be accidentally committed
+   - No files deleted; only git visibility blocked
+
+**Result:** ✅ COMPLETE  
+**Status:** Confidential `tmp/` folder is now protected from public exposure  
+**Deliverable:** Decision #11 merged into `.squad/decisions.md`
+
+---
+
+## Session: 2026-03-26T23:19:02Z — Final Squad Orchestration
+
+**Scribe Tasks Executed:**
+1. ✅ Orchestration log written: `.squad/orchestration-log/2026-03-26T23-19-02Z-mcmanus.md`
+2. ✅ Session log written: `.squad/log/2026-03-26T23-19-02Z-tmp-privacy.md`
+3. ✅ Decision inbox merged: 3 files → 1 entry in `decisions.md`; inbox files deleted
+4. ✅ Cross-agent updates: This history.md entry appended
+5. ✅ Squad changes staged and committed to git
+
+**Summary:** McManus protected confidential tmp/ folder via two-layer .gitignore. Scribe completed end-of-session orchestration: logs written, decisions merged, history updated, git committed.

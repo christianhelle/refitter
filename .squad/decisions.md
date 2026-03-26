@@ -1,6 +1,45 @@
 # Decisions — Refitter Squad
 
 ## Active Decisions
+
+### 11. Protect Confidential `tmp/` Folder (2026-03-26)
+
+**Assigned:** McManus (DevOps)  
+**Status:** ✅ IMPLEMENTED  
+**Severity:** P1 — Security/Confidentiality  
+
+#### Problem
+
+User directive (2026-03-26T23:15:37Z – 23:16:00Z): Clarified that files under `tmp/` are **confidential** and must **NEVER** reach the public repository.
+
+**Current Risk:**
+- `tmp/` folder exists locally with confidential files (email.txt, api.json, api.refitter)
+- Folder was never committed but is untracked and could be accidentally added via `git add .`
+- Not in `.gitignore` — vulnerable to developer or CI/CD accidents
+
+#### Solution Implemented
+
+**Layer 1: Root `.gitignore` Protection**
+- Added `tmp/` rule to `.gitignore` (line 287)
+- Comment: `# Confidential temporary files — must not reach public repository`
+
+**Layer 2: Nested `.gitignore` (Defense in Depth)**
+- Created `tmp/.gitignore` with wildcard `*`
+- Catches any file added to `tmp/` regardless of root config
+- Matches existing codebase pattern
+
+#### Verification
+
+- ✅ `git check-ignore -v tmp/ tmp/email.txt tmp/.gitignore` — all paths ignored
+- ✅ Confidential files remain locally available
+- ✅ Git will refuse to stage any files under `tmp/`
+
+#### Decision
+
+**APPROVED:** Two-layer ignore protection eliminates risk of accidental public exposure. Confidential assets secured. No further action required.
+
+---
+
 ### 10. Issue #967 — Stack Overflow in Recursive Schema Traversal (2026-03-26)
 
 **Status:** ✅ APPROVED FOR MERGE  
