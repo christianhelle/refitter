@@ -1,20 +1,20 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Property Naming Policy API",
+    "title": "Recursive Property Naming API",
     "version": "1.0.0"
   },
   "paths": {
-    "/payments": {
+    "/nodes": {
       "get": {
-        "operationId": "GetPayment",
+        "operationId": "GetNode",
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaymentResponse"
+                  "$ref": "#/components/schemas/RecursiveNode"
                 }
               }
             }
@@ -25,12 +25,49 @@
   },
   "components": {
     "schemas": {
-      "PaymentResponse": {
+      "RecursiveNode": {
         "type": "object",
         "properties": {
-          "payMethod_SumBank": {
-            "type": "number",
-            "format": "double"
+          "node_id": {
+            "format": "int32"
+          },
+          "class": {
+            "type": "string"
+          },
+          "1st-node": {
+            "type": "string"
+          },
+          "child_count": {
+            "type": "integer"
+          },
+          "next_node": {
+            "$ref": "#/components/schemas/RecursiveNode"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecursiveNode"
+            }
+          },
+          "named_nodes": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RecursiveNode"
+            }
+          },
+          "external_node": {
+            "$ref": "#/components/schemas/RecursiveExternalNode"
+          }
+        }
+      },
+      "RecursiveExternalNode": {
+        "type": "object",
+        "properties": {
+          "external_id": {
+            "type": "integer"
+          },
+          "next_node": {
+            "$ref": "#/components/schemas/RecursiveExternalNode"
           }
         }
       }

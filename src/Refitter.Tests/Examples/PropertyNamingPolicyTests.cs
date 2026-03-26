@@ -16,16 +16,16 @@ public class PropertyNamingPolicyTests
             "version": "1.0.0"
           },
           "paths": {
-            "/payments": {
+            "/nodes": {
               "get": {
-                "operationId": "GetPayment",
+                "operationId": "GetNode",
                 "responses": {
                   "200": {
                     "description": "Success",
                     "content": {
                       "application/json": {
                         "schema": {
-                          "$ref": "#/components/schemas/PaymentResponse"
+                          "$ref": "#/components/schemas/RecursiveNode"
                         }
                       }
                     }
@@ -36,18 +36,49 @@ public class PropertyNamingPolicyTests
           },
           "components": {
             "schemas": {
-              "PaymentResponse": {
+              "RecursiveNode": {
                 "type": "object",
                 "properties": {
-                  "payMethod_SumBank": {
-                    "type": "number",
-                    "format": "double"
+                  "node_id": {
+                    "format": "int32"
                   },
                   "class": {
                     "type": "string"
                   },
-                  "1st-payment-method": {
+                  "1st-node": {
                     "type": "string"
+                  },
+                  "child_count": {
+                    "type": "integer"
+                  },
+                  "next_node": {
+                    "$ref": "#/components/schemas/RecursiveNode"
+                  },
+                  "children": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/RecursiveNode"
+                    }
+                  },
+                  "named_nodes": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "$ref": "#/components/schemas/RecursiveNode"
+                    }
+                  },
+                  "external_node": {
+                    "$ref": "#/components/schemas/RecursiveExternalNode"
+                  }
+                }
+              },
+              "RecursiveExternalNode": {
+                "type": "object",
+                "properties": {
+                  "external_id": {
+                    "type": "integer"
+                  },
+                  "next_node": {
+                    "$ref": "#/components/schemas/RecursiveExternalNode"
                   }
                 }
               }
@@ -67,15 +98,15 @@ public class PropertyNamingPolicyTests
     public async Task Default_PascalCase_Property_Naming_Remains_Unchanged()
     {
         string generatedCode = await GenerateCode();
-        generatedCode.Should().Contain("public double PayMethodSumBank { get; set; }");
-        generatedCode.Should().Contain("""[JsonPropertyName("payMethod_SumBank")]""");
+        generatedCode.Should().Contain("public int NodeId { get; set; }");
+        generatedCode.Should().Contain("""[JsonPropertyName("node_id")]""");
     }
 
     [Test]
     public async Task PreserveOriginal_Emits_Raw_Valid_Identifiers()
     {
         string generatedCode = await GenerateCode(PropertyNamingPolicy.PreserveOriginal);
-        generatedCode.Should().Contain("public double payMethod_SumBank { get; set; }");
+        generatedCode.Should().Contain("public int node_id { get; set; }");
     }
 
     [Test]
@@ -89,11 +120,11 @@ public class PropertyNamingPolicyTests
     public async Task PreserveOriginal_Minimally_Sanitizes_Invalid_Identifiers()
     {
         string generatedCode = await GenerateCode(PropertyNamingPolicy.PreserveOriginal);
-        generatedCode.Should().Contain("_1st_payment_method { get; set; }");
+        generatedCode.Should().Contain("_1st_node { get; set; }");
     }
 
     [Test]
-    public async Task PreserveOriginal_Generated_Code_Can_Build()
+    public async Task PreserveOriginal_Generated_Code_With_Recursive_Schemas_Can_Build()
     {
         string generatedCode = await GenerateCode(PropertyNamingPolicy.PreserveOriginal);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
@@ -102,7 +133,7 @@ public class PropertyNamingPolicyTests
     private static async Task<string> GenerateCode(
         PropertyNamingPolicy propertyNamingPolicy = PropertyNamingPolicy.PascalCase)
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(OpenApiSpec);
 
         try
         {
