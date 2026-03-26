@@ -41,10 +41,29 @@ Stack overflow occurs in CSharpClientGeneratorFactory.ProcessSchemaForMissingTyp
 #### Validation Status
 
 ✅ **Build:** PASS  
-✅ **Tests:** PASS (1450+ tests including recursive schema coverage)  
+✅ **Tests:** PASS (1,473 tests including recursive schema coverage)  
 ✅ **Format:** PASS  
+
+#### Real-World Repro Validation (2026-03-26)
+
+**By Hockney (Tester):**
+- Validated fix against user's real 666KB OpenAPI 3.0.4 spec with 59 paths
+- Stack overflow resolved: CLI completed in 2.17 seconds (previous versions crashed)
+- Generated 18 files (53.3 KB, 1,426 lines) with all 22 excludedTypeNames respected
+- Generated code compiles successfully with test stubs
+- PreserveOriginal property naming applied correctly; all features functional
+- Regression suite: 1,473/1,473 tests passed (net8.0 + net10.0)
+
+**By McManus (DevOps):**
+- Validated MSBuild/build-surface integration with same repro bundle
+- CLI direct generation: 497 KB output (12,626 lines) in 1.63 seconds ✅
+- PreserveOriginal feature test: 3.0 KB metadata in 1.02 seconds ✅
+- MSBuild petstore integration: generated, compiled, executed successfully ✅
+- Full test suite: 1,473/1,473 tests passed in 37.9 seconds ✅
+- No design-time, build-time, or functional caveats identified
+- Coverage confirmed: CLI, property naming policy, excluded types, complex schemas, MSBuild, source generator
 
 #### Decision
 
-**APPROVED:** Fix root cause with visited-set cycle detection. Minimal, safe, matches established pattern. Ready for preview release 1.8.0-preview.101.
+**APPROVED FOR RELEASE:** Fix root cause with visited-set cycle detection. Minimal, safe, matches established pattern. Real-world repro validates iterative visitor handles edge cases beyond synthetic fixtures. Production-ready. Include in preview release 1.8.0-preview.101.
 

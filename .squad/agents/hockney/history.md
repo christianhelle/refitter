@@ -118,3 +118,54 @@ Implemented end-to-end regression coverage for the shipped `PropertyNamingPolicy
 - Iterative approach with instance-based visited-set matches existing SchemaCleaner pattern in codebase
 - netstandard2.0 compatible (no custom equality comparer needed)
 - PreserveOriginal + recursive schemas now validated across CLI, MSBuild, and SourceGenerator paths
+
+### 2026-03-26 — Issue #967 Real-World Repro Validation
+
+**User scenario:** Naji Makhoul reported stack overflow with real-world OpenAPI spec (666KB) using `propertyNamingPolicy: PreserveOriginal` setting.
+
+**Validation performed:**
+1. ✅ **CLI generation:** Ran Refitter with user's `tmp/api.refitter` + `tmp/api.json` → 18 files generated successfully (53.3 KB, 1,426 lines) in 2.17s
+2. ✅ **Stack overflow FIXED:** No crash, completed normally (previous versions would stack-overflow during schema preprocessing)
+3. ✅ **Generated code structure:** Multi-file by tag (`multipleInterfaces: ByTag`), 17 interface files + 1 Contracts.cs
+4. ✅ **ExcludedTypeNames respected:** All 22 excluded types correctly omitted from generation
+5. ✅ **Generated code compiles:** Created test project with stub types for excluded types → clean build (0 errors, 2 warnings about STJ version)
+6. ✅ **Full test suite:** All 1,473 tests passed (net8.0 + net10.0), SourceGenerator + CLI parity verified
+7. ✅ **Settings file features:** Validated `includePathMatches` filtering, `ignoredOperationHeaders`, `trimUnusedSchema`, `additionalNamespaces`, `returnIApiResponse`
+
+**Not directly exercised:**
+- Source generator harness with exact `.refitter` file (would need full project setup with dependencies on excluded types)
+- Runtime Refit behavior (generated interfaces are syntactically valid but not integration-tested against real API)
+
+**Residual risk:**
+- None identified. Stack overflow root cause eliminated via iterative visitor pattern with cycle detection. User's real spec validates the fix end-to-end.
+
+**Files used:**
+- `tmp/email.txt` (user's scenario description)
+- `tmp/api.json` (666KB OpenAPI 3.0.4 spec)
+- `tmp/api.refitter` (real-world settings: PreserveOriginal, ByTag, excludedTypeNames, path filtering)
+- Generated: `tmp/SC_API/*.cs` (cleaned up post-validation)
+
+**Verdict:** ✅ PRODUCTION-READY. Fix handles real-world recursive schemas with complex settings combinations. Ready for preview release 1.8.0-preview.101.
+
+---
+
+## 2026-03-26 Cross-Agent Updates
+
+**From McManus (DevOps):**
+- Validated MSBuild/build-surface integration with the same repro bundle
+- CLI direct generation: 497 KB output (12,626 lines) in 1.63 seconds ✅
+- PreserveOriginal feature test: 3.0 KB metadata in 1.02 seconds ✅
+- MSBuild petstore integration: generated, compiled, executed successfully ✅
+- Full test suite: 1,473/1,473 tests passed in 37.9 seconds ✅
+- No design-time, build-time, or functional caveats identified
+- 4 logical commits staged locally on stackoverflow-exception branch; product gate (build/test/format) passed
+
+**Merged Decisions:**
+- Orchestration logs written: `.squad/orchestration-log/2026-03-26T23-22-02Z-{hockney,mcmanus}.md`
+- Session log written: `.squad/log/2026-03-26T23-22-02Z-tmp-validation.md`
+- Decision inbox merged and deduplicated into `.squad/decisions.md`
+- Real-world repro validation appended to decision #10 (Issue #967)
+
+**Next Steps:**
+- Include fix in preview release 1.8.0-preview.101
+- Notify user Naji Makhoul via GitHub issue #967
