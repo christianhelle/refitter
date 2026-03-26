@@ -125,6 +125,124 @@ public class CSharpClientGeneratorFactoryTests
         }
         """;
 
+    private const string RecursiveSchemaOpenApiSpec = """
+        {
+          "openapi": "3.0.1",
+          "info": {
+            "title": "Recursive Schema API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/nodes": {
+              "get": {
+                "operationId": "GetNode",
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/RecursiveNode"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "RecursiveNode": {
+                "type": "object",
+                "properties": {
+                  "formattedId": {
+                    "format": "int32"
+                  },
+                  "childCount": {
+                    "type": "integer"
+                  },
+                  "nextNode": {
+                    "$ref": "#/components/schemas/RecursiveNode"
+                  },
+                  "children": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/RecursiveNode"
+                    }
+                  },
+                  "namedNodes": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "$ref": "#/components/schemas/RecursiveNode"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    private const string RecursiveAllOfOpenApiSpec = """
+        {
+          "openapi": "3.0.1",
+          "info": {
+            "title": "Recursive AllOf API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/branch": {
+              "get": {
+                "operationId": "GetBranch",
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/RecursiveAllOfNode"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "BaseNode": {
+                "type": "object",
+                "properties": {
+                  "formattedId": {
+                    "format": "int32"
+                  }
+                }
+              },
+              "RecursiveAllOfNode": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BaseNode"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "childCount": {
+                        "type": "integer"
+                      },
+                      "nextNode": {
+                        "$ref": "#/components/schemas/RecursiveAllOfNode"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+        """;
+
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForIntegerWithoutFormat()
     {
@@ -194,9 +312,47 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
+    [Test]
+    public async Task ProcessSchemaWalkers_WithRecursivePropertyItemAndAdditionalPropertiesSchemas_CanBuildGeneratedCode()
+    {
+        string generatedCode = await GenerateCodeWithIntegerType(RecursiveSchemaOpenApiSpec, IntegerType.Int64);
+        generatedCode.Should().Contain("int FormattedId");
+        generatedCode.Should().Contain("long ChildCount");
+        generatedCode.Should().Contain("RecursiveNode NextNode");
+        generatedCode.Should().Contain("ICollection<RecursiveNode> Children");
+        generatedCode.Should().Contain("IDictionary<string, RecursiveNode> NamedNodes");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task ProcessSchemaWalkers_WithRecursiveAllOfSchemas_CanBuildGeneratedCode()
+    {
+        string generatedCode = await GenerateCodeWithIntegerType(RecursiveAllOfOpenApiSpec, IntegerType.Int64);
+        generatedCode.Should().Contain("int FormattedId");
+        generatedCode.Should().Contain("long ChildCount");
+        generatedCode.Should().Contain("RecursiveAllOfNode NextNode");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
     private static async Task<string> GenerateCodeWithIntegerType(IntegerType integerType)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(IntegerTypeOpenApiSpec);
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                IntegerType = integerType
+            }
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        return sut.Generate();
+    }
+
+    private static async Task<string> GenerateCodeWithIntegerType(string openApiSpec, IntegerType integerType)
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(openApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
