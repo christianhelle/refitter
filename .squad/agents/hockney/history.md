@@ -22,6 +22,14 @@ Run tests: dotnet test -c Release src/Refitter.slnx (~5 min — NEVER cancel). N
 
 ## Learnings
 
+### 2026-03-26 — Issue #967 Recursive-schema regression planning
+
+- Current #967 coverage is limited to acyclic behavior: `PropertyNamingPolicyTests.cs` covers PascalCase defaults plus `PreserveOriginal` identifier preservation/escaping/sanitization/build, while `GenerateCommandTests`, `SettingsTests`, and `SerializerTests` only cover binding/defaults/JSON for the enum.
+- `ExcludedTypeNames` has only a Petstore smoke assertion in `CustomCSharpGeneratorSettingsTests.cs`; there is no test that combines `PreserveOriginal`, `ExcludedTypeNames`, and a recursive schema, and no test that exercises the settings-file path used by MSBuild.
+- Source-generator parity is missing in the current tree even though `src\Refitter.SourceGenerator.Tests\Resources\PropertyNamingPolicy.json` is embedded; there is no matching `AdditionalFiles\PropertyNamingPolicy.refitter` or source-generator test class.
+- `CSharpClientGeneratorFactory.ProcessSchemaForMissingTypes()` and `ProcessSchemaForIntegerType()` both recurse without a shared visited-set, so any self-reference, mutual reference, array-item cycle, additional-properties cycle, or discriminator-induced `allOf` back-edge can escape the current suite.
+- Manual CLI repro with a tiny self-referential `.refitter` configuration using `propertyNamingPolicy: PreserveOriginal` and `excludedTypeNames` failed to complete and had to be stopped, which is consistent with the unbounded traversal path.
+
 ### 2026 Recent Work — Issue #944 Unicode XML Documentation
 
 Added regression test coverage for non-ASCII XML documentation fix:
@@ -94,3 +102,19 @@ Implemented end-to-end regression coverage for the shipped `PropertyNamingPolicy
 
 **Validation:** `dotnet build -c Release src\Refitter.slnx`, `dotnet test --solution src\Refitter.slnx -c Release --no-build`, and `dotnet format --verify-no-changes src\Refitter.slnx` all passed; full suite count reached 1468 tests.
 
+
+## Issue #967 — Stack Overflow in Recursive Schema Traversal (2026-03-26)
+
+**Team Execution:** Fenster (implementation) + Hockney (regression) + McManus (CI/harness) + Keaton (architecture/review)
+
+### Fenster's Work
+- Root cause: ProcessSchemaForMissingTypes() and ProcessSchemaForIntegerType() in CSharpClientGeneratorFactory.cs recursively traverse schemas without visited-set
+- Solution: Replaced duplicated recursive preprocessing with one shared iterative visitor using Stack<JsonSchema> and HashSet<JsonSchema> cycle detection
+- Key insight: Pre-existing bug predating PR #969; not caused by property-naming work
+- Files: src\Refitter.Core\CSharpClientGeneratorFactory.cs
+
+### Shared Knowledge
+- Duplicated recursive traversal pattern was the root of both overflow paths
+- Iterative approach with instance-based visited-set matches existing SchemaCleaner pattern in codebase
+- netstandard2.0 compatible (no custom equality comparer needed)
+- PreserveOriginal + recursive schemas now validated across CLI, MSBuild, and SourceGenerator paths

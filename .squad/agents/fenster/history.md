@@ -20,34 +20,9 @@ Adding a CLI option follows this pattern:
 Run CLI: `dotnet run --project src/Refitter --configuration Release --framework net9.0 -- [args]`  
 Format REQUIRED before commit: `dotnet format src/Refitter.slnx`
 
-## Learnings
+## Architecture & Code Issues (Archived from 2025)
 
-### Code Review — 2025 (Core + CLI)
-
-#### Architecture
-- **RefitGenerator.cs** is the top-level orchestrator. It creates `CSharpClientGeneratorFactory`, runs NSwag to get contracts, then delegates to one of three interface generators based on `MultipleInterfaces` enum.
-- Interface generator hierarchy: `RefitInterfaceGenerator` (base, single interface) → `RefitMultipleInterfaceGenerator` (ByEndpoint) and `RefitMultipleInterfaceByTagGenerator` (ByTag) both extend it.
-- `ParameterExtractor` is a pure static class — handles all 6 parameter kinds: Route, Query, Body, Header, FormData, BinaryBody.
-- `CSharpClientGeneratorFactory` wraps NSwag, applies custom integer type, fixes missing format fields, and injects a `CustomTemplateFactory` to patch the `JsonPolymorphic` attribute (workaround for NSwag limitations).
-- `OpenApiDocumentFactory` has a layered strategy: tries `OpenApiMultiFileReader` (Microsoft.OpenApi) first for external $ref resolution, falls back to NSwag on failure.
-- `SchemaCleaner` performs tree-shaking on OpenAPI components — used only when `TrimUnusedSchema = true`.
-- `DependencyInjectionGenerator` and `ApizrRegistrationGenerator` are output-only static classes that produce the DI extension method code.
-
-#### Settings Architecture
-- `RefitGeneratorSettings` is the core model (netstandard2.0, ~40 properties).
-- Sub-models: `CodeGeneratorSettings` (NSwag passthrough), `DependencyInjectionSettings`, `ApizrSettings`, `NamingSettings`.
-- `Settings.cs` in CLI is the Spectre.Console `CommandSettings` — NOT 1:1 with `RefitGeneratorSettings`. Some core settings are only accessible via `.refitter` file.
-
-#### Confirmed Code Issues
-- `IncludeTags` in `RefitGeneratorSettings` has a copy-pasted `[Description("Generate a Refit interface for each endpoint.")]` — wrong description.
-- `ResponseTypeOverride` description starts with "AddAcceptHeaders dictionary..." — copy-paste artifact.
-- `defaultNamespases` typo in `RefitInterfaceImports.cs` (should be `defaultNamespaces`).
-- `RefitMultipleInterfaceGenerator.GetInterfaceName` uses `.Replace("I", string.Empty)` on the full interface name — replaces ALL capital-I characters, not just the leading prefix.
-- `ParameterExtractor.GetQueryParameters` mutates `operationModel.Parameters` (a NSwag-owned collection) via `.Remove()` during dynamic querystring parameter generation — fragile side effect.
-- `GenerateCommand.cs` line 314: `ContractsOutputFolder = settings.ContractsOutputPath ?? settings.OutputPath` sets ContractsOutputFolder to the default "Output.cs" when ContractsOutputPath is null — a file path used where a folder path is expected.
-- `RefitGenerator.Generate()` and `RefitGenerator.GenerateMultipleFiles()` share ~20 identical setup lines (factory, generator, docGenerator, contracts, sanitize) — DRY violation.
-- `CSharpClientGeneratorFactory` has two near-identical recursive schema traversal methods: `FixMissingTypesWithIntegerFormat` and `ApplyCustomIntegerType` — should share a generic schema visitor.
-- `RefitGenerator.GenerateClient` single-file path returns an array where only the first item has content, remaining items have empty strings — subtle and confusing to future maintainers.
+Core generator pattern: `RefitGenerator` orchestrates `CSharpClientGeneratorFactory` → NSwag contracts → one of three interface generators (single, ByEndpoint, ByTag). Settings architecture: `RefitGeneratorSettings` (netstandard2.0) with sub-models for DI/Apizr/Naming; CLI `Settings.cs` is not 1:1 (some settings file-only). Confirmed issues: wrong `[Description]` attributes on `IncludeTags`/`ResponseTypeOverride`, `defaultNamespases` typo, `.Replace("I")` replaces all capital-I not just prefix, `ParameterExtractor` mutates NSwag collections, `ContractsOutputFolder` can be set to file path, DRY violation in `RefitGenerator` setup (~20 lines duplicated), `CSharpClientGeneratorFactory` has two identical recursive schema traversals (fixed in #967), `GenerateClient` single-file path returns array where only first item has content.
 
 ---
 
@@ -293,3 +268,27 @@ Completed comprehensive implementation plan (`.squad/implementation-plan-issue-9
 - `PreserveOriginalPropertyNameGenerator` preserves valid identifiers, escapes reserved C# keywords with `@`, minimally sanitizes invalid shapes with underscores, and de-duplicates sibling collisions with `IdentifierUtils.Counted` against `ParentSchema.Properties`.
 - Removed the dead `propertyNameGenerator` JSON schema surface and documented the replacement setting in `README.md`.
 - Validation that succeeded on this slice: CLI `--help` shows `--property-naming-policy`; direct CLI generation and `.refitter` generation both preserved raw property names and kept `[JsonPropertyName]`; full repo gate passed with `dotnet build -c Release src\Refitter.slnx`, `dotnet test -c Release --solution src\Refitter.slnx`, and `dotnet format --verify-no-changes src\Refitter.slnx`.
+
+### Issue #967 follow-up investigation — stack overflow in recursive schemas — 2026-03-26
+
+- `CSharpClientGeneratorFactory.ProcessSchemaForMissingTypes()` (`src\Refitter.Core\CSharpClientGeneratorFactory.cs:179-211`) recursively walks `Properties`, `Item`, `AdditionalPropertiesSchema`, and `AllOf`/`OneOf`/`AnyOf` with no visited-set, so a normal self-referential schema (`Node -> child/next/items -> Node`) re-enters the same `ActualSchema` forever.
+- NJsonSchema's `JsonSchema.ActualSchema` has its own per-call cycle detection, but that only protects a single reference-resolution chain; because Refitter calls `schema.ActualSchema` afresh on every recursive descent, recursive object graphs still overflow at the visitor level rather than throwing NJsonSchema's cyclic-reference exception.
+- The sibling method `ProcessSchemaForIntegerType()` (`src\Refitter.Core\CSharpClientGeneratorFactory.cs:285-321`) has the same traversal shape and should be fixed in the same patch or the next recursive-spec crash will simply move there.
+- `PropertyNamingPolicy` is not the direct cause: `Create()` performs `ConvertOneOfWithDiscriminatorToAllOf()`, `FixMissingTypesWithIntegerFormat()`, and `ApplyCustomIntegerType()` before property-name-generator selection, and the #967 change in this file only swapped `PropertyNameGenerator = ...` to `CreatePropertyNameGenerator()`.
+- `CodeGeneratorSettings.ExcludedTypeNames` is only copied later by `MapCSharpGeneratorSettings()`, so excluded types are still preprocessed today; future fixes around excluded recursive models should remember that the exclusion does not currently short-circuit schema walking.
+
+## Issue #967 — Stack Overflow in Recursive Schema Traversal (2026-03-26)
+
+**Team Execution:** Fenster (implementation) + Hockney (regression) + McManus (CI/harness) + Keaton (architecture/review)
+
+### Fenster's Work
+- Root cause: ProcessSchemaForMissingTypes() and ProcessSchemaForIntegerType() in CSharpClientGeneratorFactory.cs recursively traverse schemas without visited-set
+- Solution: Replaced duplicated recursive preprocessing with one shared iterative visitor using Stack<JsonSchema> and HashSet<JsonSchema> cycle detection
+- Key insight: Pre-existing bug predating PR #969; not caused by property-naming work
+- Files: src\Refitter.Core\CSharpClientGeneratorFactory.cs
+
+### Shared Knowledge
+- Duplicated recursive traversal pattern was the root of both overflow paths
+- Iterative approach with instance-based visited-set matches existing SchemaCleaner pattern in codebase
+- netstandard2.0 compatible (no custom equality comparer needed)
+- PreserveOriginal + recursive schemas now validated across CLI, MSBuild, and SourceGenerator paths
