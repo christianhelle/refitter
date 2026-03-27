@@ -243,6 +243,114 @@ public class CSharpClientGeneratorFactoryTests
         }
         """;
 
+    private const string RecursiveSchemaOpenApiSpecV2 = """
+        {
+          "swagger": "2.0",
+          "info": {
+            "title": "Recursive Schema API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/nodes": {
+              "get": {
+                "operationId": "GetNode",
+                "produces": ["application/json"],
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "schema": {
+                      "$ref": "#/definitions/RecursiveNode"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "definitions": {
+            "RecursiveNode": {
+              "type": "object",
+              "properties": {
+                "formattedId": {
+                  "format": "int32"
+                },
+                "childCount": {
+                  "type": "integer"
+                },
+                "nextNode": {
+                  "$ref": "#/definitions/RecursiveNode"
+                },
+                "children": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/RecursiveNode"
+                  }
+                },
+                "namedNodes": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/RecursiveNode"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    private const string RecursiveAllOfOpenApiSpecV2 = """
+        {
+          "swagger": "2.0",
+          "info": {
+            "title": "Recursive AllOf API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/branch": {
+              "get": {
+                "operationId": "GetBranch",
+                "produces": ["application/json"],
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "schema": {
+                      "$ref": "#/definitions/RecursiveAllOfNode"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "definitions": {
+            "BaseNode": {
+              "type": "object",
+              "properties": {
+                "formattedId": {
+                  "format": "int32"
+                }
+              }
+            },
+            "RecursiveAllOfNode": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/BaseNode"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "childCount": {
+                      "type": "integer"
+                    },
+                    "nextNode": {
+                      "$ref": "#/definitions/RecursiveAllOfNode"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+        """;
+
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForIntegerWithoutFormat()
     {
@@ -330,6 +438,28 @@ public class CSharpClientGeneratorFactoryTests
         string generatedCode = await GenerateCodeWithIntegerType(RecursiveAllOfOpenApiSpec, IntegerType.Int64);
         generatedCode.Should().Contain("int FormattedId");
         generatedCode.Should().Contain("long ChildCount");
+        generatedCode.Should().Contain("RecursiveAllOfNode NextNode");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task ProcessSchemaWalkers_WithRecursivePropertyItemAndAdditionalPropertiesSchemas_V2_CanBuildGeneratedCode()
+    {
+        string generatedCode = await GenerateCodeWithIntegerType(RecursiveSchemaOpenApiSpecV2, IntegerType.Int64);
+        generatedCode.Should().Contain("int? FormattedId");
+        generatedCode.Should().Contain("long? ChildCount");
+        generatedCode.Should().Contain("RecursiveNode NextNode");
+        generatedCode.Should().Contain("ICollection<RecursiveNode> Children");
+        generatedCode.Should().Contain("IDictionary<string, RecursiveNode> NamedNodes");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task ProcessSchemaWalkers_WithRecursiveAllOfSchemas_V2_CanBuildGeneratedCode()
+    {
+        string generatedCode = await GenerateCodeWithIntegerType(RecursiveAllOfOpenApiSpecV2, IntegerType.Int64);
+        generatedCode.Should().Contain("int? FormattedId");
+        generatedCode.Should().Contain("long? ChildCount");
         generatedCode.Should().Contain("RecursiveAllOfNode NextNode");
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }

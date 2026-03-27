@@ -7,7 +7,8 @@
     <Target Name="RefitterGenerate" BeforeTargets="CoreCompile">
         <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                               DisableLogging="$(RefitterNoLogging)"
-                              SkipValidation="$(RefitterSkipValidation)">
+                              SkipValidation="$(RefitterSkipValidation)"
+                              IncludePatterns="$(RefitterIncludePatterns)">
             <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
         </RefitterGenerateTask>
         <ItemGroup>
