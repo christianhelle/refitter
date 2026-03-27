@@ -2,16 +2,31 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.99...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.100...HEAD)
+
+**Implemented enhancements:**
+
+- Fix recursive schema stack overflows [\#971](https://github.com/christianhelle/refitter/pull/971) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- StackOverflowException in recursive schema traversal [\#973](https://github.com/christianhelle/refitter/issues/973)
+- how to keep contract Property Name as original name without Serialization ? [\#967](https://github.com/christianhelle/refitter/issues/967)
+
+**Merged pull requests:**
+
+- Bump codecov/codecov-action from 5 to 6 [\#972](https://github.com/christianhelle/refitter/pull/972) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 10.1.7 [\#966](https://github.com/christianhelle/refitter/pull/966) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.21.30 [\#965](https://github.com/christianhelle/refitter/pull/965) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.8.0-preview.100](https://github.com/christianhelle/refitter/tree/1.8.0-preview.100) (2026-03-25)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.99...1.8.0-preview.100)
 
 **Implemented enhancements:**
 
 - Add PropertyNamingPolicy support for JSON property naming [\#969](https://github.com/christianhelle/refitter/pull/969) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency tunit to 1.20.0 [\#962](https://github.com/christianhelle/refitter/pull/962) ([renovate[bot]](https://github.com/apps/renovate))
-
-**Closed issues:**
-
-- how to keep contract Property Name as original name without Serialization ? [\#967](https://github.com/christianhelle/refitter/issues/967)
 
 **Merged pull requests:**
 
