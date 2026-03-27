@@ -62,6 +62,13 @@ Key workflows: `build.yml` (main), `smoke-tests.yml` (quick), `release.yml` + `r
 
 Full assessment written to `.squad/decisions/inbox/mcmanus-cicd-review.md`
 
+### Session: MSBuild finding verification (2026-03-27)
+
+- Verified workflow finding 1 is still real in `.github\workflows\msbuild.yml`: the default naming build step used the implicit Debug configuration while the later PreserveOriginal step explicitly used Release.
+- Applied the smallest correct fix by adding `-c release` to the default naming build step only. The related `dotnet clean -c release`, `msbuild.log` filelogger behavior, and `RefitterIncludePatterns` scope were left unchanged because they were already consistent enough or not present in the current implementation.
+- Verified finding 2 is stale against current code: `src\Refitter.MSBuild\RefitterGenerateTask.cs` is now 297 lines and does not contain the reported `fileName.Equals(...)` / `fileName.IndexOf(...)` predicate, so no task-code change was needed.
+- Validation passed after the edit: `dotnet build -c Release src\Refitter.slnx`, `dotnet test --solution src\Refitter.slnx -c Release`, and `dotnet format --verify-no-changes src\Refitter.slnx`.
+
 ## Validation Gate: Issue #944 (2026-03-06)
 
 **Objective:** Validate patch for non-ASCII XML comment handling via the 3-step PR gate.
@@ -250,13 +257,14 @@ Full assessment written to `.squad/decisions/inbox/mcmanus-cicd-review.md`
 
 ---
 
-## Session: 2026-03-26T23:19:02Z — Final Squad Orchestration
+## Session: 2026-03-27T08:28:05Z — MSBuild Finding Verification & Orchestration
 
 **Scribe Tasks Executed:**
-1. ✅ Orchestration log written: `.squad/orchestration-log/2026-03-26T23-19-02Z-mcmanus.md`
-2. ✅ Session log written: `.squad/log/2026-03-26T23-19-02Z-tmp-privacy.md`
-3. ✅ Decision inbox merged: 3 files → 1 entry in `decisions.md`; inbox files deleted
+1. ✅ Orchestration log written: `.squad/orchestration-log/2026-03-27T08-28-05Z-mcmanus.md`
+2. ✅ Session log written: `.squad/log/2026-03-27T08-28-05Z-finding-verification.md`
+3. ✅ Decision inbox merged: 1 file (`mcmanus-msbuild-findings.md`) → 1 new entry (#13) in `decisions.md`; inbox file deleted
 4. ✅ Cross-agent updates: This history.md entry appended
 5. ✅ Squad changes staged and committed to git
 
-**Summary:** McManus protected confidential tmp/ folder via two-layer .gitignore. Scribe completed end-of-session orchestration: logs written, decisions merged, history updated, git committed.
+**Summary:** McManus verified and fixed one real MSBuild workflow configuration drift (adding `-c release` to default build step) and confirmed one stale finding no longer present in codebase. All validation gates passed. Scribe completed end-of-session orchestration: logs written, decision merged, history updated, git committed.
+

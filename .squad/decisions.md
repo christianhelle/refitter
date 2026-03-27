@@ -2,6 +2,46 @@
 
 ## Active Decisions
 
+### 13. Verify MSBuild Findings Against Current Code (2026-03-27)
+
+**Status:** ✅ IMPLEMENTED  
+**Owner:** McManus (DevOps)  
+**Scope:** `.github/workflows/msbuild.yml`, `src/Refitter.MSBuild/RefitterGenerateTask.cs`
+
+#### Problem
+
+Two reported findings needed verification against current codebase:
+
+1. **Workflow:** Default MSBuild sample build in `msbuild.yml` uses implicit Debug while later PreserveOriginal step uses explicit Release — inconsistency
+2. **Task Code:** Reported `fileName.Equals(...)` / `fileName.IndexOf(...)` predicate in `RefitterGenerateTask.cs` needs verification
+
+#### Solution Implemented
+
+**Finding 1 — VERIFIED & FIXED:**
+- Issue confirmed: Default build step in `msbuild.yml` line 18 used implicit Debug config
+- Later PreserveOriginal step (line 27) explicitly used `-c Release`
+- Fix: Added `-c release` flag to default build step only
+- Rationale: Minimal change aligning workflow with existing local MSBuild harness
+- Related changes (dotnet clean, RefitterIncludePatterns, msbuild.log handling) already consistent or not present
+
+**Finding 2 — VERIFIED STALE:**
+- Code inspection: `RefitterGenerateTask.cs` is 297 lines
+- Finding: No `fileName.Equals(...)` / `fileName.IndexOf(...)` predicate present in current code
+- Action: No code change made — finding does not apply
+
+#### Validation Results
+
+All three gates passed post-edit:
+- ✅ Build: `dotnet build -c Release src\Refitter.slnx` (0 errors)
+- ✅ Tests: `dotnet test --solution src\Refitter.slnx -c Release` (all passed)
+- ✅ Format: `dotnet format --verify-no-changes src\Refitter.slnx` (no violations)
+
+#### Decision
+
+**APPROVED:** One real workflow drift fixed (minimal scope); one stale finding confirmed. All validation gates pass. Workflow now consistent across all build steps.
+
+---
+
 ### 11. Protect Confidential `tmp/` Folder (2026-03-26)
 
 **Assigned:** McManus (DevOps)  
