@@ -1,0 +1,16 @@
+{
+  "openApiPath": "../Resources/PropertyNamingPolicy.json",
+  "namespace": "Refitter.Tests.PropertyNamingPolicy",
+  "propertyNamingPolicy": "PreserveOriginal",
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "RecursivePropertyNamingApi",
+    "filename": "RecursivePropertyNamingApi"
+  },
+  "codeGeneratorSettings": {
+    "integerType": "Int64",
+    "excludedTypeNames": [
+      "RecursiveExternalNode"
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using NJsonSchema;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
@@ -129,86 +130,8 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         }
     }
 
-    private void FixMissingTypesWithIntegerFormat()
-    {
-        ProcessSchemasForMissingTypes(document.Components.Schemas);
-
-        foreach (var path in document.Paths)
-        {
-            if (path.Value == null) continue;
-
-            foreach (var operation in path.Value.Values)
-            {
-                if (operation == null) continue;
-
-                foreach (var parameter in operation.Parameters)
-                {
-                    FixSchemaTypeFromFormat(parameter.ActualSchema);
-                }
-
-                if (operation.RequestBody?.Content != null)
-                {
-                    foreach (var content in operation.RequestBody.Content.Values)
-                    {
-                        ProcessSchemaForMissingTypes(content.Schema);
-                    }
-                }
-
-                foreach (var response in operation.Responses.Values)
-                {
-                    if (response.Content != null)
-                    {
-                        foreach (var content in response.Content.Values)
-                        {
-                            ProcessSchemaForMissingTypes(content.Schema);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void ProcessSchemasForMissingTypes(IDictionary<string, JsonSchema> schemas)
-    {
-        foreach (var schema in schemas.Values)
-        {
-            ProcessSchemaForMissingTypes(schema);
-        }
-    }
-
-    private void ProcessSchemaForMissingTypes(JsonSchema? schema)
-    {
-        if (schema == null) return;
-
-        var actualSchema = schema.ActualSchema;
-
-        FixSchemaTypeFromFormat(actualSchema);
-
-        foreach (var property in actualSchema.Properties.Values)
-        {
-            ProcessSchemaForMissingTypes(property);
-        }
-
-        if (actualSchema.Item != null)
-        {
-            ProcessSchemaForMissingTypes(actualSchema.Item);
-        }
-
-        if (actualSchema.AdditionalPropertiesSchema != null)
-        {
-            ProcessSchemaForMissingTypes(actualSchema.AdditionalPropertiesSchema);
-        }
-
-        var subSchemas = actualSchema.AllOf
-            .Concat(actualSchema.OneOf)
-            .Concat(actualSchema.AnyOf)
-            .ToArray();
-
-        foreach (var subSchema in subSchemas)
-        {
-            ProcessSchemaForMissingTypes(subSchema);
-        }
-    }
+    private void FixMissingTypesWithIntegerFormat() =>
+        TraverseDocumentSchemas(FixSchemaTypeFromFormat);
 
     private void FixSchemaTypeFromFormat(JsonSchema schema)
     {
@@ -233,91 +156,167 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         if (customIntegerType == IntegerType.Int32)
             return;
 
-        ProcessSchemasForIntegerType(document.Components.Schemas);
+        TraverseDocumentSchemas(FixSchemaIntegerFormat);
+    }
 
-        foreach (var path in document.Paths)
+    private static void FixSchemaIntegerFormat(JsonSchema schema)
+    {
+        if (schema.Type == JsonObjectType.Integer &&
+            string.IsNullOrEmpty(schema.Format))
         {
-            if (path.Value == null) continue;
+            schema.Format = "int64";
+        }
+    }
 
-            foreach (var operation in path.Value.Values)
+    private void TraverseDocumentSchemas(Action<JsonSchema> visitor)
+    {
+        var visited = new HashSet<JsonSchema>(JsonSchemaReferenceComparer.Instance);
+        var schemasToProcess = new Stack<JsonSchema>();
+
+        foreach (var schema in EnumerateDocumentSchemaRoots())
+        {
+            TryPush(schema, schemasToProcess);
+        }
+
+        while (schemasToProcess.Count > 0)
+        {
+            var actualSchema = schemasToProcess.Pop().ActualSchema;
+            if (!visited.Add(actualSchema))
             {
-                if (operation == null) continue;
+                continue;
+            }
 
-                foreach (var parameter in operation.Parameters)
+            visitor(actualSchema);
+
+            foreach (var childSchema in EnumerateTraversableSchemas(actualSchema))
+            {
+                TryPush(childSchema, schemasToProcess);
+            }
+        }
+    }
+
+    private IEnumerable<JsonSchema?> EnumerateDocumentSchemaRoots()
+    {
+        if (document.Components?.Schemas != null)
+        {
+            foreach (var schema in document.Components.Schemas.Values)
+            {
+                yield return schema;
+            }
+        }
+
+        if (document.Paths == null)
+        {
+            yield break;
+        }
+
+        foreach (var pathItem in document.Paths.Values)
+        {
+            if (pathItem == null)
+            {
+                continue;
+            }
+
+            foreach (var parameter in pathItem.Parameters)
+            {
+                yield return parameter;
+            }
+
+            foreach (var operation in pathItem.Values)
+            {
+                if (operation == null)
                 {
-                    if (parameter.ActualSchema.Type == JsonObjectType.Integer &&
-                        string.IsNullOrEmpty(parameter.ActualSchema.Format))
-                    {
-                        parameter.ActualSchema.Format = "int64";
-                    }
+                    continue;
+                }
+
+                foreach (var parameter in operation.ActualParameters)
+                {
+                    yield return parameter;
                 }
 
                 if (operation.RequestBody?.Content != null)
                 {
                     foreach (var content in operation.RequestBody.Content.Values)
                     {
-                        ProcessSchemaForIntegerType(content.Schema);
+                        yield return content.Schema;
                     }
                 }
 
-                foreach (var response in operation.Responses.Values)
+                foreach (var response in operation.ActualResponses.Values)
                 {
-                    if (response.Content != null)
+                    if (response.Headers != null)
                     {
-                        foreach (var content in response.Content.Values)
+                        foreach (var header in response.Headers.Values)
                         {
-                            ProcessSchemaForIntegerType(content.Schema);
+                            yield return header;
                         }
+                    }
+
+                    if (response.Content == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var content in response.Content.Values)
+                    {
+                        yield return content.Schema;
                     }
                 }
             }
         }
     }
 
-    private void ProcessSchemasForIntegerType(IDictionary<string, JsonSchema> schemas)
+    private static IEnumerable<JsonSchema?> EnumerateTraversableSchemas(JsonSchema schema)
     {
-        foreach (var schema in schemas.Values)
+        yield return schema.AdditionalItemsSchema;
+        yield return schema.AdditionalPropertiesSchema;
+        yield return schema.DictionaryKey;
+        yield return schema.Item;
+
+        if (schema.Items != null)
         {
-            ProcessSchemaForIntegerType(schema);
+            foreach (var item in schema.Items)
+            {
+                yield return item;
+            }
+        }
+
+        yield return schema.Not;
+
+        foreach (var property in schema.Properties.Values)
+        {
+            yield return property;
+        }
+
+        foreach (var subSchema in schema.AllOf)
+        {
+            yield return subSchema;
+        }
+
+        foreach (var subSchema in schema.OneOf)
+        {
+            yield return subSchema;
+        }
+
+        foreach (var subSchema in schema.AnyOf)
+        {
+            yield return subSchema;
+        }
+
+        foreach (var definition in schema.Definitions.Values)
+        {
+            yield return definition;
         }
     }
 
-    private void ProcessSchemaForIntegerType(JsonSchema? schema)
+    private static void TryPush(JsonSchema? schema, Stack<JsonSchema> stack)
     {
-        if (schema == null) return;
-
-        var actualSchema = schema.ActualSchema;
-
-        if (actualSchema.Type == JsonObjectType.Integer &&
-            string.IsNullOrEmpty(actualSchema.Format))
+        if (schema == null)
         {
-            actualSchema.Format = "int64";
+            return;
         }
 
-        foreach (var property in actualSchema.Properties.Values)
-        {
-            ProcessSchemaForIntegerType(property);
-        }
-
-        if (actualSchema.Item != null)
-        {
-            ProcessSchemaForIntegerType(actualSchema.Item);
-        }
-
-        if (actualSchema.AdditionalPropertiesSchema != null)
-        {
-            ProcessSchemaForIntegerType(actualSchema.AdditionalPropertiesSchema);
-        }
-
-        var subSchemas = actualSchema.AllOf
-            .Concat(actualSchema.OneOf)
-            .Concat(actualSchema.AnyOf)
-            .ToArray();
-
-        foreach (var subSchema in subSchemas)
-        {
-            ProcessSchemaForIntegerType(subSchema);
-        }
+        stack.Push(schema);
     }
 
     private static void MapCSharpGeneratorSettings(
@@ -381,5 +380,16 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                 _ => templateText,
             };
         }
+    }
+
+    private sealed class JsonSchemaReferenceComparer : IEqualityComparer<JsonSchema>
+    {
+        public static JsonSchemaReferenceComparer Instance { get; } = new();
+
+        public bool Equals(JsonSchema? x, JsonSchema? y) =>
+            ReferenceEquals(x, y);
+
+        public int GetHashCode(JsonSchema obj) =>
+            RuntimeHelpers.GetHashCode(obj);
     }
 }

@@ -31,10 +31,18 @@ jobs:
         dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
         nuget add .\Refitter.MSBuild.1.0.0.nupkg -source .
         dotnet add package Refitter.MSBuild -s .
-    - name: 🛠️ Build
+    - name: 🛠️ Build (default naming)
       working-directory: test/MSBuild
-      run: dotnet build -v d -filelogger
-    - name: 🧪 Build Output
+      run: dotnet build -v d -filelogger -p:RefitterIncludePatterns="petstore.refitter"
+    - name: 🧪 Build Output (default)
+      working-directory: test/MSBuild
+      run: cat msbuild.log
+    - name: 🛠️ Build (PreserveOriginal naming)
+      working-directory: test/MSBuild
+      run: |
+        dotnet clean -c release --nologo
+        dotnet build -c release -v d -filelogger -p:RefitterIncludePatterns="petstore-preserve-original.refitter"
+    - name: 🧪 Build Output (PreserveOriginal)
       working-directory: test/MSBuild
       run: cat msbuild.log
     - name: 🗳️ Upload

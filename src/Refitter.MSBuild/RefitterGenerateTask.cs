@@ -14,6 +14,8 @@ public class RefitterGenerateTask : MSBuildTask
 
     public bool SkipValidation { get; set; }
 
+    public string IncludePatterns { get; set; }
+
     [Output]
     public ITaskItem[] GeneratedFiles { get; set; }
 
@@ -26,6 +28,8 @@ public class RefitterGenerateTask : MSBuildTask
             ProjectFileDirectory,
             "*.refitter",
             SearchOption.AllDirectories);
+
+        files = FilterFiles(files, IncludePatterns);
 
         TryLogCommandLine($"Found {files.Length} .refitter files...");
 
@@ -293,5 +297,31 @@ public class RefitterGenerateTask : MSBuildTask
         var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*(true|false)";
         var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
         return match.Success && string.Equals(match.Groups[1].Value, "true", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Filters the list of .refitter files based on include patterns
+    /// </summary>
+    /// <param name="files">The list of .refitter files to filter</param>
+    /// <param name="includePatterns">Semicolon-separated file name patterns to include (e.g. "petstore.refitter;petstore-default.refitter")</param>
+    /// <returns>The filtered list of .refitter files</returns>
+    private static string[] FilterFiles(string[] files, string includePatterns)
+    {
+        if (string.IsNullOrWhiteSpace(includePatterns))
+        {
+            return files;
+        }
+
+        var patterns = includePatterns.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => p.Trim())
+            .ToList();
+
+        return files.Where(file =>
+        {
+            var fileName = Path.GetFileName(file);
+            return patterns.Any(pattern =>
+                fileName.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
+                fileName.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0);
+        }).ToArray();
     }
 }

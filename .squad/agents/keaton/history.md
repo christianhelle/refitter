@@ -194,3 +194,40 @@ Drafted comprehensive PRD for the "Preserve Original Property Names" feature. Ke
 **Follow-up recommendation (non-blocking):**
 - `IdentifierUtils` has three new public methods (`ToCompilableIdentifier`, `IsValidIdentifier`, `EscapeReservedKeyword`) with zero external callers — dead code. `PreserveOriginalPropertyNameGenerator` reimplements the same logic with a broader keyword list (130 vs 78 keywords). Future cleanup should either refactor the generator to delegate to `IdentifierUtils` (merging keyword lists) or remove the unused methods.
 
+### Issue #967 Stack Overflow Investigation — 2026-07-09
+
+**Incident:** User reported stack overflow in `Refitter.MSBuild 1.8.0-preview.100` when using `propertyNamingPolicy: PreserveOriginal` + `excludedTypeNames`.
+
+**Root Cause:** Pre-existing bug, NOT caused by PR #969. Two recursive schema traversal methods in `CSharpClientGeneratorFactory.cs` lack visited-set cycle detection:
+- `ProcessSchemaForMissingTypes()` (line 179) — introduced in commit `8ce7259d` (Jan 2026)
+- `ProcessSchemaForIntegerType()` (line 285) — introduced in commit `dc53d898`
+Both traverse `Properties`, `Item`, `AdditionalPropertiesSchema`, `AllOf`/`OneOf`/`AnyOf` recursively without tracking visited schemas.
+
+**Cycle amplifier:** `ConvertOneOfWithDiscriminatorToAllOf()` (line 96, commit `7cd060fe`) creates `AllOf` back-references from subtypes → discriminator base, inducing cycles even in specs without explicit circular `$ref`.
+
+**PR #969 diff is clean:** Only `CreatePropertyNameGenerator()` (14 lines) was added. Zero changes to recursive traversal code.
+
+**Existing safe pattern:** `SchemaCleaner.FindUsedJsonSchema()` (line 71) already uses `HashSet<JsonSchema>` + `!seen.Add(schema.ActualSchema)` for cycle detection. The fix should replicate this pattern.
+
+**Fix shape approved:** Add `HashSet<JsonSchema> visited` parameter to both recursive methods, guard on `actualSchema` (the resolved `$ref` target). netstandard2.0 compatible — `JsonSchema` uses default reference equality.
+
+**Key architectural insight:** Schema preprocessing runs on ALL component schemas before NSwag applies `excludedTypeNames` filtering. The visited-set fix is the correct solution; filtering excluded types earlier would be a separate optimization but doesn't address cycles between non-excluded types.
+
+**Test gap:** Zero existing tests for circular `$ref` schemas anywhere in the test suite. 8-scenario regression test matrix designed. See decision file `.squad/decisions/inbox/keaton-issue-967-stack-overflow.md`.
+
+
+## Issue #967 — Stack Overflow in Recursive Schema Traversal (2026-03-26)
+
+**Team Execution:** Fenster (implementation) + Hockney (regression) + McManus (CI/harness) + Keaton (architecture/review)
+
+### Fenster's Work
+- Root cause: ProcessSchemaForMissingTypes() and ProcessSchemaForIntegerType() in CSharpClientGeneratorFactory.cs recursively traverse schemas without visited-set
+- Solution: Replaced duplicated recursive preprocessing with one shared iterative visitor using Stack<JsonSchema> and HashSet<JsonSchema> cycle detection
+- Key insight: Pre-existing bug predating PR #969; not caused by property-naming work
+- Files: src\Refitter.Core\CSharpClientGeneratorFactory.cs
+
+### Shared Knowledge
+- Duplicated recursive traversal pattern was the root of both overflow paths
+- Iterative approach with instance-based visited-set matches existing SchemaCleaner pattern in codebase
+- netstandard2.0 compatible (no custom equality comparer needed)
+- PreserveOriginal + recursive schemas now validated across CLI, MSBuild, and SourceGenerator paths

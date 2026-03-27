@@ -189,7 +189,8 @@ function RunTests
         @{ Suffix="NoXmlDocComments"; Prefix="NoXmlDoc"; Args="--no-xml-doc-comments" },
         @{ Suffix="NoOperationHeaders"; Prefix="NoOpHeaders"; Args="--no-operation-headers" },
         @{ Suffix="AdditionalNamespace"; Prefix="AdditionalNs"; Args="--additional-namespace System.ComponentModel" },
-        @{ Suffix="ExcludeNamespace"; Prefix="ExcludeNs"; Args="--exclude-namespace System.Xml.Serialization" }
+        @{ Suffix="ExcludeNamespace"; Prefix="ExcludeNs"; Args="--exclude-namespace System.Xml.Serialization" },
+        @{ Suffix="PreserveOriginal"; Prefix="PreserveOriginal"; Args="--property-naming-policy PreserveOriginal" }
     )
 
     # Petstore-only variants: require specs with specific tags/paths (petstore has "pet", "user", "store" tags)

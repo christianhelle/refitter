@@ -4,7 +4,6 @@
   "outputFileName": "Petstore.cs",
   "naming": {
     "useOpenApiTitle": false,
-    "interfaceName": "SwaggerPetstore",
-    "filename": "SwaggerPetstore"
+    "interfaceName": "SwaggerPetstore"
   }
 }
