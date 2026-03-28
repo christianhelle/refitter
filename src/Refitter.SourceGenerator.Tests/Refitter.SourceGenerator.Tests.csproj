@@ -14,7 +14,7 @@
         <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
         <PackageReference Include="FluentAssertions" Version="7.2.2" />
         <PackageReference Include="System.Text.Json" Version="10.0.3" />
-        <PackageReference Include="TUnit" Version="1.22.3" />
+        <PackageReference Include="TUnit" Version="1.22.6" />
         <PackageReference Include="coverlet.collector" Version="8.0.1">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
