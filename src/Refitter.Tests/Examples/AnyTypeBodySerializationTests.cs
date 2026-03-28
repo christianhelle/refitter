@@ -58,18 +58,41 @@ public class AnyTypeBodySerializationTests
     }
 
     [Test]
+    public async Task Generated_Code_Contains_Json_BodySerializationMethod_When_Configured()
+    {
+        string generatedCode = await GenerateCode(BodySerializationMethod.Json);
+        generatedCode.Should().Contain("[Body(BodySerializationMethod.Json)] object body");
+    }
+
+    [Test]
+    public async Task Generated_Code_Contains_UrlEncoded_BodySerializationMethod_When_Configured()
+    {
+        string generatedCode = await GenerateCode(BodySerializationMethod.UrlEncoded);
+        generatedCode.Should().Contain("[Body(BodySerializationMethod.UrlEncoded)] object body");
+    }
+
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    [Test]
+    public async Task Can_Build_Generated_Code_With_Json_BodySerializationMethod()
+    {
+        string generatedCode = await GenerateCode(BodySerializationMethod.Json);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    private static async Task<string> GenerateCode(
+        BodySerializationMethod method = BodySerializationMethod.Serialized)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
-            OpenApiPath = swaggerFile
+            OpenApiPath = swaggerFile,
+            AnyTypeBodySerializationMethod = method,
         };
 
         var generator = await RefitGenerator.CreateAsync(settings);

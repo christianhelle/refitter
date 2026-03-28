@@ -161,6 +161,8 @@ OPTIONS:
                                                                   Parameter (adds method parameters for authentication),
                                                                   Method (generates a Refit [Headers] attribute for bearer token authentication)
         --security-scheme                                        Generate Authorization header for a specific security scheme. When omitted, authentication headers will be generated for all security schemes
+        --any-type-body-serialization-method      Serialized      The body serialization method to use for AnyType body parameters.
+                                                                   Options: Serialized (uses the configured serializer), Json (serializes as JSON), UrlEncoded (URL-encodes the body)
 ```
 
 To generate code from an OpenAPI specifications file, run the following:
@@ -273,6 +275,7 @@ The following is an example `.refitter` file using a single OpenAPI specificatio
   "usePolymorphicSerialization": true, // Optional. Default=false
   "collectionFormat": "Multi", // Optional. Default=Multi. The collection format for array query parameters. Possible values: Multi, Csv, Ssv, Tsv, Pipes
   "contractTypeSuffix": null, // Optional. Default=null. Suffix to append to all generated contract type names (e.g., "Dto" would rename Pet to PetDto)
+  "anyTypeBodySerializationMethod": "Serialized", // Optional. Default=Serialized. The body serialization method for AnyType body parameters. Possible values: Serialized, Json, UrlEncoded
   "generateDisposableClients": true, // Optional. Default=false
   "dependencyInjectionSettings": { // Optional
     "baseUrl": "https://petstore3.swagger.io/api/v3", // Optional. Leave this blank to set the base address manually
@@ -391,6 +394,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `usePolymorphicSerialization`: Set to `true` to use System.Text.Json polymorphic serialization. Replaces NSwag `JsonInheritanceConverter` attributes with `System.Text.Json` `JsonPolymorphicAttributes`. Default is `false`. See <https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism>
 - `collectionFormat` - The collection format for array query parameters. Possible values: `Multi`, `Csv`, `Ssv`, `Tsv`, `Pipes`. Default is `Multi`
 - `contractTypeSuffix` - An optional suffix to append to all generated contract type names. For example, setting this to `Dto` would rename `Pet` to `PetDto`. Default is `null` (no suffix)
+- `anyTypeBodySerializationMethod` - The body serialization method to use for AnyType body parameters. Possible values: `Serialized`, `Json`, `UrlEncoded`. Default is `Serialized`
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
