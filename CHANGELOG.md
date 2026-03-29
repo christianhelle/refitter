@@ -7,6 +7,7 @@
 **Merged pull requests:**
 
 - chore\(deps\): update dependency tunit to 1.22.3 [\#974](https://github.com/christianhelle/refitter/pull/974) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dotnet monorepo [\#960](https://github.com/christianhelle/refitter/pull/960) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.8.0-preview.101](https://github.com/christianhelle/refitter/tree/1.8.0-preview.101) (2026-03-27)
 
