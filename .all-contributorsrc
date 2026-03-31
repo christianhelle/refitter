@@ -848,6 +848,16 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "smoerijf",
+      "name": "smoerijf",
+      "avatar_url": "https://avatars.githubusercontent.com/u/51750688?v=4",
+      "profile": "https://github.com/smoerijf",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
