@@ -158,7 +158,7 @@ internal static class ParameterExtractor
         foreach (var character in unsafeText)
         {
             var safeCharacter = character;
-            if (char.GetUnicodeCategory(character) == UnicodeCategory.OtherPunctuation)
+            if (!char.IsLetterOrDigit(character))
             {
                 safeCharacter = '_';
             }

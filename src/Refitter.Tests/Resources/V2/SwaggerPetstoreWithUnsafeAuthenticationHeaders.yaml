@@ -246,7 +246,7 @@ paths:
       - "application/json"
       - "application/xml"
       parameters:
-      - name: "auth_key"
+      - name: "auth.key-test_2"
         in: "header"
         required: false
         type: "string"

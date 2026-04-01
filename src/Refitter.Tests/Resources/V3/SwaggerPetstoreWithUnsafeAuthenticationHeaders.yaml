@@ -731,5 +731,5 @@ components:
   securitySchemes:
     auth_key:
       type: apiKey
-      name: auth.key
+      name: auth.key-test_2
       in: header
