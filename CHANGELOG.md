@@ -6,6 +6,8 @@
 
 **Merged pull requests:**
 
+- docs: add smoerijf as a contributor for bug, and code [\#978](https://github.com/christianhelle/refitter/pull/978) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Made Header Parameters for Security Schemes safe to use as C\# variable name [\#977](https://github.com/christianhelle/refitter/pull/977) ([smoerijf](https://github.com/smoerijf))
 - chore\(deps\): update dependency tunit to 1.22.6 [\#975](https://github.com/christianhelle/refitter/pull/975) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.22.3 [\#974](https://github.com/christianhelle/refitter/pull/974) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dotnet monorepo [\#960](https://github.com/christianhelle/refitter/pull/960) ([renovate[bot]](https://github.com/apps/renovate))
