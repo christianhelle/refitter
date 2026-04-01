@@ -283,7 +283,7 @@ public class SwaggerPetstoreApizrTests
     {
         var settings = new ApizrGeneratorSettings { AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter };
         var generatedCode = await GenerateCode(version, filename, settings);
-        generatedCode.Should().Contain("[Header(\"auth.key\")] string auth_key");
+        generatedCode.Should().Contain("[Header(\"auth.key-test_2\")] string auth_key_test_2");
     }
 
     [Test]
