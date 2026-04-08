@@ -2,12 +2,23 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.101...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.102...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): update dependency tunit to 1.29.0 [\#976](https://github.com/christianhelle/refitter/pull/976) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [1.8.0-preview.102](https://github.com/christianhelle/refitter/tree/1.8.0-preview.102) (2026-04-01)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.101...1.8.0-preview.102)
+
+**Implemented enhancements:**
+
+- Made Header Parameters for Security Schemes safe to use as C\# variable name [\#977](https://github.com/christianhelle/refitter/pull/977) ([smoerijf](https://github.com/smoerijf))
 
 **Merged pull requests:**
 
 - docs: add smoerijf as a contributor for bug, and code [\#978](https://github.com/christianhelle/refitter/pull/978) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Made Header Parameters for Security Schemes safe to use as C\# variable name [\#977](https://github.com/christianhelle/refitter/pull/977) ([smoerijf](https://github.com/smoerijf))
 - chore\(deps\): update dependency tunit to 1.22.6 [\#975](https://github.com/christianhelle/refitter/pull/975) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.22.3 [\#974](https://github.com/christianhelle/refitter/pull/974) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dotnet monorepo [\#960](https://github.com/christianhelle/refitter/pull/960) ([renovate[bot]](https://github.com/apps/renovate))
