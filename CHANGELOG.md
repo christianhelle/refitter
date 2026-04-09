@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- chore\(deps\): update dependency tunit to 1.30.0 [\#981](https://github.com/christianhelle/refitter/pull/981) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.29.0 [\#976](https://github.com/christianhelle/refitter/pull/976) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.8.0-preview.102](https://github.com/christianhelle/refitter/tree/1.8.0-preview.102) (2026-04-01)
