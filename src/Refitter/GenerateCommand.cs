@@ -327,6 +327,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             AuthenticationHeaderStyle = settings.GenerateAuthenticationHeader,
             SecurityScheme = settings.SecurityScheme,
             GenerateJsonSerializerContext = settings.GenerateJsonSerializerContext,
+            AnyTypeBodySerializationMethod = settings.AnyTypeBodySerializationMethod,
         };
     }
     private static async Task WriteSingleFile(

@@ -311,7 +311,7 @@ internal static class ParameterExtractor
         if (parameterType.Equals(anyType, StringComparison.OrdinalIgnoreCase) ||
             parameterType.Contains("JsonElement", StringComparison.OrdinalIgnoreCase))
         {
-            return "Body(BodySerializationMethod.Serialized)";
+            return $"Body(BodySerializationMethod.{settings.AnyTypeBodySerializationMethod})";
         }
 
         return "Body";
