@@ -21,7 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Exceptionless" Version="6.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsServer" Version="2.23.0" />
-    <PackageReference Include="Spectre.Console.Cli" Version="0.53.1" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.55.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.201" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="10.0.5" />
   </ItemGroup>
