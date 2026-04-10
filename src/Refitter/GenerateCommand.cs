@@ -23,7 +23,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     private static readonly string Crlf = Environment.NewLine;
 
-    public override ValidationResult Validate(CommandContext context, Settings settings)
+    protected override ValidationResult Validate(CommandContext context, Settings settings)
     {
         if (!settings.NoLogging)
             Analytics.Configure();
@@ -35,7 +35,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return SettingsValidator.Validate(settings);
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         var refitGeneratorSettings = CreateRefitGeneratorSettings(settings);
         try
