@@ -260,3 +260,70 @@ Full assessment written to `.squad/decisions/inbox/mcmanus-cicd-review.md`
 5. ✅ Squad changes staged and committed to git
 
 **Summary:** McManus protected confidential tmp/ folder via two-layer .gitignore. Scribe completed end-of-session orchestration: logs written, decisions merged, history updated, git committed.
+
+---
+
+## GitHub Dependency Submission Failure — NETSDK1147 (2026-04-09)
+
+**Problem:** GitHub's automatic NuGet dependency submission workflow failing with `NETSDK1147: To build this project, the following workloads must be installed: android wasm-tools-net8`.
+
+**Root Cause Analysis:**
+
+1. **What Failed:**
+   - Workflow: "Automatic Dependency Submission (NuGet)" (GitHub-managed)
+   - Job: `submit-nuget`
+   - Error: NETSDK1147 during `dotnet restore` of `test/MauiExample/MauiExample.csproj`
+   - Target framework: `net8.0-android` (requires Android workload not installed on CI runner)
+
+2. **Why It Failed:**
+   - GitHub's automatic dependency submission scans ALL .csproj files in the repository
+   - `test/MauiExample/MauiExample.csproj` targets platform-specific frameworks: `net8.0-android`, `net8.0-ios`, `net8.0-maccatalyst`, `net8.0-windows`
+   - These require workloads (android, wasm-tools-net8) that aren't installed on standard GitHub runners
+   - The automatic submission tries to restore all projects to extract NuGet dependencies
+
+3. **Why MauiExample Exists:**
+   - Test project demonstrating Refitter source generator integration with .NET MAUI apps
+   - Not a shipping artifact (IsPackable=false)
+   - Included in `test/Tests.slnx` for local developer validation
+   - Requires platform-specific workloads that aren't needed for core Refitter functionality
+
+**Solution Implemented:**
+
+1. **Primary Fix: Custom Dependency Submission Workflow**
+   - Created `.github/workflows/dependency-submission.yml`
+   - Overrides GitHub's automatic dependency submission
+   - Only restores `src/Refitter.slnx` (main solution)
+   - Excludes `test/Tests.slnx` which contains MauiExample
+
+2. **Secondary Fix: MauiExample.csproj Hardening**
+   - Added `<IsPackable>false</IsPackable>` to mark as non-shipping artifact
+   - Signals to tooling that this is a test/example project
+
+**Files Changed:**
+- `.github/workflows/dependency-submission.yml` (CREATED) — Custom workflow to control dependency scanning
+- `test/MauiExample/MauiExample.csproj` (MODIFIED) — Added IsPackable=false property
+
+**Validation Approach:**
+
+1. **Test Workflow Locally:**
+   ```powershell
+   # Verify main solution restores without workloads
+   dotnet restore src/Refitter.slnx
+   ```
+
+2. **Verify on GitHub:**
+   - Push changes to a test branch
+   - Monitor workflow run at: https://github.com/christianhelle/refitter/actions/workflows/dependency-submission.yml
+   - Should complete successfully without NETSDK1147 error
+
+3. **Confirm Dependency Graph Updates:**
+   - Navigate to: Repository → Insights → Dependency graph
+   - Verify NuGet dependencies are detected from main solution projects only
+
+**Expected Outcome:**
+- Dependency submission completes successfully
+- Only main Refitter projects (CLI, Core, SourceGenerator, MSBuild) are scanned for dependencies
+- Platform-specific test projects (MauiExample) are excluded
+- No loss of dependency visibility for shipping packages
+
+**Status:** ✅ IMPLEMENTED — Ready for testing
