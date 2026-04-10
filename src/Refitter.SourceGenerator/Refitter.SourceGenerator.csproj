@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="H.Generators.Extensions" Version="1.24.2" PrivateAssets="all" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.6.3" PrivateAssets="all" />
-    <PackageReference Include="NSwag.Core.Yaml" Version="14.6.3" PrivateAssets="all" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.7.0" PrivateAssets="all" />
+    <PackageReference Include="NSwag.Core.Yaml" Version="14.7.0" PrivateAssets="all" />
     <PackageReference Include="OasReader" Version="3.5.0.19" />
     <PackageReference Include="Refit" Version="10.1.6" />
   </ItemGroup>
