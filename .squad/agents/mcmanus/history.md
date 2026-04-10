@@ -260,3 +260,165 @@ Full assessment written to `.squad/decisions/inbox/mcmanus-cicd-review.md`
 5. ✅ Squad changes staged and committed to git
 
 **Summary:** McManus protected confidential tmp/ folder via two-layer .gitignore. Scribe completed end-of-session orchestration: logs written, decisions merged, history updated, git committed.
+
+---
+
+## GitHub Dependency Submission Failure — NETSDK1147 (2026-04-09)
+
+**Problem:** GitHub's automatic NuGet dependency submission workflow failing with `NETSDK1147: To build this project, the following workloads must be installed: android wasm-tools-net8`.
+
+**Root Cause Analysis:**
+
+1. **What Failed:**
+   - Workflow: "Automatic Dependency Submission (NuGet)" (GitHub-managed)
+   - Job: `submit-nuget`
+   - Error: NETSDK1147 during `dotnet restore` of `test/MauiExample/MauiExample.csproj`
+   - Target framework: `net8.0-android` (requires Android workload not installed on CI runner)
+
+2. **Why It Failed:**
+   - GitHub's automatic dependency submission scans ALL .csproj files in the repository
+   - `test/MauiExample/MauiExample.csproj` targets platform-specific frameworks: `net8.0-android`, `net8.0-ios`, `net8.0-maccatalyst`, `net8.0-windows`
+   - These require workloads (android, wasm-tools-net8) that aren't installed on standard GitHub runners
+   - The automatic submission tries to restore all projects to extract NuGet dependencies
+
+3. **Why MauiExample Exists:**
+   - Test project demonstrating Refitter source generator integration with .NET MAUI apps
+   - Not a shipping artifact (IsPackable=false)
+   - Included in `test/Tests.slnx` for local developer validation
+   - Requires platform-specific workloads that aren't needed for core Refitter functionality
+
+**Solution Implemented:**
+
+1. **Primary Fix: Custom Dependency Submission Workflow**
+   - Created `.github/workflows/dependency-submission.yml`
+   - Overrides GitHub's automatic dependency submission
+   - Only restores `src/Refitter.slnx` (main solution)
+   - Excludes `test/Tests.slnx` which contains MauiExample
+
+2. **Secondary Fix: MauiExample.csproj Hardening**
+   - Added `<IsPackable>false</IsPackable>` to mark as non-shipping artifact
+   - Signals to tooling that this is a test/example project
+
+**Files Changed:**
+- `.github/workflows/dependency-submission.yml` (CREATED) — Custom workflow to control dependency scanning
+- `test/MauiExample/MauiExample.csproj` (MODIFIED) — Added IsPackable=false property
+
+**Validation Approach:**
+
+1. **Test Workflow Locally:**
+   ```powershell
+   # Verify main solution restores without workloads
+   dotnet restore src/Refitter.slnx
+   ```
+
+2. **Verify on GitHub:**
+   - Push changes to a test branch
+   - Monitor workflow run at: https://github.com/christianhelle/refitter/actions/workflows/dependency-submission.yml
+   - Should complete successfully without NETSDK1147 error
+
+3. **Confirm Dependency Graph Updates:**
+   - Navigate to: Repository → Insights → Dependency graph
+   - Verify NuGet dependencies are detected from main solution projects only
+
+**Expected Outcome:**
+- Dependency submission completes successfully
+- Only main Refitter projects (CLI, Core, SourceGenerator, MSBuild) are scanned for dependencies
+- Platform-specific test projects (MauiExample) are excluded
+- No loss of dependency visibility for shipping packages
+
+**Status:** ✅ IMPLEMENTED — Ready for testing
+
+---
+
+## GitHub Dependency Submission Fix — Phase 2 (2026-04-10)
+
+**Problem:** Previous fix (creating `.github/workflows/dependency-submission.yml`) did NOT work. The GitHub automatic NuGet dependency submission is a **system-level feature** that runs independently and cannot be overridden by custom workflow files.
+
+**Investigation Findings:**
+
+1. **GitHub's Automatic Submission Architecture:**
+   - System-level feature enabled in repository settings (Settings → Security → Advanced Security → Automatic dependency submission)
+   - Uses a GitHub-managed workflow that finds ALL .csproj files with `find` command
+   - Runs independently on pushes to main branch
+   - Cannot be overridden by creating custom workflows with the same name
+
+2. **Available Control Mechanisms:**
+   - Repository setting: Enable/Disable automatic submission (loses all dependency tracking)
+   - `dependabot.yml`: Controls Dependabot alerts, NOT automatic submission
+   - Component-detection tool: Supports `--DirectoryExclusionList` parameter, but only when tool is invoked directly
+   - **No file-based configuration** exists for GitHub's automatic submission
+
+3. **Why Custom Workflow Failed:**
+   - GitHub's system-level submission runs regardless of custom workflows
+   - PR #986 still failed with NETSDK1147 error on `submit-nuget` job
+   - Custom workflow ran successfully but didn't prevent system workflow from running
+
+**Solution Implemented (Phase 2):**
+
+**Conditional Target Frameworks in MauiExample.csproj**
+- Detect when running in GitHub's automatic dependency submission context
+- Use environment variables `GITHUB_ACTIONS` and `GITHUB_WORKFLOW` to identify the submission job
+- Conditionally set `TargetFrameworks`:
+  - **Normal build:** Use `net8.0-android;net8.0-ios;net8.0-maccatalyst;net8.0-windows` (full MAUI support)
+  - **GitHub submission:** Fallback to `net8.0` (no workloads required)
+- Conditionally include MAUI packages only when not in submission context
+
+**Files Changed:**
+- `.github/workflows/dependency-submission.yml` (DELETED) — Custom workflow didn't work
+- `test/MauiExample/MauiExample.csproj` (MODIFIED) — Added conditional target framework logic
+
+**Key Code Changes:**
+```xml
+<PropertyGroup>
+  <!-- Detect GitHub's automatic dependency submission -->
+  <_IsGitHubDependencySubmission Condition="'$(GITHUB_ACTIONS)' == 'true' AND '$(GITHUB_WORKFLOW)' == 'Automatic Dependency Submission (NuGet)'">true</_IsGitHubDependencySubmission>
+  
+  <!-- Use MAUI frameworks normally -->
+  <TargetFrameworks Condition="'$(_IsGitHubDependencySubmission)' != 'true'">net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+  
+  <!-- Fallback to net8.0 during GitHub submission -->
+  <TargetFrameworks Condition="'$(_IsGitHubDependencySubmission)' == 'true'">net8.0</TargetFrameworks>
+</PropertyGroup>
+
+<ItemGroup>
+  <!-- Only include MAUI packages when not in submission context -->
+  <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" Condition="'$(_IsGitHubDependencySubmission)' != 'true'" />
+  <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" Condition="'$(_IsGitHubDependencySubmission)' != 'true'" />
+</ItemGroup>
+```
+
+**Validation Results:**
+
+1. **Local Simulation (GitHub Actions env):**
+   ```powershell
+   $env:GITHUB_ACTIONS = "true"
+   $env:GITHUB_WORKFLOW = "Automatic Dependency Submission (NuGet)"
+   dotnet restore test\MauiExample\MauiExample.csproj
+   # Result: ✅ SUCCESS (no NETSDK1147 error)
+   ```
+
+2. **PR Validation Gates:**
+   - ✅ Build: `dotnet build -c Release src\Refitter.slnx` — PASS (7.5s, 0 errors)
+   - ✅ Test: `dotnet test --solution src\Refitter.slnx -c Release` — PASS (1,476 tests, 100% pass rate)
+   - ✅ Format: `dotnet format --verify-no-changes src\Refitter.slnx` — PASS (no violations)
+
+3. **Local Build (Normal):**
+   - MauiExample still uses MAUI target frameworks when `GITHUB_ACTIONS` is not set
+   - No impact on local developer workflow
+   - MAUI workload requirements preserved for normal builds
+
+**Why This Solution Works:**
+
+1. **Environment Detection:** GitHub's automatic submission sets `GITHUB_ACTIONS=true` and `GITHUB_WORKFLOW="Automatic Dependency Submission (NuGet)"`
+2. **MSBuild Evaluation:** Conditions are evaluated during project load, before SDK imports
+3. **Minimal Impact:** Only affects the specific scenario (GitHub submission); normal builds unchanged
+4. **No Workload Installation:** Avoids requiring Android/iOS workloads on standard GitHub runners
+5. **Preserves Functionality:** MauiExample can still be built locally with full MAUI support
+
+**Status:** ✅ COMPLETE — Ready for PR
+
+**Next Steps:**
+1. Push changes to PR #986 or new branch
+2. Monitor GitHub Actions workflow run for `submit-nuget` job
+3. Verify no NETSDK1147 error occurs
+4. Confirm dependency graph updates successfully

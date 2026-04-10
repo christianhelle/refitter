@@ -1,8 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+		<!-- GitHub's automatic dependency submission runs without MAUI workloads installed -->
+		<!-- Skip MAUI target frameworks when running in GitHub Actions dependency submission -->
+		<!-- to prevent NETSDK1147 errors -->
+		<_IsGitHubDependencySubmission Condition="'$(GITHUB_ACTIONS)' == 'true' AND '$(GITHUB_WORKFLOW)' == 'Automatic Dependency Submission (NuGet)'">true</_IsGitHubDependencySubmission>
+		
+		<TargetFrameworks Condition="'$(_IsGitHubDependencySubmission)' != 'true'">net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="'$(_IsGitHubDependencySubmission)' != 'true' AND $([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+		<!-- Fallback to net8.0 when running in GitHub dependency submission -->
+		<TargetFrameworks Condition="'$(_IsGitHubDependencySubmission)' == 'true'">net8.0</TargetFrameworks>
+		<!-- Mark as non-packable to hint it's not a shipping artifact -->
+		<IsPackable>false</IsPackable>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
 
@@ -57,8 +66,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" Condition="'$(_IsGitHubDependencySubmission)' != 'true'" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" Condition="'$(_IsGitHubDependencySubmission)' != 'true'" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
 	</ItemGroup>
 
