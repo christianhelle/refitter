@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Triage issue via Lead agent
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
