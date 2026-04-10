@@ -6,10 +6,13 @@
 
 **Merged pull requests:**
 
+- Update dependency AutoMapper to v16 [\#988](https://github.com/christianhelle/refitter/pull/988) ([renovate[bot]](https://github.com/apps/renovate))
+- Bump the nuget group with 1 update [\#987](https://github.com/christianhelle/refitter/pull/987) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Update Spectre.Console.Cli to v0.55.0 [\#985](https://github.com/christianhelle/refitter/pull/985) ([christianhelle](https://github.com/christianhelle))
 - Update actions/github-script action to v9 [\#984](https://github.com/christianhelle/refitter/pull/984) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.30.8 [\#983](https://github.com/christianhelle/refitter/pull/983) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.30.0 [\#981](https://github.com/christianhelle/refitter/pull/981) ([renovate[bot]](https://github.com/apps/renovate))
+- Update NSwag to v14.7.0 [\#980](https://github.com/christianhelle/refitter/pull/980) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.29.0 [\#976](https://github.com/christianhelle/refitter/pull/976) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [1.8.0-preview.102](https://github.com/christianhelle/refitter/tree/1.8.0-preview.102) (2026-04-01)
