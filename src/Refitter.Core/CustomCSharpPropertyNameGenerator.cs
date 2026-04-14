@@ -57,6 +57,6 @@ internal class CustomCSharpPropertyNameGenerator : IPropertyNameGenerator
                 .Replace("%", "Percent");
         }
 
-        return name;
+        return IdentifierUtils.ToCompilableIdentifier(name);
     }
 }

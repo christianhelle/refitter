@@ -71,6 +71,13 @@ public class IdentifierUtilsTests
     }
 
     [Test]
+    public void ToCompilableIdentifier_Prefixes_Digit_Prefixed_PascalCase_Names()
+    {
+        var result = IdentifierUtils.ToCompilableIdentifier("42QuestionField");
+        result.Should().Be("_42QuestionField");
+    }
+
+    [Test]
     public void Sanitize_Removes_Spaces()
     {
         var result = "Test Name".Sanitize();

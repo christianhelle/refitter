@@ -87,6 +87,55 @@ public class PropertyNamingPolicyTests
         }
         """;
 
+    private const string DigitPrefixedPropertyOpenApiSpec = """
+        {
+          "openapi": "3.0.1",
+          "info": {
+            "title": "Digit Prefixed Property API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/responses": {
+              "get": {
+                "operationId": "GetResponse",
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/TestResponse"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "TestResponse": {
+                "type": "object",
+                "properties": {
+                  "42_question_field": {
+                    "$ref": "#/components/schemas/42Question"
+                  }
+                }
+              },
+              "42Question": {
+                "type": "object",
+                "properties": {
+                  "answer_text": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
     [Test]
     public async Task Can_Generate_Code_With_Default_PascalCase_Property_Naming()
     {
@@ -130,10 +179,32 @@ public class PropertyNamingPolicyTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Test]
+    public async Task Default_PascalCase_Property_Naming_Prefixes_Digit_Prefixed_Properties()
+    {
+        string generatedCode = await GenerateCodeFromSpec(DigitPrefixedPropertyOpenApiSpec);
+        generatedCode.Should().Contain("""[JsonPropertyName("42_question_field")]""");
+        generatedCode.Should().Contain("_42QuestionField { get; set; }");
+    }
+
+    [Test]
+    public async Task Default_PascalCase_Digit_Prefixed_Properties_Can_Build()
+    {
+        string generatedCode = await GenerateCodeFromSpec(DigitPrefixedPropertyOpenApiSpec);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
     private static async Task<string> GenerateCode(
         PropertyNamingPolicy propertyNamingPolicy = PropertyNamingPolicy.PascalCase)
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(OpenApiSpec);
+        return await GenerateCodeFromSpec(OpenApiSpec, propertyNamingPolicy);
+    }
+
+    private static async Task<string> GenerateCodeFromSpec(
+        string openApiSpec,
+        PropertyNamingPolicy propertyNamingPolicy = PropertyNamingPolicy.PascalCase)
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(openApiSpec);
 
         try
         {
