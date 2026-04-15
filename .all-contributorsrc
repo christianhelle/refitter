@@ -858,6 +858,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "dimyle",
+      "name": "Dmitry",
+      "avatar_url": "https://avatars.githubusercontent.com/u/54911257?v=4",
+      "profile": "https://github.com/dimyle",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
