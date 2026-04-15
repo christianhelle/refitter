@@ -152,6 +152,13 @@ public class PropertyNamingPolicyTests
     }
 
     [Test]
+    public async Task Default_PascalCase_Minimally_Sanitizes_Invalid_Identifiers()
+    {
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("public string _1stNode { get; set; }");
+    }
+
+    [Test]
     public async Task PreserveOriginal_Emits_Raw_Valid_Identifiers()
     {
         string generatedCode = await GenerateCode(PropertyNamingPolicy.PreserveOriginal);
