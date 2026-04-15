@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Resources;
+using Refitter.Tests.TestUtilities;
 using TUnit.Core;
 
 namespace Refitter.Tests;
@@ -105,5 +106,71 @@ public class SchemaCleanerTests
         };
 
         cleaner.IncludeInheritanceHierarchy.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task RemoveUnreferencedSchema_Handles_Alias_Schemas_Sharing_The_Same_Instance()
+    {
+        const string spec = """
+            openapi: 3.0.4
+            info:
+              title: Alias schema test
+              version: "1"
+            paths:
+              /items:
+                get:
+                  operationId: GetItem
+                  responses:
+                    '200':
+                      description: Success
+                      content:
+                        application/json:
+                          schema:
+                            $ref: '#/components/schemas/AliasItem'
+            components:
+              schemas:
+                AliasItem:
+                  $ref: '#/components/schemas/ActualItem'
+                ActualItem:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                UnusedItem:
+                  type: object
+                  properties:
+                    ignored:
+                      type: string
+            """;
+
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
+
+        try
+        {
+            var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+            ReferenceEquals(document.Components.Schemas["AliasItem"], document.Components.Schemas["ActualItem"])
+                .Should()
+                .BeTrue();
+
+            var cleaner = new SchemaCleaner(document, []);
+            cleaner.Invoking(x => x.RemoveUnreferencedSchema()).Should().NotThrow();
+
+            document.Components.Schemas.Should().ContainKey("AliasItem");
+            document.Components.Schemas.Should().ContainKey("ActualItem");
+            document.Components.Schemas.Should().NotContainKey("UnusedItem");
+        }
+        finally
+        {
+            if (File.Exists(swaggerFile))
+            {
+                File.Delete(swaggerFile);
+            }
+
+            var directory = Path.GetDirectoryName(swaggerFile);
+            if (directory != null && Directory.Exists(directory))
+            {
+                Directory.Delete(directory, true);
+            }
+        }
     }
 }

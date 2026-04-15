@@ -108,7 +108,8 @@ public class SchemaCleaner
         var seen = new HashSet<JsonSchema>();
         while (toProcess.Count > 0)
         {
-            var actualSchema = toProcess.Pop().ActualSchema;
+            var schema = toProcess.Pop();
+            var actualSchema = schema.ActualSchema;
             if (!seen.Add(actualSchema))
             {
                 continue;
