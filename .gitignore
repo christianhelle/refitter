@@ -285,3 +285,4 @@ install.sh
 
 # Confidential temporary files — must not reach public repository
 tmp/
+test/Generated/GeneratedCode/*.generated.cs
