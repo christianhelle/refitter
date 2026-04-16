@@ -16,6 +16,8 @@
 
 **Merged pull requests:**
 
+- docs: add Timovzl as a contributor for bug [\#999](https://github.com/christianhelle/refitter/pull/999) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Update dependency TUnit to 1.34.5 [\#995](https://github.com/christianhelle/refitter/pull/995) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add dimyle as a contributor for bug [\#994](https://github.com/christianhelle/refitter/pull/994) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update dependency TUnit to 1.31.0 [\#989](https://github.com/christianhelle/refitter/pull/989) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency AutoMapper to v16 [\#988](https://github.com/christianhelle/refitter/pull/988) ([renovate[bot]](https://github.com/apps/renovate))
