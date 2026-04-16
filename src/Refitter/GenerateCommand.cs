@@ -697,6 +697,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFilename))
         {
             var refitterFileName = Path.GetFileNameWithoutExtension(settingsFilePath);
+            if (string.IsNullOrEmpty(refitterFileName))
+                refitterFileName = "Output";
             refitGeneratorSettings.OutputFilename = $"{refitterFileName}.cs";
         }
     }
