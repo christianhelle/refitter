@@ -39,26 +39,26 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     {
         RefitGeneratorSettings refitGeneratorSettings;
 
-        // When settings file is provided, deserialize it first and use as source of truth
-        if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
-        {
-            var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
-            refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
-
-            // Allow CLI to override OpenApiPath if explicitly provided
-            if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
-                refitGeneratorSettings.OpenApiPath = settings.OpenApiPath;
-
-            ApplySettingsFileDefaults(settings.SettingsFilePath, refitGeneratorSettings);
-        }
-        else
-        {
-            // No settings file - build from CLI arguments
-            refitGeneratorSettings = CreateRefitGeneratorSettings(settings);
-        }
-
         try
         {
+            // When settings file is provided, deserialize it first and use as source of truth
+            if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            {
+                var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
+                refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+
+                // Allow CLI to override OpenApiPath if explicitly provided
+                if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
+                    refitGeneratorSettings.OpenApiPath = settings.OpenApiPath;
+
+                ApplySettingsFileDefaults(settings.SettingsFilePath, refitGeneratorSettings);
+            }
+            else
+            {
+                // No settings file - build from CLI arguments
+                refitGeneratorSettings = CreateRefitGeneratorSettings(settings);
+            }
+
             var stopwatch = Stopwatch.StartNew();
             var version = GetType().Assembly.GetName().Version!.ToString();
             if (version == "1.0.0.0")
@@ -653,12 +653,12 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ? string.Empty
             : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
 
-        var outputPath = settings.OutputPath != Settings.DefaultOutputPath &&
-                         !string.IsNullOrWhiteSpace(settings.OutputPath)
-            ? settings.OutputPath
+        var outputPath = HasExplicitOutputPath(settings)
+            ? settings.OutputPath!
             : refitGeneratorSettings.OutputFilename ?? "Output.cs";
 
-        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
+        // Only apply OutputFolder when CLI did not provide an explicit output path
+        if (!HasExplicitOutputPath(settings) && !string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
         {
             outputPath = Path.Combine(refitGeneratorSettings.OutputFolder, outputPath);
         }
@@ -671,6 +671,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         return outputPath;
     }
+
+    private static bool HasExplicitOutputPath(Settings settings) =>
+        settings.OutputPath != Settings.DefaultOutputPath &&
+        !string.IsNullOrWhiteSpace(settings.OutputPath);
 
     private static void ApplySettingsFileDefaults(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
     {
@@ -701,13 +705,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ? string.Empty
             : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
 
-        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
+        if (!HasExplicitOutputPath(settings) && !string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
         {
             return Path.Combine(root, refitGeneratorSettings.OutputFolder, outputFile.Filename);
         }
 
-        return !string.IsNullOrWhiteSpace(settings.OutputPath) && settings.OutputPath != Settings.DefaultOutputPath
-            ? Path.Combine(root, settings.OutputPath, outputFile.Filename)
+        return HasExplicitOutputPath(settings)
+            ? Path.Combine(root, settings.OutputPath!, outputFile.Filename)
             : Path.Combine(root, outputFile.Filename);
     }
     private static async Task ValidateOpenApiSpec(string openApiPath, Settings settings)
