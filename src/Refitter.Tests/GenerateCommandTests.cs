@@ -147,4 +147,146 @@ public class GenerateCommandTests
         method.Should().NotBeNull();
         method!.IsFamily.Should().BeTrue();
     }
+
+    [Test]
+    public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Default()
+    {
+        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var settings = new Settings
+        {
+            SettingsFilePath = settingsFilePath,
+            OutputPath = Settings.DefaultOutputPath
+        };
+
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "Output.cs"
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "GetOutputPath",
+            BindingFlags.NonPublic | BindingFlags.Static,
+            [typeof(Settings), typeof(RefitGeneratorSettings)]);
+
+        method.Should().NotBeNull();
+        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+
+        result.Should().Be(@"C:\Projects\MyApi\./Generated\Output.cs");
+    }
+
+    [Test]
+    public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Custom()
+    {
+        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var settings = new Settings
+        {
+            SettingsFilePath = settingsFilePath,
+            OutputPath = Settings.DefaultOutputPath
+        };
+
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./CustomOutput",
+            OutputFilename = "PetStore.cs"
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "GetOutputPath",
+            BindingFlags.NonPublic | BindingFlags.Static,
+            [typeof(Settings), typeof(RefitGeneratorSettings)]);
+
+        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+
+        result.Should().Be(@"C:\Projects\MyApi\./CustomOutput\PetStore.cs");
+    }
+
+    [Test]
+    public void GetOutputPath_Should_Use_SettingsFileName_When_OutputFilename_Is_Missing()
+    {
+        // OutputFilename will be defaulted by ApplySettingsFileDefaults
+        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var settings = new Settings
+        {
+            SettingsFilePath = settingsFilePath,
+            OutputPath = Settings.DefaultOutputPath
+        };
+
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = null
+        };
+
+        // Apply defaults first (simulates what GenerateCommand does)
+        var applyMethod = typeof(GenerateCommand).GetMethod(
+            "ApplySettingsFileDefaults",
+            BindingFlags.NonPublic | BindingFlags.Static);
+        applyMethod!.Invoke(null, [settingsFilePath, refitSettings]);
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "GetOutputPath",
+            BindingFlags.NonPublic | BindingFlags.Static,
+            [typeof(Settings), typeof(RefitGeneratorSettings)]);
+
+        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+
+        // Should use settings file base name
+        result.Should().Be(@"C:\Projects\MyApi\./Generated\petstore.cs");
+    }
+
+    [Test]
+    public void ApplySettingsFileDefaults_Should_Set_Default_OutputFolder()
+    {
+        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = null
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "ApplySettingsFileDefaults",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+        method!.Invoke(null, [settingsFilePath, refitSettings]);
+
+        refitSettings.OutputFolder.Should().Be("./Generated");
+    }
+
+    [Test]
+    public void ApplySettingsFileDefaults_Should_Preserve_Explicit_OutputFolder()
+    {
+        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./CustomFolder"
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "ApplySettingsFileDefaults",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        method!.Invoke(null, [settingsFilePath, refitSettings]);
+
+        refitSettings.OutputFolder.Should().Be("./CustomFolder");
+    }
+
+    [Test]
+    public void ApplySettingsFileDefaults_Should_Set_Default_When_Empty_OutputFolder()
+    {
+        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = string.Empty
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "ApplySettingsFileDefaults",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        method!.Invoke(null, [settingsFilePath, refitSettings]);
+
+        refitSettings.OutputFolder.Should().Be("./Generated");
+    }
 }
