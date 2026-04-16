@@ -1,0 +1,10 @@
+{
+  "openApiPath": "https://petstore3.swagger.io/api/v3/openapi.json",
+  "outputFolder": "./GeneratedOutput",
+  "outputFilename": "PetstoreWithFolder.cs",
+  "namespace": "Petstore.Client",
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstoreWithFolder"
+  }
+}
