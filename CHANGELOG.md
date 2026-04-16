@@ -6,11 +6,13 @@
 
 **Implemented enhancements:**
 
+- Verify alias handling and sanitize PascalCase properties [\#997](https://github.com/christianhelle/refitter/pull/997) ([christianhelle](https://github.com/christianhelle))
 - Enhance schema alias handling and property name generation [\#996](https://github.com/christianhelle/refitter/pull/996) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
 - OpenApi client generates invalid schema property name if it starts with a digit [\#992](https://github.com/christianhelle/refitter/issues/992)
+- OpenApi client generate fails with System.ArgumentException: An item with the same key has already been added [\#991](https://github.com/christianhelle/refitter/issues/991)
 
 **Merged pull requests:**
 
