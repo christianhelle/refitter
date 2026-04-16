@@ -37,7 +37,26 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
-        var refitGeneratorSettings = CreateRefitGeneratorSettings(settings);
+        RefitGeneratorSettings refitGeneratorSettings;
+
+        // When settings file is provided, deserialize it first and use as source of truth
+        if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+        {
+            var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
+            refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+
+            // Allow CLI to override OpenApiPath if explicitly provided
+            if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
+                refitGeneratorSettings.OpenApiPath = settings.OpenApiPath;
+
+            ApplySettingsFileDefaults(settings.SettingsFilePath, refitGeneratorSettings);
+        }
+        else
+        {
+            // No settings file - build from CLI arguments
+            refitGeneratorSettings = CreateRefitGeneratorSettings(settings);
+        }
+
         try
         {
             var stopwatch = Stopwatch.StartNew();
@@ -84,16 +103,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase)))
             {
                 return 0;
-            }
-
-            if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
-            {
-                var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
-                refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
-                refitGeneratorSettings.OpenApiPath = settings.OpenApiPath!;
-
-                if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder))
-                    refitGeneratorSettings.GenerateMultipleFiles = true;
             }
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
@@ -639,18 +648,48 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
     {
+        // Determine root directory based on settings file location
+        var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)
+            ? string.Empty
+            : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
+
         var outputPath = settings.OutputPath != Settings.DefaultOutputPath &&
                          !string.IsNullOrWhiteSpace(settings.OutputPath)
             ? settings.OutputPath
             : refitGeneratorSettings.OutputFilename ?? "Output.cs";
 
-        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder) &&
-            refitGeneratorSettings.OutputFolder != RefitGeneratorSettings.DefaultOutputFolder)
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
         {
             outputPath = Path.Combine(refitGeneratorSettings.OutputFolder, outputPath);
         }
 
+        // Root the output path relative to settings file location if applicable
+        if (!string.IsNullOrWhiteSpace(root))
+        {
+            outputPath = Path.Combine(root, outputPath);
+        }
+
         return outputPath;
+    }
+
+    private static void ApplySettingsFileDefaults(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        // Re-apply multi-file trigger logic
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder))
+            refitGeneratorSettings.GenerateMultipleFiles = true;
+
+        // Default outputFolder to ./Generated if not specified (property initializer not invoked by JSON deserialization)
+        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
+        {
+            refitGeneratorSettings.OutputFolder = RefitGeneratorSettings.DefaultOutputFolder;
+        }
+
+        // Default outputFilename to .refitter filename if not specified
+        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFilename))
+        {
+            var refitterFileName = Path.GetFileNameWithoutExtension(settingsFilePath);
+            refitGeneratorSettings.OutputFilename = $"{refitterFileName}.cs";
+        }
     }
 
     private string GetOutputPath(
@@ -662,15 +701,14 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ? string.Empty
             : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
 
-        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder) &&
-            refitGeneratorSettings.OutputFolder != RefitGeneratorSettings.DefaultOutputFolder)
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
         {
             return Path.Combine(root, refitGeneratorSettings.OutputFolder, outputFile.Filename);
         }
 
         return !string.IsNullOrWhiteSpace(settings.OutputPath) && settings.OutputPath != Settings.DefaultOutputPath
             ? Path.Combine(root, settings.OutputPath, outputFile.Filename)
-            : outputFile.Filename;
+            : Path.Combine(root, outputFile.Filename);
     }
     private static async Task ValidateOpenApiSpec(string openApiPath, Settings settings)
     {
