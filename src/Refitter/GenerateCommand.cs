@@ -39,26 +39,25 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     {
         RefitGeneratorSettings refitGeneratorSettings;
 
-        // When settings file is provided, deserialize it first and use as source of truth
-        if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
-        {
-            var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
-            refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
-
-            // Allow CLI to override OpenApiPath if explicitly provided
-            if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
-                refitGeneratorSettings.OpenApiPath = settings.OpenApiPath;
-
-            ApplySettingsFileDefaults(settings.SettingsFilePath, refitGeneratorSettings);
-        }
-        else
-        {
-            // No settings file - build from CLI arguments
-            refitGeneratorSettings = CreateRefitGeneratorSettings(settings);
-        }
-
         try
         {
+            // When settings file is provided, deserialize it first and use as source of truth
+            if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            {
+                var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
+                refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+
+                // Allow CLI to override OpenApiPath if explicitly provided
+                if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
+                    refitGeneratorSettings.OpenApiPath = settings.OpenApiPath;
+
+                ApplySettingsFileDefaults(settings.SettingsFilePath, refitGeneratorSettings);
+            }
+            else
+            {
+                // No settings file - build from CLI arguments
+                refitGeneratorSettings = CreateRefitGeneratorSettings(settings);
+            }
             var stopwatch = Stopwatch.StartNew();
             var version = GetType().Assembly.GetName().Version!.ToString();
             if (version == "1.0.0.0")
