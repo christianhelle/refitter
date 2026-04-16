@@ -1,24 +1,27 @@
-# Squad — Refitter
+# Squad Team
 
 ## Project Context
 
-**Project:** Refitter — generates C# Refit interfaces and contracts from OpenAPI (Swagger) specifications.  
-**Stack:** C# / .NET (8, 9, 10), NSwag, Spectre.Console, xUnit, FluentAssertions  
-**Ships as:** .NET CLI tool, C# Source Generator, MSBuild task  
-**Repo root:** `C:/projects/christianhelle/refitter`  
-**User:** Christian Helle  
+- Requested by: Christian Helle
+- Repository: Refitter (`christianhelle/refitter`)
+- Language: C#
+- Stack: .NET, Refit, NSwag, Source Generator, MSBuild, Microsoft OpenAPI.NET
+- Product: Generates C# REST API clients from OpenAPI specifications using Refit
+- Team root strategy: worktree-local
+- Team root: `C:\projects\christianhelle\refitter`
+
+## Issue Source
+
+- Repository: `christianhelle/refitter`
 
 ## Members
 
-| Name | Role | Skills | Badge |
-|------|------|--------|-------|
-| Keaton | Lead / Architect | Architecture, code review, API design, decisions | 🏗️ Lead |
-| Fenster | .NET Dev | Core library, code generation logic, CLI, Refit interfaces | 🔧 Backend Dev |
-| Hockney | Tester | Unit tests, generated-code validation, edge cases, build checks | 🧪 Tester |
-| McManus | DevOps | CI/CD workflows, MSBuild integration, release automation | ⚙️ DevOps |
-| Scribe | Session Logger | Memory, decisions, orchestration logs | 📋 Scribe |
-| Ralph | Work Monitor | Work queue, backlog, GitHub issue tracking | 🔄 Monitor |
-
-## Universe
-
-**The Usual Suspects** — cast assigned 2026-03-02
+| Name | Role | Focus | Badge |
+| --- | --- | --- | --- |
+| Ripley | Lead | Scope, decisions, architecture, review | 🏗️ Lead |
+| Parker | Core Dev | Generator logic, schema handling, code fixes | 🔧 Core |
+| Dallas | Tooling Dev | CLI, source generator, MSBuild, CI | ⚙️ Tooling |
+| Lambert | Tester | Repros, validation, edge cases | 🧪 Test |
+| Bishop | Docs | README, docs, issue wording, guidance | 📝 Docs |
+| Scribe | Session Logger | Memory, decisions, session logs | 📋 Scribe |
+| Ralph | Work Monitor | — | 🔄 Monitor |

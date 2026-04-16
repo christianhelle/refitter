@@ -1,23 +1,18 @@
-# Routing Rules — Refitter Squad
+# Routing
 
-## Signal → Agent Mapping
+| Signal | Route |
+| --- | --- |
+| Issue triage, scope decisions, reviewer gates, cross-cutting changes | Ripley |
+| Core generation logic, schema traversal, NSwag or NJsonSchema behavior | Parker |
+| CLI options, `.refitter` handling, source generator, MSBuild, CI | Dallas |
+| Reproduction steps, regression tests, validation, edge cases | Lambert |
+| README, docs, examples, issue wording, usage guidance | Bishop |
+| Team memory, orchestration logs, decision merges | Scribe |
+| Backlog monitoring, issue pickup, PR flow checks | Ralph |
 
-| Signal | Route To |
-|--------|----------|
-| Architecture, design decisions, PR review, scope questions | Keaton |
-| Core library changes (`Refitter.Core/`) | Fenster |
-| CLI changes (`Refitter/`) | Fenster |
-| Source generator (`Refitter.SourceGenerator/`) | Fenster |
-| MSBuild task (`Refitter.MSBuild/`) | McManus |
-| Unit tests (`Refitter.Tests/`) | Hockney |
-| Source generator tests (`Refitter.SourceGenerator.Tests/`) | Hockney |
-| CI/CD workflows (`.github/workflows/`) | McManus |
-| Release, versioning, changelog | McManus |
-| Build failures, packaging issues | McManus |
-| Code generation correctness, Refit interface quality | Hockney (validate) + Fenster (fix) |
-| New CLI options / settings | Fenster (implement) + Hockney (test) |
-| OpenAPI spec support, NSwag integration | Fenster |
-| Documentation (`README.md`, `docs/`) | Keaton (review) + Fenster (content) |
-| Multi-domain / "Team" requests | Keaton + Fenster + Hockney in parallel |
-| Session logging, decisions | Scribe |
-| Work queue, GitHub issues | Ralph |
+## Default Collaboration
+
+- Bug or regression investigation: Ripley + Lambert + Bishop
+- Core generator changes: Parker + Lambert
+- Tooling or build pipeline changes: Dallas + Lambert
+- Documentation mismatches: Bishop + Ripley
