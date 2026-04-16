@@ -6,16 +6,19 @@
 
 **Implemented enhancements:**
 
+- Harden .refitter settings deserialization and output path handling [\#1000](https://github.com/christianhelle/refitter/pull/1000) ([christianhelle](https://github.com/christianhelle))
 - Verify alias handling and sanitize PascalCase properties [\#997](https://github.com/christianhelle/refitter/pull/997) ([christianhelle](https://github.com/christianhelle))
 - Enhance schema alias handling and property name generation [\#996](https://github.com/christianhelle/refitter/pull/996) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
+- Refitter.MSBuild 1.7.3 on .NET 10 ignores output file path [\#998](https://github.com/christianhelle/refitter/issues/998)
 - OpenApi client generates invalid schema property name if it starts with a digit [\#992](https://github.com/christianhelle/refitter/issues/992)
 - OpenApi client generate fails with System.ArgumentException: An item with the same key has already been added [\#991](https://github.com/christianhelle/refitter/issues/991)
 
 **Merged pull requests:**
 
+- CodeRabbit auto-fixes for PR \#1000 [\#1001](https://github.com/christianhelle/refitter/pull/1001) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
 - docs: add Timovzl as a contributor for bug [\#999](https://github.com/christianhelle/refitter/pull/999) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update dependency TUnit to 1.34.5 [\#995](https://github.com/christianhelle/refitter/pull/995) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add dimyle as a contributor for bug [\#994](https://github.com/christianhelle/refitter/pull/994) ([allcontributors[bot]](https://github.com/apps/allcontributors))
