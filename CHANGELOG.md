@@ -4,8 +4,17 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.102...HEAD)
 
+**Implemented enhancements:**
+
+- Enhance schema alias handling and property name generation [\#996](https://github.com/christianhelle/refitter/pull/996) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- OpenApi client generates invalid schema property name if it starts with a digit [\#992](https://github.com/christianhelle/refitter/issues/992)
+
 **Merged pull requests:**
 
+- docs: add dimyle as a contributor for bug [\#994](https://github.com/christianhelle/refitter/pull/994) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update dependency TUnit to 1.31.0 [\#989](https://github.com/christianhelle/refitter/pull/989) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency AutoMapper to v16 [\#988](https://github.com/christianhelle/refitter/pull/988) ([renovate[bot]](https://github.com/apps/renovate))
 - Bump the nuget group with 1 update [\#987](https://github.com/christianhelle/refitter/pull/987) ([dependabot[bot]](https://github.com/apps/dependabot))
