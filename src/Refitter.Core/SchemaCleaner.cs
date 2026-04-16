@@ -71,9 +71,18 @@ public class SchemaCleaner
     private (IReadOnlyCollection<JsonSchema>, HashSet<string>) FindUsedJsonSchema(OpenApiDocument doc)
     {
         var toProcess = new Stack<JsonSchema>();
-        var schemaIdLookup = document.Components.Schemas
-            .ToDictionary(x => x.Value,
-                x => x.Key);
+        var schemaIdLookup = new Dictionary<JsonSchema, List<string>>();
+        foreach (var kvp in document.Components.Schemas)
+        {
+            var actualSchema = kvp.Value.ActualSchema;
+            if (!schemaIdLookup.TryGetValue(actualSchema, out var aliases))
+            {
+                aliases = [];
+                schemaIdLookup[actualSchema] = aliases;
+            }
+
+            aliases.Add(kvp.Key);
+        }
 
         if (doc.Components?.Schemas != null)
         {
@@ -99,20 +108,21 @@ public class SchemaCleaner
         var seen = new HashSet<JsonSchema>();
         while (toProcess.Count > 0)
         {
-            var schema = toProcess.Pop();
-            if (!seen.Add(schema.ActualSchema))
+            var actualSchema = toProcess.Pop().ActualSchema;
+            if (!seen.Add(actualSchema))
             {
                 continue;
             }
 
-            // NOTE: NSwag schema stuff seems weird, with all their "Actual..."
-            if (schemaIdLookup.TryGetValue(schema.ActualSchema, out var refId) && !seenIds.Add(refId))
+            if (schemaIdLookup.TryGetValue(actualSchema, out var refIds))
             {
-                // prevent recursion
-                continue;
+                foreach (var refId in refIds)
+                {
+                    seenIds.Add(refId);
+                }
             }
 
-            foreach (var subSchema in EnumerateSchema(schema.ActualSchema))
+            foreach (var subSchema in EnumerateSchema(actualSchema))
             {
                 TryPush(subSchema, toProcess);
             }
