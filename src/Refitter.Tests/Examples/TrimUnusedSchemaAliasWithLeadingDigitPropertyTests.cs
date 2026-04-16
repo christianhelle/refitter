@@ -88,6 +88,77 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
                   type: number
         """;
 
+    private const string OpenApiSpec2 = """
+        swagger: "2.0"
+        info:
+          title: "Multi content test"
+          version: "1"
+        host: localhost:8000
+        schemes:
+          - https
+        paths:
+          /test:
+            post:
+              tags:
+                - Test
+              operationId: DoTest
+              parameters:
+                - name: inQueryParam
+                  in: query
+                  description: "inQueryParam test"
+                  type: boolean
+                - name: request
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/TestRequest'
+              responses:
+                '201':
+                  description: "A response"
+                  schema:
+                    $ref: '#/definitions/TestResponse'
+        definitions:
+          TestRequest:
+            title: "A test request"
+            required:
+              - type
+            type: object
+            properties:
+              42_question:
+                $ref: '#/definitions/A42Question'
+              request_param1:
+                type: string
+              request_param2:
+                type: array
+                items:
+                  $ref: '#/definitions/RequestParamArrayItem'
+              request_param3:
+                $ref: '#/definitions/RequestParamArrayItem'
+          A42Question:
+            title: "A question about.. well, you know"
+            type: object
+            properties:
+              param1:
+                type: string
+              param2:
+                type: string
+          TestResponse:
+            title: "A test response"
+            type: object
+            properties:
+              item:
+                $ref: '#/definitions/RequestParamArrayItem'
+          RequestParamArrayItem:
+            $ref: '#/definitions/RequestParamArrayItemInternal'
+          RequestParamArrayItemInternal:
+            required:
+              - param1
+            type: object
+            properties:
+              param1:
+                type: number
+        """;
+
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -102,9 +173,36 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Test]
+    public async Task Can_Generate_Code_OpenApi2()
+    {
+        var generatedCode = await GenerateCodeFromSpec(OpenApiSpec2);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task Can_Build_Generated_Code_OpenApi2()
+    {
+        var generatedCode = await GenerateCodeFromSpec(OpenApiSpec2);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Can_Generated_Identifier_Is_Valid_And_Compilable()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("_42Question { get; set; }");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
     private static async Task<string> GenerateCode()
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        return await GenerateCodeFromSpec(OpenApiSpec);
+    }
+
+    private static async Task<string> GenerateCodeFromSpec(string openApiSpec)
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(openApiSpec);
 
         try
         {

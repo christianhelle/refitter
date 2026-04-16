@@ -136,6 +136,79 @@ public class PropertyNamingPolicyTests
         }
         """;
 
+    private const string OpenApiSpec2 = """
+        {
+          "swagger": "2.0",
+          "info": {
+            "title": "Property Naming Policy API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/nodes": {
+              "get": {
+                "operationId": "GetNode",
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "schema": {
+                      "$ref": "#/definitions/RecursiveNode"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "definitions": {
+            "RecursiveNode": {
+              "type": "object",
+              "properties": {
+                "node_id": {
+                  "format": "int32"
+                },
+                "class": {
+                  "type": "string"
+                },
+                "1st-node": {
+                  "type": "string"
+                },
+                "child_count": {
+                  "type": "integer"
+                },
+                "next_node": {
+                  "$ref": "#/definitions/RecursiveNode"
+                },
+                "children": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/RecursiveNode"
+                  }
+                },
+                "named_nodes": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/RecursiveNode"
+                  }
+                },
+                "external_node": {
+                  "$ref": "#/definitions/RecursiveExternalNode"
+                }
+              }
+            },
+            "RecursiveExternalNode": {
+              "type": "object",
+              "properties": {
+                "external_id": {
+                  "type": "integer"
+                },
+                "next_node": {
+                  "$ref": "#/definitions/RecursiveExternalNode"
+                }
+              }
+            }
+          }
+        }
+        """;
+
     [Test]
     public async Task Can_Generate_Code_With_Default_PascalCase_Property_Naming()
     {
@@ -156,6 +229,14 @@ public class PropertyNamingPolicyTests
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("public string _1stNode { get; set; }");
+    }
+
+    [Test]
+    public async Task Default_PascalCase_Minimally_Sanitizes_Invalid_Identifiers_OpenApi2()
+    {
+        string generatedCode = await GenerateCodeFromSpec(OpenApiSpec2);
+        generatedCode.Should().Contain("public string _1stNode { get; set; }");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
     [Test]
