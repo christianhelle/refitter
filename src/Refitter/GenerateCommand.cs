@@ -647,6 +647,16 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
     {
+        if (UsesDirectCliOutput(settings))
+        {
+            return settings.OutputPath!;
+        }
+
+        if (UsesDirectCliDefaults(settings))
+        {
+            return Settings.DefaultOutputPath;
+        }
+
         // Determine root directory based on settings file location
         var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)
             ? string.Empty
@@ -696,6 +706,15 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         RefitGeneratorSettings refitGeneratorSettings,
         GeneratedCode outputFile)
     {
+        if (IsDirectCliGeneration(settings))
+        {
+            var outputDirectory = UsesDirectCliOutput(settings)
+                ? settings.OutputPath!
+                : ".";
+
+            return Path.Combine(outputDirectory, outputFile.Filename);
+        }
+
         var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)
             ? string.Empty
             : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
@@ -709,6 +728,18 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ? Path.Combine(root, settings.OutputPath, outputFile.Filename)
             : Path.Combine(root, outputFile.Filename);
     }
+
+    private static bool IsDirectCliGeneration(Settings settings) =>
+        string.IsNullOrWhiteSpace(settings.SettingsFilePath);
+
+    private static bool UsesDirectCliOutput(Settings settings) =>
+        IsDirectCliGeneration(settings) &&
+        !string.IsNullOrWhiteSpace(settings.OutputPath) &&
+        settings.OutputPath != Settings.DefaultOutputPath;
+
+    private static bool UsesDirectCliDefaults(Settings settings) =>
+        IsDirectCliGeneration(settings) &&
+        (string.IsNullOrWhiteSpace(settings.OutputPath) || settings.OutputPath == Settings.DefaultOutputPath);
     private static async Task ValidateOpenApiSpec(string openApiPath, Settings settings)
     {
         OpenApiValidationResult validationResult;

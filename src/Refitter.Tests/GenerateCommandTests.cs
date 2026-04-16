@@ -177,6 +177,56 @@ public class GenerateCommandTests
     }
 
     [Test]
+    public void GetOutputPath_Should_Use_Explicit_Cli_Output_File_Path()
+    {
+        var settings = new Settings
+        {
+            OutputPath = Path.Combine("GeneratedCode", "Petstore.cs")
+        };
+
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "Output.cs"
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "GetOutputPath",
+            BindingFlags.NonPublic | BindingFlags.Static,
+            [typeof(Settings), typeof(RefitGeneratorSettings)]);
+
+        method.Should().NotBeNull();
+        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+
+        result.Should().Be(Path.Combine("GeneratedCode", "Petstore.cs"));
+    }
+
+    [Test]
+    public void GetOutputPath_Should_Use_Default_Cli_Output_File_In_Current_Directory()
+    {
+        var settings = new Settings
+        {
+            OutputPath = Settings.DefaultOutputPath
+        };
+
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "Output.cs"
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "GetOutputPath",
+            BindingFlags.NonPublic | BindingFlags.Static,
+            [typeof(Settings), typeof(RefitGeneratorSettings)]);
+
+        method.Should().NotBeNull();
+        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+
+        result.Should().Be(Settings.DefaultOutputPath);
+    }
+
+    [Test]
     public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Custom()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -237,6 +287,34 @@ public class GenerateCommandTests
         var expectedFilename = Path.GetFileNameWithoutExtension(settingsFilePath) + ".cs";
         var expectedPath = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./Generated", expectedFilename);
         result.Should().Be(expectedPath);
+    }
+
+    [Test]
+    public void GetOutputPath_For_MultipleFiles_Should_Use_Explicit_Cli_Output_Directory()
+    {
+        var settings = new Settings
+        {
+            OutputPath = Path.Combine("GeneratedCode", "MultipleFiles"),
+            GenerateMultipleFiles = true
+        };
+
+        var refitSettings = new RefitGeneratorSettings
+        {
+            GenerateMultipleFiles = true,
+            OutputFolder = "./Generated"
+        };
+
+        var command = new GenerateCommand();
+        var method = typeof(GenerateCommand).GetMethod(
+            "GetOutputPath",
+            BindingFlags.NonPublic | BindingFlags.Instance,
+            [typeof(Settings), typeof(RefitGeneratorSettings), typeof(GeneratedCode)]);
+
+        method.Should().NotBeNull();
+
+        var result = method!.Invoke(command, [settings, refitSettings, new GeneratedCode("RefitInterfaces", "// code")]) as string;
+
+        result.Should().Be(Path.Combine("GeneratedCode", "MultipleFiles", "RefitInterfaces.cs"));
     }
 
     [Test]
