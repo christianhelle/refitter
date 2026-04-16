@@ -209,17 +209,12 @@ public class RefitterGenerateTask : MSBuildTask
             else
             {
                 // Single file mode
-                string outputPath;
-                if (!string.IsNullOrWhiteSpace(outputFolder))
-                {
-                    // outputFolder is specified
-                    outputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, outputFolder, outputFilename));
-                }
-                else
-                {
-                    // No outputFolder specified - generate in current directory (default behavior)
-                    outputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, outputFilename));
-                }
+                // If outputFolder is not specified in .refitter, CLI uses default "./Generated"
+                var effectiveOutputFolder = !string.IsNullOrWhiteSpace(outputFolder)
+                    ? outputFolder
+                    : "./Generated";
+
+                var outputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, effectiveOutputFolder, outputFilename));
                 generatedFiles.Add(outputPath);
             }
 
