@@ -57,8 +57,9 @@ Write-Host "PASS: No stray Output.cs in root directory" -ForegroundColor Green
 # Check interface naming (smoke test for naming.interfaceName)
 $petstoreContent = Get-Content "Generated\Petstore.cs" -Raw
 if ($petstoreContent -notmatch "interface ISwaggerPetstore") {
-    Write-Host "WARNING: Expected interface ISwaggerPetstore not found in Petstore.cs" -ForegroundColor Yellow
-    Write-Host "         naming.interfaceName setting may have been ignored" -ForegroundColor Yellow
+    Write-Host "ERROR: Expected interface ISwaggerPetstore not found in Petstore.cs" -ForegroundColor Red
+    Write-Host "       naming.interfaceName setting may have been ignored" -ForegroundColor Red
+    exit 1
 } else {
     Write-Host "PASS: Interface ISwaggerPetstore found (respects naming.interfaceName)" -ForegroundColor Green
 }
@@ -72,7 +73,9 @@ Write-Host "PASS: GeneratedOutput\PetstoreWithFolder.cs exists (respects explici
 
 $petstoreWithFolderContent = Get-Content "GeneratedOutput\PetstoreWithFolder.cs" -Raw
 if ($petstoreWithFolderContent -notmatch "interface ISwaggerPetstoreWithFolder") {
-    Write-Host "WARNING: Expected interface ISwaggerPetstoreWithFolder not found in GeneratedOutput\PetstoreWithFolder.cs" -ForegroundColor Yellow
+    Write-Host "ERROR: Expected interface ISwaggerPetstoreWithFolder not found in GeneratedOutput\PetstoreWithFolder.cs" -ForegroundColor Red
+    Write-Host "       naming.interfaceName setting may have been ignored" -ForegroundColor Red
+    exit 1
 } else {
     Write-Host "PASS: Interface ISwaggerPetstoreWithFolder found (respects naming.interfaceName with outputFolder)" -ForegroundColor Green
 }

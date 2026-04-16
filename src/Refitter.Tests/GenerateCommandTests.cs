@@ -151,7 +151,7 @@ public class GenerateCommandTests
     [Test]
     public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Default()
     {
-        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var settings = new Settings
         {
             SettingsFilePath = settingsFilePath,
@@ -172,13 +172,14 @@ public class GenerateCommandTests
         method.Should().NotBeNull();
         var result = method!.Invoke(null, [settings, refitSettings]) as string;
 
-        result.Should().Be(@"C:\Projects\MyApi\./Generated\Output.cs");
+        var expectedPath = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./Generated", "Output.cs");
+        result.Should().Be(expectedPath);
     }
 
     [Test]
     public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Custom()
     {
-        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var settings = new Settings
         {
             SettingsFilePath = settingsFilePath,
@@ -198,14 +199,15 @@ public class GenerateCommandTests
 
         var result = method!.Invoke(null, [settings, refitSettings]) as string;
 
-        result.Should().Be(@"C:\Projects\MyApi\./CustomOutput\PetStore.cs");
+        var expectedPath = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./CustomOutput", "PetStore.cs");
+        result.Should().Be(expectedPath);
     }
 
     [Test]
     public void GetOutputPath_Should_Use_SettingsFileName_When_OutputFilename_Is_Missing()
     {
         // OutputFilename will be defaulted by ApplySettingsFileDefaults
-        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var settings = new Settings
         {
             SettingsFilePath = settingsFilePath,
@@ -232,13 +234,15 @@ public class GenerateCommandTests
         var result = method!.Invoke(null, [settings, refitSettings]) as string;
 
         // Should use settings file base name
-        result.Should().Be(@"C:\Projects\MyApi\./Generated\petstore.cs");
+        var expectedFilename = Path.GetFileNameWithoutExtension(settingsFilePath) + ".cs";
+        var expectedPath = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./Generated", expectedFilename);
+        result.Should().Be(expectedPath);
     }
 
     [Test]
     public void ApplySettingsFileDefaults_Should_Set_Default_OutputFolder()
     {
-        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var refitSettings = new RefitGeneratorSettings
         {
             OutputFolder = null
@@ -257,7 +261,7 @@ public class GenerateCommandTests
     [Test]
     public void ApplySettingsFileDefaults_Should_Preserve_Explicit_OutputFolder()
     {
-        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var refitSettings = new RefitGeneratorSettings
         {
             OutputFolder = "./CustomFolder"
@@ -275,7 +279,7 @@ public class GenerateCommandTests
     [Test]
     public void ApplySettingsFileDefaults_Should_Set_Default_When_Empty_OutputFolder()
     {
-        var settingsFilePath = @"C:\Projects\MyApi\petstore.refitter";
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var refitSettings = new RefitGeneratorSettings
         {
             OutputFolder = string.Empty
