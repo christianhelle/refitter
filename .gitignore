@@ -288,3 +288,8 @@ tmp/
 test/Generated/GeneratedCode/*.generated.cs
 test/MSBuild/Generated/**/*.generated.cs
 test/MSBuild/GeneratedOutput/**/*.cs
+.squad/orchestration-log/
+.squad/log/
+.squad/decisions/inbox/
+.squad/sessions/
+.squad-workstream

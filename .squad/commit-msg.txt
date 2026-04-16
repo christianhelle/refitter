@@ -1,0 +1,13 @@
+Scribe: log issue #998 squad investigation
+
+- Orchestration logs: Bishop (docs review), Dallas (MSBuild validation), Lambert (reproduction)
+- Session log: issue #998 verdict and root cause
+- Decisions merged: issue #998 classified as real product bug in CLI output path handling
+- Agent histories updated with cross-team findings
+- Inbox decisions deleted after merge
+
+Verdict: CLI ignores outputFolder when it equals default "./Generated", causing MSBuild 
+file prediction mismatch on first clean build. Fix: remove default-value check in 
+GenerateCommand.cs:648.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
