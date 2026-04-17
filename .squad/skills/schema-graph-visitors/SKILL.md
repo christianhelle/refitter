@@ -40,6 +40,17 @@ For any Refitter preprocessing visitor over `JsonSchema`:
 
 In `CSharpClientGeneratorFactory.Create()`, schema preprocessing currently runs **before** `MapCSharpGeneratorSettings()`. That means NSwag settings such as `ExcludedTypeNames` do not automatically protect preprocessing visitors unless Refitter adds an explicit guard.
 
+## Real-world implementation reference
+
+See commit 3d9cdb6c for the production implementation of this pattern:
+- `TraverseDocumentSchemas(Action<JsonSchema> visitor)` - Iterative traversal with shared visited set
+- `EnumerateDocumentSchemaRoots()` - Yields all entry points (components, paths, operations, parameters)
+- `EnumerateTraversableSchemas(JsonSchema)` - Yields all child schemas (properties, items, additionalProperties, allOf/oneOf/anyOf)
+- Uses `JsonSchemaReferenceComparer.Instance` for identity-based deduplication
+- Replaced two separate recursive methods (ProcessSchemaForMissingTypes, ProcessSchemaForIntegerType) with a single safe visitor pattern
+
+This pattern fixed issue #967 (stack overflow on recursive schemas) and is the canonical approach for all schema preprocessing in Refitter.
+
 ## Regression testing pattern
 
 When adding regression coverage for schema walkers in Refitter:

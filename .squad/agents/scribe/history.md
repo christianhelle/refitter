@@ -1,15 +1,11 @@
-# Scribe — History
+# Scribe History
 
-## Core Context
+## Context
 
-**Project:** Refitter  
-**User:** Christian Helle  
-**Repo root:** `C:/projects/christianhelle/refitter`  
-**Team:** Keaton (Lead), Fenster (.NET Dev), Hockney (Tester), McManus (DevOps)  
-
-My job: log sessions, merge decisions inbox, write orchestration logs, commit `.squad/` changes.  
-Commit format: write message to temp file, use `git commit -F {tempfile}`.
+- User: Christian Helle
+- Product: Refitter generates C# REST API clients from OpenAPI specifications using Refit.
+- Stack: .NET, Refit, NSwag, Source Generator, MSBuild, Microsoft OpenAPI.NET
 
 ## Learnings
 
-_Session learnings will be appended here._
+- Team initialized on 2026-04-16.

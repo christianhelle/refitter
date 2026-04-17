@@ -1,52 +1,58 @@
-{
-  "agents": [
-    {
-      "persistent_name": "Keaton",
-      "universe": "The Usual Suspects",
-      "role": "Lead / Architect",
-      "created_at": "2026-03-02T15:03:29Z",
-      "legacy_named": false,
-      "status": "active"
-    },
-    {
-      "persistent_name": "Fenster",
-      "universe": "The Usual Suspects",
-      "role": ".NET Dev",
-      "created_at": "2026-03-02T15:03:29Z",
-      "legacy_named": false,
-      "status": "active"
-    },
-    {
-      "persistent_name": "Hockney",
-      "universe": "The Usual Suspects",
-      "role": "Tester",
-      "created_at": "2026-03-02T15:03:29Z",
-      "legacy_named": false,
-      "status": "active"
-    },
-    {
-      "persistent_name": "McManus",
-      "universe": "The Usual Suspects",
-      "role": "DevOps",
-      "created_at": "2026-03-02T15:03:29Z",
-      "legacy_named": false,
-      "status": "active"
-    },
-    {
-      "persistent_name": "Scribe",
-      "universe": "exempt",
-      "role": "Session Logger",
-      "created_at": "2026-03-02T15:03:29Z",
-      "legacy_named": false,
-      "status": "active"
-    },
-    {
-      "persistent_name": "Ralph",
-      "universe": "exempt",
-      "role": "Work Monitor",
-      "created_at": "2026-03-02T15:03:29Z",
-      "legacy_named": false,
-      "status": "active"
-    }
-  ]
-}
+[
+  {
+    "persistent_name": "Ripley",
+    "universe": "Alien",
+    "created_at": "2026-04-16T12:04:04Z",
+    "legacy_named": false,
+    "status": "active",
+    "role": "Lead"
+  },
+  {
+    "persistent_name": "Parker",
+    "universe": "Alien",
+    "created_at": "2026-04-16T12:04:04Z",
+    "legacy_named": false,
+    "status": "active",
+    "role": "Core Dev"
+  },
+  {
+    "persistent_name": "Dallas",
+    "universe": "Alien",
+    "created_at": "2026-04-16T12:04:04Z",
+    "legacy_named": false,
+    "status": "active",
+    "role": "Tooling Dev"
+  },
+  {
+    "persistent_name": "Lambert",
+    "universe": "Alien",
+    "created_at": "2026-04-16T12:04:04Z",
+    "legacy_named": false,
+    "status": "active",
+    "role": "Tester"
+  },
+  {
+    "persistent_name": "Bishop",
+    "universe": "Alien",
+    "created_at": "2026-04-16T12:04:04Z",
+    "legacy_named": false,
+    "status": "active",
+    "role": "Docs"
+  },
+  {
+    "persistent_name": "Scribe",
+    "universe": "Reserved",
+    "created_at": "2026-04-16T12:04:04Z",
+    "legacy_named": false,
+    "status": "active",
+    "role": "Session Logger"
+  },
+  {
+    "persistent_name": "Ralph",
+    "universe": "Reserved",
+    "created_at": "2026-04-16T12:04:04Z",
+    "legacy_named": false,
+    "status": "active",
+    "role": "Work Monitor"
+  }
+]

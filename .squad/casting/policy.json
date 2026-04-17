@@ -1,6 +1,13 @@
 {
-  "universe_allowlist": ["The Usual Suspects"],
-  "max_team_size": 10,
-  "allow_overflow": true,
-  "overflow_strategy": "diegetic_expansion"
+  "version": 1,
+  "selectedUniverse": "Alien",
+  "allowlist": [
+    "Alien"
+  ],
+  "maxActiveCast": 5,
+  "reservedNames": [
+    "Scribe",
+    "Ralph",
+    "@copilot"
+  ]
 }
