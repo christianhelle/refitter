@@ -15,7 +15,7 @@
         <PackageReference Include="FluentAssertions" Version="7.2.2" />
         <PackageReference Include="System.Text.Json" Version="10.0.5" />
         <PackageReference Include="TUnit" Version="1.35.2" />
-        <PackageReference Include="coverlet.collector" Version="8.0.1">
+        <PackageReference Include="coverlet.collector" Version="10.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
