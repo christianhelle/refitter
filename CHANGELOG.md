@@ -18,6 +18,7 @@
 
 **Merged pull requests:**
 
+- Update dependency TUnit to 1.35.2 [\#1003](https://github.com/christianhelle/refitter/pull/1003) ([renovate[bot]](https://github.com/apps/renovate))
 - Special-case the default .refitter filename before deriving OutputFilename [\#1002](https://github.com/christianhelle/refitter/pull/1002) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
 - CodeRabbit auto-fixes for PR \#1000 [\#1001](https://github.com/christianhelle/refitter/pull/1001) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
 - docs: add Timovzl as a contributor for bug [\#999](https://github.com/christianhelle/refitter/pull/999) ([allcontributors[bot]](https://github.com/apps/allcontributors))
