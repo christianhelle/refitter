@@ -293,3 +293,5 @@ test/MSBuild/GeneratedOutput/**/*.cs
 .squad/decisions/inbox/
 .squad/sessions/
 .squad-workstream
+.squad/commit-message.txt
+.squad/inbox-content.json
