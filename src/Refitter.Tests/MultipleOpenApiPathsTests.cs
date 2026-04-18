@@ -200,6 +200,49 @@ components:
     }
 
     [Test]
+    public async Task OpenApiDocumentFactory_Merges_Schemas_When_Base_Has_No_Components()
+    {
+        // Repro for: base spec has no components/schemas section
+        // schemas from subsequent docs must NOT be silently dropped
+        var pathsOnlySpec = @"openapi: '3.0.0'
+info:
+  title: Paths Only API
+  version: '1.0'
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      responses:
+        '200':
+          description: A list of pets
+";
+
+        var schemasOnlySpec = @"openapi: '3.0.0'
+info:
+  title: Schemas API
+  version: '1.0'
+paths: {}
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+";
+
+        var file1 = await TestFile.CreateSwaggerFile(pathsOnlySpec, "paths-only.yaml");
+        var file2 = await TestFile.CreateSwaggerFile(schemasOnlySpec, "schemas-only.yaml");
+
+        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+
+        merged.Paths.Should().ContainKey("/pets");
+        merged.Components.Schemas.Should().ContainKey("Pet");
+    }
+
+    [Test]
     public async Task OpenApiDocumentFactory_Throws_For_Empty_Paths()
     {
         var act = async () => await OpenApiDocumentFactory.CreateAsync(Array.Empty<string>());
