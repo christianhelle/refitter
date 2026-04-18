@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
 
 namespace Refitter.Core;
@@ -10,12 +11,12 @@ namespace Refitter.Core;
 public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
 {
     private static readonly Regex JsonStringEnumConverterAttributeRegex = new(
-        @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter(?:<[\w.]+>)?\)\)\]\s*\r?\n?",
+        @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter(?:<[^)]*>)?\)\)\]\s*\r?\n?",
         RegexOptions.Compiled | RegexOptions.Multiline,
         TimeSpan.FromSeconds(1));
 
     private static readonly Regex EnumDeclarationRegex = new(
-        @"^(\s*)(public\s+(?:partial\s+)?enum\s+\w+\b)",
+        @"^(\s*)((?:public|internal)\s+(?:partial\s+)?enum\s+\w+\b)",
         RegexOptions.Compiled | RegexOptions.Multiline,
         TimeSpan.FromSeconds(1));
 
@@ -263,8 +264,16 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private string SanitizeGeneratedContracts(string contracts)
     {
+        var isSystemTextJson = settings.CodeGeneratorSettings?.JsonLibrary is not CSharpJsonLibrary.NewtonsoftJson;
+
         if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
         {
+            if (!isSystemTextJson)
+            {
+                // Newtonsoft.Json: no STJ-specific attributes to inject or strip.
+                return contracts.TrimEnd();
+            }
+
             // InlineJsonConverters = true (default): move [JsonConverter] from enum properties to enum type declarations.
             // This allows users to override the converter via JsonSerializerOptions.Converters (e.g. to use
             // JsonStringEnumMemberConverter for enums with [EnumMember] values containing special characters).
@@ -274,6 +283,12 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                     contracts,
                     "$1[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]\n$1$2")
                 .TrimEnd();
+        }
+
+        if (!isSystemTextJson)
+        {
+            // Newtonsoft.Json: no STJ-specific attributes to strip.
+            return contracts.TrimEnd();
         }
 
         // InlineJsonConverters = false: remove all [JsonConverter(typeof(JsonStringEnumConverter))] attributes.

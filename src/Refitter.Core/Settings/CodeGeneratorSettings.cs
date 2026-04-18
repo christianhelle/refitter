@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using NJsonSchema.CodeGeneration;
+using NJsonSchema.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 
@@ -264,6 +265,18 @@ public class CodeGeneratorSettings
     [Description("Gets or sets a custom IPropertyNameGenerator.")]
     [JsonIgnore]
     public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
+
+    /// <summary>
+    /// Gets or sets the JSON library to use for serialization (default: SystemTextJson).
+    /// When set to <c>NewtonsoftJson</c>, no System.Text.Json-specific attributes are injected
+    /// into generated enums.
+    /// </summary>
+    [Description(
+        "Gets or sets the JSON library to use for serialization (default: SystemTextJson). " +
+        "When set to NewtonsoftJson, no System.Text.Json-specific attributes are injected into generated enums."
+    )]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public CSharpJsonLibrary JsonLibrary { get; set; } = CSharpJsonLibrary.SystemTextJson;
 
     /// <summary>
     /// Gets or sets a value indicating whether to inline JsonConverter attributes for enum types (default: true).

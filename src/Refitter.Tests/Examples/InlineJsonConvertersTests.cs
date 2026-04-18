@@ -1,5 +1,6 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NJsonSchema.CodeGeneration.CSharp;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
@@ -141,7 +142,49 @@ public class InlineJsonConvertersTests
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode(bool inlineJsonConverters = true)
+    [Test]
+    public async Task Generated_Code_Does_Not_Contain_STJ_JsonConverter_When_Using_Newtonsoft()
+    {
+        string generatedCode = await GenerateCode(jsonLibrary: CSharpJsonLibrary.NewtonsoftJson);
+
+        using (new AssertionScope())
+        {
+            generatedCode.Should().NotContain("[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]");
+            generatedCode.Should().Contain("public enum PetStatus");
+        }
+    }
+
+    [Test]
+    public async Task Generated_Code_With_Newtonsoft_Can_Build()
+    {
+        string generatedCode = await GenerateCode(jsonLibrary: CSharpJsonLibrary.NewtonsoftJson);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Test]
+    public async Task Generated_Code_Places_JsonConverter_On_Internal_Enum_Type()
+    {
+        string generatedCode = await GenerateCode(typeAccessibility: TypeAccessibility.Internal);
+
+        using (new AssertionScope())
+        {
+            // [JsonConverter] should appear immediately before the internal enum type declaration
+            // Note: import stripping reduces the fully-qualified STJ namespace prefix in the output
+            generatedCode.Should().MatchRegex(
+                @"\[JsonConverter\(typeof\(JsonStringEnumConverter\)\)\][\r\n\s]+internal\s+(?:partial\s+)?enum\s+PetStatus");
+            // The property line itself should NOT be preceded by [JsonConverter]
+            generatedCode.Should().NotMatchRegex(
+                @"\[JsonConverter\(typeof\(JsonStringEnumConverter[^)]*\)\)\][\r\n\s]+(?:public|internal)\s+PetStatus");
+        }
+    }
+
+    private static async Task<string> GenerateCode(
+        bool inlineJsonConverters = true,
+        CSharpJsonLibrary jsonLibrary = CSharpJsonLibrary.SystemTextJson,
+        TypeAccessibility typeAccessibility = TypeAccessibility.Public)
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         try
@@ -149,9 +192,11 @@ public class InlineJsonConvertersTests
             var settings = new RefitGeneratorSettings
             {
                 OpenApiPath = swaggerFile,
+                TypeAccessibility = typeAccessibility,
                 CodeGeneratorSettings = new CodeGeneratorSettings
                 {
-                    InlineJsonConverters = inlineJsonConverters
+                    InlineJsonConverters = inlineJsonConverters,
+                    JsonLibrary = jsonLibrary
                 }
             };
             var generator = await RefitGenerator.CreateAsync(settings);
