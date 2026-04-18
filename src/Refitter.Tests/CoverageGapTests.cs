@@ -408,6 +408,98 @@ namespace TestNamespace
         result.Should().NotContain($"public enum PetStatus{Environment.NewLine}");
     }
 
+    [Test]
+    public void ContractTypeSuffixApplier_Does_Not_Double_Suffix_Already_Suffixed_Names()
+    {
+        const string code = @"
+namespace TestNamespace
+{
+    public partial class PetDto
+    {
+        public int Id { get; set; }
+    }
+}";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        result.Should().Contain("public partial class PetDto");
+        result.Should().NotContain("public partial class PetDtoDto");
+    }
+
+    [Test]
+    public void ContractTypeSuffixApplier_Does_Not_Rename_Member_With_Same_Name_As_Type()
+    {
+        const string code = @"
+namespace TestNamespace
+{
+    public partial class Pet
+    {
+        public int Id { get; set; }
+    }
+
+    public partial class Owner
+    {
+        public Pet Pet { get; set; }
+    }
+}";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        result.Should().Contain("public partial class PetDto");
+        result.Should().Contain("public PetDto Pet { get; set; }");
+        result.Should().NotContain("public PetDto PetDto { get; set; }");
+    }
+
+    [Test]
+    public void ContractTypeSuffixApplier_Does_Not_Rename_Method_With_Same_Name_As_Type()
+    {
+        const string code = @"
+namespace TestNamespace
+{
+    public partial class Foo
+    {
+        public int Id { get; set; }
+    }
+
+    public interface IFooApi
+    {
+        Task<Foo> Foo();
+    }
+}";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        result.Should().Contain("public partial class FooDto");
+        result.Should().Contain("Task<FooDto> Foo()");
+        result.Should().NotContain("Task<FooDto> FooDto()");
+    }
+
+    [Test]
+    public void ContractTypeSuffixApplier_Skips_Rename_When_Collision_Would_Occur()
+    {
+        const string code = @"
+namespace TestNamespace
+{
+    public partial class Foo
+    {
+        public int Id { get; set; }
+    }
+
+    public partial class FooDto
+    {
+        public int Id { get; set; }
+    }
+}";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        // Foo should NOT be renamed because FooDto already exists — renaming would produce a duplicate.
+        result.Should().Contain("public partial class Foo");
+        result.Should().Contain("public partial class FooDto");
+        // There must be exactly one "class FooDto" declaration, not two.
+        result.Split("public partial class FooDto").Length.Should().Be(2);
+    }
+
     #endregion
 
     #region RefitMultipleInterfaceByTagGenerator Tests
