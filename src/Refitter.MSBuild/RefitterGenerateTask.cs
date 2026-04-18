@@ -34,12 +34,17 @@ public class RefitterGenerateTask : MSBuildTask
         TryLogCommandLine($"Found {files.Length} .refitter files...");
 
         var generatedFiles = new List<string>();
+        var success = true;
 
         foreach (var file in files)
         {
             TryLogCommandLine($"Processing {file}");
             var generated = TryExecuteRefitter(file);
-            if (generated != null)
+            if (generated == null)
+            {
+                success = false;
+            }
+            else
             {
                 generatedFiles.AddRange(generated);
             }
@@ -48,7 +53,7 @@ public class RefitterGenerateTask : MSBuildTask
         GeneratedFiles = generatedFiles.Select(f => new Microsoft.Build.Utilities.TaskItem(f)).ToArray();
         TryLogCommandLine($"Generated {GeneratedFiles.Length} files");
 
-        return true;
+        return success;
     }
 
     private List<string>? TryExecuteRefitter(string file)
@@ -122,7 +127,18 @@ public class RefitterGenerateTask : MSBuildTask
         process.Start();
         process.BeginErrorReadLine();
         process.BeginOutputReadLine();
-        process.WaitForExit();
+
+        const int timeoutMs = 5 * 60 * 1000; // 5 minutes
+        if (!process.WaitForExit(timeoutMs))
+        {
+            process.Kill();
+            throw new TimeoutException($"Refitter process timed out after 5 minutes while processing '{file}'.");
+        }
+
+        if (process.ExitCode != 0)
+        {
+            throw new InvalidOperationException($"Refitter exited with code {process.ExitCode} while processing '{file}'.");
+        }
 
         // Return the list of files that should have been generated
         return expectedFiles.Where(File.Exists).ToList();
