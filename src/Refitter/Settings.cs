@@ -302,4 +302,15 @@ public sealed class Settings : CommandSettings
     [CommandOption("--json-serializer-context")]
     [DefaultValue(false)]
     public bool GenerateJsonSerializerContext { get; set; }
+
+    [Description("""
+                 The body serialization method to use for AnyType body parameters. Default is Serialized.
+                 May be one of:
+                 - Serialized: Uses the configured serializer (e.g. System.Text.Json or Newtonsoft.Json)
+                 - Json: Serializes the body as JSON
+                 - UrlEncoded: URL-encodes the body
+                 """)]
+    [CommandOption("--any-type-body-serialization-method")]
+    [DefaultValue(BodySerializationMethod.Serialized)]
+    public BodySerializationMethod AnyTypeBodySerializationMethod { get; set; } = BodySerializationMethod.Serialized;
 }

@@ -493,6 +493,11 @@
       "description": "Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.",
       "type": [ "string", "null" ]
     },
+    "anyTypeBodySerializationMethod": {
+      "description": "The body serialization method to use for AnyType body parameters. Default is Serialized.",
+      "type": "string",
+      "enum": [ "Serialized", "Json", "UrlEncoded" ]
+    },
     "collectionFormat": {
       "description": "The collection format to use for array query parameters. Default is Multi.",
       "type": "string",
