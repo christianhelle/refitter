@@ -73,3 +73,70 @@
 - Team consensus: v2.0.0 major bump required
 
 **Detailed Audit Report Written**: `.squad/decisions/inbox/dallas-breaking-audit.md` with full evidence chain, migration paths, and non-breaking change summary for reference during release planning.
+
+### P2 Issue Verification (2026-04-18)
+
+**Verified 16 P2 issues from v2.0 audit**
+
+Key patterns and file paths discovered:
+
+**Source Generator Architecture:**
+- src\Refitter.SourceGenerator\RefitterSourceGenerator.cs - Main generator using incremental compilation
+- Pipeline outputs defined as private record GeneratedCode(List<Diagnostic>, string?, string?)
+- Uses Debug.WriteLine for logging (no-op in Release)
+- Should use context.ReportDiagnostic for user-visible warnings
+- Should use EquatableArray or implement IEquatable for incremental caching
+
+**CLI Validation Flow:**
+- src\Refitter\SettingsValidator.cs - Validates settings before generation
+- src\Refitter\GenerateCommand.cs - Orchestrates validation and generation
+- Path resolution inconsistency: CLI uses CWD, generator uses .refitter directory
+- Multi-spec validation only checks first entry
+
+**Core Generation Critical Files:**
+- src\Refitter.Core\RefitGenerator.cs - Main generation orchestrator
+  - Line 275: Hard-coded \n in regex replacement (should use Environment.NewLine)
+  - Handles JsonConverter attribute placement
+- src\Refitter.Core\OpenApiDocumentFactory.cs - Spec loading and merging
+  - Lines 15-19: Static HttpClient without timeout/User-Agent configuration
+  - Line 46: Merge mutates documents[0] directly
+  - Lines 60-70: Silent conflict resolution (first wins)
+- src\Refitter.Core\XmlDocumentationGenerator.cs - XML comment generation
+  - Line 133: Parameter descriptions not escaped before XML emission
+  - Has EscapeSymbols method but not always used
+  - AppendXmlCommentBlock doesn't escape attribute values
+- src\Refitter.Core\ParameterExtractor.cs - Parameter processing
+  - Line 180: Uses Contains("?") to detect nullability (matches generics)
+  - Line 465: Mutates shared operationModel.Parameters collection
+- src\Refitter.Core\RefitInterfaceImports.cs - Namespace generation
+  - Line 62: Uses Aggregate which throws on empty sequence
+- src\Refitter.Core\CustomCSharpTypeResolver.cs - Type mapping
+  - Lines 32-33: Appends ? without checking NRT setting
+  - Fragile Contains("Nullable<") check
+
+**MSBuild Integration:**
+- src\Refitter.MSBuild\RefitterGenerateTask.cs - Build-time generation
+  - Line 93: Unescaped arguments (path injection risk)
+  - Line 150: No null check before Split
+  - Lines 76-91: TFM selection without File.Exists check
+
+**Common Anti-patterns Found:**
+1. Mutation of shared NSwag models (breaks subsequent generators)
+2. String contains checks instead of proper parsing (nullable detection, type checking)
+3. Missing XML escaping for user-supplied content
+4. Hard-coded line endings instead of Environment.NewLine
+5. Aggregate on potentially empty sequences
+6. Debug.WriteLine in libraries (invisible in Release)
+7. Path resolution relative to CWD instead of file location
+
+**Settings Architecture:**
+- src\Refitter\Settings.cs - CLI settings with Spectre.Console attributes
+- src\Refitter.Core\Settings\RefitGeneratorSettings.cs - Core settings
+- src\Refitter.Core\Settings\CodeGeneratorSettings.cs - Code generation settings
+- Breaking change: --generate-authentication-header changed from bool to AuthenticationHeaderStyle enum
+
+**Dependencies:**
+- Spectre.Console.Cli 0.55.0 (potential parsing changes from 0.53)
+- NSwag for OpenAPI document model and code generation
+- H.Generators.Extensions (provides EquatableArray for source generators)
+
