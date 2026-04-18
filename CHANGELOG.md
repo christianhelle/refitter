@@ -2,7 +2,17 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.102...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.103...HEAD)
+
+**Merged pull requests:**
+
+- Update actions/github-script action to v9 [\#1006](https://github.com/christianhelle/refitter/pull/1006) ([renovate[bot]](https://github.com/apps/renovate))
+- Update actions/checkout action to v6 [\#1005](https://github.com/christianhelle/refitter/pull/1005) ([renovate[bot]](https://github.com/apps/renovate))
+- Upgrade Squad to v0.9.1 [\#1004](https://github.com/christianhelle/refitter/pull/1004) ([christianhelle](https://github.com/christianhelle))
+
+## [1.8.0-preview.103](https://github.com/christianhelle/refitter/tree/1.8.0-preview.103) (2026-04-17)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.102...1.8.0-preview.103)
 
 **Implemented enhancements:**
 
