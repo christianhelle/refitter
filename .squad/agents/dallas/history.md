@@ -60,3 +60,16 @@
 - Source generator: `src/Refitter.SourceGenerator/RefitterSourceGenerator.cs`
 - MSBuild task: `src/Refitter.MSBuild/RefitterGenerateTask.cs`
 - Settings docs: `docs/docfx_project/articles/refitter-file-format.md`
+
+### 2026-04-17: GitHub Discussions Setup + Distribution Audit
+
+**Discussion Creation Capability**: Confirmed repo has discussions enabled. GitHub CLI (v2.73.0) authenticated as `christianhelle`. Available categories: Announcements (recommended), General, Ideas, Polls, Q&A, Show and tell. Can create Discussion directly via `gh api graphql` with `createDiscussion` mutation.
+
+**Evidence Artifacts for Discussion Post**:
+- Auth property change: Commits 7dbf6c0c (PR #897), 14101a49 (PR #936)
+- Source generator change: Commit f853bcf2 (PR #923) - fixes issues #635, #520, #310
+- 359 total commits, 370 files changed (+36,658/-6,808)
+- All breaking changes have unit test coverage
+- Team consensus: v2.0.0 major bump required
+
+**Detailed Audit Report Written**: `.squad/decisions/inbox/dallas-breaking-audit.md` with full evidence chain, migration paths, and non-breaking change summary for reference during release planning.
