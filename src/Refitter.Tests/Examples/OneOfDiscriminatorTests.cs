@@ -267,6 +267,50 @@ components:
             .BeTrue();
     }
 
+    [Test]
+    public async Task Can_Generate_Code_For_OpenApi3_Without_Components()
+    {
+        const string spec = @"
+openapi: 3.0.1
+info:
+  title: Test
+  version: v1
+paths:
+  /api/ping:
+    get:
+      operationId: Ping
+      responses:
+        '200':
+          description: Success
+";
+        string generatedCode = await GenerateCode(spec: spec);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task Can_Generate_Code_For_Swagger2_Without_Components()
+    {
+        const string spec = @"
+swagger: '2.0'
+info:
+  title: Test
+  version: v1
+host: localhost
+basePath: /
+paths:
+  /api/ping:
+    get:
+      operationId: Ping
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+";
+        string generatedCode = await GenerateCode(spec: spec);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
     private static async Task<string> GenerateCode(string spec = OpenApiSpec, bool usePolymorphicSerialization = false)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
