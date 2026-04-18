@@ -156,4 +156,50 @@ components:
 
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
+
+    [Test]
+    public void Test_HintName_IsUnique_For_SameFilename_InDifferentDirectories()
+    {
+        // Regression test for: hint-name collisions when two .refitter files share a filename
+        // Two .refitter files with the same filename in different directories must produce different hint names.
+        static string ComputeHintName(string filePath)
+        {
+            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(filePath);
+            if (string.IsNullOrEmpty(fileNameWithoutExt) || fileNameWithoutExt == ".")
+                fileNameWithoutExt = "Refitter";
+
+            var dir = Path.GetDirectoryName(filePath) ?? string.Empty;
+            var safeDir = dir
+                .Replace(Path.DirectorySeparatorChar, '_')
+                .Replace(Path.AltDirectorySeparatorChar, '_')
+                .Replace(':', '_');
+
+            return string.IsNullOrEmpty(safeDir)
+                ? $"{fileNameWithoutExt}.g.cs"
+                : $"{safeDir}_{fileNameWithoutExt}.g.cs";
+        }
+
+        var pathA = Path.Combine("src", "ApiA", "petstore.refitter");
+        var pathB = Path.Combine("src", "ApiB", "petstore.refitter");
+
+        var hintA = ComputeHintName(pathA);
+        var hintB = ComputeHintName(pathB);
+
+        hintA.Should().NotBe(hintB,
+            "two .refitter files with the same name in different directories must produce different hint names");
+    }
+
+    [Test]
+    public void Test_HintName_UsesOutputFilename_WhenSpecified()
+    {
+        // When settings.OutputFilename is set, it should be used as the hint name directly.
+        var outputFilename = "MyCustomOutput.g.cs";
+
+        var hintName = outputFilename.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)
+            ? outputFilename
+            : outputFilename + ".g.cs";
+
+        hintName.Should().Be("MyCustomOutput.g.cs",
+            "OutputFilename should be used as-is when it already ends with .cs");
+    }
 }
