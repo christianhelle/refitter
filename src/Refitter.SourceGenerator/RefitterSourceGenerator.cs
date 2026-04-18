@@ -145,19 +145,37 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var refit = generator.Generate();
 
             cancellationToken.ThrowIfCancellationRequested();
-            var filename = settings.OutputFilename ?? Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
-            if (filename == ".g.cs")
-            {
-                filename = "Refitter.g.cs";
-            }
 
-            // Create unique hint name based on the .refitter file path to avoid collisions
-            var hintName = Path.GetFileNameWithoutExtension(file.Path);
-            if (string.IsNullOrEmpty(hintName) || hintName == ".")
+            string hintName;
+            if (!string.IsNullOrEmpty(settings.OutputFilename))
             {
-                hintName = "Refitter";
+                // Honor the user-specified output filename as the hint name
+                hintName = settings.OutputFilename!;
+                if (!hintName.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
+                {
+                    hintName += ".g.cs";
+                }
             }
-            hintName = hintName + ".g.cs";
+            else
+            {
+                // Disambiguate using the full directory path to avoid collisions when multiple
+                // .refitter files share the same filename in different directories (e.g. src/ApiA/petstore.refitter
+                // and src/ApiB/petstore.refitter would both produce "petstore.g.cs" without this).
+                var fileNameWithoutExt = Path.GetFileNameWithoutExtension(file.Path);
+                if (string.IsNullOrEmpty(fileNameWithoutExt) || fileNameWithoutExt == ".")
+                {
+                    fileNameWithoutExt = "Refitter";
+                }
+
+                var dir = Path.GetDirectoryName(file.Path) ?? string.Empty;
+                var safeDir = dir
+                    .Replace(Path.DirectorySeparatorChar, '_')
+                    .Replace(Path.AltDirectorySeparatorChar, '_')
+                    .Replace(':', '_');
+                hintName = string.IsNullOrEmpty(safeDir)
+                    ? $"{fileNameWithoutExt}.g.cs"
+                    : $"{safeDir}_{fileNameWithoutExt}.g.cs";
+            }
 
             return new GeneratedCode(diagnostics, refit, hintName);
         }
