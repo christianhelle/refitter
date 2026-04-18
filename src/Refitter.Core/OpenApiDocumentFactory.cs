@@ -65,8 +65,7 @@ public static class OpenApiDocumentFactory
             {
                 foreach (var schema in document.Components.Schemas)
                 {
-                    if (baseDocument.Components?.Schemas != null &&
-                        !baseDocument.Components.Schemas.ContainsKey(schema.Key))
+                    if (!baseDocument.Components.Schemas.ContainsKey(schema.Key))
                         baseDocument.Components.Schemas[schema.Key] = schema.Value;
                 }
             }
