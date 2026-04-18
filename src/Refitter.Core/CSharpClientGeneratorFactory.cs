@@ -96,6 +96,9 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
     /// </summary>
     private void ConvertOneOfWithDiscriminatorToAllOf()
     {
+        if (document.Components?.Schemas == null)
+            return;
+
         foreach (var kvp in document.Components.Schemas)
         {
             var schema = kvp.Value.ActualSchema;
