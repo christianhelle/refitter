@@ -61,6 +61,64 @@
 - MSBuild task: `src/Refitter.MSBuild/RefitterGenerateTask.cs`
 - Settings docs: `docs/docfx_project/articles/refitter-file-format.md`
 
+### 2026-04-18: Critical Tooling Fixes (Issues #1011, #1012)
+
+**Fixed #1011 — Source Generator Hint-Name Collisions**
+
+Problem: When multiple `.refitter` files with the same filename existed in different directories (e.g., `src/ApiA/petstore.refitter` and `src/ApiB/petstore.refitter`), the source generator crashed with `ArgumentException: hintName was already added` because hint names were computed only from the filename.
+
+Solution implemented:
+- Created `CreateUniqueHintName()` method that generates stable, unique hint names by combining the base filename with a hash of the directory path
+- Honors explicit `OutputFilename` when set while still preventing collisions
+- Uses simple deterministic hash (31-bit polynomial) formatted as 8-char hex suffix
+- Hint name format: `{baseName}_{pathHash}.g.cs` (e.g., `petstore_A1B2C3D4.g.cs`)
+
+Files changed:
+- `src/Refitter.SourceGenerator/RefitterSourceGenerator.cs`: Added `CreateUniqueHintName()` and `GetStableHash()` helper methods
+
+Regression coverage:
+- Created `src/Refitter.SourceGenerator.Tests/HintNameCollisionTests.cs` with two test cases:
+  1. Verifies generator doesn't crash with duplicate filenames in different directories
+  2. Verifies explicit `outputFilename` intent is preserved in hint name base
+
+**Fixed #1012 — MSBuild Task Swallows CLI Failures**
+
+Problem: `RefitterGenerateTask.Execute()` ignored the `dotnet refitter.dll` process exit code and unconditionally returned `true`, causing CI/CD pipelines to silently ship stale/missing generated code when the CLI failed.
+
+Solution implemented:
+- Added exit code inspection: `process.ExitCode != 0` → log error and mark as failed
+- Added process timeout (5 minutes) to prevent build hangs
+- Modified `TryExecuteRefitter()` to return `out bool failed` parameter
+- Modified `Execute()` to track `hasErrors` and return `false` if any .refitter file failed
+- Exception paths also set `failed = true` for comprehensive error handling
+
+Files changed:
+- `src/Refitter.MSBuild/RefitterGenerateTask.cs`: Modified `Execute()`, `TryExecuteRefitter()`, and `StartProcess()` methods
+
+Regression coverage:
+- Created `test/MSBuild/test-exit-code.ps1` script that:
+  1. Creates test project with invalid .refitter (unreachable URL)
+  2. Runs `dotnet build`
+  3. Asserts build fails with non-zero exit code (would pass before fix)
+
+**Build Status**:
+- MSBuild project compiled successfully: ✅ `src\Refitter.MSBuild\bin\Release\netstandard2.0\Refitter.MSBuild.dll`
+- Source generator changes are syntactically correct but compilation blocked by pre-existing Refitter.Core issues (unrelated to this work):
+  - `OpenApiDocumentFactory.cs(68,21)`: Property assignment errors
+  - `RefitGenerator.cs(275,48)`: Missing `JsonLibrary` definition
+  - These are outside the scope of the critical tooling slice
+- All modified code formatted with `dotnet format`
+
+**Validation**:
+- MSBuild task changes compile cleanly
+- Code formatted according to project standards
+- Regression test infrastructure in place (execution depends on Core build fix)
+
+**Scope Notes**:
+- Tightly scoped to P0 tooling issues #1011 and #1012
+- No coupling with other audit findings
+- Both fixes are self-contained and can ship independently once Core compilation is restored
+
 ### 2026-04-17: GitHub Discussions Setup + Distribution Audit
 
 **Discussion Creation Capability**: Confirmed repo has discussions enabled. GitHub CLI (v2.73.0) authenticated as `christianhelle`. Available categories: Announcements (recommended), General, Ideas, Polls, Q&A, Show and tell. Can create Discussion directly via `gh api graphql` with `createDiscussion` mutation.
