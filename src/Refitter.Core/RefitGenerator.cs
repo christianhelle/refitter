@@ -15,7 +15,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         TimeSpan.FromSeconds(1));
 
     private static readonly Regex EnumDeclarationRegex = new(
-        @"^(\s*)(public\s+(?:partial\s+)?enum\s+\w+\b)",
+        @"^(\s*)((?:public|internal)\s+(?:partial\s+)?enum\s+\w+\b)",
         RegexOptions.Compiled | RegexOptions.Multiline,
         TimeSpan.FromSeconds(1));
 
@@ -31,7 +31,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     /// <returns>A new instance of the <see cref="RefitGenerator"/> class.</returns>
     public static async Task<RefitGenerator> CreateAsync(RefitGeneratorSettings settings)
     {
-        var openApiDocument = await GetOpenApiDocument(settings);
+        var openApiDocument = await GetOpenApiDocument(settings).ConfigureAwait(false);
 
         ProcessTagFilters(openApiDocument, settings.IncludeTags);
         ProcessPathFilters(openApiDocument, settings.IncludePathMatches);
@@ -43,8 +43,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     private static async Task<OpenApiDocument> GetOpenApiDocument(RefitGeneratorSettings settings)
     {
         if (settings.OpenApiPaths is { Length: > 0 })
-            return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPaths);
-        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath);
+            return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPaths).ConfigureAwait(false);
+        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath).ConfigureAwait(false);
     }
 
     private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches,
@@ -142,12 +142,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         // (pre-generation) operation IDs. GenerateFile() auto-populates operation IDs
         // with globally unique names which would prevent the switch to the path segments
         // generator, causing unnecessary numeric suffixes in ByTag mode.
-        IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
-        {
-            MultipleInterfaces.ByEndpoint => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
-            MultipleInterfaces.ByTag => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
-            _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
-        };
+        var interfaceGenerator = CreateInterfaceGenerator(generator, docGenerator);
 
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
@@ -202,14 +197,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         // (pre-generation) operation IDs. GenerateFile() auto-populates operation IDs
         // with globally unique names which would prevent the switch to the path segments
         // generator, causing unnecessary numeric suffixes in ByTag mode.
-        IRefitInterfaceGenerator interfaceGenerator = settings.MultipleInterfaces switch
-        {
-            MultipleInterfaces.ByEndpoint
-                => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
-            MultipleInterfaces.ByTag
-                => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
-            _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
-        };
+        var interfaceGenerator = CreateInterfaceGenerator(generator, docGenerator);
 
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
@@ -259,6 +247,22 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
 
         return new GeneratorOutput(generatedFiles);
+    }
+
+    /// <summary>
+    /// Creates the appropriate interface generator based on settings.
+    /// This must be called before GenerateFile() to ensure operation ID detection works correctly.
+    /// </summary>
+    private IRefitInterfaceGenerator CreateInterfaceGenerator(
+        CustomCSharpClientGenerator generator,
+        XmlDocumentationGenerator docGenerator)
+    {
+        return settings.MultipleInterfaces switch
+        {
+            MultipleInterfaces.ByEndpoint => new RefitMultipleInterfaceGenerator(settings, document, generator, docGenerator),
+            MultipleInterfaces.ByTag => new RefitMultipleInterfaceByTagGenerator(settings, document, generator, docGenerator),
+            _ => new RefitInterfaceGenerator(settings, document, generator, docGenerator),
+        };
     }
 
     private string SanitizeGeneratedContracts(string contracts)

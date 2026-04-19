@@ -1,60 +1,167 @@
-using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Refitter.Core;
 
 internal static class ContractTypeSuffixApplier
 {
-    private static readonly Regex TypeDeclarationRegex =
-        new(@"(?:public|internal)\s+(?:partial\s+)?(?:class|record|struct)\s+(\w+)", RegexOptions.Multiline | RegexOptions.Compiled, TimeSpan.FromSeconds(1));
-
-    private static readonly Regex EnumDeclarationRegex =
-        new(@"(?:public|internal)\s+(?:partial\s+)?enum\s+(\w+)", RegexOptions.Multiline | RegexOptions.Compiled, TimeSpan.FromSeconds(1));
-
     public static string ApplySuffix(string generatedCode, string suffix)
     {
         if (string.IsNullOrWhiteSpace(suffix))
             return generatedCode;
 
+        // Parse the generated code into a syntax tree
+        var tree = CSharpSyntaxTree.ParseText(generatedCode);
+        var root = (CompilationUnitSyntax)tree.GetRoot();
+
+        // First pass: collect all contract type names that need suffixing
         var typeNames = new HashSet<string>();
+        var typeDeclarations = root.DescendantNodes()
+            .Where(n => n is ClassDeclarationSyntax
+                     || n is RecordDeclarationSyntax
+                     || n is StructDeclarationSyntax
+                     || n is EnumDeclarationSyntax)
+            .OfType<BaseTypeDeclarationSyntax>()
+            .ToList();
 
-        // First pass: collect all type names (classes, records, structs, enums)
-        foreach (Match match in TypeDeclarationRegex.Matches(generatedCode))
+        foreach (var typeDecl in typeDeclarations)
         {
-            typeNames.Add(match.Groups[1].Value);
+            var typeName = typeDecl.Identifier.Text;
+
+            // Skip if already has suffix to prevent double-suffixing (#1013)
+            if (!typeName.EndsWith(suffix, StringComparison.Ordinal))
+            {
+                typeNames.Add(typeName);
+            }
         }
 
-        foreach (Match match in EnumDeclarationRegex.Matches(generatedCode))
+        if (typeNames.Count == 0)
+            return generatedCode;
+
+        // Create a mapping of original type names to suffixed names
+        var typeRenameMap = typeNames.ToDictionary(
+            name => name,
+            name => name + suffix);
+
+        // Second pass: rewrite the syntax tree with renamed types
+        var rewriter = new TypeSuffixRewriter(typeRenameMap);
+        var newRoot = rewriter.Visit(root);
+
+        // Return the modified code with original formatting preserved
+        return newRoot.ToFullString();
+    }
+
+    /// <summary>
+    /// Syntax rewriter that renames type declarations and all references to them
+    /// </summary>
+    private class TypeSuffixRewriter : CSharpSyntaxRewriter
+    {
+        private readonly Dictionary<string, string> typeRenameMap;
+
+        public TypeSuffixRewriter(Dictionary<string, string> typeRenameMap)
         {
-            typeNames.Add(match.Groups[1].Value);
+            this.typeRenameMap = typeRenameMap;
         }
 
-        // Second pass: replace type names with suffixed versions
-        // Sort by length (longest first) to avoid partial replacements
-        var orderedTypeNames = typeNames.OrderByDescending(t => t.Length).ToList();
-        var result = generatedCode;
-
-        foreach (var typeName in orderedTypeNames)
+        /// <summary>
+        /// Rename class declarations
+        /// </summary>
+        public override SyntaxNode? VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var suffixedName = typeName + suffix;
+            var newNode = (ClassDeclarationSyntax)base.VisitClassDeclaration(node)!;
 
-            // Replace type declarations
-            result = Regex.Replace(
-                result,
-                $@"(?:public|internal)\s+((?:partial\s+)?(?:class|record|struct|enum))\s+\b{Regex.Escape(typeName)}\b",
-                m => $"{m.Groups[0].Value.Replace(typeName, suffixedName)}",
-                RegexOptions.Multiline,
-                TimeSpan.FromSeconds(1));
+            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
+            {
+                newNode = newNode.WithIdentifier(
+                    SyntaxFactory.Identifier(newName)
+                        .WithTriviaFrom(node.Identifier));
+            }
 
-            // Replace type references in inheritance, properties, parameters, etc.
-            // Match word boundaries to avoid partial replacements
-            result = Regex.Replace(
-                result,
-                $@"\b{Regex.Escape(typeName)}\b(?![a-zA-Z0-9_])",
-                suffixedName,
-                RegexOptions.None,
-                TimeSpan.FromSeconds(1));
+            return newNode;
         }
 
-        return result;
+        /// <summary>
+        /// Rename record declarations
+        /// </summary>
+        public override SyntaxNode? VisitRecordDeclaration(RecordDeclarationSyntax node)
+        {
+            var newNode = (RecordDeclarationSyntax)base.VisitRecordDeclaration(node)!;
+
+            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
+            {
+                newNode = newNode.WithIdentifier(
+                    SyntaxFactory.Identifier(newName)
+                        .WithTriviaFrom(node.Identifier));
+            }
+
+            return newNode;
+        }
+
+        /// <summary>
+        /// Rename struct declarations
+        /// </summary>
+        public override SyntaxNode? VisitStructDeclaration(StructDeclarationSyntax node)
+        {
+            var newNode = (StructDeclarationSyntax)base.VisitStructDeclaration(node)!;
+
+            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
+            {
+                newNode = newNode.WithIdentifier(
+                    SyntaxFactory.Identifier(newName)
+                        .WithTriviaFrom(node.Identifier));
+            }
+
+            return newNode;
+        }
+
+        /// <summary>
+        /// Rename enum declarations
+        /// </summary>
+        public override SyntaxNode? VisitEnumDeclaration(EnumDeclarationSyntax node)
+        {
+            var newNode = (EnumDeclarationSyntax)base.VisitEnumDeclaration(node)!;
+
+            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
+            {
+                newNode = newNode.WithIdentifier(
+                    SyntaxFactory.Identifier(newName)
+                        .WithTriviaFrom(node.Identifier));
+            }
+
+            return newNode;
+        }
+
+        /// <summary>
+        /// Rename type references (IdentifierNameSyntax like "Pet" in properties, parameters, etc.)
+        /// </summary>
+        public override SyntaxNode? VisitIdentifierName(IdentifierNameSyntax node)
+        {
+            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
+            {
+                return SyntaxFactory.IdentifierName(newName)
+                    .WithTriviaFrom(node);
+            }
+
+            return node;
+        }
+
+        /// <summary>
+        /// Rename generic type references (GenericNameSyntax like "Task&lt;Pet&gt;")
+        /// The type arguments will be visited separately by VisitIdentifierName
+        /// </summary>
+        public override SyntaxNode? VisitGenericName(GenericNameSyntax node)
+        {
+            var newNode = (GenericNameSyntax)base.VisitGenericName(node)!;
+
+            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
+            {
+                newNode = newNode.WithIdentifier(
+                    SyntaxFactory.Identifier(newName)
+                        .WithTriviaFrom(node.Identifier));
+            }
+
+            return newNode;
+        }
     }
 }
