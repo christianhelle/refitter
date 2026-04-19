@@ -83,7 +83,11 @@ internal static class IdentifierUtils
         "virtual",
         "void",
         "volatile",
-        "while"
+        "while",
+        "__arglist",
+        "__makeref",
+        "__reftype",
+        "__refvalue"
     };
 
     /// <summary>
@@ -137,8 +141,9 @@ internal static class IdentifierUtils
         {
             value = "_" + value;
         }
-        return string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries))
+        var sanitized = string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries))
                 .Trim(dash);
+        return EscapeReservedKeyword(sanitized);
     }
 
     /// <summary>

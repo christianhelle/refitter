@@ -34,12 +34,18 @@ public class RefitterGenerateTask : MSBuildTask
         TryLogCommandLine($"Found {files.Length} .refitter files...");
 
         var generatedFiles = new List<string>();
+        var hasErrors = false;
 
         foreach (var file in files)
         {
             TryLogCommandLine($"Processing {file}");
-            var generated = TryExecuteRefitter(file);
-            if (generated != null)
+            var generated = TryExecuteRefitter(file, out var failed);
+            if (failed)
+            {
+                hasErrors = true;
+                TryLogError($"Failed to generate code from {file}");
+            }
+            else if (generated != null)
             {
                 generatedFiles.AddRange(generated);
             }
@@ -48,24 +54,28 @@ public class RefitterGenerateTask : MSBuildTask
         GeneratedFiles = generatedFiles.Select(f => new Microsoft.Build.Utilities.TaskItem(f)).ToArray();
         TryLogCommandLine($"Generated {GeneratedFiles.Length} files");
 
-        return true;
+        // Return false if any refitter execution failed
+        return !hasErrors;
     }
 
-    private List<string>? TryExecuteRefitter(string file)
+    private List<string>? TryExecuteRefitter(string file, out bool failed)
     {
+        failed = false;
         try
         {
-            return StartProcess(file);
+            return StartProcess(file, out failed);
         }
         catch (Exception e)
         {
+            failed = true;
             TryLogErrorFromException(e);
             return null;
         }
     }
 
-    private List<string> StartProcess(string file)
+    private List<string> StartProcess(string file, out bool failed)
     {
+        failed = false;
         var expectedFiles = GetExpectedGeneratedFiles(file);
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
@@ -122,7 +132,32 @@ public class RefitterGenerateTask : MSBuildTask
         process.Start();
         process.BeginErrorReadLine();
         process.BeginOutputReadLine();
-        process.WaitForExit();
+
+        // Wait for process to exit with a reasonable timeout (5 minutes)
+        // to prevent build hangs on network issues or infinite loops
+        const int timeoutMilliseconds = 300000; // 5 minutes
+        if (!process.WaitForExit(timeoutMilliseconds))
+        {
+            failed = true;
+            try
+            {
+                process.Kill();
+                TryLogError($"Refitter process timed out after {timeoutMilliseconds / 1000} seconds and was terminated");
+            }
+            catch (Exception ex)
+            {
+                TryLogError($"Failed to terminate timed-out process: {ex.Message}");
+            }
+            return new List<string>();
+        }
+
+        // Check exit code - non-zero indicates failure
+        if (process.ExitCode != 0)
+        {
+            failed = true;
+            TryLogError($"Refitter process exited with code {process.ExitCode}");
+            return new List<string>();
+        }
 
         // Return the list of files that should have been generated
         return expectedFiles.Where(File.Exists).ToList();

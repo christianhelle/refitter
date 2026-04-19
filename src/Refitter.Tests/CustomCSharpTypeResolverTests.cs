@@ -58,7 +58,10 @@ public class CustomCSharpTypeResolverTests
     [Test]
     public void Resolve_With_Generic_Mapping_Returns_Nullable_Suffix()
     {
-        var settings = new CSharpGeneratorSettings();
+        var settings = new CSharpGeneratorSettings
+        {
+            GenerateNullableReferenceTypes = true
+        };
         var formatMappings = new Dictionary<string, string>
         {
             { "list-int", "List<int>" }

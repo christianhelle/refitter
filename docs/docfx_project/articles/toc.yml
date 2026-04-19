@@ -7,6 +7,9 @@
 - name: Source Generator
   href: source-generator.md
 
+- name: Breaking Changes (v2.0.0)
+  href: breaking-changes-v2-0-0.md
+
 - name: MSBuild
   href: msbuild.md
 

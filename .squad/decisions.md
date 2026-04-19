@@ -1,5 +1,115 @@
 # Squad Decisions
 
+## 2026-04-18
+
+### P0 Audit Findings - Critical Generator Bugs
+
+**Verified By:** Parker (Core Developer)  
+**Status:** ALL VALID
+
+- **#1011**: Source generator crashes IDE/build on duplicate filenames
+- **#1012**: CI/CD silently ships stale/missing code on CLI failures
+- **#1013**: Regex corrupts generated code, breaks member names
+- **#1014**: Breaks Newtonsoft users, silently regresses internal enums (PARTIAL)
+- **#1015**: NRE on every Swagger 2.0 document
+- **#1016**: Multi-spec merge drops all schemas from split APIs
+
+**Key Architectural Concerns:**
+1. Regex-on-raw-source fundamentally unsafe (word boundaries insufficient)
+2. Missing null checks in OpenAPI document traversal (Swagger 2.0 vs 3.0)
+3. MSBuild task doesn't follow MSBuild contract (returns true regardless of exit code)
+
+**Recommendation:** Fix all P0 before v2.0 release.
+
+---
+
+### P1 Audit Findings - High-Priority Issues
+
+**Verified By:** Lambert (Tester)  
+**Status:** 10 VALID, 1 PARTIAL
+
+- **#1017**: AOT context non-compiling (generics, nested types, namespaces)
+- **#1018**: ParameterExtractor invalid identifiers (not using IdentifierUtils)
+- **#1019**: Security scheme header unsafe (leading digits, keywords)
+- **#1020**: Dynamic-querystring self-assign (`_foo = _foo;`)
+- **#1021**: CLI --output no longer overrides when settings file used
+- **#1022**: MSBuild predicted paths diverge from actual generation
+- **#1023**: MSBuild IncludePatterns uses substring matching (fragile)
+- **#1024**: Refit 10 leaks to consumers (design decision, PARTIAL)
+- **#1025**: OpenApi.Readers 1.x → 3.x silent change
+- **#1026**: Auto-enable GenerateOptionalPropertiesAsNullable
+- **#1027**: RefitInterfaceGenerator NRE on no content
+
+**Critical:** #1018, #1019, #1020 produce non-compiling code; #1027 crashes on 204 responses.
+
+---
+
+### P2 Medium Audit Findings
+
+**Verified By:** Dallas (Tooling Developer)  
+**Status:** 14 VALID, 2 PARTIAL
+
+**Critical Issues (Crashes/Corruption):**
+- **#1028**: Source Generator Incremental Caching Defeated (List vs EquatableArray)
+- **#1037**: Crash on Empty Namespace List
+- **#1039**: Mutation of Shared NSwag Model
+
+**Security/Correctness:**
+- **#1035**: XML Doc Injection Vulnerability (unescaped parameter descriptions)
+- **#1034**: Silent Data Loss in Multi-Spec Merge
+
+**Type System Issues:**
+- **#1036**: Nullable Parameter Mis-classification
+- **#1038**: Reference Type Nullability (CS8632 errors)
+
+**Tooling Issues:**
+- **#1029**: Source Generator Silent Warnings (Debug.WriteLine no-op)
+- **#1041**: MSBuild Task Multiple Failure Modes
+- **#1043**: Breaking CLI Change (bool flag → enum)
+
+**Partial Issues:**
+- **#1032**: JsonConverter Semantics (runtime verification needed)
+- **#1042**: Spectre.Console.Cli version bump (smoke testing needed)
+
+---
+
+### P2 Low Audit Findings
+
+**Verified By:** Ripley (Lead)  
+**Status:** 13 VALID, 0 PARTIAL
+
+All issues appropriately classified. Systemic patterns identified:
+
+1. **Settings Validation Gaps** (#1044, #1045, #1046)
+2. **Parsing Fragility** (#1047, #1050, #1051)
+3. **Double-Read/Double-Process** (#1048, #1052)
+4. **Keyword Handling Gaps** (#1053)
+5. **Library Async Best Practices** (#1049)
+6. **Fragile Ordering Dependencies** (#1055, #1056)
+
+Recommendation: Address incrementally in 2.1.x patches.
+
+---
+
+### Breaking Changes Guidance Plan
+
+**Decided By:** Bishop (Docs Specialist)  
+**Status:** APPROVED FOR PUBLICATION
+
+**Deliverables Created:**
+1. GitHub Discussion draft (ready to publish)
+2. Migration guide in docs/ (breaking-changes-v2-0-0.md)
+3. Documentation index updated (toc.yml)
+
+**Publication Strategy:**
+- Create Discussion under Announcements category
+- Pin for 2-3 weeks during v2.0.0 adoption
+- Link from CHANGELOG and README
+
+**Reviewed By:** Ripley (Lead) - ✅ APPROVED
+
+---
+
 ## 2026-04-17
 
 ### Release Compatibility Audit: 1.7.3 → HEAD (All Agents Consensus)
