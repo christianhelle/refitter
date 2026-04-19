@@ -23,6 +23,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     private static readonly string Crlf = Environment.NewLine;
 
+    private RefitGeneratorSettings? _cachedSettings;
+
     protected override ValidationResult Validate(CommandContext context, Settings settings)
     {
         if (!settings.NoLogging)
@@ -32,7 +34,14 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase)))
             return ValidationResult.Success();
 
-        return SettingsValidator.Validate(settings);
+        // Cache settings if using settings file to avoid reading twice
+        var validationResult = SettingsValidator.Validate(settings, out var refitSettings);
+        if (refitSettings != null)
+        {
+            _cachedSettings = refitSettings;
+        }
+
+        return validationResult;
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
@@ -41,9 +50,15 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         try
         {
-            // When settings file is provided, deserialize it first and use as source of truth
-            if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            // Use cached settings from Validate() if available
+            if (_cachedSettings != null)
             {
+                refitGeneratorSettings = _cachedSettings;
+                _cachedSettings = null; // Clear cache after use
+            }
+            else if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            {
+                // Fallback: read settings file if not cached (shouldn't normally happen)
                 var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
                 refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
 
@@ -104,9 +119,20 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 return 0;
             }
 
+            // Resolve relative paths from settings file directory before creating generator
+            if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            {
+                ResolveRelativeSpecPaths(settings.SettingsFilePath, refitGeneratorSettings);
+            }
+
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             if (!settings.SkipValidation)
-                await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath, settings);
+            {
+                var specPath = refitGeneratorSettings.OpenApiPaths?.Length > 0
+                    ? refitGeneratorSettings.OpenApiPaths[0]
+                    : refitGeneratorSettings.OpenApiPath!;
+                await ValidateOpenApiSpec(specPath, settings);
+            }
 
             await (refitGeneratorSettings.GenerateMultipleFiles
                 ? WriteMultipleFiles(generator, settings, refitGeneratorSettings)
@@ -647,6 +673,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
     {
+        // Direct CLI invocation (no settings file)
         if (UsesDirectCliOutput(settings))
         {
             return settings.OutputPath!;
@@ -657,23 +684,32 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             return Settings.DefaultOutputPath;
         }
 
-        // Determine root directory based on settings file location
+        // Settings file mode
         var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)
             ? string.Empty
             : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
 
-        var outputPath = settings.OutputPath != Settings.DefaultOutputPath &&
-                         !string.IsNullOrWhiteSpace(settings.OutputPath)
-            ? settings.OutputPath
-            : refitGeneratorSettings.OutputFilename ?? "Output.cs";
+        // Check if CLI explicitly overrides output (#1021 fix)
+        var cliOverridesOutput = !string.IsNullOrWhiteSpace(settings.OutputPath) &&
+                                  settings.OutputPath != Settings.DefaultOutputPath;
 
-        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
+        string outputPath;
+        if (cliOverridesOutput)
         {
-            outputPath = Path.Combine(refitGeneratorSettings.OutputFolder, outputPath);
+            // CLI --output overrides settings file
+            outputPath = settings.OutputPath!;
+        }
+        else
+        {
+            // Use settings file output folder and filename
+            var filename = refitGeneratorSettings.OutputFilename ?? "Output.cs";
+            outputPath = !string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder)
+                ? Path.Combine(refitGeneratorSettings.OutputFolder, filename)
+                : filename;
         }
 
-        // Root the output path relative to settings file location if applicable
-        if (!string.IsNullOrWhiteSpace(root))
+        // Root the output path relative to settings file location if not already rooted
+        if (!string.IsNullOrWhiteSpace(root) && !Path.IsPathRooted(outputPath))
         {
             outputPath = Path.Combine(root, outputPath);
         }
@@ -681,7 +717,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return outputPath;
     }
 
-    private static void ApplySettingsFileDefaults(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
+    internal static void ApplySettingsFileDefaults(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
     {
         // Re-apply multi-file trigger logic
         if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder))
@@ -967,5 +1003,39 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         // Default: put .refitter file in current directory
         return FileExtensionConstants.Refitter;
+    }
+
+    private static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty;
+
+        // Resolve OpenApiPath if it's a relative path
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath) &&
+            !IsUrl(refitGeneratorSettings.OpenApiPath) &&
+            !Path.IsPathRooted(refitGeneratorSettings.OpenApiPath))
+        {
+            refitGeneratorSettings.OpenApiPath = Path.GetFullPath(
+                Path.Combine(settingsFileDirectory, refitGeneratorSettings.OpenApiPath));
+        }
+
+        // Resolve all OpenApiPaths entries if they're relative paths
+        if (refitGeneratorSettings.OpenApiPaths is { Length: > 0 })
+        {
+            for (var i = 0; i < refitGeneratorSettings.OpenApiPaths.Length; i++)
+            {
+                var path = refitGeneratorSettings.OpenApiPaths[i];
+                if (!IsUrl(path) && !Path.IsPathRooted(path))
+                {
+                    refitGeneratorSettings.OpenApiPaths[i] = Path.GetFullPath(
+                        Path.Combine(settingsFileDirectory, path));
+                }
+            }
+        }
+    }
+
+    private static bool IsUrl(string path)
+    {
+        return path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+               path.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
     }
 }
