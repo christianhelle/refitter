@@ -25,14 +25,17 @@ public class RefitGeneratorSettings
     /// Gets or sets the path to the Open API.
     /// </summary>
     [Description("The path to the OpenAPI document.")]
-    public string OpenApiPath { get; set; } = null!;
+    [JsonPropertyName("openApiPath")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? OpenApiPath { get; set; }
 
     /// <summary>
     /// Gets or sets the paths to multiple Open API documents. When specified, the documents are merged.
     /// This takes precedence over <see cref="OpenApiPath"/> when non-empty.
     /// </summary>
     [Description("The paths to multiple OpenAPI documents. When specified, the documents are merged into a single client.")]
-    public string[] OpenApiPaths { get; set; } = Array.Empty<string>();
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public string[]? OpenApiPaths { get; set; }
 
     /// <summary>
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
