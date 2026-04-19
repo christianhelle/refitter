@@ -125,7 +125,7 @@ public class XmlDocumentationGenerator
                 continue;
 
             var description = parameter.HasDescription
-                ? parameter.Description
+                ? SanitizeResponseDescription(parameter.Description)
                 : $"{parameter.VariableName} parameter";
 
             this.AppendXmlCommentBlock(
@@ -190,7 +190,7 @@ public class XmlDocumentationGenerator
                 }
                 else
                 {
-                    description = this.SanitizeResponseDescription(description);
+                    description = SanitizeResponseDescription(description);
                 }
 
                 this.AppendXmlCommentBlock("returns", description, code);
@@ -324,7 +324,7 @@ public class XmlDocumentationGenerator
 
             if (!string.IsNullOrWhiteSpace(response.ExceptionDescription))
             {
-                var responseDescription = this.SanitizeResponseDescription(response.ExceptionDescription);
+                var responseDescription = SanitizeResponseDescription(response.ExceptionDescription);
 
                 description
                     .Append("<description>")
@@ -341,7 +341,7 @@ public class XmlDocumentationGenerator
         return description.ToString();
     }
 
-    private string EscapeSymbols(string input)
+    internal static string EscapeSymbols(string input)
     {
         return input
             .Replace("&", "&amp;")
@@ -349,12 +349,12 @@ public class XmlDocumentationGenerator
             .Replace(">", "&gt;");
     }
 
-    private string SanitizeResponseDescription(string input)
+    internal static string SanitizeResponseDescription(string input)
     {
-        return this.EscapeSymbols(this.DecodeJsonEscapedText(input));
+        return EscapeSymbols(DecodeJsonEscapedText(input));
     }
 
-    private string DecodeJsonEscapedText(string input)
+    internal static string DecodeJsonEscapedText(string input)
     {
         if (string.IsNullOrEmpty(input))
         {
@@ -407,6 +407,15 @@ public class XmlDocumentationGenerator
                     {
                         result.Append(decodedChar);
                     }
+                    index += 4;
+                    continue;
+                }
+                else
+                {
+                    // Malformed \uXXXX (non-hex characters): append the raw escape sequence and advance past it
+                    result.Append('\\');
+                    result.Append('u');
+                    result.Append(hexValue);
                     index += 4;
                     continue;
                 }
