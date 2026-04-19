@@ -259,6 +259,9 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             var uniqueContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var response in operations.Value.Responses.Values)
             {
+                if (response.Content == null)
+                    continue;
+
                 foreach (var contentType in response.Content.Keys)
                 {
                     uniqueContentTypes.Add(contentType);
