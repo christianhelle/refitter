@@ -39,7 +39,7 @@ internal class CustomCSharpTypeResolver : CSharpTypeResolver
 
             // Only append ? if the type is a value type and nullable reference types are enabled
             // For reference types, only append ? if GenerateNullableReferenceTypes is true
-            if (isNullable && !mappedType.EndsWith("?"))
+            if (isNullable && !mappedType.EndsWith("?", StringComparison.Ordinal))
             {
                 // Try to determine if this is a value type by checking for common patterns
                 var isKnownValueType = IsValueType(mappedType);
@@ -68,12 +68,12 @@ internal class CustomCSharpTypeResolver : CSharpTypeResolver
         {
             // System namespace qualified names
             "System.Guid", "System.DateTime", "System.DateTimeOffset",
-            "System.TimeSpan", "System.Decimal", "System.Int32", "System.Int64",
+            "System.TimeSpan", "System.DateOnly", "System.TimeOnly", "System.Decimal", "System.Int32", "System.Int64",
             "System.Double", "System.Single", "System.Boolean", "System.Byte",
             "System.SByte", "System.Int16", "System.UInt16", "System.UInt32",
             "System.UInt64", "System.Char",
             // Unqualified names
-            "Guid", "DateTime", "DateTimeOffset", "TimeSpan", "Decimal",
+            "Guid", "DateTime", "DateTimeOffset", "TimeSpan", "DateOnly", "TimeOnly", "Decimal",
             "Int32", "Int64", "Double", "Single", "Boolean", "Byte",
             "SByte", "Int16", "UInt16", "UInt32", "UInt64", "Char",
             // C# type aliases

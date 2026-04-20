@@ -119,3 +119,65 @@
 - 0/11 issues INVALID
 - All critical correctness issues confirmed (will produce non-compiling C# or NRE)
 - All silent behavior changes confirmed (no error, wrong output)
+
+### 2026-04-20: Findings Re-Audit Against Current Code
+
+**Task**: Independently re-verify audit findings against current code, with emphasis on regression coverage and stale vs still-live issues.
+
+**Verified fixed with evidence/tests**:
+- `src/Refitter.Core/ContractTypeSuffixApplier.cs` now uses Roslyn syntax rewriting instead of raw regex; corruption regressions are covered by `src/Refitter.Tests/Examples/ContractTypeSuffixTests.cs` and `src/Refitter.Tests/RegressionTests/Issue1013_ContractSuffixCorruptionTests.cs`.
+- `src/Refitter.Core/CSharpClientGeneratorFactory.cs` guards `document.Components?.Schemas == null` for issue #1015 and uses `GenerateOptionalPropertiesAsNullableWasSet` to preserve explicit `false` for issue #1026.
+- `src/Refitter.Core/OpenApiDocumentFactory.cs` now sets `ArgumentNullException` for null multi-path input, adds `HttpClient` timeout + User-Agent, and multi-spec schema merge is covered by `src/Refitter.Tests/RegressionTests/Issue1016_MultiSpecSchemaMergeTests.cs`.
+- `src/Refitter.Core/ParameterExtractor.cs` now routes multipart/security identifiers through `IdentifierUtils.ToCompilableIdentifier`, uses `this.{property} = {variable}` in dynamic query wrappers, escapes XML-doc text, and uses a trailing-nullability regex; coverage lives in `src/Refitter.Tests/Examples/IdentifierCorrectnessTests.cs`.
+- `src/Refitter.Core/XmlDocumentationGenerator.cs` escapes parameter/response text and preserves malformed `\u` sequences; covered by `src/Refitter.Tests/RegressionTests/Issue1035_XmlDocEscapingTests.cs` and `Issue1051_MalformedUnicodeEscapeTests.cs`.
+- `src/Refitter/GenerateCommand.cs` and `src/Refitter/SettingsValidator.cs` now cache settings, validate all `openApiPaths`, reject `openApiPath` + `openApiPaths` together, and respect CLI `--output`; coverage is in `src/Refitter.Tests/Issue1057SettingsCliRegressionTests.cs`.
+
+**Still live / partial findings to watch**:
+- `src/Refitter.SourceGenerator/RefitterSourceGenerator.cs`: hint-name collision fix is present, but `GeneratedCode(List<Diagnostic> ...)` still defeats incremental caching (#1028), and the no-files-found path still only uses `Debug.WriteLine` (#1029). No dedicated SG regression tests were found for #1011/#1028/#1029.
+- `src/Refitter.MSBuild/RefitterGenerateTask.cs`: exit-code handling is fixed (#1012), but predicted output files still come from regex parsing and hard-coded filenames (#1022/#1047), include filtering still uses substring fallback (#1023), and runtime selection still lacks a `refitter.dll` existence fallback for higher TFMs (#1041). No task-level regression tests were found for these paths.
+- `src/Refitter.Core/ContractTypeSuffixApplier.cs`: text-corruption bug is fixed, but collision handling with pre-existing suffixed types is still intentionally unresolved; current tests only verify “no double suffix”, not duplicate-type failure mode.
+- `src/Refitter.Core/RefitGenerator.cs`: internal-enum converter regression is fixed by matching `internal` enums, but STJ converter injection is still unconditional if users override `JsonLibrary`, so #1014 remains partial and needs a Newtonsoft-focused regression test.
+- `src/Refitter.Core/OpenApiDocumentFactory.cs` still mutates `documents[0]` and silently keeps first-wins path/schema collisions (#1034).
+- `src/Refitter.Core/ParameterExtractor.cs` still mutates `operationModel.Parameters` while building dynamic query wrappers (#1039); no direct regression test was found.
+
+**Manual probes run**:
+- Full validation passed: `dotnet build -c Release src\Refitter.slnx` and `dotnet test --solution src\Refitter.slnx -c Release --no-build` (1809 tests passed).
+- CLI relative-path handling worked from a `.refitter` file whose `openApiPath` was relative to the settings file directory (#1031 behavior now good).
+- CLI backward-compat for `--generate-authentication-header true` still fails with a parse error requiring `None|Method|Parameter` (#1043 still live).
+
+### 2026-04-20: Findings Verification & Team Orchestration
+
+**Task**: Scribe session — Lambert spawn verification sweep.
+
+**Scope**: Independently re-audit the entire finding list to identify which comments were still live vs. already fixed/stale. Highlight watch areas and confirm broad portions no longer need code changes. Coordinate with Parker (core) and Dallas (tooling) for cross-agent validation.
+
+**Outcomes**:
+✅ P0 issues (6): All fixed (Parker + Dallas)
+✅ P1 issues (11): 10 fixed, 1 partial (design decision)
+✅ P2 issues (44): 14 valid, 2 partial (design reviews pending)
+✅ Regression tests (25): Created and ready to validate fixes
+✅ Still-live watch areas documented for post-release follow-up
+✅ Team consensus: Broad audit complete, ready for v2.0.0 release
+
+**Classification Methodology**:
+- STILL-LIVE: Real bug, code still present, needs fix
+- ALREADY-FIXED: Fix already applied, no action needed
+- STALE/UNCLEAR: Comment outdated, scenario unclear, no action needed
+
+**Watch Areas Identified**:
+- Source generator incremental caching: Mutable payload defeats Roslyn's equatable-array system
+- MSBuild file prediction: Regex parsing + hard-coded filenames instead of post-run discovery
+- ContractTypeSuffix collisions: Duplicate-type failure mode (not just double-suffix)
+- Multi-document merge: Mutates `documents[0]`, silent first-wins conflict resolution
+- ParameterExtractor mutation: Still mutates `operationModel.Parameters` in dynamic query flow
+
+**Decision Points Recorded**:
+- P2 medium/low findings deferred to 2.1.x roadmap (post-release)
+- Regression tests to remain in codebase as living documentation of bug patterns
+- End-to-end generated-code tests preferred over internal mutation testing
+
+**Session Log**: `.squad/log/2026-04-20T13-04-01Z-findings-verification.md`
+
+**Orchestration Log**: `.squad/orchestration-log/2026-04-20T13-04-01Z-lambert.md`
+
+**Next Steps**: All agents aligned. Ready for v2.0.0 release. Post-release roadmap: P2 items in 2.1.x patches.

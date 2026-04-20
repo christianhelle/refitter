@@ -363,6 +363,76 @@ public class SettingsValidatorTests
     }
 
     [Test]
+    public void Validate_Should_Resolve_Relative_OpenApiPath_Against_Settings_File_Directory()
+    {
+        var tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDirectory);
+
+        try
+        {
+            var openApiFile = Path.Combine(tempDirectory, "openapi.json");
+            var settingsFile = Path.Combine(tempDirectory, "test.refitter");
+            File.WriteAllText(openApiFile, "{}");
+            File.WriteAllText(settingsFile, JsonSerializer.Serialize(new RefitGeneratorSettings
+            {
+                OpenApiPath = "openapi.json"
+            }));
+
+            var settings = new Settings
+            {
+                SettingsFilePath = settingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings, out var refitSettings);
+
+            result.Successful.Should().BeTrue();
+            settings.OpenApiPath.Should().Be(openApiFile);
+            refitSettings!.OpenApiPath.Should().Be(openApiFile);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDirectory))
+                Directory.Delete(tempDirectory, true);
+        }
+    }
+
+    [Test]
+    public void Validate_Should_Resolve_Relative_OpenApiPaths_Against_Settings_File_Directory()
+    {
+        var tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDirectory);
+
+        try
+        {
+            var openApiFile1 = Path.Combine(tempDirectory, "openapi-1.json");
+            var openApiFile2 = Path.Combine(tempDirectory, "openapi-2.json");
+            var settingsFile = Path.Combine(tempDirectory, "test.refitter");
+            File.WriteAllText(openApiFile1, "{}");
+            File.WriteAllText(openApiFile2, "{}");
+            File.WriteAllText(settingsFile, JsonSerializer.Serialize(new RefitGeneratorSettings
+            {
+                OpenApiPaths = ["openapi-1.json", "openapi-2.json"]
+            }));
+
+            var settings = new Settings
+            {
+                SettingsFilePath = settingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings, out var refitSettings);
+
+            result.Successful.Should().BeTrue();
+            settings.OpenApiPath.Should().Be(openApiFile1);
+            refitSettings!.OpenApiPaths.Should().Equal(openApiFile1, openApiFile2);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDirectory))
+                Directory.Delete(tempDirectory, true);
+        }
+    }
+
+    [Test]
     public void Validate_Should_Fail_When_Settings_File_Has_Empty_OpenApiPaths()
     {
         var tempSettingsFile = Path.GetTempFileName();

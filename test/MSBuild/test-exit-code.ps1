@@ -8,12 +8,20 @@ Remove-Item bin -Force -Recurse -ErrorAction SilentlyContinue
 Remove-Item obj -Force -Recurse -ErrorAction SilentlyContinue
 Remove-Item Generated -Force -Recurse -ErrorAction SilentlyContinue
 dotnet build-server shutdown
+dotnet nuget locals global-packages --clear | Out-Null
 
 # Build the Refitter.MSBuild package
 Write-Host "Building Refitter.MSBuild package..." -ForegroundColor Yellow
 dotnet clean -c Release ..\..\src\Refitter.MSBuild\Refitter.MSBuild.csproj
 dotnet build -c Release ..\..\src\Refitter.MSBuild\Refitter.MSBuild.csproj
 dotnet pack -c Release ..\..\src\Refitter.MSBuild\Refitter.MSBuild.csproj -o .
+$package = Get-ChildItem -Filter "Refitter.MSBuild.*.nupkg" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+if ($null -eq $package) {
+    Write-Host "ERROR: Failed to locate packed Refitter.MSBuild package" -ForegroundColor Red
+    exit 1
+}
+
+$packageVersion = $package.BaseName.Substring("Refitter.MSBuild.".Length)
 
 # Create a test project with an invalid .refitter file
 $testDir = "test-exit-code"
@@ -27,7 +35,7 @@ $csprojContent = @"
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Refitter.MSBuild" Version="1.0.0" />
+    <PackageReference Include="Refitter.MSBuild" Version="$packageVersion" />
     <AdditionalFiles Include="invalid.refitter" />
   </ItemGroup>
 </Project>
@@ -45,7 +53,7 @@ $invalidRefitterContent = @"
 Set-Content "$testDir\invalid.refitter" $invalidRefitterContent
 
 # Copy the package to test directory
-Copy-Item "Refitter.MSBuild.1.0.0.nupkg" "$testDir\" -Force
+Copy-Item $package.FullName "$testDir\" -Force
 
 # Create a nuget.config that uses local source
 $nugetConfig = @"
@@ -60,12 +68,14 @@ Set-Content "$testDir\nuget.config" $nugetConfig
 
 Push-Location $testDir
 try {
+    $env:NUGET_PACKAGES = Join-Path (Get-Location) ".nuget-packages"
+
     # Try to build the project - it should FAIL because the OpenAPI spec is unreachable
     Write-Host "Attempting build with invalid spec (should fail)..." -ForegroundColor Yellow
     dotnet restore
     
     # Run build and capture exit code
-    dotnet build --no-restore 2>&1 | Out-Null
+    $buildOutput = dotnet build --no-restore 2>&1
     $buildExitCode = $LASTEXITCODE
     
     if ($buildExitCode -eq 0) {
@@ -77,7 +87,19 @@ try {
     }
     
     Write-Host "PASS: Build correctly failed with exit code $buildExitCode" -ForegroundColor Green
+
+    $buildOutputText = $buildOutput | Out-String
+    if ($buildOutputText -notmatch "Generation partially completed") {
+        Write-Host "ERROR: Expected partial-failure summary message was not found in build output!" -ForegroundColor Red
+        Write-Host "       RefitterGenerateTask summary is still misleading on partial failure." -ForegroundColor Red
+        Pop-Location
+        Remove-Item ..\$testDir -Force -Recurse -ErrorAction SilentlyContinue
+        exit 1
+    }
+
+    Write-Host "PASS: Partial-failure summary message was emitted" -ForegroundColor Green
 } finally {
+    Remove-Item Env:NUGET_PACKAGES -ErrorAction SilentlyContinue
     Pop-Location
 }
 

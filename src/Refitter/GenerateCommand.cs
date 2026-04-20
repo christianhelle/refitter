@@ -122,7 +122,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             // Resolve relative paths from settings file directory before creating generator
             if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
-                ResolveRelativeSpecPaths(settings.SettingsFilePath, refitGeneratorSettings);
+                SettingsFilePathResolver.ResolveOpenApiSpecPaths(settings.SettingsFilePath, refitGeneratorSettings);
             }
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
@@ -498,46 +498,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         foreach (var outputFile in generatorOutput.Files)
         {
-            if (
-                !string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder)
-                && refitGeneratorSettings.ContractsOutputFolder != RefitGeneratorSettings.DefaultOutputFolder
-                && outputFile.Filename == $"{TypenameConstants.Contracts}.cs"
-            )
-            {
-                var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)
-                    ? string.Empty
-                    : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
-
-                var contractsFolder = Path.GetFullPath(Path.Combine(root, refitGeneratorSettings.ContractsOutputFolder));
-                if (!string.IsNullOrWhiteSpace(contractsFolder) && !Directory.Exists(contractsFolder))
-                    Directory.CreateDirectory(contractsFolder);
-
-                var contractsFile = Path.Combine(contractsFolder ?? "./", outputFile.Filename);
-                var sizeFormatted = FormatFileSize(outputFile.Content.Length);
-                var contractsDir = Path.GetDirectoryName(contractsFile) ?? "";
-                var lines = outputFile.Content.Split('\n').Length;
-
-                if (settings.SimpleOutput)
-                {
-                    Console.WriteLine($"{outputFile.Filename,-30} {sizeFormatted,-10} {lines,-10:N0}");
-                }
-                else
-                {
-                    table?.AddRow(
-                        $"[cyan]{outputFile.Filename}[/]",
-                        $"[dim]{contractsDir}[/]",
-                        $"[green]{sizeFormatted}[/]",
-                        $"[green]{lines:N0}[/]"
-                    );
-                }
-
-                totalSize += outputFile.Content.Length;
-                totalLines += lines;
-
-                await File.WriteAllTextAsync(contractsFile, outputFile.Content);
-                continue;
-            }
-
             var code = outputFile.Content;
             var outputPath = GetOutputPath(settings, refitGeneratorSettings, outputFile);
             var formattedSize = FormatFileSize(code.Length);
@@ -752,27 +712,47 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         RefitGeneratorSettings refitGeneratorSettings,
         GeneratedCode outputFile)
     {
+        var outputDirectory = GetMultiFileOutputDirectory(settings, refitGeneratorSettings, outputFile);
+        return Path.Combine(outputDirectory, outputFile.Filename);
+    }
+
+    private static string GetMultiFileOutputDirectory(
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings,
+        GeneratedCode outputFile)
+    {
         if (IsDirectCliGeneration(settings))
         {
-            var outputDirectory = UsesDirectCliOutput(settings)
+            if (IsContractsFile(outputFile) && !string.IsNullOrWhiteSpace(settings.ContractsOutputPath))
+            {
+                return settings.ContractsOutputPath!;
+            }
+
+            return UsesDirectCliOutput(settings)
                 ? settings.OutputPath!
                 : ".";
-
-            return Path.Combine(outputDirectory, outputFile.Filename);
         }
 
         var root = string.IsNullOrWhiteSpace(settings.SettingsFilePath)
             ? string.Empty
             : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
 
-        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
+        if (HasExplicitCliOutput(settings))
         {
-            return Path.Combine(root, refitGeneratorSettings.OutputFolder, outputFile.Filename);
+            return Path.Combine(root, settings.OutputPath!);
         }
 
-        return !string.IsNullOrWhiteSpace(settings.OutputPath) && settings.OutputPath != Settings.DefaultOutputPath
-            ? Path.Combine(root, settings.OutputPath, outputFile.Filename)
-            : Path.Combine(root, outputFile.Filename);
+        if (IsContractsFile(outputFile) && !string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder))
+        {
+            return Path.Combine(root, refitGeneratorSettings.ContractsOutputFolder);
+        }
+
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
+        {
+            return Path.Combine(root, refitGeneratorSettings.OutputFolder);
+        }
+
+        return root;
     }
 
     private static bool IsDirectCliGeneration(Settings settings) =>
@@ -1013,37 +993,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return FileExtensionConstants.Refitter;
     }
 
-    private static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
-    {
-        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty;
+    private static bool HasExplicitCliOutput(Settings settings) =>
+        !string.IsNullOrWhiteSpace(settings.OutputPath) &&
+        settings.OutputPath != Settings.DefaultOutputPath;
 
-        // Resolve OpenApiPath if it's a relative path
-        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath) &&
-            !IsUrl(refitGeneratorSettings.OpenApiPath) &&
-            !Path.IsPathRooted(refitGeneratorSettings.OpenApiPath))
-        {
-            refitGeneratorSettings.OpenApiPath = Path.GetFullPath(
-                Path.Combine(settingsFileDirectory, refitGeneratorSettings.OpenApiPath));
-        }
-
-        // Resolve all OpenApiPaths entries if they're relative paths
-        if (refitGeneratorSettings.OpenApiPaths is { Length: > 0 })
-        {
-            for (var i = 0; i < refitGeneratorSettings.OpenApiPaths.Length; i++)
-            {
-                var path = refitGeneratorSettings.OpenApiPaths[i];
-                if (!IsUrl(path) && !Path.IsPathRooted(path))
-                {
-                    refitGeneratorSettings.OpenApiPaths[i] = Path.GetFullPath(
-                        Path.Combine(settingsFileDirectory, path));
-                }
-            }
-        }
-    }
-
-    private static bool IsUrl(string path)
-    {
-        return path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-               path.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
-    }
+    private static bool IsContractsFile(GeneratedCode outputFile) =>
+        string.Equals(outputFile.Filename, $"{TypenameConstants.Contracts}.cs", StringComparison.Ordinal);
 }

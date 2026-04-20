@@ -573,14 +573,85 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("double? DoubleIntValue { get; set; } = 10.0");
     }
 
-    private static async Task<string> GenerateCode(string openApiSpec)
+    [Test]
+    public async Task Dynamic_QueryString_Docs_Only_Expose_QueryParams_And_NonQuery_Parameters()
+    {
+        const string openApiSpec =
+            """
+            {
+              "openapi": "3.0.1",
+              "info": {
+                "title": "Test API",
+                "version": "v1"
+              },
+              "paths": {
+                "/api/test/{tenantId}": {
+                  "get": {
+                    "operationId": "GetItems",
+                    "parameters": [
+                      {
+                        "name": "tenantId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        },
+                        "description": "Tenant identifier"
+                      },
+                      {
+                        "name": "class",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        },
+                        "description": "Reserved query parameter"
+                      },
+                      {
+                        "name": "page-size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "description": "Paging size"
+                      }
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        string generatedCode = await GenerateCode(openApiSpec, generateXmlDocCodeComments: true);
+
+        generatedCode.Should().Contain("Task GetItems(string tenantId, [Query] GetItemsQueryParams queryParams);");
+        generatedCode.Should().Contain("/// <param name=\"tenantId\">Tenant identifier</param>");
+        generatedCode.Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
+        generatedCode.Should().NotContain("/// <param name=\"@class\">");
+        generatedCode.Should().NotContain("/// <param name=\"page_size\">");
+        generatedCode.Should().Contain("[Query, AliasAs(\"class\")]");
+        generatedCode.Should().Contain("public string @class");
+        generatedCode.Should().Contain("[Query, AliasAs(\"page-size\")]");
+        generatedCode.Should().Contain("public int? Page_size");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    private static async Task<string> GenerateCode(string openApiSpec, bool generateXmlDocCodeComments = false)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(openApiSpec);
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
             OptionalParameters = true,
-            UseDynamicQuerystringParameters = true
+            UseDynamicQuerystringParameters = true,
+            GenerateXmlDocCodeComments = generateXmlDocCodeComments
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);

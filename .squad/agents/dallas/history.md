@@ -198,3 +198,98 @@ Key patterns and file paths discovered:
 - NSwag for OpenAPI document model and code generation
 - H.Generators.Extensions (provides EquatableArray for source generators)
 
+### 2026-04-20: Tooling Findings Re-Verification
+
+**Verified stale and fixed (tooling-owned only):**
+
+- `src\Refitter.MSBuild\RefitterGenerateTask.cs`
+  - `hasErrors` was still followed by a misleading `"Generated X files"` success-style log line.
+  - Added a partial-failure summary message, configurable `TimeoutSeconds` handling (default 300, invalid values fall back with a warning), and `WaitForExit()` after both normal completion and timeout kill to flush async output readers.
+- `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs`
+  - Hint names still hashed only the directory, so two `.refitter` files in the same folder with the same `outputFilename` could still collide.
+  - Fixed `CreateUniqueHintName()` to hash the full `.refitter` path and normalized both `openApiPath` and every `openApiPaths[]` entry relative to the `.refitter` file before `RefitGenerator.CreateAsync`.
+- `src\Refitter\GenerateCommand.cs` + `src\Refitter\SettingsValidator.cs`
+  - Multi-file output resolution still let settings-file defaults shadow explicit CLI `--output`, especially for `Contracts.cs`.
+  - Added shared `SettingsFilePathResolver` logic for settings-file-relative OpenAPI path resolution and made explicit CLI `--output` win for multi-file writes, including the contracts branch.
+
+**Focused coverage added:**
+
+- Source generator regressions:
+  - `src\Refitter.SourceGenerator.Tests\DuplicateOutputFilenameGeneratorTests.cs`
+  - `src\Refitter.SourceGenerator.Tests\MultipleOpenApiPathsGeneratorTests.cs`
+  - Additional files: duplicate same-directory `outputFilename` configs + relative `openApiPaths` config
+- CLI/tooling tests:
+  - `src\Refitter.Tests\GenerateCommandTests.cs`
+  - `src\Refitter.Tests\SettingsValidatorTests.cs`
+  - `src\Refitter.Tests\RefitterGenerateTaskTests.cs`
+- MSBuild regression script:
+  - `test\MSBuild\test-exit-code.ps1` now avoids stale NuGet cache usage and checks for the partial-failure summary text
+
+**Validation notes:**
+
+- `dotnet build -c Release src\Refitter.slnx` succeeded after the tooling changes.
+- `dotnet test --project src\Refitter.SourceGenerator.Tests\Refitter.SourceGenerator.Tests.csproj -c Release` passed (net8.0 + net10.0).
+- Focused tooling tests in `Refitter.Tests.exe` passed for new CLI/MSBuild helper coverage.
+- Manual MSBuild package validation confirmed build failure on invalid `.refitter` input plus the new partial-failure warning.
+- Full `dotnet test --solution src\Refitter.slnx -c Release` currently hits unrelated/non-tooling `Refitter.Tests` failures in already-modified core/test files in the shared workspace (`IdentifierCorrectnessTests`, plus a separate full-suite failure path around `ContractTypeSuffixTests` that passes in isolation).
+
+### 2026-04-20: Second-Pass Tooling Fixes (Still-Live Lambert Findings)
+
+**Resolved source-generator follow-ups:**
+
+- `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs`
+  - Replaced the incremental payload’s mutable `List<Diagnostic>` with value-based diagnostic/result structs so identical runs can compare by contents instead of reference identity (#1028).
+  - Added a real Roslyn warning diagnostic (`REFITTER003`) when no `.refitter` files are present, while keeping the existing debug trace for local troubleshooting (#1029).
+
+**Resolved MSBuild follow-ups:**
+
+- `src\Refitter.MSBuild\RefitterGenerateTask.cs`
+  - Replaced regex-derived exact file prediction with JSON-based output-plan parsing plus post-run file-system diffing, so multi-file outputs are collected from the actual changed `.cs` files in the configured output directories instead of assuming `RefitInterfaces.cs` / `Contracts.cs`.
+  - Tightened include filtering to exact / wildcard matching and removed the substring fallback that over-included files (#1023).
+  - Added runtime-target fallback selection so the task can step down from net10 → net9 → net8 when a higher-targeted `refitter.dll` is unavailable (#1041).
+
+**Focused regression coverage added:**
+
+- `src\Refitter.Tests\RefitterSourceGeneratorTests.cs`
+  - Reflection-based source-generator test for the new no-files warning.
+  - Reflection-based equality regression for the incremental payload types.
+- `src\Refitter.Tests\RefitterGenerateTaskTests.cs`
+  - Runtime-target fallback selection.
+  - Exact-vs-wildcard include filtering.
+  - Multi-file output-plan parsing and changed-file collection without hardcoded interface filenames.
+
+**Validation notes:**
+
+- `dotnet build -c Release src\Refitter.slnx --no-restore` succeeded using a repo-local `NUGET_PACKAGES` cache.
+- `dotnet test --project src\Refitter.SourceGenerator.Tests\Refitter.SourceGenerator.Tests.csproj -c Release --no-build` passed (net8.0 + net10.0).
+- Focused TUnit runs passed for:
+  - `/*/Refitter.Tests/RefitterGenerateTaskTests/*`
+  - `/*/Refitter.Tests/RefitterSourceGeneratorTests/*`
+- `dotnet format --verify-no-changes --no-restore src\Refitter.slnx` passed after the tooling updates.
+
+### 2026-04-20: Findings Verification & Team Orchestration
+
+**Task**: Scribe session — Dallas spawn verification sweep.
+
+**Scope**: Re-verify all tooling-owned findings from v2.0 audit in orchestrated spawn. Commit only the still-live fixes. Coordinate with Parker (core) and Lambert (tester) for cross-agent validation.
+
+**Outcomes**:
+✅ Spec path resolution: Relative to `.refitter` file; CLI overrides settings defaults
+✅ MSBuild failure handling: Exit on failure; process all files; report all errors
+✅ Source-generator incremental caching: Value semantics instead of mutable lists
+✅ Source-generator hint-name collisions: Deterministic 31-bit polynomial hash
+✅ MSBuild timeout enforcement: 5-minute configurable timeout with final process waits
+✅ All P0 and P1 tooling findings fixed or documented
+✅ Focused regression tests created for SG/MSBuild surfaces
+
+**Decision Points Recorded**:
+- Relative path resolution prevents divergence between CLI validation, generation, and source generator (decisions.md:2026-04-20)
+- Explicit CLI `--output` must override settings-file defaults for multi-file generation (decisions.md:2026-04-20)
+- Prediction-free assumption design: Use post-run file discovery instead of regex-parsing (decisions.md:2026-04-20)
+
+**Session Log**: `.squad/log/2026-04-20T13-04-01Z-findings-verification.md`
+
+**Orchestration Log**: `.squad/orchestration-log/2026-04-20T13-04-01Z-dallas.md`
+
+**Next Steps**: Ready for final integration testing and v2.0.0 release.
+

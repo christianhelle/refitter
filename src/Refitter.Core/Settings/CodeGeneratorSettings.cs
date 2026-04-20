@@ -10,6 +10,8 @@ namespace Refitter.Core;
 [Description("CSharp code generator settings")]
 public class CodeGeneratorSettings
 {
+    private bool generateOptionalPropertiesAsNullable;
+
     /// <summary>
     /// Gets or sets a value indicating whether a required property must be defined in JSON
     /// (sets Required.Always when the property is required) (default: true).
@@ -206,7 +208,17 @@ public class CodeGeneratorSettings
     [Description(
         "Gets or sets a value indicating whether optional schema properties (not required) are generated as nullable properties (default: false)."
     )]
-    public bool GenerateOptionalPropertiesAsNullable { get; set; }
+    public bool GenerateOptionalPropertiesAsNullable
+    {
+        get => generateOptionalPropertiesAsNullable;
+        set
+        {
+            generateOptionalPropertiesAsNullable = value;
+            GenerateOptionalPropertiesAsNullableWasSet = true;
+        }
+    }
+
+    internal bool GenerateOptionalPropertiesAsNullableWasSet { get; private set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate Nullable Reference Type annotations (default: false).

@@ -32,7 +32,8 @@ public static class OpenApiDocumentFactory
     /// </summary>
     /// <param name="openApiPaths">The paths or URLs to the OpenAPI specifications.</param>
     /// <returns>A merged <see cref="NSwag.OpenApiDocument"/>.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="openApiPaths"/> is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="openApiPaths"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="openApiPaths"/> is empty.</exception>
     public static async Task<OpenApiDocument> CreateAsync(IEnumerable<string> openApiPaths)
     {
         if (openApiPaths == null)

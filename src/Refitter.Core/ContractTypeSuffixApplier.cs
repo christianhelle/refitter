@@ -16,7 +16,6 @@ internal static class ContractTypeSuffixApplier
         var root = (CompilationUnitSyntax)tree.GetRoot();
 
         // First pass: collect all contract type names that need suffixing
-        var typeNames = new HashSet<string>();
         var typeDeclarations = root.DescendantNodes()
             .Where(n => n is ClassDeclarationSyntax
                      || n is RecordDeclarationSyntax
@@ -25,24 +24,22 @@ internal static class ContractTypeSuffixApplier
             .OfType<BaseTypeDeclarationSyntax>()
             .ToList();
 
-        foreach (var typeDecl in typeDeclarations)
-        {
-            var typeName = typeDecl.Identifier.Text;
+        var declaredTypeNames = new HashSet<string>(
+            typeDeclarations.Select(typeDeclaration => typeDeclaration.Identifier.Text),
+            StringComparer.Ordinal);
 
-            // Skip if already has suffix to prevent double-suffixing (#1013)
-            if (!typeName.EndsWith(suffix, StringComparison.Ordinal))
-            {
-                typeNames.Add(typeName);
-            }
-        }
+        var typeRenameMap = typeDeclarations
+            .Select(typeDeclaration => typeDeclaration.Identifier.Text)
+            .Where(typeName => !typeName.EndsWith(suffix, StringComparison.Ordinal))
+            .Where(typeName => !declaredTypeNames.Contains(typeName + suffix))
+            .Distinct(StringComparer.Ordinal)
+            .ToDictionary(
+                typeName => typeName,
+                typeName => typeName + suffix,
+                StringComparer.Ordinal);
 
-        if (typeNames.Count == 0)
+        if (typeRenameMap.Count == 0)
             return generatedCode;
-
-        // Create a mapping of original type names to suffixed names
-        var typeRenameMap = typeNames.ToDictionary(
-            name => name,
-            name => name + suffix);
 
         // Second pass: rewrite the syntax tree with renamed types
         var rewriter = new TypeSuffixRewriter(typeRenameMap);
@@ -55,7 +52,7 @@ internal static class ContractTypeSuffixApplier
     /// <summary>
     /// Syntax rewriter that renames type declarations and all references to them
     /// </summary>
-    private class TypeSuffixRewriter : CSharpSyntaxRewriter
+    private sealed class TypeSuffixRewriter : CSharpSyntaxRewriter
     {
         private readonly Dictionary<string, string> typeRenameMap;
 
@@ -137,13 +134,17 @@ internal static class ContractTypeSuffixApplier
         /// </summary>
         public override SyntaxNode? VisitIdentifierName(IdentifierNameSyntax node)
         {
-            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
+            var newNode = (IdentifierNameSyntax)base.VisitIdentifierName(node)!;
+
+            if (IsTypeReferenceContext(node) &&
+                typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
             {
-                return SyntaxFactory.IdentifierName(newName)
-                    .WithTriviaFrom(node);
+                return newNode.WithIdentifier(
+                    SyntaxFactory.Identifier(newName)
+                        .WithTriviaFrom(newNode.Identifier));
             }
 
-            return node;
+            return newNode;
         }
 
         /// <summary>
@@ -154,7 +155,8 @@ internal static class ContractTypeSuffixApplier
         {
             var newNode = (GenericNameSyntax)base.VisitGenericName(node)!;
 
-            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
+            if (IsTypeReferenceContext(node) &&
+                typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
             {
                 newNode = newNode.WithIdentifier(
                     SyntaxFactory.Identifier(newName)
@@ -162,6 +164,37 @@ internal static class ContractTypeSuffixApplier
             }
 
             return newNode;
+        }
+
+        private static bool IsTypeReferenceContext(SyntaxNode node)
+        {
+            return node.Parent switch
+            {
+                QualifiedNameSyntax qualifiedName => IsTypeReferenceContext(qualifiedName),
+                AliasQualifiedNameSyntax aliasQualifiedName => IsTypeReferenceContext(aliasQualifiedName),
+                ArrayTypeSyntax => true,
+                CastExpressionSyntax castExpression when castExpression.Type == node => true,
+                DeclarationExpressionSyntax declarationExpression when declarationExpression.Type == node => true,
+                DefaultExpressionSyntax defaultExpression when defaultExpression.Type == node => true,
+                EventDeclarationSyntax eventDeclaration when eventDeclaration.Type == node => true,
+                ForEachStatementSyntax forEachStatement when forEachStatement.Type == node => true,
+                LocalFunctionStatementSyntax localFunction when localFunction.ReturnType == node => true,
+                MethodDeclarationSyntax methodDeclaration when methodDeclaration.ReturnType == node => true,
+                NullableTypeSyntax => true,
+                ObjectCreationExpressionSyntax objectCreationExpression when objectCreationExpression.Type == node => true,
+                ParameterSyntax parameterSyntax when parameterSyntax.Type == node => true,
+                PointerTypeSyntax => true,
+                PropertyDeclarationSyntax propertyDeclaration when propertyDeclaration.Type == node => true,
+                RefTypeSyntax => true,
+                SimpleBaseTypeSyntax => true,
+                SizeOfExpressionSyntax sizeOfExpression when sizeOfExpression.Type == node => true,
+                TupleElementSyntax tupleElement when tupleElement.Type == node => true,
+                TypeArgumentListSyntax => true,
+                TypeConstraintSyntax => true,
+                TypeOfExpressionSyntax typeOfExpression when typeOfExpression.Type == node => true,
+                VariableDeclarationSyntax variableDeclaration when variableDeclaration.Type == node => true,
+                _ => false,
+            };
         }
     }
 }

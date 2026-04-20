@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 using MSBuildTask = Microsoft.Build.Utilities.Task;
@@ -8,6 +9,8 @@ namespace Refitter.MSBuild;
 
 public class RefitterGenerateTask : MSBuildTask
 {
+    internal const int DefaultTimeoutSeconds = 300;
+
     public string ProjectFileDirectory { get; set; }
 
     public bool DisableLogging { get; set; }
@@ -15,6 +18,8 @@ public class RefitterGenerateTask : MSBuildTask
     public bool SkipValidation { get; set; }
 
     public string IncludePatterns { get; set; }
+
+    public int TimeoutSeconds { get; set; } = DefaultTimeoutSeconds;
 
     [Output]
     public ITaskItem[] GeneratedFiles { get; set; }
@@ -52,9 +57,16 @@ public class RefitterGenerateTask : MSBuildTask
         }
 
         GeneratedFiles = generatedFiles.Select(f => new Microsoft.Build.Utilities.TaskItem(f)).ToArray();
-        TryLogCommandLine($"Generated {GeneratedFiles.Length} files");
+        var summaryMessage = CreateSummaryMessage(GeneratedFiles.Length, hasErrors);
+        if (hasErrors)
+        {
+            TryLogWarning(summaryMessage);
+        }
+        else
+        {
+            TryLogCommandLine(summaryMessage);
+        }
 
-        // Return false if any refitter execution failed
         return !hasErrors;
     }
 
@@ -76,29 +88,23 @@ public class RefitterGenerateTask : MSBuildTask
     private List<string> StartProcess(string file, out bool failed)
     {
         failed = false;
-        var expectedFiles = GetExpectedGeneratedFiles(file);
+        var outputPlan = GetOutputPlan(file);
+        var outputSnapshot = CaptureOutputSnapshot(outputPlan);
+        var timeoutSeconds = GetValidatedTimeoutSeconds(TimeoutSeconds);
+        if (timeoutSeconds != TimeoutSeconds)
+        {
+            TryLogWarning(
+                $"Invalid TimeoutSeconds value '{TimeoutSeconds}'. Using default timeout of {DefaultTimeoutSeconds} seconds.");
+        }
+
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
-        var separator = Path.DirectorySeparatorChar;
-        var refitterDll = $"{packageFolder}{separator}..{separator}net8.0{separator}refitter.dll";
-
         List<string> installedRuntimes = GetInstalledDotnetRuntimes();
-        if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 10.")))
-        {
-            // Use .NET 10 version if available
-            refitterDll = $"{packageFolder}{separator}..{separator}net10.0{separator}refitter.dll";
-            TryLogCommandLine("Detected .NET 10 runtime. Using .NET 10 version of Refitter.");
-        }
-        else if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 9.")))
-        {
-            // Use .NET 9 version if available
-            refitterDll = $"{packageFolder}{separator}..{separator}net9.0{separator}refitter.dll";
-            TryLogCommandLine("Detected .NET 9 runtime. Using .NET 9 version of Refitter.");
-        }
-        else
-        {
-            TryLogCommandLine("Using .NET 8 version of Refitter.");
-        }
+        var selectedTargetFramework = SelectRefitterTargetFramework(
+            installedRuntimes,
+            targetFramework => File.Exists(GetRefitterDllPath(packageFolder, targetFramework)));
+        var refitterDll = GetRefitterDllPath(packageFolder, selectedTargetFramework);
+        TryLogCommandLine($"Using {selectedTargetFramework} version of Refitter.");
 
         var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
         if (DisableLogging)
@@ -133,16 +139,15 @@ public class RefitterGenerateTask : MSBuildTask
         process.BeginErrorReadLine();
         process.BeginOutputReadLine();
 
-        // Wait for process to exit with a reasonable timeout (5 minutes)
-        // to prevent build hangs on network issues or infinite loops
-        const int timeoutMilliseconds = 300000; // 5 minutes
+        var timeoutMilliseconds = checked(timeoutSeconds * 1000);
         if (!process.WaitForExit(timeoutMilliseconds))
         {
             failed = true;
             try
             {
                 process.Kill();
-                TryLogError($"Refitter process timed out after {timeoutMilliseconds / 1000} seconds and was terminated");
+                process.WaitForExit();
+                TryLogError($"Refitter process timed out after {timeoutSeconds} seconds and was terminated");
             }
             catch (Exception ex)
             {
@@ -150,6 +155,8 @@ public class RefitterGenerateTask : MSBuildTask
             }
             return new List<string>();
         }
+
+        process.WaitForExit();
 
         // Check exit code - non-zero indicates failure
         if (process.ExitCode != 0)
@@ -159,8 +166,7 @@ public class RefitterGenerateTask : MSBuildTask
             return new List<string>();
         }
 
-        // Return the list of files that should have been generated
-        return expectedFiles.Where(File.Exists).ToList();
+        return CollectGeneratedFiles(outputPlan, outputSnapshot);
     }
 
     /// <summary>
@@ -190,77 +196,138 @@ public class RefitterGenerateTask : MSBuildTask
         return installedRuntimes;
     }
 
-    /// <summary>
-    /// Determines the expected output files that should be generated from a .refitter configuration file
-    /// </summary>
-    /// <param name="refitterFilePath">Path to the .refitter configuration file</param>
-    /// <returns>List of expected output file paths</returns>
-    private List<string> GetExpectedGeneratedFiles(string refitterFilePath)
+    private RefitterOutputPlan GetOutputPlan(string refitterFilePath)
     {
         try
         {
-            var refitterFileDirectory = Path.GetDirectoryName(refitterFilePath) ?? string.Empty;
             var refitterContent = File.ReadAllText(refitterFilePath);
-
-            // Parse JSON properties using simple regex patterns
-            var outputFolder = ExtractJsonStringValue(refitterContent, "outputFolder");
-            var outputFilename = ExtractJsonStringValue(refitterContent, "outputFilename");
-            var generateMultipleFiles = ExtractJsonBoolValue(refitterContent, "generateMultipleFiles");
-            var contractsOutputFolder = ExtractJsonStringValue(refitterContent, "contractsOutputFolder");
-            var hasDependencyInjectionSettings = refitterContent.Contains("\"dependencyInjectionSettings\"");
-
-            // If contractsOutputFolder is specified, automatically enable multiple files
-            bool hasContractsOutputFolder = !string.IsNullOrWhiteSpace(contractsOutputFolder);
-            generateMultipleFiles = generateMultipleFiles || hasContractsOutputFolder;
-
-            // Default output filename based on .refitter filename if not specified
-            if (string.IsNullOrWhiteSpace(outputFilename))
-            {
-                var refitterFileName = Path.GetFileNameWithoutExtension(refitterFilePath);
-                outputFilename = $"{refitterFileName}.cs";
-            }
-
-            var generatedFiles = new List<string>();
-
-            if (generateMultipleFiles)
-            {
-                // Multiple files mode
-                var baseOutputFolder = !string.IsNullOrWhiteSpace(outputFolder) ? outputFolder : "./Generated";
-                var interfaceOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, baseOutputFolder, "RefitInterfaces.cs"));
-                var contractsOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory,
-                    !string.IsNullOrWhiteSpace(contractsOutputFolder) ? contractsOutputFolder : baseOutputFolder,
-                    "Contracts.cs"));
-                var diOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, baseOutputFolder, "DependencyInjection.cs"));
-
-                generatedFiles.Add(interfaceOutputPath);
-                generatedFiles.Add(contractsOutputPath);
-
-                // DependencyInjection.cs is only generated if dependencyInjectionSettings are specified
-                if (hasDependencyInjectionSettings)
-                {
-                    generatedFiles.Add(diOutputPath);
-                }
-            }
-            else
-            {
-                // Single file mode
-                // If outputFolder is not specified in .refitter, CLI uses default "./Generated"
-                var effectiveOutputFolder = !string.IsNullOrWhiteSpace(outputFolder)
-                    ? outputFolder
-                    : "./Generated";
-
-                var outputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, effectiveOutputFolder, outputFilename));
-                generatedFiles.Add(outputPath);
-            }
-
-            TryLogCommandLine($"Expected generated files: {string.Join(", ", generatedFiles)}");
-            return generatedFiles;
+            var outputPlan = GetOutputPlan(refitterFilePath, refitterContent);
+            var summary = outputPlan.IsMultiFile
+                ? $"Monitoring generated output directories: {string.Join(", ", outputPlan.CandidateDirectories)}"
+                : $"Expected generated file: {outputPlan.SingleFilePath}";
+            TryLogCommandLine(summary);
+            return outputPlan;
         }
         catch (Exception ex)
         {
             TryLogError($"Error parsing .refitter file {refitterFilePath}: {ex.Message}");
-            return new List<string>();
+            return RefitterOutputPlan.Empty;
         }
+    }
+
+    internal static int GetValidatedTimeoutSeconds(int timeoutSeconds) =>
+        timeoutSeconds > 0 ? timeoutSeconds : DefaultTimeoutSeconds;
+
+    internal static string CreateSummaryMessage(int generatedFileCount, bool hasErrors) =>
+        hasErrors
+            ? $"Generation partially completed: generated {generatedFileCount} files before one or more .refitter files failed."
+            : $"Generated {generatedFileCount} files.";
+
+    internal static string SelectRefitterTargetFramework(
+        IEnumerable<string> installedRuntimes,
+        Func<string, bool>? targetExists = null)
+    {
+        targetExists ??= _ => true;
+
+        var candidates = new List<string>();
+        if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 10.", StringComparison.OrdinalIgnoreCase)))
+        {
+            candidates.Add("net10.0");
+        }
+
+        if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 9.", StringComparison.OrdinalIgnoreCase)))
+        {
+            candidates.Add("net9.0");
+        }
+
+        candidates.Add("net8.0");
+
+        return candidates.FirstOrDefault(targetExists) ?? "net8.0";
+    }
+
+    internal static RefitterOutputPlan GetOutputPlan(string refitterFilePath, string refitterContent)
+    {
+        var settings = JsonSerializer.Deserialize<RefitterTaskSettings>(refitterContent, JsonSerializerOptions)
+            ?? new RefitterTaskSettings();
+        var refitterFileDirectory = Path.GetDirectoryName(refitterFilePath) ?? string.Empty;
+        var generateMultipleFiles = settings.GenerateMultipleFiles ||
+                                    !string.IsNullOrWhiteSpace(settings.ContractsOutputFolder);
+
+        if (!generateMultipleFiles)
+        {
+            var outputFilename = !string.IsNullOrWhiteSpace(settings.OutputFilename)
+                ? settings.OutputFilename
+                : $"{Path.GetFileNameWithoutExtension(refitterFilePath)}.cs";
+            var outputFolder = !string.IsNullOrWhiteSpace(settings.OutputFolder)
+                ? settings.OutputFolder
+                : DefaultOutputFolder;
+            var outputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, outputFolder, outputFilename));
+            return RefitterOutputPlan.ForSingleFile(outputPath);
+        }
+
+        var baseOutputFolder = !string.IsNullOrWhiteSpace(settings.OutputFolder)
+            ? settings.OutputFolder
+            : DefaultOutputFolder;
+        var candidateDirectories = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            Path.GetFullPath(Path.Combine(refitterFileDirectory, baseOutputFolder))
+        };
+
+        var contractsOutputFolder = !string.IsNullOrWhiteSpace(settings.ContractsOutputFolder)
+            ? settings.ContractsOutputFolder
+            : baseOutputFolder;
+        candidateDirectories.Add(Path.GetFullPath(Path.Combine(refitterFileDirectory, contractsOutputFolder)));
+
+        return RefitterOutputPlan.ForMultipleFiles(candidateDirectories.ToArray());
+    }
+
+    internal static Dictionary<string, DateTime> CaptureOutputSnapshot(RefitterOutputPlan outputPlan)
+    {
+        var snapshot = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
+        if (!outputPlan.IsMultiFile)
+        {
+            return snapshot;
+        }
+
+        foreach (var directory in outputPlan.CandidateDirectories.Where(Directory.Exists))
+        {
+            foreach (var file in Directory.GetFiles(directory, "*.cs", SearchOption.TopDirectoryOnly))
+            {
+                snapshot[file] = File.GetLastWriteTimeUtc(file);
+            }
+        }
+
+        return snapshot;
+    }
+
+    internal static List<string> CollectGeneratedFiles(
+        RefitterOutputPlan outputPlan,
+        IReadOnlyDictionary<string, DateTime> outputSnapshot)
+    {
+        if (!outputPlan.IsMultiFile)
+        {
+            return !string.IsNullOrWhiteSpace(outputPlan.SingleFilePath) && File.Exists(outputPlan.SingleFilePath)
+                ? new List<string> { outputPlan.SingleFilePath }
+                : new List<string>();
+        }
+
+        var generatedFiles = new List<string>();
+        foreach (var directory in outputPlan.CandidateDirectories.Where(Directory.Exists))
+        {
+            foreach (var file in Directory.GetFiles(directory, "*.cs", SearchOption.TopDirectoryOnly))
+            {
+                var lastWriteTime = File.GetLastWriteTimeUtc(file);
+                if (!outputSnapshot.TryGetValue(file, out var previousWriteTime) ||
+                    previousWriteTime != lastWriteTime)
+                {
+                    generatedFiles.Add(file);
+                }
+            }
+        }
+
+        return generatedFiles
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     private void TryLogErrorFromException(Exception e)
@@ -287,6 +354,18 @@ public class RefitterGenerateTask : MSBuildTask
         }
     }
 
+    private void TryLogWarning(string text)
+    {
+        try
+        {
+            Log.LogWarning(text);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to log warning: {ex}");
+        }
+    }
+
     private void TryLogError(string text)
     {
         try
@@ -300,42 +379,12 @@ public class RefitterGenerateTask : MSBuildTask
     }
 
     /// <summary>
-    /// Extracts a string value from a JSON property using regex pattern matching
-    /// </summary>
-    /// <param name="json">The JSON content to search</param>
-    /// <param name="propertyName">The name of the property to extract</param>
-    /// <returns>The extracted string value, or null if not found</returns>
-    private static string? ExtractJsonStringValue(string json, string propertyName)
-    {
-        // Simple regex to extract string values from JSON
-        // Pattern: "propertyName": "value" or "propertyName":"value"
-        var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*""([^""]*)""";
-        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
-        return match.Success ? match.Groups[1].Value : null;
-    }
-
-    /// <summary>
-    /// Extracts a boolean value from a JSON property using regex pattern matching
-    /// </summary>
-    /// <param name="json">The JSON content to search</param>
-    /// <param name="propertyName">The name of the property to extract</param>
-    /// <returns>True if the property value is "true", false otherwise</returns>
-    private static bool ExtractJsonBoolValue(string json, string propertyName)
-    {
-        // Simple regex to extract boolean values from JSON
-        // Pattern: "propertyName": true or "propertyName":false
-        var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*(true|false)";
-        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
-        return match.Success && string.Equals(match.Groups[1].Value, "true", StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
     /// Filters the list of .refitter files based on include patterns
     /// </summary>
     /// <param name="files">The list of .refitter files to filter</param>
     /// <param name="includePatterns">Semicolon-separated file name patterns to include (e.g. "petstore.refitter;petstore-default.refitter")</param>
     /// <returns>The filtered list of .refitter files</returns>
-    private static string[] FilterFiles(string[] files, string includePatterns)
+    internal static string[] FilterFiles(string[] files, string includePatterns)
     {
         if (string.IsNullOrWhiteSpace(includePatterns))
         {
@@ -348,10 +397,95 @@ public class RefitterGenerateTask : MSBuildTask
 
         return files.Where(file =>
         {
-            var fileName = Path.GetFileName(file);
-            return patterns.Any(pattern =>
-                fileName.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
-                fileName.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0);
+            return patterns.Any(pattern => MatchesIncludePattern(file, pattern));
         }).ToArray();
+    }
+
+    private static bool MatchesIncludePattern(string filePath, string pattern)
+    {
+        var normalizedPattern = pattern.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        var normalizedFilePath = Path.GetFullPath(filePath)
+            .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        var fileName = Path.GetFileName(normalizedFilePath);
+        var containsDirectory = normalizedPattern.Contains(Path.DirectorySeparatorChar);
+        var hasWildcards = normalizedPattern.Contains('*') || normalizedPattern.Contains('?');
+
+        if (!containsDirectory)
+        {
+            return hasWildcards
+                ? Regex.IsMatch(
+                    fileName,
+                    WildcardToRegex(normalizedPattern),
+                    RegexOptions.IgnoreCase,
+                    TimeSpan.FromSeconds(1))
+                : fileName.Equals(normalizedPattern, StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (!hasWildcards)
+        {
+            return Path.IsPathRooted(normalizedPattern)
+                ? normalizedFilePath.Equals(normalizedPattern, StringComparison.OrdinalIgnoreCase)
+                : normalizedFilePath.EndsWith(
+                    $"{Path.DirectorySeparatorChar}{normalizedPattern}",
+                    StringComparison.OrdinalIgnoreCase);
+        }
+
+        var pathPattern = Path.IsPathRooted(normalizedPattern)
+            ? normalizedPattern
+            : $"*{Path.DirectorySeparatorChar}{normalizedPattern}";
+        return Regex.IsMatch(
+            normalizedFilePath,
+            WildcardToRegex(pathPattern),
+            RegexOptions.IgnoreCase,
+            TimeSpan.FromSeconds(1));
+    }
+
+    private static string WildcardToRegex(string pattern) =>
+        $"^{Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".")}$";
+
+    private static string GetRefitterDllPath(string packageFolder, string targetFramework) =>
+        Path.GetFullPath(Path.Combine(packageFolder, "..", targetFramework, "refitter.dll"));
+
+    private const string DefaultOutputFolder = "./Generated";
+
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        AllowTrailingCommas = true,
+        PropertyNameCaseInsensitive = true,
+        ReadCommentHandling = JsonCommentHandling.Skip,
+    };
+
+    internal readonly struct RefitterOutputPlan
+    {
+        public RefitterOutputPlan(string? singleFilePath, string[] candidateDirectories)
+        {
+            SingleFilePath = singleFilePath;
+            CandidateDirectories = candidateDirectories;
+        }
+
+        public static RefitterOutputPlan Empty { get; } = new(null, Array.Empty<string>());
+
+        public string? SingleFilePath { get; }
+
+        public string[] CandidateDirectories { get; }
+
+        public bool IsMultiFile => CandidateDirectories.Length > 0;
+
+        public static RefitterOutputPlan ForSingleFile(string outputPath) =>
+            new(outputPath, Array.Empty<string>());
+
+        public static RefitterOutputPlan ForMultipleFiles(string[] candidateDirectories) =>
+            new(null, candidateDirectories);
+    }
+
+    private sealed class RefitterTaskSettings
+    {
+        public string? OutputFolder { get; set; }
+
+        public string? OutputFilename { get; set; }
+
+        public bool GenerateMultipleFiles { get; set; }
+
+        public string? ContractsOutputFolder { get; set; }
     }
 }

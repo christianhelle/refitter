@@ -17,7 +17,11 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         {
             foreach (var kvp in document.Components.Schemas)
             {
-                kvp.Value.ActualSchema.AllowAdditionalProperties = false;
+                var schema = kvp.Value?.ActualSchema;
+                if (schema == null)
+                    continue;
+
+                schema.AllowAdditionalProperties = false;
             }
         }
 
@@ -71,7 +75,8 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         // Note: This is a behavioral change from v1.x where GenerateOptionalPropertiesAsNullable
         // defaulted to false. If you need the old behavior, explicitly set
         // GenerateOptionalPropertiesAsNullable = false in your settings.
-        if (generator.Settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes)
+        if (generator.Settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes &&
+            settings.CodeGeneratorSettings?.GenerateOptionalPropertiesAsNullableWasSet != true)
         {
             generator.Settings.CSharpGeneratorSettings.GenerateOptionalPropertiesAsNullable = true;
         }

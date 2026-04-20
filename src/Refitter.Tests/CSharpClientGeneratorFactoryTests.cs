@@ -1,4 +1,6 @@
 using FluentAssertions;
+using NJsonSchema;
+using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
@@ -552,6 +554,54 @@ public class CSharpClientGeneratorFactoryTests
         }
         """;
 
+    private const string OptionalPropertiesOpenApiSpec = """
+        {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Optional Properties Test API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/items": {
+              "post": {
+                "operationId": "CreateItem",
+                "requestBody": {
+                  "required": true,
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/Item"
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "200": {
+                    "description": "Success"
+                  }
+                }
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "Item": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
     [Test]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesFalse_DoesNotGenerateAdditionalProperties()
     {
@@ -602,6 +652,44 @@ public class CSharpClientGeneratorFactoryTests
             .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
+    }
+
+    [Test]
+    public void Create_WithNullSchemaEntries_DoesNotThrow_When_DisablingAdditionalProperties()
+    {
+        var document = new OpenApiDocument();
+        document.Components.Schemas["Valid"] = new JsonSchema();
+        document.Components.Schemas["Missing"] = null!;
+
+        var settings = new RefitGeneratorSettings
+        {
+            GenerateDefaultAdditionalProperties = false
+        };
+
+        var act = () => new CSharpClientGeneratorFactory(settings, document).Create();
+
+        act.Should().NotThrow();
+        document.Components.Schemas["Valid"].ActualSchema.AllowAdditionalProperties.Should().BeFalse();
+    }
+
+    [Test]
+    public async Task Create_WithNullableReferenceTypes_And_ExplicitFalse_DoesNot_AutoEnable_OptionalNullableProperties()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OptionalPropertiesOpenApiSpec);
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var settings = new RefitGeneratorSettings
+        {
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = false
+            }
+        };
+
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+
+        generator.Settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes.Should().BeTrue();
+        generator.Settings.CSharpGeneratorSettings.GenerateOptionalPropertiesAsNullable.Should().BeFalse();
     }
 
     private static async Task<string> GenerateCodeWithAdditionalProperties(bool generateDefaultAdditionalProperties)

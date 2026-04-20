@@ -60,6 +60,51 @@ public class IdentifierCorrectnessTests
         }
         """;
 
+    private const string MultipartFormDataWithCollidingSanitizedNames = """
+        {
+          "openapi": "3.0.1",
+          "info": {
+            "title": "Test API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/upload": {
+              "post": {
+                "operationId": "UploadFile",
+                "requestBody": {
+                  "content": {
+                    "multipart/form-data": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "Class": {
+                            "type": "string"
+                          },
+                          "class": {
+                            "type": "string"
+                          },
+                          "user-name": {
+                            "type": "string"
+                          },
+                          "user_name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "200": {
+                    "description": "Success"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
     [Test]
     public async Task Can_Generate_Code_With_Invalid_Multipart_Identifiers()
     {
@@ -95,6 +140,24 @@ public class IdentifierCorrectnessTests
     public async Task Generated_Code_With_Invalid_Multipart_Identifiers_Compiles()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Multipart_CamelCased_Reserved_Keywords_Are_Escaped()
+    {
+        var generatedCode = await GenerateCode(MultipartFormDataWithCollidingSanitizedNames);
+        generatedCode.Should().Contain("[AliasAs(\"Class\")] string @class");
+    }
+
+    [Test]
+    public async Task Multipart_Deduplicates_Sanitized_Variable_Names()
+    {
+        var generatedCode = await GenerateCode(MultipartFormDataWithCollidingSanitizedNames);
+        generatedCode.Should().Contain("[AliasAs(\"Class\")] string @class");
+        generatedCode.Should().NotContain("[AliasAs(\"class\")] string @class");
+        generatedCode.Should().Contain("[AliasAs(\"user-name\")] string user_name");
+        generatedCode.Should().NotContain("[AliasAs(\"user_name\")] string user_name");
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 

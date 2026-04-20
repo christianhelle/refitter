@@ -85,20 +85,22 @@ internal static class ParameterExtractor
             }
         }
 
+        var seenFormParameterNames = new HashSet<string>(StringComparer.Ordinal);
         var formParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
             .Select(p =>
             {
                 var variableName = GetVariableName(p);
-                return $"{JoinAttributes(GetAliasAsAttribute(p.Name, variableName))}{GetParameterType(p, settings)} {variableName}";
+                return new
+                {
+                    Parameter = p,
+                    VariableName = variableName,
+                    Code = $"{JoinAttributes(GetAliasAsAttribute(p.Name, variableName))}{GetParameterType(p, settings)} {variableName}"
+                };
             })
+            .Where(p => TryRegisterFormParameterName(seenFormParameterNames, p.Parameter.Name, p.VariableName))
+            .Select(p => p.Code)
             .ToList();
-
-        var seenFormParameterNames = new HashSet<string>(
-            operationModel.Parameters
-                .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
-                .Select(p => p.Name),
-            StringComparer.Ordinal);
 
         // Manually extract non-binary properties from multipart/form-data in OpenAPI 3.x
         // NSwag doesn't populate these in operationModel.Parameters
@@ -129,7 +131,7 @@ internal static class ParameterExtractor
 
                         var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
 
-                        if (seenFormParameterNames.Add(property.Key))
+                        if (TryRegisterFormParameterName(seenFormParameterNames, property.Key, variableName))
                         {
                             formParameters.Add(parameter);
                         }
@@ -609,14 +611,30 @@ $$"""
 
         // Use ToCompilableIdentifier to handle reserved keywords and invalid characters
         var identifier = IdentifierUtils.ToCompilableIdentifier(propertyName);
+        var unescapedIdentifier = identifier.StartsWith("@", StringComparison.Ordinal)
+            ? identifier.Substring(1)
+            : identifier;
 
         // Convert first character to lowercase for camelCase, if it's a letter
-        if (identifier.Length > 0 && char.IsUpper(identifier[0]))
+        if (unescapedIdentifier.Length > 0 && char.IsUpper(unescapedIdentifier[0]))
         {
-            return char.ToLowerInvariant(identifier[0]) + identifier.Substring(1);
+            unescapedIdentifier = char.ToLowerInvariant(unescapedIdentifier[0]) + unescapedIdentifier.Substring(1);
         }
 
-        return identifier;
+        return IdentifierUtils.EscapeReservedKeyword(unescapedIdentifier);
+    }
+
+    private static bool TryRegisterFormParameterName(ISet<string> seenFormParameterNames, string originalName, string variableName)
+    {
+        var alternateVariableName = ConvertToVariableName(originalName);
+        if (seenFormParameterNames.Contains(variableName) || seenFormParameterNames.Contains(alternateVariableName))
+        {
+            return false;
+        }
+
+        seenFormParameterNames.Add(variableName);
+        seenFormParameterNames.Add(alternateVariableName);
+        return true;
     }
 
     private static string GetVariableName(ParameterModelBase parameterModel)

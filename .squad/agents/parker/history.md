@@ -229,3 +229,82 @@ Created comprehensive regression tests in `IdentifierCorrectnessTests.cs` coveri
 - `src/Refitter.Tests/Examples/IdentifierCorrectnessTests.cs` (regression tests)
 
 **Build Status**: ✅ Core and CLI projects build successfully with only pre-existing warnings.
+
+## 2026-04-20: Core Finding Verification Sweep
+
+**Task**: Verify Parker-owned core review findings against current code, fix only the ones still applicable, and avoid stale-review churn.
+
+**Already Fixed / Stale Findings**:
+- `ParameterExtractor` already escaped `AliasAs(...)` literals through `EscapeString(...)`.
+- `ReOrderNullableParameters()` already accepted optional verbatim identifiers via `@?\w+`.
+- `OpenApiDocumentFactory.CreateAsync(IEnumerable<string>)` already threw `ArgumentNullException` for null and `ArgumentException` for empty input; only the XML docs were stale.
+
+**Completed Fixes**:
+1. **Contract type suffix rewriting**:
+   - `ContractTypeSuffixApplier` now builds its rename map only for non-colliding declarations and skips names whose suffixed form already exists.
+   - The Roslyn rewriter now renames only declarations plus true type-reference syntax nodes, so method calls and `nameof(...)` operands are left alone while `typeof(...)` and generic type arguments still update.
+2. **Optional-nullability tri-state**:
+   - `CodeGeneratorSettings.GenerateOptionalPropertiesAsNullable` now tracks whether callers explicitly assigned the setting.
+   - `CSharpClientGeneratorFactory` only auto-enables optional-property nullability when NRT is enabled **and** the setting was not explicitly set to false.
+3. **Multipart/form-data parameter safety**:
+   - `ParameterExtractor` now re-escapes reserved keywords after camel-casing multipart property names.
+   - Multipart deduplication now uses emitted/sanitized variable names so NSwag-provided form parameters and manual multipart extraction cannot emit duplicate `@class` / `user_name` parameters.
+4. **Custom type nullability**:
+   - `CustomCSharpTypeResolver` treats `DateOnly` and `TimeOnly` as known value types, so nullable mappings append `?` correctly.
+5. **XML doc decoding maintenance**:
+   - `XmlDocumentationGenerator.DecodeJsonEscapedText` was split into small helper methods without changing behavior; the malformed-unicode regression coverage still passes.
+
+**Test Coverage Added/Updated**:
+- `src/Refitter.Tests/Examples/ContractTypeSuffixTests.cs`
+- `src/Refitter.Tests/Examples/IdentifierCorrectnessTests.cs`
+- `src/Refitter.Tests/CustomCSharpTypeResolverTests.cs`
+- `src/Refitter.Tests/CSharpClientGeneratorFactoryTests.cs`
+
+**Validation**:
+- Ran `dotnet format src\Refitter.slnx`
+- Ran `dotnet build -c Release src\Refitter.slnx --no-restore`
+- Ran `dotnet test --solution src\Refitter.slnx -c Release --no-restore`
+- Ran `dotnet format --verify-no-changes src\Refitter.slnx`
+
+**Key File Paths**:
+- `src/Refitter.Core/ContractTypeSuffixApplier.cs`
+- `src/Refitter.Core/CSharpClientGeneratorFactory.cs`
+- `src/Refitter.Core/Settings/CodeGeneratorSettings.cs`
+- `src/Refitter.Core/ParameterExtractor.cs`
+- `src/Refitter.Core/CustomCSharpTypeResolver.cs`
+- `src/Refitter.Core/XmlDocumentationGenerator.cs`
+
+### 2026-04-20: Lambert Follow-Up on Live Core Findings
+
+**Task**: Re-check Lambert's re-audit and spend time only on still-live core watch areas.
+
+**Follow-up Work**:
+- Strengthened `ContractTypeSuffixTests` so pre-existing suffixed declarations now assert both the original type declaration **and** method signatures stay unsuffixed (`Task<Pet>`, `Task<ICollection<Pet>>`) when a collision would occur.
+- Added an end-to-end regression in `DynamicQueryStringParametersEdgeCasesTests` proving dynamic query wrappers expose only `queryParams` plus non-query parameters in XML docs while still generating the wrapped query properties (`@class`, `Page_size`) correctly.
+
+**Practical Takeaway**:
+- For `ParameterExtractor` watch areas, the most stable regression is end-to-end generated code: assert emitted method signature, XML doc params, wrapped query DTO properties, and successful compilation in one test rather than testing internal list mutation directly.
+
+### 2026-04-20: Findings Verification & Team Orchestration
+
+**Task**: Scribe session — Parker spawn verification sweep.
+
+**Scope**: Re-verify all core-owned findings from v2.0 audit in orchestrated spawn. Commit only the still-live fixes. Coordinate with Dallas (tooling) and Lambert (tester) for cross-agent validation.
+
+**Outcomes**:
+✅ Tri-state nullable handling: Auto-enable only when caller did not explicitly assign; explicit `false` wins
+✅ Contract-type rename safety: Type-reference contexts only; exclude blanket SimpleName rewrites
+✅ ParameterExtractor watch areas: Documented for regression coverage; no additional fixes needed
+✅ All P0 and P1 core findings fixed or documented
+✅ 25 regression tests created by Lambert, ready to validate
+
+**Decision Points Recorded**:
+- Tri-state design prevents heuristics from overriding user intent (decisions.md:2026-04-20)
+- Regex-on-raw-source fundamentally unsafe; type-reference-only scope prevents false positives (decisions.md:2026-04-20)
+- ParameterExtractor regressions best covered end-to-end in integration tests (decisions.md:2026-04-20)
+
+**Session Log**: `.squad/log/2026-04-20T13-04-01Z-findings-verification.md`
+
+**Orchestration Log**: `.squad/orchestration-log/2026-04-20T13-04-01Z-parker.md`
+
+**Next Steps**: Ready for final integration testing and v2.0.0 release.

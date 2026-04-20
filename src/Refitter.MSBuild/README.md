@@ -19,7 +19,8 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
 <Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
     <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                           DisableLogging="$(RefitterNoLogging)"
-                          SkipValidation="$(RefitterSkipValidation)">
+                          SkipValidation="$(RefitterSkipValidation)"
+                          TimeoutSeconds="$(RefitterTimeoutSeconds)">
         <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
     </RefitterGenerateTask>
     <ItemGroup>
@@ -45,6 +46,14 @@ You can also skip OpenAPI validation by setting:
 ```xml
 <PropertyGroup>
   <RefitterSkipValidation>true</RefitterSkipValidation>
+</PropertyGroup>
+```
+
+To change the MSBuild task timeout (default: 300 seconds), set:
+
+```xml
+<PropertyGroup>
+  <RefitterTimeoutSeconds>600</RefitterTimeoutSeconds>
 </PropertyGroup>
 ```
 

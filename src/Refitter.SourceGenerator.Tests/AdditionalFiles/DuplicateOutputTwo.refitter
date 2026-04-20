@@ -1,0 +1,11 @@
+{
+  "openApiPath": "../Resources/V3/SwaggerPetstore.json",
+  "namespace": "Refitter.Tests.AdditionalFiles.DuplicateOutput.Two",
+  "outputFilename": "SharedOutput.cs",
+  "generateContracts": false,
+  "additionalNamespaces": ["Refitter.Tests.AdditionalFiles.SingeInterface"],
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "DuplicateOutputTwoApi"
+  }
+}

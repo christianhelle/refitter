@@ -81,34 +81,10 @@ public static class SettingsValidator
             return fileAndOutputResult;
         }
 
-        // Then populate settings.OpenApiPath and validate file existence
-        if (refitGeneratorSettings.OpenApiPaths is { Length: > 0 })
+        var openApiValidationResult = ValidateAndResolveOpenApiSpecPaths(settings, refitGeneratorSettings);
+        if (!openApiValidationResult.Successful)
         {
-            settings.OpenApiPath = refitGeneratorSettings.OpenApiPaths[0];
-
-            // Validate all OpenApiPaths entries
-            var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settings.SettingsFilePath!)) ?? string.Empty;
-            for (var i = 0; i < refitGeneratorSettings.OpenApiPaths.Length; i++)
-            {
-                var path = refitGeneratorSettings.OpenApiPaths[i];
-                if (!IsUrl(path))
-                {
-                    // Resolve relative paths from settings file directory
-                    var fullPath = Path.IsPathRooted(path)
-                        ? path
-                        : Path.GetFullPath(Path.Combine(settingsFileDirectory, path));
-
-                    if (!File.Exists(fullPath))
-                    {
-                        return ValidationResult.Error(
-                            $"OpenAPI specification file not found in openApiPaths[{i}]: {fullPath}");
-                    }
-                }
-            }
-        }
-        else if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
-        {
-            settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
+            return openApiValidationResult;
         }
 
         // Apply defaults before returning cached settings
@@ -178,7 +154,7 @@ public static class SettingsValidator
         // If we have a single path, validate it
         if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
         {
-            return IsUrl(settings.OpenApiPath) ? ValidationResult.Success() : ValidateFileExistence(settings);
+            return SettingsFilePathResolver.IsUrl(settings.OpenApiPath) ? ValidationResult.Success() : ValidateFileExistence(settings);
         }
 
         // For settings file path, the validator would have already loaded and set settings.OpenApiPath
@@ -197,10 +173,38 @@ public static class SettingsValidator
             : ValidationResult.Error($"File not found - {Path.GetFullPath(settings.OpenApiPath!)}");
     }
 
-    private static bool IsUrl(string openApiPath)
+    private static ValidationResult ValidateAndResolveOpenApiSpecPaths(
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings)
     {
-        return Uri.TryCreate(openApiPath, UriKind.Absolute, out var uriResult) &&
-               (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+        SettingsFilePathResolver.ResolveOpenApiSpecPaths(settings.SettingsFilePath!, refitGeneratorSettings);
+
+        if (refitGeneratorSettings.OpenApiPaths is { Length: > 0 })
+        {
+            settings.OpenApiPath = refitGeneratorSettings.OpenApiPaths[0];
+
+            for (var i = 0; i < refitGeneratorSettings.OpenApiPaths.Length; i++)
+            {
+                var path = refitGeneratorSettings.OpenApiPaths[i];
+                if (!SettingsFilePathResolver.IsUrl(path) && !File.Exists(path))
+                {
+                    return ValidationResult.Error(
+                        $"OpenAPI specification file not found in openApiPaths[{i}]: {path}");
+                }
+            }
+
+            return ValidationResult.Success();
+        }
+
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
+        {
+            settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
+            return SettingsFilePathResolver.IsUrl(refitGeneratorSettings.OpenApiPath)
+                ? ValidationResult.Success()
+                : ValidateFileExistence(settings);
+        }
+
+        return ValidationResult.Success();
     }
 
     private static string ExtractEnumNameFromException(JsonException ex)

@@ -1,5 +1,89 @@
 # Squad Decisions
 
+## 2026-04-20
+
+### Core Findings Post-Audit: Tri-State Nullable Handling
+
+**Decided By:** Parker (Core Developer)  
+**Status:** IMPLEMENTED
+
+Treat `CodeGeneratorSettings.GenerateOptionalPropertiesAsNullable` as a tri-state at the Refitter layer:
+- Auto-enable for NRT only when the caller did **not** explicitly assign the setting
+- Explicit `false` must win over the convenience default
+- Prevents user-intended nullable behavior from being overridden by heuristics
+
+**Rationale:** NRT is a strong signal of intent; explicit `false` indicates deliberate opt-out.
+
+---
+
+### Core Findings Post-Audit: Contract Type Rename Safety
+
+**Decided By:** Parker (Core Developer)  
+**Status:** IMPLEMENTED
+
+Any post-generation contract-type rename pass must:
+1. Build rename map only after collision checks
+2. Restrict Roslyn `SimpleName` rewrites to type-reference contexts only
+3. Exclude blanket simple-name rewriting to prevent regressions in:
+   - `nameof(...)` expressions
+   - Method calls
+   - Other expression identifiers
+
+**Rationale:** Regex-on-raw-source is fundamentally unsafe; word boundaries are insufficient. Type-reference-only scope prevents false positives.
+
+---
+
+### Core Findings Post-Audit: ParameterExtractor Regression Watch Areas
+
+**Decided By:** Parker (Core Developer)  
+**Status:** DOCUMENTED FOR FOLLOW-UP
+
+For `ParameterExtractor` dynamic-query watch areas, prefer end-to-end regression coverage around:
+- Emitted signatures
+- XML documentation
+- Query-wrapper DTOs
+
+**Note:** No concrete behavior regression was reproduced beyond the already-fixed dedupe issues. Monitor for future regressions as code evolves.
+
+---
+
+### Tooling Findings Post-Audit: Spec Path Resolution & CLI Override Precedence
+
+**Decided By:** Dallas (Tooling Developer)  
+**Status:** IMPLEMENTED
+
+When Refitter is driven from a `.refitter` file:
+1. Every tooling surface resolves OpenAPI spec paths relative to the `.refitter` file itself **before** validation or generation
+2. Explicit CLI `--output` must override settings-file output folders for multi-file generation (including `Contracts.cs`)
+3. Shared CLI helper centralizes path resolution logic
+
+**Rationale:** Relative path handling had diverged between CLI validation, CLI generation, and source generator flows, causing "works in one surface, breaks in another" regressions.
+
+**Implementation:**
+- Shared helper: `src\Refitter\SettingsFilePathResolver.cs`
+- CLI writer: `src\Refitter\GenerateCommand.cs`
+- CLI validator: `src\Refitter\SettingsValidator.cs`
+- Source generator: `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs`
+- MSBuild: `src\Refitter.MSBuild\RefitterGenerateTask.cs`
+
+---
+
+### Tooling Findings Post-Audit: Prediction-Free Assumption Design
+
+**Decided By:** Dallas (Tooling Developer)  
+**Status:** IMPLEMENTED
+
+Tooling layers should avoid prediction-by-assumption:
+
+1. **Source-generator incremental payloads**: Use value semantics so Roslyn incremental caching can treat unchanged `.refitter` inputs as unchanged work
+2. **Source-generator warnings**: Emit user-visible warning when zero `.refitter` AdditionalFiles present
+3. **MSBuild discovery**: Discover generated outputs by configured output locations + post-run file changes, not regex-parsed settings into hardcoded filenames
+4. **Include patterns**: Use exact or wildcard matches, never substring containment
+
+**Rationale:** Roslyn's incremental system relies on stable reference semantics; assumption-based path prediction causes sync mismatches.
+
+---
+
 ## 2026-04-18
 
 ### P0 Audit Findings - Critical Generator Bugs

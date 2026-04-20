@@ -325,9 +325,12 @@ public class ContractTypeSuffixTests
         // Pre-existing PetDto should not be renamed
         result.Should().Contain("public partial class PetDto { }");
 
-        // Original Pet class should be renamed to PetDto
-        // This creates a collision, but that's the behavior - we don't double-suffix
-        // The test verifies no "PetDtoDto" is created
+        // Original Pet class and references should stay unchanged when the suffixed name already exists
+        result.Should().Contain("public partial class Pet");
+        result.Should().Contain("Task<ICollection<Pet>>");
+        result.Should().Contain("Task<Pet>");
+        result.Should().NotContain("Task<ICollection<PetDto>>");
+        result.Should().NotContain("Task<PetDto>");
         result.Should().NotContain("PetDtoDto");
     }
 
@@ -371,6 +374,52 @@ public class ContractTypeSuffixTests
 
         // But Owner class should be renamed
         result.Should().Contain("public partial class OwnerDto");
+    }
+
+    [Test]
+    public void Renames_Only_True_Type_References()
+    {
+        const string generatedCode = """
+using System;
+
+namespace Demo
+{
+public partial class Pet
+{
+}
+
+public partial class Owner
+{
+    public string Label => nameof(Pet);
+
+    public void Pet()
+    {
+    }
+
+    public void Run()
+    {
+        Pet();
+        var petType = typeof(Pet);
+        Demo.Serializer.Serialize<Pet>(default);
+    }
+}
+
+public static class Serializer
+{
+    public static void Serialize<T>(T value)
+    {
+    }
+}
+}
+""";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(generatedCode, "Dto");
+
+        result.Should().Contain("public partial class PetDto");
+        result.Should().Contain("nameof(Pet)");
+        result.Should().Contain("Pet();");
+        result.Should().Contain("typeof(PetDto)");
+        result.Should().Contain("Demo.Serializer.Serialize<PetDto>(default);");
     }
 
     private static async Task<string> GenerateCode(string? contractTypeSuffix)

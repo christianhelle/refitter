@@ -1,5 +1,7 @@
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Refitter.Core;
 
@@ -12,6 +14,15 @@ namespace Refitter.SourceGenerator;
 [Generator(LanguageNames.CSharp)]
 public class RefitterSourceGenerator : IIncrementalGenerator
 {
+    internal static readonly DiagnosticDescriptor NoRefitterFilesDescriptor =
+        new(
+            "REFITTER003",
+            "Refitter",
+            "No .refitter files were found. Add one as an AdditionalFiles item, for example: <AdditionalFiles Include=\"Petstore.refitter\" />",
+            "Refitter",
+            DiagnosticSeverity.Warning,
+            true);
+
     /// <summary>
     /// Initializes the incremental generator with the necessary configurations.
     /// </summary>
@@ -33,7 +44,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         {
             if (paths.Length == 0)
             {
-                // log a warning if no .refitter files were found, instructing the user how to add them
+                spc.ReportDiagnostic(Diagnostic.Create(NoRefitterFilesDescriptor, Location.None));
                 Debug.WriteLine("[Refitter] No .refitter files found. Ensure they are added to your project as `<AdditionalFiles Include=\"Petstore.refitter\" />`");
                 return;
             }
@@ -49,11 +60,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         context.RegisterImplementationSourceOutput(refitterFiles.Select(GenerateCode), ProcessResults);
     }
 
-    private static void ProcessResults(SourceProductionContext context, GeneratedCode result)
+    private static void ProcessResults(SourceProductionContext context, GeneratedSourceResult result)
     {
         foreach (var diagnostic in result.Diagnostics)
         {
-            context.ReportDiagnostic(diagnostic);
+            context.ReportDiagnostic(diagnostic.ToDiagnostic());
         }
 
         if (result.Code is not null && result.HintName is not null)
@@ -76,23 +87,20 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
         Justification = "By design")]
-    private static GeneratedCode GenerateCode(
+    private static GeneratedSourceResult GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var diagnostics = new List<Diagnostic>
-        {
-            Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    "REFITTER001",
-                    "Refitter",
-                    $"Found .refitter File: {file.Path}",
-                    "Refitter",
-                    DiagnosticSeverity.Info,
-                    true),
-                Location.None)
-        };
+        var diagnostics = ImmutableArray.CreateBuilder<DiagnosticInfo>();
+        diagnostics.Add(
+            new DiagnosticInfo(
+                "REFITTER001",
+                "Refitter",
+                $"Found .refitter File: {file.Path}",
+                "Refitter",
+                DiagnosticSeverity.Info,
+                true));
 
         try
         {
@@ -100,45 +108,34 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var json = content.ToString();
 
             diagnostics.Add(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER001",
-                        "Refitter File Contents",
-                        json,
-                        "Refitter",
-                        DiagnosticSeverity.Info,
-                        true),
-                    Location.None));
+                new DiagnosticInfo(
+                    "REFITTER001",
+                    "Refitter File Contents",
+                    json,
+                    "Refitter",
+                    DiagnosticSeverity.Info,
+                    true));
 
             var settings = TryDeserialize(json, diagnostics);
             if (settings is null)
             {
-                return new GeneratedCode(diagnostics);
+                return new GeneratedSourceResult(diagnostics.ToImmutable());
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
-                !settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
-                !File.Exists(settings.OpenApiPath))
-            {
-                settings.OpenApiPath = Path.Combine(
-                    Path.GetDirectoryName(file.Path)!,
-                    settings.OpenApiPath);
-            }
+            ResolveOpenApiSpecPaths(settings, file.Path);
 
             if (settings.UseIsoDateFormat &&
                 settings.CodeGeneratorSettings?.DateFormat is not null)
             {
                 diagnostics.Add(
-                    Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "REFITTER002",
-                            "Warning",
-                            "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
-                            "Refitter",
-                            DiagnosticSeverity.Warning,
-                            true),
-                        Location.None));
+                    new DiagnosticInfo(
+                        "REFITTER002",
+                        "Warning",
+                        "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
+                        "Refitter",
+                        DiagnosticSeverity.Warning,
+                        true));
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -151,26 +148,26 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             // when multiple .refitter files with the same name exist in different directories
             var hintName = CreateUniqueHintName(file.Path, settings.OutputFilename);
 
-            return new GeneratedCode(diagnostics, refit, hintName);
+            return new GeneratedSourceResult(diagnostics.ToImmutable(), refit, hintName);
         }
         catch (Exception e)
         {
             diagnostics.Add(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER000",
-                        "Error",
-                        $"Refitter failed to generate code: {e}",
-                        "Refitter",
-                        DiagnosticSeverity.Error,
-                        true),
-                    Location.None));
+                new DiagnosticInfo(
+                    "REFITTER000",
+                    "Error",
+                    $"Refitter failed to generate code: {e}",
+                    "Refitter",
+                    DiagnosticSeverity.Error,
+                    true));
 
-            return new GeneratedCode(diagnostics);
+            return new GeneratedSourceResult(diagnostics.ToImmutable());
         }
     }
 
-    private static RefitGeneratorSettings? TryDeserialize(string json, List<Diagnostic> diagnostics)
+    private static RefitGeneratorSettings? TryDeserialize(
+        string json,
+        ImmutableArray<DiagnosticInfo>.Builder diagnostics)
     {
         try
         {
@@ -179,16 +176,13 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         catch (Exception e)
         {
             diagnostics.Add(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER000",
-                        "Error",
-                        $"Unable to deserialize .refitter file: {e}",
-                        "Refitter",
-                        DiagnosticSeverity.Info,
-                        true
-                    ),
-                    Location.None
+                new DiagnosticInfo(
+                    "REFITTER000",
+                    "Error",
+                    $"Unable to deserialize .refitter file: {e}",
+                    "Refitter",
+                    DiagnosticSeverity.Info,
+                    true
                 )
             );
 
@@ -198,7 +192,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
     /// <summary>
     /// Creates a unique hint name for AddSource that prevents collisions when multiple
-    /// .refitter files with the same name exist in different directories.
+    /// .refitter files resolve to the same output filename.
     /// </summary>
     /// <param name="refitterFilePath">The full path to the .refitter file</param>
     /// <param name="outputFilename">Optional explicit output filename from settings</param>
@@ -206,7 +200,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     private static string CreateUniqueHintName(string refitterFilePath, string? outputFilename)
     {
         // If an explicit output filename is set, use it as the base for the hint name
-        // but still include path disambiguation to prevent collisions
+        // but still include path disambiguation to prevent collisions.
         var baseName = !string.IsNullOrWhiteSpace(outputFilename)
             ? Path.GetFileNameWithoutExtension(outputFilename)
             : Path.GetFileNameWithoutExtension(refitterFilePath);
@@ -216,18 +210,10 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             baseName = "Refitter";
         }
 
-        // Create a stable unique suffix from the directory path to prevent collisions
-        // Use the full path, normalize separators, and create a hash-like identifier
-        var directory = Path.GetDirectoryName(refitterFilePath);
-        if (!string.IsNullOrEmpty(directory))
-        {
-            // Normalize path separators and compute a stable hash
-            var normalizedPath = directory.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            var pathHash = GetStableHash(normalizedPath);
-            return $"{baseName}_{pathHash}.g.cs";
-        }
-
-        return $"{baseName}.g.cs";
+        var normalizedPath = Path.GetFullPath(refitterFilePath)
+            .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        var pathHash = GetStableHash(normalizedPath);
+        return $"{baseName}_{pathHash}.g.cs";
     }
 
     /// <summary>
@@ -248,5 +234,139 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private record GeneratedCode(List<Diagnostic> Diagnostics, string? Code = null, string? HintName = null);
+    private static void ResolveOpenApiSpecPaths(RefitGeneratorSettings settings, string refitterFilePath)
+    {
+        if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
+        {
+            settings.OpenApiPath = ResolveOpenApiSpecPath(settings.OpenApiPath, refitterFilePath);
+        }
+
+        if (settings.OpenApiPaths is not { Length: > 0 })
+        {
+            return;
+        }
+
+        for (var i = 0; i < settings.OpenApiPaths.Length; i++)
+        {
+            settings.OpenApiPaths[i] = ResolveOpenApiSpecPath(settings.OpenApiPaths[i], refitterFilePath);
+        }
+    }
+
+    private static string? ResolveOpenApiSpecPath(string? openApiPath, string refitterFilePath)
+    {
+        if (string.IsNullOrWhiteSpace(openApiPath) ||
+            openApiPath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            openApiPath.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
+            Path.IsPathRooted(openApiPath))
+        {
+            return openApiPath;
+        }
+
+        var root = Path.GetDirectoryName(Path.GetFullPath(refitterFilePath)) ?? string.Empty;
+        return Path.GetFullPath(Path.Combine(root, openApiPath));
+    }
+
+    internal readonly struct DiagnosticInfo : IEquatable<DiagnosticInfo>
+    {
+        public DiagnosticInfo(
+            string id,
+            string title,
+            string message,
+            string category,
+            DiagnosticSeverity severity,
+            bool isEnabledByDefault)
+        {
+            Id = id;
+            Title = title;
+            Message = message;
+            Category = category;
+            Severity = severity;
+            IsEnabledByDefault = isEnabledByDefault;
+        }
+
+        public string Id { get; }
+
+        public string Title { get; }
+
+        public string Message { get; }
+
+        public string Category { get; }
+
+        public DiagnosticSeverity Severity { get; }
+
+        public bool IsEnabledByDefault { get; }
+
+        public Diagnostic ToDiagnostic() =>
+            Diagnostic.Create(
+                new DiagnosticDescriptor(Id, Title, Message, Category, Severity, IsEnabledByDefault),
+                Location.None);
+
+        public bool Equals(DiagnosticInfo other) =>
+            string.Equals(Id, other.Id, StringComparison.Ordinal) &&
+            string.Equals(Title, other.Title, StringComparison.Ordinal) &&
+            string.Equals(Message, other.Message, StringComparison.Ordinal) &&
+            string.Equals(Category, other.Category, StringComparison.Ordinal) &&
+            Severity == other.Severity &&
+            IsEnabledByDefault == other.IsEnabledByDefault;
+
+        public override bool Equals(object? obj) => obj is DiagnosticInfo other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hash = 17;
+                hash = (hash * 31) + StringComparer.Ordinal.GetHashCode(Id);
+                hash = (hash * 31) + StringComparer.Ordinal.GetHashCode(Title);
+                hash = (hash * 31) + StringComparer.Ordinal.GetHashCode(Message);
+                hash = (hash * 31) + StringComparer.Ordinal.GetHashCode(Category);
+                hash = (hash * 31) + Severity.GetHashCode();
+                hash = (hash * 31) + IsEnabledByDefault.GetHashCode();
+                return hash;
+            }
+        }
+    }
+
+    internal readonly struct GeneratedSourceResult : IEquatable<GeneratedSourceResult>
+    {
+        public GeneratedSourceResult(
+            ImmutableArray<DiagnosticInfo> diagnostics,
+            string? code = null,
+            string? hintName = null)
+        {
+            Diagnostics = diagnostics;
+            Code = code;
+            HintName = hintName;
+        }
+
+        public ImmutableArray<DiagnosticInfo> Diagnostics { get; }
+
+        public string? Code { get; }
+
+        public string? HintName { get; }
+
+        public bool Equals(GeneratedSourceResult other) =>
+            string.Equals(Code, other.Code, StringComparison.Ordinal) &&
+            string.Equals(HintName, other.HintName, StringComparison.Ordinal) &&
+            Diagnostics.SequenceEqual(other.Diagnostics);
+
+        public override bool Equals(object? obj) => obj is GeneratedSourceResult other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hash = 17;
+                hash = (hash * 31) + (Code is null ? 0 : StringComparer.Ordinal.GetHashCode(Code));
+                hash = (hash * 31) + (HintName is null ? 0 : StringComparer.Ordinal.GetHashCode(HintName));
+
+                foreach (var diagnostic in Diagnostics)
+                {
+                    hash = (hash * 31) + diagnostic.GetHashCode();
+                }
+
+                return hash;
+            }
+        }
+    }
 }

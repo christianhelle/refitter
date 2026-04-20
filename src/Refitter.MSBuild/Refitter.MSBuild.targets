@@ -8,6 +8,7 @@
         <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                               DisableLogging="$(RefitterNoLogging)"
                               SkipValidation="$(RefitterSkipValidation)"
+                              TimeoutSeconds="$(RefitterTimeoutSeconds)"
                               IncludePatterns="$(RefitterIncludePatterns)">
             <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
         </RefitterGenerateTask>

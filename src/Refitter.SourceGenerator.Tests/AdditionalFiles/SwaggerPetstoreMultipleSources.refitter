@@ -1,0 +1,13 @@
+{
+  "openApiPaths": [
+    "../Resources/V3/SwaggerPetstore.json",
+    "../Resources/V3/SwaggerPetstore.yaml"
+  ],
+  "namespace": "Refitter.Tests.AdditionalFiles.MultipleSources",
+  "generateContracts": false,
+  "additionalNamespaces": ["Refitter.Tests.AdditionalFiles.SingeInterface"],
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstoreMultipleSources"
+  }
+}
