@@ -1,5 +1,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSwag;
 
 namespace Refitter.Core;
@@ -278,6 +281,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private string SanitizeGeneratedContracts(string contracts)
     {
+        contracts = NormalizeSwagger2OptionalReferencePropertyNullability(contracts);
+
         if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
         {
             // InlineJsonConverters = true (default): move [JsonConverter] from enum properties to enum type declarations.
@@ -295,6 +300,47 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         return JsonStringEnumConverterAttributeRegex
             .Replace(contracts, string.Empty)
             .TrimEnd();
+    }
+
+    private string NormalizeSwagger2OptionalReferencePropertyNullability(string contracts)
+    {
+        if (document.SchemaType != NJsonSchema.SchemaType.Swagger2 ||
+            settings.CodeGeneratorSettings?.GenerateNullableReferenceTypes != true ||
+            settings.CodeGeneratorSettings.GenerateOptionalPropertiesAsNullable)
+        {
+            return contracts;
+        }
+
+        var tree = CSharpSyntaxTree.ParseText(contracts);
+        var root = tree.GetCompilationUnitRoot();
+        var rewrittenRoot = new Swagger2OptionalReferencePropertyNullabilityRewriter().Visit(root);
+        return rewrittenRoot?.ToFullString() ?? contracts;
+    }
+
+    private sealed class Swagger2OptionalReferencePropertyNullabilityRewriter : CSharpSyntaxRewriter
+    {
+        public override SyntaxNode? VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            if (node.Type is NullableTypeSyntax nullableType &&
+                IsReferenceType(nullableType.ElementType))
+            {
+                node = node.WithType(nullableType.ElementType.WithTriviaFrom(node.Type));
+            }
+
+            return base.VisitPropertyDeclaration(node);
+        }
+
+        private static bool IsReferenceType(TypeSyntax typeSyntax) =>
+            typeSyntax switch
+            {
+                PredefinedTypeSyntax predefinedType => predefinedType.Keyword.Kind() is SyntaxKind.ObjectKeyword or SyntaxKind.StringKeyword,
+                ArrayTypeSyntax => true,
+                IdentifierNameSyntax => true,
+                GenericNameSyntax => true,
+                QualifiedNameSyntax => true,
+                AliasQualifiedNameSyntax => true,
+                _ => false,
+            };
     }
 
     private string GenerateJsonSerializerContext(string contracts) =>

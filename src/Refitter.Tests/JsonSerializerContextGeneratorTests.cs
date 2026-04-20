@@ -37,6 +37,24 @@ public class JsonSerializerContextGeneratorTests
     }
 
     [Test]
+    public void Generate_Falls_Back_To_Default_Context_Name_When_Interface_Name_Is_Missing()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+            }
+            """;
+
+        var settings = CreateSettings(interfaceName: null!);
+        var result = JsonSerializerContextGenerator.Generate(contracts, settings);
+
+        result.Should().Contain("internal partial class ApiClientSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
+    }
+
+    [Test]
     public void Generate_Registers_Types_Once()
     {
         const string contracts = """

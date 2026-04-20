@@ -52,6 +52,11 @@ internal static class JsonSerializerContextGenerator
     public static string GetContextTypeName(RefitGeneratorSettings settings)
     {
         var interfaceName = settings.Naming.InterfaceName;
+        if (string.IsNullOrWhiteSpace(interfaceName))
+        {
+            interfaceName = NamingSettings.DefaultInterfaceName;
+        }
+
         if (interfaceName.Length > 1 &&
             interfaceName[0] == 'I' &&
             char.IsUpper(interfaceName[1]))
