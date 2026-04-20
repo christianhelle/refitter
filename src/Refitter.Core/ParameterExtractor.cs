@@ -185,7 +185,7 @@ internal static class ParameterExtractor
 
         // Use regex to check for nullable type marker at the end of the type declaration
         // Matches "?" followed by whitespace and parameter name (and optional default value)
-        var nullablePattern = new System.Text.RegularExpressions.Regex(@"\?\s+\w+(\s*=\s*[^,]+)?$",
+        var nullablePattern = new System.Text.RegularExpressions.Regex(@"\?\s+@?\w+(\s*=\s*[^,]+)?$",
             System.Text.RegularExpressions.RegexOptions.Compiled);
 
         parameters = parameters.OrderBy(c => nullablePattern.IsMatch(c)).ToList();

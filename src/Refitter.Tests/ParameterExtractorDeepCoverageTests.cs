@@ -746,6 +746,55 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("bool? nullableBool");
     }
 
+    private const string OpenApiSpecWithKeywordParameterName = """
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Test API",
+    "version": "v1"
+  },
+  "paths": {
+    "/test": {
+      "get": {
+        "parameters": [
+          {
+            "name": "class",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  }
+}
+""";
+
+    [Test]
+    public async Task NullablePattern_Matches_Escaped_CSharp_Identifier()
+    {
+        // NSwag prefixes reserved C# keywords with @ (e.g. "class" → "@class")
+        // The nullable regex must match "@class" not just plain identifiers.
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecWithKeywordParameterName);
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            OptionalParameters = true
+        };
+        var generator = await RefitGenerator.CreateAsync(settings);
+        string generatedCode = generator.Generate();
+
+        generatedCode.Should().Contain("@class");
+        generatedCode.Should().Contain("@class = default");
+    }
+
     [Test]
     public async Task GetCSharpType_Array_Of_Integers()
     {
