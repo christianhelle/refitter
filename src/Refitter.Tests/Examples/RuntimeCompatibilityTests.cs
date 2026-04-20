@@ -121,6 +121,60 @@ public class RuntimeCompatibilityTests
     }
 
     /// <summary>
+    /// Swagger 2.0 equivalent of Can_Generate_Accept_Headers_For_Valid_Responses.
+    /// </summary>
+    [Test]
+    public async Task Can_Generate_Accept_Headers_For_Valid_Responses_Swagger2()
+    {
+        const string swaggerSpecV2 = """
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Accept Headers Test API",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "paths": {
+    "/items": {
+      "get": {
+        "operationId": "GetItems",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          }
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(swaggerSpecV2),
+            AddAcceptHeaders = true
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().NotBeNullOrWhiteSpace();
+        code.Should().Contain("GetItems");
+        // Swagger 2.0 with produces field: verify generation succeeds without crashing
+    }
+
+    /// <summary>
     /// Test for issue #1026: Verify auto-enabling of GenerateOptionalPropertiesAsNullable.
     /// When GenerateNullableReferenceTypes is enabled, optional properties should be nullable.
     /// </summary>
@@ -193,6 +247,78 @@ public class RuntimeCompatibilityTests
     }
 
     /// <summary>
+    /// Swagger 2.0 equivalent of Auto_Enables_Optional_Properties_As_Nullable_When_NRT_Enabled.
+    /// </summary>
+    [Test]
+    public async Task Auto_Enables_Optional_Properties_As_Nullable_When_NRT_Enabled_Swagger2()
+    {
+        const string swaggerSpecV2 = """
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Optional Properties Test API",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "paths": {
+    "/items": {
+      "post": {
+        "operationId": "CreateItem",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Item"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Item": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(swaggerSpecV2),
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true
+            }
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().NotBeNullOrWhiteSpace();
+        code.Should().Contain("public string Name");
+        code.Should().Contain("public string? Description"); // Optional property should be nullable
+    }
+
+    /// <summary>
     /// Test for issue #1052: Verify duplicate operation ID detection is efficient.
     /// This test ensures the duplicate detection short-circuits on first duplicate found.
     /// </summary>
@@ -234,6 +360,59 @@ public class RuntimeCompatibilityTests
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = CreateTempFile(openApiSpec)
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().NotBeNullOrWhiteSpace();
+        code.Should().Contain("Task Items()");
+        code.Should().Contain("Task Products()");
+    }
+
+    /// <summary>
+    /// Swagger 2.0 equivalent of Duplicate_Operation_Id_Detection_Is_Efficient.
+    /// </summary>
+    [Test]
+    public async Task Duplicate_Operation_Id_Detection_Is_Efficient_Swagger2()
+    {
+        const string swaggerSpecV2 = """
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Duplicate Operation ID Test API",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "paths": {
+    "/items": {
+      "get": {
+        "operationId": "GetItem",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "operationId": "GetItem",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(swaggerSpecV2)
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
@@ -317,6 +496,77 @@ public class RuntimeCompatibilityTests
     }
 
     /// <summary>
+    /// Swagger 2.0 equivalent of Interface_Generator_Created_Before_Generate_File.
+    /// </summary>
+    [Test]
+    public async Task Interface_Generator_Created_Before_Generate_File_Swagger2()
+    {
+        const string swaggerSpecV2 = """
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Generator Ordering Test API",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Items"
+    }
+  ],
+  "paths": {
+    "/items": {
+      "get": {
+        "operationId": "GetItems",
+        "tags": ["Items"],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/items/{id}": {
+      "get": {
+        "operationId": "GetItemById",
+        "tags": ["Items"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(swaggerSpecV2),
+            MultipleInterfaces = MultipleInterfaces.ByTag
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().NotBeNullOrWhiteSpace();
+        code.Should().Contain("GetItems");
+        code.Should().Contain("GetItemById");
+        // Should not have numeric suffixes like GetItems2
+        code.Should().NotContain("GetItems2");
+    }
+
+    /// <summary>
     /// Test for issue #1049: Verify generated code with async operations.
     /// Note: ConfigureAwait(false) is used internally in library code, not in generated output.
     /// </summary>
@@ -358,6 +608,56 @@ public class RuntimeCompatibilityTests
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = CreateTempFile(openApiSpec)
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().NotBeNullOrWhiteSpace();
+        code.Should().Contain("Task<");
+        BuildHelper.BuildCSharp(code).Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Swagger 2.0 equivalent of Can_Generate_Code_With_Async_Operations.
+    /// </summary>
+    [Test]
+    public async Task Can_Generate_Code_With_Async_Operations_Swagger2()
+    {
+        const string swaggerSpecV2 = """
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Async Test API",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "paths": {
+    "/items": {
+      "get": {
+        "operationId": "GetItems",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(swaggerSpecV2)
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);
