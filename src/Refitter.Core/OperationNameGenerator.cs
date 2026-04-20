@@ -76,21 +76,23 @@ internal class OperationNameGenerator : IOperationNameGenerator
     private bool CheckForDuplicateOperationIds(
         OpenApiDocument document)
     {
-        List<string> operationNames = new();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var kv in document.Paths)
         {
             foreach (var operations in kv.Value)
             {
                 var operation = operations.Value;
-                operationNames.Add(
-                    GetOperationName(
-                        document,
-                        kv.Key,
-                        operations.Key,
-                        operation));
+                var operationName = GetOperationName(
+                    document,
+                    kv.Key,
+                    operations.Key,
+                    operation);
+
+                if (!seen.Add(operationName))
+                    return true; // Short-circuit on first duplicate
             }
         }
 
-        return operationNames.Distinct().Count() != operationNames.Count;
+        return false;
     }
 }

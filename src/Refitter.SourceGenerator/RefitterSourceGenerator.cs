@@ -117,7 +117,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            if (!settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
+            if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
+                !settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
                 !File.Exists(settings.OpenApiPath))
             {
                 settings.OpenApiPath = Path.Combine(
@@ -145,19 +146,10 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var refit = generator.Generate();
 
             cancellationToken.ThrowIfCancellationRequested();
-            var filename = settings.OutputFilename ?? Path.GetFileName(file.Path).Replace(".refitter", ".g.cs");
-            if (filename == ".g.cs")
-            {
-                filename = "Refitter.g.cs";
-            }
 
-            // Create unique hint name based on the .refitter file path to avoid collisions
-            var hintName = Path.GetFileNameWithoutExtension(file.Path);
-            if (string.IsNullOrEmpty(hintName) || hintName == ".")
-            {
-                hintName = "Refitter";
-            }
-            hintName = hintName + ".g.cs";
+            // Create unique hint name based on the full .refitter file path to avoid collisions
+            // when multiple .refitter files with the same name exist in different directories
+            var hintName = CreateUniqueHintName(file.Path, settings.OutputFilename);
 
             return new GeneratedCode(diagnostics, refit, hintName);
         }
@@ -201,6 +193,58 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             );
 
             return null;
+        }
+    }
+
+    /// <summary>
+    /// Creates a unique hint name for AddSource that prevents collisions when multiple
+    /// .refitter files with the same name exist in different directories.
+    /// </summary>
+    /// <param name="refitterFilePath">The full path to the .refitter file</param>
+    /// <param name="outputFilename">Optional explicit output filename from settings</param>
+    /// <returns>A unique hint name safe for AddSource</returns>
+    private static string CreateUniqueHintName(string refitterFilePath, string? outputFilename)
+    {
+        // If an explicit output filename is set, use it as the base for the hint name
+        // but still include path disambiguation to prevent collisions
+        var baseName = !string.IsNullOrWhiteSpace(outputFilename)
+            ? Path.GetFileNameWithoutExtension(outputFilename)
+            : Path.GetFileNameWithoutExtension(refitterFilePath);
+
+        if (string.IsNullOrEmpty(baseName) || baseName == ".")
+        {
+            baseName = "Refitter";
+        }
+
+        // Create a stable unique suffix from the directory path to prevent collisions
+        // Use the full path, normalize separators, and create a hash-like identifier
+        var directory = Path.GetDirectoryName(refitterFilePath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            // Normalize path separators and compute a stable hash
+            var normalizedPath = directory.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var pathHash = GetStableHash(normalizedPath);
+            return $"{baseName}_{pathHash}.g.cs";
+        }
+
+        return $"{baseName}.g.cs";
+    }
+
+    /// <summary>
+    /// Generates a stable hash string from the input suitable for use in filenames.
+    /// Uses a simple but deterministic algorithm.
+    /// </summary>
+    private static string GetStableHash(string input)
+    {
+        unchecked
+        {
+            int hash = 17;
+            foreach (char c in input)
+            {
+                hash = hash * 31 + c;
+            }
+            // Convert to unsigned and format as hex to ensure no negative sign
+            return ((uint)hash).ToString("X8");
         }
     }
 

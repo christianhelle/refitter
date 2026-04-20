@@ -16,7 +16,15 @@ public static class OpenApiDocumentFactory
         new HttpClientHandler
         {
             AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-        });
+        })
+    {
+        Timeout = TimeSpan.FromSeconds(30)
+    };
+
+    static OpenApiDocumentFactory()
+    {
+        HttpClient.DefaultRequestHeaders.Add("User-Agent", $"refitter/{typeof(OpenApiDocumentFactory).Assembly.GetName().Version}");
+    }
 
     /// <summary>
     /// Creates a merged <see cref="NSwag.OpenApiDocument"/> from multiple paths or URLs.
@@ -27,16 +35,19 @@ public static class OpenApiDocumentFactory
     /// <exception cref="ArgumentException">Thrown when <paramref name="openApiPaths"/> is null or empty.</exception>
     public static async Task<OpenApiDocument> CreateAsync(IEnumerable<string> openApiPaths)
     {
-        var paths = openApiPaths?.ToArray() ?? throw new ArgumentException("At least one OpenAPI path must be specified.", nameof(openApiPaths));
+        if (openApiPaths == null)
+            throw new ArgumentNullException(nameof(openApiPaths));
+
+        var paths = openApiPaths.ToArray();
         if (paths.Length == 0)
             throw new ArgumentException("At least one OpenAPI path must be specified.", nameof(openApiPaths));
 
         if (paths.Length == 1)
-            return await CreateAsync(paths[0]);
+            return await CreateAsync(paths[0]).ConfigureAwait(false);
 
         var documents = new OpenApiDocument[paths.Length];
         for (var i = 0; i < paths.Length; i++)
-            documents[i] = await CreateAsync(paths[i]);
+            documents[i] = await CreateAsync(paths[i]).ConfigureAwait(false);
 
         return Merge(documents);
     }
@@ -63,10 +74,11 @@ public static class OpenApiDocumentFactory
 
             if (document.Components?.Schemas != null)
             {
+                // Ensure base document has schemas dictionary initialized (#1016)
+                // Components property is read-only but auto-initialized by NSwag
                 foreach (var schema in document.Components.Schemas)
                 {
-                    if (baseDocument.Components?.Schemas != null &&
-                        !baseDocument.Components.Schemas.ContainsKey(schema.Key))
+                    if (!baseDocument.Components.Schemas.ContainsKey(schema.Key))
                         baseDocument.Components.Schemas[schema.Key] = schema.Value;
                 }
             }
@@ -104,26 +116,26 @@ public static class OpenApiDocumentFactory
     {
         try
         {
-            var readResult = await OpenApiMultiFileReader.Read(openApiPath);
+            var readResult = await OpenApiMultiFileReader.Read(openApiPath).ConfigureAwait(false);
             if (!readResult.ContainedExternalReferences)
-                return await CreateUsingNSwagAsync(openApiPath);
+                return await CreateUsingNSwagAsync(openApiPath).ConfigureAwait(false);
 
             var specificationVersion = readResult.OpenApiDiagnostic.SpecificationVersion;
             PopulateMissingRequiredFields(openApiPath, readResult);
 
             if (IsYaml(openApiPath))
             {
-                var yaml = await readResult.OpenApiDocument.SerializeAsYamlAsync(specificationVersion);
-                return await OpenApiYamlDocument.FromYamlAsync(yaml);
+                var yaml = await readResult.OpenApiDocument.SerializeAsYamlAsync(specificationVersion).ConfigureAwait(false);
+                return await OpenApiYamlDocument.FromYamlAsync(yaml).ConfigureAwait(false);
             }
 
-            var json = await readResult.OpenApiDocument.SerializeAsJsonAsync(specificationVersion);
-            return await OpenApiDocument.FromJsonAsync(json);
+            var json = await readResult.OpenApiDocument.SerializeAsJsonAsync(specificationVersion).ConfigureAwait(false);
+            return await OpenApiDocument.FromJsonAsync(json).ConfigureAwait(false);
         }
         catch (Exception)
         {
             // Fallback to NSwag if OpenApiMultiFileReader fails (e.g., for files without external references)
-            return await CreateUsingNSwagAsync(openApiPath);
+            return await CreateUsingNSwagAsync(openApiPath).ConfigureAwait(false);
         }
     }
 
@@ -131,15 +143,15 @@ public static class OpenApiDocumentFactory
     {
         if (IsHttp(openApiPath))
         {
-            var content = await GetHttpContent(openApiPath);
+            var content = await GetHttpContent(openApiPath).ConfigureAwait(false);
             return IsYaml(openApiPath)
-                ? await OpenApiYamlDocument.FromYamlAsync(content)
-                : await OpenApiDocument.FromJsonAsync(content);
+                ? await OpenApiYamlDocument.FromYamlAsync(content).ConfigureAwait(false)
+                : await OpenApiDocument.FromJsonAsync(content).ConfigureAwait(false);
         }
 
         return IsYaml(openApiPath)
-            ? await OpenApiYamlDocument.FromFileAsync(openApiPath)
-            : await OpenApiDocument.FromFileAsync(openApiPath);
+            ? await OpenApiYamlDocument.FromFileAsync(openApiPath).ConfigureAwait(false)
+            : await OpenApiDocument.FromFileAsync(openApiPath).ConfigureAwait(false);
     }
 
     [ExcludeFromCodeCoverage]

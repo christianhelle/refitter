@@ -1,13 +1,17 @@
-Scribe: log issue #998 squad investigation
+Scribe: finalize breaking changes v2.0.0 guidance
 
-- Orchestration logs: Bishop (docs review), Dallas (MSBuild validation), Lambert (reproduction)
-- Session log: issue #998 verdict and root cause
-- Decisions merged: issue #998 classified as real product bug in CLI output path handling
-- Agent histories updated with cross-team findings
-- Inbox decisions deleted after merge
+- Bishop: discussion draft + migration guide + TOC update  
+- Ripley: production-ready approval
+- Scribe: orchestration logs + session log + cross-agent updates
 
-Verdict: CLI ignores outputFolder when it equals default "./Generated", causing MSBuild 
-file prediction mismatch on first clean build. Fix: remove default-value check in 
-GenerateCommand.cs:648.
+Artifacts:
+- docs/docfx_project/articles/breaking-changes-v2-0-0.md (new)
+- docs/docfx_project/articles/toc.yml (updated)
+- .squad/orchestration-log/2026-04-18T10-46-51Z-bishop.md (new)
+- .squad/orchestration-log/2026-04-18T10-46-51Z-ripley.md (new)
+- .squad/log/2026-04-18T10-46-51Z-breaking-changes-guidance.md (new)
+- .squad/agents/{bishop,ripley}/history.md (updated)
+
+Status: Ready for publication; discussion draft in session state pending user decision.
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

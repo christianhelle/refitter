@@ -259,6 +259,9 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
             var uniqueContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var response in operations.Value.Responses.Values)
             {
+                if (response.Content == null)
+                    continue;
+
                 foreach (var contentType in response.Content.Keys)
                 {
                     uniqueContentTypes.Add(contentType);
@@ -360,10 +363,11 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     private string GenerateInterfaceDeclaration(out string interfaceName)
     {
         var title = settings.Naming.UseOpenApiTitle
-            ? (document.Info?.Title ?? NamingSettings.DefaultInterfaceName).Sanitize()
+            ? (document.Info?.Title ?? NamingSettings.DefaultInterfaceName)
             : settings.Naming.InterfaceName;
 
-        interfaceName = $"I{title.CapitalizeFirstCharacter()}";
+        // Sanitize after prefixing to prevent I@keyword pattern (#1053)
+        interfaceName = $"I{title.CapitalizeFirstCharacter()}".Sanitize();
 
         var inheritance = settings.GenerateDisposableClients
             ? " : IDisposable"

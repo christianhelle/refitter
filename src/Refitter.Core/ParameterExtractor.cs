@@ -19,7 +19,11 @@ internal static class ParameterExtractor
     {
         var routeParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Path)
-            .Select(p => $"{JoinAttributes(GetAliasAsAttribute(p))}{p.Type} {p.VariableName}")
+            .Select(p =>
+            {
+                var variableName = GetVariableName(p);
+                return $"{JoinAttributes(GetAliasAsAttribute(p.Name, variableName))}{p.Type} {variableName}";
+            })
             .ToList();
 
         var queryParameters =
@@ -28,7 +32,10 @@ internal static class ParameterExtractor
         var bodyParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
             .Select(p =>
-                $"{JoinAttributes(GetBodyAttribute(p, settings), GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
+            {
+                var variableName = GetVariableName(p);
+                return $"{JoinAttributes(GetBodyAttribute(p, settings), GetAliasAsAttribute(p.Name, variableName))}{GetParameterType(p, settings)} {variableName}";
+            })
             .ToList();
 
         var headerParameters = new List<string>();
@@ -46,7 +53,10 @@ internal static class ParameterExtractor
                 .Where(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader)
                 .Where(p => !anyIgnoredHeaders || !ignoredHeaders.Contains(p.Name, StringComparer.OrdinalIgnoreCase))
                 .Select(p =>
-                    $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {p.VariableName}")
+                {
+                    var variableName = GetVariableName(p);
+                    return $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {variableName}";
+                })
                 .ToList();
         }
 
@@ -75,11 +85,21 @@ internal static class ParameterExtractor
             }
         }
 
-        var formParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
-            .Select(p =>
-                $"{JoinAttributes(GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {p.VariableName}")
-            .ToList();
+        // Deduplicate form parameters by sanitized identifier (#1018)
+        // Use ConvertToVariableName for both paths to ensure consistent deduplication
+        var seenFormParameterNames = new HashSet<string>(StringComparer.Ordinal);
+        var formParameters = new List<string>();
+
+        foreach (var p in operationModel.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter))
+        {
+            // Use VariableName (NSwag's processed name) not Name (original OpenAPI name)
+            var variableName = ConvertToVariableName(p.VariableName);
+            // Only add if this sanitized identifier hasn't been seen
+            if (seenFormParameterNames.Add(variableName))
+            {
+                formParameters.Add($"{JoinAttributes(GetAliasAsAttribute(p.Name, variableName))}{GetParameterType(p, settings)} {variableName}");
+            }
+        }
 
         // Manually extract non-binary properties from multipart/form-data in OpenAPI 3.x
         // NSwag doesn't populate these in operationModel.Parameters
@@ -105,18 +125,16 @@ internal static class ParameterExtractor
                         var propertyType = GetCSharpType(propertySchema, settings);
                         var variableName = ConvertToVariableName(property.Key);
 
-                        // Add AliasAs attribute if property name differs from variable name
-                        var aliasAttribute = property.Key != variableName
-                            ? $"AliasAs(\"{property.Key}\")"
-                            : string.Empty;
-
-                        var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
-
-                        // Only add if not already present (avoid duplicates)
-                        if (!formParameters.Contains(parameter))
+                        // Deduplicate by sanitized C# identifier, not original OpenAPI name (#1018)
+                        // HashSet.Add returns true if item was added (first occurrence), false if already present
+                        if (seenFormParameterNames.Add(variableName))
                         {
+                            // First occurrence of this sanitized identifier - add the parameter
+                            var aliasAttribute = GetAliasAsAttribute(property.Key, variableName);
+                            var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
                             formParameters.Add(parameter);
                         }
+                        // else: duplicate sanitized identifier - skip this parameter
                     }
                 }
             }
@@ -125,11 +143,13 @@ internal static class ParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
             .Select(p =>
             {
-                var generatedAliasAsAttribute = string.IsNullOrWhiteSpace(GetAliasAsAttribute(p))
+                var variableName = GetVariableName(p);
+                var aliasAsAttribute = GetAliasAsAttribute(p.Name, variableName);
+                var generatedAliasAsAttribute = string.IsNullOrWhiteSpace(aliasAsAttribute)
                     ? string.Empty
-                    : $"[{GetAliasAsAttribute(p)}]";
+                    : $"[{aliasAsAttribute}]";
 
-                return $"{generatedAliasAsAttribute}StreamPart {p.VariableName}";
+                return $"{generatedAliasAsAttribute}StreamPart {variableName}";
             })
             .ToList();
 
@@ -154,19 +174,7 @@ internal static class ParameterExtractor
     private static string ReplaceUnsafeCharacters(
         string unsafeText)
     {
-        var safeText = new StringBuilder(unsafeText.Length);
-        foreach (var character in unsafeText)
-        {
-            var safeCharacter = character;
-            if (!char.IsLetterOrDigit(character))
-            {
-                safeCharacter = '_';
-            }
-
-            safeText.Append(safeCharacter);
-        }
-
-        return safeText.ToString();
+        return IdentifierUtils.ToCompilableIdentifier(unsafeText);
     }
 
     private static List<string> ReOrderNullableParameters(
@@ -177,10 +185,15 @@ internal static class ParameterExtractor
         if (!settings.OptionalParameters || settings.ApizrSettings?.WithRequestOptions == true)
             return parameters;
 
-        parameters = parameters.OrderBy(c => c.Contains("?")).ToList();
+        // Use regex to check for nullable type marker at the end of the type declaration
+        // Matches "?" followed by whitespace and parameter name (and optional default value)
+        var nullablePattern = new System.Text.RegularExpressions.Regex(@"\?\s+@?\w+(\s*=\s*[^,]+)?$",
+            System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        parameters = parameters.OrderBy(c => nullablePattern.IsMatch(c)).ToList();
         for (int index = 0; index < parameters.Count; index++)
         {
-            if (parameters[index].Contains("?"))
+            if (nullablePattern.IsMatch(parameters[index]))
             {
                 var parameterString = parameters[index];
                 var defaultValue = GetDefaultValueForParameter(parameterString, parameterModels);
@@ -200,6 +213,7 @@ internal static class ParameterExtractor
         var variableName = parts[parts.Length - 1].TrimEnd(';', ',');
 
         var parameterModel = parameterModels.FirstOrDefault(p => p.VariableName == variableName);
+        parameterModel ??= parameterModels.FirstOrDefault(p => GetVariableName(p) == variableName);
         if (parameterModel?.Schema?.Default != null && !string.IsNullOrEmpty(parameterModel.Type))
         {
             return FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type);
@@ -338,7 +352,12 @@ internal static class ParameterExtractor
     private static string GetAliasAsAttribute(CSharpParameterModel parameterModel) =>
         string.Equals(parameterModel.Name, parameterModel.VariableName)
             ? string.Empty
-            : $"AliasAs(\"{parameterModel.Name}\")";
+            : $"AliasAs(\"{EscapeString(parameterModel.Name)}\")";
+
+    private static string GetAliasAsAttribute(string originalName, string variableName) =>
+        string.Equals(originalName, variableName, StringComparison.Ordinal)
+            ? string.Empty
+            : $"AliasAs(\"{EscapeString(originalName)}\")";
 
     private static string JoinAttributes(params string[] attributes)
     {
@@ -427,27 +446,29 @@ internal static class ParameterExtractor
                 var allNullable = true;
                 foreach (var operationParameter in operationParameters)
                 {
-                    var attributes = $"{JoinAttributes(GetQueryAttribute(operationParameter, settings), GetAliasAsAttribute(operationParameter))}";
                     var propertyType = GetQueryParameterType(operationParameter, settings);
                     allNullable = allNullable && propertyType.EndsWith("?");
-                    var propertyName = operationParameter.VariableName.CapitalizeFirstCharacter();
+                    var variableName = GetVariableName(operationParameter);
+                    var attributes = $"{JoinAttributes(GetQueryAttribute(operationParameter, settings), GetAliasAsAttribute(operationParameter.Name, variableName))}";
+                    var propertyName = variableName.CapitalizeFirstCharacter();
                     if (operationParameter.IsRequired)
                     {
                         injectedParametersCodeBuilder.Append(injectedParametersCodeBuilder.Length == 0
-                            ? $$"""{{propertyType}} {{operationParameter.VariableName}}"""
-                            : $$""", {{propertyType}} {{operationParameter.VariableName}}""");
+                            ? $$"""{{propertyType}} {{variableName}}"""
+                            : $$""", {{propertyType}} {{variableName}}""");
 
                         initializedParametersCodeBuilder.AppendLine();
                         initializedParametersCodeBuilder.Append(
             $$"""
-                        {{propertyName}} = {{operationParameter.VariableName}};
+                        this.{{propertyName}} = {{variableName}};
             """);
                     }
 
                     propertiesCodeBuilder.AppendLine();
                     if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
                     {
-                        AppendXmlDocComment(operationParameter.Description, propertiesCodeBuilder);
+                        var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(operationParameter.Description);
+                        AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
                     }
 
                     propertiesCodeBuilder.Append(
@@ -501,7 +522,10 @@ internal static class ParameterExtractor
         parameters ??= operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
             .Select(p =>
-                $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetQueryParameterType(p, settings)} {p.VariableName}")
+            {
+                var variableName = GetVariableName(p);
+                return $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p.Name, variableName))}{GetQueryParameterType(p, settings)} {variableName}";
+            })
             .ToList();
 
         return parameters;
@@ -585,19 +609,20 @@ $$"""
         if (string.IsNullOrEmpty(propertyName))
             return "value";
 
-        // Convert first character to lowercase for camelCase
-        var variableName = char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
+        // Use ToCompilableIdentifier to handle reserved keywords and invalid characters
+        var identifier = IdentifierUtils.ToCompilableIdentifier(propertyName);
 
-        // Replace invalid characters with underscore
-        var safeVariableName = new StringBuilder(variableName.Length);
-        foreach (var c in variableName)
+        // Convert first character to lowercase for camelCase, if it's a letter
+        if (identifier.Length > 0 && char.IsUpper(identifier[0]))
         {
-            if (char.IsLetterOrDigit(c) || c == '_')
-                safeVariableName.Append(c);
-            else
-                safeVariableName.Append('_');
+            return char.ToLowerInvariant(identifier[0]) + identifier.Substring(1);
         }
 
-        return safeVariableName.ToString();
+        return identifier;
+    }
+
+    private static string GetVariableName(ParameterModelBase parameterModel)
+    {
+        return IdentifierUtils.ToCompilableIdentifier(parameterModel.VariableName);
     }
 }

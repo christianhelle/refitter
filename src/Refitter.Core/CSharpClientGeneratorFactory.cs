@@ -13,7 +13,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 {
     public CustomCSharpClientGenerator Create()
     {
-        if (!settings.GenerateDefaultAdditionalProperties)
+        if (!settings.GenerateDefaultAdditionalProperties && document.Components?.Schemas != null)
         {
             foreach (var kvp in document.Components.Schemas)
             {
@@ -65,7 +65,12 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             settings.CodeGeneratorSettings,
             generator.Settings.CSharpGeneratorSettings);
 
-        // Auto-enable optional properties as nullable when nullable reference types enabled
+        // Auto-enable optional properties as nullable when nullable reference types enabled.
+        // This ensures consistent nullability behavior: when NRT is enabled, optional properties
+        // should be nullable to avoid CS8618 warnings for required members.
+        // Note: This is a behavioral change from v1.x where GenerateOptionalPropertiesAsNullable
+        // defaulted to false. If you need the old behavior, explicitly set
+        // GenerateOptionalPropertiesAsNullable = false in your settings.
         if (generator.Settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes)
         {
             generator.Settings.CSharpGeneratorSettings.GenerateOptionalPropertiesAsNullable = true;
@@ -96,9 +101,15 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
     /// </summary>
     private void ConvertOneOfWithDiscriminatorToAllOf()
     {
+        // Null-safe check for Swagger 2.0 docs that use definitions instead (#1015)
+        if (document.Components?.Schemas == null)
+            return;
+
         foreach (var kvp in document.Components.Schemas)
         {
-            var schema = kvp.Value.ActualSchema;
+            var schema = kvp.Value?.ActualSchema;
+            if (schema == null)
+                continue;
 
             if (schema.DiscriminatorObject == null)
                 continue;
@@ -114,7 +125,10 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             // For each subtype, add allOf pointing to the base schema if not already present
             foreach (var subSchemaRef in unionSchemas)
             {
-                var subSchema = subSchemaRef.ActualSchema;
+                var subSchema = subSchemaRef?.ActualSchema;
+                if (subSchema == null)
+                    continue;
+
                 bool alreadyInherits = subSchema.AllOf.Any(
                     a => a.HasReference && a.ActualSchema == schema);
                 if (!alreadyInherits)

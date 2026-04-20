@@ -23,5 +23,6 @@
 | Dallas | Tooling Dev | CLI, source generator, MSBuild, CI | ⚙️ Tooling |
 | Lambert | Tester | Repros, validation, edge cases | 🧪 Test |
 | Bishop | Docs | README, docs, issue wording, guidance | 📝 Docs |
+| Ash | Safety Reviewer | Roslyn rewriting, source generator, MSBuild, sanitization | 🔒 Review |
 | Scribe | Session Logger | Memory, decisions, session logs | 📋 Scribe |
 | Ralph | Work Monitor | — | 🔄 Monitor |
