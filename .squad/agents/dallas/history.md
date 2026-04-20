@@ -267,3 +267,9 @@ dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-r
 
 **Merge Status:** ✅ APPROVED (temporary test JSON files marked for deletion)
 
+### 2026-04-20: P1 Tooling Fixes (#1022, #1023, #1024)
+
+- **MSBuild generated-file discovery:** `src\Refitter.MSBuild\RefitterGenerateTask.cs` now trusts `GeneratedFile:` markers emitted by `src\Refitter\GenerateCommand.cs --simple-output` instead of re-parsing `.refitter` contents. This removes duplicated output-path prediction logic and keeps MSBuild compile items aligned with the CLI's actual writes.
+- **MSBuild include filtering semantics:** `RefitterIncludePatterns` now matches only exact filenames, exact project-relative paths, or exact full paths. Substring matching was removed; `apis\petstore.refitter` is now a stable way to target one file without over-including similarly named files.
+- **SourceGenerator dependency boundary:** `src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj` keeps `OasReader` private to the generator package and hides `Refit` compile assets from consumers (`PrivateAssets="compile"`). Source generator consumers must carry their own explicit `Refit` reference so Refitter does not silently upgrade them to Refit 10.
+- **Focused validation that worked reliably:** use a repo-local NuGet cache (`C:\projects\christianhelle\refitter\.nuget\packages`) when the shared global cache is locked, then run targeted TUnit treenode filters from `src\Refitter.Tests\bin\Release\net10.0\Refitter.Tests.exe` for fast regression checks.
