@@ -17,6 +17,7 @@ internal static class ContractTypeSuffixApplier
 
         // First pass: collect all contract type names that need suffixing
         var typeNames = new HashSet<string>();
+        var existingTypeNames = new HashSet<string>(StringComparer.Ordinal);
         var typeDeclarations = root.DescendantNodes()
             .Where(n => n is ClassDeclarationSyntax
                      || n is RecordDeclarationSyntax
@@ -24,6 +25,12 @@ internal static class ContractTypeSuffixApplier
                      || n is EnumDeclarationSyntax)
             .OfType<BaseTypeDeclarationSyntax>()
             .ToList();
+
+        // Build set of all existing type names
+        foreach (var typeDecl in typeDeclarations)
+        {
+            existingTypeNames.Add(typeDecl.Identifier.Text);
+        }
 
         foreach (var typeDecl in typeDeclarations)
         {
@@ -40,9 +47,22 @@ internal static class ContractTypeSuffixApplier
             return generatedCode;
 
         // Create a mapping of original type names to suffixed names
-        var typeRenameMap = typeNames.ToDictionary(
-            name => name,
-            name => name + suffix);
+        // Check for suffix-target collisions (#1013): reject if Pet + suffix would collide with existing PetDto
+        var typeRenameMap = new Dictionary<string, string>();
+        foreach (var name in typeNames)
+        {
+            var suffixedName = name + suffix;
+            if (existingTypeNames.Contains(suffixedName))
+            {
+                // Collision detected: existing type already has the target name
+                // Skip renaming this type to avoid duplicate type names
+                continue;
+            }
+            typeRenameMap[name] = suffixedName;
+        }
+
+        if (typeRenameMap.Count == 0)
+            return generatedCode;
 
         // Second pass: rewrite the syntax tree with renamed types
         var rewriter = new TypeSuffixRewriter(typeRenameMap);

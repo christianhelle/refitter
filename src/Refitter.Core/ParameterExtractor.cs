@@ -85,20 +85,21 @@ internal static class ParameterExtractor
             }
         }
 
-        var formParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
-            .Select(p =>
-            {
-                var variableName = GetVariableName(p);
-                return $"{JoinAttributes(GetAliasAsAttribute(p.Name, variableName))}{GetParameterType(p, settings)} {variableName}";
-            })
-            .ToList();
+        // Deduplicate form parameters by sanitized identifier (#1018)
+        // Use ConvertToVariableName for both paths to ensure consistent deduplication
+        var seenFormParameterNames = new HashSet<string>(StringComparer.Ordinal);
+        var formParameters = new List<string>();
 
-        var seenFormParameterNames = new HashSet<string>(
-            operationModel.Parameters
-                .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
-                .Select(p => p.Name),
-            StringComparer.Ordinal);
+        foreach (var p in operationModel.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter))
+        {
+            // Use VariableName (NSwag's processed name) not Name (original OpenAPI name)
+            var variableName = ConvertToVariableName(p.VariableName);
+            // Only add if this sanitized identifier hasn't been seen
+            if (seenFormParameterNames.Add(variableName))
+            {
+                formParameters.Add($"{JoinAttributes(GetAliasAsAttribute(p.Name, variableName))}{GetParameterType(p, settings)} {variableName}");
+            }
+        }
 
         // Manually extract non-binary properties from multipart/form-data in OpenAPI 3.x
         // NSwag doesn't populate these in operationModel.Parameters
@@ -124,15 +125,16 @@ internal static class ParameterExtractor
                         var propertyType = GetCSharpType(propertySchema, settings);
                         var variableName = ConvertToVariableName(property.Key);
 
-                        // Add AliasAs attribute if property name differs from variable name
-                        var aliasAttribute = GetAliasAsAttribute(property.Key, variableName);
-
-                        var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
-
-                        if (seenFormParameterNames.Add(property.Key))
+                        // Deduplicate by sanitized C# identifier, not original OpenAPI name (#1018)
+                        // HashSet.Add returns true if item was added (first occurrence), false if already present
+                        if (seenFormParameterNames.Add(variableName))
                         {
+                            // First occurrence of this sanitized identifier - add the parameter
+                            var aliasAttribute = GetAliasAsAttribute(property.Key, variableName);
+                            var parameter = $"{JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
                             formParameters.Add(parameter);
                         }
+                        // else: duplicate sanitized identifier - skip this parameter
                     }
                 }
             }
