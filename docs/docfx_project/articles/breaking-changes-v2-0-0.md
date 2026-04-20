@@ -113,10 +113,64 @@ If your CI/CD pipeline references generated files:
 
 ---
 
+## Silent Behavioral Change: OpenAPI Parser Upgrade
+
+### Summary
+Refitter v2.0.0 upgrades the OpenAPI parser from **Microsoft.OpenApi.Readers 1.x to 3.x** (`OasReader 3.5.0.19`). This is a **major version upgrade** with materially different schema interpretation.
+
+### Impact
+Users upgrading from v1.7.3 may see **different generated C# code** even without changing their OpenAPI specifications. This is not a breaking change in the Refitter API, but a **behavioral change in code generation** due to the underlying parser improvements.
+
+### What Changed in the Parser
+Microsoft.OpenApi 3.x interprets these schema aspects differently than 1.x:
+- **Nullability handling:** More strict `null` type interpretation
+- **Discriminator support:** Improved `oneOf`/`anyOf` discriminator resolution
+- **Reference resolution:** Safer `$ref` path handling
+- **Examples:** Better handling of embedded schema examples
+- **Swagger 2.0 edge cases:** More robust handling of specs without `components` section
+
+### Migration
+**Action required:** After upgrading Refitter to v2.0.0:
+
+1. Regenerate your client code from your OpenAPI specification
+2. Review the generated code diff carefully
+3. Run your test suite to ensure the new client works correctly
+4. Commit the updated generated code
+
+This ensures your generated client reflects any schema interpretation improvements and avoids unexpected behavior at runtime.
+
+### Example
+If you're using the CLI:
+```bash
+# Regenerate with new parser
+refitter ./swagger.json --output ./GeneratedClient.cs --namespace "MyApi"
+
+# Review the diff
+git diff GeneratedClient.cs
+
+# Run tests
+dotnet test
+
+# Commit
+git add GeneratedClient.cs && git commit -m "Regenerate client with OpenAPI parser v3.x"
+```
+
+If you're using Source Generator or MSBuild, simply rebuild your project and review the generated changes.
+
+### Related Evidence
+- [PR #907: Migrate from Microsoft.OpenApi.Readers 1.x to Microsoft.OpenApi 3.x](https://github.com/christianhelle/refitter/pull/907)
+- [PR #945: Upgrade Microsoft.OpenApi v3.4](https://github.com/christianhelle/refitter/pull/945)
+
+---
+
 ## Migration Checklist
 
+- [ ] Upgrade Refitter to v2.0.0
+- [ ] **Regenerate client code** from your OpenAPI specification
+- [ ] **Review generated code diff** for changes due to improved OpenAPI parser
 - [ ] Update `.refitter` files: replace `generateAuthenticationHeader` with `authenticationHeaderStyle`
 - [ ] If using Source Generator: choose IDE viewing or switch to CLI/MSBuild
+- [ ] Run test suite to verify new client behavior
 - [ ] Rebuild and test code generation
 - [ ] Update CI/CD pipelines and build scripts as needed
 - [ ] Remove generated `.g.cs` files from version control (if using Source Generator)
