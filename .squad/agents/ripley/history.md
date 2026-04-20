@@ -15,6 +15,10 @@
 - Key compatibility surfaces: `.refitter` JSON schema, CLI option names, generated code shape, source generator behavior, MSBuild task predicted paths.
 - OasReader jumped from v1.x to v3.x — a major dependency version change that affects OpenAPI parsing.
 - Version is already bumped to 1.8.0 in commit `983ad149`.
+- `Refitter.MSBuild` now resolves generated files from CLI-emitted `GeneratedFile:` markers in simple-output mode rather than predicting output paths; key files are `src/Refitter.MSBuild/RefitterGenerateTask.cs` and `src/Refitter/GenerateCommand.cs`.
+- Safe SourceGenerator packaging uses `OasReader` with `PrivateAssets="all"` and `Refit` with `PrivateAssets="compile"`, plus consumer-facing guidance in `README.md` and verification in `src/Refitter.Tests/SourceGeneratorPackageReferenceTests.cs`.
+- The current P1 merge gate is: approve `#1022`, `#1023`, `#1024`; hold `#1017` and `#1025` for more evidence; reject `#1026` until the Swagger 2 nullable-shape regression in `src/Refitter.Tests/Examples/RuntimeCompatibilityTests.cs` is fixed. Temporary repro artifacts (`.refitter`, `aot-repro.*`, `validation-work/`) must be removed before merge.
+- Reviewer lockout note: Parker owned the current #1026 implementation slice (`.squad/agents/parker/history.md` runtime/compatibility workstream), so Parker is locked out from the revision after rejection; Ash is the correct revision owner.
 
 ### 2026-04-17: Release Compatibility Audit Completion
 
