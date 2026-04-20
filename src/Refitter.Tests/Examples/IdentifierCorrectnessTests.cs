@@ -329,6 +329,320 @@ public class IdentifierCorrectnessTests
 
     #endregion
 
+    #region Issue #1018 (Swagger 2.0) - Invalid Parameter Identifiers in Multipart Form Data
+
+    private const string MultipartFormDataWithInvalidIdentifiers_Swagger2 = """
+        {
+          "swagger": "2.0",
+          "info": {
+            "title": "Test API",
+            "version": "1.0.0"
+          },
+          "host": "localhost",
+          "basePath": "/",
+          "paths": {
+            "/upload": {
+              "post": {
+                "operationId": "UploadFile",
+                "consumes": ["multipart/form-data"],
+                "parameters": [
+                  {
+                    "name": "123File",
+                    "in": "formData",
+                    "type": "string"
+                  },
+                  {
+                    "name": "class",
+                    "in": "formData",
+                    "type": "string"
+                  },
+                  {
+                    "name": "event",
+                    "in": "formData",
+                    "type": "string"
+                  },
+                  {
+                    "name": "!special",
+                    "in": "formData",
+                    "type": "string"
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Success"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Can_Generate_Code_With_Invalid_Multipart_Identifiers_Swagger2()
+    {
+        var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task Multipart_LeadingDigit_Identifiers_Are_Prefixed_Swagger2()
+    {
+        var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
+        generatedCode.Should().Contain("_123File");
+        generatedCode.Should().NotContain("string 123File");
+    }
+
+    [Test]
+    public async Task Multipart_ReservedKeyword_Identifiers_Are_Escaped_Swagger2()
+    {
+        var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
+        generatedCode.Should().Contain("@class");
+        generatedCode.Should().Contain("@event");
+    }
+
+    [Test]
+    public async Task Multipart_SpecialChar_Identifiers_Are_Sanitized_Swagger2()
+    {
+        var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
+        generatedCode.Should().Contain("_special");
+        generatedCode.Should().NotContain("string !special");
+    }
+
+    [Test]
+    public async Task Generated_Code_With_Invalid_Multipart_Identifiers_Compiles_Swagger2()
+    {
+        var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    #endregion
+
+    #region Issue #1019 (Swagger 2.0) - Security Scheme Header Identifier Sanitization
+
+    private const string SecuritySchemeWithInvalidIdentifiers_Swagger2 = """
+        {
+          "swagger": "2.0",
+          "info": {
+            "title": "Test API",
+            "version": "1.0.0"
+          },
+          "host": "localhost",
+          "basePath": "/",
+          "securityDefinitions": {
+            "1Token": {
+              "type": "apiKey",
+              "name": "1Token",
+              "in": "header"
+            },
+            "class-key": {
+              "type": "apiKey",
+              "name": "class",
+              "in": "header"
+            }
+          },
+          "paths": {
+            "/secure": {
+              "get": {
+                "operationId": "SecureEndpoint",
+                "security": [
+                  {
+                    "1Token": []
+                  },
+                  {
+                    "class-key": []
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Success"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Can_Generate_Code_With_Invalid_Security_Identifiers_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            SecuritySchemeWithInvalidIdentifiers_Swagger2,
+            authHeaderStyle: AuthenticationHeaderStyle.Parameter);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task SecurityScheme_LeadingDigit_Identifiers_Are_Prefixed_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            SecuritySchemeWithInvalidIdentifiers_Swagger2,
+            authHeaderStyle: AuthenticationHeaderStyle.Parameter);
+        generatedCode.Should().Contain("_1Token");
+        generatedCode.Should().NotContain("string 1Token");
+    }
+
+    [Test]
+    public async Task SecurityScheme_ReservedKeyword_Identifiers_Are_Escaped_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            SecuritySchemeWithInvalidIdentifiers_Swagger2,
+            authHeaderStyle: AuthenticationHeaderStyle.Parameter);
+        generatedCode.Should().Contain("@class");
+    }
+
+    [Test]
+    public async Task Generated_Code_With_Invalid_Security_Identifiers_Compiles_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            SecuritySchemeWithInvalidIdentifiers_Swagger2,
+            authHeaderStyle: AuthenticationHeaderStyle.Parameter);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    #endregion
+
+    #region Issue #1020 (Swagger 2.0) - Dynamic Querystring Self-Assignment
+
+    private const string QuerystringWithLeadingNonLetter_Swagger2 = """
+        {
+          "swagger": "2.0",
+          "info": {
+            "title": "Test API",
+            "version": "1.0.0"
+          },
+          "host": "localhost",
+          "basePath": "/",
+          "paths": {
+            "/search": {
+              "get": {
+                "operationId": "SearchItems",
+                "parameters": [
+                  {
+                    "name": "_foo",
+                    "in": "query",
+                    "type": "string",
+                    "required": true
+                  },
+                  {
+                    "name": "1bar",
+                    "in": "query",
+                    "type": "string",
+                    "required": true
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Success"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Can_Generate_Code_With_Querystring_Leading_NonLetter_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            QuerystringWithLeadingNonLetter_Swagger2,
+            useDynamicQuerystringParameters: true);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task Generated_Code_With_Querystring_Leading_NonLetter_Uses_This_Qualifier_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            QuerystringWithLeadingNonLetter_Swagger2,
+            useDynamicQuerystringParameters: true);
+
+        // Should use "this." prefix to avoid self-assignment when parameter name equals property name
+        generatedCode.Should().Contain("this._foo = _foo;");
+    }
+
+    [Test]
+    public async Task Generated_Code_With_Querystring_Leading_NonLetter_Compiles_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            QuerystringWithLeadingNonLetter_Swagger2,
+            useDynamicQuerystringParameters: true);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    #endregion
+
+    #region Issue #1036 (Swagger 2.0) - Nullable Parameter Reordering with Generics
+
+    private const string ParametersWithGenerics_Swagger2 = """
+        {
+          "swagger": "2.0",
+          "info": {
+            "title": "Test API",
+            "version": "1.0.0"
+          },
+          "host": "localhost",
+          "basePath": "/",
+          "paths": {
+            "/filter": {
+              "get": {
+                "operationId": "FilterItems",
+                "parameters": [
+                  {
+                    "name": "filters",
+                    "in": "query",
+                    "required": true,
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "name": "optionalParam",
+                    "in": "query",
+                    "required": false,
+                    "type": "string"
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Success"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Can_Generate_Code_With_Generic_Parameters_Swagger2()
+    {
+        var generatedCode = await GenerateCode(ParametersWithGenerics_Swagger2, optionalParameters: true);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task Generic_Dictionary_Parameter_Not_Misclassified_As_Nullable_Swagger2()
+    {
+        var generatedCode = await GenerateCode(ParametersWithGenerics_Swagger2, optionalParameters: true);
+
+        // Dictionary<string, string?> should NOT be treated as optional based on internal "?"
+        // It should come before optional parameters and not have "= default" unless truly optional
+        generatedCode.Should().NotContain("IDictionary<string, string?> filters = default");
+    }
+
+    [Test]
+    public async Task Generated_Code_With_Generic_Parameters_Compiles_Swagger2()
+    {
+        var generatedCode = await GenerateCode(ParametersWithGenerics_Swagger2, optionalParameters: true);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    #endregion
+
     #region Optional Parameter Identifier Reordering
 
     [Test]
