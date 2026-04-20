@@ -63,21 +63,24 @@ internal class CustomCSharpTypeResolver : CSharpTypeResolver
         return base.Resolve(schema, isNullable, typeNameHint);
     }
 
+    private static readonly HashSet<string> KnownValueTypes
+        = new(StringComparer.Ordinal)
+        {
+            // System namespace qualified names
+            "System.Guid", "System.DateTime", "System.DateTimeOffset",
+            "System.TimeSpan", "System.Decimal", "System.Int32", "System.Int64",
+            "System.Double", "System.Single", "System.Boolean", "System.Byte",
+            "System.SByte", "System.Int16", "System.UInt16", "System.UInt32",
+            "System.UInt64", "System.Char",
+            // Unqualified names
+            "Guid", "DateTime", "DateTimeOffset", "TimeSpan", "Decimal",
+            "Int32", "Int64", "Double", "Single", "Boolean", "Byte",
+            "SByte", "Int16", "UInt16", "UInt32", "UInt64", "Char",
+            // C# type aliases
+            "bool", "byte", "sbyte", "char", "decimal", "double",
+            "float", "int", "uint", "long", "ulong", "short", "ushort"
+        };
+
     private static bool IsValueType(string typeName)
-    {
-        // Common value types
-        return typeName is "System.Guid" or "System.DateTime" or "System.DateTimeOffset"
-            or "System.TimeSpan" or "System.Decimal" or "System.Int32" or "System.Int64"
-            or "System.Double" or "System.Single" or "System.Boolean" or "System.Byte"
-            or "System.SByte" or "System.Int16" or "System.UInt16" or "System.UInt32"
-            or "System.UInt64" or "System.Char"
-            // Also check for unqualified names
-            or "Guid" or "DateTime" or "DateTimeOffset" or "TimeSpan" or "Decimal"
-            or "Int32" or "Int64" or "Double" or "Single" or "Boolean" or "Byte"
-            or "SByte" or "Int16" or "UInt16" or "UInt32" or "UInt64" or "Char"
-            // C# aliases
-            or "bool" or "byte" or "sbyte" or "char" or "decimal" or "double"
-            or "float" or "int" or "uint" or "long" or "ulong" or "short"
-            or "ushort";
-    }
+        => KnownValueTypes.Contains(typeName);
 }

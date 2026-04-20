@@ -1,4 +1,9 @@
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using FluentAssertions;
+using NJsonSchema;
+using NSwag;
+using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
@@ -320,6 +325,51 @@ public class IdentifierCorrectnessTests
     {
         var generatedCode = await GenerateCode(ParametersWithGenerics, optionalParameters: true);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    #endregion
+
+    #region Optional Parameter Identifier Reordering
+
+    [Test]
+    public void GetDefaultValueForParameter_Uses_Sanitized_Variable_Name_Fallback()
+    {
+        var openApiParameter = new OpenApiParameter
+        {
+            Name = "class",
+            Kind = OpenApiParameterKind.Query,
+            IsRequired = false,
+            Schema = new JsonSchema
+            {
+                Type = JsonObjectType.String,
+                Default = "abc"
+            }
+        };
+
+        var parameterModel = (CSharpParameterModel)RuntimeHelpers.GetUninitializedObject(typeof(CSharpParameterModel));
+        var baseType = typeof(CSharpParameterModel).BaseType!;
+
+        baseType
+            .GetField("<Type>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(parameterModel, "string");
+        baseType
+            .GetField("<Name>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(parameterModel, "class");
+        baseType
+            .GetField("<VariableName>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(parameterModel, "class");
+        baseType
+            .GetField("_parameter", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .SetValue(parameterModel, openApiParameter);
+
+        var method = typeof(ParameterExtractor)
+            .GetMethod("GetDefaultValueForParameter", BindingFlags.NonPublic | BindingFlags.Static);
+
+        var result = method!.Invoke(
+            null,
+            ["string? @class", new List<CSharpParameterModel> { parameterModel }]);
+
+        result.Should().Be("\"abc\"");
     }
 
     #endregion
