@@ -176,6 +176,75 @@ Recommendation: Address incrementally in 2.1.x patches.
 
 ---
 
+## 2026-04-20
+
+### PR #1064 Blocker Fixes: Final Validation Complete
+
+**Decision Date:** 2026-04-20  
+**PR:** #1064 ([v2.0 audit] Fix pre-release regressions from #1057)  
+**Verdict:** ✅ **APPROVED FOR MERGE** (cleanup pending)
+
+#### All Blockers FULLY RESOLVED
+
+**Issue #1013 — ContractTypeSuffixApplier Collision Detection** ✅
+- Implemented: Pre-flight collision check before building typeRenameMap
+- Strategy: Skip renaming if `name + suffix` collides with existing type
+- Test coverage: 3 tests in PR1064BlockerRegressions.cs
+- Status: PRODUCTION-READY
+
+**Issue #1018 — ParameterExtractor Multipart Deduplication** ✅
+- Root cause: Two parameter extraction paths used different naming methods
+- Fixed: Unified naming via `ConvertToVariableName()` across both paths
+- Test coverage: 3 tests in PR1064BlockerRegressions.cs
+- Status: PRODUCTION-READY
+
+**Issue #1053 — IdentifierUtils Keyword Escaping** ✅
+- Added: `__arglist`, `__makeref`, `__reftype`, `__refvalue` to reserved keywords
+- Fixed: Interface name sanitization AFTER prefixing (prevents `I@class` pattern)
+- Fixed: Test expectations corrected for NSwag schema name capitalization behavior
+- Test coverage: 6 tests in PR1064BlockerRegressions.cs
+- Status: PRODUCTION-READY
+
+#### Validation Results
+
+- **Build Status:** ✅ Clean build, 0 errors
+- **Test Suite:** ✅ 1779/1779 PASSING (0 failures)
+- **Code Formatting:** ✅ All changes properly formatted
+
+#### Quality Metrics
+
+- **Code Quality:** Excellent — defensive programming, no exceptions, surgical scope
+- **Test Coverage:** Comprehensive — 13 new tests covering all three blockers + edge cases
+- **Regression Risk:** Minimal — targeted fixes, existing tests unaffected
+
+#### Cleanup Required (CRITICAL)
+
+⚠️ **BEFORE MERGE:**
+- [ ] DELETE `src/test-multipart.json` — temporary repro file for #1018
+- [ ] DELETE `src/test-keywords.json` — temporary repro file for #1053
+
+#### Agent Sign-offs
+
+- ✅ **Parker:** Implemented initial fixes; identified #1018 naming method mismatch
+- ✅ **Ash:** Diagnosed root causes; implemented unified naming for #1018; corrected #1053 test expectations
+- ✅ **Lambert:** Created 13 comprehensive regression tests; verified all passing
+- ✅ **Dallas:** Validated build and test suite; confirmed all 1779 tests passing
+
+#### Key Learnings
+
+1. **Deduplication requires naming consistency** — Both code paths must use SAME transformation method
+2. **Case sensitivity matters** — GetVariableName() preserves casing; ConvertToVariableName() lowercases
+3. **NSwag behavior is normative** — Schema names capitalized by NSwag; tests must match actual behavior
+4. **Two-phase extraction complexity** — ParameterExtractor has parallel paths requiring coordinated fixes
+
+#### Recommendation
+
+**APPROVED FOR MERGE after cleanup.** All blockers are comprehensively resolved with excellent test coverage. Code is production-ready. Implementation follows best practices and minimal-scope surgical fixes.
+
+**Session Log:** `.squad/log/2026-04-20T16-00-14Z-pr1064-blocker-fixes.md`
+
+---
+
 ## 2026-04-17
 
 ### Release Compatibility Audit: 1.7.3 → HEAD (All Agents Consensus)

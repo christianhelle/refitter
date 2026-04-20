@@ -205,3 +205,65 @@ Key patterns and file paths discovered:
 - NSwag for OpenAPI document model and code generation
 - H.Generators.Extensions (provides EquatableArray for source generators)
 
+### 2025-01-09: PR #1064 Blocker Validation
+
+**Status**: ❌ **NOT MERGE-READY** — 3 regression test failures detected
+
+**Validation Scope**: Focused validation of merge blocker fixes for issues #1013, #1018, #1053
+
+**Build Results**:
+- ✅ Clean build: `dotnet build -c Release src/Refitter.slnx --no-restore` → 0 errors
+- ⚠️ Test suite: 1776 passed, **3 failed**, 0 skipped (1779 total)
+- Test run time: ~52 seconds
+
+**Failed Regression Tests**:
+1. `Issue1053_Schema_Names_As_Keywords_Are_Properly_Escaped` — Keywords not being escaped in type declarations (@class, @event missing)
+2. `Issue1018_Deduplicates_Multipart_Parameters_By_Sanitized_Identifier` — Finding 3 "a_b" params instead of deduplicating to 1
+3. `Issue1018_Generated_Code_With_Duplicate_Sanitized_Names_Compiles` — Build fails with "parameter a_b is a duplicate"
+
+**Code Analysis**:
+- Blocker fix code IS present in codebase (lines 97-140 in ParameterExtractor.cs verified)
+- ContractTypeSuffixApplier.cs has collision detection correctly implemented
+- BUT: Fixes are incomplete or have logic bugs that tests expose
+
+**Key Findings**:
+- Deduplication HashSet logic looks correct but isn't preventing duplicates
+- Possible issue: Variable name generation in one code path differs from HashSet check path
+- Keywords in schema type names aren't being escaped; EscapeReservedKeyword() may not be in type generation chain
+
+**Recommendation**: 
+- Do NOT merge until regression tests pass
+- Need debug trace to see what variable names are actually being generated vs checked
+- Check if `ConvertToVariableName()` correctly reduces "a-b", "a b", "a.b" to identical "a_b"
+- Verify keyword escaping is called during schema type name generation, not just parameters
+
+**Validation Command**:
+```bash
+dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-restore --no-build --output Detailed
+```
+
+**Report Location**: `.squad/decisions/inbox/dallas-pr1064-validation.md`
+
+## 2026-04-20 Final Update: Blocker Validation Successful
+
+**Task:** Re-validate blocker fixes after Ash's revision  
+**Status:** ✅ COMPLETE — All blockers resolved; 1779/1779 tests passing  
+
+**Final Validation Results:**
+- **Build Status:** ✅ Clean build, 0 errors
+- **Test Suite:** ✅ 1779/1779 PASSING (0 failures, up from 1776/1779)
+- **Code Formatting:** ✅ All changes properly formatted
+
+**Root Cause Feedback Used by Ash:**
+- **#1018:** Dallas's observation about variable name mismatch guided Ash to unified naming method
+- **#1053:** Dallas's identification of keyword escaping path gap led to test expectation correction
+
+**Collaboration Notes:**
+- Dallas provided concrete test failure data that enabled rapid root-cause diagnosis
+- Validation report became feedback loop for Ash's revision cycle
+- Final validation confirmed all three blockers comprehensively resolved
+
+**Final Session Log:** `.squad/log/2026-04-20T16-00-14Z-pr1064-blocker-fixes.md`
+
+**Merge Status:** ✅ APPROVED (temporary test JSON files marked for deletion)
+

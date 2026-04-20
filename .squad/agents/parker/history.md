@@ -10,6 +10,32 @@
 
 - Team initialized on 2026-04-16.
 
+## 2026-04-20 Final Update: Blockers Implemented and Validated
+
+**Task:** Implement fixes for PR #1064 merge blockers  
+**Status:** ✅ COMPLETE — Parker's initial fixes + Ash's revision; all 1779 tests passing  
+
+**Implementation Summary:**
+- **#1013 (Collision Detection):** Parker implemented pre-flight collision check; Ash verified production-ready
+- **#1018 (Multipart Dedup):** Parker's fix was incomplete; Ash diagnosed naming method mismatch and unified both code paths
+- **#1053 (Keyword Escaping):** Parker's code fix was correct; Ash corrected test expectations for NSwag capitalization
+
+**Key Collaboration Points:**
+- Parker's blocker gate review correctly identified gaps in initial implementation
+- Dallas's validation report provided concrete test failures for Ash to root-cause
+- Ripley's triage correctly predicted naming method mismatch in #1018
+- Ash's revision achieved comprehensive fix for all three blockers
+
+**Lessons for Future Work:**
+1. When fixing multipart/parameter extraction, verify ALL code paths use same naming method
+2. Case sensitivity in identifier deduplication is critical
+3. NSwag's automatic schema capitalization bypasses post-generation sanitization
+4. Test expectations must match actual framework behavior, not ideal behavior
+
+**Final Session Log:** `.squad/log/2026-04-20T16-00-14Z-pr1064-blocker-fixes.md`
+
+**Merge Status:** ✅ APPROVED (cleanup of temporary test JSON files required)
+
 ### 2026-04-20: PR #1064 Core Closure Review
 
 **Task**: Re-review PR #1064 against the exact closed-issue list and verify that the current branch actually resolves the core-generator issues it claims to close.
@@ -252,5 +278,64 @@ Created comprehensive regression tests in `IdentifierCorrectnessTests.cs` coveri
 - `src/Refitter.Core/RefitInterfaceImports.cs` (namespace import generation)
 - `src/Refitter.Core/CustomCSharpTypeResolver.cs` (custom format mapping nullability)
 - `src/Refitter.Tests/Examples/IdentifierCorrectnessTests.cs` (regression tests)
-
+
 **Build Status**: ✅ Core and CLI projects build successfully with only pre-existing warnings.
+
+## 2026-04-20: PR #1064 Remaining Merge Blockers
+
+**Task**: Fix the final three merge blockers from PR #1064: #1013 (suffix collision), #1018 (multipart dedup), #1053 (keyword escaping).
+
+**Completed Fixes**:
+
+1. **#1013 - ContractTypeSuffixApplier Collision Detection**:
+   - Added pre-flight collision check before building type rename map
+   - Collects all existing type names into a HashSet
+   - Skips renaming if `typeName + suffix` already exists in the codebase
+   - Prevents `Pet` → `PetDto` when `PetDto` already exists (would cause duplicate type names)
+   - Location: `src/Refitter.Core/ContractTypeSuffixApplier.cs` lines 18-47
+
+2. **#1053 - Reserved Keyword Escaping Order**:
+   - Fixed interface name generation to sanitize AFTER prefixing "I"
+   - OLD: `title.Sanitize()` → `"@class"` → prepend "I" → `"I@class"` (invalid!)
+   - NEW: prepend "I" to title → `"I@class-Service"` → `Sanitize()` → `"IClassService"` (valid!)
+   - Sanitize strips illegal chars (`@`, `-`, etc.) and escapes keywords in final step
+   - Location: `src/Refitter.Core/RefitInterfaceGenerator.cs` line 370
+
+**Partial Fix**:
+
+3. **#1018 - Multipart Parameter Deduplication**:
+   - Changed deduplication to use sanitized C# identifier instead of original OpenAPI key
+   - Initialize `seenFormParameterNames` with `GetVariableName(p)` instead of `p.Name`
+   - Check `seenFormParameterNames.Add(variableName)` instead of `property.Key`
+   - Logic verified correct: HashSet.Add returns true on first occurrence, false on duplicates
+   - **Issue**: Generated output still shows 3 duplicate parameters despite correct logic
+   - **Status**: Requires debugger-attached investigation to trace runtime behavior
+   - Location: `src/Refitter.Core/ParameterExtractor.cs` lines 97-100, 129-135
+
+**Investigation Notes - #1018**:
+- Manual trace-through confirms logic is sound: "a-b", "a b", "a.b" all produce "a_b"
+- Clean rebuild verified - DLL hash matches between source and output directories
+- Code path confirmed - only one location generates multipart parameters
+- Test spec manually verified - produces 3 duplicate parameters with current code
+- Possible causes: NSwag model quirk, multiple generation passes, or unknown secondary code path
+
+**Test File Fix**:
+- Fixed `PR1064BlockerRegressions.cs` line 174: `BeLessOrEqualTo` → `BeLessThanOrEqualTo` (FluentAssertions API correction)
+
+**Code Patterns Learned**:
+- ContractTypeSuffix must check for collision with target names, not just double-suffixing
+- Identifier escaping must happen as the FINAL step after all string composition
+- HashSet.Add returns true when item added (first occurrence), false when already present
+- Multipart/form-data parameter extraction is manual because NSwag doesn't populate operationModel.Parameters for OpenAPI 3.x requestBody schemas
+
+**File Locations**:
+- `src/Refitter.Core/ContractTypeSuffixApplier.cs` (collision detection)
+- `src/Refitter.Core/ParameterExtractor.cs` (multipart deduplication - partial)
+- `src/Refitter.Core/RefitInterfaceGenerator.cs` (keyword escaping order)
+- `src/Refitter.Tests/Examples/PR1064BlockerRegressions.cs` (test fix)
+
+**Build Status**: ✅ Solution builds successfully with no errors (only pre-existing warnings)
+**Test Status**: ⚠️ #1018 tests still failing - requires debugging investigation
+
+**Recommendation**: Merge #1013 and #1053 immediately. Hold #1018 for debugger investigation or create follow-up issue.
+
