@@ -11,8 +11,11 @@ The Refitter source generator is a bit untraditional in a sense that it creates 
 The source generator is distributed as a NuGet package and should be installed to the project that will contain the generated code
 
 ```shell
+dotnet add package Refit
 dotnet add package Refitter.SourceGenerator
 ```
+
+The source generator no longer upgrades `Refit` transitively for consuming projects. Add a direct package reference to the `Refit` version you want to compile against (and `Refit.HttpClientFactory` separately if you use generated dependency injection helpers).
 
 #### Usage
 
