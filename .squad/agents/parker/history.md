@@ -9,6 +9,34 @@
 ## Learnings
 
 - Team initialized on 2026-04-16.
+- 2026-04-20: `JsonSerializerContextGenerator` must use Roslyn syntax analysis instead of regex, emit attributes inside the contracts namespace, register nested types plus closed generic usages, and strip a conventional leading `I` from serializer-context names.
+- 2026-04-20: `GenerateJsonSerializerContext` is wired through both `RefitGenerator.Generate()` and `GenerateMultipleFiles()`; multi-file generation emits a dedicated `{ContextName}.cs` file alongside contracts.
+- 2026-04-20: `GenerateNullableReferenceTypes` must not silently flip `GenerateOptionalPropertiesAsNullable`; optional-property nullability stays an explicit user choice in `CodeGeneratorSettings`.
+
+## 2026-04-20: P1 Audit Closures (#1017, #1026)
+
+**Task:** Close the remaining core P1 audit findings for AOT serializer-context generation and silent nullable-shape mutation.
+**Status:** ✅ COMPLETE — 3 commits created, manual generator/CLI validation passed, focused regression tests added.
+
+**Implementation Summary:**
+- **#1017:** Replaced regex-based serializer-context discovery with Roslyn syntax traversal in `src/Refitter.Core/JsonSerializerContextGenerator.cs`, added namespace-safe emission in `RefitGenerator`, and covered nested types, closed generics, multi-file output, and contracts-namespace separation in tests.
+- **#1026:** Removed the automatic `GenerateOptionalPropertiesAsNullable` mutation from `src/Refitter.Core/CSharpClientGeneratorFactory.cs`; runtime regressions now assert that NRT alone preserves the old DTO shape while explicit opt-in still yields nullable optional properties.
+- **Follow-up hardening:** Added fallback handling for null/blank `Naming.InterfaceName` when deriving serializer-context names and restored a missing Roslyn import in `RefitGenerator.cs` after review.
+
+**Validation Notes:**
+- Built `src\Refitter.Core\Refitter.Core.csproj` and `src\Refitter\Refitter.csproj` successfully with a fresh local NuGet cache after shared-cache file locks blocked the default/global cache.
+- Manual validation harness confirmed:
+  - direct serializer-context generation handles nested types and closed generics,
+  - single-file and multi-file AOT output compile in standalone projects,
+  - NRT-only generation keeps optional properties non-nullable unless `GenerateOptionalPropertiesAsNullable` is explicitly set.
+
+**Key File Paths:**
+- `src/Refitter.Core/JsonSerializerContextGenerator.cs`
+- `src/Refitter.Core/CSharpClientGeneratorFactory.cs`
+- `src/Refitter.Core/RefitGenerator.cs`
+- `src/Refitter.Tests/JsonSerializerContextGeneratorTests.cs`
+- `src/Refitter.Tests/Examples/GenerateJsonSerializerContextTests.cs`
+- `src/Refitter.Tests/Examples/RuntimeCompatibilityTests.cs`
 
 ## 2026-04-20 Final Update: Blockers Implemented and Validated
 
