@@ -11,6 +11,13 @@
 - Team initialized on 2026-04-16.
 - **Issue #998 findings (2026-04-16):** Validated MSBuild tooling path. CLI loads settings correctly (naming honored). Single-file output without explicit `outputFilename` falls back to `Output.cs` and skips `./Generated` folder when it matches default. Real product bug: MSBuild expects wrong file locations on first clean build.
 
+### 2026-04-20: PR #1064 Tooling Review
+
+- **#1011 is only partially fixed:** `RefitterSourceGenerator.CreateUniqueHintName()` hashes only the directory path, so two `.refitter` files in the same folder that share the same `outputFilename` still collide on `context.AddSource()`. The attempted fix moved the failure instead of making hint names unique per `.refitter` input.
+- **#1021 is only partially fixed:** single-file `--output` override was repaired, but multi-file generation still ignores `settings.OutputPath` whenever `OutputFolder` is populated/defaulted. Settings-file + `--multiple-files`/contracts-output flows still write under the settings output folder.
+- **#1050 is only fixed for CLI/MSBuild:** helpful enum diagnostics were added to `SettingsValidator`, but `RefitterSourceGenerator.TryDeserialize()` still emits the raw exception text without property/value guidance. `.refitter` enum mistakes remain hard to diagnose in source-generator hosts.
+- **Validation evidence gap:** PR #1064 check runs were green, but the `test` GitHub check is a no-op placeholder (`No build commands configured — update squad-ci.yml`). The local `test\MSBuild\test-exit-code.ps1` script passes when launched from `test\MSBuild`, but fails from repo root because its relative paths assume that working directory.
+
 ### 2026-04-17: Breaking Changes Audit + Tie-Break Decision
 
 **Primary Audit Task**: Reviewed 370 files (36,658 insertions, 6,808 deletions) between 1.7.3 and HEAD for breaking changes. **INITIAL ASSESSMENT:** No breaking changes found. All changes appeared backward-compatible or additive.

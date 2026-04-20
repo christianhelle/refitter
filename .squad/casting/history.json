@@ -15,6 +15,23 @@
         "Scribe",
         "Ralph"
       ]
+    },
+    {
+      "assignment_id": "2026-04-20T14-00-00Z-add-ash",
+      "created_at": "2026-04-20T14:00:00Z",
+      "repository": "christianhelle/refitter",
+      "user": "Christian Helle",
+      "universe": "Alien",
+      "members": [
+        "Ripley",
+        "Parker",
+        "Dallas",
+        "Lambert",
+        "Bishop",
+        "Ash",
+        "Scribe",
+        "Ralph"
+      ]
     }
   ]
 }

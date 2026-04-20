@@ -110,6 +110,72 @@ Recommendation: Address incrementally in 2.1.x patches.
 
 ---
 
+## 2026-04-20
+
+### PR #1064 Squad Review: v2.0 Audit Fix Status
+
+**Decision Date:** 2026-04-20  
+**PR:** #1064 ([v2.0 audit] Fix pre-release regressions from #1057)  
+**Branch:** v2.0.0-prerelease-audit  
+**Verdict:** **NO MERGE YET** — 5 confirmed blockers pending resolution
+
+#### Review Lanes & Findings
+
+**Bishop (Documentation)** — ✅ READY
+- Breaking-changes docs accurate and complete
+- 29 issues closed with real code fixes verified
+- Optional post-merge improvements: README link, CLI precedence clarity, security fix highlight
+- Recommendation: APPROVE (non-blocking gaps only)
+
+**Dallas (Tooling)** — ❌ NOT READY
+- Blocker #1011: Source generator hint-name collision on same-directory duplicates (partial fix)
+- Blocker #1021: CLI `--output` override ignored in multi-file settings-file flow (partial fix)
+- Blocker #1050: Enum-error guidance only added to CLI; source generator still raw (partial fix)
+- Verified #1012: MSBuild exit-code handling correct
+
+**Ash (Safety)** — ❌ NOT READY
+- Blocker #1013: ContractTypeSuffixApplier missing suffix-target collision detection (no check for `Foo` + `FooDto` → `FooDto` duplicate)
+- Blocker #1018: ParameterExtractor multipart dedup uses original key, not sanitized name (`"a-b"` + `"a b"` → duplicate `"a_b"`)
+- Both are compilation-breaking; must fix before merge
+
+**Ripley (Issue Matrix)** — ❌ NOT READY
+- Blocker #1053: `Sanitize()` returns unescaped keywords (`@class`, missing `__*` set); no `EscapeReservedKeyword()` routing
+- Blocker #1021: Multi-file precedence guard incomplete
+- Blocker #1050: Source generator enum guidance not improved
+- Supporting blockers from Ash (#1013, #1018)
+- Awaiting Parker on #1040 (timeout config), #1050 (enum error handling)
+
+#### Confirmed Must-Fix Blockers (5 Items)
+
+| Issue | File | Gap | Fix |
+|-------|------|-----|-----|
+| #1013 | ContractTypeSuffixApplier.cs | No collision check | Add guard for duplicate targets |
+| #1018 | ParameterExtractor.cs | Dedupe by wrong key | Dedupe by sanitized identifier |
+| #1021 | GenerateCommand.cs | Multi-file ignores `-o` | Restore override guard + test |
+| #1050 | RefitterSourceGenerator.cs | CLI-only guidance | Catch + re-throw with context |
+| #1053 | IdentifierUtils (call sites) | No keyword routing | Route through `EscapeReservedKeyword` |
+
+#### Evidence Summary
+
+**Resolved (20/28):** P0 all 7 fixed; P1 partial fixes; P2 mostly silent improvements  
+**Partial (6/28):** #1013, #1018, #1021, #1050, #1053, #1019  
+**Unresolved (1/28):** #1053 (coordinator spot-check)  
+**Awaiting (1/28):** #1040 (Parker review)  
+
+#### Recommendation
+
+- **Request blocker fixes:** ~30 minutes estimated work
+- **Re-run full test suite** after fixes
+- **Final gate:** All blockers resolved + tests passing → APPROVE FOR MERGE
+- **Nice-to-have:** Parker/Lambert confirmations on #1040, #1019
+
+#### Agents Still Running
+
+- **Parker (Core Developer):** Awaiting verdict on #1040 (HttpClient timeout) + #1050 (enum errors)
+- **Lambert (Tester):** Optional confirmation on #1019 (edge cases), #1021 (CLI regression)
+
+---
+
 ## 2026-04-17
 
 ### Release Compatibility Audit: 1.7.3 → HEAD (All Agents Consensus)

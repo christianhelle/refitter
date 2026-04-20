@@ -10,6 +10,31 @@
 
 - Team initialized on 2026-04-16.
 
+### 2026-04-20: PR #1064 Core Closure Review
+
+**Task**: Re-review PR #1064 against the exact closed-issue list and verify that the current branch actually resolves the core-generator issues it claims to close.
+
+**Key Findings**:
+- **#1013 remains PARTIAL**: moving from regex to Roslyn avoids comment/string corruption, but `ContractTypeSuffixApplier` still blindly maps `name -> name + suffix` with no collision detection. A spec that already contains `PetDto` still collides when `Pet` is suffixed to `PetDto`, and `VisitIdentifierName()` rewrites every matching identifier token rather than only proven type contexts.
+- **#1018 remains PARTIAL**: multipart manual extraction still deduplicates by the original OpenAPI key (`property.Key`) instead of the sanitized identifier. Reproducing with `Class/class` and `user-name/user name` still emits duplicate `@class` and `user_name` parameters.
+- **#1014 remains PARTIAL**: internal enum handling is fixed, but `RefitGenerator.SanitizeGeneratedContracts()` still injects `System.Text.Json.Serialization.JsonStringEnumConverter` unconditionally and `CSharpClientGeneratorFactory` still hard-codes `JsonLibrary = SystemTextJson`.
+- **#1053 remains PARTIAL and introduces a new regression**: `IdentifierUtils.Sanitize()` now escapes reserved keywords too early. Prefixed emit sites still compose invalid identifiers like `I@class` when `UseOpenApiTitle=true` and the title is `class`.
+- **#1044 / #1050 are only CLI-side fixes**: `SettingsValidator` now reports them better, but the core library still silently prefers `OpenApiPaths` over `OpenApiPath` and `Serializer.Deserialize()` still throws the raw `JsonException` for non-CLI callers/source generator flows.
+- **#1040 is only PARTIAL**: timeout and `User-Agent` were added, but `OpenApiDocumentFactory` still has no cancellation-token plumbing.
+
+**Verified Full Closures In Core Lane**:
+- #1015, #1016, #1019, #1020, #1027, #1035, #1036, #1037, #1038, #1046, #1049, #1051, #1052, #1054, #1055.
+
+**Validation Run**:
+- `dotnet build src\Refitter.Tests\Refitter.Tests.csproj -c Release --no-restore`
+- `dotnet test --project src\Refitter.Tests\Refitter.Tests.csproj -c Release --framework net10.0 --no-build --no-restore`
+- `dotnet build src\Refitter.slnx -c Release --no-restore`
+- `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`
+
+**Useful Repros**:
+- Multipart collision repro still generates: `Task UploadFile([AliasAs("Class")] string @class, [AliasAs("class")] string @class, [AliasAs("user-name")] string user_name, [AliasAs("user name")] string user_name);`
+- OpenAPI title keyword repro still generates: `public partial interface I@class`
+
 ### 2026-04-17: Release Compatibility Audit (1.7.3 to HEAD)
 
 **Task**: Audit generator-core changes between 1.7.3 and HEAD for breaking behavior ahead of major release.

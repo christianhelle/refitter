@@ -116,3 +116,54 @@
 - Library async patterns inconsistent (no ConfigureAwait discipline)
 
 **Recommendation**: Audit quality is high. These issues can be addressed incrementally in 2.1.x patch releases after 2.0 stable.
+
+### 2026-04-20: PR #1064 Issue-to-Evidence Matrix
+
+**Task**: Build comprehensive issue-to-evidence matrix for 28 closed issues in PR #1064 v2.0 prerelease fix.
+
+**Methodology**:
+- Collated existing audit findings (Parker P0, Dallas P0/P1/P2, Lambert P1, Ripley P2-Low)
+- Cross-referenced with Coordinator spot-checks on #1013, #1018, #1053
+- Integrated Ash's automated review comments from PR thread
+- Classified each issue as resolved/partial/unresolved/awaiting-reviewer
+
+**Key Findings**:
+
+**Resolution Breakdown**:
+- 20 issues fully resolved (7 P0, 2 P1, 11 P2)
+- 6 issues partially resolved (critical gaps in 3)
+- 1 unresolved (#1053)
+- 1 awaiting-reviewer (#1040)
+
+**Blocker Set (No-Merge Condition)**:
+1. **#1053: IdentifierUtils.Sanitize() not escaping keywords** — UNRESOLVED
+   - Sanitize() returns invalid identifiers like @class, @record
+   - Missing __arglist, __makeref, __reftype, __refvalue keywords
+   - No routing through EscapeReservedKeyword
+   
+2. **#1013: ContractTypeSuffixApplier no collision detection** — PARTIAL
+   - Missing guard for duplicate FooDto when both Foo and FooDto exist
+   - No skip for already-suffixed names
+   
+3. **#1018: ParameterExtractor multipart collision not deduped** — PARTIAL
+   - Different property names sanitizing to same C# identifier not deduplicated
+   - Example: "a-b" and "a b" both → "a_b"
+   
+4. **#1021: CLI --output precedence logic unclear** — PARTIAL
+   - Guard restoration from #998 fix may be incomplete
+   - Needs regression test
+   
+5. **#1050: Enum deserialization errors not actionable** — PARTIAL
+   - Generic JsonException; unclear if caught + re-thrown with context
+
+**Evidence Sources**:
+- Parker's P0 audit (6 confirmed fixes)
+- Dallas's P0/P1/P2 audit (comprehensive)
+- Lambert's P1 audit (2 confirmed fixes)
+- Ripley's P2-Low audit (13 confirmed valid)
+- Ash's automated PR review (3 collision gaps identified)
+- Coordinator spot-check (keyword escaping gap confirmed)
+
+**Provisional Verdict**: DO NOT MERGE until blockers cleared. Recommendation: fix 3 critical gaps (#1013, #1018, #1053 one-liners) in ~30 minutes, then merge.
+
+**Record Created**: `.squad/decisions/inbox/ripley-pr1064-evidence-matrix.md`

@@ -40,6 +40,14 @@
     "role": "Docs"
   },
   {
+    "persistent_name": "Ash",
+    "universe": "Alien",
+    "created_at": "2026-04-20T14:00:00Z",
+    "legacy_named": false,
+    "status": "active",
+    "role": "Safety Reviewer"
+  },
+  {
     "persistent_name": "Scribe",
     "universe": "Reserved",
     "created_at": "2026-04-16T12:04:04Z",
