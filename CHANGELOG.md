@@ -4,8 +4,41 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.103...HEAD)
 
+**Fixed bugs:**
+
+- \[v2.0 audit\]\[L12\] Reordering of interface-generator construction in Generate\(\) is correct but fragile [\#1055](https://github.com/christianhelle/refitter/issues/1055)
+- \[v2.0 audit\]\[L11\] OpenApiDocumentFactory.CreateAsync\(IEnumerable\<string\>\) throws wrong exception type on null [\#1054](https://github.com/christianhelle/refitter/issues/1054)
+- \[v2.0 audit\]\[L10\] IdentifierUtils.ReservedKeywords incomplete; Sanitize\(\) does not escape keywords [\#1053](https://github.com/christianhelle/refitter/issues/1053)
+- \[v2.0 audit\]\[L9\] OperationNameGenerator.CheckForDuplicateOperationIds runs full pipeline twice in constructor [\#1052](https://github.com/christianhelle/refitter/issues/1052)
+- \[v2.0 audit\]\[L8\] XmlDocumentationGenerator.DecodeJsonEscapedText mishandles malformed \u sequences [\#1051](https://github.com/christianhelle/refitter/issues/1051)
+- \[v2.0 audit\]\[L7\] Enum-deserialization errors in .refitter give unhelpful JsonException [\#1050](https://github.com/christianhelle/refitter/issues/1050)
+- \[v2.0 audit\]\[L6\] Library code missing ConfigureAwait\(false\) — sync-over-async deadlock risk for hosted callers [\#1049](https://github.com/christianhelle/refitter/issues/1049)
+- \[v2.0 audit\]\[L5\] CLI reads .refitter twice \(validator + execute\), risks drift [\#1048](https://github.com/christianhelle/refitter/issues/1048)
+- \[v2.0 audit\]\[L3\] Default OpenApiPaths = Array.Empty\<string\>\(\) round-trips into saved settings as "openApiPaths": \[\] [\#1046](https://github.com/christianhelle/refitter/issues/1046)
+- \[v2.0 audit\]\[L1\] OpenApiPath + OpenApiPaths precedence is silent; no validation [\#1044](https://github.com/christianhelle/refitter/issues/1044)
+- \[v2.0 audit\]\[M13\] Static HttpClient has no timeout, no cancellation, no User-Agent [\#1040](https://github.com/christianhelle/refitter/issues/1040)
+- \[v2.0 audit\]\[M11\] CustomCSharpTypeResolver appends ? to mapped reference-type aliases regardless of nullable-reference-type setting [\#1038](https://github.com/christianhelle/refitter/issues/1038)
+- \[v2.0 audit\]\[M10\] RefitInterfaceImports.GenerateNamespaceImports throws on empty namespace list [\#1037](https://github.com/christianhelle/refitter/issues/1037)
+- \[v2.0 audit\]\[M9\] ReOrderNullableParameters mis-classifies generic parameters that contain ? [\#1036](https://github.com/christianhelle/refitter/issues/1036)
+- \[v2.0 audit\]\[M8\] XML doc emission does not escape user-supplied parameter / dynamic-querystring descriptions [\#1035](https://github.com/christianhelle/refitter/issues/1035)
+- \[v2.0 audit\]\[M4\] ValidateOpenApiSpec does not resolve relative spec paths from settings-file directory [\#1031](https://github.com/christianhelle/refitter/issues/1031)
+- \[v2.0 audit\]\[M3\] SettingsValidator only validates the first entry of openApiPaths [\#1030](https://github.com/christianhelle/refitter/issues/1030)
+- \[v2.0 audit\]\[H11\] RefitInterfaceGenerator NRE when an OpenAPI response has no content [\#1027](https://github.com/christianhelle/refitter/issues/1027)
+- \[v2.0 audit\]\[H5\] CLI: --output / -o no longer overrides settings-file outputFolder \(script regression\) [\#1021](https://github.com/christianhelle/refitter/issues/1021)
+- \[v2.0 audit\]\[H4\] Dynamic-querystring constructor self-assigns when parameter name starts with non-letter [\#1020](https://github.com/christianhelle/refitter/issues/1020)
+- \[v2.0 audit\]\[H3\] Security-scheme header parameter name not safely sanitized [\#1019](https://github.com/christianhelle/refitter/issues/1019)
+- \[v2.0 audit\]\[H2\] ParameterExtractor.ConvertToVariableName produces invalid C\# identifiers \(multipart form-data fields\) [\#1018](https://github.com/christianhelle/refitter/issues/1018)
+- \[v2.0 audit\]\[C6\] Multi-spec merge silently drops all schemas when first spec has no components [\#1016](https://github.com/christianhelle/refitter/issues/1016)
+- \[v2.0 audit\]\[C5\] ConvertOneOfWithDiscriminatorToAllOf NRE on Swagger 2 / OpenAPI 3 docs without components [\#1015](https://github.com/christianhelle/refitter/issues/1015)
+- \[v2.0 audit\]\[C4\] Forced JsonStringEnumConverter injection breaks Newtonsoft users and silently regresses internal enums [\#1014](https://github.com/christianhelle/refitter/issues/1014)
+- \[v2.0 audit\]\[C3\] ContractTypeSuffixApplier corrupts code via raw word-boundary regex \(renames members, comments, strings; double-suffix on rerun\) [\#1013](https://github.com/christianhelle/refitter/issues/1013)
+- \[v2.0 audit\]\[C2\] MSBuild task swallows CLI failures; build always reports success with stale/missing output [\#1012](https://github.com/christianhelle/refitter/issues/1012)
+- \[v2.0 audit\]\[C1\] SourceGenerator: hint-name collisions when two .refitter files share a filename [\#1011](https://github.com/christianhelle/refitter/issues/1011)
+
 **Merged pull requests:**
 
+- \[v2.0 audit\] Fix pre-release regressions from \#1057 [\#1064](https://github.com/christianhelle/refitter/pull/1064) ([christianhelle](https://github.com/christianhelle))
+- Update dependency coverlet.collector to v10 [\#1007](https://github.com/christianhelle/refitter/pull/1007) ([renovate[bot]](https://github.com/apps/renovate))
 - Update actions/github-script action to v9 [\#1006](https://github.com/christianhelle/refitter/pull/1006) ([renovate[bot]](https://github.com/apps/renovate))
 - Update actions/checkout action to v6 [\#1005](https://github.com/christianhelle/refitter/pull/1005) ([renovate[bot]](https://github.com/apps/renovate))
 - Upgrade Squad to v0.9.1 [\#1004](https://github.com/christianhelle/refitter/pull/1004) ([christianhelle](https://github.com/christianhelle))
