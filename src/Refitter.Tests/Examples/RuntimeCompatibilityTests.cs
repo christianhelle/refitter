@@ -391,6 +391,78 @@ public class RuntimeCompatibilityTests
     }
 
     /// <summary>
+    /// Swagger 2.0 should still honor explicit opt-in for nullable optional properties.
+    /// </summary>
+    [Test]
+    public async Task Honors_Explicit_GenerateOptionalPropertiesAsNullable_When_NRT_Enabled_Swagger2()
+    {
+        const string swaggerSpecV2 = """
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Optional Properties Test API",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "paths": {
+    "/items": {
+      "post": {
+        "operationId": "CreateItem",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Item"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Item": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(swaggerSpecV2),
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = true
+            }
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().Contain("public string Name");
+        code.Should().Contain("public string? Description");
+    }
+
+    /// <summary>
     /// Test for issue #1052: Verify duplicate operation ID detection is efficient.
     /// This test ensures the duplicate detection short-circuits on first duplicate found.
     /// </summary>
