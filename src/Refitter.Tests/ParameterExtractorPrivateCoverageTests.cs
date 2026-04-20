@@ -136,6 +136,47 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [Test]
+    public void GetAliasAsAttribute_CSharpParameterModel_Escapes_Special_Characters()
+    {
+        // A parameter name containing quotes or backslashes must be escaped
+        // so the generated AliasAs(...) literal is valid C#.
+        var withQuote = CreateParameterModel("user\"id", "userQuoteid");
+        var withBackslash = CreateParameterModel("user\\id", "userBackslashid");
+
+        var method = typeof(ParameterExtractor).GetMethod(
+            "GetAliasAsAttribute",
+            BindingFlags.NonPublic | BindingFlags.Static,
+            null,
+            [typeof(CSharpParameterModel)],
+            null);
+
+        var quoteResult = (string?)method!.Invoke(null, [withQuote]);
+        var backslashResult = (string?)method.Invoke(null, [withBackslash]);
+
+        quoteResult.Should().Be("AliasAs(\"user\\\"id\")");
+        backslashResult.Should().Be("AliasAs(\"user\\\\id\")");
+    }
+
+    [Test]
+    public void GetAliasAsAttribute_StringOverload_Escapes_Special_Characters()
+    {
+        var method = typeof(ParameterExtractor).GetMethod(
+            "GetAliasAsAttribute",
+            BindingFlags.NonPublic | BindingFlags.Static,
+            null,
+            [typeof(string), typeof(string)],
+            null);
+
+        var unchanged = (string?)method!.Invoke(null, ["same", "same"]);
+        var withQuote = (string?)method.Invoke(null, ["user\"id", "userId"]);
+        var withBackslash = (string?)method.Invoke(null, ["user\\id", "userId"]);
+
+        unchanged.Should().BeEmpty();
+        withQuote.Should().Be("AliasAs(\"user\\\"id\")");
+        withBackslash.Should().Be("AliasAs(\"user\\\\id\")");
+    }
+
+    [Test]
     public void GetCSharpType_Handles_Number_Object_Unknown_And_Nullable_String()
     {
         var settings = new RefitGeneratorSettings { OptionalParameters = true };

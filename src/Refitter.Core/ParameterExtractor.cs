@@ -350,12 +350,12 @@ internal static class ParameterExtractor
     private static string GetAliasAsAttribute(CSharpParameterModel parameterModel) =>
         string.Equals(parameterModel.Name, parameterModel.VariableName)
             ? string.Empty
-            : $"AliasAs(\"{parameterModel.Name}\")";
+            : $"AliasAs(\"{EscapeString(parameterModel.Name)}\")";
 
     private static string GetAliasAsAttribute(string originalName, string variableName) =>
         string.Equals(originalName, variableName, StringComparison.Ordinal)
             ? string.Empty
-            : $"AliasAs(\"{originalName}\")";
+            : $"AliasAs(\"{EscapeString(originalName)}\")";
 
     private static string JoinAttributes(params string[] attributes)
     {
