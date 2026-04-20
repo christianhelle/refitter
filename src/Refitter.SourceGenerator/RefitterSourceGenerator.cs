@@ -117,7 +117,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            if (!settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
+            if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
+                !settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
                 !File.Exists(settings.OpenApiPath))
             {
                 settings.OpenApiPath = Path.Combine(
