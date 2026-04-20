@@ -128,10 +128,18 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
             if (!settings.SkipValidation)
             {
-                var specPath = refitGeneratorSettings.OpenApiPaths?.Length > 0
-                    ? refitGeneratorSettings.OpenApiPaths[0]
-                    : refitGeneratorSettings.OpenApiPath!;
-                await ValidateOpenApiSpec(specPath, settings);
+                if (refitGeneratorSettings.OpenApiPaths == null || refitGeneratorSettings.OpenApiPaths.Length == 0)
+                {
+                    var specPath = refitGeneratorSettings.OpenApiPath!;
+                    await ValidateOpenApiSpec(specPath, settings);
+                }
+                else
+                {
+                    foreach (var specPath in refitGeneratorSettings.OpenApiPaths)
+                    {
+                        await ValidateOpenApiSpec(specPath, settings);
+                    }
+                }
             }
 
             await (refitGeneratorSettings.GenerateMultipleFiles
