@@ -175,11 +175,10 @@ public class RuntimeCompatibilityTests
     }
 
     /// <summary>
-    /// Test for issue #1026: Verify auto-enabling of GenerateOptionalPropertiesAsNullable.
-    /// When GenerateNullableReferenceTypes is enabled, optional properties should be nullable.
+    /// Test for issue #1026: nullable reference types alone must not silently change contract shapes.
     /// </summary>
     [Test]
-    public async Task Auto_Enables_Optional_Properties_As_Nullable_When_NRT_Enabled()
+    public async Task Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled()
     {
         const string openApiSpec = """
 {
@@ -243,14 +242,15 @@ public class RuntimeCompatibilityTests
 
         code.Should().NotBeNullOrWhiteSpace();
         code.Should().Contain("public string Name");
-        code.Should().Contain("public string? Description"); // Optional property should be nullable
+        code.Should().Contain("public string Description");
+        code.Should().NotContain("public string? Description");
     }
 
     /// <summary>
-    /// Swagger 2.0 equivalent of Auto_Enables_Optional_Properties_As_Nullable_When_NRT_Enabled.
+    /// Swagger 2.0 equivalent of Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled.
     /// </summary>
     [Test]
-    public async Task Auto_Enables_Optional_Properties_As_Nullable_When_NRT_Enabled_Swagger2()
+    public async Task Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled_Swagger2()
     {
         const string swaggerSpecV2 = """
 {
@@ -315,7 +315,79 @@ public class RuntimeCompatibilityTests
 
         code.Should().NotBeNullOrWhiteSpace();
         code.Should().Contain("public string Name");
-        code.Should().Contain("public string? Description"); // Optional property should be nullable
+        code.Should().Contain("public string Description");
+        code.Should().NotContain("public string? Description");
+    }
+
+    /// <summary>
+    /// Explicit opt-in should still generate nullable optional properties when desired.
+    /// </summary>
+    [Test]
+    public async Task Honors_Explicit_GenerateOptionalPropertiesAsNullable_When_NRT_Enabled()
+    {
+        const string openApiSpec = """
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Optional Properties Test API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/items": {
+      "post": {
+        "operationId": "CreateItem",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Item"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Item": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(openApiSpec),
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = true
+            }
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().Contain("public string Name");
+        code.Should().Contain("public string? Description");
     }
 
     /// <summary>
