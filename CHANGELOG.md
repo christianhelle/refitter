@@ -14,6 +14,8 @@
 
 **Fixed bugs:**
 
+- \[v2.0 audit\]\[H10\] Auto-enabling GenerateOptionalPropertiesAsNullable is a silent breaking shape change [\#1026](https://github.com/christianhelle/refitter/issues/1026)
+- \[v2.0 audit\]\[H1\] JsonSerializerContextGenerator emits non-compiling AOT context [\#1017](https://github.com/christianhelle/refitter/issues/1017)
 - \[v2.0 audit\]\[L12\] Reordering of interface-generator construction in Generate\(\) is correct but fragile [\#1055](https://github.com/christianhelle/refitter/issues/1055)
 - \[v2.0 audit\]\[L11\] OpenApiDocumentFactory.CreateAsync\(IEnumerable\<string\>\) throws wrong exception type on null [\#1054](https://github.com/christianhelle/refitter/issues/1054)
 - \[v2.0 audit\]\[L10\] IdentifierUtils.ReservedKeywords incomplete; Sanitize\(\) does not escape keywords [\#1053](https://github.com/christianhelle/refitter/issues/1053)
@@ -32,6 +34,9 @@
 - \[v2.0 audit\]\[M4\] ValidateOpenApiSpec does not resolve relative spec paths from settings-file directory [\#1031](https://github.com/christianhelle/refitter/issues/1031)
 - \[v2.0 audit\]\[M3\] SettingsValidator only validates the first entry of openApiPaths [\#1030](https://github.com/christianhelle/refitter/issues/1030)
 - \[v2.0 audit\]\[H11\] RefitInterfaceGenerator NRE when an OpenAPI response has no content [\#1027](https://github.com/christianhelle/refitter/issues/1027)
+- \[v2.0 audit\]\[H8\] Refit major bump 9 → 10 silently leaks to Refitter.SourceGenerator consumers [\#1024](https://github.com/christianhelle/refitter/issues/1024)
+- \[v2.0 audit\]\[H7\] MSBuild IncludePatterns is substring-matched, over-includes files [\#1023](https://github.com/christianhelle/refitter/issues/1023)
+- \[v2.0 audit\]\[H6\] MSBuild predicted output paths diverge from CLI actual paths → silent missing compile items [\#1022](https://github.com/christianhelle/refitter/issues/1022)
 - \[v2.0 audit\]\[H5\] CLI: --output / -o no longer overrides settings-file outputFolder \(script regression\) [\#1021](https://github.com/christianhelle/refitter/issues/1021)
 - \[v2.0 audit\]\[H4\] Dynamic-querystring constructor self-assigns when parameter name starts with non-letter [\#1020](https://github.com/christianhelle/refitter/issues/1020)
 - \[v2.0 audit\]\[H3\] Security-scheme header parameter name not safely sanitized [\#1019](https://github.com/christianhelle/refitter/issues/1019)
