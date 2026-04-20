@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 using MSBuildTask = Microsoft.Build.Utilities.Task;
 
@@ -8,6 +7,8 @@ namespace Refitter.MSBuild;
 
 public class RefitterGenerateTask : MSBuildTask
 {
+    internal const string GeneratedFileMarker = "GeneratedFile: ";
+
     public string ProjectFileDirectory { get; set; }
 
     public bool DisableLogging { get; set; }
@@ -29,7 +30,7 @@ public class RefitterGenerateTask : MSBuildTask
             "*.refitter",
             SearchOption.AllDirectories);
 
-        files = FilterFiles(files, IncludePatterns);
+        files = FilterFiles(files, IncludePatterns, ProjectFileDirectory);
 
         TryLogCommandLine($"Found {files.Length} .refitter files...");
 
@@ -76,11 +77,12 @@ public class RefitterGenerateTask : MSBuildTask
     private List<string> StartProcess(string file, out bool failed)
     {
         failed = false;
-        var expectedFiles = GetExpectedGeneratedFiles(file);
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
         var separator = Path.DirectorySeparatorChar;
         var refitterDll = $"{packageFolder}{separator}..{separator}net8.0{separator}refitter.dll";
+        var generatedFiles = new List<string>();
+        var generatedFilesLock = new object();
 
         List<string> installedRuntimes = GetInstalledDotnetRuntimes();
         if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 10.")))
@@ -127,8 +129,33 @@ public class RefitterGenerateTask : MSBuildTask
             }
         };
 
-        process.ErrorDataReceived += (_, args) => TryLogError(args.Data);
-        process.OutputDataReceived += (_, args) => TryLogCommandLine(args.Data);
+        process.ErrorDataReceived += (_, args) =>
+        {
+            if (string.IsNullOrWhiteSpace(args.Data))
+            {
+                return;
+            }
+
+            TryLogError(args.Data);
+        };
+        process.OutputDataReceived += (_, args) =>
+        {
+            if (string.IsNullOrWhiteSpace(args.Data))
+            {
+                return;
+            }
+
+            var generatedFilePath = ParseGeneratedFilePath(args.Data);
+            if (!string.IsNullOrWhiteSpace(generatedFilePath))
+            {
+                lock (generatedFilesLock)
+                {
+                    generatedFiles.Add(generatedFilePath!);
+                }
+            }
+
+            TryLogCommandLine(args.Data);
+        };
         process.Start();
         process.BeginErrorReadLine();
         process.BeginOutputReadLine();
@@ -151,6 +178,8 @@ public class RefitterGenerateTask : MSBuildTask
             return new List<string>();
         }
 
+        process.WaitForExit();
+
         // Check exit code - non-zero indicates failure
         if (process.ExitCode != 0)
         {
@@ -159,8 +188,18 @@ public class RefitterGenerateTask : MSBuildTask
             return new List<string>();
         }
 
-        // Return the list of files that should have been generated
-        return expectedFiles.Where(File.Exists).ToList();
+        var existingGeneratedFiles = generatedFiles
+            .Where(File.Exists)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (existingGeneratedFiles.Count == 0)
+        {
+            failed = true;
+            TryLogError($"Refitter did not report any generated files for {file}");
+        }
+
+        return existingGeneratedFiles;
     }
 
     /// <summary>
@@ -188,79 +227,6 @@ public class RefitterGenerateTask : MSBuildTask
         }
 
         return installedRuntimes;
-    }
-
-    /// <summary>
-    /// Determines the expected output files that should be generated from a .refitter configuration file
-    /// </summary>
-    /// <param name="refitterFilePath">Path to the .refitter configuration file</param>
-    /// <returns>List of expected output file paths</returns>
-    private List<string> GetExpectedGeneratedFiles(string refitterFilePath)
-    {
-        try
-        {
-            var refitterFileDirectory = Path.GetDirectoryName(refitterFilePath) ?? string.Empty;
-            var refitterContent = File.ReadAllText(refitterFilePath);
-
-            // Parse JSON properties using simple regex patterns
-            var outputFolder = ExtractJsonStringValue(refitterContent, "outputFolder");
-            var outputFilename = ExtractJsonStringValue(refitterContent, "outputFilename");
-            var generateMultipleFiles = ExtractJsonBoolValue(refitterContent, "generateMultipleFiles");
-            var contractsOutputFolder = ExtractJsonStringValue(refitterContent, "contractsOutputFolder");
-            var hasDependencyInjectionSettings = refitterContent.Contains("\"dependencyInjectionSettings\"");
-
-            // If contractsOutputFolder is specified, automatically enable multiple files
-            bool hasContractsOutputFolder = !string.IsNullOrWhiteSpace(contractsOutputFolder);
-            generateMultipleFiles = generateMultipleFiles || hasContractsOutputFolder;
-
-            // Default output filename based on .refitter filename if not specified
-            if (string.IsNullOrWhiteSpace(outputFilename))
-            {
-                var refitterFileName = Path.GetFileNameWithoutExtension(refitterFilePath);
-                outputFilename = $"{refitterFileName}.cs";
-            }
-
-            var generatedFiles = new List<string>();
-
-            if (generateMultipleFiles)
-            {
-                // Multiple files mode
-                var baseOutputFolder = !string.IsNullOrWhiteSpace(outputFolder) ? outputFolder : "./Generated";
-                var interfaceOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, baseOutputFolder, "RefitInterfaces.cs"));
-                var contractsOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory,
-                    !string.IsNullOrWhiteSpace(contractsOutputFolder) ? contractsOutputFolder : baseOutputFolder,
-                    "Contracts.cs"));
-                var diOutputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, baseOutputFolder, "DependencyInjection.cs"));
-
-                generatedFiles.Add(interfaceOutputPath);
-                generatedFiles.Add(contractsOutputPath);
-
-                // DependencyInjection.cs is only generated if dependencyInjectionSettings are specified
-                if (hasDependencyInjectionSettings)
-                {
-                    generatedFiles.Add(diOutputPath);
-                }
-            }
-            else
-            {
-                // Single file mode
-                // If outputFolder is not specified in .refitter, CLI uses default "./Generated"
-                var effectiveOutputFolder = !string.IsNullOrWhiteSpace(outputFolder)
-                    ? outputFolder
-                    : "./Generated";
-
-                var outputPath = Path.GetFullPath(Path.Combine(refitterFileDirectory, effectiveOutputFolder, outputFilename));
-                generatedFiles.Add(outputPath);
-            }
-
-            TryLogCommandLine($"Expected generated files: {string.Join(", ", generatedFiles)}");
-            return generatedFiles;
-        }
-        catch (Exception ex)
-        {
-            TryLogError($"Error parsing .refitter file {refitterFilePath}: {ex.Message}");
-            return new List<string>();
-        }
     }
 
     private void TryLogErrorFromException(Exception e)
@@ -300,42 +266,13 @@ public class RefitterGenerateTask : MSBuildTask
     }
 
     /// <summary>
-    /// Extracts a string value from a JSON property using regex pattern matching
-    /// </summary>
-    /// <param name="json">The JSON content to search</param>
-    /// <param name="propertyName">The name of the property to extract</param>
-    /// <returns>The extracted string value, or null if not found</returns>
-    private static string? ExtractJsonStringValue(string json, string propertyName)
-    {
-        // Simple regex to extract string values from JSON
-        // Pattern: "propertyName": "value" or "propertyName":"value"
-        var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*""([^""]*)""";
-        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
-        return match.Success ? match.Groups[1].Value : null;
-    }
-
-    /// <summary>
-    /// Extracts a boolean value from a JSON property using regex pattern matching
-    /// </summary>
-    /// <param name="json">The JSON content to search</param>
-    /// <param name="propertyName">The name of the property to extract</param>
-    /// <returns>True if the property value is "true", false otherwise</returns>
-    private static bool ExtractJsonBoolValue(string json, string propertyName)
-    {
-        // Simple regex to extract boolean values from JSON
-        // Pattern: "propertyName": true or "propertyName":false
-        var pattern = $@"""{Regex.Escape(propertyName)}""\s*:\s*(true|false)";
-        var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
-        return match.Success && string.Equals(match.Groups[1].Value, "true", StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
     /// Filters the list of .refitter files based on include patterns
     /// </summary>
     /// <param name="files">The list of .refitter files to filter</param>
-    /// <param name="includePatterns">Semicolon-separated file name patterns to include (e.g. "petstore.refitter;petstore-default.refitter")</param>
+    /// <param name="includePatterns">Semicolon-separated file names or project-relative paths to include (e.g. "petstore.refitter;apis\petstore-default.refitter")</param>
+    /// <param name="projectFileDirectory">The root project directory used when matching relative paths.</param>
     /// <returns>The filtered list of .refitter files</returns>
-    private static string[] FilterFiles(string[] files, string includePatterns)
+    internal static string[] FilterFiles(string[] files, string includePatterns, string projectFileDirectory)
     {
         if (string.IsNullOrWhiteSpace(includePatterns))
         {
@@ -343,15 +280,63 @@ public class RefitterGenerateTask : MSBuildTask
         }
 
         var patterns = includePatterns.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(p => p.Trim())
+            .Select(NormalizeIncludePattern)
             .ToList();
 
         return files.Where(file =>
         {
-            var fileName = Path.GetFileName(file);
+            var fileName = NormalizeIncludePattern(Path.GetFileName(file));
+            var relativePath = string.IsNullOrWhiteSpace(projectFileDirectory)
+                ? fileName
+                : NormalizeIncludePattern(GetRelativePath(projectFileDirectory, file));
+            var fullPath = NormalizeIncludePattern(Path.GetFullPath(file));
+
             return patterns.Any(pattern =>
                 fileName.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
-                fileName.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0);
+                relativePath.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
+                fullPath.Equals(pattern, StringComparison.OrdinalIgnoreCase));
         }).ToArray();
     }
+
+    internal static string? ParseGeneratedFilePath(string? outputLine)
+    {
+        var markerLine = outputLine ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(markerLine))
+        {
+            return null;
+        }
+
+        if (!markerLine.StartsWith(GeneratedFileMarker, StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var generatedFilePath = markerLine.Substring(GeneratedFileMarker.Length).Trim();
+        return string.IsNullOrWhiteSpace(generatedFilePath) ? null : generatedFilePath;
+    }
+
+    private static string NormalizeIncludePattern(string path)
+    {
+        var normalizedPath = path
+            .Trim()
+            .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+        var relativePrefix = $".{Path.DirectorySeparatorChar}";
+        return normalizedPath.StartsWith(relativePrefix, StringComparison.Ordinal)
+            ? normalizedPath.Substring(relativePrefix.Length)
+            : normalizedPath;
+    }
+
+    private static string GetRelativePath(string relativeTo, string path)
+    {
+        var relativeToUri = new Uri(AppendDirectorySeparator(relativeTo));
+        var pathUri = new Uri(path);
+        return Uri.UnescapeDataString(relativeToUri.MakeRelativeUri(pathUri).ToString())
+            .Replace('/', Path.DirectorySeparatorChar);
+    }
+
+    private static string AppendDirectorySeparator(string path) =>
+        path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+            ? path
+            : path + Path.DirectorySeparatorChar;
 }

@@ -21,6 +21,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
 """;
 
+    internal const string GeneratedFileMarker = "GeneratedFile: ";
     private static readonly string Crlf = Environment.NewLine;
 
     private RefitGeneratorSettings? _cachedSettings;
@@ -431,6 +432,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             Directory.CreateDirectory(outputDirectory);
 
         await File.WriteAllTextAsync(outputPath, code);
+        if (settings.SimpleOutput)
+        {
+            WriteGeneratedFileMarker(outputPath);
+        }
     }
 
     private static string FormatFileSize(long bytes)
@@ -535,6 +540,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 totalLines += lines;
 
                 await File.WriteAllTextAsync(contractsFile, outputFile.Content);
+                if (settings.SimpleOutput)
+                {
+                    WriteGeneratedFileMarker(contractsFile);
+                }
                 continue;
             }
 
@@ -566,6 +575,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 Directory.CreateDirectory(fileDirectory);
 
             await File.WriteAllTextAsync(outputPath, code);
+            if (settings.SimpleOutput)
+            {
+                WriteGeneratedFileMarker(outputPath);
+            }
         }
 
         if (settings.SimpleOutput)
@@ -765,14 +778,16 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ? string.Empty
             : Path.GetDirectoryName(settings.SettingsFilePath) ?? string.Empty;
 
-        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
+        var outputFolder = HasExplicitCliOutputOverride(settings)
+            ? settings.OutputPath
+            : refitGeneratorSettings.OutputFolder;
+
+        if (!string.IsNullOrWhiteSpace(outputFolder))
         {
-            return Path.Combine(root, refitGeneratorSettings.OutputFolder, outputFile.Filename);
+            return CombineWithSettingsRoot(root, outputFolder, outputFile.Filename);
         }
 
-        return !string.IsNullOrWhiteSpace(settings.OutputPath) && settings.OutputPath != Settings.DefaultOutputPath
-            ? Path.Combine(root, settings.OutputPath, outputFile.Filename)
-            : Path.Combine(root, outputFile.Filename);
+        return CombineWithSettingsRoot(root, outputFile.Filename);
     }
 
     private static bool IsDirectCliGeneration(Settings settings) =>
@@ -786,6 +801,22 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     private static bool UsesDirectCliDefaults(Settings settings) =>
         IsDirectCliGeneration(settings) &&
         (string.IsNullOrWhiteSpace(settings.OutputPath) || settings.OutputPath == Settings.DefaultOutputPath);
+
+    private static bool HasExplicitCliOutputOverride(Settings settings) =>
+        !string.IsNullOrWhiteSpace(settings.OutputPath) &&
+        settings.OutputPath != Settings.DefaultOutputPath;
+
+    private static string CombineWithSettingsRoot(string root, params string[] segments)
+    {
+        var combinedPath = Path.Combine(segments);
+        return !string.IsNullOrWhiteSpace(root) && !Path.IsPathRooted(combinedPath)
+            ? Path.Combine(root, combinedPath)
+            : combinedPath;
+    }
+
+    private static void WriteGeneratedFileMarker(string outputPath) =>
+        Console.WriteLine($"{GeneratedFileMarker}{Path.GetFullPath(outputPath)}");
+
     private static async Task ValidateOpenApiSpec(string openApiPath, Settings settings)
     {
         OpenApiValidationResult validationResult;

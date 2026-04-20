@@ -22,6 +22,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="8.8.0" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.4.0" PrivateAssets="all" />
         <PackageReference Include="TUnit" Version="1.35.2" />
         <PackageReference Include="coverlet.collector" Version="10.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -37,6 +38,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
       <ProjectReference Include="..\Refitter\Refitter.csproj" />
+      <ProjectReference Include="..\Refitter.MSBuild\Refitter.MSBuild.csproj" />
     </ItemGroup>
 
 </Project>
