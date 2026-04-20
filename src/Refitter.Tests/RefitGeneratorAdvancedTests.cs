@@ -670,6 +670,37 @@ public class RefitGeneratorAdvancedTests
     }
 
     [Test]
+    public async Task GenerateMultipleFiles_With_JsonSerializerContext_Adds_Context_File()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        try
+        {
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                GenerateMultipleFiles = true,
+                GenerateJsonSerializerContext = true,
+                Naming = new NamingSettings
+                {
+                    UseOpenApiTitle = false,
+                    InterfaceName = "ITestApi"
+                }
+            };
+
+            var generator = await RefitGenerator.CreateAsync(settings);
+            var result = generator.GenerateMultipleFiles();
+
+            result.Files.Should().Contain(f => f.TypeName == "TestApiSerializerContext");
+            var combinedCode = result.Files.Select(f => f.Content).ToArray();
+            BuildHelper.BuildCSharp(combinedCode).Should().BeTrue();
+        }
+        finally
+        {
+            CleanupSwaggerFile(swaggerFile);
+        }
+    }
+
+    [Test]
     public async Task GenerateMultipleFiles_With_GenerateContracts_False_And_ContractTypeSuffix()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);

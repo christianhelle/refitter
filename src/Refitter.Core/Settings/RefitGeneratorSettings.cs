@@ -354,6 +354,7 @@ public class RefitGeneratorSettings
     /// Refit interface(s) are written to a file called RefitInterfaces.cs
     /// Contracts are written to a file called Contracts.cs
     /// Dependency Injection is written to a file called DependencyInjection.cs
+    /// When <see cref="GenerateJsonSerializerContext"/> is enabled, an additional serializer context file is emitted.
     /// </summary>
     [Description(
         """
@@ -362,6 +363,7 @@ public class RefitGeneratorSettings
         Refit interface(s) are written to a file called RefitInterfaces.cs
         Contracts are written to a file called Contracts.cs
         Dependency Injection is written to a file called DependencyInjection.cs
+        When GenerateJsonSerializerContext is enabled, an additional serializer context file is emitted.
         """
     )]
     public bool GenerateMultipleFiles { get; set; }
@@ -422,8 +424,9 @@ public class RefitGeneratorSettings
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate JsonSerializerContext for AOT compilation support.
+    /// The context is emitted into the contracts namespace and only when contracts are generated.
     /// </summary>
-    [Description("Generate JsonSerializerContext for AOT compilation support")]
+    [Description("Generate JsonSerializerContext for AOT compilation support in the contracts namespace when contracts are generated.")]
     public bool GenerateJsonSerializerContext { get; set; }
 
     /// <summary>

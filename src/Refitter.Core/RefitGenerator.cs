@@ -146,6 +146,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
+        var serializerContext = GenerateJsonSerializerContext(contracts);
 
         if (settings.GenerateClients)
         {
@@ -166,6 +167,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .AppendLine(settings.GenerateClients ? refitInterfacesCode : string.Empty)
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
+            .AppendLine(serializerContext)
             .AppendLine(
                 settings.ApizrSettings != null
                     ? ApizrRegistrationGenerator.Generate(settings, interfaceNames, title)
@@ -201,6 +203,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
+        var serializerContext = GenerateJsonSerializerContext(contracts);
 
         var generatedFiles = new List<GeneratedCode>();
 
@@ -213,6 +216,14 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                 new GeneratedCode(
                     TypenameConstants.Contracts,
                     contracts));
+        }
+
+        if (!string.IsNullOrWhiteSpace(serializerContext))
+        {
+            generatedFiles.Add(
+                new GeneratedCode(
+                    JsonSerializerContextGenerator.GetContextTypeName(settings),
+                    serializerContext));
         }
 
         if (settings.DependencyInjectionSettings is not null || settings.ApizrSettings is not null)
@@ -285,6 +296,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .Replace(contracts, string.Empty)
             .TrimEnd();
     }
+
+    private string GenerateJsonSerializerContext(string contracts) =>
+        settings.GenerateJsonSerializerContext && settings.GenerateContracts
+            ? JsonSerializerContextGenerator.Generate(contracts, settings)
+            : string.Empty;
 
     /// <summary>
     /// Generates the client code based on the specified interface generator.
