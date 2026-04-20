@@ -13,6 +13,8 @@
 
 Refitter is a tool for generating a C# REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface and contracts from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
+> **Upgrading to v2.0.0?** Review the [Breaking Changes (v2.0.0)](docs/docfx_project/articles/breaking-changes-v2-0-0.md) guide, especially the OpenAPI parser upgrade note. Regenerate your client code and test carefully.
+
 Refitter comes in 3 forms:
 
 - A [.NET CLI Tool](#cli-tool) distributed via [nuget.org](http://www.nuget.org/packages/refitter) that outputs a single C# file on disk
