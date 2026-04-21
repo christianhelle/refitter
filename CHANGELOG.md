@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.103...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0-preview.105...HEAD)
+
+**Merged pull requests:**
+
+- Update nswag monorepo to 14.7.1 [\#1065](https://github.com/christianhelle/refitter/pull/1065) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [2.0.0-preview.105](https://github.com/christianhelle/refitter/tree/2.0.0-preview.105) (2026-04-21)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.103...2.0.0-preview.105)
 
 **Fixed bugs:**
 
