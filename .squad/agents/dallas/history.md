@@ -10,6 +10,7 @@
 
 - Team initialized on 2026-04-16.
 - **Issue #998 findings (2026-04-16):** Validated MSBuild tooling path. CLI loads settings correctly (naming honored). Single-file output without explicit `outputFilename` falls back to `Output.cs` and skips `./Generated` folder when it matches default. Real product bug: MSBuild expects wrong file locations on first clean build.
+- **PR #1067 tooling proof (2026-04-21):** The strongest regression signal came from testing the actual stdout marker contract and the packed `Refitter.SourceGenerator` artifact. `RefitterGenerateTask` now has unit coverage for exact include matching plus duplicate/zero-marker handling, and package validation inspects the produced `.nupkg`/`.nuspec` instead of trusting project metadata.
 
 ### 2026-04-20: PR #1064 Tooling Review
 

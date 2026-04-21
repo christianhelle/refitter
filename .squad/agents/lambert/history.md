@@ -12,6 +12,7 @@
 - **Issue #998 findings (2026-04-16):** Reproduced on clean .NET 10 build. Output.cs written to project root instead of Generated folder. Settings honored, but file path logic broken. Non-default folders work. First build fails due to sync mismatch; second build succeeds. Specific to default single-file output path behavior.
 - **PR #1064 closure audit (2026-04-20):** Validation evidence is strong for most closed issues, but #1014, #1040, #1053, and #1055 are over-claimed closures: tests only prove a subset or the code still leaves the reported gap. Manual repros did confirm #1011 (duplicate .refitter filenames now generate distinct hint names), #1012 (MSBuild build now fails on CLI error), and #1031 (settings-relative spec paths validate/generate from repo root).
 - **PR #1064 blocker recheck (2026-04-20):** Narrowed repros changed the confidence split: #1021 and #1050 are now proven end-to-end, but #1013 and #1018 are still only partial closures because uncovered collision cases remain reproducible despite the new tests.
+- **PR #1067 coverage pass (2026-04-21):** Added direct branch coverage for AOT serializer-context generation (whitespace contracts, OpenAPI-title naming, open-generic rejection, qualified/alias-qualified generic formatting). Swagger 2.0 #1026 compatibility is now explicitly locked for optional `ICollection<T>`, custom reference types, and `IDictionary<string, T>` staying non-nullable while optional value types still fall through as nullable.
 
 ### 2026-04-17: Release Compatibility Validation + Tie-Break Repro
 
