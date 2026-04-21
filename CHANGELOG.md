@@ -34,8 +34,8 @@
 - \[v2.0 audit\]\[M4\] ValidateOpenApiSpec does not resolve relative spec paths from settings-file directory [\#1031](https://github.com/christianhelle/refitter/issues/1031)
 - \[v2.0 audit\]\[M3\] SettingsValidator only validates the first entry of openApiPaths [\#1030](https://github.com/christianhelle/refitter/issues/1030)
 - \[v2.0 audit\]\[H11\] RefitInterfaceGenerator NRE when an OpenAPI response has no content [\#1027](https://github.com/christianhelle/refitter/issues/1027)
-- \[v2.0 audit\]\[H8\] Refit major bump 9 → 10 silently leaks to Refitter.SourceGenerator consumers [\#1024](https://github.com/christianhelle/refitter/issues/1024)
-- \[v2.0 audit\]\[H7\] MSBuild IncludePatterns is substring-matched, over-includes files [\#1023](https://github.com/christianhelle/refitter/issues/1023)
+- \[v2.0 audit\]\[H8\] Source-generator consumers now need their own explicit `Refit` package reference [\#1024](https://github.com/christianhelle/refitter/issues/1024)
+- \[v2.0 audit\]\[H7\] MSBuild `RefitterIncludePatterns` now uses exact matching only [\#1023](https://github.com/christianhelle/refitter/issues/1023)
 - \[v2.0 audit\]\[H6\] MSBuild predicted output paths diverge from CLI actual paths → silent missing compile items [\#1022](https://github.com/christianhelle/refitter/issues/1022)
 - \[v2.0 audit\]\[H5\] CLI: --output / -o no longer overrides settings-file outputFolder \(script regression\) [\#1021](https://github.com/christianhelle/refitter/issues/1021)
 - \[v2.0 audit\]\[H4\] Dynamic-querystring constructor self-assigns when parameter name starts with non-letter [\#1020](https://github.com/christianhelle/refitter/issues/1020)
@@ -47,6 +47,10 @@
 - \[v2.0 audit\]\[C3\] ContractTypeSuffixApplier corrupts code via raw word-boundary regex \(renames members, comments, strings; double-suffix on rerun\) [\#1013](https://github.com/christianhelle/refitter/issues/1013)
 - \[v2.0 audit\]\[C2\] MSBuild task swallows CLI failures; build always reports success with stale/missing output [\#1012](https://github.com/christianhelle/refitter/issues/1012)
 - \[v2.0 audit\]\[C1\] SourceGenerator: hint-name collisions when two .refitter files share a filename [\#1011](https://github.com/christianhelle/refitter/issues/1011)
+
+**Migration notes:**
+
+- The Microsoft.OpenApi parser upgrade (1.x → 3.x) is documented migration guidance, not a claim of exhaustive behavioral equivalence. Regenerate clients, review diffs, and run tests after upgrading. See the [breaking changes guide](docs/docfx_project/articles/breaking-changes-v2-0-0.md).
 
 **Merged pull requests:**
 

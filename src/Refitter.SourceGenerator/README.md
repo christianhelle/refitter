@@ -4,9 +4,7 @@
 
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
-The Refitter source generator is a bit untraditional in a sense that it creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `--outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code
-
-***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
+Starting with v2.0.0, the source generator emits code in-memory through Roslyn `AddSource()` instead of writing `.g.cs` files to disk. Use your IDE's generated-files view to inspect the output. If your workflow requires physical generated files for review, commits, or build scripts, use Refitter CLI or Refitter.MSBuild instead.
 
 ### Installation
 
@@ -14,7 +12,10 @@ The source generator is distributed as a NuGet package and should be installed t
 
 ```shell
 dotnet add package Refitter.SourceGenerator
+dotnet add package Refit
 ```
+
+`Refitter.SourceGenerator` keeps its `Refit` dependency private, so consuming projects must add their own direct package reference to `Refit`. If you use generated dependency-injection helpers such as `ConfigureRefitClients()`, also add `Refit.HttpClientFactory` explicitly.
 
 ### Usage
 
@@ -184,10 +185,10 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `useCancellationTokens` - Use cancellation tokens in the generated methods. Default is `false`
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
-- `outputFolder` - a string describing a relative path to a desired output folder. Default is `./Generated`
-- `outputFilename` - Output filename. Default is `Output.cs` when used from the CLI tool, otherwise its the .refitter filename. So `Petstore.refitter` becomes `Petstore.cs`.
-- `contractsOutputFolder` - a string describing a relative path to the folder where contract files are generated. Enabling this automatically enables generating multiple files. Default is `NULL`
-- `generateMultipleFiles` - a boolean indicating whether to generate multiple files instead of a single large file. Refit interface(s) are written to `RefitInterfaces.cs`, contracts to `Contracts.cs`, and dependency injection to `DependencyInjection.cs`. Default is `false`
+- `outputFolder` - a relative output folder used by Refitter CLI and Refitter.MSBuild. The source generator emits code in-memory and does not write to this folder. Default is `./Generated`
+- `outputFilename` - Output filename when used from the CLI tool. For the source generator, this sets the base Roslyn hint name for the in-memory generated source; when omitted it derives from the `.refitter` filename.
+- `contractsOutputFolder` - a relative contracts output folder used by Refitter CLI and Refitter.MSBuild. The source generator emits contracts in-memory, so this setting has no effect there. Default is `NULL`
+- `generateMultipleFiles` - generates multiple disk files when used by Refitter CLI or Refitter.MSBuild. The source generator currently emits a single in-memory source addition per `.refitter` file, so this does not produce separate physical files there. Default is `false`
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 - `excludeNamespaces` - A collection of regular expressions to exclude namespaces from the generated file. A use case for this is when your project has global usings where these namespaces would be redundant. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
