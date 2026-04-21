@@ -320,6 +320,108 @@ public class RuntimeCompatibilityTests
     }
 
     /// <summary>
+    /// Swagger 2.0 optional reference properties should keep pre-#1026 shapes for arrays, custom types and generic collections.
+    /// Value types should still retain nullable fallthrough where appropriate.
+    /// </summary>
+    [Test]
+    public async Task Does_Not_Auto_Enable_Optional_Properties_As_Nullable_For_Swagger2_Reference_Shapes()
+    {
+        const string swaggerSpecV2 = """
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Optional Reference Shapes API",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "paths": {
+    "/items": {
+      "post": {
+        "operationId": "CreateItem",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Item"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Child": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "Item": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Child"
+          }
+        },
+        "primaryChild": {
+          "$ref": "#/definitions/Child"
+        },
+        "namedChildren": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Child"
+          }
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(swaggerSpecV2),
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true
+            }
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().Contain("public ICollection<Child> Children");
+        code.Should().Contain("public Child PrimaryChild");
+        code.Should().Contain("public IDictionary<string, Child> NamedChildren");
+        code.Should().Contain("public int? Count");
+        code.Should().NotContain("public ICollection<Child>? Children");
+        code.Should().NotContain("public Child? PrimaryChild");
+        code.Should().NotContain("public IDictionary<string, Child>? NamedChildren");
+        BuildHelper.BuildCSharp(code).Should().BeTrue();
+    }
+
+    /// <summary>
     /// Explicit opt-in should still generate nullable optional properties when desired.
     /// </summary>
     [Test]

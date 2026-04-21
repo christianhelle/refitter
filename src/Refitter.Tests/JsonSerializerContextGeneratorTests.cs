@@ -7,6 +7,14 @@ namespace Refitter.Tests;
 public class JsonSerializerContextGeneratorTests
 {
     [Test]
+    public void Generate_Returns_Empty_When_Contracts_Are_Whitespace()
+    {
+        JsonSerializerContextGenerator.Generate(" \r\n\t ", CreateSettings())
+            .Should()
+            .BeEmpty();
+    }
+
+    [Test]
     public void Generate_Returns_Empty_When_No_Types()
     {
         var settings = CreateSettings();
@@ -14,6 +22,27 @@ public class JsonSerializerContextGeneratorTests
         JsonSerializerContextGenerator.Generate("// no contracts", settings)
             .Should()
             .BeEmpty();
+    }
+
+    [Test]
+    public void Generate_Uses_OpenApi_Title_For_Context_Name_When_Enabled()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+            }
+            """;
+
+        var settings = CreateSettings(interfaceName: "IIgnoredApi");
+        settings.Naming.UseOpenApiTitle = true;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, settings, "PetService");
+
+        result.Should().Contain("internal partial class PetServiceSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
+        result.Should().NotContain("IgnoredApiSerializerContext");
     }
 
     [Test]
@@ -138,6 +167,41 @@ public class JsonSerializerContextGeneratorTests
     }
 
     [Test]
+    public void Generate_Skips_Generic_Usages_That_Still_Reference_Open_Type_Parameters()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+
+                public partial class Envelope<T>
+                {
+                    public T Payload { get; set; }
+                }
+
+                public partial class Wrapper<T>
+                {
+                    public Envelope<T> OpenValue { get; set; }
+                }
+
+                public partial class ClosedWrapper
+                {
+                    public Envelope<Pet> ClosedValue { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Pet>))]");
+        result.Should().NotContain("typeof(Envelope<T>))");
+        result.Should().NotContain("typeof(Wrapper))");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
+    [Test]
     public void Generate_Global_Qualifies_Types_Outside_The_Context_Namespace()
     {
         const string contracts = """
@@ -160,6 +224,105 @@ public class JsonSerializerContextGeneratorTests
 
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(LocalModel))]");
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(global::Shared.Contracts.SharedModel))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
+    [Test]
+    public void Generate_Formats_Nullable_Array_And_Qualified_Generic_Usages()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+
+                public partial class Envelope<T>
+                {
+                    public T Payload { get; set; }
+                }
+
+                public partial class Container<T>
+                {
+                    public T Value { get; set; }
+                }
+
+                public partial class Response
+                {
+                    public Container<My.Contracts.Envelope<My.Contracts.Pet>[]?> QualifiedValues { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Container<Envelope<Pet>[]?>))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
+    [Test]
+    public void Generate_Formats_Alias_Qualified_Generic_Usages()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+
+                public partial class Envelope<T>
+                {
+                    public T Payload { get; set; }
+                }
+
+                public partial class Container<T>
+                {
+                    public T Value { get; set; }
+                }
+
+                public partial class Response
+                {
+                    public Container<global::My.Contracts.Envelope<global::My.Contracts.Pet>> AliasedValue { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Container<global::My.Contracts.Envelope<global::My.Contracts.Pet>>))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
+    [Test]
+    public void Generate_Formats_Alias_Qualified_Declared_Types_Using_Namespace_Alias()
+    {
+        const string contracts = """
+            using Contracts = My.Contracts;
+
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+
+                public partial class Envelope<T>
+                {
+                    public T Payload { get; set; }
+                }
+
+                public partial class Response
+                {
+                    public Contracts::Pet AliasedPet { get; set; }
+
+                    public Contracts::Envelope<Pet> AliasedEnvelope { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Pet>))]");
         BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
     }
 

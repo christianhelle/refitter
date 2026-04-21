@@ -168,9 +168,6 @@ internal static class JsonSerializerContextGenerator
             QualifiedNameSyntax qualifiedName
                 when TryResolveDeclaredType(qualifiedName, declaredTypes, GetCurrentNamespace(typeSyntax), out var declaredQualifiedType)
                 => FormatDeclaredTypeName(qualifiedName, declaredQualifiedType, declaredTypes, contextNamespace),
-            AliasQualifiedNameSyntax aliasQualifiedName
-                when TryResolveDeclaredType(aliasQualifiedName, declaredTypes, GetCurrentNamespace(typeSyntax), out var declaredAliasType)
-                => FormatDeclaredTypeName(aliasQualifiedName, declaredAliasType, declaredTypes, contextNamespace),
             GenericNameSyntax genericName
                 when TryResolveDeclaredType(genericName, declaredTypes, GetCurrentNamespace(typeSyntax), out var declaredGenericType)
                 => FormatDeclaredTypeName(genericName, declaredGenericType, declaredTypes, contextNamespace),
@@ -185,15 +182,12 @@ internal static class JsonSerializerContextGenerator
     }
 
     private static string FormatDeclaredTypeName(
-        SimpleNameSyntax typeSyntax,
+        GenericNameSyntax typeSyntax,
         DeclaredTypeInfo declaredType,
         IReadOnlyCollection<DeclaredTypeInfo> declaredTypes,
         string contextNamespace)
     {
-        if (typeSyntax is not GenericNameSyntax genericName)
-            return declaredType.GetDisplayName(contextNamespace);
-
-        var arguments = string.Join(", ", genericName.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)));
+        var arguments = string.Join(", ", typeSyntax.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)));
         return $"{declaredType.GetDisplayName(contextNamespace)}<{arguments}>";
     }
 
@@ -204,19 +198,6 @@ internal static class JsonSerializerContextGenerator
         string contextNamespace)
     {
         if (typeSyntax.Right is not GenericNameSyntax genericName)
-            return declaredType.GetDisplayName(contextNamespace);
-
-        var arguments = string.Join(", ", genericName.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)));
-        return $"{declaredType.GetDisplayName(contextNamespace)}<{arguments}>";
-    }
-
-    private static string FormatDeclaredTypeName(
-        AliasQualifiedNameSyntax typeSyntax,
-        DeclaredTypeInfo declaredType,
-        IReadOnlyCollection<DeclaredTypeInfo> declaredTypes,
-        string contextNamespace)
-    {
-        if (typeSyntax.Name is not GenericNameSyntax genericName)
             return declaredType.GetDisplayName(contextNamespace);
 
         var arguments = string.Join(", ", genericName.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)));
