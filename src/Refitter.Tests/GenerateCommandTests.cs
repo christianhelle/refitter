@@ -149,6 +149,16 @@ public class GenerateCommandTests
     }
 
     [Test]
+    public void FormatGeneratedFileMarker_Should_Emit_A_Task_Parseable_Full_Path()
+    {
+        var generatedFile = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Generated", "Petstore.cs"));
+        var outputLine = GenerateCommand.FormatGeneratedFileMarker(generatedFile);
+
+        outputLine.Should().Be($"{GenerateCommand.GeneratedFileMarker}{generatedFile}");
+        Refitter.MSBuild.RefitterGenerateTask.ParseGeneratedFilePath(outputLine).Should().Be(generatedFile);
+    }
+
+    [Test]
     public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Default()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");

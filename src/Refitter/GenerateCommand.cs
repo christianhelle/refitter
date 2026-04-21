@@ -814,8 +814,11 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             : combinedPath;
     }
 
+    internal static string FormatGeneratedFileMarker(string outputPath) =>
+        $"{GeneratedFileMarker}{Path.GetFullPath(outputPath)}";
+
     private static void WriteGeneratedFileMarker(string outputPath) =>
-        Console.WriteLine($"{GeneratedFileMarker}{Path.GetFullPath(outputPath)}");
+        Console.WriteLine(FormatGeneratedFileMarker(outputPath));
 
     private static async Task ValidateOpenApiSpec(string openApiPath, Settings settings)
     {

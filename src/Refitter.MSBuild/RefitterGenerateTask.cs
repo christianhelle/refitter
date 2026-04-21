@@ -81,8 +81,7 @@ public class RefitterGenerateTask : MSBuildTask
         var packageFolder = Path.GetDirectoryName(assembly.Location);
         var separator = Path.DirectorySeparatorChar;
         var refitterDll = $"{packageFolder}{separator}..{separator}net8.0{separator}refitter.dll";
-        var generatedFiles = new List<string>();
-        var generatedFilesLock = new object();
+        var outputLines = new List<string>();
 
         List<string> installedRuntimes = GetInstalledDotnetRuntimes();
         if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 10.")))
@@ -129,33 +128,8 @@ public class RefitterGenerateTask : MSBuildTask
             }
         };
 
-        process.ErrorDataReceived += (_, args) =>
-        {
-            if (string.IsNullOrWhiteSpace(args.Data))
-            {
-                return;
-            }
-
-            TryLogError(args.Data);
-        };
-        process.OutputDataReceived += (_, args) =>
-        {
-            if (string.IsNullOrWhiteSpace(args.Data))
-            {
-                return;
-            }
-
-            var generatedFilePath = ParseGeneratedFilePath(args.Data);
-            if (!string.IsNullOrWhiteSpace(generatedFilePath))
-            {
-                lock (generatedFilesLock)
-                {
-                    generatedFiles.Add(generatedFilePath!);
-                }
-            }
-
-            TryLogCommandLine(args.Data);
-        };
+        process.ErrorDataReceived += (_, args) => HandleProcessErrorOutput(args.Data, TryLogError);
+        process.OutputDataReceived += (_, args) => HandleProcessStandardOutput(args.Data, outputLines, outputLines, TryLogCommandLine);
         process.Start();
         process.BeginErrorReadLine();
         process.BeginOutputReadLine();
@@ -188,18 +162,7 @@ public class RefitterGenerateTask : MSBuildTask
             return new List<string>();
         }
 
-        var existingGeneratedFiles = generatedFiles
-            .Where(File.Exists)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        if (existingGeneratedFiles.Count == 0)
-        {
-            failed = true;
-            TryLogError($"Refitter did not report any generated files for {file}");
-        }
-
-        return existingGeneratedFiles;
+        return ResolveGeneratedFiles(outputLines, file, out failed, TryLogError);
     }
 
     /// <summary>
@@ -313,6 +276,59 @@ public class RefitterGenerateTask : MSBuildTask
 
         var generatedFilePath = markerLine.Substring(GeneratedFileMarker.Length).Trim();
         return string.IsNullOrWhiteSpace(generatedFilePath) ? null : generatedFilePath;
+    }
+
+    internal static void HandleProcessErrorOutput(string? outputLine, Action<string> logError)
+    {
+        if (string.IsNullOrWhiteSpace(outputLine))
+        {
+            return;
+        }
+
+        logError(outputLine!);
+    }
+
+    internal static void HandleProcessStandardOutput(string? outputLine, ICollection<string> outputLines, object outputLinesLock, Action<string> logCommandLine)
+    {
+        if (string.IsNullOrWhiteSpace(outputLine))
+        {
+            return;
+        }
+
+        lock (outputLinesLock)
+        {
+            outputLines.Add(outputLine!);
+        }
+
+        logCommandLine(outputLine!);
+    }
+
+    internal static List<string> ResolveGeneratedFiles(IEnumerable<string?> outputLines, string settingsFilePath, out bool failed, Action<string> logError)
+    {
+        var existingGeneratedFiles = ResolveGeneratedFiles(outputLines, settingsFilePath, out var errorMessage);
+        failed = errorMessage is not null;
+        if (failed)
+        {
+            logError(errorMessage!);
+        }
+
+        return existingGeneratedFiles;
+    }
+
+    internal static List<string> ResolveGeneratedFiles(IEnumerable<string?> outputLines, string settingsFilePath, out string? errorMessage)
+    {
+        var existingGeneratedFiles = outputLines
+            .Select(ParseGeneratedFilePath)
+            .Where(path => !string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            .Select(path => path!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        errorMessage = existingGeneratedFiles.Count == 0
+            ? $"Refitter did not report any generated files for {settingsFilePath}"
+            : null;
+
+        return existingGeneratedFiles;
     }
 
     private static string NormalizeIncludePattern(string path)
