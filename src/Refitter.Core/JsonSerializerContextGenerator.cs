@@ -15,8 +15,9 @@ internal static class JsonSerializerContextGenerator
     /// </summary>
     /// <param name="contracts">The generated contracts code containing the DTO types</param>
     /// <param name="settings">The generator settings</param>
+    /// <param name="documentTitle">The OpenAPI document title used to derive the context class name when UseOpenApiTitle is enabled</param>
     /// <returns>The generated JsonSerializerContext code</returns>
-    public static string Generate(string contracts, RefitGeneratorSettings settings)
+    public static string Generate(string contracts, RefitGeneratorSettings settings, string? documentTitle = null)
     {
         if (string.IsNullOrWhiteSpace(contracts))
             return string.Empty;
@@ -26,7 +27,7 @@ internal static class JsonSerializerContextGenerator
         if (typeNames.Count == 0)
             return string.Empty;
 
-        var contextName = GetContextTypeName(settings);
+        var contextName = GetContextTypeName(settings, documentTitle);
         var sb = new StringBuilder();
 
         sb.AppendLine($"namespace {contextNamespace}");
@@ -49,19 +50,31 @@ internal static class JsonSerializerContextGenerator
     /// <summary>
     /// Gets the generated JsonSerializerContext type name.
     /// </summary>
-    public static string GetContextTypeName(RefitGeneratorSettings settings)
+    /// <param name="settings">The generator settings</param>
+    /// <param name="documentTitle">The OpenAPI document title used when UseOpenApiTitle is enabled</param>
+    public static string GetContextTypeName(RefitGeneratorSettings settings, string? documentTitle = null)
     {
-        var interfaceName = settings.Naming.InterfaceName;
-        if (string.IsNullOrWhiteSpace(interfaceName))
-        {
-            interfaceName = NamingSettings.DefaultInterfaceName;
-        }
+        string interfaceName;
 
-        if (interfaceName.Length > 1 &&
-            interfaceName[0] == 'I' &&
-            char.IsUpper(interfaceName[1]))
+        if (settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(documentTitle))
         {
-            interfaceName = interfaceName.Substring(1);
+            // Derive from the OpenAPI title, matching how the Refit interface name is derived
+            interfaceName = documentTitle!.Sanitize().CapitalizeFirstCharacter();
+        }
+        else
+        {
+            interfaceName = settings.Naming.InterfaceName;
+            if (string.IsNullOrWhiteSpace(interfaceName))
+            {
+                interfaceName = NamingSettings.DefaultInterfaceName;
+            }
+
+            if (interfaceName.Length > 1 &&
+                interfaceName[0] == 'I' &&
+                char.IsUpper(interfaceName[1]))
+            {
+                interfaceName = interfaceName.Substring(1);
+            }
         }
 
         return $"{interfaceName}SerializerContext";

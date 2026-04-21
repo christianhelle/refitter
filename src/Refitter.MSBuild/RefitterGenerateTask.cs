@@ -319,7 +319,8 @@ public class RefitterGenerateTask : MSBuildTask
     {
         var normalizedPath = path
             .Trim()
-            .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            .Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
 
         var relativePrefix = $".{Path.DirectorySeparatorChar}";
         return normalizedPath.StartsWith(relativePrefix, StringComparison.Ordinal)

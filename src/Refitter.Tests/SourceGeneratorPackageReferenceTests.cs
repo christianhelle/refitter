@@ -20,7 +20,7 @@ public class SourceGeneratorPackageReferenceTests
                 StringComparer.OrdinalIgnoreCase);
 
         packageReferences["OasReader"].Should().Be("all");
-        packageReferences["Refit"].Should().Be("compile");
+        packageReferences["Refit"].Should().Be("all");
     }
 
     private static string GetRepositoryRoot()

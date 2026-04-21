@@ -225,7 +225,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         {
             generatedFiles.Add(
                 new GeneratedCode(
-                    JsonSerializerContextGenerator.GetContextTypeName(settings),
+                    JsonSerializerContextGenerator.GetContextTypeName(settings, document.Info?.Title),
                     serializerContext));
         }
 
@@ -345,7 +345,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private string GenerateJsonSerializerContext(string contracts) =>
         settings.GenerateJsonSerializerContext && settings.GenerateContracts
-            ? JsonSerializerContextGenerator.Generate(contracts, settings)
+            ? JsonSerializerContextGenerator.Generate(contracts, settings, document.Info?.Title)
             : string.Empty;
 
     /// <summary>
