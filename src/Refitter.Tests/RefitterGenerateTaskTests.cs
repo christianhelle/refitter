@@ -40,17 +40,26 @@ public class RefitterGenerateTaskTests
     [Test]
     public void FilterFiles_Should_Match_Exact_Full_Path()
     {
-        var projectRoot = Path.Combine("C:", "repo");
-        var matchingFile = Path.Combine(projectRoot, "apis", "petstore.refitter");
-        var files = new[]
+        var workspace = CreateWorkspace();
+
+        try
         {
-            matchingFile,
-            Path.Combine(projectRoot, "apis", "petstore-v2.refitter")
-        };
+            var projectRoot = workspace;
+            var matchingFile = Path.Combine(projectRoot, "apis", "petstore.refitter");
+            var files = new[]
+            {
+                matchingFile,
+                Path.Combine(projectRoot, "apis", "petstore-v2.refitter")
+            };
 
-        var result = RefitterGenerateTask.FilterFiles(files, matchingFile, projectRoot);
+            var result = RefitterGenerateTask.FilterFiles(files, matchingFile, projectRoot);
 
-        result.Should().ContainSingle().Which.Should().Be(matchingFile);
+            result.Should().ContainSingle().Which.Should().Be(matchingFile);
+        }
+        finally
+        {
+            DeleteWorkspace(workspace);
+        }
     }
 
     [Test]
