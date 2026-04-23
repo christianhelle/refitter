@@ -8,6 +8,8 @@ namespace Refitter.MSBuild;
 
 public class RefitterGenerateTask : MSBuildTask
 {
+    internal const string GeneratedFileMarker = "GeneratedFile: ";
+
     public string ProjectFileDirectory { get; set; }
 
     public bool DisableLogging { get; set; }
@@ -29,7 +31,7 @@ public class RefitterGenerateTask : MSBuildTask
             "*.refitter",
             SearchOption.AllDirectories);
 
-        files = FilterFiles(files, IncludePatterns);
+        files = FilterFiles(files, IncludePatterns, ProjectFileDirectory);
 
         TryLogCommandLine($"Found {files.Length} .refitter files...");
 
@@ -333,9 +335,10 @@ public class RefitterGenerateTask : MSBuildTask
     /// Filters the list of .refitter files based on include patterns
     /// </summary>
     /// <param name="files">The list of .refitter files to filter</param>
-    /// <param name="includePatterns">Semicolon-separated file name patterns to include (e.g. "petstore.refitter;petstore-default.refitter")</param>
+    /// <param name="includePatterns">Semicolon-separated file names or project-relative paths to include (e.g. "petstore.refitter;apis\petstore-default.refitter")</param>
+    /// <param name="projectFileDirectory">The root project directory used when matching relative paths.</param>
     /// <returns>The filtered list of .refitter files</returns>
-    private static string[] FilterFiles(string[] files, string includePatterns)
+    internal static string[] FilterFiles(string[] files, string includePatterns, string projectFileDirectory)
     {
         if (string.IsNullOrWhiteSpace(includePatterns))
         {
@@ -343,15 +346,117 @@ public class RefitterGenerateTask : MSBuildTask
         }
 
         var patterns = includePatterns.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(p => p.Trim())
+            .Select(NormalizeIncludePattern)
             .ToList();
 
         return files.Where(file =>
         {
-            var fileName = Path.GetFileName(file);
+            var fileName = NormalizeIncludePattern(Path.GetFileName(file));
+            var relativePath = string.IsNullOrWhiteSpace(projectFileDirectory)
+                ? fileName
+                : NormalizeIncludePattern(GetRelativePath(projectFileDirectory, file));
+            var fullPath = NormalizeIncludePattern(file);
+
             return patterns.Any(pattern =>
                 fileName.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
-                fileName.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0);
+                relativePath.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
+                fullPath.Equals(pattern, StringComparison.OrdinalIgnoreCase));
         }).ToArray();
     }
+
+    internal static string? ParseGeneratedFilePath(string? outputLine)
+    {
+        var markerLine = outputLine ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(markerLine))
+        {
+            return null;
+        }
+
+        if (!markerLine.StartsWith(GeneratedFileMarker, StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var generatedFilePath = markerLine.Substring(GeneratedFileMarker.Length).Trim();
+        return string.IsNullOrWhiteSpace(generatedFilePath) ? null : generatedFilePath;
+    }
+
+    internal static void HandleProcessErrorOutput(string? outputLine, Action<string> logError)
+    {
+        if (string.IsNullOrWhiteSpace(outputLine))
+        {
+            return;
+        }
+
+        logError(outputLine!);
+    }
+
+    internal static void HandleProcessStandardOutput(string? outputLine, ICollection<string> outputLines, object outputLinesLock, Action<string> logCommandLine)
+    {
+        if (string.IsNullOrWhiteSpace(outputLine))
+        {
+            return;
+        }
+
+        lock (outputLinesLock)
+        {
+            outputLines.Add(outputLine!);
+        }
+
+        logCommandLine(outputLine!);
+    }
+
+    internal static List<string> ResolveGeneratedFiles(IEnumerable<string?> outputLines, string settingsFilePath, out bool failed, Action<string> logError)
+    {
+        var existingGeneratedFiles = ResolveGeneratedFiles(outputLines, settingsFilePath, out var errorMessage);
+        failed = errorMessage is not null;
+        if (failed)
+        {
+            logError(errorMessage!);
+        }
+
+        return existingGeneratedFiles;
+    }
+
+    internal static List<string> ResolveGeneratedFiles(IEnumerable<string?> outputLines, string settingsFilePath, out string? errorMessage)
+    {
+        var existingGeneratedFiles = outputLines
+            .Select(ParseGeneratedFilePath)
+            .Where(path => !string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            .Select(path => path!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        errorMessage = existingGeneratedFiles.Count == 0
+            ? $"Refitter did not report any generated files for {settingsFilePath}"
+            : null;
+
+        return existingGeneratedFiles;
+    }
+
+    private static string NormalizeIncludePattern(string path)
+    {
+        var normalizedPath = path
+            .Trim()
+            .Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
+
+        var relativePrefix = $".{Path.DirectorySeparatorChar}";
+        return normalizedPath.StartsWith(relativePrefix, StringComparison.Ordinal)
+            ? normalizedPath.Substring(relativePrefix.Length)
+            : normalizedPath;
+    }
+
+    private static string GetRelativePath(string relativeTo, string path)
+    {
+        var relativeToUri = new Uri(AppendDirectorySeparator(relativeTo));
+        var pathUri = new Uri(path);
+        return Uri.UnescapeDataString(relativeToUri.MakeRelativeUri(pathUri).ToString())
+            .Replace('/', Path.DirectorySeparatorChar);
+    }
+
+    private static string AppendDirectorySeparator(string path) =>
+        path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+            ? path
+            : path + Path.DirectorySeparatorChar;
 }
