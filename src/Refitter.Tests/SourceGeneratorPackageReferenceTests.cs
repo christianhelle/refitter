@@ -69,11 +69,12 @@ public class SourceGeneratorPackageReferenceTests
         var projectFile = Path.Combine(repoRoot, "src", "Refitter.SourceGenerator", "Refitter.SourceGenerator.csproj");
         var packageOutputPath = Path.Combine(workspace, "packages");
         Directory.CreateDirectory(packageOutputPath);
+        BuildSourceGeneratorProject(repoRoot, projectFile);
 
         var startInfo = new System.Diagnostics.ProcessStartInfo
         {
             FileName = "dotnet",
-            Arguments = $"pack \"{projectFile}\" -c Release --no-restore -p:PackageVersion={version} -p:PackageOutputPath=\"{packageOutputPath}\"",
+            Arguments = $"pack \"{projectFile}\" -c Release --no-build --no-restore -p:PackageVersion={version} -p:PackageOutputPath=\"{packageOutputPath}\"",
             WorkingDirectory = repoRoot,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -92,6 +93,28 @@ public class SourceGeneratorPackageReferenceTests
         var packagePath = Path.Combine(packageOutputPath, $"Refitter.SourceGenerator.{version}.nupkg");
         File.Exists(packagePath).Should().BeTrue("dotnet pack should produce the expected nupkg");
         return packagePath;
+    }
+
+    private static void BuildSourceGeneratorProject(string repoRoot, string projectFile)
+    {
+        var startInfo = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "dotnet",
+            Arguments = $"build \"{projectFile}\" -c Release",
+            WorkingDirectory = repoRoot,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using var process = System.Diagnostics.Process.Start(startInfo);
+        process.Should().NotBeNull();
+        var output = process!.StandardOutput.ReadToEnd();
+        var error = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+
+        process.ExitCode.Should().Be(0, $"dotnet build should succeed before pack{Environment.NewLine}{output}{Environment.NewLine}{error}");
     }
 
     private static string CreateWorkspace()
