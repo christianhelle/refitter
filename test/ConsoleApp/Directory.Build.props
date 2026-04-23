@@ -16,14 +16,15 @@
          Two files with the same context class simple name but different namespaces cause a
          duplicate-hint-name collision that breaks the STJ source generator.
          These files ARE validated individually by unit tests (BuildHelper.BuildCSharp). -->
-    <ItemGroup Condition="'$(SmokeTest)' == 'true'">
-        <Compile Remove="../../GeneratedCode/JsonSerializerCtx*.cs" />
-    </ItemGroup>
     <ItemGroup>
         <Compile Include="..\Program.cs">
             <Link>Program.cs</Link>
         </Compile>
-        <Compile Include="../../GeneratedCode/**/*.cs" />
+        <Compile Include="../../GeneratedCode/**/*.cs"
+                 Condition="'$(SmokeTest)' != 'true'" />
+        <Compile Include="../../GeneratedCode/**/*.cs"
+                 Exclude="../../GeneratedCode/JsonSerializerCtx*.cs"
+                 Condition="'$(SmokeTest)' == 'true'" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
