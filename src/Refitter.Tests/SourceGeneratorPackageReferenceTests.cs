@@ -68,25 +68,29 @@ public class SourceGeneratorPackageReferenceTests
         var repoRoot = GetRepositoryRoot();
         var projectFile = Path.Combine(repoRoot, "src", "Refitter.SourceGenerator", "Refitter.SourceGenerator.csproj");
         var packageOutputPath = Path.Combine(workspace, "packages");
-        Directory.CreateDirectory(packageOutputPath);
-        BuildSourceGeneratorProject(repoRoot, projectFile);
 
-        var startInfo = new System.Diagnostics.ProcessStartInfo
-        {
-            FileName = "dotnet",
-            Arguments = $"pack \"{projectFile}\" -c Release --no-build --no-restore -p:PackageVersion={version} -p:PackageOutputPath=\"{packageOutputPath}\"",
-            WorkingDirectory = repoRoot,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
+        Directory.CreateDirectory(packageOutputPath);
+        BuildSourceGeneratorProject(repoRoot, projectFile, version);
+
+        var startInfo = CreateDotNetStartInfo(
+            repoRoot,
+            "pack",
+            projectFile,
+            "-c",
+            "Release",
+            "--no-build",
+            "--no-restore",
+            $"-p:PackageVersion={version}",
+            $"-p:PackageOutputPath={packageOutputPath}");
 
         using var process = System.Diagnostics.Process.Start(startInfo);
         process.Should().NotBeNull();
-        var output = process!.StandardOutput.ReadToEnd();
-        var error = process.StandardError.ReadToEnd();
+        var outputTask = process!.StandardOutput.ReadToEndAsync();
+        var errorTask = process.StandardError.ReadToEndAsync();
         process.WaitForExit();
+        Task.WaitAll(outputTask, errorTask);
+        var output = outputTask.Result;
+        var error = errorTask.Result;
 
         process.ExitCode.Should().Be(0, $"dotnet pack should succeed{Environment.NewLine}{output}{Environment.NewLine}{error}");
 
@@ -95,24 +99,28 @@ public class SourceGeneratorPackageReferenceTests
         return packagePath;
     }
 
-    private static void BuildSourceGeneratorProject(string repoRoot, string projectFile)
+    private static void BuildSourceGeneratorProject(
+        string repoRoot,
+        string projectFile,
+        string version)
     {
-        var startInfo = new System.Diagnostics.ProcessStartInfo
-        {
-            FileName = "dotnet",
-            Arguments = $"build \"{projectFile}\" -c Release",
-            WorkingDirectory = repoRoot,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
+        var startInfo = CreateDotNetStartInfo(
+            repoRoot,
+            "build",
+            projectFile,
+            "-c",
+            "Release",
+            "-p:GeneratePackageOnBuild=false",
+            $"-p:PackageVersion={version}");
 
         using var process = System.Diagnostics.Process.Start(startInfo);
         process.Should().NotBeNull();
-        var output = process!.StandardOutput.ReadToEnd();
-        var error = process.StandardError.ReadToEnd();
+        var outputTask = process!.StandardOutput.ReadToEndAsync();
+        var errorTask = process.StandardError.ReadToEndAsync();
         process.WaitForExit();
+        Task.WaitAll(outputTask, errorTask);
+        var output = outputTask.Result;
+        var error = errorTask.Result;
 
         process.ExitCode.Should().Be(0, $"dotnet build should succeed before pack{Environment.NewLine}{output}{Environment.NewLine}{error}");
     }
@@ -142,5 +150,25 @@ public class SourceGeneratorPackageReferenceTests
 
         directory.Should().NotBeNull("tests should run from within the repository workspace");
         return directory!.FullName;
+    }
+
+    private static System.Diagnostics.ProcessStartInfo CreateDotNetStartInfo(string repoRoot, params string[] arguments)
+    {
+        var startInfo = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "dotnet",
+            WorkingDirectory = repoRoot,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        foreach (var argument in arguments)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
+
+        return startInfo;
     }
 }
