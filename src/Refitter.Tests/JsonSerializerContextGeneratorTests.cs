@@ -326,6 +326,36 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
     }
 
+    [Test]
+    public void Generate_Formats_NonDeclared_Generic_Type_Arguments()
+    {
+        const string contracts = """
+            using System.Collections.Generic;
+
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+
+                public partial class Envelope<T>
+                {
+                    public T Payload { get; set; }
+                }
+
+                public partial class Response
+                {
+                    public Envelope<Dictionary<string, Pet>> Value { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Dictionary<string, Pet>>))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
     private static RefitGeneratorSettings CreateSettings(
         string interfaceName = "IMyApi",
         string @namespace = "My.Clients",

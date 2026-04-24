@@ -8,6 +8,50 @@ namespace Refitter.MSBuild;
 public class RefitterGenerateTask : MSBuildTask
 {
     internal const string GeneratedFileMarker = "GeneratedFile: ";
+    private static readonly System.Threading.AsyncLocal<Func<List<string>>?> InstalledDotnetRuntimesProviderOverride = new();
+    private static readonly System.Threading.AsyncLocal<Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult>?> ProcessRunnerOverride = new();
+    private static readonly System.Threading.AsyncLocal<int?> ProcessTimeoutMillisecondsOverride = new();
+    private static readonly System.Threading.AsyncLocal<Action<Process>?> ProcessTerminatorOverride = new();
+
+    internal sealed class ProcessExecutionResult
+    {
+        public ProcessExecutionResult(bool timedOut, int exitCode, Exception? terminationException = null)
+        {
+            TimedOut = timedOut;
+            ExitCode = exitCode;
+            TerminationException = terminationException;
+        }
+
+        public bool TimedOut { get; }
+
+        public int ExitCode { get; }
+
+        public Exception? TerminationException { get; }
+    }
+
+    internal static Func<List<string>> InstalledDotnetRuntimesProvider
+    {
+        get => InstalledDotnetRuntimesProviderOverride.Value ?? GetInstalledDotnetRuntimes;
+        set => InstalledDotnetRuntimesProviderOverride.Value = value;
+    }
+
+    internal static Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult> ProcessRunner
+    {
+        get => ProcessRunnerOverride.Value ?? RunProcess;
+        set => ProcessRunnerOverride.Value = value;
+    }
+
+    internal static int ProcessTimeoutMilliseconds
+    {
+        get => ProcessTimeoutMillisecondsOverride.Value ?? 300000;
+        set => ProcessTimeoutMillisecondsOverride.Value = value;
+    }
+
+    internal static Action<Process> ProcessTerminator
+    {
+        get => ProcessTerminatorOverride.Value ?? DefaultTerminateProcess;
+        set => ProcessTerminatorOverride.Value = value;
+    }
 
     public string ProjectFileDirectory { get; set; }
 
@@ -19,6 +63,14 @@ public class RefitterGenerateTask : MSBuildTask
 
     [Output]
     public ITaskItem[] GeneratedFiles { get; set; }
+
+    internal static void ResetTestHooks()
+    {
+        InstalledDotnetRuntimesProviderOverride.Value = null;
+        ProcessRunnerOverride.Value = null;
+        ProcessTimeoutMillisecondsOverride.Value = null;
+        ProcessTerminatorOverride.Value = null;
+    }
 
     public override bool Execute()
     {
@@ -83,7 +135,7 @@ public class RefitterGenerateTask : MSBuildTask
         var refitterDll = $"{packageFolder}{separator}..{separator}net8.0{separator}refitter.dll";
         var outputLines = new List<string>();
 
-        List<string> installedRuntimes = GetInstalledDotnetRuntimes();
+        List<string> installedRuntimes = InstalledDotnetRuntimesProvider();
         if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 10.")))
         {
             // Use .NET 10 version if available
@@ -113,57 +165,83 @@ public class RefitterGenerateTask : MSBuildTask
 
         TryLogCommandLine($"Starting dotnet {args}");
 
-        using var process = new Process
+        var startInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                Arguments = args,
-                WorkingDirectory = Path.GetDirectoryName(file)!,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
+            FileName = "dotnet",
+            Arguments = args,
+            WorkingDirectory = Path.GetDirectoryName(file)!,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            RedirectStandardInput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
         };
 
-        process.ErrorDataReceived += (_, args) => HandleProcessErrorOutput(args.Data, TryLogError);
-        process.OutputDataReceived += (_, args) => HandleProcessStandardOutput(args.Data, outputLines, outputLines, TryLogCommandLine);
+        var processResult = ProcessRunner(
+            startInfo,
+            data => HandleProcessStandardOutput(data, outputLines, outputLines, TryLogCommandLine),
+            data => HandleProcessErrorOutput(data, TryLogError));
+
+        if (processResult.TimedOut)
+        {
+            failed = true;
+            if (processResult.TerminationException is null)
+            {
+                TryLogError("Refitter process timed out after 300 seconds and was terminated");
+            }
+            else
+            {
+                TryLogError($"Failed to terminate timed-out process: {processResult.TerminationException.Message}");
+            }
+
+            return new List<string>();
+        }
+
+        // Check exit code - non-zero indicates failure
+        if (processResult.ExitCode != 0)
+        {
+            failed = true;
+            TryLogError($"Refitter process exited with code {processResult.ExitCode}");
+            return new List<string>();
+        }
+
+        return ResolveGeneratedFiles(outputLines, file, out failed, TryLogError);
+    }
+
+    private static ProcessExecutionResult RunProcess(
+        ProcessStartInfo startInfo,
+        Action<string?> handleStandardOutput,
+        Action<string?> handleErrorOutput)
+    {
+        using var process = new Process { StartInfo = startInfo };
+
+        process.ErrorDataReceived += (_, args) => handleErrorOutput(args.Data);
+        process.OutputDataReceived += (_, args) => handleStandardOutput(args.Data);
         process.Start();
         process.BeginErrorReadLine();
         process.BeginOutputReadLine();
 
         // Wait for process to exit with a reasonable timeout (5 minutes)
         // to prevent build hangs on network issues or infinite loops
-        const int timeoutMilliseconds = 300000; // 5 minutes
+        var timeoutMilliseconds = ProcessTimeoutMilliseconds;
         if (!process.WaitForExit(timeoutMilliseconds))
         {
-            failed = true;
             try
             {
-                process.Kill();
-                TryLogError($"Refitter process timed out after {timeoutMilliseconds / 1000} seconds and was terminated");
+                ProcessTerminator(process);
+                return new ProcessExecutionResult(true, -1);
             }
             catch (Exception ex)
             {
-                TryLogError($"Failed to terminate timed-out process: {ex.Message}");
+                return new ProcessExecutionResult(true, -1, ex);
             }
-            return new List<string>();
         }
 
         process.WaitForExit();
-
-        // Check exit code - non-zero indicates failure
-        if (process.ExitCode != 0)
-        {
-            failed = true;
-            TryLogError($"Refitter process exited with code {process.ExitCode}");
-            return new List<string>();
-        }
-
-        return ResolveGeneratedFiles(outputLines, file, out failed, TryLogError);
+        return new ProcessExecutionResult(false, process.ExitCode);
     }
+
+    private static void DefaultTerminateProcess(Process process) => process.Kill();
 
     /// <summary>
     /// Gets the list of installed .NET runtimes by executing 'dotnet --list-runtimes'

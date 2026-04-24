@@ -1,4 +1,7 @@
+using System.Reflection;
 using FluentAssertions;
+using NJsonSchema;
+using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
@@ -731,7 +734,65 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
+    [Test]
+    public void NormalizeSwagger2OptionalReferencePropertyNullability_Removes_Nullability_From_Reference_Type_Shapes()
+    {
+        const string contracts = """
+            using System.Collections.Generic;
+
+            public partial class Pet
+            {
+            }
+
+            namespace Generated.Contracts
+            {
+                public partial class Response
+                {
+                    public Pet[]? Pets { get; set; }
+
+                    public List<Pet>? Values { get; set; }
+
+                    public global::Pet? AliasPet { get; set; }
+
+                    public (string First, string Last)? NameParts { get; set; }
+
+                    public int? Count { get; set; }
+                }
+            }
+            """;
+
+        var generator = new RefitGenerator(
+            new RefitGeneratorSettings
+            {
+                CodeGeneratorSettings = new CodeGeneratorSettings
+                {
+                    GenerateNullableReferenceTypes = true,
+                    GenerateOptionalPropertiesAsNullable = false
+                }
+            },
+            new OpenApiDocument { SchemaType = SchemaType.Swagger2 });
+
+        var normalized = NormalizeSwagger2OptionalReferencePropertyNullability(generator, contracts);
+
+        normalized.Should().Contain("public Pet[] Pets { get; set; }");
+        normalized.Should().Contain("public List<Pet> Values { get; set; }");
+        normalized.Should().Contain("public global::Pet AliasPet { get; set; }");
+        normalized.Should().Contain("public (string First, string Last)? NameParts { get; set; }");
+        normalized.Should().Contain("public int? Count { get; set; }");
+        BuildHelper.BuildCSharp(normalized).Should().BeTrue();
+    }
+
     #endregion
+
+    private static string NormalizeSwagger2OptionalReferencePropertyNullability(RefitGenerator generator, string contracts)
+    {
+        var method = typeof(RefitGenerator).GetMethod(
+            "NormalizeSwagger2OptionalReferencePropertyNullability",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
+        method.Should().NotBeNull();
+        return method!.Invoke(generator, [contracts]).Should().BeOfType<string>().Subject;
+    }
 
     private static void CleanupSwaggerFile(string swaggerFile)
     {
