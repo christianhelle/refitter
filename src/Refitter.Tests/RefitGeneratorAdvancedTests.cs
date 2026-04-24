@@ -782,12 +782,271 @@ public class RefitGeneratorAdvancedTests
         BuildHelper.BuildCSharp(normalized).Should().BeTrue();
     }
 
+    [Test]
+    public async Task Generate_Does_Not_Emit_JsonSerializerContext_When_Contracts_Are_Disabled()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        try
+        {
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                GenerateContracts = false,
+                GenerateJsonSerializerContext = true,
+                Naming = new NamingSettings
+                {
+                    UseOpenApiTitle = false,
+                    InterfaceName = "ITestApi"
+                }
+            };
+
+            var generator = await RefitGenerator.CreateAsync(settings);
+            var result = generator.Generate();
+
+            result.Should().NotContain("JsonSerializerContext");
+            result.Should().NotContain("TestApiSerializerContext");
+        }
+        finally
+        {
+            CleanupSwaggerFile(swaggerFile);
+        }
+    }
+
+    [Test]
+    public async Task GenerateMultipleFiles_Does_Not_Add_JsonSerializerContext_File_When_Contracts_Are_Disabled()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        try
+        {
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                GenerateMultipleFiles = true,
+                GenerateContracts = false,
+                GenerateJsonSerializerContext = true,
+                Naming = new NamingSettings
+                {
+                    UseOpenApiTitle = false,
+                    InterfaceName = "ITestApi"
+                }
+            };
+
+            var generator = await RefitGenerator.CreateAsync(settings);
+            var result = generator.GenerateMultipleFiles();
+
+            result.Files.Should().NotContain(f => f.TypeName == "TestApiSerializerContext");
+        }
+        finally
+        {
+            CleanupSwaggerFile(swaggerFile);
+        }
+    }
+
+    [Test]
+    public async Task GenerateMultipleFiles_Handles_Missing_Document_Info_For_JsonSerializerContext_File_Name()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        try
+        {
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                GenerateMultipleFiles = true,
+                GenerateJsonSerializerContext = true,
+                Naming = new NamingSettings
+                {
+                    UseOpenApiTitle = true,
+                    InterfaceName = "ITestApi"
+                }
+            };
+
+            var generator = await RefitGenerator.CreateAsync(settings);
+            generator.OpenApiDocument.Info = null!;
+
+            var result = generator.GenerateMultipleFiles();
+
+            result.Files.Should().Contain(f => f.TypeName == "TestApiSerializerContext");
+        }
+        finally
+        {
+            CleanupSwaggerFile(swaggerFile);
+        }
+    }
+
+    [Test]
+    public void GenerateJsonSerializerContext_Handles_Missing_Document_Info()
+    {
+        const string contracts = """
+            namespace Generated.Contracts
+            {
+                public partial class Product
+                {
+                }
+            }
+            """;
+
+        var generator = new RefitGenerator(
+            new RefitGeneratorSettings
+            {
+                GenerateJsonSerializerContext = true,
+                GenerateContracts = true,
+                Namespace = "Generated.Clients",
+                ContractsNamespace = "Generated.Contracts",
+                Naming = new NamingSettings
+                {
+                    UseOpenApiTitle = true,
+                    InterfaceName = "ITestApi"
+                }
+            },
+            new OpenApiDocument
+            {
+                Info = null!
+            });
+
+        var serializerContext = GenerateJsonSerializerContext(generator, contracts);
+
+        serializerContext.Should().Contain("internal partial class TestApiSerializerContext");
+    }
+
+    [Test]
+    public async Task GenerateMultipleFiles_Does_Not_Add_JsonSerializerContext_File_When_No_Contract_Types_Are_Generated()
+    {
+        const string specWithoutSchemas = """
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "Primitive API",
+                "version": "1.0.0"
+              },
+              "paths": {
+                "/health": {
+                  "get": {
+                    "operationId": "getHealth",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(specWithoutSchemas);
+        try
+        {
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                GenerateMultipleFiles = true,
+                GenerateJsonSerializerContext = true,
+                Naming = new NamingSettings
+                {
+                    UseOpenApiTitle = false,
+                    InterfaceName = "IPrimitiveApi"
+                }
+            };
+
+            var generator = await RefitGenerator.CreateAsync(settings);
+            var result = generator.GenerateMultipleFiles();
+
+            result.Files.Should().NotContain(f => f.TypeName == "PrimitiveApiSerializerContext");
+        }
+        finally
+        {
+            CleanupSwaggerFile(swaggerFile);
+        }
+    }
+
+    [Test]
+    public async Task GenerateMultipleFiles_With_Whitespace_OpenApi_Title_Uses_InterfaceName_For_Apizr_Title_Fallback()
+    {
+        const string specWithWhitespaceTitle = """
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "   ",
+                "version": "1.0.0"
+              },
+              "paths": {
+                "/api/products": {
+                  "get": {
+                    "operationId": "getProducts",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/Product"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "components": {
+                "schemas": {
+                  "Product": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer" }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(specWithWhitespaceTitle);
+        try
+        {
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                GenerateMultipleFiles = true,
+                Naming = new NamingSettings
+                {
+                    UseOpenApiTitle = true,
+                    InterfaceName = "IFallbackApi"
+                },
+                ApizrSettings = new ApizrSettings
+                {
+                    WithRegistrationHelper = true
+                }
+            };
+
+            var generator = await RefitGenerator.CreateAsync(settings);
+            var result = generator.GenerateMultipleFiles();
+
+            var registrationFile = result.Files.First(f => f.TypeName == "DependencyInjection");
+            registrationFile.Content.Should().Contain("BuildIFallbackApiApizrManager");
+        }
+        finally
+        {
+            CleanupSwaggerFile(swaggerFile);
+        }
+    }
+
     #endregion
 
     private static string NormalizeSwagger2OptionalReferencePropertyNullability(RefitGenerator generator, string contracts)
     {
         var method = typeof(RefitGenerator).GetMethod(
             "NormalizeSwagger2OptionalReferencePropertyNullability",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
+        method.Should().NotBeNull();
+        return method!.Invoke(generator, [contracts]).Should().BeOfType<string>().Subject;
+    }
+
+    private static string GenerateJsonSerializerContext(RefitGenerator generator, string contracts)
+    {
+        var method = typeof(RefitGenerator).GetMethod(
+            "GenerateJsonSerializerContext",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
         method.Should().NotBeNull();

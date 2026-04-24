@@ -314,7 +314,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var tree = CSharpSyntaxTree.ParseText(contracts);
         var root = tree.GetCompilationUnitRoot();
         var rewrittenRoot = new Swagger2OptionalReferencePropertyNullabilityRewriter().Visit(root);
-        return rewrittenRoot?.ToFullString() ?? contracts;
+        return rewrittenRoot!.ToFullString();
     }
 
     private sealed class Swagger2OptionalReferencePropertyNullabilityRewriter : CSharpSyntaxRewriter

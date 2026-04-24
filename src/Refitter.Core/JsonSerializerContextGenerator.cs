@@ -133,7 +133,7 @@ internal static class JsonSerializerContextGenerator
         }
 
         typeName = FormatTypeSyntax(typeSyntax, declaredTypes, contextNamespace);
-        return typeName.Contains('<') && typeName.Contains('>');
+        return true;
     }
 
     private static bool ContainsOpenTypeParameter(TypeSyntax typeSyntax)
@@ -256,10 +256,7 @@ internal static class JsonSerializerContextGenerator
     {
         public string RelativeName => string.Join(".", Containers.Append(Name));
 
-        public string FullyQualifiedName =>
-            string.IsNullOrWhiteSpace(Namespace)
-                ? RelativeName
-                : $"{Namespace}.{RelativeName}";
+        public string FullyQualifiedName => $"{Namespace}.{RelativeName}".TrimStart('.');
 
         public string GetDisplayName(string contextNamespace) =>
             Namespace.Equals(contextNamespace, StringComparison.Ordinal) || string.IsNullOrWhiteSpace(Namespace)

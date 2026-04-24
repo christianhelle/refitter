@@ -356,6 +356,21 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
     }
 
+    [Test]
+    public void Generate_Handles_Declared_Types_In_Global_Namespace()
+    {
+        const string contracts = """
+            public partial class Pet
+            {
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
     private static RefitGeneratorSettings CreateSettings(
         string interfaceName = "IMyApi",
         string @namespace = "My.Clients",

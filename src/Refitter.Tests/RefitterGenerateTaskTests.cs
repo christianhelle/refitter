@@ -95,6 +95,51 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void FilterFiles_Should_Handle_Blank_Project_File_Directory()
+    {
+        var matchingFile = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "petstore.refitter"));
+        var files = new[]
+        {
+            matchingFile,
+            Path.GetFullPath(Path.Combine(Path.GetTempPath(), "petstore-v2.refitter"))
+        };
+
+        var result = RefitterGenerateTask.FilterFiles(files, matchingFile, string.Empty);
+
+        result.Should().ContainSingle().Which.Should().Be(matchingFile);
+    }
+
+    [Test]
+    public void FilterFiles_Should_Normalize_Relative_Prefix_In_Include_Patterns()
+    {
+        var projectRoot = Path.Combine("C:", "repo");
+        var files = new[]
+        {
+            Path.Combine(projectRoot, "apis", "petstore.refitter"),
+            Path.Combine(projectRoot, "samples", "petstore.refitter")
+        };
+
+        var result = RefitterGenerateTask.FilterFiles(files, $".{Path.DirectorySeparatorChar}apis{Path.DirectorySeparatorChar}petstore.refitter", projectRoot);
+
+        result.Should().ContainSingle().Which.Should().Be(Path.Combine(projectRoot, "apis", "petstore.refitter"));
+    }
+
+    [Test]
+    public void FilterFiles_Should_Handle_Project_Directory_With_Trailing_Separator()
+    {
+        var projectRoot = Path.Combine("C:", "repo");
+        var files = new[]
+        {
+            Path.Combine(projectRoot, "apis", "petstore.refitter"),
+            Path.Combine(projectRoot, "samples", "petstore.refitter")
+        };
+
+        var result = RefitterGenerateTask.FilterFiles(files, @"apis\petstore.refitter", projectRoot + Path.DirectorySeparatorChar);
+
+        result.Should().ContainSingle().Which.Should().Be(Path.Combine(projectRoot, "apis", "petstore.refitter"));
+    }
+
+    [Test]
     public void ParseGeneratedFilePath_Should_Return_File_Path_From_Marker()
     {
         var generatedFile = Path.Combine("C:", "repo", "Generated", "Petstore.cs");
@@ -116,6 +161,14 @@ public class RefitterGenerateTaskTests
     public void ParseGeneratedFilePath_Should_Return_Null_For_Whitespace_Output()
     {
         var result = RefitterGenerateTask.ParseGeneratedFilePath("   ");
+
+        result.Should().BeNull();
+    }
+
+    [Test]
+    public void ParseGeneratedFilePath_Should_Return_Null_For_Null_Output()
+    {
+        var result = RefitterGenerateTask.ParseGeneratedFilePath(null);
 
         result.Should().BeNull();
     }
