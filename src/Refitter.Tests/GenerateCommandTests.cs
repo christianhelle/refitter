@@ -149,6 +149,16 @@ public class GenerateCommandTests
     }
 
     [Test]
+    public void FormatGeneratedFileMarker_Should_Emit_A_Task_Parseable_Full_Path()
+    {
+        var generatedFile = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Generated", "Petstore.cs"));
+        var outputLine = GenerateCommand.FormatGeneratedFileMarker(generatedFile);
+
+        outputLine.Should().Be($"{GenerateCommand.GeneratedFileMarker}{generatedFile}");
+        Refitter.MSBuild.RefitterGenerateTask.ParseGeneratedFilePath(outputLine).Should().Be(generatedFile);
+    }
+
+    [Test]
     public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Default()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -315,6 +325,36 @@ public class GenerateCommandTests
         var result = method!.Invoke(command, [settings, refitSettings, new GeneratedCode("RefitInterfaces", "// code")]) as string;
 
         result.Should().Be(Path.Combine("GeneratedCode", "MultipleFiles", "RefitInterfaces.cs"));
+    }
+
+    [Test]
+    public void GetOutputPath_For_MultipleFiles_WithSettingsFile_Should_Use_Explicit_Cli_Output_Directory()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings
+        {
+            SettingsFilePath = settingsFilePath,
+            OutputPath = Path.Combine("GeneratedCode", "MultipleFiles"),
+            GenerateMultipleFiles = true
+        };
+
+        var refitSettings = new RefitGeneratorSettings
+        {
+            GenerateMultipleFiles = true,
+            OutputFolder = "./Generated"
+        };
+
+        var command = new GenerateCommand();
+        var method = typeof(GenerateCommand).GetMethod(
+            "GetOutputPath",
+            BindingFlags.NonPublic | BindingFlags.Instance,
+            [typeof(Settings), typeof(RefitGeneratorSettings), typeof(GeneratedCode)]);
+
+        method.Should().NotBeNull();
+
+        var result = method!.Invoke(command, [settings, refitSettings, new GeneratedCode("RefitInterfaces", "// code")]) as string;
+
+        result.Should().Be(Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "GeneratedCode", "MultipleFiles", "RefitInterfaces.cs"));
     }
 
     [Test]

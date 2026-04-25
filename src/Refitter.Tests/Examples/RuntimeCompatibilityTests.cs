@@ -175,11 +175,10 @@ public class RuntimeCompatibilityTests
     }
 
     /// <summary>
-    /// Test for issue #1026: Verify auto-enabling of GenerateOptionalPropertiesAsNullable.
-    /// When GenerateNullableReferenceTypes is enabled, optional properties should be nullable.
+    /// Test for issue #1026: nullable reference types alone must not silently change contract shapes.
     /// </summary>
     [Test]
-    public async Task Auto_Enables_Optional_Properties_As_Nullable_When_NRT_Enabled()
+    public async Task Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled()
     {
         const string openApiSpec = """
 {
@@ -243,14 +242,15 @@ public class RuntimeCompatibilityTests
 
         code.Should().NotBeNullOrWhiteSpace();
         code.Should().Contain("public string Name");
-        code.Should().Contain("public string? Description"); // Optional property should be nullable
+        code.Should().Contain("public string Description");
+        code.Should().NotContain("public string? Description");
     }
 
     /// <summary>
-    /// Swagger 2.0 equivalent of Auto_Enables_Optional_Properties_As_Nullable_When_NRT_Enabled.
+    /// Swagger 2.0 equivalent of Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled.
     /// </summary>
     [Test]
-    public async Task Auto_Enables_Optional_Properties_As_Nullable_When_NRT_Enabled_Swagger2()
+    public async Task Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled_Swagger2()
     {
         const string swaggerSpecV2 = """
 {
@@ -315,7 +315,253 @@ public class RuntimeCompatibilityTests
 
         code.Should().NotBeNullOrWhiteSpace();
         code.Should().Contain("public string Name");
-        code.Should().Contain("public string? Description"); // Optional property should be nullable
+        code.Should().Contain("public string Description");
+        code.Should().NotContain("public string? Description");
+    }
+
+    /// <summary>
+    /// Swagger 2.0 optional reference properties should keep pre-#1026 shapes for arrays, custom types and generic collections.
+    /// Value types should still retain nullable fallthrough where appropriate.
+    /// </summary>
+    [Test]
+    public async Task Does_Not_Auto_Enable_Optional_Properties_As_Nullable_For_Swagger2_Reference_Shapes()
+    {
+        const string swaggerSpecV2 = """
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Optional Reference Shapes API",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "paths": {
+    "/items": {
+      "post": {
+        "operationId": "CreateItem",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Item"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Child": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "Item": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Child"
+          }
+        },
+        "primaryChild": {
+          "$ref": "#/definitions/Child"
+        },
+        "namedChildren": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Child"
+          }
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(swaggerSpecV2),
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true
+            }
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().Contain("public ICollection<Child> Children");
+        code.Should().Contain("public Child PrimaryChild");
+        code.Should().Contain("public IDictionary<string, Child> NamedChildren");
+        code.Should().Contain("public int? Count");
+        code.Should().NotContain("public ICollection<Child>? Children");
+        code.Should().NotContain("public Child? PrimaryChild");
+        code.Should().NotContain("public IDictionary<string, Child>? NamedChildren");
+        BuildHelper.BuildCSharp(code).Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Explicit opt-in should still generate nullable optional properties when desired.
+    /// </summary>
+    [Test]
+    public async Task Honors_Explicit_GenerateOptionalPropertiesAsNullable_When_NRT_Enabled()
+    {
+        const string openApiSpec = """
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Optional Properties Test API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/items": {
+      "post": {
+        "operationId": "CreateItem",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Item"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Item": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(openApiSpec),
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = true
+            }
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().Contain("public string Name");
+        code.Should().Contain("public string? Description");
+    }
+
+    /// <summary>
+    /// Swagger 2.0 should still honor explicit opt-in for nullable optional properties.
+    /// </summary>
+    [Test]
+    public async Task Honors_Explicit_GenerateOptionalPropertiesAsNullable_When_NRT_Enabled_Swagger2()
+    {
+        const string swaggerSpecV2 = """
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Optional Properties Test API",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "paths": {
+    "/items": {
+      "post": {
+        "operationId": "CreateItem",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Item"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Item": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+""";
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = CreateTempFile(swaggerSpecV2),
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = true
+            }
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var code = sut.Generate();
+
+        code.Should().Contain("public string Name");
+        code.Should().Contain("public string? Description");
     }
 
     /// <summary>

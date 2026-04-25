@@ -11,11 +11,20 @@
         <DisableRefitSourceGenerator>true</DisableRefitSourceGenerator>
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     </PropertyGroup>
+    <!-- JsonSerializerContext files cannot be compiled together in batch because the STJ source
+         generator uses the simple class name (not fully-qualified) as the hint file prefix.
+         Two files with the same context class simple name but different namespaces cause a
+         duplicate-hint-name collision that breaks the STJ source generator.
+         These files ARE validated individually by unit tests (BuildHelper.BuildCSharp). -->
     <ItemGroup>
         <Compile Include="..\Program.cs">
             <Link>Program.cs</Link>
         </Compile>
-        <Compile Include="../../GeneratedCode/**/*.cs" />
+        <Compile Include="../../GeneratedCode/**/*.cs"
+                 Condition="'$(SmokeTest)' != 'true'" />
+        <Compile Include="../../GeneratedCode/**/*.cs"
+                 Exclude="../../GeneratedCode/JsonSerializerCtx*.cs"
+                 Condition="'$(SmokeTest)' == 'true'" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />

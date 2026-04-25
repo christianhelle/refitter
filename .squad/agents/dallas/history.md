@@ -10,6 +10,7 @@
 
 - Team initialized on 2026-04-16.
 - **Issue #998 findings (2026-04-16):** Validated MSBuild tooling path. CLI loads settings correctly (naming honored). Single-file output without explicit `outputFilename` falls back to `Output.cs` and skips `./Generated` folder when it matches default. Real product bug: MSBuild expects wrong file locations on first clean build.
+- **PR #1067 tooling proof (2026-04-21):** The strongest regression signal came from testing the actual stdout marker contract and the packed `Refitter.SourceGenerator` artifact. `RefitterGenerateTask` now has unit coverage for exact include matching plus duplicate/zero-marker handling, and package validation inspects the produced `.nupkg`/`.nuspec` instead of trusting project metadata.
 
 ### 2026-04-20: PR #1064 Tooling Review
 
@@ -267,3 +268,9 @@ dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-r
 
 **Merge Status:** ✅ APPROVED (temporary test JSON files marked for deletion)
 
+### 2026-04-20: P1 Tooling Fixes (#1022, #1023, #1024)
+
+- **MSBuild generated-file discovery:** `src\Refitter.MSBuild\RefitterGenerateTask.cs` now trusts `GeneratedFile:` markers emitted by `src\Refitter\GenerateCommand.cs --simple-output` instead of re-parsing `.refitter` contents. This removes duplicated output-path prediction logic and keeps MSBuild compile items aligned with the CLI's actual writes.
+- **MSBuild include filtering semantics:** `RefitterIncludePatterns` now matches only exact filenames, exact project-relative paths, or exact full paths. Substring matching was removed; `apis\petstore.refitter` is now a stable way to target one file without over-including similarly named files.
+- **SourceGenerator dependency boundary:** `src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj` keeps `OasReader` private to the generator package and hides `Refit` compile assets from consumers (`PrivateAssets="compile"`). Source generator consumers must carry their own explicit `Refit` reference so Refitter does not silently upgrade them to Refit 10.
+- **Focused validation that worked reliably:** use a repo-local NuGet cache (`C:\projects\christianhelle\refitter\.nuget\packages`) when the shared global cache is locked, then run targeted TUnit treenode filters from `src\Refitter.Tests\bin\Release\net10.0\Refitter.Tests.exe` for fast regression checks.

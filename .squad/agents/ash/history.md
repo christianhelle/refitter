@@ -11,6 +11,11 @@
 - Added to the squad on 2026-04-20 as a specialist reviewer for PR #1064 review work.
 - PR #1064's Roslyn rewrite fixes raw regex corruption for ContractTypeSuffix, but issue #1013 is not closed unless it also blocks suffix-target collisions like `Pet` + `PetDto`.
 - For ParameterExtractor multipart fields, deduplication must use the emitted C# identifier, not the original OpenAPI property key, or issue #1018 still reproduces through sanitization collisions.
+- For source-generator dependency reviews, inspect the packed `.nuspec` and `analyzers/dotnet/cs/` payload, not just the `.csproj`; this repo's package bundles `OasReader.dll` as an analyzer asset but still declares `Refit` as a transitive NuGet dependency.
+- `RuntimeCompatibilityTests.Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled_Swagger2` currently fails because Swagger 2 generation still emits `string?` for optional properties when only `GenerateNullableReferenceTypes=true`.
+- `JsonSerializerContextGenerator` now statically covers nested types, closed generic usages, cross-namespace qualification, and `I`-prefix stripping; polymorphic specs also register all derived DTOs in the generated serializer context, but there is still no runtime AOT serialization regression test for that path.
+- The minimal safe #1026 fix lives in `src/Refitter.Core/RefitGenerator.cs`: for Swagger 2 only, when NRT is enabled but `GenerateOptionalPropertiesAsNullable` is false, a Roslyn rewrite strips `?` from generated nullable reference-type property declarations after NSwag generation.
+- Focused #1026 regression coverage now includes Swagger 2 explicit opt-in in `src/Refitter.Tests/Examples/RuntimeCompatibilityTests.cs`, and the four targeted NRT/nullability tests pass against the updated core/test binaries.
 
 ## 2026-04-20 Update: PR #1064 Review Complete
 
@@ -181,3 +186,42 @@ When fixing parameter extraction/deduplication:
 **Final Session Log:** `.squad/log/2026-04-20T16-00-14Z-pr1064-blocker-fixes.md`
 
 **Merge Status:** ✅ APPROVED (cleanup of test JSON files required)
+
+## 2026-04-20 Update: Issue #1024 Transitive Dependency Leak - FULLY RESOLVED
+
+**Task:** Own revision #2 for #1024 after Dallas lockout; complete the packaging fix  
+**Status:** ✅ COMPLETE — Transitive dependency leak eliminated; package and docs aligned  
+**Lockout Context:** Dallas attempted fix at commit 20ab08de with `PrivateAssets="compile"` but this was insufficient
+
+**Root Cause Analysis:**
+Dallas set `PrivateAssets="compile"` on Refit reference in `Refitter.SourceGenerator.csproj`. This prevents Refit assemblies from flowing into the generator's compilation but does NOT prevent NuGet from adding Refit as a transitive dependency in the packed `.nupkg` file.
+
+**Evidence:**
+Packed the source generator and examined the `.nuspec` file inside the `.nupkg`:
+- **Before fix (PrivateAssets="compile"):** nuspec contained `<dependency id="Refit" version="10.1.6" include="Runtime,Build,Native,ContentFiles,Analyzers,BuildTransitive" />`
+- **After fix (PrivateAssets="all"):** nuspec contains `<group targetFramework=".NETStandard2.0" />` with zero dependencies
+
+**Fix Applied:**
+Changed `Refitter.SourceGenerator.csproj` line 22:
+```diff
+- <PackageReference Include="Refit" Version="10.1.6" PrivateAssets="compile" />
++ <PackageReference Include="Refit" Version="10.1.6" PrivateAssets="all" />
+```
+
+**Documentation Alignment:**
+- README.md already documented at lines 559-564 that consumers must add explicit Refit reference
+- Updated `docs/docfx_project/articles/source-generator.md` to match README guidance
+- Both now clearly state: "The source generator no longer upgrades Refit transitively"
+
+**Verification:**
+1. Built source generator project cleanly (0 errors)
+2. Packed as `.nupkg` and extracted to verify nuspec dependencies section
+3. Confirmed zero transitive dependencies in package metadata
+4. Verified documentation alignment across README and docs/
+
+**Commit:** `3ebbc5df` — "fix(source-generator): prevent Refit transitive leak with PrivateAssets=all"
+
+**Issue #1024 Status:** ✅ CLOSED — No transitive dependency leak; explicit Refit reference requirement documented
+
+**Key Learning:**
+`PrivateAssets="compile"` only prevents assembly references from flowing to the consuming compilation. To prevent NuGet package dependencies from appearing in the `.nuspec`, you must use `PrivateAssets="all"`. For source generators and analyzers that generate code requiring runtime dependencies (like Refit), the consuming project must add those dependencies explicitly.

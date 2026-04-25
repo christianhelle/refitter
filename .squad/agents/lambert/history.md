@@ -12,6 +12,7 @@
 - **Issue #998 findings (2026-04-16):** Reproduced on clean .NET 10 build. Output.cs written to project root instead of Generated folder. Settings honored, but file path logic broken. Non-default folders work. First build fails due to sync mismatch; second build succeeds. Specific to default single-file output path behavior.
 - **PR #1064 closure audit (2026-04-20):** Validation evidence is strong for most closed issues, but #1014, #1040, #1053, and #1055 are over-claimed closures: tests only prove a subset or the code still leaves the reported gap. Manual repros did confirm #1011 (duplicate .refitter filenames now generate distinct hint names), #1012 (MSBuild build now fails on CLI error), and #1031 (settings-relative spec paths validate/generate from repo root).
 - **PR #1064 blocker recheck (2026-04-20):** Narrowed repros changed the confidence split: #1021 and #1050 are now proven end-to-end, but #1013 and #1018 are still only partial closures because uncovered collision cases remain reproducible despite the new tests.
+- **PR #1067 coverage pass (2026-04-21):** Added direct branch coverage for AOT serializer-context generation (whitespace contracts, OpenAPI-title naming, open-generic rejection, qualified/alias-qualified generic formatting). Swagger 2.0 #1026 compatibility is now explicitly locked for optional `ICollection<T>`, custom reference types, and `IDictionary<string, T>` staying non-nullable while optional value types still fall through as nullable.
 
 ### 2026-04-17: Release Compatibility Validation + Tie-Break Repro
 
@@ -189,3 +190,16 @@
 **Final Session Log:** `.squad/log/2026-04-20T16-00-14Z-pr1064-blocker-fixes.md`
 
 **Merge Status:** ✅ APPROVED (all 12 tests passing; comprehensive edge case coverage)
+
+### 2026-04-20: Remaining Open P1 Worktree Audit
+
+**Task**: Independent tester pass on the still-open P1 fixes under issue #1057 (#1017, #1022, #1023, #1024, #1025, #1026).
+
+**Key findings**:
+- `src/Refitter.Core/JsonSerializerContextGenerator.cs` is now wired into `RefitGenerator.Generate()` / `GenerateMultipleFiles()`, but the current implementation uses APIs not available on the `netstandard2.0` target (`ReplaceLineEndings`, range/index syntax, `ToHashSet`), so the worktree does not build yet. This is the current blocker for #1017.
+- The new AOT generator also still does not emit any `JsonDerivedType` / polymorphism metadata, and the new JsonSerializerContext test coverage does not exercise polymorphic contracts. Even after the netstandard build break is fixed, #1017 is not fully closed yet.
+- `src/Refitter.MSBuild/RefitterGenerateTask.cs` no longer predicts generated files with regex; it now asks the CLI to run in `--simple-output` mode and parses `GeneratedFile:` markers emitted by `src/Refitter/GenerateCommand.cs`. This directly addresses the filename divergence behind #1022 and removes the substring fallback for #1023.
+- `src/Refitter.Core/CSharpClientGeneratorFactory.cs` removes the forced `GenerateOptionalPropertiesAsNullable = true` behavior, and `src/Refitter.Tests/Examples/RuntimeCompatibilityTests.cs` now expects nullable-reference-types alone to preserve non-null optional properties. The code change for #1026 looks correct, but it could not be executed end-to-end because #1017 currently breaks the build.
+- `src/Refitter.SourceGenerator/Refitter.SourceGenerator.csproj` and `src/Refitter.SourceGenerator/obj/Release/Refitter.SourceGenerator.1.0.0.nuspec` still expose `Refit 10.1.6` and `OasReader 3.5.0.19` as package dependencies, so #1024 remains open.
+- `docs/docfx_project/articles/breaking-changes-v2-0-0.md` already documents the Microsoft.OpenApi 1.x → 3.x parser migration, but there is still no comparative smoke-test corpus proving real-world diff coverage, so #1025 remains only partially addressed.
+- Temporary repro artifacts are still sitting untracked in the repo root (`.refitter`, `aot-repro.cs`, `aot-repro.json`); they should be cleaned before merge unless intentionally kept.

@@ -61,6 +61,7 @@ Users of `Refitter.SourceGenerator` who:
 - Version-control generated `.g.cs` files
 - Reference generated files directly in build scripts
 - Expect physical files in the `./Generated` folder
+- Relied on `Refit` flowing transitively from `Refitter.SourceGenerator`
 
 will need to adjust their workflow.
 
@@ -81,6 +82,20 @@ Generated code remains accessible through your IDE without cluttering the file s
 - **Rider:** Right-click `.refitter` file → Select **"View Generated Files"**
 
 This is the recommended approach for most users.
+
+#### Package References for Source Generator Consumers
+
+`Refitter.SourceGenerator` keeps its `Refit` dependency private. Add a direct package reference to `Refit` in every consuming project, and add `Refit.HttpClientFactory` separately if you use generated dependency-injection helpers such as `ConfigureRefitClients()`.
+
+```xml
+<ItemGroup>
+  <PackageReference Include="Refitter.SourceGenerator" Version="2.0.0" />
+  <PackageReference Include="Refit" Version="10.1.6" />
+  <PackageReference Include="Refit.HttpClientFactory" Version="10.1.6" />
+</ItemGroup>
+```
+
+If you do not use the generated DI helpers, omit `Refit.HttpClientFactory`.
 
 #### Option B: Generate Physical Files with CLI or MSBuild
 
@@ -113,10 +128,65 @@ If your CI/CD pipeline references generated files:
 
 ---
 
+## Silent Behavioral Change: OpenAPI Parser Upgrade
+
+### Summary
+Refitter v2.0.0 upgrades the OpenAPI parser from **Microsoft.OpenApi.Readers 1.x to 3.x** (`OasReader 3.5.0.19`). This is a **major version upgrade** with materially different schema interpretation.
+
+### Impact
+Users upgrading from v1.7.3 may see **different generated C# code** even without changing their OpenAPI specifications. This is not a breaking change in the Refitter API, but a **behavioral change in code generation** caused by the parser upgrade. The branch proves the parser changed and documents how to migrate; it does **not** prove full 1.7.3-vs-v2.0 behavioral equivalence across a broad real-world corpus.
+
+### What Changed in the Parser
+Microsoft.OpenApi 3.x interprets these schema aspects differently than 1.x:
+- **Nullability handling:** More strict `null` type interpretation
+- **Discriminator support:** Improved `oneOf`/`anyOf` discriminator resolution
+- **Reference resolution:** Safer `$ref` path handling
+- **Examples:** Better handling of embedded schema examples
+- **Swagger 2.0 edge cases:** More robust handling of specs without `components` section
+
+### Migration
+**Action required:** After upgrading Refitter to v2.0.0:
+
+1. Regenerate your client code from your OpenAPI specification
+2. Review the generated code diff carefully
+3. Run your test suite to ensure the new client works correctly
+4. Commit the updated generated code
+
+Treat these steps as the recommended mitigation for the parser upgrade: regenerate, inspect the diff, and validate your client with tests before shipping.
+
+### Example
+If you're using the CLI:
+```bash
+# Regenerate with new parser
+refitter ./swagger.json --output ./GeneratedClient.cs --namespace "MyApi"
+
+# Review the diff
+git diff GeneratedClient.cs
+
+# Run tests
+dotnet test
+
+# Commit
+git add GeneratedClient.cs && git commit -m "Regenerate client with OpenAPI parser v3.x"
+```
+
+If you're using Source Generator or MSBuild, rebuild your project and review the generated changes the same way.
+
+### Related Evidence
+- [PR #907: Migrate from Microsoft.OpenApi.Readers 1.x to Microsoft.OpenApi 3.x](https://github.com/christianhelle/refitter/pull/907)
+- [PR #945: Upgrade Microsoft.OpenApi v3.4](https://github.com/christianhelle/refitter/pull/945)
+
+---
+
 ## Migration Checklist
 
+- [ ] Upgrade Refitter to v2.0.0
+- [ ] **Regenerate client code** from your OpenAPI specification
+- [ ] **Review generated code diff** for changes caused by the OpenAPI parser upgrade
 - [ ] Update `.refitter` files: replace `generateAuthenticationHeader` with `authenticationHeaderStyle`
+- [ ] If using `Refitter.SourceGenerator`: add a direct `Refit` package reference (and `Refit.HttpClientFactory` if using generated DI helpers)
 - [ ] If using Source Generator: choose IDE viewing or switch to CLI/MSBuild
+- [ ] Run test suite to verify new client behavior
 - [ ] Rebuild and test code generation
 - [ ] Update CI/CD pipelines and build scripts as needed
 - [ ] Remove generated `.g.cs` files from version control (if using Source Generator)

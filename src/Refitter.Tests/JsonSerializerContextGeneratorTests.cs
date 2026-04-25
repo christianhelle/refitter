@@ -1,450 +1,387 @@
 using FluentAssertions;
 using Refitter.Core;
+using Refitter.Tests.Build;
 
 namespace Refitter.Tests;
 
 public class JsonSerializerContextGeneratorTests
 {
     [Test]
+    public void Generate_Returns_Empty_When_Contracts_Are_Whitespace()
+    {
+        JsonSerializerContextGenerator.Generate(" \r\n\t ", CreateSettings())
+            .Should()
+            .BeEmpty();
+    }
+
+    [Test]
     public void Generate_Returns_Empty_When_No_Types()
     {
-        var contractCode = @"
-            namespace MyNamespace
-            {
-                // No types here
-            }
-        ";
+        var settings = CreateSettings();
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().BeEmpty();
+        JsonSerializerContextGenerator.Generate("// no contracts", settings)
+            .Should()
+            .BeEmpty();
     }
 
     [Test]
-    public void Generate_Returns_Empty_For_Empty_Contract()
+    public void Generate_Uses_OpenApi_Title_For_Context_Name_When_Enabled()
     {
-        var contractCode = string.Empty;
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().BeEmpty();
-    }
-
-    [Test]
-    public void Generate_Returns_Context_With_JsonSerializable_Attributes_For_Class()
-    {
-        var contractCode = @"
-            namespace MyNamespace
-            {
-                public class Pet
-                {
-                    public string Name { get; set; }
-                }
-            }
-        ";
-
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(Pet))]");
-        result.Should().Contain("internal partial class IMyApiSerializerContext : JsonSerializerContext");
-    }
-
-    [Test]
-    public void Generate_Returns_Context_With_JsonSerializable_Attributes_For_Record()
-    {
-        var contractCode = @"
-            namespace MyNamespace
-            {
-                public record Owner(string Name, int Age);
-            }
-        ";
-
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(Owner))]");
-        result.Should().Contain("internal partial class IMyApiSerializerContext : JsonSerializerContext");
-    }
-
-    [Test]
-    public void Generate_Returns_Context_With_JsonSerializable_Attributes_For_Enum()
-    {
-        var contractCode = @"
-            namespace MyNamespace
-            {
-                public enum Status
-                {
-                    Available,
-                    Pending,
-                    Sold
-                }
-            }
-        ";
-
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(Status))]");
-        result.Should().Contain("internal partial class IMyApiSerializerContext : JsonSerializerContext");
-    }
-
-    [Test]
-    public void Generate_Includes_All_Type_Names()
-    {
-        var contractCode = @"
-            namespace MyNamespace
-            {
-                public class Pet
-                {
-                    public string Name { get; set; }
-                }
-
-                public record Owner(string Name);
-
-                public enum Status
-                {
-                    Available,
-                    Pending
-                }
-
-                internal class InternalModel
-                {
-                    public int Id { get; set; }
-                }
-            }
-        ";
-
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(Pet))]");
-        result.Should().Contain("[JsonSerializable(typeof(Owner))]");
-        result.Should().Contain("[JsonSerializable(typeof(Status))]");
-        result.Should().Contain("[JsonSerializable(typeof(InternalModel))]");
-    }
-
-    [Test]
-    public void Generate_Sorts_Type_Names_Alphabetically()
-    {
-        var contractCode = @"
-            namespace MyNamespace
-            {
-                public class Zebra { }
-                public class Apple { }
-                public class Mango { }
-            }
-        ";
-
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().NotBeNullOrWhiteSpace();
-        var appleIndex = result.IndexOf("[JsonSerializable(typeof(Apple))]");
-        var mangoIndex = result.IndexOf("[JsonSerializable(typeof(Mango))]");
-        var zebraIndex = result.IndexOf("[JsonSerializable(typeof(Zebra))]");
-
-        appleIndex.Should().BeLessThan(mangoIndex);
-        mangoIndex.Should().BeLessThan(zebraIndex);
-    }
-
-    [Test]
-    public void Generate_Uses_Interface_Name_For_Context_Class_Name()
-    {
-        var contractCode = @"
-            namespace MyNamespace
-            {
-                public class Pet { }
-            }
-        ";
-
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IPetStoreApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().Contain("internal partial class IPetStoreApiSerializerContext : JsonSerializerContext");
-    }
-
-    [Test]
-    public void Generate_Handles_Partial_Classes()
-    {
-        var contractCode = @"
-            namespace MyNamespace
+        const string contracts = """
+            namespace My.Contracts
             {
                 public partial class Pet
                 {
-                    public string Name { get; set; }
                 }
             }
-        ";
+            """;
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
+        var settings = CreateSettings(interfaceName: "IIgnoredApi");
+        settings.Naming.UseOpenApiTitle = true;
 
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(Pet))]");
+        var result = JsonSerializerContextGenerator.Generate(contracts, settings, "PetService");
+
+        result.Should().Contain("internal partial class PetServiceSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
+        result.Should().NotContain("IgnoredApiSerializerContext");
     }
 
     [Test]
-    public void Generate_Handles_Internal_Classes()
+    public void Generate_Uses_Contracts_Namespace_And_Strips_Interface_Prefix()
     {
-        var contractCode = @"
-            namespace MyNamespace
+        const string contracts = """
+            namespace My.Contracts
             {
-                internal class InternalPet
+                public partial class Pet
                 {
-                    public string Name { get; set; }
                 }
             }
-        ";
+            """;
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
+        var settings = CreateSettings(interfaceName: "IMyApi", @namespace: "My.Clients", contractsNamespace: "My.Contracts");
+        var result = JsonSerializerContextGenerator.Generate(contracts, settings);
 
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(InternalPet))]");
+        result.Should().Contain("namespace My.Contracts");
+        result.Should().Contain("internal partial class MyApiSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
+        result.Should().NotContain("IMyApiSerializerContext");
     }
 
     [Test]
-    public void Generate_Handles_Internal_Records()
+    public void Generate_Falls_Back_To_Default_Context_Name_When_Interface_Name_Is_Missing()
     {
-        var contractCode = @"
-            namespace MyNamespace
+        const string contracts = """
+            namespace My.Contracts
             {
-                internal record InternalOwner(string Name);
+                public partial class Pet
+                {
+                }
             }
-        ";
+            """;
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
+        var settings = CreateSettings(interfaceName: null!);
+        var result = JsonSerializerContextGenerator.Generate(contracts, settings);
 
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(InternalOwner))]");
+        result.Should().Contain("internal partial class ApiClientSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
     }
 
     [Test]
-    public void Generate_Handles_Internal_Enums()
+    public void Generate_Registers_Types_Once()
     {
-        var contractCode = @"
-            namespace MyNamespace
+        const string contracts = """
+            namespace My.Contracts
             {
-                internal enum InternalStatus
+                public partial class Pet
                 {
-                    Active,
-                    Inactive
+                }
+
+                internal record Owner(string Name);
+
+                public enum Status
+                {
+                    Active
+                }
+
+                public partial class Pet
+                {
+                    public Status CurrentStatus { get; set; }
                 }
             }
-        ";
+            """;
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(InternalStatus))]");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Owner))]");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Status))]");
+        result.Split("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]").Length.Should().Be(2);
     }
 
     [Test]
-    public void Generate_Ignores_Private_Types()
+    public void Generate_Registers_Nested_Types_With_Qualified_Name()
     {
-        var contractCode = @"
-            namespace MyNamespace
+        const string contracts = """
+            namespace My.Contracts
             {
-                private class PrivatePet
+                public partial class Outer
                 {
-                    public string Name { get; set; }
-                }
-
-                public class PublicPet
-                {
-                    public string Name { get; set; }
+                    public partial class Inner
+                    {
+                    }
                 }
             }
-        ";
+            """;
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(PublicPet))]");
-        result.Should().NotContain("PrivatePet");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Outer))]");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Outer.Inner))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
     }
 
     [Test]
-    public void Generate_Handles_Types_With_Underscores()
+    public void Generate_Registers_Closed_Generic_Usages_And_Skips_Open_Generic_Declarations()
     {
-        var contractCode = @"
-            namespace MyNamespace
+        const string contracts = """
+            namespace My.Contracts
             {
-                public class Pet_Model
+                public partial class Pet
                 {
-                    public string Name { get; set; }
                 }
 
-                public class _InternalModel
+                public partial class Envelope<T>
                 {
-                    public int Id { get; set; }
+                    public T Payload { get; set; }
+                }
+
+                public partial class PetResponse
+                {
+                    public Envelope<Pet> Value { get; set; }
                 }
             }
-        ";
+            """;
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(Pet_Model))]");
-        result.Should().Contain("[JsonSerializable(typeof(_InternalModel))]");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Pet>))]");
+        result.Should().NotContain("typeof(Envelope))");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
     }
 
     [Test]
-    public void Generate_Handles_Types_With_Numbers()
+    public void Generate_Skips_Generic_Usages_That_Still_Reference_Open_Type_Parameters()
     {
-        var contractCode = @"
-            namespace MyNamespace
+        const string contracts = """
+            namespace My.Contracts
             {
-                public class Pet2
+                public partial class Pet
                 {
-                    public string Name { get; set; }
                 }
 
-                public class Model123
+                public partial class Envelope<T>
                 {
-                    public int Id { get; set; }
+                    public T Payload { get; set; }
+                }
+
+                public partial class Wrapper<T>
+                {
+                    public Envelope<T> OpenValue { get; set; }
+                }
+
+                public partial class ClosedWrapper
+                {
+                    public Envelope<Pet> ClosedValue { get; set; }
                 }
             }
-        ";
+            """;
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(Pet2))]");
-        result.Should().Contain("[JsonSerializable(typeof(Model123))]");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Pet>))]");
+        result.Should().NotContain("typeof(Envelope<T>))");
+        result.Should().NotContain("typeof(Wrapper))");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
     }
 
     [Test]
-    public void Generate_Does_Not_Duplicate_Type_Names()
+    public void Generate_Global_Qualifies_Types_Outside_The_Context_Namespace()
     {
-        var contractCode = @"
-            namespace MyNamespace
+        const string contracts = """
+            namespace Shared.Contracts
             {
-                public class Pet
+                public partial class SharedModel
                 {
-                    public string Name { get; set; }
                 }
             }
 
-            namespace AnotherNamespace
+            namespace My.Contracts
             {
-                public class Pet
+                public partial class LocalModel
                 {
-                    public string Name { get; set; }
                 }
             }
-        ";
+            """;
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
-        result.Should().NotBeNullOrWhiteSpace();
-        var petCount = System.Text.RegularExpressions.Regex.Matches(result, @"\[JsonSerializable\(typeof\(Pet\)\)\]").Count;
-        petCount.Should().Be(1, "duplicate type names should only appear once");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(LocalModel))]");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(global::Shared.Contracts.SharedModel))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
     }
 
     [Test]
-    public void Generate_Creates_Closing_Brace()
+    public void Generate_Formats_Nullable_Array_And_Qualified_Generic_Usages()
     {
-        var contractCode = @"
-            namespace MyNamespace
+        const string contracts = """
+            namespace My.Contracts
             {
-                public class Pet { }
+                public partial class Pet
+                {
+                }
+
+                public partial class Envelope<T>
+                {
+                    public T Payload { get; set; }
+                }
+
+                public partial class Container<T>
+                {
+                    public T Value { get; set; }
+                }
+
+                public partial class Response
+                {
+                    public Container<My.Contracts.Envelope<My.Contracts.Pet>[]?> QualifiedValues { get; set; }
+                }
             }
-        ";
+            """;
 
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
-        result.Should().Contain("{");
-        result.Should().Contain("}");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Container<Envelope<Pet>[]?>))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
     }
 
     [Test]
-    public void Generate_Handles_Mixed_Indentation()
+    public void Generate_Formats_Alias_Qualified_Generic_Usages()
     {
-        var contractCode = @"
-namespace MyNamespace
-{
-public class Pet
-{
-    public string Name { get; set; }
-}
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
 
-    internal record Owner(string Name);
+                public partial class Envelope<T>
+                {
+                    public T Payload { get; set; }
+                }
 
-        public enum Status
+                public partial class Container<T>
+                {
+                    public T Value { get; set; }
+                }
+
+                public partial class Response
+                {
+                    public Container<global::My.Contracts.Envelope<global::My.Contracts.Pet>> AliasedValue { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Container<global::My.Contracts.Envelope<global::My.Contracts.Pet>>))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
+    [Test]
+    public void Generate_Formats_Alias_Qualified_Declared_Types_Using_Namespace_Alias()
+    {
+        const string contracts = """
+            using Contracts = My.Contracts;
+
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+
+                public partial class Envelope<T>
+                {
+                    public T Payload { get; set; }
+                }
+
+                public partial class Response
+                {
+                    public Contracts::Pet AliasedPet { get; set; }
+
+                    public Contracts::Envelope<Pet> AliasedEnvelope { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]");
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Pet>))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
+    [Test]
+    public void Generate_Formats_NonDeclared_Generic_Type_Arguments()
+    {
+        const string contracts = """
+            using System.Collections.Generic;
+
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+
+                public partial class Envelope<T>
+                {
+                    public T Payload { get; set; }
+                }
+
+                public partial class Response
+                {
+                    public Envelope<Dictionary<string, Pet>> Value { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Dictionary<string, Pet>>))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
+    [Test]
+    public void Generate_Handles_Declared_Types_In_Global_Namespace()
+    {
+        const string contracts = """
+            public partial class Pet
+            {
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]");
+        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+    }
+
+    private static RefitGeneratorSettings CreateSettings(
+        string interfaceName = "IMyApi",
+        string @namespace = "My.Clients",
+        string contractsNamespace = "My.Contracts") =>
+        new()
         {
-            Active
-        }
-}
-        ";
-
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(Pet))]");
-        result.Should().Contain("[JsonSerializable(typeof(Owner))]");
-        result.Should().Contain("[JsonSerializable(typeof(Status))]");
-    }
-
-    [Test]
-    public void Generate_Handles_Record_With_Block_Body()
-    {
-        var contractCode = @"
-            namespace MyNamespace
+            Namespace = @namespace,
+            ContractsNamespace = contractsNamespace,
+            Naming = new NamingSettings
             {
-                public record Pet
-                {
-                    public string Name { get; init; }
-                    public int Age { get; init; }
-                }
+                InterfaceName = interfaceName
             }
-        ";
-
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("[JsonSerializable(typeof(Pet))]");
-    }
-
-    [Test]
-    public void Generate_Handles_Multiple_Partial_Classes()
-    {
-        var contractCode = @"
-            namespace MyNamespace
-            {
-                public partial class Pet
-                {
-                    public string Name { get; set; }
-                }
-
-                public partial class Pet
-                {
-                    public int Age { get; set; }
-                }
-            }
-        ";
-
-        var settings = new RefitGeneratorSettings { Naming = { InterfaceName = "IMyApi" } };
-        var result = JsonSerializerContextGenerator.Generate(contractCode, settings);
-
-        result.Should().NotBeNullOrWhiteSpace();
-        var petCount = System.Text.RegularExpressions.Regex.Matches(result, @"\[JsonSerializable\(typeof\(Pet\)\)\]").Count;
-        petCount.Should().Be(1, "partial class declarations should only generate one JsonSerializable attribute");
-    }
+        };
 }

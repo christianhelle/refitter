@@ -65,17 +65,6 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             settings.CodeGeneratorSettings,
             generator.Settings.CSharpGeneratorSettings);
 
-        // Auto-enable optional properties as nullable when nullable reference types enabled.
-        // This ensures consistent nullability behavior: when NRT is enabled, optional properties
-        // should be nullable to avoid CS8618 warnings for required members.
-        // Note: This is a behavioral change from v1.x where GenerateOptionalPropertiesAsNullable
-        // defaulted to false. If you need the old behavior, explicitly set
-        // GenerateOptionalPropertiesAsNullable = false in your settings.
-        if (generator.Settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes)
-        {
-            generator.Settings.CSharpGeneratorSettings.GenerateOptionalPropertiesAsNullable = true;
-        }
-
         return generator;
     }
 

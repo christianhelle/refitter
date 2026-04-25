@@ -1,5 +1,5 @@
 # Current Focus
 
-Fixing the remaining PR #1064 merge blockers: #1013, #1018, and #1053, with targeted regression coverage and a safety gate before merge.
+Fixing the remaining open high-severity audit findings linked from issue #1057, with parallel ownership across core, tooling, docs, and an explicit review gate before merge.
 
 Requested by Christian Helle.

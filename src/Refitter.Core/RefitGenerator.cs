@@ -1,5 +1,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSwag;
 
 namespace Refitter.Core;
@@ -146,6 +149,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
+        var serializerContext = GenerateJsonSerializerContext(contracts);
 
         if (settings.GenerateClients)
         {
@@ -166,6 +170,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .AppendLine(settings.GenerateClients ? refitInterfacesCode : string.Empty)
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
+            .AppendLine(serializerContext)
             .AppendLine(
                 settings.ApizrSettings != null
                     ? ApizrRegistrationGenerator.Generate(settings, interfaceNames, title)
@@ -201,6 +206,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
+        var serializerContext = GenerateJsonSerializerContext(contracts);
 
         var generatedFiles = new List<GeneratedCode>();
 
@@ -213,6 +219,14 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                 new GeneratedCode(
                     TypenameConstants.Contracts,
                     contracts));
+        }
+
+        if (!string.IsNullOrWhiteSpace(serializerContext))
+        {
+            generatedFiles.Add(
+                new GeneratedCode(
+                    JsonSerializerContextGenerator.GetContextTypeName(settings, document.Info?.Title),
+                    serializerContext));
         }
 
         if (settings.DependencyInjectionSettings is not null || settings.ApizrSettings is not null)
@@ -267,6 +281,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
     private string SanitizeGeneratedContracts(string contracts)
     {
+        contracts = NormalizeSwagger2OptionalReferencePropertyNullability(contracts);
+
         if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
         {
             // InlineJsonConverters = true (default): move [JsonConverter] from enum properties to enum type declarations.
@@ -285,6 +301,52 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .Replace(contracts, string.Empty)
             .TrimEnd();
     }
+
+    private string NormalizeSwagger2OptionalReferencePropertyNullability(string contracts)
+    {
+        if (document.SchemaType != NJsonSchema.SchemaType.Swagger2 ||
+            settings.CodeGeneratorSettings?.GenerateNullableReferenceTypes != true ||
+            settings.CodeGeneratorSettings.GenerateOptionalPropertiesAsNullable)
+        {
+            return contracts;
+        }
+
+        var tree = CSharpSyntaxTree.ParseText(contracts);
+        var root = tree.GetCompilationUnitRoot();
+        var rewrittenRoot = new Swagger2OptionalReferencePropertyNullabilityRewriter().Visit(root);
+        return rewrittenRoot!.ToFullString();
+    }
+
+    private sealed class Swagger2OptionalReferencePropertyNullabilityRewriter : CSharpSyntaxRewriter
+    {
+        public override SyntaxNode? VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            if (node.Type is NullableTypeSyntax nullableType &&
+                IsReferenceType(nullableType.ElementType))
+            {
+                node = node.WithType(nullableType.ElementType.WithTriviaFrom(node.Type));
+            }
+
+            return base.VisitPropertyDeclaration(node);
+        }
+
+        private static bool IsReferenceType(TypeSyntax typeSyntax) =>
+            typeSyntax switch
+            {
+                PredefinedTypeSyntax predefinedType => predefinedType.Keyword.Kind() is SyntaxKind.ObjectKeyword or SyntaxKind.StringKeyword,
+                ArrayTypeSyntax => true,
+                IdentifierNameSyntax => true,
+                GenericNameSyntax => true,
+                QualifiedNameSyntax => true,
+                AliasQualifiedNameSyntax => true,
+                _ => false,
+            };
+    }
+
+    private string GenerateJsonSerializerContext(string contracts) =>
+        settings.GenerateJsonSerializerContext && settings.GenerateContracts
+            ? JsonSerializerContextGenerator.Generate(contracts, settings, document.Info?.Title)
+            : string.Empty;
 
     /// <summary>
     /// Generates the client code based on the specified interface generator.
