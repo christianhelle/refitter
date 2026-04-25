@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using Refitter.Core;
 using TUnit.Core;
@@ -417,12 +418,14 @@ public class GenerateCommandTests
     public void Program_Main_Should_Show_Help_When_Invoked_Without_Arguments()
     {
         var result = InvokeProgram([]);
+        var normalizedOutput = NormalizeConsoleOutput(result.Output);
 
         result.ExitCode.Should().Be(0);
-        result.Output.Should().MatchRegex(@"USAGE:\s+refitter\s+\[URL or input file\]\s+\[OPTIONS\]");
-        result.Output.Should().Contain("ARGUMENTS:");
-        result.Output.Should().Contain("OPTIONS:");
-        result.Output.Should().Contain("--generate-authentication-header");
+        normalizedOutput.Should().Contain("USAGE:");
+        normalizedOutput.Should().Contain("refitter [URL or input file] [OPTIONS]");
+        normalizedOutput.Should().Contain("ARGUMENTS:");
+        normalizedOutput.Should().Contain("OPTIONS:");
+        normalizedOutput.Should().Contain("--generate-authentication-header");
     }
 
     [Test]
@@ -531,6 +534,12 @@ public class GenerateCommandTests
         {
             Directory.Delete(workspace, recursive: true);
         }
+    }
+
+    private static string NormalizeConsoleOutput(string output)
+    {
+        var withoutAnsi = Regex.Replace(output, @"\x1B\[[0-9;?]*[ -/]*[@-~]", string.Empty);
+        return withoutAnsi.ReplaceLineEndings("\n");
     }
 
     private static string QuoteArgument(string argument) =>
