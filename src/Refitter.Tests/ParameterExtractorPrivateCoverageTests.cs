@@ -281,6 +281,46 @@ public class ParameterExtractorPrivateCoverageTests
         arguments[4].Should().Be(string.Empty);
     }
 
+    [Test]
+    public void GetParameters_Does_Not_Mutate_Query_Parameter_Collection_When_Generating_Dynamic_Querystring_Wrapper()
+    {
+        var firstParameter = CreateParameterModel(
+            "query",
+            "query",
+            parameter: new OpenApiParameter
+            {
+                Name = "query",
+                Kind = OpenApiParameterKind.Query,
+                IsRequired = true,
+                Schema = new JsonSchema { Type = JsonObjectType.String }
+            });
+        var secondParameter = CreateParameterModel(
+            "page",
+            "page",
+            type: "int?",
+            parameter: new OpenApiParameter
+            {
+                Name = "page",
+                Kind = OpenApiParameterKind.Query,
+                Schema = new JsonSchema { Type = JsonObjectType.Integer }
+            });
+        var operationModel = CreateOperationModel(firstParameter, secondParameter);
+        var operation = new OpenApiOperation();
+
+        var parameters = ParameterExtractor.GetParameters(
+                operationModel,
+                operation,
+                new RefitGeneratorSettings { UseDynamicQuerystringParameters = true },
+                "SearchQueryParams",
+                out var dynamicQuerystringParameters)
+            .ToList();
+
+        parameters.Should().ContainSingle().Which.Should().Be("[Query] SearchQueryParams queryParams");
+        dynamicQuerystringParameters.Should().Contain("class SearchQueryParams");
+        operationModel.Parameters.Should().HaveCount(2);
+        operationModel.Parameters.Should().ContainInOrder(firstParameter, secondParameter);
+    }
+
     private static T InvokePrivate<T>(string methodName, Type[] parameterTypes, params object?[] arguments)
     {
         var method = typeof(ParameterExtractor).GetMethod(

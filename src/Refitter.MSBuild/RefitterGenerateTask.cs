@@ -12,6 +12,21 @@ public class RefitterGenerateTask : MSBuildTask
     private static readonly System.Threading.AsyncLocal<Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult>?> ProcessRunnerOverride = new();
     private static readonly System.Threading.AsyncLocal<int?> ProcessTimeoutMillisecondsOverride = new();
     private static readonly System.Threading.AsyncLocal<Action<Process>?> ProcessTerminatorOverride = new();
+    private static readonly System.Threading.AsyncLocal<Func<string, bool>?> FileExistsOverride = new();
+
+    private static readonly (string TargetFramework, string RuntimePrefix)[] PreferredRuntimeOrder =
+    [
+        ("net10.0", "Microsoft.NETCore.App 10."),
+        ("net9.0", "Microsoft.NETCore.App 9."),
+        ("net8.0", "Microsoft.NETCore.App 8.")
+    ];
+
+    private static readonly string[] CompatibilityFallbackOrder =
+    [
+        "net8.0",
+        "net9.0",
+        "net10.0"
+    ];
 
     internal sealed class ProcessExecutionResult
     {
@@ -53,6 +68,12 @@ public class RefitterGenerateTask : MSBuildTask
         set => ProcessTerminatorOverride.Value = value;
     }
 
+    internal static Func<string, bool> FileExists
+    {
+        get => FileExistsOverride.Value ?? File.Exists;
+        set => FileExistsOverride.Value = value;
+    }
+
     public string ProjectFileDirectory { get; set; }
 
     public bool DisableLogging { get; set; }
@@ -70,6 +91,7 @@ public class RefitterGenerateTask : MSBuildTask
         ProcessRunnerOverride.Value = null;
         ProcessTimeoutMillisecondsOverride.Value = null;
         ProcessTerminatorOverride.Value = null;
+        FileExistsOverride.Value = null;
     }
 
     public override bool Execute()
@@ -131,26 +153,24 @@ public class RefitterGenerateTask : MSBuildTask
         failed = false;
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
-        var separator = Path.DirectorySeparatorChar;
-        var refitterDll = $"{packageFolder}{separator}..{separator}net8.0{separator}refitter.dll";
         var outputLines = new List<string>();
 
-        List<string> installedRuntimes = InstalledDotnetRuntimesProvider();
-        if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 10.")))
+        List<string>? installedRuntimes = null;
+        try
         {
-            // Use .NET 10 version if available
-            refitterDll = $"{packageFolder}{separator}..{separator}net10.0{separator}refitter.dll";
-            TryLogCommandLine("Detected .NET 10 runtime. Using .NET 10 version of Refitter.");
+            installedRuntimes = InstalledDotnetRuntimesProvider();
         }
-        else if (installedRuntimes.Any(r => r.StartsWith("Microsoft.NETCore.App 9.")))
+        catch (Exception exception)
         {
-            // Use .NET 9 version if available
-            refitterDll = $"{packageFolder}{separator}..{separator}net9.0{separator}refitter.dll";
-            TryLogCommandLine("Detected .NET 9 runtime. Using .NET 9 version of Refitter.");
+            TryLogCommandLine($"Failed to inspect installed .NET runtimes: {exception.Message}. Falling back to bundled Refitter runtime selection.");
         }
-        else
+
+        var refitterDll = ResolveRefitterDll(packageFolder, installedRuntimes, TryLogCommandLine);
+        if (string.IsNullOrWhiteSpace(refitterDll) || !FileExists(refitterDll))
         {
-            TryLogCommandLine("Using .NET 8 version of Refitter.");
+            failed = true;
+            TryLogError("Unable to locate a bundled Refitter CLI runtime for the MSBuild task.");
+            return new List<string>();
         }
 
         var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
@@ -185,13 +205,14 @@ public class RefitterGenerateTask : MSBuildTask
         if (processResult.TimedOut)
         {
             failed = true;
+            var timeoutDescription = FormatTimeout(ProcessTimeoutMilliseconds);
             if (processResult.TerminationException is null)
             {
-                TryLogError("Refitter process timed out after 300 seconds and was terminated");
+                TryLogError($"Refitter process timed out after {timeoutDescription} and was terminated");
             }
             else
             {
-                TryLogError($"Failed to terminate timed-out process: {processResult.TerminationException.Message}");
+                TryLogError($"Refitter process timed out after {timeoutDescription}. Failed to terminate timed-out process: {processResult.TerminationException.Message}");
             }
 
             return new List<string>();
@@ -261,14 +282,85 @@ public class RefitterGenerateTask : MSBuildTask
             process.Start();
             using (var reader = process.StandardOutput)
             {
-                var output = reader.ReadToEnd();
-                installedRuntimes.AddRange(output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries));
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        installedRuntimes.Add(line);
+                    }
+                }
             }
             process.WaitForExit();
         }
 
         return installedRuntimes;
     }
+
+    internal static string? ResolveRefitterDll(string? packageFolder, IReadOnlyList<string>? installedRuntimes, Action<string> logCommandLine)
+    {
+        if (string.IsNullOrWhiteSpace(packageFolder))
+        {
+            return null;
+        }
+
+        var bundledRuntimes = PreferredRuntimeOrder
+            .Select(candidate => new
+            {
+                candidate.TargetFramework,
+                candidate.RuntimePrefix,
+                Path = Path.GetFullPath(Path.Combine(packageFolder, "..", candidate.TargetFramework, "refitter.dll")),
+            })
+            .ToArray();
+
+        if (installedRuntimes is not null)
+        {
+            foreach (var runtime in bundledRuntimes)
+            {
+                if (FileExists(runtime.Path) &&
+                    installedRuntimes.Any(installed =>
+                        !string.IsNullOrWhiteSpace(installed) &&
+                        installed.StartsWith(runtime.RuntimePrefix, StringComparison.Ordinal)))
+                {
+                    logCommandLine($"Detected {GetDisplayFramework(runtime.TargetFramework)} runtime. Using {GetDisplayFramework(runtime.TargetFramework)} version of Refitter.");
+                    return runtime.Path;
+                }
+            }
+        }
+
+        foreach (var targetFramework in CompatibilityFallbackOrder)
+        {
+            var fallbackPath = bundledRuntimes
+                .First(runtime => runtime.TargetFramework == targetFramework)
+                .Path;
+
+            if (FileExists(fallbackPath))
+            {
+                logCommandLine($"Falling back to bundled {GetDisplayFramework(targetFramework)} version of Refitter.");
+                return fallbackPath;
+            }
+        }
+
+        var coLocatedCli = Path.GetFullPath(Path.Combine(packageFolder, "refitter.dll"));
+        if (FileExists(coLocatedCli))
+        {
+            logCommandLine("Falling back to co-located Refitter CLI.");
+            return coLocatedCli;
+        }
+
+        return bundledRuntimes
+            .Select(runtime => runtime.Path)
+            .FirstOrDefault();
+    }
+
+    private static string FormatTimeout(int timeoutMilliseconds) =>
+        timeoutMilliseconds >= 1000 && timeoutMilliseconds % 1000 == 0
+            ? $"{timeoutMilliseconds / 1000} seconds"
+            : timeoutMilliseconds >= 1000
+                ? $"{timeoutMilliseconds / 1000d:0.###} seconds"
+                : $"{timeoutMilliseconds} ms";
+
+    private static string GetDisplayFramework(string targetFramework) => targetFramework.Replace("net", ".NET ");
 
     private void TryLogErrorFromException(Exception e)
     {

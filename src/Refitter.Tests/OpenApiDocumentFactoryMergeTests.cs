@@ -1,4 +1,7 @@
+using System.Reflection;
 using FluentAssertions;
+using NJsonSchema;
+using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -449,5 +452,406 @@ paths:
         merged.Tags.Should().Contain(t => t.Name == "users");
         merged.Tags.Should().Contain(t => t.Name == "products");
         merged.Tags.Should().Contain(t => t.Name == "orders");
+    }
+
+    [Test]
+    public async Task Merge_For_NonConflicting_Documents_Returns_A_New_Document_Without_Mutating_Inputs()
+    {
+        const string baseSpec = """
+            openapi: '3.0.0'
+            info:
+              title: Base API
+              version: '1.0'
+            tags:
+              - name: users
+                description: User operations
+            paths:
+              /users:
+                get:
+                  operationId: listUsersBase
+                  tags:
+                    - users
+                  responses:
+                    '200':
+                      description: Base users
+            components:
+              schemas:
+                User:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+            """;
+
+        const string secondSpec = """
+            openapi: '3.0.0'
+            info:
+              title: Second API
+              version: '1.0'
+            tags:
+              - name: orders
+                description: Order operations
+            paths:
+              /orders:
+                get:
+                  operationId: listOrders
+                  tags:
+                    - orders
+                  responses:
+                    '200':
+                      description: Orders
+            components:
+              schemas:
+                Order:
+                  type: object
+                  properties:
+                    orderId:
+                      type: string
+            """;
+
+        var baseDocument = await OpenApiYamlDocument.FromYamlAsync(baseSpec);
+        var secondDocument = await OpenApiYamlDocument.FromYamlAsync(secondSpec);
+
+        var merged = InvokeMerge(baseDocument, secondDocument);
+
+        merged.Should().NotBeSameAs(baseDocument);
+        merged.Paths.Should().ContainKeys("/users", "/orders");
+        merged.Components.Schemas.Should().ContainKeys("User", "Order");
+        merged.Tags.Should().Contain(t => t.Name == "users");
+        merged.Tags.Should().Contain(t => t.Name == "orders");
+
+        baseDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/users");
+        baseDocument.Components.Schemas.Should().ContainSingle().Which.Key.Should().Be("User");
+        baseDocument.Tags.Should().ContainSingle().Which.Name.Should().Be("users");
+
+        secondDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/orders");
+        secondDocument.Components.Schemas.Should().ContainSingle().Which.Key.Should().Be("Order");
+        secondDocument.Tags.Should().ContainSingle().Which.Name.Should().Be("orders");
+    }
+
+    [Test]
+    public async Task Merge_With_Collisions_Throws_And_Does_Not_Mutate_Inputs()
+    {
+        const string baseSpec = """
+            openapi: '3.0.0'
+            info:
+              title: Base API
+              version: '1.0'
+            tags:
+              - name: users
+                description: User operations
+            paths:
+              /users:
+                get:
+                  operationId: listUsersBase
+                  tags:
+                    - users
+                  responses:
+                    '200':
+                      description: Base users
+            components:
+              schemas:
+                User:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+            """;
+
+        const string secondSpec = """
+            openapi: '3.0.0'
+            info:
+              title: Second API
+              version: '1.0'
+            tags:
+              - name: orders
+                description: Order operations
+            paths:
+              /users:
+                get:
+                  operationId: listUsersSecond
+                  tags:
+                    - users
+                  responses:
+                    '200':
+                      description: Second users
+              /orders:
+                get:
+                  operationId: listOrders
+                  tags:
+                    - orders
+                  responses:
+                    '200':
+                      description: Orders
+            components:
+              schemas:
+                User:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                Order:
+                  type: object
+                  properties:
+                    orderId:
+                      type: string
+            """;
+
+        var baseDocument = await OpenApiYamlDocument.FromYamlAsync(baseSpec);
+        var secondDocument = await OpenApiYamlDocument.FromYamlAsync(secondSpec);
+
+        var act = () => InvokeMerge(baseDocument, secondDocument);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*duplicate path '/users'*");
+
+        baseDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/users");
+        baseDocument.Components.Schemas.Should().ContainSingle().Which.Key.Should().Be("User");
+        baseDocument.Tags.Should().ContainSingle().Which.Name.Should().Be("users");
+
+        secondDocument.Paths.Should().ContainKeys("/users", "/orders");
+        secondDocument.Components.Schemas.Should().ContainKeys("User", "Order");
+        secondDocument.Tags.Should().Contain(t => t.Name == "orders");
+    }
+
+    [Test]
+    public async Task Merge_With_Schema_Collision_Throws_And_Does_Not_Mutate_Inputs()
+    {
+        const string baseSpec = """
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "Base API",
+                "version": "1.0"
+              },
+              "paths": {
+                "/users": {
+                  "get": {
+                    "operationId": "ListUsers",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              },
+              "components": {
+                "schemas": {
+                  "Shared": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        const string secondSpec = """
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "Second API",
+                "version": "1.0"
+              },
+              "paths": {
+                "/orders": {
+                  "get": {
+                    "operationId": "ListOrders",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              },
+              "components": {
+                "schemas": {
+                  "Shared": {
+                    "type": "object",
+                    "properties": {
+                      "email": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var baseDocument = await ParseJsonDocument(baseSpec);
+        var secondDocument = await ParseJsonDocument(secondSpec);
+
+        var act = () => InvokeMerge(baseDocument, secondDocument);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*duplicate schema 'Shared'*");
+
+        baseDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/users");
+        baseDocument.Components.Schemas.Should().ContainSingle().Which.Key.Should().Be("Shared");
+        secondDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/orders");
+        secondDocument.Components.Schemas.Should().ContainSingle().Which.Key.Should().Be("Shared");
+        secondDocument.Components.Schemas["Shared"].Properties.Should().ContainKey("email");
+    }
+
+    [Test]
+    public void Merge_With_Swagger2_Definition_Collision_Throws_And_Does_Not_Mutate_Dictionaries()
+    {
+        var target = new Dictionary<string, JsonSchema>
+        {
+            ["Shared"] = new()
+            {
+                Type = JsonObjectType.Object,
+                Properties =
+                {
+                    ["id"] = new JsonSchemaProperty
+                    {
+                        Type = JsonObjectType.String
+                    }
+                }
+            }
+        };
+        var incoming = new JsonSchema
+        {
+            Type = JsonObjectType.Object,
+            Properties =
+            {
+                ["total"] = new JsonSchemaProperty
+                {
+                    Type = JsonObjectType.Integer
+                }
+            }
+        };
+
+        var act = () => InvokeMergeIfMissingOrThrowOnConflict(target, "Shared", incoming, "definition");
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*duplicate definition 'Shared'*");
+
+        target.Should().ContainSingle().Which.Key.Should().Be("Shared");
+        target["Shared"].Properties.Should().ContainKey("id");
+        incoming.Properties.Should().ContainKey("total");
+    }
+
+    [Test]
+    public async Task Merge_With_Security_Scheme_Collision_Throws_And_Does_Not_Mutate_Inputs()
+    {
+        const string baseSpec = """
+            {
+              "swagger": "2.0",
+              "info": {
+                "title": "Base API",
+                "version": "1.0"
+              },
+              "paths": {
+                "/users": {
+                  "get": {
+                    "operationId": "ListUsers",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              },
+              "securityDefinitions": {
+                "ApiKey": {
+                  "type": "apiKey",
+                  "name": "X-Base-Key",
+                  "in": "header"
+                }
+              }
+            }
+            """;
+
+        const string secondSpec = """
+            {
+              "swagger": "2.0",
+              "info": {
+                "title": "Second API",
+                "version": "1.0"
+              },
+              "paths": {
+                "/orders": {
+                  "get": {
+                    "operationId": "ListOrders",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              },
+              "securityDefinitions": {
+                "ApiKey": {
+                  "type": "apiKey",
+                  "name": "X-Second-Key",
+                  "in": "header"
+                }
+              }
+            }
+            """;
+
+        var baseDocument = await ParseJsonDocument(baseSpec);
+        var secondDocument = await ParseJsonDocument(secondSpec);
+
+        var act = () => InvokeMerge(baseDocument, secondDocument);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*duplicate security scheme 'ApiKey'*");
+
+        baseDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/users");
+        baseDocument.SecurityDefinitions.Should().ContainSingle().Which.Key.Should().Be("ApiKey");
+        baseDocument.SecurityDefinitions["ApiKey"].Name.Should().Be("X-Base-Key");
+        secondDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/orders");
+        secondDocument.SecurityDefinitions.Should().ContainSingle().Which.Key.Should().Be("ApiKey");
+        secondDocument.SecurityDefinitions["ApiKey"].Name.Should().Be("X-Second-Key");
+    }
+
+    private static Task<OpenApiDocument> ParseJsonDocument(string json)
+        => OpenApiDocument.FromJsonAsync(json);
+
+    private static OpenApiDocument InvokeMerge(params OpenApiDocument[] documents)
+    {
+        var mergeMethod = typeof(OpenApiDocumentFactory).GetMethod("Merge", BindingFlags.NonPublic | BindingFlags.Static);
+
+        mergeMethod.Should().NotBeNull();
+
+        try
+        {
+            return (OpenApiDocument)mergeMethod!.Invoke(null, [documents])!;
+        }
+        catch (TargetInvocationException exception) when (exception.InnerException != null)
+        {
+            throw exception.InnerException;
+        }
+    }
+
+    private static void InvokeMergeIfMissingOrThrowOnConflict<TValue>(
+        IDictionary<string, TValue> target,
+        string key,
+        TValue value,
+        string itemType)
+    {
+        var mergeMethod = typeof(OpenApiDocumentFactory)
+            .GetMethod("MergeIfMissingOrThrowOnConflict", BindingFlags.NonPublic | BindingFlags.Static)!
+            .MakeGenericMethod(typeof(TValue));
+
+        try
+        {
+            mergeMethod.Invoke(null, [target, key, value!, itemType]);
+        }
+        catch (TargetInvocationException exception) when (exception.InnerException != null)
+        {
+            throw exception.InnerException;
+        }
     }
 }

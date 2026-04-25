@@ -285,10 +285,10 @@ public sealed class Settings : CommandSettings
     /// <summary>
     /// Controls how authorization headers are generated for authenticated operations.
     /// </summary>
-    [Description("Controls generation of Authorization header support. Options: None (no authentication code is generated), Parameter (adds method parameters for authentication), Method (generates a Refit [[Headers]] attribute for bearer token authentication). Also see 'security-scheme' option")]
-    [CommandOption("--generate-authentication-header")]
-    [DefaultValue(AuthenticationHeaderStyle.None)]
-    public AuthenticationHeaderStyle GenerateAuthenticationHeader { get; set; } = AuthenticationHeaderStyle.None;
+    [Description("Controls generation of Authorization header support. Options: None (no authentication code is generated), Parameter (adds method parameters for authentication), Method (generates a Refit [[Headers]] attribute for bearer token authentication). For backward compatibility, the legacy boolean forms 'true', 'false', or omitting the value are also accepted. Also see 'security-scheme' option")]
+    [CommandOption("--generate-authentication-header [STYLE]")]
+    [DefaultValue("None")]
+    public FlagValue<string>? GenerateAuthenticationHeader { get; set; }
 
     /// <summary>
     /// Restricts authorization header generation to a specific OpenAPI security scheme.
@@ -302,4 +302,38 @@ public sealed class Settings : CommandSettings
     [CommandOption("--json-serializer-context")]
     [DefaultValue(false)]
     public bool GenerateJsonSerializerContext { get; set; }
+
+    internal bool TryGetAuthenticationHeaderStyle(out AuthenticationHeaderStyle style, out string? errorMessage)
+    {
+        style = AuthenticationHeaderStyle.None;
+        errorMessage = null;
+
+        if (GenerateAuthenticationHeader is null || !GenerateAuthenticationHeader.IsSet)
+        {
+            return true;
+        }
+
+        var rawValue = GenerateAuthenticationHeader.Value;
+        if (string.IsNullOrWhiteSpace(rawValue))
+        {
+            style = AuthenticationHeaderStyle.Method;
+            return true;
+        }
+
+        if (bool.TryParse(rawValue, out var enabled))
+        {
+            style = enabled ? AuthenticationHeaderStyle.Method : AuthenticationHeaderStyle.None;
+            return true;
+        }
+
+        if (Enum.TryParse<AuthenticationHeaderStyle>(rawValue, ignoreCase: true, out style) &&
+            Enum.IsDefined(style))
+        {
+            return true;
+        }
+
+        errorMessage = "Invalid value for --generate-authentication-header. Valid values are None, Method, Parameter, true, or false.";
+        style = AuthenticationHeaderStyle.None;
+        return false;
+    }
 }

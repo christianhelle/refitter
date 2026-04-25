@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Refitter.Core;
+using Spectre.Console.Cli;
 
 namespace Refitter.Tests;
 
@@ -58,6 +59,7 @@ public class SettingsTests
         settings.IntegerType.Should().Be(IntegerType.Int32);
         settings.CustomTemplateDirectory.Should().BeNull();
         settings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PascalCase);
+        settings.GenerateAuthenticationHeader.Should().BeNull();
     }
 
     [Test]
@@ -202,6 +204,54 @@ public class SettingsTests
 
         settings.PropertyNamingPolicy = PropertyNamingPolicy.PascalCase;
         settings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PascalCase);
+    }
+
+    [Test]
+    public void TryGetAuthenticationHeaderStyle_Should_Map_Legacy_Boolean_True_To_Method()
+    {
+        var settings = new Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "true" } };
+
+        var parsed = settings.TryGetAuthenticationHeaderStyle(out var style, out var errorMessage);
+
+        parsed.Should().BeTrue();
+        style.Should().Be(AuthenticationHeaderStyle.Method);
+        errorMessage.Should().BeNull();
+    }
+
+    [Test]
+    public void TryGetAuthenticationHeaderStyle_Should_Map_Legacy_Boolean_False_To_None()
+    {
+        var settings = new Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "false" } };
+
+        var parsed = settings.TryGetAuthenticationHeaderStyle(out var style, out var errorMessage);
+
+        parsed.Should().BeTrue();
+        style.Should().Be(AuthenticationHeaderStyle.None);
+        errorMessage.Should().BeNull();
+    }
+
+    [Test]
+    public void TryGetAuthenticationHeaderStyle_Should_Parse_Enum_Values_Case_Insensitively()
+    {
+        var settings = new Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "parameter" } };
+
+        var parsed = settings.TryGetAuthenticationHeaderStyle(out var style, out var errorMessage);
+
+        parsed.Should().BeTrue();
+        style.Should().Be(AuthenticationHeaderStyle.Parameter);
+        errorMessage.Should().BeNull();
+    }
+
+    [Test]
+    public void TryGetAuthenticationHeaderStyle_Should_Reject_Invalid_Values()
+    {
+        var settings = new Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "headers" } };
+
+        var parsed = settings.TryGetAuthenticationHeaderStyle(out var style, out var errorMessage);
+
+        parsed.Should().BeFalse();
+        style.Should().Be(AuthenticationHeaderStyle.None);
+        errorMessage.Should().Contain("Valid values are None, Method, Parameter, true, or false");
     }
 
     [Test]

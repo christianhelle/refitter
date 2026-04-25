@@ -421,14 +421,13 @@ internal static class ParameterExtractor
     {
         List<string>? parameters = null;
         var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
+        var queryParameters = operationModel.Parameters
+            .Where(p => p.Kind == OpenApiParameterKind.Query)
+            .ToList();
 
         if (settings.UseDynamicQuerystringParameters)
         {
-            var operationParameters = operationModel.Parameters
-                .Where(p => p.Kind == OpenApiParameterKind.Query)
-                .ToList();
-
-            if (operationParameters.Count >= 2)
+            if (queryParameters.Count >= 2)
             {
                 var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
                 var isRecord = settings.ImmutableRecords ||
@@ -444,7 +443,7 @@ internal static class ParameterExtractor
                 var initializedParametersCodeBuilder = new StringBuilder();
                 var propertiesCodeBuilder = new StringBuilder();
                 var allNullable = true;
-                foreach (var operationParameter in operationParameters)
+                foreach (var operationParameter in queryParameters)
                 {
                     var propertyType = GetQueryParameterType(operationParameter, settings);
                     allNullable = allNullable && propertyType.EndsWith("?");
@@ -483,7 +482,6 @@ internal static class ParameterExtractor
                         propertiesCodeBuilder.Append($" = {formattedDefaultValue};");
                     }
                     propertiesCodeBuilder.AppendLine();
-                    operationModel.Parameters.Remove(operationParameter);
                 }
 
                 dynamicQuerystringParametersCodeBuilder.AppendLine(
@@ -519,8 +517,7 @@ internal static class ParameterExtractor
 
         dynamicQuerystringParameters = dynamicQuerystringParametersCodeBuilder.ToString();
 
-        parameters ??= operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Query)
+        parameters ??= queryParameters
             .Select(p =>
             {
                 var variableName = GetVariableName(p);

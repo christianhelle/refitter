@@ -177,15 +177,14 @@ components:
     }
 
     [Test]
-    public async Task OpenApiDocumentFactory_Merge_Does_Not_Overwrite_Existing_Paths()
+    public async Task OpenApiDocumentFactory_Merge_Throws_For_Duplicate_Paths()
     {
         var (file1, _) = await CreateTestSpecFiles();
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file1 });
+        var act = async () => await OpenApiDocumentFactory.CreateAsync(new[] { file1, file1 });
 
-        // /pets appears in both but should only be present once
-        merged.Paths.Should().ContainKey("/pets");
-        merged.Paths.Count.Should().Be(1);
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*duplicate path '/pets'*");
     }
 
     [Test]

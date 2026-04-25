@@ -320,6 +320,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     private static RefitGeneratorSettings CreateRefitGeneratorSettings(Settings settings)
     {
+        settings.TryGetAuthenticationHeaderStyle(out var authenticationHeaderStyle, out _);
+
         return new RefitGeneratorSettings
         {
             OpenApiPath = settings.OpenApiPath!,
@@ -367,7 +369,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 IntegerType = settings.IntegerType
             },
             CustomTemplateDirectory = settings.CustomTemplateDirectory,
-            AuthenticationHeaderStyle = settings.GenerateAuthenticationHeader,
+            AuthenticationHeaderStyle = authenticationHeaderStyle,
             SecurityScheme = settings.SecurityScheme,
             GenerateJsonSerializerContext = settings.GenerateJsonSerializerContext,
         };
