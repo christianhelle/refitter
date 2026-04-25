@@ -419,8 +419,9 @@ public class GenerateCommandTests
         var result = InvokeProgram([]);
 
         result.ExitCode.Should().Be(0);
-        result.Output.Should().Contain("USAGE:");
-        result.Output.Should().Contain("refitter [URL or input file] [OPTIONS]");
+        result.Output.Should().MatchRegex(@"USAGE:\s+refitter\s+\[URL or input file\]\s+\[OPTIONS\]");
+        result.Output.Should().Contain("ARGUMENTS:");
+        result.Output.Should().Contain("OPTIONS:");
         result.Output.Should().Contain("--generate-authentication-header");
     }
 
