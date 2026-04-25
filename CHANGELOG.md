@@ -4,8 +4,17 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0-preview.105...HEAD)
 
+**Fixed bugs:**
+
+- \[v2.0 audit\]\[H10\] Auto-enabling GenerateOptionalPropertiesAsNullable is a silent breaking shape change [\#1026](https://github.com/christianhelle/refitter/issues/1026)
+- \[v2.0 audit\]\[H8\] Refit major bump 9 → 10 silently leaks to Refitter.SourceGenerator consumers [\#1024](https://github.com/christianhelle/refitter/issues/1024)
+- \[v2.0 audit\]\[H7\] MSBuild IncludePatterns is substring-matched, over-includes files [\#1023](https://github.com/christianhelle/refitter/issues/1023)
+- \[v2.0 audit\]\[H6\] MSBuild predicted output paths diverge from CLI actual paths → silent missing compile items [\#1022](https://github.com/christianhelle/refitter/issues/1022)
+- \[v2.0 audit\]\[H1\] JsonSerializerContextGenerator emits non-compiling AOT context \(generics, namespaces, polymorphism, nested types\) [\#1017](https://github.com/christianhelle/refitter/issues/1017)
+
 **Merged pull requests:**
 
+- Resolve high-severity audit findings from \#1057 [\#1067](https://github.com/christianhelle/refitter/pull/1067) ([christianhelle](https://github.com/christianhelle))
 - Update nswag monorepo to 14.7.1 [\#1065](https://github.com/christianhelle/refitter/pull/1065) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.0.0-preview.105](https://github.com/christianhelle/refitter/tree/2.0.0-preview.105) (2026-04-21)
@@ -14,8 +23,6 @@
 
 **Fixed bugs:**
 
-- \[v2.0 audit\]\[H10\] Auto-enabling GenerateOptionalPropertiesAsNullable is a silent breaking shape change [\#1026](https://github.com/christianhelle/refitter/issues/1026)
-- \[v2.0 audit\]\[H1\] JsonSerializerContextGenerator emits non-compiling AOT context [\#1017](https://github.com/christianhelle/refitter/issues/1017)
 - \[v2.0 audit\]\[L12\] Reordering of interface-generator construction in Generate\(\) is correct but fragile [\#1055](https://github.com/christianhelle/refitter/issues/1055)
 - \[v2.0 audit\]\[L11\] OpenApiDocumentFactory.CreateAsync\(IEnumerable\<string\>\) throws wrong exception type on null [\#1054](https://github.com/christianhelle/refitter/issues/1054)
 - \[v2.0 audit\]\[L10\] IdentifierUtils.ReservedKeywords incomplete; Sanitize\(\) does not escape keywords [\#1053](https://github.com/christianhelle/refitter/issues/1053)
@@ -34,9 +41,7 @@
 - \[v2.0 audit\]\[M4\] ValidateOpenApiSpec does not resolve relative spec paths from settings-file directory [\#1031](https://github.com/christianhelle/refitter/issues/1031)
 - \[v2.0 audit\]\[M3\] SettingsValidator only validates the first entry of openApiPaths [\#1030](https://github.com/christianhelle/refitter/issues/1030)
 - \[v2.0 audit\]\[H11\] RefitInterfaceGenerator NRE when an OpenAPI response has no content [\#1027](https://github.com/christianhelle/refitter/issues/1027)
-- \[v2.0 audit\]\[H8\] Source-generator consumers now need their own explicit `Refit` package reference [\#1024](https://github.com/christianhelle/refitter/issues/1024)
-- \[v2.0 audit\]\[H7\] MSBuild `RefitterIncludePatterns` now uses exact matching only [\#1023](https://github.com/christianhelle/refitter/issues/1023)
-- \[v2.0 audit\]\[H6\] MSBuild predicted output paths diverge from CLI actual paths → silent missing compile items [\#1022](https://github.com/christianhelle/refitter/issues/1022)
+- \[v2.0 audit\]\[H9\] Microsoft.OpenApi.Readers 1.x → 3.x silently changes parsing/codegen for users [\#1025](https://github.com/christianhelle/refitter/issues/1025)
 - \[v2.0 audit\]\[H5\] CLI: --output / -o no longer overrides settings-file outputFolder \(script regression\) [\#1021](https://github.com/christianhelle/refitter/issues/1021)
 - \[v2.0 audit\]\[H4\] Dynamic-querystring constructor self-assigns when parameter name starts with non-letter [\#1020](https://github.com/christianhelle/refitter/issues/1020)
 - \[v2.0 audit\]\[H3\] Security-scheme header parameter name not safely sanitized [\#1019](https://github.com/christianhelle/refitter/issues/1019)
@@ -47,10 +52,6 @@
 - \[v2.0 audit\]\[C3\] ContractTypeSuffixApplier corrupts code via raw word-boundary regex \(renames members, comments, strings; double-suffix on rerun\) [\#1013](https://github.com/christianhelle/refitter/issues/1013)
 - \[v2.0 audit\]\[C2\] MSBuild task swallows CLI failures; build always reports success with stale/missing output [\#1012](https://github.com/christianhelle/refitter/issues/1012)
 - \[v2.0 audit\]\[C1\] SourceGenerator: hint-name collisions when two .refitter files share a filename [\#1011](https://github.com/christianhelle/refitter/issues/1011)
-
-**Migration notes:**
-
-- The Microsoft.OpenApi parser upgrade (1.x → 3.x) is documented migration guidance, not a claim of exhaustive behavioral equivalence. Regenerate clients, review diffs, and run tests after upgrading. See the [breaking changes guide](docs/docfx_project/articles/breaking-changes-v2-0-0.md).
 
 **Merged pull requests:**
 
