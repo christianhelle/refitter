@@ -6,6 +6,13 @@
 
 **Fixed bugs:**
 
+- \[v2.0 audit\]\[M16\] CLI --generate-authentication-header changed from bool flag to enum value \(silent script breakage\) [\#1043](https://github.com/christianhelle/refitter/issues/1043)
+- \[v2.0 audit\]\[M14\] MSBuild task: dotnet --list-runtimes invocation is fragile \(NRE, unquoted args, no fallback when target TFM dll missing\) [\#1041](https://github.com/christianhelle/refitter/issues/1041)
+- \[v2.0 audit\]\[M12\] GetQueryParameters mutates the shared operationModel.Parameters collection [\#1039](https://github.com/christianhelle/refitter/issues/1039)
+- \[v2.0 audit\]\[M7\] Merge mutates input documents\[0\] and silently drops conflicting paths/schemas without warning [\#1034](https://github.com/christianhelle/refitter/issues/1034)
+- \[v2.0 audit\]\[M6\] Hard-coded \n in regex replacement → mixed CRLF/LF on Windows [\#1033](https://github.com/christianhelle/refitter/issues/1033)
+- \[v2.0 audit\]\[M2\] SourceGenerator user-visible warnings only emit to Debug.WriteLine \(no-op in Release\) [\#1029](https://github.com/christianhelle/refitter/issues/1029)
+- \[v2.0 audit\]\[M1\] SourceGenerator pipeline output uses List\<Diagnostic\> \(defeats incremental caching\) [\#1028](https://github.com/christianhelle/refitter/issues/1028)
 - \[v2.0 audit\]\[H10\] Auto-enabling GenerateOptionalPropertiesAsNullable is a silent breaking shape change [\#1026](https://github.com/christianhelle/refitter/issues/1026)
 - \[v2.0 audit\]\[H8\] Refit major bump 9 → 10 silently leaks to Refitter.SourceGenerator consumers [\#1024](https://github.com/christianhelle/refitter/issues/1024)
 - \[v2.0 audit\]\[H7\] MSBuild IncludePatterns is substring-matched, over-includes files [\#1023](https://github.com/christianhelle/refitter/issues/1023)
@@ -14,6 +21,7 @@
 
 **Merged pull requests:**
 
+- \[v2.0 audit\] Close remaining verified \#1057 regressions [\#1070](https://github.com/christianhelle/refitter/pull/1070) ([christianhelle](https://github.com/christianhelle))
 - Resolve high-severity audit findings from \#1057 [\#1067](https://github.com/christianhelle/refitter/pull/1067) ([christianhelle](https://github.com/christianhelle))
 - Update nswag monorepo to 14.7.1 [\#1065](https://github.com/christianhelle/refitter/pull/1065) ([renovate[bot]](https://github.com/apps/renovate))
 
