@@ -274,3 +274,69 @@ dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-r
 - **MSBuild include filtering semantics:** `RefitterIncludePatterns` now matches only exact filenames, exact project-relative paths, or exact full paths. Substring matching was removed; `apis\petstore.refitter` is now a stable way to target one file without over-including similarly named files.
 - **SourceGenerator dependency boundary:** `src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj` keeps `OasReader` private to the generator package and hides `Refit` compile assets from consumers (`PrivateAssets="compile"`). Source generator consumers must carry their own explicit `Refit` reference so Refitter does not silently upgrade them to Refit 10.
 - **Focused validation that worked reliably:** use a repo-local NuGet cache (`C:\projects\christianhelle\refitter\.nuget\packages`) when the shared global cache is locked, then run targeted TUnit treenode filters from `src\Refitter.Tests\bin\Release\net10.0\Refitter.Tests.exe` for fast regression checks.
+
+### 2026-04-25: Audit Matrix Narrowing
+
+- Ripley's remaining #1057 matrix pass treated #1047 as already fixed at HEAD because MSBuild now follows CLI `GeneratedFile:` markers.
+- #1042 is validation-only and #1056 is doc/invariant-only, so remaining tooling/code follow-up is narrowed to the still-open code-backed items.
+
+### 2026-04-25: Lambert Repro Narrowing
+
+- Lambert's evidence pass keeps **#1029** and **#1041** only as **partial tooling repros** on current HEAD.
+- **#1043** still reproduces as the legacy bool-style `--generate-authentication-header` CLI break.
+- **#1042** remains validation-only and **#1047** remains fixed-at-HEAD unless a fresh failing packaged repro appears.
+
+### 2026-04-25: Queued Core Revision Follow-up
+
+- Ash rejected Parker's latest closure set for the #1057 core artifact.
+- **#1034** and **#1039** remain open and require real fixes.
+- Dallas is queued to take the next revision after the current tooling lane finishes, with Lambert adding blocker tests first.
+
+### 2026-04-25: Tooling Lane Complete
+
+- Completed the tooling lane with real fixes landed for **#1028**, **#1029**, **#1041**, and **#1043**.
+- Validation outcome for the remaining tooling-adjacent checks: **#1042** is no-code / validation-only at current HEAD, and **#1047** is fixed-at-HEAD because MSBuild now follows CLI-emitted `GeneratedFile:` markers.
+- Dallas reported successful build, test, and format validation for the tooling slice.
+- Follow-up ownership is now active: Dallas moved immediately onto the rejected core revision for **#1034**/**#1039** because Parker is locked out.
+
+### 2026-04-25: Core Revision Lane Complete
+
+- Completed the non-Parker revision for **#1034** and **#1039** after Ash rejected Parker's earlier closure set.
+- `OpenApiDocumentFactory.Merge()` now clones the first input before merge and warns on path/schema collisions instead of mutating the caller-owned document.
+- `ParameterExtractor` now preserves the shared `operationModel.Parameters` list while assembling grouped query-parameter wrappers.
+- Regression coverage for the core blockers was updated, and Dallas reported the revised validation lane green.
+- Follow-up handoff is active: Ash is re-reviewing the revised core changes and Lambert is reconciling the blocker-test lane.
+
+
+### 2026-04-25: Core Revision Partial Acceptance
+
+- Ash cleared **#1039** on the revised core lane: ParameterExtractor no longer mutates the shared operationModel.Parameters list, and the new coverage locked that in.
+- Ash kept **#1034** open because merge collisions still warn and keep the first entry instead of throwing on conflicting multi-spec inputs.
+- Dallas owns one last narrow revision to flip the merge-collision behavior and its tests to fail-fast semantics.
+
+### 2026-04-25: Final Narrow #1034 Revision
+
+- Completed the last implementation pass for **#1034** after Ash's partial re-review kept the warning-backed merge contract open.
+- `OpenApiDocumentFactory.Merge()` now keeps the clone-first non-mutation guarantee while failing fast on conflicting duplicate path/schema/definition/security keys instead of silently keeping the first entry.
+- Updated merge regression coverage now locks the fail-fast contract; Ash is on the final review gate while Lambert reconciles the blocker-test lane.
+
+### 2026-04-25: Final #1034 Gate Rejected
+
+- Ash rejected Dallas's latest #1034 revision at the final gate.
+- The blocker proof is still incomplete because the test surface does not explicitly cover conflicting duplicate schema, definition, and security-scheme merges.
+- Broader core validation also reported a failing `Dynamic_Querystring_Generation_Preserves_Original_Query_Param_Documentation(ByEndpoint)` regression in `Issue1039_DynamicQuerystringMutationTests`.
+- Dallas is now locked out of the next revision cycle for this artifact; Lambert owns the next/final revision cycle.
+
+### 2026-04-25: Post-Lockout Handoff Landed
+
+- Lambert completed the final **#1034** ownership pass after the Parker and Dallas lockouts.
+- The blocker proof now includes the schema, definition, and security-scheme collision surfaces that were still missing at the last gate.
+- **#1039** is now tracked as a brittle regression assertion update instead of reopened core behavior.
+- Validation was reported green; Ash owns the final reviewer gate.
+
+
+### 2026-04-25: Core Artifact Lockout Set Extended
+
+- Lambert's follow-up proof pass was also rejected at Ash's gate.
+- Dallas remains locked out of the next revision cycle for this artifact, now alongside Parker and Lambert.
+- Ripley inherits the next narrow #1034 revision cycle.

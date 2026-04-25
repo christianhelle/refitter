@@ -1,314 +1,204 @@
 # Squad Decisions
 
-## 2026-04-18
+## 2026-04-21
 
-### P0 Audit Findings - Critical Generator Bugs
+### PR #1067 Linked-Issue Closure Matrix
 
-**Verified By:** Parker (Core Developer)  
-**Status:** ALL VALID
+**Lead:** Ripley  
+**Status:** REVIEWED
 
-- **#1011**: Source generator crashes IDE/build on duplicate filenames
-- **#1012**: CI/CD silently ships stale/missing code on CLI failures
-- **#1013**: Regex corrupts generated code, breaks member names
-- **#1014**: Breaks Newtonsoft users, silently regresses internal enums (PARTIAL)
-- **#1015**: NRE on every Swagger 2.0 document
-- **#1016**: Multi-spec merge drops all schemas from split APIs
+- Treat **#1017, #1022, #1023, #1024, and #1026** as fully closed on the reviewed branch state.
+- Treat **#1025** as **partial/documentation-first only**; do not auto-close it from PR wording.
+- Final review guidance requires removing or downgrading `Fixes #1025` in the PR body so GitHub does not overstate closure.
 
-**Key Architectural Concerns:**
-1. Regex-on-raw-source fundamentally unsafe (word boundaries insufficient)
-2. Missing null checks in OpenAPI document traversal (Swagger 2.0 vs 3.0)
-3. MSBuild task doesn't follow MSBuild contract (returns true regardless of exit code)
+### Documentation and Package Guidance Alignment
 
-**Recommendation:** Fix all P0 before v2.0 release.
+**Verified By:** Bishop / Ash  
+**Status:** REQUIRED AND VERIFIED
 
----
+- `Refitter.SourceGenerator` package guidance must describe Roslyn `AddSource()` behavior rather than legacy disk-file output.
+- Consumer guidance must explicitly require a direct `Refit` reference (and `Refit.HttpClientFactory` when generated DI helpers are used).
+- Disk-output settings (`outputFolder`, `contractsOutputFolder`, `generateMultipleFiles`) should be documented as CLI/MSBuild-oriented, not source-generator disk artifacts.
+- Final safety-lane review approved PR #1067 once issue-closure wording was honest and the packaging/docs/test evidence aligned.
 
-### P1 Audit Findings - High-Priority Issues
+### Session Directives Archived
+
+**By:** Christian Helle (via Copilot)
+
+- 2026-04-20: Commit changes as often as possible in small logical groups.
+- 2026-04-21: Use Opus for all agents for the rest of that session only.
+- 2026-04-21: Commit changes in small logical groups.
+- 2026-04-25: Use GPT-5.5 for all agents for the rest of this session only.
+
+## 2026-04-25
+
+### Remaining Audit Matrix Pass (#1057)
+
+**Verified By:** Ripley  
+**Status:** VERIFIED
+
+- Treat **#1042** as **validation-only** until a concrete Spectre.Console.Cli parsing regression is reproduced at current HEAD.
+- Treat **#1047** as **already fixed / stale issue text** at current HEAD because MSBuild now consumes CLI-emitted `GeneratedFile:` markers instead of regex-parsing `.refitter` JSON for output paths.
+- Treat **#1056** as **doc/invariant-only** for now; preserve the current generation ordering/state flow and document the invariant before changing behavior.
+- Treat **#1032** as **validation-first**; gather runtime evidence before changing enum-converter behavior.
+- Coordination note from the verification pass: **#1045 and #1047 appear already fixed at HEAD**, and the remaining code-backed follow-up stays with Dallas/Parker.
+
+### Remaining Audit Repro Pass (#1057)
 
 **Verified By:** Lambert (Tester)  
-**Status:** 10 VALID, 1 PARTIAL
+**Status:** EVIDENCE NARROWED
 
-- **#1017**: AOT context non-compiling (generics, nested types, namespaces)
-- **#1018**: ParameterExtractor invalid identifiers (not using IdentifierUtils)
-- **#1019**: Security scheme header unsafe (leading digits, keywords)
-- **#1020**: Dynamic-querystring self-assign (`_foo = _foo;`)
-- **#1021**: CLI --output no longer overrides when settings file used
-- **#1022**: MSBuild predicted paths diverge from actual generation
-- **#1023**: MSBuild IncludePatterns uses substring matching (fragile)
-- **#1024**: Refit 10 leaks to consumers (design decision, PARTIAL)
-- **#1025**: OpenApi.Readers 1.x → 3.x silent change
-- **#1026**: Auto-enable GenerateOptionalPropertiesAsNullable
-- **#1027**: RefitInterfaceGenerator NRE on no content
+- Treat **#1028** as **still reproducible by inspection** on current HEAD; the source-generator incremental pipeline still carries a `List<Diagnostic>` equality hazard.
+- Treat **#1029** as **partial** on current HEAD; visible diagnostics improved, but the "no .refitter files found" path is still only `Debug.WriteLine`.
+- Treat **#1033** as **still reproducible by inspection**; enum-converter injection still uses a hard-coded LF and needs newline normalization coverage.
+- Treat **#1041** as **partial**; runtime resolution improved, but argument escaping and timeout kill semantics still leave repro surface.
+- Treat **#1043** as **still reproducible**; legacy `--generate-authentication-header` bool-style CLI usage still fails at current HEAD.
+- Treat **#1032, #1042, #1045, and #1047** as **validation-only / fixed-at-HEAD evidence** unless stronger failing repros appear.
+- Treat **#1034, #1039, and #1056** as **not reproduced on current HEAD** in Lambert's pass.
 
-**Critical:** #1018, #1019, #1020 produce non-compiling code; #1027 crashes on 204 responses.
+### Multi-spec Merge Collision Policy
 
----
+**Decided By:** Parker (Core Developer)  
+**Status:** APPROVED
 
-### P2 Medium Audit Findings
+- `OpenApiDocumentFactory` should clone the first loaded document before merging additional specs so callers do not observe mutation of a previously loaded `OpenApiDocument`.
+- Path and schema-key collisions across distinct OpenAPI inputs should fail fast with `InvalidOperationException` instead of silently keeping the first definition.
+- Exact duplicate input paths should continue to deduplicate up front so feeding the same spec twice stays harmless.
+
+**Rationale:** Silent first-one-wins merge behavior hides real API-shape conflicts and only surfaces later during generation or runtime use. Failing fast is the safer core-library policy.
+
+### Core Lane Follow-up Gate (#1057)
+
+**Verified By:** Parker (Core Developer)  
+**Status:** FIXED / NARROWED
+
+- **#1033**: landed at HEAD with a code change in `src/Refitter.Core/RefitGenerator.cs` plus regression coverage in `src/Refitter.Tests/Examples/InlineJsonConvertersTests.cs`.
+- **#1032**: treat as validation-first pending review gate; no current core-lane code change required.
+- **#1034** and **#1039**: treat as fixed-at-HEAD / no-repro on the reviewed branch state pending final gate review.
+- **#1045**: treat as fixed-at-HEAD on the reviewed branch state pending final gate review.
+- **#1056**: treat as doc/invariant-only for now; preserve current ordering behavior unless new failing evidence appears.
+### Tooling Compatibility Follow-up
 
 **Verified By:** Dallas (Tooling Developer)  
-**Status:** 14 VALID, 2 PARTIAL
+**Status:** APPROVED
 
-**Critical Issues (Crashes/Corruption):**
-- **#1028**: Source Generator Incremental Caching Defeated (List vs EquatableArray)
-- **#1037**: Crash on Empty Namespace List
-- **#1039**: Mutation of Shared NSwag Model
+- Preserve CLI compatibility for `--generate-authentication-header` by treating the legacy boolean forms (`true`, `false`) and the bare flag as valid inputs. The bare flag and `true` now map to `AuthenticationHeaderStyle.Method`; `false` maps to `None`, while `Parameter` still requires the explicit enum value.
+- Keep MSBuild runtime resolution resilient across both packed and test-project layouts. The task now prefers bundled framework-specific Refitter binaries, falls back to lower compatible TFMs when probing fails, and finally uses a co-located `refitter.dll` when the packaged layout is unavailable.
 
-**Security/Correctness:**
-- **#1035**: XML Doc Injection Vulnerability (unescaped parameter descriptions)
-- **#1034**: Silent Data Loss in Multi-Spec Merge
+### PR Prep Closure Guidance
 
-**Type System Issues:**
-- **#1036**: Nullable Parameter Mis-classification
-- **#1038**: Reference Type Nullability (CS8632 errors)
+**Verified By:** Ripley  
+**Status:** DRAFTED FOR PR ASSEMBLY
 
-**Tooling Issues:**
-- **#1029**: Source Generator Silent Warnings (Debug.WriteLine no-op)
-- **#1041**: MSBuild Task Multiple Failure Modes
-- **#1043**: Breaking CLI Change (bool flag → enum)
+- Safe auto-close candidates on the reviewed branch state: **#1028**, **#1029**, **#1033**, and **#1043**.
+- Keep **#1032**, **#1034**, **#1039**, **#1041**, **#1042**, **#1045**, **#1047**, and **#1056** out of PR auto-close wording until stronger evidence or final lane approval exists.
+- **#1041** specifically remains a Dallas-owned tooling verdict before any PR body claims closure.
 
-**Partial Issues:**
-- **#1032**: JsonConverter Semantics (runtime verification needed)
-- **#1042**: Spectre.Console.Cli version bump (smoke testing needed)
+### Ash core review of remaining #1057 closures
 
----
+**Verified By:** Ash  
+**Status:** REJECT
 
-### P2 Low Audit Findings
+- Verified acceptable:
+  - **#1032** does not reproduce the claimed custom `JsonNamingPolicy` override regression at current HEAD; runtime repro with a type-level `JsonStringEnumConverter` still serialized via `JsonSerializerOptions.Converters` (`"my_value"`).
+  - **#1045** is effectively fixed at current HEAD because `RefitGenerator.GetOpenApiDocument()` uses `OpenApiPaths` directly when populated instead of dereferencing `OpenApiPath`.
+  - **#1033** is the only intentional core code change in the working tree (`src/Refitter.Core/RefitGenerator.cs`) and it has matching regression coverage in `src/Refitter.Tests/Examples/InlineJsonConvertersTests.cs`.
+- Still open / false closure:
+  - **#1034** remains open in `src/Refitter.Core/OpenApiDocumentFactory.cs:55-107`; `Merge()` still mutates `documents[0]` and still silently keeps the first path/schema on key collisions.
+  - **#1039** remains open in `src/Refitter.Core/ParameterExtractor.cs:447-487` plus `src/Refitter.Core/RefitInterfaceGenerator.cs:69-82`; `GetParameters()` removes query parameters from `operationModel.Parameters` before XML-doc generation reads the shared model.
+- Follow-up requirement: reassign the remaining core revisions to Parker (or another core implementer) for real fixes before closing **#1034**/**#1039** from the `#1057` matrix.
 
-**Verified By:** Ripley (Lead)  
-**Status:** 13 VALID, 0 PARTIAL
+### Dallas core revision on rejected blockers
 
-All issues appropriately classified. Systemic patterns identified:
+**Verified By:** Dallas  
+**Status:** IMPLEMENTED / PENDING ASH RE-REVIEW
 
-1. **Settings Validation Gaps** (#1044, #1045, #1046)
-2. **Parsing Fragility** (#1047, #1050, #1051)
-3. **Double-Read/Double-Process** (#1048, #1052)
-4. **Keyword Handling Gaps** (#1053)
-5. **Library Async Best Practices** (#1049)
-6. **Fragile Ordering Dependencies** (#1055, #1056)
+- **#1034:** `OpenApiDocumentFactory.Merge()` now clones the first input before merge so callers no longer observe mutation of a previously loaded `OpenApiDocument`.
+- **#1034:** duplicate path/schema collisions now emit warnings while preserving the existing merged entry; this revised pass does **not** follow the earlier fail-fast proposal.
+- **#1039:** `ParameterExtractor` no longer mutates the shared `operationModel.Parameters` collection when building grouped query-parameter wrappers, so downstream consumers keep the original operation model intact.
+- Regression coverage was refreshed for the revised core pass in `src/Refitter.Tests/OpenApiDocumentFactoryMergeTests.cs`, `src/Refitter.Tests/ParameterExtractorEdgeCaseTests.cs`, `src/Refitter.Tests/ParameterExtractorPrivateCoverageTests.cs`, and `src/Refitter.Tests/RegressionTests/Issue1039_DynamicQuerystringMutationTests.cs`.
+- Dallas reported the revised core validation lane green; Ash is performing re-review and Lambert is reconciling the blocker-test lane against the landed behavior.
 
-Recommendation: Address incrementally in 2.1.x patches.
+### Ash core re-review of Dallas revision
 
----
+**Verified By:** Ash  
+**Status:** PARTIAL / BLOCKED
 
-### Breaking Changes Guidance Plan
+- **#1039 resolved:** ParameterExtractor.GetParameters() no longer mutates operationModel.Parameters, and ParameterExtractorPrivateCoverageTests now lock that invariant for XML-doc generation and shared-model reuse.
+- **#1034 still open:** OpenApiDocumentFactory.Merge() now clones the first input, but it still keeps the first conflicting path/schema/definition/security entry via Trace.TraceWarning(...) instead of failing fast.
+- src/Refitter.Tests/OpenApiDocumentFactoryMergeTests.cs still codifies warning-backed first-wins collision handling; the next narrow revision must flip that coverage to an InvalidOperationException contract for conflicting inputs.
+- Do **not** close **#1034** from the #1057 matrix yet. Dallas owns one last narrow revision, and Lambert remains on the blocker-test lane.
 
-**Decided By:** Bishop (Docs Specialist)  
-**Status:** APPROVED FOR PUBLICATION
+### Dallas final #1034 revision / Lambert blocker-test reconciliation
 
-**Deliverables Created:**
-1. GitHub Discussion draft (ready to publish)
-2. Migration guide in docs/ (breaking-changes-v2-0-0.md)
-3. Documentation index updated (toc.yml)
+**Verified By:** Dallas / Lambert  
+**Status:** IMPLEMENTED / READY FOR ASH FINAL GATE
 
-**Publication Strategy:**
-- Create Discussion under Announcements category
-- Pin for 2-3 weeks during v2.0.0 adoption
-- Link from CHANGELOG and README
+- `OpenApiDocumentFactory.Merge()` now preserves the clone-first non-mutation guarantee **and** fails fast with `InvalidOperationException` when distinct inputs introduce conflicting duplicate path, schema, definition, or security keys.
+- Non-conflicting merges still return a new document without mutating either input document, and exact duplicate input paths remain harmless because they are deduplicated before merge.
+- Blocker coverage is now aligned to the fail-fast contract in `src/Refitter.Tests/OpenApiDocumentFactoryMergeTests.cs`; `Issue1039_DynamicQuerystringMutationTests.cs` still preserves grouped-query XML-doc assertions across single-interface, `MultipleInterfaces.ByTag`, and `MultipleInterfaces.ByEndpoint` generation.
+- Dallas's final narrow implementation pass is complete. Ash is performing the final review gate, and Lambert is reconciling the blocker-test lane against the landed fail-fast behavior.
 
-**Reviewed By:** Ripley (Lead) - ✅ APPROVED
+### Ash final core gate rejection
 
----
+**Verified By:** Ash  
+**Status:** REJECTED
 
-## 2026-04-20
+- **#1034** is still not proven closed: `src/Refitter.Tests/OpenApiDocumentFactoryMergeTests.cs` only demonstrates fail-fast behavior for duplicate **paths**, not explicit conflicting **schemas**, **definitions**, and **security schemes**.
+- The broader core validation lane is not green because `dotnet test -c Release src\Refitter.Tests\Refitter.Tests.csproj` still fails `Dynamic_Querystring_Generation_Preserves_Original_Query_Param_Documentation(ByEndpoint)` in `Issue1039_DynamicQuerystringMutationTests`.
+- Dallas is now locked out of the next revision cycle for this artifact; Parker remains locked out from the prior rejected cycle.
+- Lambert now owns the next/final revision cycle for **#1034** while staying in the blocker-test lane.
 
-### PR #1064 Squad Review: v2.0 Audit Fix Status
+### Ash final review of Lambert revision
 
-**Decision Date:** 2026-04-20  
-**PR:** #1064 ([v2.0 audit] Fix pre-release regressions from #1057)  
-**Branch:** v2.0.0-prerelease-audit  
-**Verdict:** **NO MERGE YET** — 5 confirmed blockers pending resolution
+**Verified By:** Ash  
+**Status:** REJECTED
 
-#### Review Lanes & Findings
+- **#1039 acceptable:** `ParameterExtractor.GetQueryParameters()` still snapshots query parameters locally and preserves the shared `operationModel.Parameters` list; the regression coverage remains aligned with the intended non-mutating behavior.
+- **#1034 still not proven closed:** the Swagger 2 definition-collision proof is still not isolated cleanly enough. `OpenApiDocumentFactoryMergeTests.Merge_With_Definition_Collision_Throws_And_Does_Not_Mutate_Inputs` still trips the duplicate **schema** conflict before it conclusively proves the duplicate **definition** lane.
+- Remaining blocker for the next cycle: isolate the definition-specific fail-fast proof so the test fails for the intended definition-collision reason instead of the mirrored schema path.
+- Lambert now joins Parker and Dallas in lockout for the next revision cycle on this artifact.
+- Ripley now owns the next narrow revision cycle for **#1034**.
 
-**Bishop (Documentation)** — ✅ READY
-- Breaking-changes docs accurate and complete
-- 29 issues closed with real code fixes verified
-- Optional post-merge improvements: README link, CLI precedence clarity, security fix highlight
-- Recommendation: APPROVE (non-blocking gaps only)
+### Ripley final #1034 proof-gap revision
 
-**Dallas (Tooling)** — ❌ NOT READY
-- Blocker #1011: Source generator hint-name collision on same-directory duplicates (partial fix)
-- Blocker #1021: CLI `--output` override ignored in multi-file settings-file flow (partial fix)
-- Blocker #1050: Enum-error guidance only added to CLI; source generator still raw (partial fix)
-- Verified #1012: MSBuild exit-code handling correct
+**Verified By:** Ripley  
+**Status:** IMPLEMENTED / PENDING ASH FINAL SIGNOFF
 
-**Ash (Safety)** — ❌ NOT READY
-- Blocker #1013: ContractTypeSuffixApplier missing suffix-target collision detection (no check for `Foo` + `FooDto` → `FooDto` duplicate)
-- Blocker #1018: ParameterExtractor multipart dedup uses original key, not sanitized name (`"a-b"` + `"a b"` → duplicate `"a_b"`)
-- Both are compilation-breaking; must fix before merge
+- Preserve the source document schema type during clone/copy so Swagger 2 inputs stay on the intended definitions surface throughout merge handling.
+- Isolate the Swagger 2 definition-collision proof at MergeIfMissingOrThrowOnConflict(...) so the definition-specific fail-fast contract is asserted directly instead of being masked by the mirrored schema collision first.
+- Reported validation from the revision lane is green for dotnet build -c Release src\Refitter.slnx and dotnet test -c Release src\Refitter.Tests\Refitter.Tests.csproj.
+- Ash now owns the final reviewer signoff before broader validation resumes.
+### Ash final signoff on Ripley #1034/#1039 follow-up
 
-**Ripley (Issue Matrix)** — ❌ NOT READY
-- Blocker #1053: `Sanitize()` returns unescaped keywords (`@class`, missing `__*` set); no `EscapeReservedKeyword()` routing
-- Blocker #1021: Multi-file precedence guard incomplete
-- Blocker #1050: Source generator enum guidance not improved
-- Supporting blockers from Ash (#1013, #1018)
-- Awaiting Parker on #1040 (timeout config), #1050 (enum error handling)
+**Verified By:** Ash  
+**Status:** APPROVED
 
-#### Confirmed Must-Fix Blockers (5 Items)
+- **#1034 approved:** OpenApiDocumentFactory.Merge() now clones the first document before merge, fails fast on conflicting duplicate path/schema/definition/security keys, and isolates the remaining Swagger 2 definition proof through the shared MergeIfMissingOrThrowOnConflict(...) path.
+- **#1039 approved:** grouped dynamic-query extraction still snapshots query parameters instead of mutating operationModel.Parameters, and XML-doc regression coverage remains locked for single-interface, ByTag, and ByEndpoint generation.
+- Evidence reviewed: src/Refitter.Core/OpenApiDocumentFactory.cs, src/Refitter.Tests/OpenApiDocumentFactoryMergeTests.cs, src/Refitter.Tests/RegressionTests/Issue1039_DynamicQuerystringMutationTests.cs, and src/Refitter.Tests/ParameterExtractorPrivateCoverageTests.cs.
+- Reviewer signoff was reported against dotnet test -c Release src\Refitter.Tests\Refitter.Tests.csproj with 1840 passing and 0 failing.
 
-| Issue | File | Gap | Fix |
-|-------|------|-----|-----|
-| #1013 | ContractTypeSuffixApplier.cs | No collision check | Add guard for duplicate targets |
-| #1018 | ParameterExtractor.cs | Dedupe by wrong key | Dedupe by sanitized identifier |
-| #1021 | GenerateCommand.cs | Multi-file ignores `-o` | Restore override guard + test |
-| #1050 | RefitterSourceGenerator.cs | CLI-only guidance | Catch + re-throw with context |
-| #1053 | IdentifierUtils (call sites) | No keyword routing | Route through `EscapeReservedKeyword` |
+### Final PR package guidance for #1057
 
-#### Evidence Summary
+**Prepared By:** Ripley  
+**Status:** READY FOR PR ASSEMBLY
 
-**Resolved (20/28):** P0 all 7 fixed; P1 partial fixes; P2 mostly silent improvements  
-**Partial (6/28):** #1013, #1018, #1021, #1050, #1053, #1019  
-**Unresolved (1/28):** #1053 (coordinator spot-check)  
-**Awaiting (1/28):** #1040 (Parker review)  
+- Proposed PR title: `[v2.0 audit] Close remaining verified #1057 regressions`.
+- Keep PR summary focused on five landed lanes: source-generator diagnostics, newline-safe enum-converter rewriting, non-mutating dynamic querystring generation, fail-fast multi-spec merge handling, and tooling/runtime compatibility hardening.
+- Safe auto-close set for the final PR body: **#1028, #1029, #1033, #1034, #1039, #1041, #1043**.
+- Keep **#1032, #1042, #1045, #1047, and #1056** out of auto-close wording because they are validation-only, fixed-at-HEAD/stale, or doc/invariant-only.
+- Before opening the PR, recreate/publish v2.0.0-prerelease-fixes with `git push -u origin HEAD` because the local branch tracks a gone upstream.
+- Latest local full validation reported: dotnet restore src\Refitter.slnx, dotnet build -c Release src\Refitter.slnx --no-restore, dotnet test -c Release src\Refitter.slnx --no-build, and dotnet format --verify-no-changes src\Refitter.slnx --no-restore with 1886 tests passing.
 
-#### Recommendation
+### CLI help output assertions should be semantic
 
-- **Request blocker fixes:** ~30 minutes estimated work
-- **Re-run full test suite** after fixes
-- **Final gate:** All blockers resolved + tests passing → APPROVE FOR MERGE
-- **Nice-to-have:** Parker/Lambert confirmations on #1040, #1019
+**Verified By:** Lambert (Tester)  
+**Status:** APPROVED
 
-#### Agents Still Running
+- src\Refitter\Program.cs intentionally rewrites a no-argument invocation to --help, exits 0, and emits Spectre.Console.Cli help output.
+- The current product behavior is correct; the instability sits in whitespace-sensitive test expectations, not in production code.
+- src\Refitter.Tests\GenerateCommandTests.cs should assert semantic help markers (usage pattern, sections, and known option names) instead of exact formatter-driven spacing/default-value layout.
+- Validation reported: release run of src\Refitter.Tests\Refitter.Tests.csproj, focused rerun of Program_Main_Should_Show_Help_When_Invoked_Without_Arguments, and dotnet format --verify-no-changes src\Refitter.slnx.
 
-- **Parker (Core Developer):** Awaiting verdict on #1040 (HttpClient timeout) + #1050 (enum errors)
-- **Lambert (Tester):** Optional confirmation on #1019 (edge cases), #1021 (CLI regression)
 
----
-
-## 2026-04-20
-
-### PR #1064 Blocker Fixes: Final Validation Complete
-
-**Decision Date:** 2026-04-20  
-**PR:** #1064 ([v2.0 audit] Fix pre-release regressions from #1057)  
-**Verdict:** ✅ **APPROVED FOR MERGE** (cleanup pending)
-
-#### All Blockers FULLY RESOLVED
-
-**Issue #1013 — ContractTypeSuffixApplier Collision Detection** ✅
-- Implemented: Pre-flight collision check before building typeRenameMap
-- Strategy: Skip renaming if `name + suffix` collides with existing type
-- Test coverage: 3 tests in PR1064BlockerRegressions.cs
-- Status: PRODUCTION-READY
-
-**Issue #1018 — ParameterExtractor Multipart Deduplication** ✅
-- Root cause: Two parameter extraction paths used different naming methods
-- Fixed: Unified naming via `ConvertToVariableName()` across both paths
-- Test coverage: 3 tests in PR1064BlockerRegressions.cs
-- Status: PRODUCTION-READY
-
-**Issue #1053 — IdentifierUtils Keyword Escaping** ✅
-- Added: `__arglist`, `__makeref`, `__reftype`, `__refvalue` to reserved keywords
-- Fixed: Interface name sanitization AFTER prefixing (prevents `I@class` pattern)
-- Fixed: Test expectations corrected for NSwag schema name capitalization behavior
-- Test coverage: 6 tests in PR1064BlockerRegressions.cs
-- Status: PRODUCTION-READY
-
-#### Validation Results
-
-- **Build Status:** ✅ Clean build, 0 errors
-- **Test Suite:** ✅ 1779/1779 PASSING (0 failures)
-- **Code Formatting:** ✅ All changes properly formatted
-
-#### Quality Metrics
-
-- **Code Quality:** Excellent — defensive programming, no exceptions, surgical scope
-- **Test Coverage:** Comprehensive — 13 new tests covering all three blockers + edge cases
-- **Regression Risk:** Minimal — targeted fixes, existing tests unaffected
-
-#### Cleanup Required (CRITICAL)
-
-⚠️ **BEFORE MERGE:**
-- [ ] DELETE `src/test-multipart.json` — temporary repro file for #1018
-- [ ] DELETE `src/test-keywords.json` — temporary repro file for #1053
-
-#### Agent Sign-offs
-
-- ✅ **Parker:** Implemented initial fixes; identified #1018 naming method mismatch
-- ✅ **Ash:** Diagnosed root causes; implemented unified naming for #1018; corrected #1053 test expectations
-- ✅ **Lambert:** Created 13 comprehensive regression tests; verified all passing
-- ✅ **Dallas:** Validated build and test suite; confirmed all 1779 tests passing
-
-#### Key Learnings
-
-1. **Deduplication requires naming consistency** — Both code paths must use SAME transformation method
-2. **Case sensitivity matters** — GetVariableName() preserves casing; ConvertToVariableName() lowercases
-3. **NSwag behavior is normative** — Schema names capitalized by NSwag; tests must match actual behavior
-4. **Two-phase extraction complexity** — ParameterExtractor has parallel paths requiring coordinated fixes
-
-#### Recommendation
-
-**APPROVED FOR MERGE after cleanup.** All blockers are comprehensively resolved with excellent test coverage. Code is production-ready. Implementation follows best practices and minimal-scope surgical fixes.
-
-**Session Log:** `.squad/log/2026-04-20T16-00-14Z-pr1064-blocker-fixes.md`
-
----
-
-## 2026-04-17
-
-### Release Compatibility Audit: 1.7.3 → HEAD (All Agents Consensus)
-
-**Verdict:** BREAKING CHANGES FOUND. Cannot be marketed as non-breaking release. Major version bump (2.0.0) required.
-
-#### Breaking Changes (2 Confirmed)
-
-1. **Auth Property Renamed (MEDIUM RISK)**
-   - `.refitter` setting: `generateAuthenticationHeader` (bool) → `authenticationHeaderStyle` (enum: None, Method, Parameter)
-   - No backward compatibility layer or JSON mapping
-   - Old JSON key silently ignored; defaults to `AuthenticationHeaderStyle.None`
-   - Affected: users with `"generateAuthenticationHeader": true` in `.refitter` files
-   - Evidence: Commits 7dbf6c0c, 14101a49; confirmed by Lambert's deserialization tests
-   - Migration: Replace `"generateAuthenticationHeader": true` with `"authenticationHeaderStyle": "Method"` or `"Parameter"`
-
-2. **Source Generator Disk Files (HIGH RISK)**
-   - Source generator no longer writes `.g.cs` files to disk
-   - Changed from `File.WriteAllText()` to `context.AddSource()` (Roslyn best practice)
-   - Fixes issues #635, #520, #310 (file locking, process access errors)
-   - Affected: source generator users expecting physical files in `./Generated` folder
-   - Users must view generated code via IDE or switch to CLI/MSBuild for disk files
-   - Evidence: Commit f853bcf2 (PR #923); confirmed by Dallas tie-breaker audit
-
-#### Non-Breaking Changes
-
-- **MSBuild output path fix (Issue #998):** NOT a breaking change. MSBuild now respects default `./Generated` instead of incorrectly outputting to `.refitter` directory. This is a bug fix, not a break. Users relying on old buggy behavior can set `"outputFolder": "."` explicitly.
-- **8 Additive Features** (all backward compatible with safe defaults):
-  - PropertyNamingPolicy (defaults to PascalCase)
-  - OpenApiPaths (multi-spec merge)
-  - ContractTypeSuffix
-  - GenerateJsonSerializerContext (AOT)
-  - SecurityScheme filtering
-  - CustomTemplateDirectory
-  - New CLI options for all above
-  - Auto-enable GenerateOptionalPropertiesAsNullable (scoped)
-- **4 Bug Fixes** (only affect previously broken inputs):
-  - Stack overflow in recursive schemas
-  - Digit-prefixed property naming (invalid C# identifiers)
-  - Multipart form-data parameter extraction
-  - OneOf discriminator handling
-- **Generated Code Quality Improvements:**
-  - JsonConverter attribute placement: properties → enum types (semantically equivalent)
-  - Method naming in ByTag mode: numeric suffixes now scoped per-interface
-
-#### Release Recommendation
-
-- **Version:** 2.0.0 (major bump required)
-- **CHANGELOG:** Document both breaking changes with clear migration paths
-- **Migration Guide:** Provide search/replace instructions and generated-code viewing guidance
-- **Timeline:** All agents aligned; ready for release decision
-
-#### Agents Aligned
-
-✅ Ripley (Lead): BREAKING CHANGES FOUND - cannot approve as non-breaking  
-✅ Parker (Core Dev): BREAKING CHANGE DETECTED in auth settings surface  
-✅ Dallas (Tooling Dev): CONFIRMED 2 breaking changes; bug fix is non-breaking  
-✅ Lambert (Tester): BREAKING CHANGE CONFIRMED with concrete deserialization evidence  
-
----
-
-## 2026-04-16
-
-- Squad initialized for Refitter.
-- Team root uses the worktree-local strategy at `C:\projects\christianhelle\refitter`.
-- Shared append-only Squad files use Git's `union` merge driver.
-- **Issue #998 Investigation Complete:** Verdict is a real product bug, not user error. CLI ignores `outputFolder` when it equals the default `./Generated`, causing MSBuild to search for files in wrong location. First clean build fails due to sync mismatch between MSBuild prediction and CLI output. Fix: remove default-value check in `GenerateCommand.cs:648`.

@@ -278,10 +278,10 @@ Created comprehensive regression tests in `RuntimeCompatibilityTests.cs` coverin
    - Replaced `Aggregate()` with `string.Join()` to avoid `InvalidOperationException` when all namespaces excluded
 
 6. **#1038 - Reference Type Nullability**:
-   - Enhanced `CustomCSharpTypeResolver` to check `GenerateNullableReferenceTypes` setting
-   - Added `IsValueType()` helper to distinguish value types from reference types
-   - Prevents CS8632 errors when mapping reference types like `System.Uri` without NRT enabled
-   - Value types always support nullable (`?`), reference types only when NRT enabled
+    - Enhanced `CustomCSharpTypeResolver` to check `GenerateNullableReferenceTypes` setting
+    - Added `IsValueType()` helper to distinguish value types from reference types
+    - Prevents CS8632 errors when mapping reference types like `System.Uri` without NRT enabled
+    - Value types always support nullable (`?`), reference types only when NRT enabled
 
 **Test Coverage**:
 Created comprehensive regression tests in `IdentifierCorrectnessTests.cs` covering:
@@ -367,3 +367,51 @@ Created comprehensive regression tests in `IdentifierCorrectnessTests.cs` coveri
 
 **Recommendation**: Merge #1013 and #1053 immediately. Hold #1018 for debugger investigation or create follow-up issue.
 
+
+### 2026-04-25: Audit Matrix Narrowing
+
+- Ripley's remaining #1057 matrix pass reported #1045 as already fixed at HEAD and #1056 as doc/invariant-only.
+- Remaining core/code-backed follow-up should stay focused on the still-open implementation items rather than reopening already-fixed or validation-only findings.
+
+### 2026-04-25: Lambert Repro Narrowing
+
+- Lambert's follow-up pass leaves **#1028** and **#1033** as current-HEAD core repros by inspection.
+- **#1034, #1039, and #1056** were not reproduced on current HEAD in the tester pass.
+- Multi-spec merge policy is now explicitly recorded: clone the first document, fail fast on path/schema collisions, and keep exact duplicate-path deduplication.
+
+### 2026-04-25: Core Audit Fixes + Verification
+
+- Landed **#1033** at HEAD by updating enum-converter injection in `src/Refitter.Core/RefitGenerator.cs` and locking it with regression coverage in `src/Refitter.Tests/Examples/InlineJsonConvertersTests.cs`.
+- Current review-gate stance: keep **#1032** validation-first; treat **#1034**, **#1039**, and **#1045** as fixed-at-HEAD / no-repro on the reviewed branch state; keep **#1056** as doc/invariant-only unless fresh failing evidence appears.
+- This narrows Parker's remaining core follow-up to genuinely open code-backed issues instead of reopening the already-cleared matrix items.
+
+### 2026-04-25: Core Closure Set Rejected
+
+- Ash rejected the current no-code closure set for the #1057 core artifact.
+- **#1034** and **#1039** remain open and still need real fixes.
+- Parker is locked out of the next revision cycle for this artifact.
+- Lambert will add blocker tests; Dallas is queued for the next implementation pass.
+
+### 2026-04-25: Core Revision Reassigned
+
+- Dallas completed the tooling lane first, including real fixes for **#1028**, **#1029**, **#1041**, and **#1043** plus validation-only closure on **#1042**/**#1047**.
+- With Parker locked out, Dallas is now the active follow-up owner for the rejected **#1034**/**#1039** core revision.
+
+### 2026-04-25: Core Artifact Lockout Still In Force
+
+- Parker remains locked out of the next revision cycle for the #1057 core artifact after the earlier rejected closure pass.
+- Ash has now also rejected Dallas's follow-up at the final gate, so ownership of the next/final #1034 revision has moved to Lambert.
+
+### 2026-04-25: Final Lockout Handoff Recorded
+
+- Lambert completed the post-lockout final blocker pass for **#1034**.
+- The reconciled evidence now covers duplicate schema, definition, and security-scheme collisions, and **#1039** is treated as a brittle test assertion rather than a reopened production defect.
+- Validation was reported green for build, format, and tests.
+- Ash is now the active final reviewer gate.
+
+
+### 2026-04-25: Core Artifact Lockout Still In Force
+
+- Ash rejected Lambert's follow-up #1034 proof pass on test-isolation grounds.
+- Parker remains locked out of the next revision cycle for this artifact, now alongside Dallas and Lambert.
+- Ripley inherits the next narrow #1034 revision cycle.

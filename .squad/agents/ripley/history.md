@@ -171,3 +171,34 @@
 **Provisional Verdict**: DO NOT MERGE until blockers cleared. Recommendation: fix 3 critical gaps (#1013, #1018, #1053 one-liners) in ~30 minutes, then merge.
 
 **Record Created**: `.squad/decisions/inbox/ripley-pr1064-evidence-matrix.md`
+
+### 2026-04-25: Remaining Audit Matrix Verification Pass
+
+**Task**: Verify the remaining #1057 audit matrix and hand off only the truly code-backed follow-up.
+
+**Findings**:
+- #1045 and #1047 appear already fixed at HEAD.
+- #1042 is best treated as validation-only unless a concrete Spectre.Console.Cli regression is reproduced.
+- #1056 is doc/invariant-only for now.
+- Remaining code-backed fixes stay with Dallas/Parker.
+
+### 2026-04-25: Next Narrow #1034 Revision Ownership
+
+- Ash rejected Lambert's latest proof pass because the Swagger 2 definition-collision proof is still not isolated cleanly enough.
+- The duplicate schema conflict still fires before the intended definition-specific proof is conclusively exercised.
+- Ripley now owns the next narrow revision cycle for #1034 after Parker, Dallas, and Lambert lockouts.
+
+### 2026-04-25: Final Narrow #1034 Proof-Gap Revision Complete
+
+- Completed the final narrow revision for **#1034** after the Lambert proof-gap rejection.
+- Preserved the source schema type during clone so Swagger 2 inputs stay Swagger 2 while OpenApiDocumentFactory.Merge() proves fail-fast behavior.
+- Isolated the Swagger 2 definition-collision assertion at MergeIfMissingOrThrowOnConflict(...), which avoids schema-surface alias collisions masking the intended definition proof.
+- Reported the revision lane green for build plus Refitter.Tests; Ash now owns the final reviewer signoff before validation begins.
+### 2026-04-25: Final PR Package Guidance
+
+- Prepared the final PR package for the remaining verified #1057 regressions.
+- Proposed title: `[v2.0 audit] Close remaining verified #1057 regressions`.
+- Safe auto-close set is now **#1028, #1029, #1033, #1034, #1039, #1041, and #1043**; keep **#1032, #1042, #1045, #1047, and #1056** out of auto-close wording.
+- Latest local full validation reported restore, release build, release test, and format verification green with 1886 passing tests.
+- Before opening the PR, recreate/publish `v2.0.0-prerelease-fixes` with `git push -u origin HEAD` because the local branch tracks a gone upstream.
+
