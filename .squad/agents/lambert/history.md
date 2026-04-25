@@ -45,3 +45,16 @@
 - Lambert changed only src\Refitter.Tests\GenerateCommandTests.cs, normalizing redirected console output and asserting semantic help markers instead of formatter-specific layout.
 - Reported final validation: dotnet build -c Release src\Refitter.slnx, dotnet test -c Release src\Refitter.slnx, and dotnet format --verify-no-changes src\Refitter.slnx.
 
+## 2026-04-25: RefitterGenerateTask coverage gap analysis
+
+- Coverage evidence from `src\Refitter.Tests\bin\Release\net10.0\TestResults\coverage-all.xml` leaves `src\Refitter.MSBuild\RefitterGenerateTask.cs` at **91.86% line / 94.29% block** coverage.
+- Exact uncovered lanes are: `TryExecuteRefitter()` exception handling (lines 143-147), missing bundled CLI handling in `StartProcess()` (171-173), unresolved package-folder / co-located CLI / final-first-bundle fallbacks in `ResolveRefitterDll()` (304, 344-348, 351-353), the `<1000 ms` arm of `FormatTimeout()` (357-361 partial), and the non-throwing `Log.LogErrorFromException(e)` path (370).
+- Full `Refitter.Tests` coverage run still hit the known network-dependent failures (`IsHttp_Detects_Https_Protocol` and `Can_Build_Generated_Code_From_Url(...)`), but it produced the decisive per-function coverage report needed for Dallas.
+
+## 2026-04-25: RefitterGenerateTask coverage closure landed
+
+- Dallas used the isolated branch list to add only regression coverage in `src\Refitter.Tests\RefitterGenerateTaskTests.cs`; no product behavior changes were needed in `src\Refitter.MSBuild\RefitterGenerateTask.cs`.
+- The landed test pass covered exception handling, missing bundled CLI failure, blank package folder handling, whitespace runtime probing, co-located and first-bundled fallback resolution, millisecond timeout formatting, and successful `LogErrorFromException` forwarding.
+- Reported validation: `dotnet test --project src\Refitter.Tests\Refitter.Tests.csproj -c Release --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml`, `dotnet build -c Release src\Refitter.slnx --no-restore`, and `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`.
+- Reported end state: `src\Refitter.MSBuild\RefitterGenerateTask.cs` at 100% line coverage, 100% block coverage, and 0 partial functions.
+

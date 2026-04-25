@@ -203,4 +203,15 @@
 - Cross-agent merge outcome: Dallas proved the Ubuntu failure was ANSI/wrapping noise in raw Spectre.Console help output, and Lambert landed the test-only fix in src\Refitter.Tests\GenerateCommandTests.cs by normalizing redirected console output before asserting semantic help markers.
 - Final landed validation for the product commit `normalize help output test across platforms`: dotnet build -c Release src\Refitter.slnx, dotnet test -c Release src\Refitter.slnx, and dotnet format --verify-no-changes src\Refitter.slnx.
 
+### RefitterGenerateTask edge-case coverage stays test-only
+
+**Verified By:** Dallas / Lambert  
+**Status:** APPROVED
+
+- Preserve the current `src\Refitter.MSBuild\RefitterGenerateTask.cs` behavior and close the remaining coverage gap with regression tests instead of production changes.
+- Lambert isolated the last uncovered branches to `TryExecuteRefitter()` exception handling, missing bundled CLI handling in `StartProcess()`, `ResolveRefitterDll()` fallback edges, sub-second timeout formatting, and the non-throwing `TryLogErrorFromException()` path.
+- Dallas landed the test-only closure in `src\Refitter.Tests\RefitterGenerateTaskTests.cs`, covering blank package folders, whitespace runtime entries, co-located and first-bundled fallback resolution, missing bundled CLI failure, process-runner exception handling, millisecond timeout formatting, and successful `LogErrorFromException` forwarding.
+- Reported validation: `dotnet test --project src\Refitter.Tests\Refitter.Tests.csproj -c Release --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml`, `dotnet build -c Release src\Refitter.slnx --no-restore`, and `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`.
+- Result: `RefitterGenerateTask.cs` reached 100% line coverage, 100% block coverage, and 0 partial functions in the reported coverage output.
+
 

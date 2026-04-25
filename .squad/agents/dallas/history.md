@@ -33,3 +33,11 @@
 - Proved the failure was formatter noise in the raw redirected help payload: ANSI sequences and host-dependent wrapping differed across Linux Actions and local Windows captures while preserving the same semantic help content.
 - Handed off the recommended fix to Lambert: normalize redirected console output first, then assert semantic help markers in `src\Refitter.Tests\GenerateCommandTests.cs`.
 - Lambert's final landed change stayed test-only and validated green with `dotnet build -c Release src\Refitter.slnx`, `dotnet test -c Release src\Refitter.slnx`, and `dotnet format --verify-no-changes src\Refitter.slnx`.
+
+## 2026-04-25: RefitterGenerateTask Coverage Closure
+
+- Closed the remaining `src\Refitter.MSBuild\RefitterGenerateTask.cs` coverage gaps with test-only changes in `src\Refitter.Tests\RefitterGenerateTaskTests.cs`.
+- Lambert's gap analysis isolated the exact missing defensive branches first, which let Dallas keep the implementation pass scoped to regression coverage instead of production changes.
+- Added direct coverage for the defensive tooling paths: blank package folder, whitespace runtime entries, co-located CLI fallback, first-bundled-path fallback, missing bundled CLI failure, process-runner exception handling, millisecond timeout formatting, and successful `LogErrorFromException` forwarding.
+- Validation reported green with `dotnet test --project src\Refitter.Tests\Refitter.Tests.csproj -c Release --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml`, `dotnet build -c Release src\Refitter.slnx --no-restore`, and `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`.
+- The reported end state for `src\Refitter.MSBuild\RefitterGenerateTask.cs` was 100% line coverage, 100% block coverage, and 0 partial functions.
