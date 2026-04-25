@@ -41,3 +41,17 @@
 - Added direct coverage for the defensive tooling paths: blank package folder, whitespace runtime entries, co-located CLI fallback, first-bundled-path fallback, missing bundled CLI failure, process-runner exception handling, millisecond timeout formatting, and successful `LogErrorFromException` forwarding.
 - Validation reported green with `dotnet test --project src\Refitter.Tests\Refitter.Tests.csproj -c Release --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml`, `dotnet build -c Release src\Refitter.slnx --no-restore`, and `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`.
 - The reported end state for `src\Refitter.MSBuild\RefitterGenerateTask.cs` was 100% line coverage, 100% block coverage, and 0 partial functions.
+
+## 2026-04-25: PR #1070 SonarCloud Quality Gate Repair
+
+- Pulled the live SonarCloud PR issue feed for `christianhelle_refitter` / PR `1070` and confirmed five leak-period findings: one reliability bug plus one maintainability finding in `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs`, one maintainability finding in `src\Refitter.Core\ParameterExtractor.cs`, and two maintainability findings in `src\Refitter.MSBuild\RefitterGenerateTask.cs`.
+- Collapsed the nested dynamic-query guard in `ParameterExtractor.GetQueryParameters()` to satisfy the clumsy-condition finding without changing the non-mutating grouped-query behavior.
+- Simplified `ResolveRefitterDll()` to pre-filter whitespace runtime rows / missing bundled binaries and rewrote `FormatTimeout()` as straight-line conditionals so the MSBuild task no longer trips the Sonar loop and nested-ternary smells.
+- Hardened source-generator diagnostics by reusing the shared `Refitter` title constant, assigning distinct stable IDs to the found-file and file-contents diagnostics, and replacing the `GeneratedDiagnostic` record struct with an explicit readonly struct that pairs `Equals(...)` with the custom hash code.
+- Validation reported green with `dotnet build -c Release src\Refitter.slnx --no-restore`, `dotnet test -c Release src\Refitter.slnx --no-build`, and `dotnet format --verify-no-changes src\Refitter.slnx --no-restore` (1894 tests passed).
+## 2026-04-25: Scribe consolidation of PR #1070
+
+- Ash approved Dallas's S1066, S3267, and S3358 cleanups plus the distinct diagnostic-ID/source-title cleanup as the safe parts of the Sonar response.
+- Ash rejected Dallas's first S1206 direction because converting GeneratedDiagnostic away from a readonly record struct was risky semantic churn for an analyzer-only complaint.
+- Parker superseded only the source-generator S1206 artifact; the final merged state keeps Dallas's ParameterExtractor and RefitterGenerateTask changes alongside Parker's approved record-struct suppression revision.
+

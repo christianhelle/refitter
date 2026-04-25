@@ -34,3 +34,28 @@
 - Signed off that merge handling now stays clone-first, fails fast on conflicting duplicate path/schema/definition/security keys, and keeps grouped dynamic-query extraction non-mutating across single-interface, ByTag, and ByEndpoint generation.
 - Evidence reviewed included src\Refitter.Core\OpenApiDocumentFactory.cs, src\Refitter.Tests\OpenApiDocumentFactoryMergeTests.cs, src\Refitter.Tests\RegressionTests\Issue1039_DynamicQuerystringMutationTests.cs, and src\Refitter.Tests\ParameterExtractorPrivateCoverageTests.cs.
 - Final reviewer gate was reported green on dotnet test -c Release src\Refitter.Tests\Refitter.Tests.csproj with 1840 passing and 0 failing.
+
+## 2026-04-25: SonarCloud PR #1070 gate review
+
+- Reviewed SonarCloud PR #1070 quality-gate output: 5 findings total, with the gate failing only because Sonar classified `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs` `GeneratedDiagnostic` as a BUG (`S1206`).
+- Treat the `S1206` finding as analyzer noise, not a real product bug: `GeneratedDiagnostic` is a `record struct`, so changing equality members just to satisfy Sonar would risk destabilizing incremental-generator equality semantics without fixing an observed defect.
+- Treat the remaining findings in `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs`, `src\Refitter.Core\ParameterExtractor.cs`, and `src\Refitter.MSBuild\RefitterGenerateTask.cs` as maintainability-only/style noise rather than product or test failures.
+- Risk guidance: avoid style-only rewrites in the dynamic querystring extraction and MSBuild runtime-resolution/timeout-formatting paths, because those areas were recently hardened and a cleanup-only patch could regress real behavior while merely silencing Sonar.
+
+## 2026-04-25: Review of landed Sonar cleanup
+
+- Re-reviewed the landed cleanup on the three implicated files. The `S1066`, `S3267`, `S3358`, and `S1192` changes are acceptable as behavior-preserving cleanup only.
+- Rejected the `S1206` fix direction: converting `GeneratedDiagnostic` from `readonly record struct` to a manual `readonly struct` is unnecessary churn for a likely Sonar false positive and weakens the safety story by making equality/hash maintenance manual.
+- Gate guidance for Dallas: request changes only on the source-generator `GeneratedDiagnostic` rewrite; the other four Sonar items do not justify blocking once they stay narrow and behavior-preserving.
+
+## 2026-04-25: Parker follow-up on source-generator Sonar fix
+
+- Approved Parker's revised `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs` artifact.
+- The safe correction was restoring `GeneratedDiagnostic` to `readonly record struct` and suppressing `S1206` with an explicit justification, which preserves synthesized equality while keeping the custom ordinal `GetHashCode()` implementation.
+- The `S1192` cleanup remains cosmetic and safe, and no new generator-safety regression is evident in the revised source-generator artifact.
+## 2026-04-25: Scribe consolidation of PR #1070
+
+- Final squad memory keeps Dallas's ParameterExtractor / RefitterGenerateTask cleanups and the source-generator diagnostic-ID cleanup as the approved behavior-preserving Sonar response.
+- The only rejected direction was the first manual-struct S1206 rewrite; Parker's follow-up restored the readonly record struct shape and was the approved final source-generator artifact.
+- Shared validation to cite for the consolidated PR #1070 outcome: dotnet build -c Release src\Refitter.slnx --no-restore, dotnet test -c Release --solution src\Refitter.slnx --no-build, and dotnet format --verify-no-changes src\Refitter.slnx --no-restore.
+

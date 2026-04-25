@@ -213,5 +213,13 @@
 - Dallas landed the test-only closure in `src\Refitter.Tests\RefitterGenerateTaskTests.cs`, covering blank package folders, whitespace runtime entries, co-located and first-bundled fallback resolution, missing bundled CLI failure, process-runner exception handling, millisecond timeout formatting, and successful `LogErrorFromException` forwarding.
 - Reported validation: `dotnet test --project src\Refitter.Tests\Refitter.Tests.csproj -c Release --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml`, `dotnet build -c Release src\Refitter.slnx --no-restore`, and `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`.
 - Result: `RefitterGenerateTask.cs` reached 100% line coverage, 100% block coverage, and 0 partial functions in the reported coverage output.
+### PR #1070 SonarCloud quality-gate repair
 
+**Verified By:** Dallas / Ash / Parker  
+**Status:** APPROVED
+
+- Keep the ParameterExtractor (S1066) and RefitterGenerateTask (S3267, S3358) changes narrow and behavior-preserving; Ash approved those cleanups as safe.
+- Keep the source-generator diagnostic cleanup on the stable one-descriptor-per-ID contract: reuse the shared Refitter title/category constant, but assign distinct IDs when the title/message semantics differ.
+- Preserve GeneratedDiagnostic as a readonly record struct; retain the explicit ordinal GetHashCode() behavior and handle Sonar S1206 with a targeted suppression plus justification instead of rewriting the type into a manual struct.
+- Final validation recorded for the landed artifact: dotnet build -c Release src\Refitter.slnx --no-restore, dotnet test -c Release --solution src\Refitter.slnx --no-build, and dotnet format --verify-no-changes src\Refitter.slnx --no-restore.
 
