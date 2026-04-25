@@ -17,6 +17,11 @@ public static class SettingsValidator
     {
         refitSettings = null;
 
+        if (!settings.TryGetAuthenticationHeaderStyle(out _, out var authHeaderError))
+        {
+            return ValidationResult.Error(authHeaderError!);
+        }
+
         if (BothSettingsFilesAreEmpty(settings) || BothSettingsFilesArePresent(settings))
         {
             return GetValidationErrorForSettingsFiles();

@@ -384,21 +384,135 @@ public class RefitterGenerateTaskTests
         try
         {
             CreateRefitterSettingsFile(workspace);
+            var generatedFile = CreateGeneratedFile(workspace);
             RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => throw new InvalidOperationException("boom");
+            RefitterGenerateTask.FileExists = path =>
+                path.EndsWith("refitter.dll", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                startInfo.Arguments.Should().Contain("net8.0");
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
 
             var result = task.Execute();
 
-            result.Should().BeFalse();
-            task.GeneratedFiles.Should().BeEmpty();
-            buildEngine.Errors.Should().Contain(message => message.Contains("Failed to generate code from", StringComparison.Ordinal));
+            result.Should().BeTrue();
+            task.GeneratedFiles.Should().ContainSingle().Which.ItemSpec.Should().Be(generatedFile);
+            buildEngine.Messages.Should().Contain(message => message.Contains("Failed to inspect installed .NET runtimes", StringComparison.Ordinal));
+            buildEngine.Messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
         }
         finally
         {
             RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Fall_Back_When_Preferred_Runtime_Binary_Is_Missing()
+    {
+        try
+        {
+            var packageFolder = Path.Combine("C:", "repo", "tasks");
+            var messages = new List<string>();
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase);
+
+            var result = RefitterGenerateTask.ResolveRefitterDll(
+                packageFolder,
+                ["Microsoft.NETCore.App 10.0.1", "Microsoft.NETCore.App 9.0.5"],
+                messages.Add);
+
+            result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net9.0", "refitter.dll")));
+            messages.Should().Contain(message => message.Contains("Detected .NET 9.0 runtime", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Return_Null_When_PackageFolder_Is_Blank()
+    {
+        var messages = new List<string>();
+
+        var result = RefitterGenerateTask.ResolveRefitterDll(" ", ["Microsoft.NETCore.App 10.0.0"], messages.Add);
+
+        result.Should().BeNull();
+        messages.Should().BeEmpty();
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Ignore_Whitespace_Runtime_Entries_When_Falling_Back()
+    {
+        try
+        {
+            var packageFolder = Path.Combine("C:", "repo", "tasks");
+            var messages = new List<string>();
+            var net8Path = Path.GetFullPath(Path.Combine(packageFolder, "..", "net8.0", "refitter.dll"));
+            RefitterGenerateTask.FileExists = path => string.Equals(path, net8Path, StringComparison.OrdinalIgnoreCase);
+
+            var result = RefitterGenerateTask.ResolveRefitterDll(
+                packageFolder,
+                [" ", "Microsoft.NETCore.App 7.0.0"],
+                messages.Add);
+
+            result.Should().Be(net8Path);
+            messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Fall_Back_To_CoLocated_Cli()
+    {
+        try
+        {
+            var packageFolder = Path.Combine("C:", "repo", "tasks");
+            var messages = new List<string>();
+            var coLocatedCli = Path.GetFullPath(Path.Combine(packageFolder, "refitter.dll"));
+            RefitterGenerateTask.FileExists = path => string.Equals(path, coLocatedCli, StringComparison.OrdinalIgnoreCase);
+
+            var result = RefitterGenerateTask.ResolveRefitterDll(
+                packageFolder,
+                ["Microsoft.NETCore.App 7.0.0"],
+                messages.Add);
+
+            result.Should().Be(coLocatedCli);
+            messages.Should().ContainSingle(message => message.Contains("Falling back to co-located Refitter CLI.", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Return_First_Bundled_Path_When_No_Binaries_Exist()
+    {
+        try
+        {
+            var packageFolder = Path.Combine("C:", "repo", "tasks");
+            var messages = new List<string>();
+            RefitterGenerateTask.FileExists = _ => false;
+
+            var result = RefitterGenerateTask.ResolveRefitterDll(packageFolder, null, messages.Add);
+
+            result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net10.0", "refitter.dll")));
+            messages.Should().BeEmpty();
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
         }
     }
 
@@ -413,6 +527,9 @@ public class RefitterGenerateTaskTests
             var generatedFile = CreateGeneratedFile(workspace);
 
             RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
             RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
             {
                 startInfo.Arguments.Should().Contain("net9.0");
@@ -428,7 +545,7 @@ public class RefitterGenerateTaskTests
             result.Should().BeTrue();
             task.GeneratedFiles.Should().ContainSingle();
             task.GeneratedFiles.Single().ItemSpec.Should().Be(generatedFile);
-            buildEngine.Messages.Should().Contain(message => message.Contains(".NET 9 runtime", StringComparison.Ordinal));
+            buildEngine.Messages.Should().Contain(message => message.Contains("Detected .NET 9.0 runtime", StringComparison.Ordinal));
         }
         finally
         {
@@ -448,6 +565,9 @@ public class RefitterGenerateTaskTests
             var generatedFile = CreateGeneratedFile(workspace);
 
             RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 8.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
             RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
             {
                 startInfo.Arguments.Should().Contain("net8.0");
@@ -462,7 +582,34 @@ public class RefitterGenerateTaskTests
 
             result.Should().BeTrue();
             task.GeneratedFiles.Should().ContainSingle();
-            buildEngine.Messages.Should().Contain(message => message.Contains("Using .NET 8 version of Refitter.", StringComparison.Ordinal));
+            buildEngine.Messages.Should().Contain(message => message.Contains("Detected .NET 8.0 runtime", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Return_False_When_Refitter_Cli_Cannot_Be_Located()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => null!;
+            RefitterGenerateTask.FileExists = _ => false;
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            task.GeneratedFiles.Should().BeEmpty();
+            buildEngine.Errors.Should().Contain(message => message.Contains("Unable to locate a bundled Refitter CLI runtime for the MSBuild task.", StringComparison.Ordinal));
         }
         finally
         {
@@ -499,6 +646,33 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void Execute_Should_Log_Millisecond_Timeout_Value()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
+            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(true, -1);
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            buildEngine.Errors.Should().Contain(message => message.Contains("timed out after 500 ms", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
     public void Execute_Should_Log_When_Timed_Out_Process_Cannot_Be_Terminated()
     {
         var workspace = CreateWorkspace();
@@ -519,6 +693,63 @@ public class RefitterGenerateTaskTests
 
             result.Should().BeFalse();
             buildEngine.Errors.Should().Contain(message => message.Contains("Failed to terminate timed-out process: termination failed", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Log_Configured_Timeout_Value()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 1500;
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
+            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(true, -1);
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            buildEngine.Errors.Should().Contain(message => message.Contains($"timed out after {1500 / 1000d:0.###} seconds", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Log_ProcessRunner_Exception_And_Return_False()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net10.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (_, _, _) => throw new InvalidOperationException("boom");
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            task.GeneratedFiles.Should().BeEmpty();
+            buildEngine.Errors.Should().Contain(message => message.Contains("boom", StringComparison.Ordinal));
         }
         finally
         {
@@ -616,6 +847,17 @@ public class RefitterGenerateTaskTests
         var action = () => InvokePrivateMethod(task, "TryLogErrorFromException", new InvalidOperationException("boom"));
 
         action.Should().NotThrow();
+    }
+
+    [Test]
+    public void TryLogErrorFromException_Should_Log_When_BuildEngine_Allows_It()
+    {
+        var buildEngine = new RecordingBuildEngine();
+        var task = new RefitterGenerateTask { BuildEngine = buildEngine };
+
+        InvokePrivateMethod(task, "TryLogErrorFromException", new InvalidOperationException("boom"));
+
+        buildEngine.Errors.Should().Contain(message => message.Contains("boom", StringComparison.Ordinal));
     }
 
     private static string CreateWorkspace()

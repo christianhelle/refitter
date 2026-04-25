@@ -1,5 +1,8 @@
+using System.Reflection;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
@@ -114,6 +117,27 @@ public class InlineJsonConvertersTests
             generatedCode.Should().NotMatchRegex(
                 @"\[JsonConverter\(typeof\(JsonStringEnumConverter[^)]*\)\)\][\r\n\s]+public PetStatus");
         }
+    }
+
+    [Test]
+    public void Generated_Code_Preserves_CRLF_When_Moving_JsonConverter_Attributes()
+    {
+        const string contracts = "[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]\r\npublic enum PetStatus\r\n{\r\n}\r\n";
+        var settings = new RefitGeneratorSettings
+        {
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                InlineJsonConverters = true
+            }
+        };
+
+        var method = typeof(RefitGenerator).GetMethod("SanitizeGeneratedContracts", BindingFlags.Instance | BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+
+        var result = (string)method!.Invoke(new RefitGenerator(settings, new OpenApiDocument()), new object[] { contracts })!;
+
+        result.Should().Contain("[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]\r\npublic enum PetStatus");
+        Regex.Matches(result, "(?<!\\r)\\n").Should().BeEmpty();
     }
 
     [Test]

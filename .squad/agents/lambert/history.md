@@ -9,197 +9,52 @@
 ## Learnings
 
 - Team initialized on 2026-04-16.
-- **Issue #998 findings (2026-04-16):** Reproduced on clean .NET 10 build. Output.cs written to project root instead of Generated folder. Settings honored, but file path logic broken. Non-default folders work. First build fails due to sync mismatch; second build succeeds. Specific to default single-file output path behavior.
-- **PR #1064 closure audit (2026-04-20):** Validation evidence is strong for most closed issues, but #1014, #1040, #1053, and #1055 are over-claimed closures: tests only prove a subset or the code still leaves the reported gap. Manual repros did confirm #1011 (duplicate .refitter filenames now generate distinct hint names), #1012 (MSBuild build now fails on CLI error), and #1031 (settings-relative spec paths validate/generate from repo root).
-- **PR #1064 blocker recheck (2026-04-20):** Narrowed repros changed the confidence split: #1021 and #1050 are now proven end-to-end, but #1013 and #1018 are still only partial closures because uncovered collision cases remain reproducible despite the new tests.
-- **PR #1067 coverage pass (2026-04-21):** Added direct branch coverage for AOT serializer-context generation (whitespace contracts, OpenAPI-title naming, open-generic rejection, qualified/alias-qualified generic formatting). Swagger 2.0 #1026 compatibility is now explicitly locked for optional `ICollection<T>`, custom reference types, and `IDictionary<string, T>` staying non-nullable while optional value types still fall through as nullable.
+- **2026-04-25 CLI help repro:** src\Refitter\Program.cs intentionally rewrites a no-argument invocation to --help, exits 0, and emits Spectre.Console.Cli help output. Tests in src\Refitter.Tests\GenerateCommandTests.cs should assert semantic help markers like usage, sections, and option names rather than exact formatter-driven spacing.
+- **2026-04-25 Linux help-test follow-up:** GitHub Actions on Ubuntu still showed the semantic help text, but the raw redirected Spectre output did not satisfy the single regex assertion. The safe regression contract is to normalize console control sequences/line endings first and then assert semantic help markers (`USAGE`, usage text, sections, known option names).
+- **PR #1064 / #1057 testing pattern:** When blocker work is in flux, Lambert's safest lane is minimal repro specs plus compilation gates, then focused test reruns once the implementing lane lands.
 
-### 2026-04-17: Release Compatibility Validation + Tie-Break Repro
+## Core Context
 
-**Task**: Validation audit for 1.7.3 → HEAD breaking changes, plus concrete reproduction of flagged issues.
+- **2026-04-17 release compatibility audit:** Confirmed two real breaking changes from 1.7.3 → HEAD: the silent `.refitter` rename from `generateAuthenticationHeader` to `authenticationHeaderStyle`, and the source generator move from disk-written `.g.cs` files to Roslyn `AddSource()` output.
+- **2026-04-18 P1 audit verification:** Validated ten high-priority issues and one partial, with the sharpest failure patterns in serializer-context regex parsing, identifier sanitization, dynamic querystring self-assignment, CLI precedence, and null content handling.
+- **2026-04-20 PR #1064 blocker coverage:** Built regression tests around suffix-target collisions, multipart deduplication on sanitized identifiers, and keyword/title handling; later confirmed the blocker suite green once fixes landed.
+- **2026-04-20 remaining P1 worktree audit:** Confirmed the tooling path for `GeneratedFile:` markers, flagged the netstandard build break and missing polymorphism/runtime proof for #1017, and kept #1024/#1025 open pending package and smoke-test evidence.
 
-**Type Change Validation: `GenerateAuthenticationHeader` (bool → enum)**
+## 2026-04-25: Remaining Audit Repro Pass
 
-**Location**: `src/Refitter.Core/Settings/RefitGeneratorSettings.cs`
+- Narrowed the current-HEAD reproducible set to **#1028, #1029 (partial), #1033, #1041 (partial), and #1043**.
+- Confirmed **#1032, #1042, #1045, and #1047** as validation-only or fixed-at-HEAD candidates unless stronger failing repros appear.
+- Found no current-HEAD repro for **#1034, #1039, and #1056** in the initial tester pass.
 
-**Change**:
-- **1.7.3**: `public bool GenerateAuthenticationHeader { get; set; }`
-- **HEAD**: `public AuthenticationHeaderStyle AuthenticationHeaderStyle { get; set; }`
+## 2026-04-25: Core Blocker-Test Lane
 
-**Concrete Test Results**:
-- Created `test-deser/Program.cs` to test deserialization
-- **Test:** `"generateAuthenticationHeader": true` → deserializes to `AuthenticationHeaderStyle.None` (wrong!)
-- **Test:** `"generateAuthenticationHeader": false` → deserializes to `AuthenticationHeaderStyle.None` (wrong!)
-- **Test:** `"authenticationHeaderStyle": "Method"` → deserializes to `AuthenticationHeaderStyle.Method` (correct)
+- Ash's rejection kept **#1034** and **#1039** open and initially routed Lambert toward blocker-test coverage for the remaining failures.
+- Dallas's later revisions shifted Lambert's lane from "write the first blocker tests" to reconciling blocker expectations against the landed merge and grouped-query behavior.
+- After Dallas lockout, Lambert owned the final blocker-test revision for **#1034**, added explicit collision coverage, and reconciled the Issue1039_DynamicQuerystringMutationTests expectation drift.
+- Ash still rejected that proof pass because the Swagger 2 definition-collision lane was not isolated cleanly enough, which moved the final narrow revision to Ripley.
 
-**Root Cause Analysis**:
-- Property name changed: `GenerateAuthenticationHeader` → `authenticationHeaderStyle`
-- JSON serializer uses camelCase policy (`Serializer.cs:17`)
-- Old JSON key `generateAuthenticationHeader` doesn't match new property name
-- Unrecognized keys silently ignored; property gets default value (`None`)
+## 2026-04-25: CLI Help Output Test Stabilization
 
-**Generation Behavior**:
-- CLI generation with old key succeeds **WITHOUT error or warning**
-- BUT: Setting is silently ignored—no authentication headers generated
-- Users get **wrong output without any indication** (extremely dangerous silent failure)
+- Reproduced the no-argument CLI path and confirmed the product behavior is correct.
+- The durable test contract is semantic Spectre.Console.Cli help assertions, not exact whitespace/layout matching.
+- Validation reported green for the release Refitter.Tests run, a focused rerun of Program_Main_Should_Show_Help_When_Invoked_Without_Arguments, and format verification.
 
-**Build Validation**:
-- ✅ `dotnet build -c Release` succeeded
-- ✅ Generated code from 1.7.3-compatible `.refitter` file
-- ✅ No compilation errors
+## 2026-04-25: Linux Help Output Fix Landed
 
-**Test Coverage Expansion** (230 new files):
-- New test suites: `ContractTypeSuffixTests`, `GenerateJsonSerializerContextTests`, `PropertyNamingPolicyTests` (multiple variants), authentication header generation tests
+- Dallas's Ubuntu log analysis proved the failure was raw ANSI/wrapping noise from Spectre.Console help output rather than a CLI product bug.
+- Lambert changed only src\Refitter.Tests\GenerateCommandTests.cs, normalizing redirected console output and asserting semantic help markers instead of formatter-specific layout.
+- Reported final validation: dotnet build -c Release src\Refitter.slnx, dotnet test -c Release src\Refitter.slnx, and dotnet format --verify-no-changes src\Refitter.slnx.
 
-**Obsolete Properties (Non-Breaking Deprecation)**:
-- `DependencyInjectionSettings.UsePolly` → `TransientErrorHandler`
-- `DependencyInjectionSettings.PollyMaxRetryCount` → `MaxRetryCount`
-- Both marked `[Obsolete]` with `[ExcludeFromCodeCoverage]` — no breaking change, just warnings
+## 2026-04-25: RefitterGenerateTask coverage gap analysis
 
-**Tie-Break Conclusion**: **BREAKING CHANGE CONFIRMED**. Silent failure of old `generateAuthenticationHeader` key is worse than explicit error — users will ship broken code.
+- Coverage evidence from `src\Refitter.Tests\bin\Release\net10.0\TestResults\coverage-all.xml` leaves `src\Refitter.MSBuild\RefitterGenerateTask.cs` at **91.86% line / 94.29% block** coverage.
+- Exact uncovered lanes are: `TryExecuteRefitter()` exception handling (lines 143-147), missing bundled CLI handling in `StartProcess()` (171-173), unresolved package-folder / co-located CLI / final-first-bundle fallbacks in `ResolveRefitterDll()` (304, 344-348, 351-353), the `<1000 ms` arm of `FormatTimeout()` (357-361 partial), and the non-throwing `Log.LogErrorFromException(e)` path (370).
+- Full `Refitter.Tests` coverage run still hit the known network-dependent failures (`IsHttp_Detects_Https_Protocol` and `Can_Build_Generated_Code_From_Url(...)`), but it produced the decisive per-function coverage report needed for Dallas.
 
-**Required Actions**:
-1. Document as BREAKING CHANGE in CHANGELOG
-2. Bump to major version (2.0.0)
-3. Add migration guide with search/replace instructions
-4. Update all example files in repo (test/petstore.refitter still uses old key)
-5. Consider adding compatibility shim (custom JSON converter) to warn users
+## 2026-04-25: RefitterGenerateTask coverage closure landed
 
-### 2026-04-18: v2.0 P1 Audit Verification
+- Dallas used the isolated branch list to add only regression coverage in `src\Refitter.Tests\RefitterGenerateTaskTests.cs`; no product behavior changes were needed in `src\Refitter.MSBuild\RefitterGenerateTask.cs`.
+- The landed test pass covered exception handling, missing bundled CLI failure, blank package folder handling, whitespace runtime probing, co-located and first-bundled fallback resolution, millisecond timeout formatting, and successful `LogErrorFromException` forwarding.
+- Reported validation: `dotnet test --project src\Refitter.Tests\Refitter.Tests.csproj -c Release --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml`, `dotnet build -c Release src\Refitter.slnx --no-restore`, and `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`.
+- Reported end state: `src\Refitter.MSBuild\RefitterGenerateTask.cs` at 100% line coverage, 100% block coverage, and 0 partial functions.
 
-**Task**: Verify 11 P1 (High) issues from v2.0 audit against current codebase.
-
-**Key File Paths**:
-- `src/Refitter.Core/JsonSerializerContextGenerator.cs` — AOT context generation
-- `src/Refitter.Core/ParameterExtractor.cs` — parameter name sanitization, security headers, dynamic querystrings
-- `src/Refitter.Core/IdentifierUtils.cs` — identifier validation and sanitization utilities
-- `src/Refitter.Core/StringCasingExtensions.cs` — casing helpers (CapitalizeFirstCharacter)
-- `src/Refitter/GenerateCommand.cs` — CLI output path resolution
-- `src/Refitter.MSBuild/RefitterGenerateTask.cs` — MSBuild task output prediction and file filtering
-- `src/Refitter.SourceGenerator/Refitter.SourceGenerator.csproj` — NuGet dependency configuration
-- `src/Refitter.Core/CSharpClientGeneratorFactory.cs` — auto-enabling settings
-
-**Bug Patterns Found**:
-
-1. **Regex-Based Type Discovery** (Issue #1017):
-   - Pattern: Using regex to re-parse emitted C# code instead of using NSwag's type symbols
-   - Impact: Misses generics, namespaces, nested types, polymorphic types
-   - Location: `JsonSerializerContextGenerator.cs:48-73`
-
-2. **Incomplete Identifier Sanitization** (Issues #1018, #1019):
-   - Pattern: Custom sanitization that doesn't use existing `IdentifierUtils.ToCompilableIdentifier`
-   - Impact: Produces invalid C# identifiers (leading digits, reserved keywords)
-   - Locations: `ParameterExtractor.cs:106,154-170,583-602`
-
-3. **Self-Assignment Due to Capitalization No-Op** (Issue #1020):
-   - Pattern: `CapitalizeFirstCharacter("_foo")` returns `"_foo"` unchanged; property name == variable name
-   - Impact: Constructor self-assigns, property never set, query parameter silently dropped
-   - Location: `ParameterExtractor.cs:433,443` + `StringCasingExtensions.cs:39-45`
-
-4. **CLI Override Ignored** (Issue #1021):
-   - Pattern: Settings file defaults applied unconditionally, CLI flags not checked
-   - Impact: `-o` flag silently ignored when using settings file
-   - Location: `GenerateCommand.cs:665-679,691-694`
-
-5. **Null-Reference on Valid Input** (Issue #1027):
-   - Pattern: No null check before accessing `response.Content.Keys`
-   - Impact: NRE on 204 No Content or error responses (valid OpenAPI)
-   - Location: `RefitInterfaceGenerator.cs:262`
-
-6. **Substring Pattern Matching** (Issue #1023):
-   - Pattern: `IndexOf(pattern) >= 0` for file filtering
-   - Impact: Pattern "pet" matches "mypet.refitter" (over-inclusion)
-   - Location: `RefitterGenerateTask.cs:318-319`
-
-7. **Unconditional Setting Override** (Issue #1026):
-   - Pattern: Force-enable setting when related setting is true, no tri-state to detect explicit user choice
-   - Impact: Silent breaking API shape change
-   - Location: `CSharpClientGeneratorFactory.cs:69-71`
-
-**Findings Summary**:
-- 10/11 issues VALID (exist in current code)
-- 1/11 issue PARTIAL (#1024 — design decision, not bug, but needs documentation)
-- 0/11 issues INVALID
-- All critical correctness issues confirmed (will produce non-compiling C# or NRE)
-- All silent behavior changes confirmed (no error, wrong output)
-
-### 2026-04-20: PR #1064 Blocker Regression Tests
-
-**Task**: Create targeted regression coverage for the three remaining PR #1064 merge blockers.
-
-**Deliverable**: New test file `src/Refitter.Tests/Examples/PR1064BlockerRegressions.cs` with 12 test cases (390 lines).
-
-**Key File Paths**:
-- `src/Refitter.Core/ContractTypeSuffixApplier.cs` — Roslyn-based type suffix transformation
-- `src/Refitter.Core/ParameterExtractor.cs:132` — Multipart deduplication logic (blocker #1018 gap)
-- `src/Refitter.Core/IdentifierUtils.cs:146` — Sanitize() calls EscapeReservedKeyword() (may already fix #1053)
-
-**Blocker Analysis**:
-
-1. **Issue #1013 - Suffix-Target Collision**:
-   - **Repro**: Schema contains both `Pet` and `PetDto`. Applying suffix="Dto" to `Pet` would collide with existing `PetDto`.
-   - **Expected behavior**: No double-suffixing (`PetDtoDto`); existing `PetDto` preserved; type references resolve correctly.
-   - **Test coverage**: 3 tests proving collision prevention and compilability.
-
-2. **Issue #1018 - Multipart Deduplication on Sanitized Identifier**:
-   - **Repro**: Multipart properties `"a-b"`, `"a b"`, `"a.b"` all sanitize to `a_b` → must dedupe **after** sanitization.
-   - **Code inspection**: Line 132-133 in `ParameterExtractor.cs` **already** dedupes on `variableName` (sanitized), not `property.Key` (original).
-   - **Status**: Fix appears to be in place; tests will verify if #1018 is fully resolved or if edge cases remain.
-   - **Test coverage**: 3 tests proving deduplication logic and first-wins semantics.
-
-3. **Issue #1053 - Keyword/Title Handling**:
-   - **Repro**: Parameters/schemas named with C# keywords (`class`, `event`) or special chars in title (`@class-Service`).
-   - **Expected behavior**: Keywords escaped as `@class`, `@event`; no double-prefixes like `I@class`, `_@class`.
-   - **Code inspection**: `Sanitize()` line 146 **does** call `EscapeReservedKeyword()`, suggesting fix may already be in place.
-   - **Test coverage**: 6 tests proving keyword escaping, title handling, and parameter/schema edge cases.
-
-**Test Design Patterns**:
-- **Minimal OpenAPI specs**: Each test uses smallest possible spec to reproduce exact blocker scenario.
-- **Compilation gates**: Every blocker has a `BuildHelper.BuildCSharp()` test to prove generated code compiles.
-- **Explicit assertions**: Tests check for both presence of correct identifiers and **absence** of malformed ones.
-- **Regex matchers**: Used for flexible pattern matching (e.g., `@"(partial\s+class|record)\s+@class\b"`).
-
-**Execution Blocked**: Build environment has NuGet file lock errors. Tests cannot execute until locks clear.
-
-**Recommendation**: 
-- Commit tests to establish regression contract.
-- Execute after Parker's fixes: `dotnet test --filter "FullyQualifiedName~PR1064BlockerRegressions"`
-- Expected initial state: #1018 tests should **fail** before fix; #1013 and #1053 may already pass.
-
-**Team Coordination**:
-- Tests created **before** Parker's code fixes (no blocking dependency).
-- Tests document expected behavior and will guide correct implementation.
-- Decision doc: `.squad/decisions/inbox/lambert-pr1064-blockers.md`
-
-## 2026-04-20 Final Update: All Tests Passing
-
-**Task:** Verify regression test suite validates blocker fixes  
-**Status:** ✅ COMPLETE — All 13 PR1064BlockerRegressions tests passing; 1779/1779 full suite  
-
-**Execution Results:**
-- **Build Environment:** Locks cleared; clean build successful
-- **Test Results:** 1779/1779 PASSING (0 failures)
-- **Blocker Coverage:** All 3 issues (#1013, #1018, #1053) validated with edge cases
-
-**Collaboration Notes:**
-- Ash's unified naming method fix proved the #1018 root cause diagnosis was correct
-- Test expectations for #1053 validated NSwag automatic schema name capitalization
-- Regression test file now serves as permanent contract for these three critical blockers
-- Lambert's test patterns establish model for future regression coverage
-
-**Final Session Log:** `.squad/log/2026-04-20T16-00-14Z-pr1064-blocker-fixes.md`
-
-**Merge Status:** ✅ APPROVED (all 12 tests passing; comprehensive edge case coverage)
-
-### 2026-04-20: Remaining Open P1 Worktree Audit
-
-**Task**: Independent tester pass on the still-open P1 fixes under issue #1057 (#1017, #1022, #1023, #1024, #1025, #1026).
-
-**Key findings**:
-- `src/Refitter.Core/JsonSerializerContextGenerator.cs` is now wired into `RefitGenerator.Generate()` / `GenerateMultipleFiles()`, but the current implementation uses APIs not available on the `netstandard2.0` target (`ReplaceLineEndings`, range/index syntax, `ToHashSet`), so the worktree does not build yet. This is the current blocker for #1017.
-- The new AOT generator also still does not emit any `JsonDerivedType` / polymorphism metadata, and the new JsonSerializerContext test coverage does not exercise polymorphic contracts. Even after the netstandard build break is fixed, #1017 is not fully closed yet.
-- `src/Refitter.MSBuild/RefitterGenerateTask.cs` no longer predicts generated files with regex; it now asks the CLI to run in `--simple-output` mode and parses `GeneratedFile:` markers emitted by `src/Refitter/GenerateCommand.cs`. This directly addresses the filename divergence behind #1022 and removes the substring fallback for #1023.
-- `src/Refitter.Core/CSharpClientGeneratorFactory.cs` removes the forced `GenerateOptionalPropertiesAsNullable = true` behavior, and `src/Refitter.Tests/Examples/RuntimeCompatibilityTests.cs` now expects nullable-reference-types alone to preserve non-null optional properties. The code change for #1026 looks correct, but it could not be executed end-to-end because #1017 currently breaks the build.
-- `src/Refitter.SourceGenerator/Refitter.SourceGenerator.csproj` and `src/Refitter.SourceGenerator/obj/Release/Refitter.SourceGenerator.1.0.0.nuspec` still expose `Refit 10.1.6` and `OasReader 3.5.0.19` as package dependencies, so #1024 remains open.
-- `docs/docfx_project/articles/breaking-changes-v2-0-0.md` already documents the Microsoft.OpenApi 1.x → 3.x parser migration, but there is still no comparative smoke-test corpus proving real-world diff coverage, so #1025 remains only partially addressed.
-- Temporary repro artifacts are still sitting untracked in the repo root (`.refitter`, `aot-repro.cs`, `aot-repro.json`); they should be cleaned before merge unless intentionally kept.

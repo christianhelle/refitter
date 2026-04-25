@@ -289,10 +289,12 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             // This allows users to override the converter via JsonSerializerOptions.Converters (e.g. to use
             // JsonStringEnumMemberConverter for enums with [EnumMember] values containing special characters).
             contracts = JsonStringEnumConverterAttributeRegex.Replace(contracts, string.Empty);
+            var newLine = GetPreferredNewLine(contracts);
             return EnumDeclarationRegex
                 .Replace(
                     contracts,
-                    "$1[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]\n$1$2")
+                    match =>
+                        $"{match.Groups[1].Value}[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]{newLine}{match.Groups[1].Value}{match.Groups[2].Value}")
                 .TrimEnd();
         }
 
@@ -301,6 +303,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
             .Replace(contracts, string.Empty)
             .TrimEnd();
     }
+
+    private static string GetPreferredNewLine(string content) =>
+        content.Contains("\r\n", StringComparison.Ordinal)
+            ? "\r\n"
+            : "\n";
 
     private string NormalizeSwagger2OptionalReferencePropertyNullability(string contracts)
     {

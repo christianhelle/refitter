@@ -1,5 +1,7 @@
-using System.Diagnostics;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 using Refitter.Core;
 
@@ -12,6 +14,9 @@ namespace Refitter.SourceGenerator;
 [Generator(LanguageNames.CSharp)]
 public class RefitterSourceGenerator : IIncrementalGenerator
 {
+    internal const string Category = "Refitter";
+    private const string RefitterDiagnosticTitle = Category;
+
     /// <summary>
     /// Initializes the incremental generator with the necessary configurations.
     /// </summary>
@@ -25,23 +30,15 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         // collect and sort the paths of the .refitter files for logging
         var refitterPathList = refitterFiles
             .Select((t, _) => t.Path)
-            .Collect()
-            .Select((arr, _) => arr.Sort(StringComparer.InvariantCultureIgnoreCase));
+            .CollectAsEquatableArray()
+            .Select((arr, _) => arr.AsImmutableArray().Sort(StringComparer.InvariantCultureIgnoreCase).AsEquatableArray());
 
-        // add a source output that logs what we found for easier troubleshooting and setup
+        // add a source output that warns when no .refitter files were found
         context.RegisterSourceOutput(refitterPathList, static (spc, paths) =>
         {
-            if (paths.Length == 0)
+            if (paths.IsEmpty)
             {
-                // log a warning if no .refitter files were found, instructing the user how to add them
-                Debug.WriteLine("[Refitter] No .refitter files found. Ensure they are added to your project as `<AdditionalFiles Include=\"Petstore.refitter\" />`");
-                return;
-            }
-
-            // log each found .refitter file path
-            foreach (var path in paths)
-            {
-                Debug.WriteLine($"[Refitter] Found .refitter file: {path}");
+                spc.ReportDiagnostic(CreateDiagnostic(CreateNoRefitterFilesFoundDiagnostic()));
             }
         });
 
@@ -53,22 +50,13 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     {
         foreach (var diagnostic in result.Diagnostics)
         {
-            context.ReportDiagnostic(diagnostic);
+            context.ReportDiagnostic(CreateDiagnostic(diagnostic));
         }
 
         if (result.Code is not null && result.HintName is not null)
         {
             context.AddSource(result.HintName, result.Code);
-            context.ReportDiagnostic(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER001",
-                        "Refitter",
-                        $"Refitter generated {result.HintName} successfully",
-                        "Refitter",
-                        DiagnosticSeverity.Info,
-                        true),
-                    Location.None));
+            context.ReportDiagnostic(CreateDiagnostic(CreateGeneratedSuccessfullyDiagnostic(result.HintName)));
         }
     }
 
@@ -76,22 +64,14 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
         Justification = "By design")]
-    private static GeneratedCode GenerateCode(
+    internal static GeneratedCode GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var diagnostics = new List<Diagnostic>
+        var diagnostics = new List<GeneratedDiagnostic>
         {
-            Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    "REFITTER001",
-                    "Refitter",
-                    $"Found .refitter File: {file.Path}",
-                    "Refitter",
-                    DiagnosticSeverity.Info,
-                    true),
-                Location.None)
+            CreateFoundFileDiagnostic(file.Path)
         };
 
         try
@@ -99,21 +79,12 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var content = file.GetText(cancellationToken)!;
             var json = content.ToString();
 
-            diagnostics.Add(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER001",
-                        "Refitter File Contents",
-                        json,
-                        "Refitter",
-                        DiagnosticSeverity.Info,
-                        true),
-                    Location.None));
+            diagnostics.Add(CreateFileContentsDiagnostic(json));
 
             var settings = TryDeserialize(json, diagnostics);
             if (settings is null)
             {
-                return new GeneratedCode(diagnostics);
+                return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -129,16 +100,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             if (settings.UseIsoDateFormat &&
                 settings.CodeGeneratorSettings?.DateFormat is not null)
             {
-                diagnostics.Add(
-                    Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "REFITTER002",
-                            "Warning",
-                            "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
-                            "Refitter",
-                            DiagnosticSeverity.Warning,
-                            true),
-                        Location.None));
+                diagnostics.Add(CreateIsoDateFormatOverrideDiagnostic());
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -151,26 +113,17 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             // when multiple .refitter files with the same name exist in different directories
             var hintName = CreateUniqueHintName(file.Path, settings.OutputFilename);
 
-            return new GeneratedCode(diagnostics, refit, hintName);
+            return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), refit, hintName);
         }
         catch (Exception e)
         {
-            diagnostics.Add(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER000",
-                        "Error",
-                        $"Refitter failed to generate code: {e}",
-                        "Refitter",
-                        DiagnosticSeverity.Error,
-                        true),
-                    Location.None));
+            diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to generate code: {e}"));
 
-            return new GeneratedCode(diagnostics);
+            return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
         }
     }
 
-    private static RefitGeneratorSettings? TryDeserialize(string json, List<Diagnostic> diagnostics)
+    private static RefitGeneratorSettings? TryDeserialize(string json, List<GeneratedDiagnostic> diagnostics)
     {
         try
         {
@@ -178,23 +131,64 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         }
         catch (Exception e)
         {
-            diagnostics.Add(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "REFITTER000",
-                        "Error",
-                        $"Unable to deserialize .refitter file: {e}",
-                        "Refitter",
-                        DiagnosticSeverity.Info,
-                        true
-                    ),
-                    Location.None
-                )
-            );
+            diagnostics.Add(CreateErrorDiagnostic($"Unable to deserialize .refitter file: {e}"));
 
             return null;
         }
     }
+
+    internal static GeneratedDiagnostic CreateNoRefitterFilesFoundDiagnostic() =>
+        new(
+            "REFITTER003",
+            "No .refitter files found",
+            "No .refitter files found. Ensure they are added to your project as `<AdditionalFiles Include=\"Petstore.refitter\" />`.",
+            DiagnosticSeverity.Warning);
+
+    internal static GeneratedDiagnostic CreateGeneratedSuccessfullyDiagnostic(string hintName) =>
+        new(
+            "REFITTER001",
+            RefitterDiagnosticTitle,
+            $"{RefitterDiagnosticTitle} generated {hintName} successfully",
+            DiagnosticSeverity.Info);
+
+    private static GeneratedDiagnostic CreateFoundFileDiagnostic(string path) =>
+        new(
+            "REFITTER004",
+            RefitterDiagnosticTitle,
+            $"Found .refitter File: {path}",
+            DiagnosticSeverity.Info);
+
+    private static GeneratedDiagnostic CreateFileContentsDiagnostic(string json) =>
+        new(
+            "REFITTER005",
+            "Refitter File Contents",
+            json,
+            DiagnosticSeverity.Info);
+
+    private static GeneratedDiagnostic CreateIsoDateFormatOverrideDiagnostic() =>
+        new(
+            "REFITTER002",
+            "Warning",
+            "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
+            DiagnosticSeverity.Warning);
+
+    private static GeneratedDiagnostic CreateErrorDiagnostic(string message) =>
+        new(
+            "REFITTER000",
+            "Error",
+            message,
+            DiagnosticSeverity.Error);
+
+    private static Diagnostic CreateDiagnostic(GeneratedDiagnostic diagnostic) =>
+        Diagnostic.Create(
+            new DiagnosticDescriptor(
+                diagnostic.Id,
+                diagnostic.Title,
+                diagnostic.Message,
+                Category,
+                diagnostic.Severity,
+                diagnostic.EnabledByDefault),
+            Location.None);
 
     /// <summary>
     /// Creates a unique hint name for AddSource that prevents collisions when multiple
@@ -213,7 +207,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
         if (string.IsNullOrEmpty(baseName) || baseName == ".")
         {
-            baseName = "Refitter";
+            baseName = RefitterDiagnosticTitle;
         }
 
         // Create a stable unique suffix from the directory path to prevent collisions
@@ -248,5 +242,50 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private record GeneratedCode(List<Diagnostic> Diagnostics, string? Code = null, string? HintName = null);
+    internal readonly record struct GeneratedCode(
+        EquatableArray<GeneratedDiagnostic> Diagnostics,
+        string? Code = null,
+        string? HintName = null);
+
+    [SuppressMessage(
+        "Major Code Smell",
+        "S1206:Equals(object) and GetHashCode() should be overridden in pairs",
+        Justification = "readonly record struct synthesizes the paired Equals overloads; only the hash code is customized to keep ordinal semantics explicit.")]
+    internal readonly record struct GeneratedDiagnostic : IEquatable<GeneratedDiagnostic>
+    {
+        public GeneratedDiagnostic(
+            string id,
+            string title,
+            string message,
+            DiagnosticSeverity severity,
+            bool enabledByDefault = true)
+        {
+            Id = id;
+            Title = title;
+            Message = message;
+            Severity = severity;
+            EnabledByDefault = enabledByDefault;
+        }
+
+        public string Id { get; }
+
+        public string Title { get; }
+
+        public string Message { get; }
+
+        public DiagnosticSeverity Severity { get; }
+
+        public bool EnabledByDefault { get; }
+
+        public override int GetHashCode()
+        {
+            HashCode hashCode = default;
+            hashCode.Add(Id, StringComparer.Ordinal);
+            hashCode.Add(Title, StringComparer.Ordinal);
+            hashCode.Add(Message, StringComparer.Ordinal);
+            hashCode.Add((int)Severity);
+            hashCode.Add(EnabledByDefault);
+            return hashCode.ToHashCode();
+        }
+    }
 }

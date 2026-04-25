@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using Refitter.Core;
 using TUnit.Core;
@@ -411,4 +413,137 @@ public class GenerateCommandTests
 
         refitSettings.OutputFolder.Should().Be("./Generated");
     }
+
+    [Test]
+    public void Program_Main_Should_Show_Help_When_Invoked_Without_Arguments()
+    {
+        var result = InvokeProgram([]);
+        var normalizedOutput = NormalizeConsoleOutput(result.Output);
+
+        result.ExitCode.Should().Be(0);
+        normalizedOutput.Should().Contain("USAGE:");
+        normalizedOutput.Should().Contain("refitter [URL or input file] [OPTIONS]");
+        normalizedOutput.Should().Contain("ARGUMENTS:");
+        normalizedOutput.Should().Contain("OPTIONS:");
+        normalizedOutput.Should().Contain("--generate-authentication-header");
+    }
+
+    [Test]
+    public void Program_Main_Should_Accept_Legacy_GenerateAuthenticationHeader_Boolean_Syntax()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "bearer.json");
+            var outputPath = Path.Combine(workspace, "Generated", "BearerClient.cs");
+
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": {
+                    "title": "Bearer API",
+                    "version": "1.0.0"
+                  },
+                  "components": {
+                    "securitySchemes": {
+                      "bearerAuth": {
+                        "type": "http",
+                        "scheme": "bearer"
+                      }
+                    }
+                  },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "security": [
+                          {
+                            "bearerAuth": []
+                          }
+                        ],
+                        "responses": {
+                          "200": {
+                            "description": "ok"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            var result = InvokeProgram(
+            [
+                openApiPath,
+                "--output", outputPath,
+                "--simple-output",
+                "--no-banner",
+                "--no-logging",
+                "--skip-validation",
+                "--generate-authentication-header", "true"
+            ]);
+
+            result.ExitCode.Should().Be(0, result.Output);
+            File.Exists(outputPath).Should().BeTrue(result.Output);
+            File.ReadAllText(outputPath).Should().Contain("[Headers(\"Authorization: Bearer\")]");
+        }
+        finally
+        {
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    private static (int ExitCode, string Output) InvokeProgram(string[] args)
+    {
+        var cliPath = Path.Combine(AppContext.BaseDirectory, "refitter.dll");
+        File.Exists(cliPath).Should().BeTrue();
+
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "dotnet",
+            Arguments = $"exec \"{cliPath}\" {string.Join(" ", args.Select(QuoteArgument))}".TrimEnd(),
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+
+        using var process = Process.Start(startInfo);
+        process.Should().NotBeNull();
+
+        var standardOutput = process!.StandardOutput.ReadToEnd();
+        var standardError = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+
+        return (process.ExitCode, standardOutput + standardError);
+    }
+
+    private static string CreateWorkspace()
+    {
+        var workspace = Path.Combine(AppContext.BaseDirectory, "GenerateCommandTests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(workspace);
+        return workspace;
+    }
+
+    private static void DeleteWorkspace(string workspace)
+    {
+        if (Directory.Exists(workspace))
+        {
+            Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    private static string NormalizeConsoleOutput(string output)
+    {
+        var withoutAnsi = Regex.Replace(output, @"\x1B\[[0-9;?]*[ -/]*[@-~]", string.Empty);
+        return withoutAnsi.ReplaceLineEndings("\n");
+    }
+
+    private static string QuoteArgument(string argument) =>
+        argument.Contains(' ', StringComparison.Ordinal)
+            ? $"\"{argument}\""
+            : argument;
 }

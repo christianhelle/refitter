@@ -54,7 +54,7 @@ public static class OpenApiDocumentFactory
 
     private static OpenApiDocument Merge(OpenApiDocument[] documents)
     {
-        var baseDocument = documents[0];
+        var baseDocument = OpenApiDocument.FromJsonAsync(documents[0].ToJson(documents[0].SchemaType)).GetAwaiter().GetResult();
         var tags = baseDocument.Tags;
         HashSet<string>? tagNames = null;
 
@@ -68,18 +68,14 @@ public static class OpenApiDocumentFactory
             var document = documents[i];
             foreach (var path in document.Paths)
             {
-                if (!baseDocument.Paths.ContainsKey(path.Key))
-                    baseDocument.Paths[path.Key] = path.Value;
+                MergeIfMissingOrThrowOnConflict(baseDocument.Paths, path.Key, path.Value, "path");
             }
 
             if (document.Components?.Schemas != null)
             {
-                // Ensure base document has schemas dictionary initialized (#1016)
-                // Components property is read-only but auto-initialized by NSwag
                 foreach (var schema in document.Components.Schemas)
                 {
-                    if (!baseDocument.Components.Schemas.ContainsKey(schema.Key))
-                        baseDocument.Components.Schemas[schema.Key] = schema.Value;
+                    MergeIfMissingOrThrowOnConflict(baseDocument.Components.Schemas, schema.Key, schema.Value, "schema");
                 }
             }
 
@@ -87,8 +83,15 @@ public static class OpenApiDocumentFactory
             {
                 foreach (var definition in document.Definitions)
                 {
-                    if (!baseDocument.Definitions.ContainsKey(definition.Key))
-                        baseDocument.Definitions[definition.Key] = definition.Value;
+                    MergeIfMissingOrThrowOnConflict(baseDocument.Definitions, definition.Key, definition.Value, "definition");
+                }
+            }
+
+            if (document.SecurityDefinitions != null)
+            {
+                foreach (var securityDefinition in document.SecurityDefinitions)
+                {
+                    MergeIfMissingOrThrowOnConflict(baseDocument.SecurityDefinitions, securityDefinition.Key, securityDefinition.Value, "security scheme");
                 }
             }
 
@@ -106,6 +109,40 @@ public static class OpenApiDocumentFactory
 
         return baseDocument;
     }
+
+    private static void MergeIfMissingOrThrowOnConflict<TValue>(
+        IDictionary<string, TValue> target,
+        string key,
+        TValue value,
+        string itemType)
+    {
+        if (!target.TryGetValue(key, out var existingValue))
+        {
+            target[key] = value;
+            return;
+        }
+
+        if (!AreEquivalent(existingValue, value))
+            throw CreateMergeConflictException(itemType, key);
+    }
+
+    private static bool AreEquivalent<TValue>(TValue existingValue, TValue incomingValue)
+    {
+        if (ReferenceEquals(existingValue, incomingValue) || EqualityComparer<TValue>.Default.Equals(existingValue, incomingValue))
+            return true;
+
+        try
+        {
+            return Serializer.Serialize(existingValue!) == Serializer.Serialize(incomingValue!);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static InvalidOperationException CreateMergeConflictException(string itemType, string key) =>
+        new($"Cannot merge OpenAPI documents because a duplicate {itemType} '{key}' was found. Refitter fails fast on merge collisions to avoid silent data loss.");
 
     /// <summary>
     /// Creates a new instance of the <see cref="NSwag.OpenApiDocument"/> class asynchronously.
