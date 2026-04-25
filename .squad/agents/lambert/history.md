@@ -10,6 +10,7 @@
 
 - Team initialized on 2026-04-16.
 - **2026-04-25 CLI help repro:** src\Refitter\Program.cs intentionally rewrites a no-argument invocation to --help, exits 0, and emits Spectre.Console.Cli help output. Tests in src\Refitter.Tests\GenerateCommandTests.cs should assert semantic help markers like usage, sections, and option names rather than exact formatter-driven spacing.
+- **2026-04-25 Linux help-test follow-up:** GitHub Actions on Ubuntu still showed the semantic help text, but the raw redirected Spectre output did not satisfy the single regex assertion. The safe regression contract is to normalize console control sequences/line endings first and then assert semantic help markers (`USAGE`, usage text, sections, known option names).
 - **PR #1064 / #1057 testing pattern:** When blocker work is in flux, Lambert's safest lane is minimal repro specs plus compilation gates, then focused test reruns once the implementing lane lands.
 
 ## Core Context
@@ -37,4 +38,10 @@
 - Reproduced the no-argument CLI path and confirmed the product behavior is correct.
 - The durable test contract is semantic Spectre.Console.Cli help assertions, not exact whitespace/layout matching.
 - Validation reported green for the release Refitter.Tests run, a focused rerun of Program_Main_Should_Show_Help_When_Invoked_Without_Arguments, and format verification.
+
+## 2026-04-25: Linux Help Output Fix Landed
+
+- Dallas's Ubuntu log analysis proved the failure was raw ANSI/wrapping noise from Spectre.Console help output rather than a CLI product bug.
+- Lambert changed only src\Refitter.Tests\GenerateCommandTests.cs, normalizing redirected console output and asserting semantic help markers instead of formatter-specific layout.
+- Reported final validation: dotnet build -c Release src\Refitter.slnx, dotnet test -c Release src\Refitter.slnx, and dotnet format --verify-no-changes src\Refitter.slnx.
 

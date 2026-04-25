@@ -10,3 +10,4 @@
 
 - Team initialized on 2026-04-16.
 - **2026-04-25: Lambert help-output consolidation:** Active decisions now archive older sections once decisions.md grows past ~20 KB, and Spectre.Console.Cli help regressions should be recorded as semantic-marker expectations rather than exact layout snapshots.
+- **2026-04-25: Linux help-output merge:** When Dallas proves a formatter/noise failure and Lambert lands the test-only stabilization, record the root cause as ANSI/wrapping noise in raw Spectre output and keep the decision phrased as a semantic-assertion contract.

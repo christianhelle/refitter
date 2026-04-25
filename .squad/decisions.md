@@ -200,5 +200,7 @@
 - The current product behavior is correct; the instability sits in whitespace-sensitive test expectations, not in production code.
 - src\Refitter.Tests\GenerateCommandTests.cs should assert semantic help markers (usage pattern, sections, and known option names) instead of exact formatter-driven spacing/default-value layout.
 - Validation reported: release run of src\Refitter.Tests\Refitter.Tests.csproj, focused rerun of Program_Main_Should_Show_Help_When_Invoked_Without_Arguments, and dotnet format --verify-no-changes src\Refitter.slnx.
+- Cross-agent merge outcome: Dallas proved the Ubuntu failure was ANSI/wrapping noise in raw Spectre.Console help output, and Lambert landed the test-only fix in src\Refitter.Tests\GenerateCommandTests.cs by normalizing redirected console output before asserting semantic help markers.
+- Final landed validation for the product commit `normalize help output test across platforms`: dotnet build -c Release src\Refitter.slnx, dotnet test -c Release src\Refitter.slnx, and dotnet format --verify-no-changes src\Refitter.slnx.
 
 
