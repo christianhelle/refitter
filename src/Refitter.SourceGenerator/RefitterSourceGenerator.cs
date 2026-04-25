@@ -15,6 +15,7 @@ namespace Refitter.SourceGenerator;
 public class RefitterSourceGenerator : IIncrementalGenerator
 {
     internal const string Category = "Refitter";
+    private const string RefitterDiagnosticTitle = Category;
 
     /// <summary>
     /// Initializes the incremental generator with the necessary configurations.
@@ -146,20 +147,20 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     internal static GeneratedDiagnostic CreateGeneratedSuccessfullyDiagnostic(string hintName) =>
         new(
             "REFITTER001",
-            "Refitter",
-            $"Refitter generated {hintName} successfully",
+            RefitterDiagnosticTitle,
+            $"{RefitterDiagnosticTitle} generated {hintName} successfully",
             DiagnosticSeverity.Info);
 
     private static GeneratedDiagnostic CreateFoundFileDiagnostic(string path) =>
         new(
-            "REFITTER001",
-            "Refitter",
+            "REFITTER004",
+            RefitterDiagnosticTitle,
             $"Found .refitter File: {path}",
             DiagnosticSeverity.Info);
 
     private static GeneratedDiagnostic CreateFileContentsDiagnostic(string json) =>
         new(
-            "REFITTER001",
+            "REFITTER005",
             "Refitter File Contents",
             json,
             DiagnosticSeverity.Info);
@@ -206,7 +207,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
         if (string.IsNullOrEmpty(baseName) || baseName == ".")
         {
-            baseName = "Refitter";
+            baseName = RefitterDiagnosticTitle;
         }
 
         // Create a stable unique suffix from the directory path to prevent collisions
@@ -246,20 +247,35 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         string? Code = null,
         string? HintName = null);
 
-    internal readonly record struct GeneratedDiagnostic(
-        string Id,
-        string Title,
-        string Message,
-        DiagnosticSeverity Severity,
-        bool EnabledByDefault = true)
-        : IEquatable<GeneratedDiagnostic>
+    [SuppressMessage(
+        "Major Code Smell",
+        "S1206:Equals(object) and GetHashCode() should be overridden in pairs",
+        Justification = "readonly record struct synthesizes the paired Equals overloads; only the hash code is customized to keep ordinal semantics explicit.")]
+    internal readonly record struct GeneratedDiagnostic : IEquatable<GeneratedDiagnostic>
     {
-        public bool Equals(GeneratedDiagnostic other) =>
-            string.Equals(Id, other.Id, StringComparison.Ordinal) &&
-            string.Equals(Title, other.Title, StringComparison.Ordinal) &&
-            string.Equals(Message, other.Message, StringComparison.Ordinal) &&
-            Severity == other.Severity &&
-            EnabledByDefault == other.EnabledByDefault;
+        public GeneratedDiagnostic(
+            string id,
+            string title,
+            string message,
+            DiagnosticSeverity severity,
+            bool enabledByDefault = true)
+        {
+            Id = id;
+            Title = title;
+            Message = message;
+            Severity = severity;
+            EnabledByDefault = enabledByDefault;
+        }
+
+        public string Id { get; }
+
+        public string Title { get; }
+
+        public string Message { get; }
+
+        public DiagnosticSeverity Severity { get; }
+
+        public bool EnabledByDefault { get; }
 
         public override int GetHashCode()
         {

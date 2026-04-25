@@ -425,94 +425,91 @@ internal static class ParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Query)
             .ToList();
 
-        if (settings.UseDynamicQuerystringParameters)
+        if (settings.UseDynamicQuerystringParameters && queryParameters.Count >= 2)
         {
-            if (queryParameters.Count >= 2)
+            var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
+            var isRecord = settings.ImmutableRecords ||
+                           settings.CodeGeneratorSettings?.GenerateNativeRecords is true;
+            var classStyle = isRecord
+                ? "record"
+                : "class";
+            var setterStyle = isRecord
+                ? "init"
+                : "set";
+
+            var injectedParametersCodeBuilder = new StringBuilder();
+            var initializedParametersCodeBuilder = new StringBuilder();
+            var propertiesCodeBuilder = new StringBuilder();
+            var allNullable = true;
+            foreach (var operationParameter in queryParameters)
             {
-                var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
-                var isRecord = settings.ImmutableRecords ||
-                               settings.CodeGeneratorSettings?.GenerateNativeRecords is true;
-                var classStyle = isRecord
-                    ? "record"
-                    : "class";
-                var setterStyle = isRecord
-                    ? "init"
-                    : "set";
-
-                var injectedParametersCodeBuilder = new StringBuilder();
-                var initializedParametersCodeBuilder = new StringBuilder();
-                var propertiesCodeBuilder = new StringBuilder();
-                var allNullable = true;
-                foreach (var operationParameter in queryParameters)
+                var propertyType = GetQueryParameterType(operationParameter, settings);
+                allNullable = allNullable && propertyType.EndsWith("?");
+                var variableName = GetVariableName(operationParameter);
+                var attributes = $"{JoinAttributes(GetQueryAttribute(operationParameter, settings), GetAliasAsAttribute(operationParameter.Name, variableName))}";
+                var propertyName = variableName.CapitalizeFirstCharacter();
+                if (operationParameter.IsRequired)
                 {
-                    var propertyType = GetQueryParameterType(operationParameter, settings);
-                    allNullable = allNullable && propertyType.EndsWith("?");
-                    var variableName = GetVariableName(operationParameter);
-                    var attributes = $"{JoinAttributes(GetQueryAttribute(operationParameter, settings), GetAliasAsAttribute(operationParameter.Name, variableName))}";
-                    var propertyName = variableName.CapitalizeFirstCharacter();
-                    if (operationParameter.IsRequired)
-                    {
-                        injectedParametersCodeBuilder.Append(injectedParametersCodeBuilder.Length == 0
-                            ? $$"""{{propertyType}} {{variableName}}"""
-                            : $$""", {{propertyType}} {{variableName}}""");
+                    injectedParametersCodeBuilder.Append(injectedParametersCodeBuilder.Length == 0
+                        ? $$"""{{propertyType}} {{variableName}}"""
+                        : $$""", {{propertyType}} {{variableName}}""");
 
-                        initializedParametersCodeBuilder.AppendLine();
-                        initializedParametersCodeBuilder.Append(
-            $$"""
+                    initializedParametersCodeBuilder.AppendLine();
+                    initializedParametersCodeBuilder.Append(
+        $$"""
                         this.{{propertyName}} = {{variableName}};
             """);
-                    }
+                }
 
-                    propertiesCodeBuilder.AppendLine();
-                    if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
-                    {
-                        var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(operationParameter.Description);
-                        AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
-                    }
+                propertiesCodeBuilder.AppendLine();
+                if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
+                {
+                    var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(operationParameter.Description);
+                    AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
+                }
 
-                    propertiesCodeBuilder.Append(
-            $$"""
+                propertiesCodeBuilder.Append(
+        $$"""
                     {{attributes}}
                     {{modifier}} {{propertyType}} {{propertyName}} { get; {{setterStyle}}; }
             """);
-                    var defaultValue = operationParameter.Schema.Default;
-                    if (defaultValue != null)
-                    {
-                        var formattedDefaultValue = FormatDefaultValue(defaultValue, propertyType);
-                        propertiesCodeBuilder.Append($" = {formattedDefaultValue};");
-                    }
-                    propertiesCodeBuilder.AppendLine();
+                var defaultValue = operationParameter.Schema.Default;
+                if (defaultValue != null)
+                {
+                    var formattedDefaultValue = FormatDefaultValue(defaultValue, propertyType);
+                    propertiesCodeBuilder.Append($" = {formattedDefaultValue};");
                 }
+                propertiesCodeBuilder.AppendLine();
+            }
 
-                dynamicQuerystringParametersCodeBuilder.AppendLine(
-            $$"""
+            dynamicQuerystringParametersCodeBuilder.AppendLine(
+        $$"""
                 {{modifier}} {{classStyle}} {{dynamicQuerystringParameterType}}
                 {
             """);
 
-                if (injectedParametersCodeBuilder.Length > 0)
-                {
-                    dynamicQuerystringParametersCodeBuilder.AppendLine(
-            $$"""
+            if (injectedParametersCodeBuilder.Length > 0)
+            {
+                dynamicQuerystringParametersCodeBuilder.AppendLine(
+        $$"""
                     {{modifier}} {{dynamicQuerystringParameterType}}({{injectedParametersCodeBuilder}})
                     {
                         {{initializedParametersCodeBuilder}}
                     }
             """);
-                }
+            }
 
-                dynamicQuerystringParametersCodeBuilder.AppendLine(
-            $$"""
+            dynamicQuerystringParametersCodeBuilder.AppendLine(
+        $$"""
                     {{propertiesCodeBuilder}}
                 }
             """);
 
-                var dynamicQuerystringParameter = $"[Query] {dynamicQuerystringParameterType}";
-                if (allNullable)
-                    dynamicQuerystringParameter += "?";
-                dynamicQuerystringParameter += " queryParams";
-                parameters = [dynamicQuerystringParameter];
-            }
+            var dynamicQuerystringParameter = $"[Query] {dynamicQuerystringParameterType}";
+            if (allNullable)
+                dynamicQuerystringParameter += "?";
+            dynamicQuerystringParameter += " queryParams";
+            parameters = [dynamicQuerystringParameter];
         }
 
         dynamicQuerystringParameters = dynamicQuerystringParametersCodeBuilder.ToString();

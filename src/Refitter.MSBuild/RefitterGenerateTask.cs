@@ -315,11 +315,13 @@ public class RefitterGenerateTask : MSBuildTask
 
         if (installedRuntimes is not null)
         {
-            foreach (var runtime in bundledRuntimes)
+            var detectedRuntimes = installedRuntimes
+                .Where(installed => !string.IsNullOrWhiteSpace(installed))
+                .ToArray();
+
+            foreach (var runtime in bundledRuntimes.Where(runtime => FileExists(runtime.Path)))
             {
-                if (FileExists(runtime.Path) &&
-                    installedRuntimes.Any(installed =>
-                        !string.IsNullOrWhiteSpace(installed) &&
+                if (detectedRuntimes.Any(installed =>
                         installed.StartsWith(runtime.RuntimePrefix, StringComparison.Ordinal)))
                 {
                     logCommandLine($"Detected {GetDisplayFramework(runtime.TargetFramework)} runtime. Using {GetDisplayFramework(runtime.TargetFramework)} version of Refitter.");
@@ -353,12 +355,20 @@ public class RefitterGenerateTask : MSBuildTask
             .FirstOrDefault();
     }
 
-    private static string FormatTimeout(int timeoutMilliseconds) =>
-        timeoutMilliseconds >= 1000 && timeoutMilliseconds % 1000 == 0
-            ? $"{timeoutMilliseconds / 1000} seconds"
-            : timeoutMilliseconds >= 1000
-                ? $"{timeoutMilliseconds / 1000d:0.###} seconds"
-                : $"{timeoutMilliseconds} ms";
+    private static string FormatTimeout(int timeoutMilliseconds)
+    {
+        if (timeoutMilliseconds < 1000)
+        {
+            return $"{timeoutMilliseconds} ms";
+        }
+
+        if (timeoutMilliseconds % 1000 == 0)
+        {
+            return $"{timeoutMilliseconds / 1000} seconds";
+        }
+
+        return $"{timeoutMilliseconds / 1000d:0.###} seconds";
+    }
 
     private static string GetDisplayFramework(string targetFramework) => targetFramework.Replace("net", ".NET ");
 
