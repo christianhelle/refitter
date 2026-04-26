@@ -25,3 +25,9 @@
 - Dallas landed commit `f6374210` (`docs: clarify source generator setup`) with narrow validation green, which keeps docs/help drift as the safest first batch.
 - Current squad capacity is sufficient for docs, tooling, test-surface, and settings cleanup; only the later core generator / `ParameterExtractor` dedup lane needs a specialized reviewer.
 
+
+## 2026-04-26: Post-cleanup reassessment
+- First-wave landings cleared several earlier high-signal seams: XML-doc split-line reuse, source-generator setup/docs drift, suffix rewriter dedup, source-generator file-read hardening, by-endpoint query-parameter naming, title angle-bracket sanitization, and bounded MSBuild runtime discovery.
+- The best remaining behavior-safe seam is still split settings/spec-path normalization across `src\Refitter\SettingsValidator.cs`, `src\Refitter\GenerateCommand.cs`, and `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs`; those paths still disagree on URL detection and only some flows normalize `OpenApiPaths`.
+- The next best tooling seam is the duplicated `GeneratedFile:` marker contract between `src\Refitter\GenerateCommand.cs` and `src\Refitter.MSBuild\RefitterGenerateTask.cs`.
+- After those two, the backlog drops into lower-priority cleanup/refactor territory such as source-generator info-diagnostic shaping, duplicate test pruning, dead output-model cleanup, and deeper core generator dedup.

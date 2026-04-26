@@ -68,3 +68,5 @@
 - Dallas has already landed commit `f6374210` (`docs: clarify source generator setup`) with narrow validation green, so the doc-drift lane is actively moving without disturbing the baseline.
 - Keep using the local green baseline plus focused coverage-safe files as the main cleanup signal; live-URL tests remain environment-sensitive and should stay out of pass/fail conclusions.
 
+- **2026-04-26 final revalidation after cleanup landing:** Current HEAD is green again on the trusted loop: `dotnet restore src\Refitter.slnx`, `dotnet build -c Release src\Refitter.slnx --no-restore`, `dotnet test -c Release src\Refitter.slnx --no-build`, and `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`. The solution test pass now reports 1918 succeeded / 0 failed, and the trusted coverage lane (`dotnet test --project src\Refitter.Tests\Refitter.Tests.csproj -c Release --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml`) passed 1862 / 1862 with `Refitter.Core.dll` 95.05% line / 96.47% block, `refitter.dll` 97.10% / 99.11%, `Refitter.MSBuild.dll` back to 100% / 100%, and generated `RuntimeProof.dll` unchanged at 80.93% / 71.58%.
+
