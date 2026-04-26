@@ -45,7 +45,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                                   """);
 
                 var operationModel = generator.CreateOperationModel(operation);
-                var dynamicQuerystringParameterType = interfaceName.Replace("I", string.Empty).Replace("Endpoint", "QueryParams");
+                var dynamicQuerystringParameterType = interfaceName.Substring(1).Replace("Endpoint", "QueryParams");
                 var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, dynamicQuerystringParameterType, out var methodDynamicQuerystringParameters).ToList();
 
                 var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(methodDynamicQuerystringParameters);
