@@ -141,7 +141,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         new(
             "REFITTER003",
             "No .refitter files found",
-            "No .refitter files found. Ensure they are added to your project as `<AdditionalFiles Include=\"Petstore.refitter\" />`.",
+            "No .refitter files found. Add a `.refitter` file to your project. Refitter.SourceGenerator automatically includes `**/*.refitter` as Roslyn AdditionalFiles via its package props.",
             DiagnosticSeverity.Warning);
 
     internal static GeneratedDiagnostic CreateGeneratedSuccessfullyDiagnostic(string hintName) =>
