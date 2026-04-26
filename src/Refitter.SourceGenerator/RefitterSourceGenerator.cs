@@ -76,8 +76,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
         try
         {
-            var content = file.GetText(cancellationToken)!;
-            var json = content.ToString();
+            var json = TryReadRefitterFile(file, diagnostics, cancellationToken);
+            if (json is null)
+            {
+                return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+            }
 
             diagnostics.Add(CreateFileContentsDiagnostic(json));
 
@@ -120,6 +123,29 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to generate code: {e}"));
 
             return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+        }
+    }
+
+    private static string? TryReadRefitterFile(
+        AdditionalText file,
+        List<GeneratedDiagnostic> diagnostics,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var content = file.GetText(cancellationToken);
+            if (content is null)
+            {
+                diagnostics.Add(CreateErrorDiagnostic($"Unable to read .refitter file: {file.Path}"));
+                return null;
+            }
+
+            return content.ToString();
+        }
+        catch (Exception e)
+        {
+            diagnostics.Add(CreateErrorDiagnostic($"Unable to read .refitter file: {file.Path}{Environment.NewLine}{e}"));
+            return null;
         }
     }
 
@@ -210,13 +236,12 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             baseName = RefitterDiagnosticTitle;
         }
 
-        // Create a stable unique suffix from the directory path to prevent collisions
-        // Use the full path, normalize separators, and create a hash-like identifier
-        var directory = Path.GetDirectoryName(refitterFilePath);
-        if (!string.IsNullOrEmpty(directory))
+        // Create a stable unique suffix from the full .refitter path so files in the same
+        // directory can still coexist even when they share the same explicit output filename.
+        if (!string.IsNullOrWhiteSpace(refitterFilePath))
         {
-            // Normalize path separators and compute a stable hash
-            var normalizedPath = directory.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var normalizedPath = Path.GetFullPath(refitterFilePath)
+                .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             var pathHash = GetStableHash(normalizedPath);
             return $"{baseName}_{pathHash}.g.cs";
         }

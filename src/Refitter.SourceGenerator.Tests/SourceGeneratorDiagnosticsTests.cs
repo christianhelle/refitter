@@ -4,6 +4,7 @@ using FluentAssertions;
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
@@ -51,6 +52,53 @@ public class SourceGeneratorDiagnosticsTests
             diagnostic.Id == "REFITTER003" &&
             diagnostic.Severity == DiagnosticSeverity.Warning &&
             diagnostic.GetMessage().Contains("No .refitter files found", StringComparison.Ordinal));
+    }
+
+    [Test]
+    public void CreateUniqueHintName_Should_Differentiate_SameDirectory_Files_With_Shared_OutputFilename()
+    {
+        var sourceGeneratorAssembly = LoadSourceGeneratorAssembly();
+        var generatorType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator", throwOnError: true)!;
+        var method = generatorType.GetMethod("CreateUniqueHintName", BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+
+        var directory = Path.Combine(Path.GetTempPath(), "Refitter", Guid.NewGuid().ToString("N"));
+        var firstPath = Path.Combine(directory, "first.refitter");
+        var secondPath = Path.Combine(directory, "second.refitter");
+
+        var firstHintName = method!.Invoke(null, [firstPath, "SharedOutput.cs"]) as string;
+        var secondHintName = method.Invoke(null, [secondPath, "SharedOutput.cs"]) as string;
+
+        firstHintName.Should().StartWith("SharedOutput_");
+        secondHintName.Should().StartWith("SharedOutput_");
+        firstHintName.Should().NotBe(secondHintName);
+    }
+
+    [Test]
+    public void GenerateCode_Should_Return_Error_Diagnostic_When_AdditionalText_GetText_Returns_Null()
+    {
+        var result = InvokeGenerateCode(new StubAdditionalText("C:\\repo\\null.refitter", _ => null));
+
+        result.Code.Should().BeNull();
+        result.HintName.Should().BeNull();
+        result.Diagnostics.Should().Contain(diagnostic =>
+            diagnostic.Id == "REFITTER000" &&
+            diagnostic.Message.Contains("Unable to read .refitter file", StringComparison.Ordinal) &&
+            diagnostic.Message.Contains("null.refitter", StringComparison.Ordinal));
+    }
+
+    [Test]
+    public void GenerateCode_Should_Return_Error_Diagnostic_When_AdditionalText_GetText_Throws()
+    {
+        var result = InvokeGenerateCode(new StubAdditionalText("C:\\repo\\throw.refitter", _ => throw new InvalidDataException("bad encoding")));
+
+        result.Code.Should().BeNull();
+        result.HintName.Should().BeNull();
+        result.Diagnostics.Should().Contain(diagnostic =>
+            diagnostic.Id == "REFITTER000" &&
+            diagnostic.Message.Contains("Unable to read .refitter file", StringComparison.Ordinal) &&
+            diagnostic.Message.Contains("bad encoding", StringComparison.Ordinal));
     }
 
     private static IEnumerable<MetadataReference> GetMetadataReferences() =>
@@ -111,5 +159,48 @@ public class SourceGeneratorDiagnosticsTests
         return equatableArrayType
             .GetMethod("FromImmutableArray", BindingFlags.Public | BindingFlags.Static)!
             .Invoke(null, [immutableArray])!;
+    }
+
+    private static GenerateCodeResult InvokeGenerateCode(AdditionalText additionalText)
+    {
+        var sourceGeneratorAssembly = LoadSourceGeneratorAssembly();
+        var generatorType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator", throwOnError: true)!;
+        var generatedCodeType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator+GeneratedCode", throwOnError: true)!;
+        var diagnosticType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator+GeneratedDiagnostic", throwOnError: true)!;
+        var method = generatorType.GetMethod("GenerateCode", BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+
+        var result = method!.Invoke(null, [additionalText, CancellationToken.None]);
+        result.Should().NotBeNull();
+
+        var diagnosticsValue = generatedCodeType.GetProperty("Diagnostics")!.GetValue(result!);
+        diagnosticsValue.Should().BeAssignableTo<System.Collections.IEnumerable>();
+
+        var diagnostics = ((System.Collections.IEnumerable)diagnosticsValue!)
+            .Cast<object>()
+            .Select(diagnostic => new GeneratedDiagnosticResult(
+                (string)diagnosticType.GetProperty("Id")!.GetValue(diagnostic)!,
+                (string)diagnosticType.GetProperty("Message")!.GetValue(diagnostic)!))
+            .ToArray();
+
+        return new GenerateCodeResult(
+            diagnostics,
+            generatedCodeType.GetProperty("Code")!.GetValue(result!) as string,
+            generatedCodeType.GetProperty("HintName")!.GetValue(result!) as string);
+    }
+
+    private sealed record GenerateCodeResult(
+        IReadOnlyList<GeneratedDiagnosticResult> Diagnostics,
+        string? Code,
+        string? HintName);
+
+    private sealed record GeneratedDiagnosticResult(string Id, string Message);
+
+    private sealed class StubAdditionalText(string path, Func<CancellationToken, SourceText?> getText) : AdditionalText
+    {
+        public override string Path => path;
+
+        public override SourceText? GetText(CancellationToken cancellationToken = default) => getText(cancellationToken);
     }
 }
