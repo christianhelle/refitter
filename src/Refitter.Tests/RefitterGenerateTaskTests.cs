@@ -542,6 +542,32 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void GetInstalledDotnetRuntimes_Should_Include_Termination_Failure_When_Runtime_Discovery_Cannot_Be_Stopped()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                return new RefitterGenerateTask.ProcessExecutionResult(true, -1, new InvalidOperationException("kill failed"));
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<TimeoutException>()
+                .WithMessage("*dotnet --list-runtimes timed out after 500 ms. Failed to terminate timed-out process: kill failed*")
+                .WithInnerException<InvalidOperationException>()
+                .WithMessage("kill failed");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
     public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero()
     {
         try
@@ -558,6 +584,29 @@ public class RefitterGenerateTaskTests
 
             action.Should().Throw<InvalidOperationException>()
                 .WithMessage("*dotnet --list-runtimes exited with code 23*runtime probe failed*");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero_Without_Error_Output()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 23);
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<InvalidOperationException>()
+                .WithMessage("dotnet --list-runtimes exited with code 23");
         }
         finally
         {
