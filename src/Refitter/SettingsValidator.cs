@@ -77,36 +77,32 @@ public static class SettingsValidator
                 $"  - See documentation for valid values: https://refitter.github.io");
         }
 
-        refitSettings = refitGeneratorSettings;
-
         // First validate the file/output settings (includes check for both OpenApiPath and OpenApiPaths)
         var fileAndOutputResult = ValidateFileAndOutputSettings(settings, refitGeneratorSettings);
         if (!fileAndOutputResult.Successful)
         {
+            refitSettings = null;
             return fileAndOutputResult;
         }
+
+        GenerateCommand.ApplySettingsFileDefaults(settings.SettingsFilePath!, refitGeneratorSettings);
+        GenerateCommand.ResolveRelativeSpecPaths(settings.SettingsFilePath!, refitGeneratorSettings);
+        refitSettings = refitGeneratorSettings;
 
         // Then populate settings.OpenApiPath and validate file existence
         if (refitGeneratorSettings.OpenApiPaths is { Length: > 0 })
         {
             settings.OpenApiPath = refitGeneratorSettings.OpenApiPaths[0];
 
-            // Validate all OpenApiPaths entries
-            var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settings.SettingsFilePath!)) ?? string.Empty;
             for (var i = 0; i < refitGeneratorSettings.OpenApiPaths.Length; i++)
             {
                 var path = refitGeneratorSettings.OpenApiPaths[i];
-                if (!IsUrl(path))
+                if (!GenerateCommand.IsUrl(path))
                 {
-                    // Resolve relative paths from settings file directory
-                    var fullPath = Path.IsPathRooted(path)
-                        ? path
-                        : Path.GetFullPath(Path.Combine(settingsFileDirectory, path));
-
-                    if (!File.Exists(fullPath))
+                    if (!File.Exists(path))
                     {
                         return ValidationResult.Error(
-                            $"OpenAPI specification file not found in openApiPaths[{i}]: {fullPath}");
+                            $"OpenAPI specification file not found in openApiPaths[{i}]: {path}");
                     }
                 }
             }
@@ -115,9 +111,6 @@ public static class SettingsValidator
         {
             settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
         }
-
-        // Apply defaults before returning cached settings
-        GenerateCommand.ApplySettingsFileDefaults(settings.SettingsFilePath!, refitGeneratorSettings);
 
         return ValidationResult.Success();
     }

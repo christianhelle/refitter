@@ -363,6 +363,50 @@ public class SettingsValidatorTests
     }
 
     [Test]
+    public void Validate_Should_Normalize_Relative_OpenApiPaths_From_Settings_File()
+    {
+        var workspace = Path.Combine(Path.GetTempPath(), $"refitter-settings-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(workspace);
+
+        try
+        {
+            var tempSettingsFile = Path.Combine(workspace, "test.refitter");
+            var specsDirectory = Path.Combine(workspace, "specs");
+            Directory.CreateDirectory(specsDirectory);
+
+            var firstSpec = Path.Combine(specsDirectory, "first.json");
+            var secondSpec = Path.Combine(specsDirectory, "second.json");
+            File.WriteAllText(firstSpec, "{}");
+            File.WriteAllText(secondSpec, "{}");
+
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPaths = ["specs/first.json", "specs/second.json"]
+            };
+            File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Settings
+            {
+                SettingsFilePath = tempSettingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings, out var cachedSettings);
+
+            result.Successful.Should().BeTrue();
+            settings.OpenApiPath.Should().Be(firstSpec);
+            cachedSettings.Should().NotBeNull();
+            cachedSettings!.OpenApiPaths.Should().Equal(firstSpec, secondSpec);
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+            {
+                Directory.Delete(workspace, recursive: true);
+            }
+        }
+    }
+
+    [Test]
     public void Validate_Should_Fail_When_Settings_File_Has_Empty_OpenApiPaths()
     {
         var tempSettingsFile = Path.GetTempFileName();

@@ -91,14 +91,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
-                !settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
-                !File.Exists(settings.OpenApiPath))
-            {
-                settings.OpenApiPath = Path.Combine(
-                    Path.GetDirectoryName(file.Path)!,
-                    settings.OpenApiPath);
-            }
+            ResolveRelativeSpecPaths(file.Path, settings);
 
             if (settings.UseIsoDateFormat &&
                 settings.CodeGeneratorSettings?.DateFormat is not null)
@@ -161,6 +154,36 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
             return null;
         }
+    }
+
+    private static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings settings)
+    {
+        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
+            !IsUrl(settings.OpenApiPath) &&
+            !Path.IsPathRooted(settings.OpenApiPath))
+        {
+            settings.OpenApiPath = Path.GetFullPath(Path.Combine(settingsFileDirectory, settings.OpenApiPath));
+        }
+
+        if (settings.OpenApiPaths is { Length: > 0 })
+        {
+            for (var i = 0; i < settings.OpenApiPaths.Length; i++)
+            {
+                var path = settings.OpenApiPaths[i];
+                if (!IsUrl(path) && !Path.IsPathRooted(path))
+                {
+                    settings.OpenApiPaths[i] = Path.GetFullPath(Path.Combine(settingsFileDirectory, path));
+                }
+            }
+        }
+    }
+
+    private static bool IsUrl(string path)
+    {
+        return Uri.TryCreate(path, UriKind.Absolute, out var uriResult) &&
+               (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
 
     internal static GeneratedDiagnostic CreateNoRefitterFilesFoundDiagnostic() =>

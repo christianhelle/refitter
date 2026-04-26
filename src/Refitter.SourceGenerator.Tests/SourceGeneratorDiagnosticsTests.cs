@@ -101,6 +101,65 @@ public class SourceGeneratorDiagnosticsTests
             diagnostic.Message.Contains("bad encoding", StringComparison.Ordinal));
     }
 
+    [Test]
+    public void ResolveRelativeSpecPaths_Should_Normalize_Relative_OpenApiPaths_Using_Refitter_File_Directory()
+    {
+        var workspace = Path.Combine(Path.GetTempPath(), "RefitterSourceGeneratorTests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(workspace);
+
+        try
+        {
+            var specPath = Path.Combine(workspace, "specs", "https-local.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(specPath)!);
+            var settingsPath = Path.Combine(workspace, "relative.refitter");
+            var settings = CreateRefitGeneratorSettings();
+            var settingsType = settings.GetType();
+            settingsType.GetProperty("OpenApiPaths")!.SetValue(settings, new[] { "specs/https-local.json" });
+
+            InvokeResolveRelativeSpecPaths(settingsPath, settings);
+
+            settingsType.GetProperty("OpenApiPaths")!.GetValue(settings)
+                .Should()
+                .BeEquivalentTo(new[] { specPath });
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+            {
+                Directory.Delete(workspace, recursive: true);
+            }
+        }
+    }
+
+    [Test]
+    public void ResolveRelativeSpecPaths_Should_Treat_HttpPrefixed_File_Names_As_Relative_When_Not_Urls()
+    {
+        var workspace = Path.Combine(Path.GetTempPath(), "RefitterSourceGeneratorTests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(workspace);
+
+        try
+        {
+            var specPath = Path.Combine(workspace, "https-local.json");
+            var settingsPath = Path.Combine(workspace, "relative.refitter");
+            var settings = CreateRefitGeneratorSettings();
+            var settingsType = settings.GetType();
+            settingsType.GetProperty("OpenApiPath")!.SetValue(settings, "https-local.json");
+
+            InvokeResolveRelativeSpecPaths(settingsPath, settings);
+
+            settingsType.GetProperty("OpenApiPath")!.GetValue(settings)
+                .Should()
+                .Be(specPath);
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+            {
+                Directory.Delete(workspace, recursive: true);
+            }
+        }
+    }
+
     private static IEnumerable<MetadataReference> GetMetadataReferences() =>
     [
         MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
@@ -188,6 +247,27 @@ public class SourceGeneratorDiagnosticsTests
             diagnostics,
             generatedCodeType.GetProperty("Code")!.GetValue(result!) as string,
             generatedCodeType.GetProperty("HintName")!.GetValue(result!) as string);
+    }
+
+    private static object CreateRefitGeneratorSettings()
+    {
+        var sourceGeneratorAssembly = LoadSourceGeneratorAssembly();
+        var generatorType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator", throwOnError: true)!;
+        var method = generatorType.GetMethod("ResolveRelativeSpecPaths", BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+        var settingsType = method!.GetParameters()[1].ParameterType;
+        return Activator.CreateInstance(settingsType)!;
+    }
+
+    private static void InvokeResolveRelativeSpecPaths(string settingsFilePath, object settings)
+    {
+        var sourceGeneratorAssembly = LoadSourceGeneratorAssembly();
+        var generatorType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator", throwOnError: true)!;
+        var method = generatorType.GetMethod("ResolveRelativeSpecPaths", BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+        method!.Invoke(null, [settingsFilePath, settings]);
     }
 
     private sealed record GenerateCodeResult(
