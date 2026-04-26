@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0-preview.105...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0-preview.106...HEAD)
+
+**Merged pull requests:**
+
+- Harden generation flows [\#1071](https://github.com/christianhelle/refitter/pull/1071) ([christianhelle](https://github.com/christianhelle))
+
+## [2.0.0-preview.106](https://github.com/christianhelle/refitter/tree/2.0.0-preview.106) (2026-04-25)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0-preview.105...2.0.0-preview.106)
 
 **Fixed bugs:**
 
