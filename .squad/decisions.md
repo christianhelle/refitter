@@ -223,3 +223,52 @@
 - Preserve GeneratedDiagnostic as a readonly record struct; retain the explicit ordinal GetHashCode() behavior and handle Sonar S1206 with a targeted suppression plus justification instead of rewriting the type into a manual struct.
 - Final validation recorded for the landed artifact: dotnet build -c Release src\Refitter.slnx --no-restore, dotnet test -c Release --solution src\Refitter.slnx --no-build, and dotnet format --verify-no-changes src\Refitter.slnx --no-restore.
 
+## 2026-04-26
+
+### AI-slop cleanup sequencing
+
+**Verified By:** Ripley
+**Status:** APPROVED
+
+- Start with **docs/help drift** so stale SourceGenerator and MSBuild guidance is corrected before code refactors.
+- Follow with **settings/spec-path normalization** across CLI and source-generator entry points, then centralize the shared **`GeneratedFile:` marker contract**.
+- Keep **test-surface cleanup** ahead of deeper generator dedup so regression coverage is stronger before touching contract-sensitive code.
+- Leave **core generator dedup** for the last batch and treat `OpenApiDocumentFactory` merge semantics, auth-header CLI compatibility, source-generator diagnostic contracts, and single-file `GeneratedCode` metadata behavior as reviewer-gated cleanup seams.
+- Current squad capacity is sufficient for docs, tests, tooling, and settings cleanup; bring in a specialized C# reviewer only for the later core generator / `ParameterExtractor` dedup lane.
+
+### Cleanup-safe baseline and coverage guardrails
+
+**Verified By:** Lambert (Tester)
+**Status:** VERIFIED
+
+- Baseline validation is healthy on this machine: restore, release build, solution tests, and format verification all passed.
+- Treat the Codecov command in `.github\workflows\codecov.yml` as the authoritative cleanup coverage lane; it targets `src\Refitter.Tests\Refitter.Tests.csproj`.
+- Prefer narrow branch-coverage gains before production edits in `src\Refitter.Core\ContractTypeSuffixApplier.cs`, `SchemaCleaner.cs`, `CSharpClientGeneratorFactory.cs`, `XmlDocumentationGenerator.cs`, `IdentifierUtils.cs`, and `src\Refitter\Settings.cs`.
+- Do not use the live-network test surface (`OpenApiDocumentFactoryTests`, `SwaggerPetstoreTests`, `SwaggerPetstoreApizrTests`, `Examples\OpenApiUrlTests`) as a stability signal during cleanup because it remains environment-sensitive.
+- Coverage reports also include `.test-work` runtime-proof artifacts; note them, but prioritize real repository source files first.
+
+### Generator cleanup phasing
+
+**Verified By:** Parker (Core Developer)
+**Status:** APPROVED
+
+- Land generator cleanups in two phases: first trim redundant string/branch duplication already covered by public regressions in `XmlDocumentationGenerator.AppendXmlCommentBlock()` and `ContractTypeSuffixApplier.TypeSuffixRewriter`.
+- Before deeper dedupe, add or tighten compile-backed public regressions for `ParameterExtractor`, multipart generation, and interface-emission behavior.
+- Route any cleanup that deduplicates `RefitGenerator.Generate()` vs `GenerateMultipleFiles()` or the shared method-emission logic across the three interface generators through **Ash review**.
+
+### AI-slop safety review gate
+
+**Verified By:** Ash
+**Status:** REQUIRED
+
+- Treat the safety-sensitive generator and MSBuild cleanup lane as **validation-first** rather than style-first.
+- Require source-generator regressions proving same-directory `.refitter` files with the same `outputFilename` do not collide on `AddSource()` hint names and that `AdditionalText.GetText(...) == null` reports a diagnostic instead of throwing.
+- Require generator regressions for OpenAPI-title-derived identifiers containing `<` / `>` and for ByEndpoint interface names whose internal `I` characters must remain intact.
+- Require MSBuild coverage for `GetInstalledDotnetRuntimes()` timeout/failure handling before claiming the process-launch path is hardened.
+
+### Session directives refresh
+
+**By:** Christian Helle (via Copilot)
+
+- 2026-04-26: Have all agents use GPT-5.5 for the rest of this session only.
+- 2026-04-26: Commit changes as frequent as possible in small logical groups for a detailed progress history.

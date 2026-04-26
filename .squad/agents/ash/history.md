@@ -13,6 +13,9 @@
 - For multipart/query parameter extraction, deduplicate by the emitted C# identifier, not the original OpenAPI key.
 - For source-generator packaging reviews, inspect the packed .nuspec and analyzer payload, not just the .csproj.
 - The minimal safe Swagger 2 nullable-shape fix for #1026 lives in src/Refitter.Core/RefitGenerator.cs as targeted post-processing when NRT is enabled but optional-nullable generation stays opt-in.
+- `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs` still has a same-directory hint-name collision risk because `CreateUniqueHintName(...)` hashes only the parent directory, not the full `.refitter` path.
+- In the source generator, treat `AdditionalText.GetText(...)` as nullable and convert read/encoding failures into diagnostics; null-forgiving it weakens failure reporting.
+- Review gate for the next safety pass: require targeted tests for source-generator hint-name collisions, OpenAPI-title sanitization including `<`/`>`, and MSBuild runtime-discovery timeout behavior before accepting cleanup claims.
 
 ## Core Context
 
@@ -58,4 +61,15 @@
 - Final squad memory keeps Dallas's ParameterExtractor / RefitterGenerateTask cleanups and the source-generator diagnostic-ID cleanup as the approved behavior-preserving Sonar response.
 - The only rejected direction was the first manual-struct S1206 rewrite; Parker's follow-up restored the readonly record struct shape and was the approved final source-generator artifact.
 - Shared validation to cite for the consolidated PR #1070 outcome: dotnet build -c Release src\Refitter.slnx --no-restore, dotnet test -c Release --solution src\Refitter.slnx --no-build, and dotnet format --verify-no-changes src\Refitter.slnx --no-restore.
+
+## 2026-04-26: AI-slop safety triage
+
+- High-confidence source-generator issues from the read-only review: same-directory `.refitter` files can still collide on `AddSource()` hint names, and `file.GetText(cancellationToken)!` can convert input-read failures into opaque crashes instead of diagnostics.
+- High-confidence core-generation issues from the same pass: `RefitMultipleInterfaceGenerator` still derives `QueryParams` types via `interfaceName.Replace("I", string.Empty)`, and `IdentifierUtils.Sanitize()` still misses angle brackets for OpenAPI-title-derived identifiers used by `RefitInterfaceGenerator` and `JsonSerializerContextGenerator`.
+- High-confidence MSBuild issue from the same pass: `RefitterGenerateTask.GetInstalledDotnetRuntimes()` still blocks on `dotnet --list-runtimes` without any timeout, so build hangs remain possible before the guarded process-runner path starts.
+
+## 2026-04-26: Shared cleanup gate context
+
+- Ripley's sequencing and Lambert's green baseline keep docs/help drift as the safe first cleanup lane, but Ash's gate still holds the deeper generator and MSBuild cleanup as validation-first work.
+- Dallas's docs clarification commit `f6374210` landed cleanly, so the next review concern stays on hint-name uniqueness, null-safe source-generator input handling, identifier sanitization, and MSBuild runtime-discovery timeout coverage.
 

@@ -12,6 +12,10 @@
 - **Issue #998 findings (2026-04-16):** MSBuild's first-clean-build path was the real tooling bug; CLI settings loading and the default single-file `Output.cs` behavior were otherwise correct.
 - **PR #1067 tooling proof (2026-04-21):** The most reliable tooling evidence comes from validating real stdout marker contracts and packed artifacts (`.nupkg`/`.nuspec`), not just project metadata or happy-path check runs.
 - **2026-04-25 Linux help-output analysis:** The Ubuntu help failure was a test portability problem caused by raw Spectre.Console ANSI/wrapping noise, not a product regression in the CLI help path.
+- **2026-04-26 tooling audit shortlist:** The best behavior-preserving cleanup seam is the duplicated settings/output-path pipeline split across `src\Refitter\SettingsValidator.cs` and `src\Refitter\GenerateCommand.cs` (`ValidateFilePath`, `ApplySettingsFileDefaults`, both `GetOutputPath` overloads, and `ResolveRelativeSpecPaths`).
+- **2026-04-26 source-generator drift seam:** `src\Refitter.SourceGenerator\Refitter.SourceGenerator.props` auto-includes `**\*.refitter`, but `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs` diagnostic `REFITTER003`, `src\Refitter.SourceGenerator\README.md`, `docs\docfx_project\articles\source-generator.md`, and `README.md` still partly speak as if consumers must wire `AdditionalFiles` manually.
+- **2026-04-26 tooling test smell:** `src\Refitter.Tests\GenerateCommandTests.cs`, `src\Refitter.Tests\Examples\SettingsFileOutputPathTests.cs`, and `src\Refitter.Tests\RefitterGenerateTaskTests.cs` lean heavily on reflection into private helpers and duplicated process/workspace harness code, which is a high-confidence cleanup target before larger tooling refactors.
+- **2026-04-26 workflow audit note:** `.github\workflows\build.yml`, `msbuild.yml`, `pr.yml`, `smoke-tests.yml`, `regression-tests.yml`, and `production-tests.yml` use `paths-ignore` with negated `!` patterns; GitHub's documented include/exclude model expects `paths` for mixed include/exclude filters, so those trigger rules are a tooling-contract review seam.
 
 ## Core Context
 
@@ -54,4 +58,10 @@
 - Ash approved Dallas's S1066, S3267, and S3358 cleanups plus the distinct diagnostic-ID/source-title cleanup as the safe parts of the Sonar response.
 - Ash rejected Dallas's first S1206 direction because converting GeneratedDiagnostic away from a readonly record struct was risky semantic churn for an analyzer-only complaint.
 - Parker superseded only the source-generator S1206 artifact; the final merged state keeps Dallas's ParameterExtractor and RefitterGenerateTask changes alongside Parker's approved record-struct suppression revision.
+
+## 2026-04-26: Shared AI-slop cleanup context
+
+- Commit `f6374210` (`docs: clarify source generator setup`) is now the landed docs/help cleanup reference point; the associated narrow validation was reported green.
+- Ripley's triage keeps docs/help drift first, then settings/spec-path normalization, then shared `GeneratedFile:` marker cleanup, which matches Dallas's current tooling/doc seams.
+- Lambert's baseline scan stays green for restore/build/test/format, but live-URL tests remain environment-sensitive and should not be used as tooling stability evidence during cleanup.
 
