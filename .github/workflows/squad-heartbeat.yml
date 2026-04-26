@@ -7,10 +7,6 @@ name: Squad Heartbeat (Ralph)
 # Run 'squad upgrade' to sync installed copies from source templates.
 
 on:
-  schedule:
-    # Every 30 minutes — adjust via cron expression as needed
-    - cron: '*/30 * * * *'
-
   # React to completed work or new squad work
   issues:
     types: [closed, labeled]
@@ -29,7 +25,7 @@ jobs:
   heartbeat:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Check triage script
         id: check-script
@@ -52,7 +48,7 @@ jobs:
 
       - name: Ralph — Apply triage decisions
         if: steps.check-script.outputs.has_script == 'true' && hashFiles('triage-results.json') != ''
-        uses: actions/github-script@v9
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
@@ -104,7 +100,7 @@ jobs:
       # Copilot auto-assign step (uses PAT if available)
       - name: Ralph — Assign @copilot issues
         if: success()
-        uses: actions/github-script@v9
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.COPILOT_ASSIGN_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
