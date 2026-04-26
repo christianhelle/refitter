@@ -89,16 +89,8 @@ internal static class ContractTypeSuffixApplier
         /// </summary>
         public override SyntaxNode? VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var newNode = (ClassDeclarationSyntax)base.VisitClassDeclaration(node)!;
-
-            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
-            {
-                newNode = newNode.WithIdentifier(
-                    SyntaxFactory.Identifier(newName)
-                        .WithTriviaFrom(node.Identifier));
-            }
-
-            return newNode;
+            return ((ClassDeclarationSyntax)base.VisitClassDeclaration(node)!)
+                .WithIdentifier(GetRenamedIdentifier(node.Identifier));
         }
 
         /// <summary>
@@ -106,16 +98,8 @@ internal static class ContractTypeSuffixApplier
         /// </summary>
         public override SyntaxNode? VisitRecordDeclaration(RecordDeclarationSyntax node)
         {
-            var newNode = (RecordDeclarationSyntax)base.VisitRecordDeclaration(node)!;
-
-            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
-            {
-                newNode = newNode.WithIdentifier(
-                    SyntaxFactory.Identifier(newName)
-                        .WithTriviaFrom(node.Identifier));
-            }
-
-            return newNode;
+            return ((RecordDeclarationSyntax)base.VisitRecordDeclaration(node)!)
+                .WithIdentifier(GetRenamedIdentifier(node.Identifier));
         }
 
         /// <summary>
@@ -123,16 +107,8 @@ internal static class ContractTypeSuffixApplier
         /// </summary>
         public override SyntaxNode? VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            var newNode = (StructDeclarationSyntax)base.VisitStructDeclaration(node)!;
-
-            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
-            {
-                newNode = newNode.WithIdentifier(
-                    SyntaxFactory.Identifier(newName)
-                        .WithTriviaFrom(node.Identifier));
-            }
-
-            return newNode;
+            return ((StructDeclarationSyntax)base.VisitStructDeclaration(node)!)
+                .WithIdentifier(GetRenamedIdentifier(node.Identifier));
         }
 
         /// <summary>
@@ -140,16 +116,8 @@ internal static class ContractTypeSuffixApplier
         /// </summary>
         public override SyntaxNode? VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
-            var newNode = (EnumDeclarationSyntax)base.VisitEnumDeclaration(node)!;
-
-            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
-            {
-                newNode = newNode.WithIdentifier(
-                    SyntaxFactory.Identifier(newName)
-                        .WithTriviaFrom(node.Identifier));
-            }
-
-            return newNode;
+            return ((EnumDeclarationSyntax)base.VisitEnumDeclaration(node)!)
+                .WithIdentifier(GetRenamedIdentifier(node.Identifier));
         }
 
         /// <summary>
@@ -182,6 +150,17 @@ internal static class ContractTypeSuffixApplier
             }
 
             return newNode;
+        }
+
+        private SyntaxToken GetRenamedIdentifier(SyntaxToken identifier)
+        {
+            if (typeRenameMap.TryGetValue(identifier.Text, out var newName))
+            {
+                return SyntaxFactory.Identifier(newName)
+                    .WithTriviaFrom(identifier);
+            }
+
+            return identifier;
         }
     }
 }
