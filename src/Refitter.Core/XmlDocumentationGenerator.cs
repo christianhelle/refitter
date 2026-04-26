@@ -249,12 +249,7 @@ public class XmlDocumentationGenerator
         {
             // When working with multiple lines, place the content on a separate line with normalized linebreaks.
             code.AppendLine();
-            foreach (var line in content.Split(
-                new[]
-                {
-                    "\r\n", "\r", "\n"
-                },
-                StringSplitOptions.None))
+            foreach (var line in lines)
                 code.AppendLine($"{indent}/// {line.Trim()}");
 
             code.AppendLine($"{indent}/// </{tagName}>");

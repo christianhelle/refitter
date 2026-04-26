@@ -1049,7 +1049,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return FileExtensionConstants.Refitter;
     }
 
-    private static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
+    internal static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
     {
         var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty;
 
@@ -1077,9 +1077,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
     }
 
-    private static bool IsUrl(string path)
+    internal static bool IsUrl(string path)
     {
-        return path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-               path.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+        return Uri.TryCreate(path, UriKind.Absolute, out var uriResult) &&
+               (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
 }

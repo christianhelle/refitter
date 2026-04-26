@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using FluentAssertions;
 using Microsoft.Build.Framework;
 using Refitter.MSBuild;
@@ -517,6 +518,144 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void GetInstalledDotnetRuntimes_Should_Throw_TimeoutException_When_Runtime_Discovery_Times_Out()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                return new RefitterGenerateTask.ProcessExecutionResult(true, -1);
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<TimeoutException>()
+                .WithMessage("*dotnet --list-runtimes timed out after 500 ms*");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void GetInstalledDotnetRuntimes_Should_Include_Termination_Failure_When_Runtime_Discovery_Cannot_Be_Stopped()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                return new RefitterGenerateTask.ProcessExecutionResult(true, -1, new InvalidOperationException("kill failed"));
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<TimeoutException>()
+                .WithMessage("*dotnet --list-runtimes timed out after 500 ms. Failed to terminate timed-out process: kill failed*")
+                .WithInnerException<InvalidOperationException>()
+                .WithMessage("kill failed");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, logError) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                logError("runtime probe failed");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 23);
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<InvalidOperationException>()
+                .WithMessage("*dotnet --list-runtimes exited with code 23*runtime probe failed*");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero_Without_Error_Output()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 23);
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<InvalidOperationException>()
+                .WithMessage("dotnet --list-runtimes exited with code 23");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Fall_Back_When_Runtime_Discovery_Times_Out()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            var generatedFile = CreateGeneratedFile(workspace);
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                if (startInfo.Arguments == "--list-runtimes")
+                {
+                    return new RefitterGenerateTask.ProcessExecutionResult(true, -1);
+                }
+
+                startInfo.Arguments.Should().Contain("net8.0");
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeTrue();
+            task.GeneratedFiles.Should().ContainSingle().Which.ItemSpec.Should().Be(generatedFile);
+            buildEngine.Messages.Should().Contain(message => message.Contains("Failed to inspect installed .NET runtimes: dotnet --list-runtimes timed out after 500 ms", StringComparison.Ordinal));
+            buildEngine.Messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
     public void Execute_Should_Use_DotNet9_Runtime_When_Available()
     {
         var workspace = CreateWorkspace();
@@ -907,6 +1046,25 @@ public class RefitterGenerateTaskTests
             .Should()
             .BeOfType<RefitterGenerateTask.ProcessExecutionResult>()
             .Subject;
+    }
+
+    private static List<string> InvokeGetInstalledDotnetRuntimes()
+    {
+        var method = typeof(RefitterGenerateTask).GetMethod("GetInstalledDotnetRuntimes", BindingFlags.Static | BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+
+        try
+        {
+            return method!.Invoke(null, [])!
+                .Should()
+                .BeOfType<List<string>>()
+                .Subject;
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            throw;
+        }
     }
 
     private static ProcessStartInfo CreateSleepProcessStartInfo()

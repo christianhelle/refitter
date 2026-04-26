@@ -271,27 +271,39 @@ public class RefitterGenerateTask : MSBuildTask
     private static List<string> GetInstalledDotnetRuntimes()
     {
         var installedRuntimes = new List<string>();
-        using (var process = new Process())
-        {
-            process.StartInfo.FileName = "dotnet";
-            process.StartInfo.Arguments = "--list-runtimes";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-
-            process.Start();
-            using (var reader = process.StandardOutput)
+        var errorLines = new List<string>();
+        var processResult = ProcessRunner(
+            new ProcessStartInfo
             {
-                while (!reader.EndOfStream)
-                {
-                    var line = reader.ReadLine();
-                    if (!string.IsNullOrWhiteSpace(line))
-                    {
-                        installedRuntimes.Add(line);
-                    }
-                }
+                FileName = "dotnet",
+                Arguments = "--list-runtimes",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            },
+            data => AddProcessOutputLine(data, installedRuntimes),
+            data => AddProcessOutputLine(data, errorLines));
+
+        if (processResult.TimedOut)
+        {
+            var timeoutDescription = FormatTimeout(ProcessTimeoutMilliseconds);
+            if (processResult.TerminationException is null)
+            {
+                throw new TimeoutException($"dotnet --list-runtimes timed out after {timeoutDescription}");
             }
-            process.WaitForExit();
+
+            throw new TimeoutException(
+                $"dotnet --list-runtimes timed out after {timeoutDescription}. Failed to terminate timed-out process: {processResult.TerminationException.Message}",
+                processResult.TerminationException);
+        }
+
+        if (processResult.ExitCode != 0)
+        {
+            var errorDetails = errorLines.Count > 0
+                ? $"{Environment.NewLine}{string.Join(Environment.NewLine, errorLines)}"
+                : string.Empty;
+            throw new InvalidOperationException($"dotnet --list-runtimes exited with code {processResult.ExitCode}{errorDetails}");
         }
 
         return installedRuntimes;
@@ -509,6 +521,14 @@ public class RefitterGenerateTask : MSBuildTask
             : null;
 
         return existingGeneratedFiles;
+    }
+
+    private static void AddProcessOutputLine(string? outputLine, ICollection<string> outputLines)
+    {
+        if (!string.IsNullOrWhiteSpace(outputLine))
+        {
+            outputLines.Add(outputLine);
+        }
     }
 
     private static string NormalizeIncludePattern(string path)

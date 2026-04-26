@@ -76,8 +76,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
         try
         {
-            var content = file.GetText(cancellationToken)!;
-            var json = content.ToString();
+            var json = TryReadRefitterFile(file, diagnostics, cancellationToken);
+            if (json is null)
+            {
+                return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+            }
 
             diagnostics.Add(CreateFileContentsDiagnostic(json));
 
@@ -88,14 +91,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
-                !settings.OpenApiPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
-                !File.Exists(settings.OpenApiPath))
-            {
-                settings.OpenApiPath = Path.Combine(
-                    Path.GetDirectoryName(file.Path)!,
-                    settings.OpenApiPath);
-            }
+            ResolveRelativeSpecPaths(file.Path, settings);
 
             if (settings.UseIsoDateFormat &&
                 settings.CodeGeneratorSettings?.DateFormat is not null)
@@ -123,6 +119,29 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         }
     }
 
+    private static string? TryReadRefitterFile(
+        AdditionalText file,
+        List<GeneratedDiagnostic> diagnostics,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var content = file.GetText(cancellationToken);
+            if (content is null)
+            {
+                diagnostics.Add(CreateErrorDiagnostic($"Unable to read .refitter file: {file.Path}"));
+                return null;
+            }
+
+            return content.ToString();
+        }
+        catch (Exception e)
+        {
+            diagnostics.Add(CreateErrorDiagnostic($"Unable to read .refitter file: {file.Path}{Environment.NewLine}{e}"));
+            return null;
+        }
+    }
+
     private static RefitGeneratorSettings? TryDeserialize(string json, List<GeneratedDiagnostic> diagnostics)
     {
         try
@@ -137,11 +156,41 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         }
     }
 
+    private static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings settings)
+    {
+        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
+            !IsUrl(settings.OpenApiPath) &&
+            !Path.IsPathRooted(settings.OpenApiPath))
+        {
+            settings.OpenApiPath = Path.GetFullPath(Path.Combine(settingsFileDirectory, settings.OpenApiPath));
+        }
+
+        if (settings.OpenApiPaths is { Length: > 0 })
+        {
+            for (var i = 0; i < settings.OpenApiPaths.Length; i++)
+            {
+                var path = settings.OpenApiPaths[i];
+                if (!IsUrl(path) && !Path.IsPathRooted(path))
+                {
+                    settings.OpenApiPaths[i] = Path.GetFullPath(Path.Combine(settingsFileDirectory, path));
+                }
+            }
+        }
+    }
+
+    private static bool IsUrl(string path)
+    {
+        return Uri.TryCreate(path, UriKind.Absolute, out var uriResult) &&
+               (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+    }
+
     internal static GeneratedDiagnostic CreateNoRefitterFilesFoundDiagnostic() =>
         new(
             "REFITTER003",
             "No .refitter files found",
-            "No .refitter files found. Ensure they are added to your project as `<AdditionalFiles Include=\"Petstore.refitter\" />`.",
+            "No .refitter files found. Add a `.refitter` file to your project. Refitter.SourceGenerator automatically includes `**/*.refitter` as Roslyn AdditionalFiles via its package props.",
             DiagnosticSeverity.Warning);
 
     internal static GeneratedDiagnostic CreateGeneratedSuccessfullyDiagnostic(string hintName) =>
@@ -210,13 +259,12 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             baseName = RefitterDiagnosticTitle;
         }
 
-        // Create a stable unique suffix from the directory path to prevent collisions
-        // Use the full path, normalize separators, and create a hash-like identifier
-        var directory = Path.GetDirectoryName(refitterFilePath);
-        if (!string.IsNullOrEmpty(directory))
+        // Create a stable unique suffix from the full .refitter path so files in the same
+        // directory can still coexist even when they share the same explicit output filename.
+        if (!string.IsNullOrWhiteSpace(refitterFilePath))
         {
-            // Normalize path separators and compute a stable hash
-            var normalizedPath = directory.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var normalizedPath = Path.GetFullPath(refitterFilePath)
+                .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             var pathHash = GetStableHash(normalizedPath);
             return $"{baseName}_{pathHash}.g.cs";
         }

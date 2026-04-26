@@ -17,6 +17,6 @@ dotnet add package Refit
 
 #### Usage
 
-This source generator generates code based on any [.refitter](refitter-file-format.md) file included to the project as `AdditionalFiles`.
+After installing the package, add one or more [.refitter](refitter-file-format.md) files to your project.
 
-The generator can automatically detect all [.refitter](refitter-file-format.md) files inside the project that referenced the `Refitter.SourceGenerator` package and there is no need to include them manually as `AdditionalFiles`
+`Refitter.SourceGenerator` automatically includes `**/*.refitter` as Roslyn `AdditionalFiles` via its package props, so you do not need to add manual `<AdditionalFiles Include="..." />` entries unless you intentionally override that default behavior.

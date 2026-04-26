@@ -415,6 +415,27 @@ public class GenerateCommandTests
     }
 
     [Test]
+    public void ResolveRelativeSpecPaths_Should_Normalize_Relative_OpenApiPaths_And_Preserve_Urls()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OpenApiPaths = ["specs/first.json", "https://example.com/openapi.json"]
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "ResolveRelativeSpecPaths",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+        method!.Invoke(null, [settingsFilePath, refitSettings]);
+
+        refitSettings.OpenApiPaths.Should().Equal(
+            Path.GetFullPath(Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "specs", "first.json")),
+            "https://example.com/openapi.json");
+    }
+
+    [Test]
     public void Program_Main_Should_Show_Help_When_Invoked_Without_Arguments()
     {
         var result = InvokeProgram([]);

@@ -127,6 +127,13 @@ public class IdentifierUtilsTests
     }
 
     [Test]
+    public void Sanitize_Removes_Angle_Brackets()
+    {
+        var result = "Test<Name>Value".Sanitize();
+        result.Should().Be("TestNameValue");
+    }
+
+    [Test]
     public void Sanitize_Removes_Pipes_And_Slashes()
     {
         var result = "Test|Name/Value\\Item".Sanitize();

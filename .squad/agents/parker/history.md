@@ -12,6 +12,9 @@
 - 2026-04-20: JsonSerializerContextGenerator must use Roslyn syntax analysis instead of regex, emit attributes inside the contracts namespace, register nested types plus closed generic usages, and strip a conventional leading I from serializer-context names.
 - 2026-04-20: GenerateJsonSerializerContext is wired through both RefitGenerator.Generate() and GenerateMultipleFiles(); multi-file generation emits a dedicated {ContextName}.cs file alongside contracts.
 - 2026-04-20: GenerateNullableReferenceTypes must not silently flip GenerateOptionalPropertiesAsNullable; optional-property nullability stays an explicit user choice in CodeGeneratorSettings.
+- 2026-04-26: Lowest-risk generator cleanup candidates are XmlDocumentationGenerator.AppendXmlCommentBlock() redundant multi-line splitting and ContractTypeSuffixApplier.TypeSuffixRewriter's repeated Visit*Declaration renaming branches; both already sit behind strong regression coverage.
+- 2026-04-26: Do not refactor ParameterExtractor or interface-emission flow until compile-backed public regressions cover multipart generation and dynamic-query behavior; ParameterExtractorPrivateCoverageTests currently leans on reflection plus RuntimeHelpers.GetUninitializedObject and is too implementation-coupled to be the only safety net.
+- 2026-04-26: The generator pipeline is duplicated between src\Refitter.Core\RefitGenerator.cs Generate()/GenerateMultipleFiles() and among src\Refitter.Core\RefitInterfaceGenerator.cs, RefitMultipleInterfaceGenerator.cs, and RefitMultipleInterfaceByTagGenerator.cs; treat those as Ash-review cleanups because ordering and emitted signature shape are behavior-sensitive.
 
 ## Core Context
 
@@ -43,3 +46,8 @@
 - Dallas's ParameterExtractor / RefitterGenerateTask cleanups remain the approved behavior-preserving response for S1066, S3267, and S3358.
 - Ash explicitly rejected only the first manual-struct S1206 direction; Parker's revision replaced that one artifact and became the final approved source-generator state.
 - The merged squad decision now records the stable diagnostic-ID contract, the preserved readonly record struct shape, and the shared build/test/format validation for PR #1070.
+
+## 2026-04-26: Shared cleanup context
+
+- Ripley's AI-slop sequencing kept Parker's low-risk-first generator guidance intact: docs/help drift first, then settings/marker cleanup, and only later Ash-reviewed generator dedup.
+- Lambert's baseline scan confirmed the repo is currently green on restore/build/test/format, which keeps compile-backed regression work as the gate before any deeper generator cleanup.

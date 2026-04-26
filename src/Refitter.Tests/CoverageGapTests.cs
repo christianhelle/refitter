@@ -408,6 +408,34 @@ namespace TestNamespace
         result.Should().NotContain($"public enum PetStatus{Environment.NewLine}");
     }
 
+    [Test]
+    public void ContractTypeSuffixApplier_Applies_Suffix_To_Record_And_Struct_Declarations()
+    {
+        const string code = """
+            namespace TestNamespace
+            {
+                public record PetRecord;
+
+                public struct PetStruct
+                {
+                }
+
+                public partial class Container
+                {
+                    public PetRecord Record { get; set; }
+                    public PetStruct Struct { get; set; }
+                }
+            }
+            """;
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        result.Should().Contain("public record PetRecordDto;");
+        result.Should().Contain("public struct PetStructDto");
+        result.Should().Contain("public PetRecordDto Record");
+        result.Should().Contain("public PetStructDto Struct");
+    }
+
     #endregion
 
     #region RefitMultipleInterfaceByTagGenerator Tests
