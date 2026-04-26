@@ -46,6 +46,27 @@ public class JsonSerializerContextGeneratorTests
     }
 
     [Test]
+    public void Generate_Sanitizes_Angle_Brackets_In_OpenApi_Title_For_Context_Name()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Pet
+                {
+                }
+            }
+            """;
+
+        var settings = CreateSettings(interfaceName: "IIgnoredApi");
+        settings.Naming.UseOpenApiTitle = true;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, settings, "Pet<Service>");
+
+        result.Should().Contain("internal partial class PetServiceSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
+        result.Should().NotContain("Pet<Service>SerializerContext");
+    }
+
+    [Test]
     public void Generate_Uses_Contracts_Namespace_And_Strips_Interface_Prefix()
     {
         const string contracts = """
