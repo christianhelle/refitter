@@ -1351,6 +1351,148 @@ paths:
         definitions.Should().ContainSingle().Which.Value.Should().BeSameAs(existingDefinition);
     }
 
+    [Test]
+    public async Task AddReferencedSchemas_Adds_Named_Property_Schema_To_Empty_Definitions()
+    {
+        var rootSchema = new JsonSchema
+        {
+            Type = JsonObjectType.Object
+        };
+        var referencedChildSchema = await JsonSchema.FromJsonAsync("""
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+            """);
+        var referencedChild = new JsonSchemaProperty
+        {
+            Reference = referencedChildSchema
+        };
+        ((NJsonSchema.References.IJsonReferenceBase)referencedChild).ReferencePath = "#/definitions/NamedChild";
+        rootSchema.Properties["child"] = referencedChild;
+
+        var definitions = new Dictionary<string, JsonSchema>();
+
+        InvokeAddReferencedSchemas(definitions, rootSchema);
+
+        definitions.Should().ContainSingle().Which.Key.Should().Be("NamedChild");
+        definitions["NamedChild"].Should().BeSameAs(referencedChildSchema);
+    }
+
+    [Test]
+    public void CreateCanonicalSchemaToken_Preserves_Null_And_NonNull_Extension_Values()
+    {
+        var schema = new JsonSchema
+        {
+            Type = JsonObjectType.Object,
+            ExtensionData = new Dictionary<string, object?>
+            {
+                ["x-null"] = null,
+                ["x-meta"] = new Dictionary<string, object?>
+                {
+                    ["beta"] = 2
+                }
+            }
+        };
+
+        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<JsonSchema>());
+
+        token["extensions"]!["x-null"]!.Type.Should().Be(JTokenType.Null);
+        token["extensions"]!["x-meta"]!["beta"]!.Value<int>().Should().Be(2);
+    }
+
+    [Test]
+    public void AddReferencedSchemas_Adds_Named_Item_Schemas_From_Items_Collection()
+    {
+        var rootSchema = new JsonSchema
+        {
+            Type = JsonObjectType.Array
+        };
+        var referencedItemSchema = new JsonSchema
+        {
+            Type = JsonObjectType.String
+        };
+        var namedItemSchema = new JsonSchemaProperty
+        {
+            Reference = referencedItemSchema
+        };
+        ((NJsonSchema.References.IJsonReferenceBase)namedItemSchema).ReferencePath = "#/definitions/NamedItem";
+        rootSchema.Items.Add(namedItemSchema);
+
+        var definitions = new Dictionary<string, JsonSchema>();
+
+        InvokeAddReferencedSchemas(definitions, rootSchema);
+
+        definitions.Should().ContainSingle().Which.Key.Should().Be("NamedItem");
+        definitions["NamedItem"].Should().BeSameAs(referencedItemSchema);
+    }
+
+    [Test]
+    public async Task ParseJsonDocument_Normalizes_Missing_Components_Schemas_To_Empty_Collections()
+    {
+        var document = await ParseJsonDocument("""
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "Components Coverage API",
+                "version": "1.0"
+              },
+              "paths": {
+                "/orders": {
+                  "get": {
+                    "operationId": "ListOrders",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """);
+
+        document.Components.Should().NotBeNull();
+        document.Components.Schemas.Should().NotBeNull();
+        document.Components.Schemas.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task ParseAndCloneDocument_Normalize_Missing_Tags_To_Empty_Collections()
+    {
+        var parsedDocument = await ParseJsonDocument("""
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "Tag Coverage API",
+                "version": "1.0"
+              },
+              "paths": {
+                "/users": {
+                  "get": {
+                    "operationId": "ListUsers",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """);
+        var clonedDocument = await OpenApiDocument.FromJsonAsync(parsedDocument.ToJson());
+
+        parsedDocument.Tags.Should().NotBeNull();
+        parsedDocument.Tags.Should().BeEmpty();
+        clonedDocument.Tags.Should().NotBeNull();
+        clonedDocument.Tags.Should().BeEmpty();
+    }
+
     private static Task<OpenApiDocument> ParseJsonDocument(string json)
         => OpenApiDocument.FromJsonAsync(json);
 
