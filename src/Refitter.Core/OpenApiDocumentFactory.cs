@@ -59,13 +59,7 @@ public static class OpenApiDocumentFactory
     private static OpenApiDocument Merge(OpenApiDocument[] documents)
     {
         var baseDocument = OpenApiDocument.FromJsonAsync(documents[0].ToJson(documents[0].SchemaType)).GetAwaiter().GetResult();
-        var tags = baseDocument.Tags;
-        HashSet<string>? tagNames = null;
-
-        if (tags != null)
-        {
-            tagNames = new HashSet<string>(tags.Select(t => t.Name), StringComparer.Ordinal);
-        }
+        var tagNames = new HashSet<string>(baseDocument.Tags.Select(t => t.Name), StringComparer.Ordinal);
 
         for (var i = 1; i < documents.Length; i++)
         {
@@ -75,7 +69,7 @@ public static class OpenApiDocumentFactory
                 MergeIfMissingOrThrowOnConflict(baseDocument.Paths, path.Key, path.Value, "path");
             }
 
-            if (document.Components?.Schemas != null)
+            if (document.Components.Schemas.Count > 0)
             {
                 foreach (var schema in document.Components.Schemas)
                 {
@@ -99,10 +93,8 @@ public static class OpenApiDocumentFactory
                 }
             }
 
-            if (document.Tags != null)
+            if (document.Tags.Count > 0)
             {
-                baseDocument.Tags ??= [];
-                tagNames ??= new HashSet<string>(baseDocument.Tags.Select(t => t.Name), StringComparer.Ordinal);
                 foreach (var tag in document.Tags)
                 {
                     if (tagNames.Add(tag.Name))
