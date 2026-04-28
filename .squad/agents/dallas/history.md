@@ -8,6 +8,8 @@
 
 ## Learnings
 
+- **2026-04-28T15:21:48.369+02:00 e-conomic multi-spec tooling verdict:** `test\economic.refitter` parses correctly and resolves both relative `openApiPaths`; CLI/MSBuild/source-generator all reach core multi-document merge, where duplicate equivalent schemas (`Error`, then `ProblemDetails`) trigger the fail-fast merge path before validation, so `--skip-validation` cannot help.
+
 - Team initialized on 2026-04-16.
 - **2026-04-28 issue #1045 tooling verdict:** current HEAD CLI accepts `.refitter` files that use only `openApiPaths`; the quoted `'openApiPath' is required` failure string is stale pre-#1057 behavior, while the remaining normalization gap is a core/library consistency concern rather than a current CLI/MSBuild break.
 - **Issue #998 findings (2026-04-16):** MSBuild's first-clean-build path was the real tooling bug; CLI settings loading and the default single-file `Output.cs` behavior were otherwise correct.
@@ -65,4 +67,12 @@
 - Commit `f6374210` (`docs: clarify source generator setup`) is now the landed docs/help cleanup reference point; the associated narrow validation was reported green.
 - Ripley's triage keeps docs/help drift first, then settings/spec-path normalization, then shared `GeneratedFile:` marker cleanup, which matches Dallas's current tooling/doc seams.
 - Lambert's baseline scan stays green for restore/build/test/format, but live-URL tests remain environment-sensitive and should not be used as tooling stability evidence during cleanup.
+
+
+## 2026-04-28: e-conomic Multi-Spec Tooling Validation (PRIMARY FIX IN CORE)
+- `test\economic.refitter` parses correctly, resolves both relative `openApiPaths` under `test\OpenAPI\v3.0\`, each spec generates independently.
+- CLI/MSBuild/source-generator all reach core merge path where duplicate equivalent schemas (`Error`, `ProblemDetails`) trigger fail-fast before validation.
+- Root cause confirmed in `Refitter.Core` not tooling; `--skip-validation` cannot help because merge happens before validation.
+- Proposal: primary fix belongs in core merge semantics (allow duplicate paths/schemas when semantically equivalent); do not split `.refitter` into multiple generation runs.
+- Tooling follow-up (post-core-fix): improve CLI error guidance for merge failures, add `openApiPaths` regression coverage, add relative-path resolution tests, add merge-failure diagnostic tests.
 

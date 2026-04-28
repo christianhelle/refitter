@@ -272,3 +272,49 @@
 
 - 2026-04-26: Have all agents use GPT-5.5 for the rest of this session only.
 - 2026-04-26: Commit changes as frequent as possible in small logical groups for a detailed progress history.
+
+## 2026-04-28
+
+### e-conomic Multi-Spec OpenAPI Merge Failure
+
+**Leads:** Ripley (analysis), Parker (core finding), Dallas (tooling validation)  
+**Tester:** Lambert  
+**Status:** TRIAGED AND APPROVED FOR FIX
+
+#### Findings
+
+- `test\economic.refitter` triggers merge failure in `OpenApiDocumentFactory.Merge()` while combining `economic-products.json` and `economic-webhooks.json`.
+- Exception: `InvalidOperationException: Cannot merge OpenAPI documents because a duplicate schema 'Error' was found.`
+- Root cause: `AreEquivalent()` calls `Serializer.Serialize()` on NSwag/NJsonSchema objects; object-cycle behavior returns `false` for semantically identical schemas.
+- Both `Error` and `ProblemDetails` are duplicated and textually equivalent in source JSON; merge fails at `Error` first.
+- Issue is **not** in `.refitter` parsing, path resolution, or individual spec generation—each spec generates successfully in isolation.
+- CLI, source generator, and MSBuild all reach the same merge failure point before code output.
+
+#### Fix Ownership and Scope
+
+**Primary owner:** `Refitter.Core` → `src\Refitter.Core\OpenApiDocumentFactory.cs` → `MergeIfMissingOrThrowOnConflict()` / `AreEquivalent()`
+
+- Replace `AreEquivalent()` with OpenAPI-aware semantic equivalence check (use NSwag `ToJson()` or canonical JSON representation).
+- Keep fail-fast policy for **genuinely conflicting** duplicate path/schema/definition/security entries.
+- Keep clone-first/non-mutating merge behavior.
+- Do **not** edit e-conomic OpenAPI specs; do **not** rename schemas in merge.
+
+#### Approved Test Coverage and Gates
+
+1. Add `OpenApiDocumentFactoryMergeTests`:
+   - `Merge_With_Equivalent_Duplicate_Schema_Does_Not_Throw` — OpenAPI 3 docs with identical schema key and body; both paths preserved.
+   - Preserve existing `Merge_With_Schema_Collision_Throws_And_Does_Not_Mutate_Inputs` for conflicts.
+   - Optional e-conomic-shaped regression for `Error` schema with descriptions, nullable properties, extensions, `additionalProperties: false`.
+
+2. Compile-backed regression: two specs with identical common error schema and distinct paths; assert generation succeeds and generated code builds.
+
+3. Run generated-code validation for `test\economic.refitter` after merge fix; triage any post-merge generation failure separately.
+
+4. Existing merge-collision tests must continue passing.
+
+#### Constraints
+
+- Preserve relative-path behavior across CLI and source generator.
+- Keep `openApiPaths` semantics consistent.
+- OpenAPI 3 `components.schemas` and Swagger 2 `definitions` equivalence must remain aligned.
+- Do not hide genuine schema differences in comparison.

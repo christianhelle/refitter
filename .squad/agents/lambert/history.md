@@ -8,6 +8,8 @@
 
 ## Learnings
 
+- **2026-04-28T15:21:48.369+02:00 e-conomic multi-spec repro:** `test\economic.refitter` fails during generation, not compilation, because `economic-products.json` and `economic-webhooks.json` both define identical `Error` and `ProblemDetails` component schemas; current merge logic throws on the first duplicate schema key (`Error`). Regression coverage should distinguish identical shared schemas from conflicting schema collisions.
+
 - Team initialized on 2026-04-16.
 - **2026-04-28T12:02:17.298+02:00 issue #1045 evidence split:** Current HEAD already covers `.refitter` `openApiPaths` validation/execution and direct `RefitGenerator.CreateAsync(settings)` multi-spec usage. The reliable tester posture is to separate the CLI/settings-file claim from the direct-core-consumer claim, because they need different proofs and the current code/test matrix supports neither regression at HEAD.
 - **2026-04-25 CLI help repro:** src\Refitter\Program.cs intentionally rewrites a no-argument invocation to --help, exits 0, and emits Spectre.Console.Cli help output. Tests in src\Refitter.Tests\GenerateCommandTests.cs should assert semantic help markers like usage, sections, and option names rather than exact formatter-driven spacing.
@@ -71,3 +73,13 @@
 
 - **2026-04-26 final revalidation after cleanup landing:** Current HEAD is green again on the trusted loop: `dotnet restore src\Refitter.slnx`, `dotnet build -c Release src\Refitter.slnx --no-restore`, `dotnet test -c Release src\Refitter.slnx --no-build`, and `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`. The solution test pass now reports 1918 succeeded / 0 failed, and the trusted coverage lane (`dotnet test --project src\Refitter.Tests\Refitter.Tests.csproj -c Release --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml`) passed 1862 / 1862 with `Refitter.Core.dll` 95.05% line / 96.47% block, `refitter.dll` 97.10% / 99.11%, `Refitter.MSBuild.dll` back to 100% / 100%, and generated `RuntimeProof.dll` unchanged at 80.93% / 71.58%.
 
+## 2026-04-28: e-conomic Multi-Spec Merge Failure Repro (APPROVED FOR FIX)
+- CLI failure repro: `dotnet .\src\Refitter\bin\Release\net9.0\refitter.dll --settings-file test\economic.refitter --no-banner --no-logging --simple-output`
+- Failure: `InvalidOperationException: Cannot merge OpenAPI documents because a duplicate schema 'Error' was found.`
+- Root cause: `economic-products.json` and `economic-webhooks.json` both define identical `Error` and `ProblemDetails` component schemas; current merge throws on first duplicate.
+- Approved test coverage plan:
+  1. `OpenApiDocumentFactoryMergeTests`: add `Merge_With_Equivalent_Duplicate_Schema_Does_Not_Throw` test (OpenAPI 3 docs with identical schema key/body); preserve collision conflict tests
+  2. Optional e-conomic-shaped regression for `Error` schema with descriptions, nullable properties, extensions, `additionalProperties: false`
+  3. Compile-backed regression: two specs with identical error schema and distinct paths; assert generation succeeds and code builds
+  4. Post-fix generated-code validation for `test\economic.refitter`; triage any post-merge generation failures separately
+- Regression gates: existing merge-collision tests must continue passing

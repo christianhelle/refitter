@@ -16,6 +16,7 @@
 - 2026-04-26: Do not refactor ParameterExtractor or interface-emission flow until compile-backed public regressions cover multipart generation and dynamic-query behavior; ParameterExtractorPrivateCoverageTests currently leans on reflection plus RuntimeHelpers.GetUninitializedObject and is too implementation-coupled to be the only safety net.
 - 2026-04-26: The generator pipeline is duplicated between src\Refitter.Core\RefitGenerator.cs Generate()/GenerateMultipleFiles() and among src\Refitter.Core\RefitInterfaceGenerator.cs, RefitMultipleInterfaceGenerator.cs, and RefitMultipleInterfaceByTagGenerator.cs; treat those as Ash-review cleanups because ordering and emitted signature shape are behavior-sensitive.
 - 2026-04-28T12:02:17.298+02:00: Issue #1045 is outdated at current HEAD for Refitter.Core. RefitGenerator.CreateAsync() leaves RefitGeneratorSettings.OpenApiPath null when only OpenApiPaths is supplied, but the core path loader branches on OpenApiPaths first and no downstream Refitter.Core consumer dereferences OpenApiPath afterward; mutating OpenApiPath inside core would be an observable settings-semantics change that conflicts with existing regression expectations.
+- 2026-04-28T15:21:48.369+02:00: e-conomic multi-spec generation fails before code emission in OpenApiDocumentFactory.Merge() on duplicate schema Error; the vendor specs define identical Error schemas, but AreEquivalent() uses System.Text.Json Serializer.Serialize() on NJsonSchema objects, which can hit object cycles and incorrectly treats equivalent shared schemas as conflicts.
 
 ## Core Context
 
@@ -52,3 +53,11 @@
 
 - Ripley's AI-slop sequencing kept Parker's low-risk-first generator guidance intact: docs/help drift first, then settings/marker cleanup, and only later Ash-reviewed generator dedup.
 - Lambert's baseline scan confirmed the repo is currently green on restore/build/test/format, which keeps compile-backed regression work as the gate before any deeper generator cleanup.
+
+## 2026-04-28: e-conomic Multi-Spec Merge Failure Analysis (APPROVED FOR FIX)
+- e-conomic failure is `OpenApiDocumentFactory.Merge()` throwing on duplicate equivalent schemas (`Error`, `ProblemDetails`).
+- Root cause: `AreEquivalent()` uses `System.Text.Json Serializer.Serialize()` on NJsonSchema objects; object cycles cause false-negative on identical schemas.
+- Proposed fix: replace `AreEquivalent()` with OpenAPI-aware canonical comparison using NSwag `ToJson()` or equivalent; keep fail-fast for genuine conflicts.
+- Implementation file: `src\Refitter.Core\OpenApiDocumentFactory.cs` → `MergeIfMissingOrThrowOnConflict()` / `AreEquivalent()`
+- Test coverage: merge equivalence tests, e-conomic-shaped regressions, compile-backed generation validation
+- Constraints: preserve clone-first/non-mutating merge, don't rename schemas, keep relative-path behavior across tooling surfaces
