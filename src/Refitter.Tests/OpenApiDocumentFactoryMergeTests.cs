@@ -530,6 +530,151 @@ paths:
     }
 
     [Test]
+    public async Task Merge_With_Equivalent_Recursive_Schema_Duplicate_Ignores_Duplicate()
+    {
+        const string baseSpec = """
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "Base API",
+                "version": "1.0"
+              },
+              "paths": {
+                "/nodes": {
+                  "get": {
+                    "operationId": "ListNodes",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/Node"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "components": {
+                "schemas": {
+                  "Node": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "next": {
+                        "$ref": "#/components/schemas/Node"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        const string secondSpec = """
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "Second API",
+                "version": "1.0"
+              },
+              "paths": {
+                "/linked-list": {
+                  "get": {
+                    "operationId": "GetLinkedList",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/Node"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "components": {
+                "schemas": {
+                  "Node": {
+                    "properties": {
+                      "next": {
+                        "$ref": "#/components/schemas/Node"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  }
+                }
+              }
+            }
+            """;
+
+        var baseDocument = await ParseJsonDocument(baseSpec);
+        var secondDocument = await ParseJsonDocument(secondSpec);
+
+        var merged = InvokeMerge(baseDocument, secondDocument);
+
+        merged.Paths.Should().ContainKeys("/nodes", "/linked-list");
+        merged.Components.Schemas.Should().ContainSingle().Which.Key.Should().Be("Node");
+        baseDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/nodes");
+        secondDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/linked-list");
+    }
+
+    [Test]
+    public async Task Merge_With_Equivalent_Swagger2_Definition_Duplicate_Ignores_Duplicate()
+    {
+        var target = new Dictionary<string, JsonSchema>
+        {
+            ["ProblemDetails"] = await JsonSchema.FromJsonAsync("""
+                {
+                  "type": "object",
+                  "required": [ "title" ],
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  }
+                }
+                """)
+        };
+        var incoming = await JsonSchema.FromJsonAsync("""
+            {
+              "properties": {
+                "status": {
+                  "format": "int32",
+                  "type": "integer"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [ "title" ],
+              "type": "object"
+            }
+            """);
+
+        InvokeMergeIfMissingOrThrowOnConflict(target, "ProblemDetails", incoming, "definition");
+
+        target.Should().ContainSingle().Which.Key.Should().Be("ProblemDetails");
+        target["ProblemDetails"].Properties.Should().ContainKeys("title", "status");
+    }
+
+    [Test]
     public async Task Merge_With_Collisions_Throws_And_Does_Not_Mutate_Inputs()
     {
         const string baseSpec = """
