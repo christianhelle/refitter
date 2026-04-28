@@ -1,8 +1,0 @@
-{
-  "openApiPaths": [
-    "OpenAPI/v3.0/economic-products.json",
-    "OpenAPI/v3.0/economic-webhooks.json"
-  ],
-  "namespace": "Economic",
-  "outputFolder": "GeneratedCode"
-}
