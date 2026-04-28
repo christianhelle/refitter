@@ -9,6 +9,7 @@
 ## Learnings
 
 - Team initialized on 2026-04-16.
+- **2026-04-28 issue #1045 tooling verdict:** current HEAD CLI accepts `.refitter` files that use only `openApiPaths`; the quoted `'openApiPath' is required` failure string is stale pre-#1057 behavior, while the remaining normalization gap is a core/library consistency concern rather than a current CLI/MSBuild break.
 - **Issue #998 findings (2026-04-16):** MSBuild's first-clean-build path was the real tooling bug; CLI settings loading and the default single-file `Output.cs` behavior were otherwise correct.
 - **PR #1067 tooling proof (2026-04-21):** The most reliable tooling evidence comes from validating real stdout marker contracts and packed artifacts (`.nupkg`/`.nuspec`), not just project metadata or happy-path check runs.
 - **2026-04-25 Linux help-output analysis:** The Ubuntu help failure was a test portability problem caused by raw Spectre.Console ANSI/wrapping noise, not a product regression in the CLI help path.

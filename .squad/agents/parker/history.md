@@ -15,6 +15,7 @@
 - 2026-04-26: Lowest-risk generator cleanup candidates are XmlDocumentationGenerator.AppendXmlCommentBlock() redundant multi-line splitting and ContractTypeSuffixApplier.TypeSuffixRewriter's repeated Visit*Declaration renaming branches; both already sit behind strong regression coverage.
 - 2026-04-26: Do not refactor ParameterExtractor or interface-emission flow until compile-backed public regressions cover multipart generation and dynamic-query behavior; ParameterExtractorPrivateCoverageTests currently leans on reflection plus RuntimeHelpers.GetUninitializedObject and is too implementation-coupled to be the only safety net.
 - 2026-04-26: The generator pipeline is duplicated between src\Refitter.Core\RefitGenerator.cs Generate()/GenerateMultipleFiles() and among src\Refitter.Core\RefitInterfaceGenerator.cs, RefitMultipleInterfaceGenerator.cs, and RefitMultipleInterfaceByTagGenerator.cs; treat those as Ash-review cleanups because ordering and emitted signature shape are behavior-sensitive.
+- 2026-04-28T12:02:17.298+02:00: Issue #1045 is outdated at current HEAD for Refitter.Core. RefitGenerator.CreateAsync() leaves RefitGeneratorSettings.OpenApiPath null when only OpenApiPaths is supplied, but the core path loader branches on OpenApiPaths first and no downstream Refitter.Core consumer dereferences OpenApiPath afterward; mutating OpenApiPath inside core would be an observable settings-semantics change that conflicts with existing regression expectations.
 
 ## Core Context
 

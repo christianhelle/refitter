@@ -9,6 +9,7 @@
 ## Learnings
 
 - Team initialized on 2026-04-16.
+- **2026-04-28T12:02:17.298+02:00 issue #1045 evidence split:** Current HEAD already covers `.refitter` `openApiPaths` validation/execution and direct `RefitGenerator.CreateAsync(settings)` multi-spec usage. The reliable tester posture is to separate the CLI/settings-file claim from the direct-core-consumer claim, because they need different proofs and the current code/test matrix supports neither regression at HEAD.
 - **2026-04-25 CLI help repro:** src\Refitter\Program.cs intentionally rewrites a no-argument invocation to --help, exits 0, and emits Spectre.Console.Cli help output. Tests in src\Refitter.Tests\GenerateCommandTests.cs should assert semantic help markers like usage, sections, and option names rather than exact formatter-driven spacing.
 - **2026-04-25 Linux help-test follow-up:** GitHub Actions on Ubuntu still showed the semantic help text, but the raw redirected Spectre output did not satisfy the single regex assertion. The safe regression contract is to normalize console control sequences/line endings first and then assert semantic help markers (`USAGE`, usage text, sections, known option names).
 - **PR #1064 / #1057 testing pattern:** When blocker work is in flux, Lambert's safest lane is minimal repro specs plus compilation gates, then focused test reruns once the implementing lane lands.

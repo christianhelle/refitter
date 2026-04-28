@@ -9,6 +9,7 @@
 ## Learnings
 
 - Team initialized on 2026-04-16.
+- 2026-04-28T12:02:17.298+02:00: Issue #1045's new multi-path `.refitter` comment does not reproduce at current HEAD; current CLI validation accepts `openApiPaths`, normalizes relative entries, and the live repro instead surfaced expected merge-collision behavior only when duplicate path specs were used.
 
 ## Core Context
 
