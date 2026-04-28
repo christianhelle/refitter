@@ -61,3 +61,4 @@
 - Implementation file: `src\Refitter.Core\OpenApiDocumentFactory.cs` → `MergeIfMissingOrThrowOnConflict()` / `AreEquivalent()`
 - Test coverage: merge equivalence tests, e-conomic-shaped regressions, compile-backed generation validation
 - Constraints: preserve clone-first/non-mutating merge, don't rename schemas, keep relative-path behavior across tooling surfaces
+- 2026-04-28T15:21:48.369+02:00: Implemented duplicate schema equivalence by comparing normalized NSwag/NJsonSchema JSON tokens, with a schema-specific canonical fallback for referenced/cyclic graphs that cannot serialize standalone. This keeps merge semantics fail-fast for real path/schema/definition/security conflicts while allowing equivalent e-conomic `ProblemDetails`/`Error` duplicates.

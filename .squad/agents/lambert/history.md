@@ -8,6 +8,8 @@
 
 ## Learnings
 
+- **2026-04-28T15:21:48.369+02:00 e-conomic OpenApiPaths regression coverage:** Added intended compile-backed regression coverage for the real `economic-products.json` + `economic-webhooks.json` inputs through `RefitGeneratorSettings.OpenApiPaths`. Current HEAD fails before code generation with duplicate schema `Error`, so the non-empty/buildable assertions become active evidence once the merge fix lands.
+
 - **2026-04-28T15:21:48.369+02:00 e-conomic multi-spec repro:** `test\economic.refitter` fails during generation, not compilation, because `economic-products.json` and `economic-webhooks.json` both define identical `Error` and `ProblemDetails` component schemas; current merge logic throws on the first duplicate schema key (`Error`). Regression coverage should distinguish identical shared schemas from conflicting schema collisions.
 
 - Team initialized on 2026-04-16.
@@ -83,3 +85,5 @@
   3. Compile-backed regression: two specs with identical error schema and distinct paths; assert generation succeeds and code builds
   4. Post-fix generated-code validation for `test\economic.refitter`; triage any post-merge generation failures separately
 - Regression gates: existing merge-collision tests must continue passing
+
+- **2026-04-28T15:21:48.369+02:00 e-conomic multi-spec merge final validation:** Release build, focused `OpenApiDocumentFactoryMergeTests` (15 tests), focused `Issue1016_MultiSpecSchemaMergeTests` (7 tests), full Release solution tests, format verification, and the real `test\economic.refitter` CLI generation all passed. The required CLI command generated `test\GeneratedCode\economic.cs` successfully from `economic-products.json` + `economic-webhooks.json` without duplicate schema merge failures.
