@@ -10,7 +10,7 @@ namespace Refitter.Tests.RegressionTests;
 /// Regression tests for Issue #1035: XML doc emission does not escape user-supplied parameter / dynamic-querystring descriptions
 /// Validates that parameter descriptions containing XML-unsafe characters (&, <, >) are properly escaped in generated XML documentation
 /// </summary>
-public class Issue1035_XmlDocEscapingTests
+public class XmlDocEscapingTests
 {
     private const string SpecWithUnsafeParameterDescription = @"
 {

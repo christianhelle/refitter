@@ -16,6 +16,7 @@
 - `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs` still has a same-directory hint-name collision risk because `CreateUniqueHintName(...)` hashes only the parent directory, not the full `.refitter` path.
 - In the source generator, treat `AdditionalText.GetText(...)` as nullable and convert read/encoding failures into diagnostics; null-forgiving it weakens failure reporting.
 - Review gate for the next safety pass: require targeted tests for source-generator hint-name collisions, OpenAPI-title sanitization including `<`/`>`, and MSBuild runtime-discovery timeout behavior before accepting cleanup claims.
+- 2026-04-28: Approved Parker/Lambert e-conomic multi-spec merge fix after verifying canonical JSON-token equivalence accepts duplicate recursive/shared schemas, conflicting duplicate path/schema/definition/security entries still fail fast, and focused net10.0 TUnit coverage passes.
 
 ## Core Context
 

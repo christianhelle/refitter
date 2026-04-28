@@ -272,3 +272,81 @@
 
 - 2026-04-26: Have all agents use GPT-5.5 for the rest of this session only.
 - 2026-04-26: Commit changes as frequent as possible in small logical groups for a detailed progress history.
+
+## 2026-04-28
+
+### e-conomic Multi-Spec OpenAPI Merge Failure
+
+**Leads:** Ripley (analysis), Parker (core finding), Dallas (tooling validation)  
+**Tester:** Lambert  
+**Status:** TRIAGED AND APPROVED FOR FIX
+
+#### Findings
+
+- `test\economic.refitter` triggers merge failure in `OpenApiDocumentFactory.Merge()` while combining `economic-products.json` and `economic-webhooks.json`.
+- Exception: `InvalidOperationException: Cannot merge OpenAPI documents because a duplicate schema 'Error' was found.`
+- Root cause: `AreEquivalent()` calls `Serializer.Serialize()` on NSwag/NJsonSchema objects; object-cycle behavior returns `false` for semantically identical schemas.
+- Both `Error` and `ProblemDetails` are duplicated and textually equivalent in source JSON; merge fails at `Error` first.
+- Issue is **not** in `.refitter` parsing, path resolution, or individual spec generation—each spec generates successfully in isolation.
+- CLI, source generator, and MSBuild all reach the same merge failure point before code output.
+
+#### Fix Ownership and Scope
+
+**Primary owner:** `Refitter.Core` → `src\Refitter.Core\OpenApiDocumentFactory.cs` → `MergeIfMissingOrThrowOnConflict()` / `AreEquivalent()`
+
+- Replace `AreEquivalent()` with OpenAPI-aware semantic equivalence check (use NSwag `ToJson()` or canonical JSON representation).
+- Keep fail-fast policy for **genuinely conflicting** duplicate path/schema/definition/security entries.
+- Keep clone-first/non-mutating merge behavior.
+- Do **not** edit e-conomic OpenAPI specs; do **not** rename schemas in merge.
+
+#### Approved Test Coverage and Gates
+
+1. Add `OpenApiDocumentFactoryMergeTests`:
+   - `Merge_With_Equivalent_Duplicate_Schema_Does_Not_Throw` — OpenAPI 3 docs with identical schema key and body; both paths preserved.
+   - Preserve existing `Merge_With_Schema_Collision_Throws_And_Does_Not_Mutate_Inputs` for conflicts.
+   - Optional e-conomic-shaped regression for `Error` schema with descriptions, nullable properties, extensions, `additionalProperties: false`.
+
+2. Compile-backed regression: two specs with identical common error schema and distinct paths; assert generation succeeds and generated code builds.
+
+3. Run generated-code validation for `test\economic.refitter` after merge fix; triage any post-merge generation failure separately.
+
+4. Existing merge-collision tests must continue passing.
+
+#### Constraints
+
+- Preserve relative-path behavior across CLI and source generator.
+- Keep `openApiPaths` semantics consistent.
+- OpenAPI 3 `components.schemas` and Swagger 2 `definitions` equivalence must remain aligned.
+- Do not hide genuine schema differences in comparison.
+
+### Ash economic merge review
+
+- Date: 2026-04-28T15:21:48.369+02:00
+
+Verdict: APPROVED
+
+Rationale:
+- `OpenApiDocumentFactory.Merge()` still fails fast on genuinely conflicting duplicate paths, schemas, Swagger 2 definitions, and security schemes while accepting equivalent duplicate schemas.
+- Equivalence is based on normalized OpenAPI/NSwag/NJsonSchema JSON tokens rather than object identity; the recursive schema test covers cyclic schema graphs and the e-conomic regression verifies real multi-spec generation remains buildable.
+- Focused validation passed for `OpenApiDocumentFactoryMergeTests`, `Issue1016_MultiSpecSchemaMergeTests`, and the duplicate-path merge coverage via the net10.0 TUnit executable. A first `dotnet test --filter` attempt failed because this TUnit project does not support that option, not because of product/test failure.
+
+### Lambert e-conomic validation
+
+- Date: 2026-04-28T15:21:48.369+02:00
+- Validation result: PASS
+- Evidence:
+  - `dotnet build -c Release src\Refitter.slnx` passed.
+  - Focused `OpenApiDocumentFactoryMergeTests` passed: 15 succeeded / 0 failed.
+  - Focused `Issue1016_MultiSpecSchemaMergeTests` passed: 7 succeeded / 0 failed.
+  - `dotnet test -c Release src\Refitter.slnx` passed.
+  - `dotnet format --verify-no-changes src\Refitter.slnx` passed.
+  - `dotnet .\src\Refitter\bin\Release\net9.0\refitter.dll --settings-file test\economic.refitter --no-banner --no-logging --simple-output` passed and generated `test\GeneratedCode\economic.cs`.
+- Decision signal: the e-conomic duplicate equivalent schema merge path is validated by focused regression tests, full solution tests, and real CLI generation.
+
+### Parker: e-conomic equivalence implementation
+
+- Date: 2026-04-28T15:21:48.369+02:00
+- Decision: `OpenApiDocumentFactory.AreEquivalent()` should compare normalized OpenAPI/NSwag JSON first and use a narrow NJsonSchema structural fallback only for schemas whose standalone JSON serialization cannot resolve references.
+- Rationale: duplicate schemas from separate vendor specs can be semantically identical while NJsonSchema object graphs contain unresolved/cyclic references; raw serializer comparison falsely reports conflicts.
+- Guardrail: merge still copies missing keys, ignores equivalent duplicates, and throws `InvalidOperationException` for non-equivalent duplicate paths, schemas, definitions, and security schemes.
+- Validation: focused merge tests and Issue1016 multi-spec regression tests passed.

@@ -8,7 +8,7 @@ namespace Refitter.Tests.RegressionTests;
 /// Regression tests for Issue #1051: XmlDocumentationGenerator.DecodeJsonEscapedText mishandles malformed \u sequences
 /// Validates that malformed Unicode escape sequences (e.g., \uZZZZ) are handled correctly without consuming extra characters
 /// </summary>
-public class Issue1051_MalformedUnicodeEscapeTests
+public class MalformedUnicodeEscapeTests
 {
     [Test]
     public void DecodeJsonEscapedText_Handles_Valid_Unicode_Escape()

@@ -10,7 +10,7 @@ namespace Refitter.Tests.RegressionTests;
 /// Regression tests for Issue #1015: NullReferenceException on Swagger 2.0 documents
 /// Validates graceful handling when document.Components is null or document.Components.Schemas is null
 /// </summary>
-public class Issue1015_OneOfDiscriminatorNullRefTests
+public class OneOfDiscriminatorNullRefTests
 {
     // Swagger 2.0 uses "definitions" not "components"
     private const string Swagger20Spec = @"

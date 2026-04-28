@@ -10,6 +10,7 @@
 
 - Team initialized on 2026-04-16.
 - 2026-04-28T12:02:17.298+02:00: Issue #1045's new multi-path `.refitter` comment does not reproduce at current HEAD; current CLI validation accepts `openApiPaths`, normalizes relative entries, and the live repro instead surfaced expected merge-collision behavior only when duplicate path specs were used.
+- 2026-04-28T15:21:48.369+02:00: The e-conomic multi-spec failure is a core `OpenApiDocumentFactory` merge-equivalence problem: `economic-products.json` and `economic-webhooks.json` share equivalent `Error` and `ProblemDetails` component schemas, but current NSwag-object serialization comparison false-negatives and throws before validation/generation.
 
 ## Core Context
 
@@ -32,3 +33,10 @@
 - The best remaining behavior-safe seam is still split settings/spec-path normalization across `src\Refitter\SettingsValidator.cs`, `src\Refitter\GenerateCommand.cs`, and `src\Refitter.SourceGenerator\RefitterSourceGenerator.cs`; those paths still disagree on URL detection and only some flows normalize `OpenApiPaths`.
 - The next best tooling seam is the duplicated `GeneratedFile:` marker contract between `src\Refitter\GenerateCommand.cs` and `src\Refitter.MSBuild\RefitterGenerateTask.cs`.
 - After those two, the backlog drops into lower-priority cleanup/refactor territory such as source-generator info-diagnostic shaping, duplicate test pruning, dead output-model cleanup, and deeper core generator dedup.
+
+## 2026-04-28: e-conomic Multi-Spec Merge Failure (APPROVED FOR FIX)
+- Squad triaged the `test\economic.refitter` failure to `OpenApiDocumentFactory.Merge()` throwing on duplicate equivalent schemas.
+- `economic-products.json` and `economic-webhooks.json` share identical `Error` and `ProblemDetails` component schemas; current `AreEquivalent()` calls `Serializer.Serialize()` on NJsonSchema objects and false-negatives on object cycles.
+- Fix approved: replace `AreEquivalent()` with OpenAPI-aware semantic comparison using NSwag canonical JSON representation; keep fail-fast for genuine conflicts.
+- Gates: merge equivalence tests, e-conomic-shaped regressions, compile-backed validation; existing collision tests must pass.
+- Constraints: preserve relative-path behavior, don't edit specs, don't rename schemas in merge.

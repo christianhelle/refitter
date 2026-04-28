@@ -9,7 +9,7 @@ namespace Refitter.Tests.RegressionTests;
 /// Regression tests for Issue #1016: Multi-spec merge drops schemas
 /// Validates that schemas from all OpenAPI specs are preserved during merge
 /// </summary>
-public class Issue1016_MultiSpecSchemaMergeTests
+public class MultiSpecSchemaMergeTests
 {
     // First spec: has paths but NO components section
     private const string SpecNoComponents = @"
@@ -240,6 +240,28 @@ public class Issue1016_MultiSpecSchemaMergeTests
             .BeTrue("merged code from multiple specs should compile");
     }
 
+    [Test]
+    public async Task Economic_OpenApiPaths_Generate_NonEmpty_Buildable_Code()
+    {
+        var repositoryRoot = GetRepositoryRoot();
+        var productsSpec = Path.Combine(repositoryRoot, "test", "OpenAPI", "v3.0", "economic-products.json");
+        var webhooksSpec = Path.Combine(repositoryRoot, "test", "OpenAPI", "v3.0", "economic-webhooks.json");
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPaths = [productsSpec, webhooksSpec],
+            Namespace = "Economic"
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue("the real e-conomic multi-spec output should compile");
+    }
+
     private static async Task<(string file1, string file2)> CreateSpecFiles(string spec1, string spec2)
     {
         var file1 = await TestFile.CreateSwaggerFile(spec1, "spec1.json");
@@ -265,5 +287,17 @@ public class Issue1016_MultiSpecSchemaMergeTests
         var sut = await RefitGenerator.CreateAsync(settings);
         var generatedCode = sut.Generate();
         return generatedCode;
+    }
+
+    private static string GetRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "README.md")))
+        {
+            directory = directory.Parent;
+        }
+
+        directory.Should().NotBeNull("tests should run from within the repository workspace");
+        return directory!.FullName;
     }
 }

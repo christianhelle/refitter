@@ -10,7 +10,7 @@ namespace Refitter.Tests.RegressionTests;
 /// Regression tests for Issue #1013: ContractTypeSuffix regex corruption
 /// Validates that suffix replacement doesn't corrupt XML comments, string literals, or partial name matches
 /// </summary>
-public class Issue1013_ContractSuffixCorruptionTests
+public class ContractSuffixCorruptionTests
 {
     private const string OpenApiSpec = @"
 {
