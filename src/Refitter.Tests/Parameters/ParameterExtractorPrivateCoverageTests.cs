@@ -5,9 +5,8 @@ using NJsonSchema;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Parameters;
 
 public class ParameterExtractorPrivateCoverageTests
 {

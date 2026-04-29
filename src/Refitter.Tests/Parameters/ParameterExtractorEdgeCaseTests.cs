@@ -2,9 +2,8 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Parameters;
 
 public class ParameterExtractorEdgeCaseTests
 {
@@ -190,7 +189,7 @@ public class ParameterExtractorEdgeCaseTests
     public async Task Multipart_FormData_Mixed_Fields_Builds()
     {
         string generatedCode = await GenerateCodeWithMultipartTextFields();
-        // The multipart code generation may produce duplicates  
+        // The multipart code generation may produce duplicates
         // Skip build test for now as production code needs fixing
         generatedCode.Should().NotBeNullOrWhiteSpace();
         generatedCode.Should().Contain("string title");
