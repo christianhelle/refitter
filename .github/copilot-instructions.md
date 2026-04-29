@@ -111,7 +111,7 @@ images/                 # Project images and assets
 
 ### Unit Testing Patterns
 
-All new code must include unit tests following the pattern used in `Refitter.Tests.Examples` namespace:
+All new code must include unit tests following the pattern used in `Refitter.Tests.Scenarios` namespace:
 
 ```csharp
 public class MyFeatureTests
@@ -170,7 +170,7 @@ dotnet run --project src/Refitter --configuration Release --framework net9.0 -- 
 2. Update `CreateRefitGeneratorSettings()` method in `src/Refitter/GenerateCommand.cs` to map the setting
 3. Add corresponding property to `src/Refitter.Core/Settings/RefitGeneratorSettings.cs`
 4. Implement logic in `src/Refitter.Core/RefitInterfaceGenerator.cs` or related generator classes
-5. Add unit tests in `src/Refitter.Tests/Examples/` following the established pattern
+5. Add unit tests in `src/Refitter.Tests/Scenarios/` following the established pattern
 6. Update README.md documentation with the new option
 
 ### Recent CLI Options Added

@@ -22,15 +22,15 @@ Refitter test projects use TUnit on Microsoft.Testing.Platform. In this repo, `d
 
 ```powershell
 & 'src\Refitter.Tests\bin\Release\net10.0\Refitter.Tests.exe' `
-  --treenode-filter '/*/Refitter.Tests.Examples/GenerateStatusCodeCommentsTests/Generated_Code_With_Unicode_Status_Code_Comments_Can_Build' `
+  --treenode-filter '/*/Refitter.Tests.Scenarios/GenerateStatusCodeCommentsTests/Generated_Code_With_Unicode_Status_Code_Comments_Can_Build' `
   --disable-logo `
   --no-progress
 ```
 
 ### Verified repo-specific examples
 - `/*/Refitter.Tests/XmlDocumentationGeneratorTests/Can_Generate_Method_Throws_With_Readable_Unicode_Status_Code_Comments`
-- `/*/Refitter.Tests.Examples/GenerateStatusCodeCommentsTests/Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments`
-- `/*/Refitter.Tests.Examples/GenerateStatusCodeCommentsTests/Generated_Code_With_Unicode_Status_Code_Comments_Can_Build`
+- `/*/Refitter.Tests.Scenarios/GenerateStatusCodeCommentsTests/Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments`
+- `/*/Refitter.Tests.Scenarios/GenerateStatusCodeCommentsTests/Generated_Code_With_Unicode_Status_Code_Comments_Can_Build`
 - `/*/Refitter.Tests/OpenApiDocumentFactoryMergeTests/*` runs the whole merge test class, which is useful for clone/merge safety checks around `OpenApiDocumentFactory`.
 
 ## Anti-Patterns

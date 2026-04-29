@@ -45,6 +45,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
       <ProjectReference Include="..\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 

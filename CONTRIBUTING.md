@@ -67,7 +67,7 @@ Feature requests are welcome! Please follow the feature request template in `.gi
 ### Testing
 
 - **All new code must include unit tests** that verify the functionality works as expected.
-- **New features must have unit tests similar to those under the Refitter.Tests.Examples namespace**. These tests must:
+- **New features must have unit tests similar to those under the Refitter.Tests.Scenarios namespace**. These tests must:
   - Contain an example OpenAPI specification stored in a const string in the test class
   - Assert on expected patterns in the generated code
   - Verify that the generated code builds successfully
