@@ -2,9 +2,8 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
-namespace Refitter.Tests.Examples;
+namespace Refitter.Tests.Apizr;
 
 public class ApizrWithCancellationTokensTests
 {

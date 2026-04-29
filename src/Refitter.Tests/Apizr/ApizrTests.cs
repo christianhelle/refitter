@@ -2,9 +2,8 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
-namespace Refitter.Tests.Examples;
+namespace Refitter.Tests.Apizr;
 
 public class ApizrTests
 {
@@ -49,14 +48,14 @@ paths:
       tags:
       - 'Foo'
       operationId: 'Get all foos'
-      description: 'Get all foos' 
+      description: 'Get all foos'
       parameters:
         - in: 'query'
           name: 'Title'
           description: 'Foo title'
           nullable: true
           schema:
-            type: 'string'       
+            type: 'string'
       responses:
         '200':
           description: 'successful operation'
@@ -65,7 +64,7 @@ paths:
       tags:
       - 'Bar'
       operationId: 'Get all bars'
-      description: 'Get all bars'      
+      description: 'Get all bars'
       responses:
         '200':
           description: 'successful operation'
@@ -74,7 +73,7 @@ paths:
       tags:
       - 'Bar'
       operationId: 'Get bar details'
-      description: 'Get the details of the specified bar'   
+      description: 'Get the details of the specified bar'
       parameters:
         - in: 'path'
           name: 'id'
