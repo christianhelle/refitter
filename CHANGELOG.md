@@ -13,6 +13,10 @@
 
 - \[v2.0 audit\] Tracking epic — 46 findings since 1.7.3 [\#1057](https://github.com/christianhelle/refitter/issues/1057)
 
+**Merged pull requests:**
+
+- House Keeping [\#1080](https://github.com/christianhelle/refitter/pull/1080) ([christianhelle](https://github.com/christianhelle))
+
 ## [2.0.0-preview.107](https://github.com/christianhelle/refitter/tree/2.0.0-preview.107) (2026-04-28)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0-preview.106...2.0.0-preview.107)
@@ -137,6 +141,7 @@
 - Update Spectre.Console.Cli to v0.55.0 [\#985](https://github.com/christianhelle/refitter/pull/985) ([christianhelle](https://github.com/christianhelle))
 - Update actions/github-script action to v9 [\#984](https://github.com/christianhelle/refitter/pull/984) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.30.8 [\#983](https://github.com/christianhelle/refitter/pull/983) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.30.0 [\#981](https://github.com/christianhelle/refitter/pull/981) ([renovate[bot]](https://github.com/apps/renovate))
 - Update NSwag to v14.7.0 [\#980](https://github.com/christianhelle/refitter/pull/980) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.29.0 [\#976](https://github.com/christianhelle/refitter/pull/976) ([renovate[bot]](https://github.com/apps/renovate))
 
@@ -150,6 +155,7 @@
 
 **Merged pull requests:**
 
+- docs: add smoerijf as a contributor for bug, and code [\#978](https://github.com/christianhelle/refitter/pull/978) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency tunit to 1.22.6 [\#975](https://github.com/christianhelle/refitter/pull/975) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.22.3 [\#974](https://github.com/christianhelle/refitter/pull/974) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dotnet monorepo [\#960](https://github.com/christianhelle/refitter/pull/960) ([renovate[bot]](https://github.com/apps/renovate))
@@ -190,6 +196,7 @@
 - chore\(deps\): update refit monorepo to 10.1.6 [\#961](https://github.com/christianhelle/refitter/pull/961) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency coverlet.collector to 8.0.1 [\#959](https://github.com/christianhelle/refitter/pull/959) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency ruby to v4.0.2 [\#958](https://github.com/christianhelle/refitter/pull/958) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency fluentassertions to 7.2.2 [\#956](https://github.com/christianhelle/refitter/pull/956) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 10.1.5 [\#952](https://github.com/christianhelle/refitter/pull/952) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.19.74 [\#951](https://github.com/christianhelle/refitter/pull/951) ([renovate[bot]](https://github.com/apps/renovate))
 
