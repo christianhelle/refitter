@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.Build.Framework;
 using Refitter.MSBuild;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.MSBuild;
 
 public class RefitterGenerateTaskTests
 {
