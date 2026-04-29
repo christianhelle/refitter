@@ -58,7 +58,7 @@ public static class OpenApiDocumentFactory
 
     private static OpenApiDocument Merge(OpenApiDocument[] documents)
     {
-        var baseDocument = OpenApiDocument.FromJsonAsync(documents[0].ToJson(documents[0].SchemaType)).GetAwaiter().GetResult();
+        var baseDocument = CloneDocument(documents[0]);
         var tagNames = new HashSet<string>(baseDocument.Tags.Select(t => t.Name), StringComparer.Ordinal);
 
         for (var i = 1; i < documents.Length; i++)
@@ -105,6 +105,9 @@ public static class OpenApiDocumentFactory
 
         return baseDocument;
     }
+
+    private static OpenApiDocument CloneDocument(OpenApiDocument document)
+        => OpenApiDocument.FromJsonAsync(document.ToJson()).GetAwaiter().GetResult();
 
     private static void MergeIfMissingOrThrowOnConflict<TValue>(
         IDictionary<string, TValue> target,
