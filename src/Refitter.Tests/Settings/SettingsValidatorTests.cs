@@ -1,17 +1,15 @@
 using System.Text.Json;
 using FluentAssertions;
 using Refitter.Core;
-using Spectre.Console;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Settings;
 
 public class SettingsValidatorTests
 {
     [Test]
     public void Validate_Should_Fail_When_Both_OpenApiPath_And_SettingsFilePath_Are_Empty()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = null,
             SettingsFilePath = null
@@ -26,7 +24,7 @@ public class SettingsValidatorTests
     [Test]
     public void Validate_Should_Fail_When_Both_OpenApiPath_And_SettingsFilePath_Are_Present()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = "openapi.json",
             SettingsFilePath = "settings.refitter"
@@ -41,7 +39,7 @@ public class SettingsValidatorTests
     [Test]
     public void Validate_Should_Succeed_With_Valid_URL()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = "https://petstore3.swagger.io/api/v3/openapi.yaml"
         };
@@ -54,7 +52,7 @@ public class SettingsValidatorTests
     [Test]
     public void Validate_Should_Succeed_With_Valid_Http_URL()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = "http://example.com/openapi.json"
         };
@@ -67,7 +65,7 @@ public class SettingsValidatorTests
     [Test]
     public void Validate_Should_Fail_When_File_Does_Not_Exist()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = "nonexistent-file.json"
         };
@@ -85,7 +83,7 @@ public class SettingsValidatorTests
         try
         {
             File.WriteAllText(tempFile, "{}");
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 OpenApiPath = tempFile
             };
@@ -104,7 +102,7 @@ public class SettingsValidatorTests
     [Test]
     public void Validate_Should_Fail_When_OperationNameTemplate_Missing_Placeholder()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = "https://example.com/openapi.json",
             OperationNameTemplate = "MyTemplate",
@@ -120,7 +118,7 @@ public class SettingsValidatorTests
     [Test]
     public void Validate_Should_Succeed_When_OperationNameTemplate_Has_Placeholder()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = "https://example.com/openapi.json",
             OperationNameTemplate = "{operationName}Async"
@@ -134,7 +132,7 @@ public class SettingsValidatorTests
     [Test]
     public void Validate_Should_Succeed_When_OperationNameTemplate_Missing_Placeholder_With_ByEndpoint()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = "https://example.com/openapi.json",
             OperationNameTemplate = "Execute",
@@ -158,7 +156,7 @@ public class SettingsValidatorTests
             };
             File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
 
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 SettingsFilePath = tempSettingsFile
             };
@@ -187,7 +185,7 @@ public class SettingsValidatorTests
             };
             File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
 
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 SettingsFilePath = tempSettingsFile
             };
@@ -218,7 +216,7 @@ public class SettingsValidatorTests
             };
             File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
 
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 SettingsFilePath = tempSettingsFile,
                 OutputPath = "./custom/Output.cs"
@@ -250,10 +248,10 @@ public class SettingsValidatorTests
             };
             File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
 
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 SettingsFilePath = tempSettingsFile,
-                OutputPath = Settings.DefaultOutputPath
+                OutputPath = Refitter.Settings.DefaultOutputPath
             };
 
             var result = SettingsValidator.Validate(settings);
@@ -270,7 +268,7 @@ public class SettingsValidatorTests
     [Test]
     public void Validate_Should_Succeed_When_OperationNameTemplate_Is_Null()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = "https://example.com/openapi.json",
             OperationNameTemplate = null
@@ -284,7 +282,7 @@ public class SettingsValidatorTests
     [Test]
     public void Validate_Should_Succeed_When_OperationNameTemplate_Is_Empty()
     {
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OpenApiPath = "https://example.com/openapi.json",
             OperationNameTemplate = ""
@@ -307,7 +305,7 @@ public class SettingsValidatorTests
             };
             File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
 
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 SettingsFilePath = tempSettingsFile
             };
@@ -341,7 +339,7 @@ public class SettingsValidatorTests
             };
             File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
 
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 SettingsFilePath = tempSettingsFile
             };
@@ -385,7 +383,7 @@ public class SettingsValidatorTests
             };
             File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
 
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 SettingsFilePath = tempSettingsFile
             };
@@ -418,7 +416,7 @@ public class SettingsValidatorTests
             };
             File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
 
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 SettingsFilePath = tempSettingsFile
             };

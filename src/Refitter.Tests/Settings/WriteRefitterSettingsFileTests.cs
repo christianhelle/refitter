@@ -1,8 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Settings;
 
 public class WriteRefitterSettingsFileTests
 {
@@ -10,9 +9,9 @@ public class WriteRefitterSettingsFileTests
     public void DetermineSettingsFilePath_Returns_Default_Path_When_No_Output_Path_Specified()
     {
         // Arrange
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
-            OutputPath = Settings.DefaultOutputPath
+            OutputPath = Refitter.Settings.DefaultOutputPath
         };
 
         // Act
@@ -28,7 +27,7 @@ public class WriteRefitterSettingsFileTests
         // Arrange
         var customPath = Path.Combine("custom", "output", "MyClient.cs");
         var expectedDir = Path.Combine("custom", "output");
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OutputPath = customPath
         };
@@ -45,7 +44,7 @@ public class WriteRefitterSettingsFileTests
     {
         // Arrange
         var customPath = Path.Combine("custom", "output");
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OutputPath = customPath,
             GenerateMultipleFiles = true
@@ -64,7 +63,7 @@ public class WriteRefitterSettingsFileTests
         // Arrange
         var customPath = Path.Combine("custom", "output");
         var contractsPath = Path.Combine("custom", "contracts");
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OutputPath = customPath,
             ContractsOutputPath = contractsPath
@@ -81,7 +80,7 @@ public class WriteRefitterSettingsFileTests
     public void DetermineSettingsFilePath_Returns_Default_When_Output_Path_Is_Empty()
     {
         // Arrange
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OutputPath = ""
         };
@@ -97,7 +96,7 @@ public class WriteRefitterSettingsFileTests
     public void DetermineSettingsFilePath_Returns_Default_When_Output_Path_Is_Null()
     {
         // Arrange
-        var settings = new Settings
+        var settings = new Refitter.Settings
         {
             OutputPath = null
         };
@@ -119,7 +118,7 @@ public class WriteRefitterSettingsFileTests
         try
         {
             var outputDir = Path.Combine(tempDir, "output");
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 OutputPath = Path.Combine(outputDir, "MyClient.cs"),
                 SimpleOutput = true
@@ -158,7 +157,7 @@ public class WriteRefitterSettingsFileTests
         try
         {
             var outputDir = Path.Combine(tempDir, "output");
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 OutputPath = outputDir,
                 GenerateMultipleFiles = true,
@@ -202,7 +201,7 @@ public class WriteRefitterSettingsFileTests
             var outputDir = Path.Combine(tempDir, "output");
             var contractsDir = Path.Combine(tempDir, "contracts");
 
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 OutputPath = outputDir,
                 ContractsOutputPath = contractsDir,
@@ -247,7 +246,7 @@ public class WriteRefitterSettingsFileTests
         try
         {
             var outputDir = Path.Combine(tempDir, "output");
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 OutputPath = Path.Combine(outputDir, "MyClient.cs"),
                 SimpleOutput = true
@@ -295,7 +294,7 @@ public class WriteRefitterSettingsFileTests
         try
         {
             var outputDir = Path.Combine(tempDir, "nested", "output", "directory");
-            var settings = new Settings
+            var settings = new Refitter.Settings
             {
                 OutputPath = Path.Combine(outputDir, "MyClient.cs"),
                 SimpleOutput = true
