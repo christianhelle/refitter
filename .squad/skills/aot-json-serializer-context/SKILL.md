@@ -35,7 +35,7 @@ Use this skill when Refitter needs to emit `JsonSerializerContext` code for gene
 - `src/Refitter.Core/JsonSerializerContextGenerator.cs`
 - `src/Refitter.Core/RefitGenerator.cs`
 - `src/Refitter.Tests/JsonSerializerContextGeneratorTests.cs`
-- `src/Refitter.Tests/Examples/GenerateJsonSerializerContextTests.cs`
+- `src/Refitter.Tests/Scenarios/GenerateJsonSerializerContextTests.cs`
 
 ## Anti-Patterns
 

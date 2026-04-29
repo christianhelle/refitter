@@ -31,7 +31,7 @@ public double? payMethod_SumBank { get; set; }
 
 ## Question 3: Recommended Test Suite
 
-If feature is enabled, add to `src/Refitter.Tests/Examples/RawPropertyNameGeneratorTests.cs`:
+If feature is enabled, add to `src/Refitter.Tests/Scenarios/RawPropertyNameGeneratorTests.cs`:
 
 ### Test 1: Basic Generation
 ```csharp
