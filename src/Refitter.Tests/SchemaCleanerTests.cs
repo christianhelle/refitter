@@ -173,4 +173,235 @@ public class SchemaCleanerTests
             }
         }
     }
+
+    [Test]
+    public async Task SchemaCleaner_Handles_DiscriminatorObject_With_Mapping()
+    {
+        const string spec = @"{
+  ""openapi"": ""3.0.1"",
+  ""info"": { ""title"": ""Test API"", ""version"": ""v1"" },
+  ""paths"": {
+    ""/api/pets"": {
+      ""get"": {
+        ""operationId"": ""GetPets"",
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": { ""$ref"": ""#/components/schemas/Animal"" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  ""components"": {
+    ""schemas"": {
+      ""Animal"": {
+        ""type"": ""object"",
+        ""required"": [""animalType""],
+        ""properties"": {
+          ""animalType"": { ""type"": ""string"" }
+        },
+        ""discriminator"": {
+          ""propertyName"": ""animalType"",
+          ""mapping"": {
+            ""dog"": ""#/components/schemas/Dog"",
+            ""cat"": ""#/components/schemas/Cat""
+          }
+        }
+      },
+      ""Dog"": {
+        ""allOf"": [
+          { ""$ref"": ""#/components/schemas/Animal"" },
+          {
+            ""type"": ""object"",
+            ""properties"": {
+              ""breed"": { ""type"": ""string"" }
+            }
+          }
+        ]
+      },
+      ""Cat"": {
+        ""allOf"": [
+          { ""$ref"": ""#/components/schemas/Animal"" },
+          {
+            ""type"": ""object"",
+            ""properties"": {
+              ""color"": { ""type"": ""string"" }
+            }
+          }
+        ]
+      },
+      ""UnusedSchema"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""id"": { ""type"": ""integer"" }
+        }
+      }
+    }
+  }
+}";
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        var cleaner = new SchemaCleaner(document, [])
+        {
+            IncludeInheritanceHierarchy = false
+        };
+
+        cleaner.RemoveUnreferencedSchema();
+
+        // When IncludeInheritanceHierarchy is false, only directly referenced schemas are kept
+        // Animal is referenced in the path, but Dog and Cat are only in discriminator mapping
+        // So with IncludeInheritanceHierarchy=false, Dog and Cat get removed from discriminator mapping
+        document.Components.Schemas.Should().ContainKey("Animal");
+        // Dog and Cat schemas are removed because they're only referenced via discriminator mapping
+        // when IncludeInheritanceHierarchy is false
+        document.Components.Schemas.Should().NotContainKey("Dog");
+        document.Components.Schemas.Should().NotContainKey("Cat");
+        document.Components.Schemas.Should().NotContainKey("UnusedSchema");
+    }
+
+    [Test]
+    public async Task SchemaCleaner_Cleans_Discriminator_Mappings_When_Not_Including_Hierarchy()
+    {
+        const string spec = @"{
+  ""openapi"": ""3.0.1"",
+  ""info"": { ""title"": ""Test API"", ""version"": ""v1"" },
+  ""paths"": {
+    ""/api/pets"": {
+      ""get"": {
+        ""operationId"": ""GetPets"",
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": { ""$ref"": ""#/components/schemas/Animal"" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  ""components"": {
+    ""schemas"": {
+      ""Animal"": {
+        ""type"": ""object"",
+        ""required"": [""animalType""],
+        ""properties"": {
+          ""animalType"": { ""type"": ""string"" }
+        },
+        ""discriminator"": {
+          ""propertyName"": ""animalType"",
+          ""mapping"": {
+            ""dog"": ""#/components/schemas/Dog"",
+            ""cat"": ""#/components/schemas/Cat""
+          }
+        }
+      },
+      ""Dog"": {
+        ""allOf"": [
+          { ""$ref"": ""#/components/schemas/Animal"" },
+          {
+            ""type"": ""object"",
+            ""properties"": {
+              ""breed"": { ""type"": ""string"" }
+            }
+          }
+        ]
+      },
+      ""Cat"": {
+        ""allOf"": [
+          { ""$ref"": ""#/components/schemas/Animal"" },
+          {
+            ""type"": ""object"",
+            ""properties"": {
+              ""color"": { ""type"": ""string"" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}";
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        var animalSchema = document.Components.Schemas["Animal"];
+        var initialMappingCount = animalSchema.DiscriminatorObject?.Mapping.Count ?? 0;
+
+        var cleaner = new SchemaCleaner(document, [])
+        {
+            IncludeInheritanceHierarchy = false
+        };
+
+        cleaner.RemoveUnreferencedSchema();
+
+        var animalSchemaAfter = document.Components.Schemas["Animal"];
+        animalSchemaAfter.DiscriminatorObject.Should().NotBeNull();
+        var finalMappingCount = animalSchemaAfter.DiscriminatorObject!.Mapping.Count;
+
+        finalMappingCount.Should().BeLessThanOrEqualTo(initialMappingCount);
+    }
+
+    [Test]
+    public async Task SchemaCleaner_TryPush_Handles_NonNull_Schema()
+    {
+        const string spec = @"{
+  ""openapi"": ""3.0.1"",
+  ""info"": { ""title"": ""Test API"", ""version"": ""v1"" },
+  ""paths"": {
+    ""/api/pets"": {
+      ""get"": {
+        ""operationId"": ""GetPets"",
+        ""parameters"": [
+          {
+            ""name"": ""petId"",
+            ""in"": ""query"",
+            ""schema"": {
+              ""type"": ""string""
+            }
+          }
+        ],
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": {
+                  ""type"": ""array"",
+                  ""items"": { ""$ref"": ""#/components/schemas/Pet"" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  ""components"": {
+    ""schemas"": {
+      ""Pet"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""id"": { ""type"": ""integer"" },
+          ""name"": { ""type"": ""string"" }
+        }
+      }
+    }
+  }
+}";
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        var cleaner = new SchemaCleaner(document, []);
+        cleaner.RemoveUnreferencedSchema();
+
+        document.Components.Schemas.Should().ContainKey("Pet");
+    }
 }

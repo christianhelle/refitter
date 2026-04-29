@@ -316,4 +316,56 @@ public class XmlDocumentationGeneratorTests
             .And.Contain("Ошибка ответа")
             .And.NotContain(@"\u041e\u0448");
     }
+
+    [Test]
+    public void XmlDocumentationGenerator_AppendInterfaceDocumentationByTag_Returns_Early_When_Disabled()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = false
+        });
+
+        var code = new StringBuilder();
+        var tag = new OpenApiTag { Name = "TestTag", Description = "Test Description" };
+        var document = new OpenApiDocument { Tags = [tag] };
+
+        generator.AppendInterfaceDocumentationByTag(document, "TestTag", code);
+
+        code.ToString().Should().BeEmpty();
+    }
+
+    [Test]
+    public void XmlDocumentationGenerator_AppendInterfaceDocumentationByEndpoint_Returns_Early_When_Disabled()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = false
+        });
+
+        var code = new StringBuilder();
+        var endpoint = new OpenApiOperation { Summary = "Test Summary" };
+
+        generator.AppendInterfaceDocumentationByEndpoint(endpoint, code);
+
+        code.ToString().Should().BeEmpty();
+    }
+
+    [Test]
+    public void XmlDocumentationGenerator_AppendMethodDocumentation_Returns_Early_When_Disabled()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
+        {
+            GenerateXmlDocCodeComments = false
+        });
+
+        var code = new StringBuilder();
+        var factory = new CSharpClientGeneratorFactory(new RefitGeneratorSettings(), new OpenApiDocument());
+        var csharpGenerator = factory.Create();
+        var operation = new OpenApiOperation { Summary = "Test Summary", Description = "Test Description" };
+        var method = csharpGenerator.CreateOperationModel(operation);
+
+        generator.AppendMethodDocumentation(method, false, false, false, false, code);
+
+        code.ToString().Should().BeEmpty();
+    }
 }
