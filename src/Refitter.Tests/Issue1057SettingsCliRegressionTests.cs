@@ -20,6 +20,38 @@ public class Issue1057SettingsCliRegressionTests
     }
 
     [Test]
+    public async Task RefitGenerator_CreateAsync_Should_Throw_When_Both_OpenApiPath_And_OpenApiPaths_Are_Missing()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = null,
+            OpenApiPaths = null
+        };
+
+        Func<Task> act = async () => await RefitGenerator.CreateAsync(settings);
+
+        await act.Should()
+            .ThrowAsync<ArgumentException>()
+            .WithMessage("*OpenApiPath*OpenApiPaths*");
+    }
+
+    [Test]
+    public async Task RefitGenerator_CreateAsync_Should_Throw_When_OpenApiPath_Is_Whitespace_And_OpenApiPaths_Is_Empty()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = "   ",
+            OpenApiPaths = Array.Empty<string>()
+        };
+
+        Func<Task> act = async () => await RefitGenerator.CreateAsync(settings);
+
+        await act.Should()
+            .ThrowAsync<ArgumentException>()
+            .WithMessage("*OpenApiPath*OpenApiPaths*");
+    }
+
+    [Test]
     public void Issue1046_OpenApiPaths_Should_Not_Serialize_When_Null()
     {
         // #1046: Default OpenApiPaths round-trip behavior

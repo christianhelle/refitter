@@ -31,6 +31,7 @@ Refitter test projects use TUnit on Microsoft.Testing.Platform. In this repo, `d
 - `/*/Refitter.Tests/XmlDocumentationGeneratorTests/Can_Generate_Method_Throws_With_Readable_Unicode_Status_Code_Comments`
 - `/*/Refitter.Tests.Examples/GenerateStatusCodeCommentsTests/Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments`
 - `/*/Refitter.Tests.Examples/GenerateStatusCodeCommentsTests/Generated_Code_With_Unicode_Status_Code_Comments_Can_Build`
+- `/*/Refitter.Tests/OpenApiDocumentFactoryMergeTests/*` runs the whole merge test class, which is useful for clone/merge safety checks around `OpenApiDocumentFactory`.
 
 ## Anti-Patterns
 - Do **not** rely on `dotnet test --filter ...` here; the TUnit/Microsoft.Testing.Platform test app rejects that option.

@@ -62,3 +62,11 @@
 - Test coverage: merge equivalence tests, e-conomic-shaped regressions, compile-backed generation validation
 - Constraints: preserve clone-first/non-mutating merge, don't rename schemas, keep relative-path behavior across tooling surfaces
 - 2026-04-28T15:21:48.369+02:00: Implemented duplicate schema equivalence by comparing normalized NSwag/NJsonSchema JSON tokens, with a schema-specific canonical fallback for referenced/cyclic graphs that cannot serialize standalone. This keeps merge semantics fail-fast for real path/schema/definition/security conflicts while allowing equivalent e-conomic `ProblemDetails`/`Error` duplicates.
+
+## 2026-04-29: OpenApiDocument Clone Path Obsolete API Fix
+
+- 2026-04-29T08:41:29Z: Replaced obsolete `OpenApiDocument.ToJson(SchemaType)` clone logic in `src\Refitter.Core\OpenApiDocumentFactory.cs` with parameterless `ToJson()` round-trip via `FromJsonAsync()`.
+- Preserves `SchemaType` across serialization round-trip for both Swagger 2 and OpenAPI 3 documents.
+- Maintains clone-first/fail-fast merge contract without carrying obsolete API forward.
+- Validation: release build ✓, full test suite ✓, format verification ✓
+- Outcome: Approved by Ash and Lambert after focused regression coverage confirmed schema-type preservation.

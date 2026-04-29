@@ -47,7 +47,15 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     {
         if (settings.OpenApiPaths is { Length: > 0 })
             return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPaths).ConfigureAwait(false);
-        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath).ConfigureAwait(false);
+
+        if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
+        {
+            throw new ArgumentException(
+                "Either OpenApiPath or OpenApiPaths must be provided with at least one valid OpenAPI specification path.",
+                nameof(settings));
+        }
+
+        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath!).ConfigureAwait(false);
     }
 
     private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches,

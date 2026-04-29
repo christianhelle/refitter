@@ -11,6 +11,7 @@
 - Team initialized on 2026-04-16.
 - 2026-04-28T12:02:17.298+02:00: Issue #1045's new multi-path `.refitter` comment does not reproduce at current HEAD; current CLI validation accepts `openApiPaths`, normalizes relative entries, and the live repro instead surfaced expected merge-collision behavior only when duplicate path specs were used.
 - 2026-04-28T15:21:48.369+02:00: The e-conomic multi-spec failure is a core `OpenApiDocumentFactory` merge-equivalence problem: `economic-products.json` and `economic-webhooks.json` share equivalent `Error` and `ProblemDetails` component schemas, but current NSwag-object serialization comparison false-negatives and throws before validation/generation.
+- 2026-04-29T11:51:36.530+02:00: PR assembly for `build-warnings` should target `main` and be framed as a branch-wide warning-hardening pass, not only the latest `OpenApiDocumentFactory` change; the landed scope spans `src\Refitter.Core\OpenApiDocumentFactory.cs`, `src\Refitter.Core\Refitter.Core.csproj`, `src\Refitter.Tests\OpenApiDocumentFactoryMergeTests.cs`, `src\Refitter.Tests\Refitter.Tests.csproj`, `src\Refitter\Refitter.csproj`, and the carried `.squad` history/decision sync.
 
 ## Core Context
 
@@ -40,3 +41,12 @@
 - Fix approved: replace `AreEquivalent()` with OpenAPI-aware semantic comparison using NSwag canonical JSON representation; keep fail-fast for genuine conflicts.
 - Gates: merge equivalence tests, e-conomic-shaped regressions, compile-backed validation; existing collision tests must pass.
 - Constraints: preserve relative-path behavior, don't edit specs, don't rename schemas in merge.
+
+## 2026-04-29: PR Assembly for Build-Warnings
+
+- **PR #1079**: "Tighten warning handling across Refitter builds"
+- **Target branch**: main (default branch for this repo)
+- **Scope framing**: Branch includes multiple warning-focused commits across core, tests, CLI packaging metadata, nullable-flow cleanup, and warning enforcement; obsolete `OpenApiDocument.ToJson(SchemaType)` replaced with `ToJson()` + `FromJsonAsync()`.
+- **Key files**: `src\Refitter.Core\OpenApiDocumentFactory.cs`, `src\Refitter.Tests\OpenApiDocumentFactoryMergeTests.cs`, `src\Refitter.Core\Refitter.Core.csproj`, `src\Refitter.Tests\Refitter.Tests.csproj`, `src\Refitter\Refitter.csproj`, `.squad` sync.
+- **PR assembly decision recorded** to decisions.md (2026-04-29).
+- **Branch pushed** with squad metadata committed.

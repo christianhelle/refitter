@@ -87,3 +87,11 @@
 - Regression gates: existing merge-collision tests must continue passing
 
 - **2026-04-28T15:21:48.369+02:00 e-conomic multi-spec merge final validation:** Release build, focused `OpenApiDocumentFactoryMergeTests` (15 tests), focused `Issue1016_MultiSpecSchemaMergeTests` (7 tests), full Release solution tests, format verification, and the real `test\economic.refitter` CLI generation all passed. The required CLI command generated `test\GeneratedCode\economic.cs` successfully from `economic-products.json` + `economic-webhooks.json` without duplicate schema merge failures.
+
+## 2026-04-29: OpenApiDocumentFactory 100% Coverage & Obsolete Clone Validation
+
+- **2026-04-28T19:19:33Z User Directive:** Get `src/Refitter.Core/OpenApiDocumentFactory.cs` to 100% coverage; it is one of the most important parts of the codebase and all possibilities should be tested thoroughly.
+- **2026-04-29T08:41:29Z Decision:** Treat `NSwag.OpenApiDocument.Tags` and `NSwag.OpenApiDocument.Components.Schemas` as non-null collections inside `Merge()`, eliminating unreachable null-handling branches that blocked 100% coverage.
+- **Validation Result:** Coverage command confirmed `OpenApiDocumentFactory` at 100% line/block coverage in `src\Refitter.Tests\bin\Release\net10.0\TestResults\coverage.cobertura.xml`.
+- **Clone Obsolete API Validation:** Added focused `OpenApiDocumentFactoryMergeTests` covering Swagger 2/3 round-trip serialization, verifying parameterless `ToJson()` + `FromJsonAsync()` preserves `SchemaType` across versions and maintains merge-critical collections.
+- **Outcome:** Obsolete `ToJson(SchemaType)` replacement confirmed safe by focused regression tests proving schema-type preservation and mixed-version merge correctness.

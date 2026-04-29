@@ -365,7 +365,7 @@ public class GenerateCommandTests
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var refitSettings = new RefitGeneratorSettings
         {
-            OutputFolder = null
+            OutputFolder = null!,
         };
 
         var method = typeof(GenerateCommand).GetMethod(

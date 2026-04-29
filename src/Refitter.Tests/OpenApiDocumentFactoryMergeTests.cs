@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using NSwag;
 using Refitter.Core;
+using Refitter.Tests.Resources;
 using TUnit.Core;
 
 namespace Refitter.Tests;
@@ -1491,6 +1492,126 @@ paths:
         parsedDocument.Tags.Should().BeEmpty();
         clonedDocument.Tags.Should().NotBeNull();
         clonedDocument.Tags.Should().BeEmpty();
+    }
+
+    [Test]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2)]
+    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
+    public async Task ParseAndCloneDocument_RoundTrips_SchemaType_And_Collections(SampleOpenSpecifications version)
+    {
+        var parsedDocument = await ParseJsonDocument(EmbeddedResources.GetSwaggerPetstore(version));
+        var clonedDocument = await OpenApiDocument.FromJsonAsync(parsedDocument.ToJson());
+
+        clonedDocument.SchemaType.Should().Be(parsedDocument.SchemaType);
+        clonedDocument.Paths.Keys.Should().BeEquivalentTo(parsedDocument.Paths.Keys);
+        clonedDocument.Tags.Select(tag => tag.Name).Should().BeEquivalentTo(parsedDocument.Tags.Select(tag => tag.Name));
+        clonedDocument.Components.Schemas.Keys.Should().BeEquivalentTo(parsedDocument.Components.Schemas.Keys);
+        clonedDocument.Definitions.Keys.Should().BeEquivalentTo(parsedDocument.Definitions.Keys);
+        clonedDocument.SecurityDefinitions.Keys.Should().BeEquivalentTo(parsedDocument.SecurityDefinitions.Keys);
+    }
+
+    [Test]
+    public async Task Merge_Preserves_OpenApi3_Base_SchemaType_For_Cloned_Document()
+    {
+        var baseDocument = await ParseJsonDocument("""
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "OpenAPI Base",
+                "version": "1.0"
+              },
+              "paths": {
+                "/users": {
+                  "get": {
+                    "operationId": "ListUsers",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """);
+        var secondDocument = await ParseJsonDocument("""
+            {
+              "swagger": "2.0",
+              "info": {
+                "title": "Swagger Incoming",
+                "version": "1.0"
+              },
+              "paths": {
+                "/orders": {
+                  "get": {
+                    "operationId": "ListOrders",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """);
+
+        var merged = InvokeMerge(baseDocument, secondDocument);
+
+        merged.SchemaType.Should().Be(SchemaType.OpenApi3);
+        JObject.Parse(merged.ToJson())["openapi"]!.Value<string>().Should().Be("3.0.0");
+    }
+
+    [Test]
+    public async Task Merge_Preserves_Swagger2_Base_SchemaType_For_Cloned_Document()
+    {
+        var baseDocument = await ParseJsonDocument("""
+            {
+              "swagger": "2.0",
+              "info": {
+                "title": "Swagger Base",
+                "version": "1.0"
+              },
+              "paths": {
+                "/users": {
+                  "get": {
+                    "operationId": "ListUsers",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """);
+        var secondDocument = await ParseJsonDocument("""
+            {
+              "openapi": "3.0.0",
+              "info": {
+                "title": "OpenAPI Incoming",
+                "version": "1.0"
+              },
+              "paths": {
+                "/orders": {
+                  "get": {
+                    "operationId": "ListOrders",
+                    "responses": {
+                      "200": {
+                        "description": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """);
+
+        var merged = InvokeMerge(baseDocument, secondDocument);
+
+        merged.SchemaType.Should().Be(SchemaType.Swagger2);
+        JObject.Parse(merged.ToJson())["swagger"]!.Value<string>().Should().Be("2.0");
     }
 
     private static Task<OpenApiDocument> ParseJsonDocument(string json)
