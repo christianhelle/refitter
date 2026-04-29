@@ -1,8 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Apizr;
 
 public class ApizrGeneratorWithMicrosoftHttpResilienceTests
 {

@@ -1,9 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
-using Refitter.Core.Settings;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Apizr;
 
 public class ApizrRegistrationGeneratorTests
 {
