@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
 
-namespace Refitter.Tests.Settings;
+namespace Refitter.Tests.SettingsFile;
 
 public class WriteRefitterSettingsFileTests
 {

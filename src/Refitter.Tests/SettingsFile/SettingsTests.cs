@@ -3,7 +3,7 @@ using FluentAssertions.Execution;
 using Refitter.Core;
 using Spectre.Console.Cli;
 
-namespace Refitter.Tests.Settings;
+namespace Refitter.Tests.SettingsFile;
 
 public class SettingsTests
 {

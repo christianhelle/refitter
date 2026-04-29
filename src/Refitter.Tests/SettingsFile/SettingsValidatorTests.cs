@@ -2,7 +2,7 @@ using System.Text.Json;
 using FluentAssertions;
 using Refitter.Core;
 
-namespace Refitter.Tests.Settings;
+namespace Refitter.Tests.SettingsFile;
 
 public class SettingsValidatorTests
 {
