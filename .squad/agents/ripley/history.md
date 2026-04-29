@@ -11,6 +11,7 @@
 - Team initialized on 2026-04-16.
 - 2026-04-28T12:02:17.298+02:00: Issue #1045's new multi-path `.refitter` comment does not reproduce at current HEAD; current CLI validation accepts `openApiPaths`, normalizes relative entries, and the live repro instead surfaced expected merge-collision behavior only when duplicate path specs were used.
 - 2026-04-28T15:21:48.369+02:00: The e-conomic multi-spec failure is a core `OpenApiDocumentFactory` merge-equivalence problem: `economic-products.json` and `economic-webhooks.json` share equivalent `Error` and `ProblemDetails` component schemas, but current NSwag-object serialization comparison false-negatives and throws before validation/generation.
+- 2026-04-29T11:51:36.530+02:00: PR assembly for `build-warnings` should target `main` and be framed as a branch-wide warning-hardening pass, not only the latest `OpenApiDocumentFactory` change; the landed scope spans `src\Refitter.Core\OpenApiDocumentFactory.cs`, `src\Refitter.Core\Refitter.Core.csproj`, `src\Refitter.Tests\OpenApiDocumentFactoryMergeTests.cs`, `src\Refitter.Tests\Refitter.Tests.csproj`, `src\Refitter\Refitter.csproj`, and the carried `.squad` history/decision sync.
 
 ## Core Context
 
