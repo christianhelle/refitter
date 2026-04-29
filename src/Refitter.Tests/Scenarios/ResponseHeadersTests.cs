@@ -1,0 +1,68 @@
+using FluentAssertions;
+using FluentAssertions.Execution;
+using Refitter.Core;
+using Refitter.Tests.Build;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
+
+namespace Refitter.Tests.Scenarios;
+
+public class ResponseHeadersTests
+{
+    private const string OpenApiSpec = @"
+openapi: 3.0.1
+paths:
+  /foo:
+    post:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+";
+
+    [Test]
+    public async Task Can_Generate_Code()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task Should_Not_Generate_ContentType_Header_Attribute()
+    {
+        var generatedCode = await GenerateCode();
+        using var scope = new AssertionScope();
+        generatedCode.Should().NotContain("Content-Type: \")]");
+    }
+
+    [Test]
+    public async Task Generates_Accept_Header_Attribute()
+    {
+        var generatedCode = await GenerateCode();
+        using var scope = new AssertionScope();
+        generatedCode.Should().Contain("Accept: application/json");
+    }
+
+    [Test]
+    public async Task Can_Build_Generated_Code()
+    {
+        var generatedCode = await GenerateCode();
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    private static async Task<string> GenerateCode()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, AddAcceptHeaders = true };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+        return generatedCode;
+    }
+
+}

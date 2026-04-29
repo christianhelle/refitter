@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Refitter.Core;
 
 namespace Refitter.Tests;
