@@ -1,9 +1,8 @@
 using FluentAssertions;
 using Refitter.Tests.Resources;
 using Refitter.Validation;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.OpenApi;
 
 public class OpenApiValidatorTests
 {

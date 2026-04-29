@@ -1,9 +1,8 @@
 using FluentAssertions;
 using Microsoft.OpenApi.Reader;
 using Refitter.Validation;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.OpenApi;
 
 public class OpenApiValidationResultTests
 {

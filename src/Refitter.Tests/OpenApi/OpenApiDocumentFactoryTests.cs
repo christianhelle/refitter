@@ -1,9 +1,8 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Resources;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.OpenApi;
 
 public class OpenApiDocumentFactoryTests
 {
