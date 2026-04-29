@@ -55,7 +55,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                 nameof(settings));
         }
 
-        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath).ConfigureAwait(false);
+        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath!).ConfigureAwait(false);
     }
 
     private static void ProcessContractFilter(OpenApiDocument openApiDocument, bool removeUnusedSchema, string[] includeSchemaMatches,
