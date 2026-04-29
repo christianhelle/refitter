@@ -1,8 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
-namespace Refitter.Tests.RegressionTests;
+namespace Refitter.Tests.Regression;
 
 /// <summary>
 /// Regression tests for Issue #1051: XmlDocumentationGenerator.DecodeJsonEscapedText mishandles malformed \u sequences

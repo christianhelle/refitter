@@ -2,7 +2,7 @@ using System.Text.Json;
 using FluentAssertions;
 using Refitter.Core;
 
-namespace Refitter.Tests.RegressionTests;
+namespace Refitter.Tests.Regression;
 
 /// <summary>
 /// Regression tests for #1057 settings and CLI workstream issues.

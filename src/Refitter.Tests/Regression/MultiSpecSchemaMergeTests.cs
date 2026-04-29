@@ -1,9 +1,8 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using TUnit.Core;
 
-namespace Refitter.Tests.RegressionTests;
+namespace Refitter.Tests.Regression;
 
 /// <summary>
 /// Regression tests for Issue #1016: Multi-spec merge drops schemas

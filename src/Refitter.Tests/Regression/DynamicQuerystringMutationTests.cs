@@ -1,8 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
-namespace Refitter.Tests.RegressionTests;
+namespace Refitter.Tests.Regression;
 
 /// <summary>
 /// Regression tests for Issue #1039: dynamic querystring extraction mutates the shared NSwag model.
