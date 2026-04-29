@@ -1,7 +1,6 @@
 using FluentAssertions;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Telemetry;
 
 public class SupportInformationTests
 {

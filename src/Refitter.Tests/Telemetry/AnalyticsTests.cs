@@ -1,9 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
-using Spectre.Console.Cli;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Telemetry;
 
 public class AnalyticsTests
 {
