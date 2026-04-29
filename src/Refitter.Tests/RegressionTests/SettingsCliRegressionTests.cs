@@ -1,15 +1,14 @@
 using System.Text.Json;
 using FluentAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.RegressionTests;
 
 /// <summary>
 /// Regression tests for #1057 settings and CLI workstream issues.
 /// Tests issues: #1021, #1030, #1031, #1044, #1045, #1046, #1048, #1050, #1054
 /// </summary>
-public class Issue1057SettingsCliRegressionTests
+public class SettingsCliRegressionTests
 {
     [Test]
     public void Issue1054_CreateAsync_Should_Throw_ArgumentNullException_For_Null_Paths()
