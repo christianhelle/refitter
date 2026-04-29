@@ -447,3 +447,27 @@ The obsolete call only exists to clone the first `NSwag.OpenApiDocument` before 
 **Date:** 2026-04-29T10:41:29.997+02:00
 
 Use GPT-5.5 for all agents for the rest of this session only.
+
+### Ripley PR Assembly (PR #1079)
+
+**Author:** Ripley (Lead)  
+**Date:** 2026-04-29T11:51:36.530+02:00  
+**Branch:** `build-warnings`  
+**PR:** #1079 `Tighten warning handling across Refitter builds`  
+**Status:** READY FOR REVIEW
+
+#### Decision
+
+Frame the PR around the branch's real aggregate scope instead of only the newest OpenAPI clone-warning fix.
+
+#### Rationale
+
+- The branch includes multiple warning-focused commits across core, tests, CLI packaging metadata, nullable-flow cleanup, and warning enforcement changes.
+- It already carries a committed `.squad` decision/history sync.
+- The obsolete `OpenApiDocument` clone fix remains important and should stay called out explicitly, but only as one bullet within the broader warning-hardening frame.
+
+#### Reviewer Guidance
+
+- Review against `main`.
+- Expect main product deltas in `src\Refitter.Core\OpenApiDocumentFactory.cs`, `src\Refitter.Tests\OpenApiDocumentFactoryMergeTests.cs`, `src\Refitter.Core\Refitter.Core.csproj`, `src\Refitter.Tests\Refitter.Tests.csproj`, and `src\Refitter\Refitter.csproj`.
+- Treat the `.squad` history/decision sync as a carried branch artifact, not the headline behavior change.

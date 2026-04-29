@@ -41,3 +41,12 @@
 - Fix approved: replace `AreEquivalent()` with OpenAPI-aware semantic comparison using NSwag canonical JSON representation; keep fail-fast for genuine conflicts.
 - Gates: merge equivalence tests, e-conomic-shaped regressions, compile-backed validation; existing collision tests must pass.
 - Constraints: preserve relative-path behavior, don't edit specs, don't rename schemas in merge.
+
+## 2026-04-29: PR Assembly for Build-Warnings
+
+- **PR #1079**: "Tighten warning handling across Refitter builds"
+- **Target branch**: main (default branch for this repo)
+- **Scope framing**: Branch includes multiple warning-focused commits across core, tests, CLI packaging metadata, nullable-flow cleanup, and warning enforcement; obsolete `OpenApiDocument.ToJson(SchemaType)` replaced with `ToJson()` + `FromJsonAsync()`.
+- **Key files**: `src\Refitter.Core\OpenApiDocumentFactory.cs`, `src\Refitter.Tests\OpenApiDocumentFactoryMergeTests.cs`, `src\Refitter.Core\Refitter.Core.csproj`, `src\Refitter.Tests\Refitter.Tests.csproj`, `src\Refitter\Refitter.csproj`, `.squad` sync.
+- **PR assembly decision recorded** to decisions.md (2026-04-29).
+- **Branch pushed** with squad metadata committed.
