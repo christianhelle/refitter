@@ -8,11 +8,11 @@ namespace Refitter.MSBuild;
 public class RefitterGenerateTask : MSBuildTask
 {
     internal const string GeneratedFileMarker = "GeneratedFile: ";
-    private static readonly System.Threading.AsyncLocal<Func<List<string>>?> InstalledDotnetRuntimesProviderOverride = new();
-    private static readonly System.Threading.AsyncLocal<Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult>?> ProcessRunnerOverride = new();
-    private static readonly System.Threading.AsyncLocal<int?> ProcessTimeoutMillisecondsOverride = new();
-    private static readonly System.Threading.AsyncLocal<Action<Process>?> ProcessTerminatorOverride = new();
-    private static readonly System.Threading.AsyncLocal<Func<string, bool>?> FileExistsOverride = new();
+    private static readonly AsyncLocal<Func<List<string>>?> InstalledDotnetRuntimesProviderOverride = new();
+    private static readonly AsyncLocal<Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult>?> ProcessRunnerOverride = new();
+    private static readonly AsyncLocal<int?> ProcessTimeoutMillisecondsOverride = new();
+    private static readonly AsyncLocal<Action<Process>?> ProcessTerminatorOverride = new();
+    private static readonly AsyncLocal<Func<string, bool>?> FileExistsOverride = new();
 
     private static readonly (string TargetFramework, string RuntimePrefix)[] PreferredRuntimeOrder =
     [
@@ -28,20 +28,17 @@ public class RefitterGenerateTask : MSBuildTask
         "net10.0"
     ];
 
-    internal sealed class ProcessExecutionResult
+    internal sealed class ProcessExecutionResult(
+        bool timedOut,
+        int exitCode,
+        Exception? terminationException = null)
     {
-        public ProcessExecutionResult(bool timedOut, int exitCode, Exception? terminationException = null)
-        {
-            TimedOut = timedOut;
-            ExitCode = exitCode;
-            TerminationException = terminationException;
-        }
 
-        public bool TimedOut { get; }
+        public bool TimedOut { get; } = timedOut;
 
-        public int ExitCode { get; }
+        public int ExitCode { get; } = exitCode;
 
-        public Exception? TerminationException { get; }
+        public Exception? TerminationException { get; } = terminationException;
     }
 
     internal static Func<List<string>> InstalledDotnetRuntimesProvider
@@ -126,7 +123,7 @@ public class RefitterGenerateTask : MSBuildTask
             }
         }
 
-        GeneratedFiles = generatedFiles.Select(f => new Microsoft.Build.Utilities.TaskItem(f)).ToArray();
+        GeneratedFiles = generatedFiles.Select(f => new Microsoft.Build.Utilities.TaskItem(f)).ToArray<ITaskItem>();
         TryLogCommandLine($"Generated {GeneratedFiles.Length} files");
 
         // Return false if any refitter execution failed
@@ -166,11 +163,11 @@ public class RefitterGenerateTask : MSBuildTask
         }
 
         var refitterDll = ResolveRefitterDll(packageFolder, installedRuntimes, TryLogCommandLine);
-        if (string.IsNullOrWhiteSpace(refitterDll) || !FileExists(refitterDll))
+        if (string.IsNullOrWhiteSpace(refitterDll) || !FileExists(refitterDll!))
         {
             failed = true;
             TryLogError("Unable to locate a bundled Refitter CLI runtime for the MSBuild task.");
-            return new List<string>();
+            return new();
         }
 
         var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
@@ -206,16 +203,12 @@ public class RefitterGenerateTask : MSBuildTask
         {
             failed = true;
             var timeoutDescription = FormatTimeout(ProcessTimeoutMilliseconds);
-            if (processResult.TerminationException is null)
-            {
-                TryLogError($"Refitter process timed out after {timeoutDescription} and was terminated");
-            }
-            else
-            {
-                TryLogError($"Refitter process timed out after {timeoutDescription}. Failed to terminate timed-out process: {processResult.TerminationException.Message}");
-            }
+            TryLogError(
+                processResult.TerminationException is null
+                    ? $"Refitter process timed out after {timeoutDescription} and was terminated"
+                    : $"Refitter process timed out after {timeoutDescription}. Failed to terminate timed-out process: {processResult.TerminationException.Message}");
 
-            return new List<string>();
+            return new();
         }
 
         // Check exit code - non-zero indicates failure
@@ -234,7 +227,8 @@ public class RefitterGenerateTask : MSBuildTask
         Action<string?> handleStandardOutput,
         Action<string?> handleErrorOutput)
     {
-        using var process = new Process { StartInfo = startInfo };
+        using var process = new Process();
+        process.StartInfo = startInfo;
 
         process.ErrorDataReceived += (_, args) => handleErrorOutput(args.Data);
         process.OutputDataReceived += (_, args) => handleStandardOutput(args.Data);
@@ -434,7 +428,7 @@ public class RefitterGenerateTask : MSBuildTask
             return files;
         }
 
-        var patterns = includePatterns.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+        var patterns = includePatterns.Split([';'], StringSplitOptions.RemoveEmptyEntries)
             .Select(NormalizeIncludePattern)
             .ToList();
 
@@ -527,7 +521,7 @@ public class RefitterGenerateTask : MSBuildTask
     {
         if (!string.IsNullOrWhiteSpace(outputLine))
         {
-            outputLines.Add(outputLine);
+            outputLines.Add(outputLine!);
         }
     }
 
