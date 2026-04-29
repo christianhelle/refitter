@@ -17,6 +17,9 @@
 - In the source generator, treat `AdditionalText.GetText(...)` as nullable and convert read/encoding failures into diagnostics; null-forgiving it weakens failure reporting.
 - Review gate for the next safety pass: require targeted tests for source-generator hint-name collisions, OpenAPI-title sanitization including `<`/`>`, and MSBuild runtime-discovery timeout behavior before accepting cleanup claims.
 - 2026-04-28: Approved Parker/Lambert e-conomic multi-spec merge fix after verifying canonical JSON-token equivalence accepts duplicate recursive/shared schemas, conflicting duplicate path/schema/definition/security entries still fail fast, and focused net10.0 TUnit coverage passes.
+- 2026-04-29T10:41:29.997+02:00: `src\Refitter.Core\OpenApiDocumentFactory.cs` should clone merge baselines with `OpenApiDocument.ToJson()` plus `OpenApiDocument.FromJsonAsync(...)`; the parameterless serializer preserves `SchemaType` for both Swagger 2 and OpenAPI 3 while avoiding obsolete `ToJson(SchemaType)` usage.
+- 2026-04-29T10:41:29.997+02:00: The safety proof for this obsolete-API lane lives in `src\Refitter.Tests\OpenApiDocumentFactoryMergeTests.cs`: round-trip embedded Swagger Petstore V2/V3 fixtures, then assert mixed-version merges keep the base document schema type and serialized top-level marker (`swagger` vs `openapi`).
+- 2026-04-29T10:41:29.997+02:00: For focused core-lane validation in this repo, `src\Refitter.Tests\bin\Release\net10.0\Refitter.Tests.exe --treenode-filter '/*/Refitter.Tests/OpenApiDocumentFactoryMergeTests/*' --disable-logo --no-progress --no-ansi` reliably runs the merge test class when `dotnet test --filter ...` is unavailable under TUnit.
 
 ## Core Context
 
@@ -74,3 +77,13 @@
 - Ripley's sequencing and Lambert's green baseline keep docs/help drift as the safe first cleanup lane, but Ash's gate still holds the deeper generator and MSBuild cleanup as validation-first work.
 - Dallas's docs clarification commit `f6374210` landed cleanly, so the next review concern stays on hint-name uniqueness, null-safe source-generator input handling, identifier sanitization, and MSBuild runtime-discovery timeout coverage.
 
+## 2026-04-29: OpenApiDocument Clone Path Obsolete API Approval
+
+- **2026-04-29T08:41:29Z Final Safety Approval:** Confirmed `src\Refitter.Core\OpenApiDocumentFactory.cs` clone path is safe to migrate from obsolete `ToJson(SchemaType)` to parameterless `ToJson()` + `FromJsonAsync()` round-trip.
+- **Evidence Verified:** 
+  - Schema-type preservation across round-trip serialization for Swagger 2 and OpenAPI 3
+  - Merge contract integrity (clone-first, fail-fast on genuine conflicts)
+  - Focused `OpenApiDocumentFactoryMergeTests` covering embedded Swagger Petstore V2/V3 fixtures
+  - Mixed-version merge assertions confirming correct schema type and top-level markers
+- **Validation Results:** Release build ✓, full Refitter.Tests ✓, Refitter.SourceGenerator.Tests ✓, format verification ✓
+- **Outcome:** APPROVED for production fix. Obsolete API successfully removed from merge-critical clone path while maintaining all semantic guarantees.
