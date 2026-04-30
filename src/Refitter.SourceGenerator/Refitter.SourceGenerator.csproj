@@ -10,12 +10,14 @@
     <Description>A C# Source Generator that uses Refitter for generating a REST API Client using the Refit library from OpenAPI specifications.</Description>
     <DevelopmentDependency>true</DevelopmentDependency>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="H.Generators.Extensions" Version="1.24.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" PrivateAssets="all" />
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.7.1" PrivateAssets="all" />
     <PackageReference Include="NSwag.Core.Yaml" Version="14.7.1" PrivateAssets="all" />
     <PackageReference Include="OasReader" Version="3.5.0.19" PrivateAssets="all" />
@@ -23,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\*.dll" Exclude="$(OutputPath)\Microsoft.CodeAnalysis*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(AssemblyName).props" Pack="true" PackagePath="build" />
     <Compile Include="../Refitter.Core/*.cs" />
     <Compile Include="../Refitter.Core/Settings/*.cs" />

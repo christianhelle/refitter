@@ -59,7 +59,7 @@ public class SourceGeneratorDiagnosticsTests
     {
         var sourceGeneratorAssembly = LoadSourceGeneratorAssembly();
         var generatorType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator", throwOnError: true)!;
-        var method = generatorType.GetMethod("CreateUniqueHintName", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = GetCreateUniqueHintNameMethod(generatorType);
 
         method.Should().NotBeNull();
 
@@ -67,12 +67,32 @@ public class SourceGeneratorDiagnosticsTests
         var firstPath = Path.Combine(directory, "first.refitter");
         var secondPath = Path.Combine(directory, "second.refitter");
 
-        var firstHintName = method!.Invoke(null, [firstPath, "SharedOutput.cs"]) as string;
-        var secondHintName = method.Invoke(null, [secondPath, "SharedOutput.cs"]) as string;
+        var firstHintName = method!.Invoke(null, [firstPath, "SharedOutput.cs", directory]) as string;
+        var secondHintName = method.Invoke(null, [secondPath, "SharedOutput.cs", directory]) as string;
 
         firstHintName.Should().StartWith("SharedOutput_");
         secondHintName.Should().StartWith("SharedOutput_");
         firstHintName.Should().NotBe(secondHintName);
+    }
+
+    [Test]
+    public void CreateUniqueHintName_Should_Be_Stable_For_Same_ProjectRelative_Path()
+    {
+        var sourceGeneratorAssembly = LoadSourceGeneratorAssembly();
+        var generatorType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator", throwOnError: true)!;
+        var method = GetCreateUniqueHintNameMethod(generatorType);
+
+        method.Should().NotBeNull();
+
+        var firstProjectDirectory = Path.Combine(AppContext.BaseDirectory, "agent-a", "repo");
+        var secondProjectDirectory = Path.Combine(AppContext.BaseDirectory, "agent-b", "repo");
+        var firstPath = Path.Combine(firstProjectDirectory, "clients", "petstore.refitter");
+        var secondPath = Path.Combine(secondProjectDirectory, "clients", "petstore.refitter");
+
+        var firstHintName = method!.Invoke(null, [firstPath, "Petstore.cs", firstProjectDirectory]) as string;
+        var secondHintName = method.Invoke(null, [secondPath, "Petstore.cs", secondProjectDirectory]) as string;
+
+        firstHintName.Should().Be(secondHintName);
     }
 
     [Test]
@@ -99,6 +119,37 @@ public class SourceGeneratorDiagnosticsTests
             diagnostic.Id == "REFITTER000" &&
             diagnostic.Message.Contains("Unable to read .refitter file", StringComparison.Ordinal) &&
             diagnostic.Message.Contains("bad encoding", StringComparison.Ordinal));
+    }
+
+    [Test]
+    public void GenerateCode_Should_Rethrow_OperationCanceledException_When_Cancellation_Is_Requested()
+    {
+        using var cancellationTokenSource = new CancellationTokenSource();
+
+        var act = () => InvokeGenerateCode(
+            new StubAdditionalText(
+                "C:\\repo\\cancel.refitter",
+                _ =>
+                {
+                    cancellationTokenSource.Cancel();
+                    throw new OperationCanceledException(cancellationTokenSource.Token);
+                }),
+            cancellationTokenSource.Token);
+
+        act.Should()
+            .Throw<TargetInvocationException>()
+            .WithInnerException<OperationCanceledException>();
+    }
+
+    [Test]
+    public void GenerateCode_Should_Not_Report_Refitter_File_Contents_Diagnostic()
+    {
+        var result = InvokeGenerateCode(new StubAdditionalText(
+            "C:\\repo\\invalid.refitter",
+            _ => SourceText.From("{ not json", System.Text.Encoding.UTF8)));
+
+        result.Diagnostics.Should().NotContain(diagnostic => diagnostic.Id == "REFITTER005");
+        result.Diagnostics.Should().NotContain(diagnostic => diagnostic.Message.Contains("{ not json", StringComparison.Ordinal));
     }
 
     [Test]
@@ -220,17 +271,33 @@ public class SourceGeneratorDiagnosticsTests
             .Invoke(null, [immutableArray])!;
     }
 
-    private static GenerateCodeResult InvokeGenerateCode(AdditionalText additionalText)
+    private static MethodInfo GetCreateUniqueHintNameMethod(Type generatorType)
+    {
+        return generatorType
+            .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+            .Single(method =>
+                method.Name == "CreateUniqueHintName" &&
+                method.GetParameters().Length == 3);
+    }
+
+    private static GenerateCodeResult InvokeGenerateCode(
+        AdditionalText additionalText,
+        CancellationToken cancellationToken = default)
     {
         var sourceGeneratorAssembly = LoadSourceGeneratorAssembly();
         var generatorType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator", throwOnError: true)!;
         var generatedCodeType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator+GeneratedCode", throwOnError: true)!;
         var diagnosticType = sourceGeneratorAssembly.GetType("Refitter.SourceGenerator.RefitterSourceGenerator+GeneratedDiagnostic", throwOnError: true)!;
-        var method = generatorType.GetMethod("GenerateCode", BindingFlags.NonPublic | BindingFlags.Static);
+        var method = generatorType
+            .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+            .Single(method =>
+                method.Name == "GenerateCode" &&
+                method.GetParameters().Length == 2 &&
+                method.GetParameters()[1].ParameterType == typeof(CancellationToken));
 
         method.Should().NotBeNull();
 
-        var result = method!.Invoke(null, [additionalText, CancellationToken.None]);
+        var result = method!.Invoke(null, [additionalText, cancellationToken]);
         result.Should().NotBeNull();
 
         var diagnosticsValue = generatedCodeType.GetProperty("Diagnostics")!.GetValue(result!);

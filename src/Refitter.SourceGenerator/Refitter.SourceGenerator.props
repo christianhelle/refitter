@@ -1,6 +1,8 @@
 <Project>
 
   <ItemGroup>
+    <CompilerVisibleProperty Include="MSBuildProjectDirectory" />
+    <CompilerVisibleProperty Include="ProjectDir" />
     <AdditionalFiles Include="**/*.refitter" />
   </ItemGroup>
 

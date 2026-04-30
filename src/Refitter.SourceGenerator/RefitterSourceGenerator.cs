@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Refitter.Core;
 
 namespace Refitter.SourceGenerator;
@@ -27,6 +28,10 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             .AdditionalTextsProvider
             .Where(text => text.Path.EndsWith(".refitter", StringComparison.InvariantCultureIgnoreCase));
 
+        var projectDirectory = context
+            .AnalyzerConfigOptionsProvider
+            .Select(static (provider, _) => GetProjectDirectory(provider.GlobalOptions));
+
         // collect and sort the paths of the .refitter files for logging
         var refitterPathList = refitterFiles
             .Select((t, _) => t.Path)
@@ -43,7 +48,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         });
 
         // generate code for each .refitter file and process the results
-        context.RegisterImplementationSourceOutput(refitterFiles.Select(GenerateCode), ProcessResults);
+        context.RegisterImplementationSourceOutput(
+            refitterFiles
+                .Combine(projectDirectory)
+                .Select(static (input, cancellationToken) => GenerateCode(input.Left, input.Right, cancellationToken)),
+            ProcessResults);
     }
 
     private static void ProcessResults(SourceProductionContext context, GeneratedCode result)
@@ -68,6 +77,14 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         AdditionalText file,
         CancellationToken cancellationToken = default)
     {
+        return GenerateCode(file, projectDirectory: null, cancellationToken);
+    }
+
+    internal static GeneratedCode GenerateCode(
+        AdditionalText file,
+        string? projectDirectory,
+        CancellationToken cancellationToken = default)
+    {
         cancellationToken.ThrowIfCancellationRequested();
         var diagnostics = new List<GeneratedDiagnostic>
         {
@@ -81,8 +98,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             {
                 return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
             }
-
-            diagnostics.Add(CreateFileContentsDiagnostic(json));
 
             var settings = TryDeserialize(json, diagnostics);
             if (settings is null)
@@ -105,11 +120,15 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            // Create unique hint name based on the full .refitter file path to avoid collisions
+            // Create unique hint name based on the project-relative .refitter file path to avoid collisions
             // when multiple .refitter files with the same name exist in different directories
-            var hintName = CreateUniqueHintName(file.Path, settings.OutputFilename);
+            var hintName = CreateUniqueHintName(file.Path, settings.OutputFilename, projectDirectory);
 
             return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), refit, hintName);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception e)
         {
@@ -135,11 +154,28 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
             return content.ToString();
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
         catch (Exception e)
         {
-            diagnostics.Add(CreateErrorDiagnostic($"Unable to read .refitter file: {file.Path}{Environment.NewLine}{e}"));
+            diagnostics.Add(CreateErrorDiagnostic($"Unable to read .refitter file: {file.Path}\n{e}"));
             return null;
         }
+    }
+
+    private static string? GetProjectDirectory(AnalyzerConfigOptions globalOptions)
+    {
+        if (!globalOptions.TryGetValue("build_property.MSBuildProjectDirectory", out var projectDirectory) ||
+            string.IsNullOrWhiteSpace(projectDirectory))
+        {
+            globalOptions.TryGetValue("build_property.ProjectDir", out projectDirectory);
+        }
+
+        return string.IsNullOrWhiteSpace(projectDirectory)
+            ? null
+            : projectDirectory;
     }
 
     private static RefitGeneratorSettings? TryDeserialize(string json, List<GeneratedDiagnostic> diagnostics)
@@ -160,11 +196,13 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     {
         var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty;
 
-        if (!string.IsNullOrWhiteSpace(settings.OpenApiPath) &&
-            !IsUrl(settings.OpenApiPath) &&
-            !Path.IsPathRooted(settings.OpenApiPath))
+        var openApiPath = settings.OpenApiPath;
+        if (openApiPath is not null &&
+            !string.IsNullOrWhiteSpace(openApiPath) &&
+            !IsUrl(openApiPath!) &&
+            !Path.IsPathRooted(openApiPath))
         {
-            settings.OpenApiPath = Path.GetFullPath(Path.Combine(settingsFileDirectory, settings.OpenApiPath));
+            settings.OpenApiPath = Path.GetFullPath(Path.Combine(settingsFileDirectory, openApiPath));
         }
 
         if (settings.OpenApiPaths is { Length: > 0 })
@@ -172,7 +210,9 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             for (var i = 0; i < settings.OpenApiPaths.Length; i++)
             {
                 var path = settings.OpenApiPaths[i];
-                if (!IsUrl(path) && !Path.IsPathRooted(path))
+                if (!string.IsNullOrWhiteSpace(path) &&
+                    !IsUrl(path) &&
+                    !Path.IsPathRooted(path))
                 {
                     settings.OpenApiPaths[i] = Path.GetFullPath(Path.Combine(settingsFileDirectory, path));
                 }
@@ -207,13 +247,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             $"Found .refitter File: {path}",
             DiagnosticSeverity.Info);
 
-    private static GeneratedDiagnostic CreateFileContentsDiagnostic(string json) =>
-        new(
-            "REFITTER005",
-            "Refitter File Contents",
-            json,
-            DiagnosticSeverity.Info);
-
     private static GeneratedDiagnostic CreateIsoDateFormatOverrideDiagnostic() =>
         new(
             "REFITTER002",
@@ -245,8 +278,12 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     /// </summary>
     /// <param name="refitterFilePath">The full path to the .refitter file</param>
     /// <param name="outputFilename">Optional explicit output filename from settings</param>
+    /// <param name="projectDirectory">Optional MSBuild project directory used to make the hint name stable across machines</param>
     /// <returns>A unique hint name safe for AddSource</returns>
-    private static string CreateUniqueHintName(string refitterFilePath, string? outputFilename)
+    private static string CreateUniqueHintName(
+        string refitterFilePath,
+        string? outputFilename,
+        string? projectDirectory = null)
     {
         // If an explicit output filename is set, use it as the base for the hint name
         // but still include path disambiguation to prevent collisions
@@ -259,17 +296,80 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             baseName = RefitterDiagnosticTitle;
         }
 
-        // Create a stable unique suffix from the full .refitter path so files in the same
+        // Create a stable unique suffix from the project-relative .refitter path so files in the same
         // directory can still coexist even when they share the same explicit output filename.
         if (!string.IsNullOrWhiteSpace(refitterFilePath))
         {
-            var normalizedPath = Path.GetFullPath(refitterFilePath)
-                .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var normalizedPath = GetStablePathForHintName(refitterFilePath, projectDirectory);
             var pathHash = GetStableHash(normalizedPath);
             return $"{baseName}_{pathHash}.g.cs";
         }
 
         return $"{baseName}.g.cs";
+    }
+
+    private static string GetStablePathForHintName(string refitterFilePath, string? projectDirectory)
+    {
+        var projectDirectoryForHintName = projectDirectory;
+        if (!string.IsNullOrWhiteSpace(projectDirectoryForHintName) &&
+            TryGetRelativePath(projectDirectoryForHintName!, refitterFilePath, out var relativePath) &&
+            relativePath is not null)
+        {
+            return NormalizePathForHash(relativePath);
+        }
+
+        return NormalizePathForHash(Path.GetFullPath(refitterFilePath));
+    }
+
+    private static bool TryGetRelativePath(string projectDirectory, string filePath, out string? relativePath)
+    {
+        relativePath = null;
+
+        try
+        {
+            var projectUri = new Uri(EnsureTrailingDirectorySeparator(Path.GetFullPath(projectDirectory)));
+            var fileUri = new Uri(Path.GetFullPath(filePath));
+
+            if (!projectUri.IsBaseOf(fileUri))
+            {
+                return false;
+            }
+
+            relativePath = Uri.UnescapeDataString(projectUri.MakeRelativeUri(fileUri).ToString())
+                .Replace('/', Path.DirectorySeparatorChar);
+
+            return !string.IsNullOrWhiteSpace(relativePath);
+        }
+        catch (UriFormatException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
+    }
+
+    private static string EnsureTrailingDirectorySeparator(string path)
+    {
+        if (path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) ||
+            path.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+        {
+            return path;
+        }
+
+        return path + Path.DirectorySeparatorChar;
+    }
+
+    private static string NormalizePathForHash(string path)
+    {
+        return path
+            .Replace(Path.AltDirectorySeparatorChar, '/')
+            .Replace(Path.DirectorySeparatorChar, '/');
     }
 
     /// <summary>

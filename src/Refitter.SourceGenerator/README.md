@@ -23,6 +23,8 @@ After installing the package, add one or more `.refitter` files to your project.
 
 `Refitter.SourceGenerator` automatically includes `**/*.refitter` as Roslyn `AdditionalFiles` via its package props, so you do not need to add manual `<AdditionalFiles Include="..." />` entries unless you intentionally override that default behavior.
 
+For deterministic incremental builds, prefer local OpenAPI files checked into the project or generated before compilation. Relative `openApiPath` and `openApiPaths` values are resolved from the `.refitter` file location. HTTP/HTTPS specifications are downloaded during compilation and can make builds non-deterministic if the remote document changes or the network is unavailable.
+
 ### .Refitter File format
 
 The following is an example `.refitter` file
