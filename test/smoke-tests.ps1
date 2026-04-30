@@ -474,9 +474,13 @@ function RunTests
     $customNameSpec = "./OpenAPI/v3.0/petstore.json"
     $customNameArgs = "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync"
     $customNameOutput = "./GeneratedCode/MultipleInterfacesWithCustomName_generateonly.cs"
-    $customNameCmd = "$processPath $customNameSpec --namespace GenerateOnly.MultipleInterfacesWithCustomName --output $customNameOutput --no-logging $customNameArgs"
-    Write-Host $customNameCmd
-    Invoke-Expression $customNameCmd
+    $customNameInvocation = "$customNameSpec --namespace GenerateOnly.MultipleInterfacesWithCustomName --output $customNameOutput --no-logging $customNameArgs"
+    $p = StartRefitter `
+        -arguments $customNameInvocation `
+        -processPath $processPath `
+        -useDocker $UseDocker
+    $p | Wait-Process
+    if ($p.ExitCode -ne 0) { throw "Generate-only test failed: MultipleInterfacesWithCustomName; exit code $($p.ExitCode)" }
     if (-not (Test-Path $customNameOutput)) { throw "Generate-only test failed: MultipleInterfacesWithCustomName" }
     Remove-Item $customNameOutput -Force
     Write-Host "Generate-only test passed: MultipleInterfacesWithCustomName"
