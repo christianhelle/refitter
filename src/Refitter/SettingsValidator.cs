@@ -57,7 +57,16 @@ public static class SettingsValidator
 
     private static ValidationResult ValidateFilePath(Settings settings, out RefitGeneratorSettings? refitSettings)
     {
-        var json = File.ReadAllText(settings.SettingsFilePath!);
+        string json;
+        try
+        {
+            json = File.ReadAllText(settings.SettingsFilePath!);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            refitSettings = null;
+            return ValidationResult.Error($"Unable to read settings file '{settings.SettingsFilePath}': {ex.Message}");
+        }
 
         RefitGeneratorSettings refitGeneratorSettings;
         try
@@ -110,6 +119,10 @@ public static class SettingsValidator
         else if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath))
         {
             settings.OpenApiPath = refitGeneratorSettings.OpenApiPath;
+            if (!GenerateCommand.IsUrl(settings.OpenApiPath))
+            {
+                return ValidateFileExistence(settings);
+            }
         }
 
         return ValidationResult.Success();

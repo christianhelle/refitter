@@ -96,12 +96,12 @@ public class RefitterGenerateTask : MSBuildTask
         TryLogCommandLine($"Starting {nameof(RefitterGenerateTask)}");
         TryLogCommandLine($"Looking for .refitter files under {ProjectFileDirectory}");
 
-        var files = Directory.GetFiles(
-            ProjectFileDirectory,
-            "*.refitter",
-            SearchOption.AllDirectories);
-
-        files = FilterFiles(files, IncludePatterns, ProjectFileDirectory);
+        var files = DiscoverRefitterFiles(ProjectFileDirectory, IncludePatterns, TryLogCommandLine, TryLogError, out var discoveryFailed);
+        if (discoveryFailed)
+        {
+            GeneratedFiles = Array.Empty<ITaskItem>();
+            return false;
+        }
 
         TryLogCommandLine($"Found {files.Length} .refitter files...");
 
@@ -445,6 +445,106 @@ public class RefitterGenerateTask : MSBuildTask
                 relativePath.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
                 fullPath.Equals(pattern, StringComparison.OrdinalIgnoreCase));
         }).ToArray();
+    }
+
+    internal static string[] DiscoverRefitterFiles(
+        string projectFileDirectory,
+        string includePatterns,
+        Action<string> logCommandLine,
+        Action<string> logError,
+        out bool failed)
+    {
+        failed = false;
+        if (string.IsNullOrWhiteSpace(projectFileDirectory))
+        {
+            logError("ProjectFileDirectory is required for Refitter MSBuild generation.");
+            failed = true;
+            return Array.Empty<string>();
+        }
+
+        string projectRoot;
+        try
+        {
+            projectRoot = Path.GetFullPath(projectFileDirectory);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            logError($"ProjectFileDirectory '{projectFileDirectory}' is invalid: {ex.Message}");
+            failed = true;
+            return Array.Empty<string>();
+        }
+
+        try
+        {
+            if (!Directory.Exists(projectRoot))
+            {
+                logError($"ProjectFileDirectory '{projectRoot}' does not exist.");
+                failed = true;
+                return Array.Empty<string>();
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            logError($"Unable to access ProjectFileDirectory '{projectRoot}': {ex.Message}");
+            failed = true;
+            return Array.Empty<string>();
+        }
+
+        var files = new List<string>();
+        EnumerateRefitterFiles(projectRoot, files, logCommandLine);
+        return FilterFiles(files.ToArray(), includePatterns, projectRoot);
+    }
+
+    private static void EnumerateRefitterFiles(string directory, ICollection<string> files, Action<string> logCommandLine)
+    {
+        string[] refitterFiles;
+        try
+        {
+            refitterFiles = Directory.GetFiles(directory, "*.refitter", SearchOption.TopDirectoryOnly);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            logCommandLine($"Skipping .refitter discovery in '{directory}': {ex.Message}");
+            return;
+        }
+
+        foreach (var file in refitterFiles)
+        {
+            files.Add(file);
+        }
+
+        string[] childDirectories;
+        try
+        {
+            childDirectories = Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            logCommandLine($"Skipping child directory discovery in '{directory}': {ex.Message}");
+            return;
+        }
+
+        foreach (var childDirectory in childDirectories)
+        {
+            if (ShouldSkipDirectory(childDirectory))
+            {
+                logCommandLine($"Skipping .refitter discovery in '{childDirectory}'");
+                continue;
+            }
+
+            EnumerateRefitterFiles(childDirectory, files, logCommandLine);
+        }
+    }
+
+    private static bool ShouldSkipDirectory(string directory)
+    {
+        var directoryName = Path.GetFileName(
+            directory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+
+        return directoryName.Equals("bin", StringComparison.OrdinalIgnoreCase) ||
+               directoryName.Equals("obj", StringComparison.OrdinalIgnoreCase) ||
+               directoryName.Equals(".git", StringComparison.OrdinalIgnoreCase) ||
+               directoryName.Equals(".vs", StringComparison.OrdinalIgnoreCase);
     }
 
     internal static string? ParseGeneratedFilePath(string? outputLine)

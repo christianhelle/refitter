@@ -127,6 +127,54 @@ public class GenerateCommandTests
     }
 
     [Test]
+    public void CreateRefitGeneratorSettings_Should_Not_Map_Default_Output_To_ContractsOutputFolder_For_Multiple_Files()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            GenerateMultipleFiles = true,
+            OutputPath = Settings.DefaultOutputPath
+        };
+
+        var refitSettings = CreateRefitGeneratorSettings(settings);
+
+        refitSettings.GenerateMultipleFiles.Should().BeTrue();
+        refitSettings.ContractsOutputFolder.Should().BeNull();
+    }
+
+    [Test]
+    public void CreateRefitGeneratorSettings_Should_Map_Explicit_Output_To_ContractsOutputFolder_For_Multiple_Files()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            GenerateMultipleFiles = true,
+            OutputPath = "Generated"
+        };
+
+        var refitSettings = CreateRefitGeneratorSettings(settings);
+
+        refitSettings.GenerateMultipleFiles.Should().BeTrue();
+        refitSettings.ContractsOutputFolder.Should().Be("Generated");
+    }
+
+    [Test]
+    public void CreateRefitGeneratorSettings_Should_Prefer_ContractsOutputPath_For_ContractsOutputFolder()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            GenerateMultipleFiles = true,
+            OutputPath = "Generated",
+            ContractsOutputPath = "Contracts"
+        };
+
+        var refitSettings = CreateRefitGeneratorSettings(settings);
+
+        refitSettings.ContractsOutputFolder.Should().Be("Contracts");
+    }
+
+    [Test]
     public void Command_Should_Have_Protected_Validate_Method()
     {
         var command = new GenerateCommand();
@@ -136,6 +184,21 @@ public class GenerateCommandTests
 
         method.Should().NotBeNull();
         method!.IsFamily.Should().BeTrue();
+    }
+
+    private static RefitGeneratorSettings CreateRefitGeneratorSettings(Settings settings)
+    {
+        var method = typeof(GenerateCommand).GetMethod(
+            "CreateRefitGeneratorSettings",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+
+        return method!
+            .Invoke(null, [settings])
+            .Should()
+            .BeOfType<RefitGeneratorSettings>()
+            .Subject;
     }
 
     [Test]

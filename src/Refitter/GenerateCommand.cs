@@ -60,7 +60,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             else if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
                 // Fallback: read settings file if not cached (shouldn't normally happen)
-                var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
+                var json = await File.ReadAllTextAsync(settings.SettingsFilePath, cancellationToken);
                 refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
 
                 // Allow CLI to override OpenApiPath if explicitly provided
@@ -132,27 +132,27 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 if (refitGeneratorSettings.OpenApiPaths == null || refitGeneratorSettings.OpenApiPaths.Length == 0)
                 {
                     var specPath = refitGeneratorSettings.OpenApiPath!;
-                    await ValidateOpenApiSpec(specPath, settings);
+                    await ValidateOpenApiSpec(specPath, settings, cancellationToken);
                 }
                 else
                 {
                     foreach (var specPath in refitGeneratorSettings.OpenApiPaths)
                     {
-                        await ValidateOpenApiSpec(specPath, settings);
+                        await ValidateOpenApiSpec(specPath, settings, cancellationToken);
                     }
                 }
             }
 
             await (refitGeneratorSettings.GenerateMultipleFiles
-                ? WriteMultipleFiles(generator, settings, refitGeneratorSettings)
-                : WriteSingleFile(generator, settings, refitGeneratorSettings));
+                ? WriteMultipleFiles(generator, settings, refitGeneratorSettings, cancellationToken)
+                : WriteSingleFile(generator, settings, refitGeneratorSettings, cancellationToken));
 
             Analytics.LogFeatureUsage(settings, refitGeneratorSettings);
 
             // Generate .refitter settings file if not using existing settings file
             if (string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
-                await WriteRefitterSettingsFile(settings, refitGeneratorSettings);
+                await WriteRefitterSettingsFile(settings, refitGeneratorSettings, cancellationToken);
             }
 
             if (refitGeneratorSettings.IncludePathMatches.Length > 0 &&
@@ -217,8 +217,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             // Error summary panel
             if (settings.SimpleOutput)
             {
-                Console.WriteLine("Generation failed!");
-                Console.WriteLine();
+                Console.Error.WriteLine("Generation failed!");
+                Console.Error.WriteLine();
             }
             else
             {
@@ -236,8 +236,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             {
                 if (settings.SimpleOutput)
                 {
-                    Console.WriteLine($"Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}");
-                    Console.WriteLine();
+                    Console.Error.WriteLine($"Unsupported OpenAPI version: {unsupportedSpecVersionException.SpecificationVersion}");
+                    Console.Error.WriteLine();
                 }
                 else
                 {
@@ -256,9 +256,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             {
                 if (settings.SimpleOutput)
                 {
-                    Console.WriteLine("Exception Details:");
-                    Console.WriteLine(exception.ToString());
-                    Console.WriteLine();
+                    Console.Error.WriteLine("Exception Details:");
+                    Console.Error.WriteLine(exception.ToString());
+                    Console.Error.WriteLine();
                 }
                 else
                 {
@@ -272,9 +272,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             {
                 if (settings.SimpleOutput)
                 {
-                    Console.WriteLine("Suggestion");
-                    Console.WriteLine("Try using the --skip-validation argument.");
-                    Console.WriteLine();
+                    Console.Error.WriteLine("Suggestion");
+                    Console.Error.WriteLine("Try using the --skip-validation argument.");
+                    Console.Error.WriteLine();
                 }
                 else
                 {
@@ -292,11 +292,11 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
             if (settings.SimpleOutput)
             {
-                Console.WriteLine("Support");
-                Console.WriteLine("Need Help?");
-                Console.WriteLine();
-                Console.WriteLine("Report an issue: https://github.com/christianhelle/refitter/issues");
-                Console.WriteLine();
+                Console.Error.WriteLine("Support");
+                Console.Error.WriteLine("Need Help?");
+                Console.Error.WriteLine();
+                Console.Error.WriteLine("Report an issue: https://github.com/christianhelle/refitter/issues");
+                Console.Error.WriteLine();
             }
             else
             {
@@ -357,7 +357,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ApizrSettings = settings.UseApizr ? new ApizrSettings() : null,
             UseDynamicQuerystringParameters = settings.UseDynamicQuerystringParameters,
             GenerateMultipleFiles = settings.GenerateMultipleFiles || !string.IsNullOrWhiteSpace(settings.ContractsOutputPath),
-            ContractsOutputFolder = settings.ContractsOutputPath ?? settings.OutputPath,
+            ContractsOutputFolder = settings.ContractsOutputPath ?? (HasExplicitCliOutputOverride(settings) ? settings.OutputPath : null),
             ContractsNamespace = settings.ContractsNamespace,
             UsePolymorphicSerialization = settings.UsePolymorphicSerialization,
             GenerateDisposableClients = settings.GenerateDisposableClients,
@@ -377,7 +377,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     private static async Task WriteSingleFile(
         RefitGenerator generator,
         Settings settings,
-        RefitGeneratorSettings refitGeneratorSettings)
+        RefitGeneratorSettings refitGeneratorSettings,
+        CancellationToken cancellationToken)
     {
         // Show progress while generating
         if (settings.SimpleOutput)
@@ -433,7 +434,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (!string.IsNullOrWhiteSpace(outputDirectory) && !Directory.Exists(outputDirectory))
             Directory.CreateDirectory(outputDirectory);
 
-        await File.WriteAllTextAsync(outputPath, code);
+        await File.WriteAllTextAsync(outputPath, code, cancellationToken);
         if (settings.SimpleOutput)
         {
             WriteGeneratedFileMarker(outputPath);
@@ -457,7 +458,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     private async Task WriteMultipleFiles(
         RefitGenerator generator,
         Settings settings,
-        RefitGeneratorSettings refitGeneratorSettings)
+        RefitGeneratorSettings refitGeneratorSettings,
+        CancellationToken cancellationToken)
     {
         // Show progress while generating
         GeneratorOutput generatorOutput;
@@ -541,7 +543,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 totalSize += outputFile.Content.Length;
                 totalLines += lines;
 
-                await File.WriteAllTextAsync(contractsFile, outputFile.Content);
+                await File.WriteAllTextAsync(contractsFile, outputFile.Content, cancellationToken);
                 if (settings.SimpleOutput)
                 {
                     WriteGeneratedFileMarker(contractsFile);
@@ -576,7 +578,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (!string.IsNullOrWhiteSpace(fileDirectory) && !Directory.Exists(fileDirectory))
                 Directory.CreateDirectory(fileDirectory);
 
-            await File.WriteAllTextAsync(outputPath, code);
+            await File.WriteAllTextAsync(outputPath, code, cancellationToken);
             if (settings.SimpleOutput)
             {
                 WriteGeneratedFileMarker(outputPath);
@@ -822,13 +824,14 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     private static void WriteGeneratedFileMarker(string outputPath) =>
         Console.WriteLine(FormatGeneratedFileMarker(outputPath));
 
-    private static async Task ValidateOpenApiSpec(string openApiPath, Settings settings)
+    private static async Task ValidateOpenApiSpec(string openApiPath, Settings settings, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         OpenApiValidationResult validationResult;
         if (settings.SimpleOutput)
         {
-            Console.WriteLine("Validating OpenAPI specification...");
-            validationResult = await Validation.OpenApiValidator.Validate(openApiPath);
+            Console.Error.WriteLine("Validating OpenAPI specification...");
+            validationResult = await Validation.OpenApiValidator.Validate(openApiPath, cancellationToken);
         }
         else
         {
@@ -837,7 +840,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 .SpinnerStyle(Style.Parse("cyan bold"))
                 .StartAsync("[cyan]🔍 Validating OpenAPI specification...[/]", async _ =>
                 {
-                    return await Validation.OpenApiValidator.Validate(openApiPath);
+                    return await Validation.OpenApiValidator.Validate(openApiPath, cancellationToken);
                 });
         }
 
@@ -845,9 +848,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         {
             if (settings.SimpleOutput)
             {
-                Console.WriteLine();
-                Console.WriteLine("OpenAPI validation failed!");
-                Console.WriteLine();
+                Console.Error.WriteLine();
+                Console.Error.WriteLine("OpenAPI validation failed!");
+                Console.Error.WriteLine();
             }
             else
             {
@@ -970,7 +973,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     {
         if (simpleOutput)
         {
-            Console.WriteLine($"{label}:{Crlf}{error}{Crlf}");
+            Console.Error.WriteLine($"{label}:{Crlf}{error}{Crlf}");
             return;
         }
 
@@ -994,7 +997,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
     }
 
-    internal static async Task WriteRefitterSettingsFile(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    internal static async Task WriteRefitterSettingsFile(
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings,
+        CancellationToken cancellationToken = default)
     {
         var settingsFilePath = DetermineSettingsFilePath(settings);
         var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
@@ -1003,7 +1009,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             Directory.CreateDirectory(settingsDirectory);
 
         var json = Serializer.Serialize(refitGeneratorSettings);
-        await File.WriteAllTextAsync(settingsFilePath, json);
+        await File.WriteAllTextAsync(settingsFilePath, json, cancellationToken);
 
         if (settings.SimpleOutput)
         {

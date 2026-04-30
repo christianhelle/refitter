@@ -141,6 +141,77 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void DiscoverRefitterFiles_Should_Return_False_For_Blank_Project_Directory()
+    {
+        var errors = new List<string>();
+
+        var result = RefitterGenerateTask.DiscoverRefitterFiles(
+            "",
+            "",
+            _ => { },
+            errors.Add,
+            out var failed);
+
+        failed.Should().BeTrue();
+        result.Should().BeEmpty();
+        errors.Should().Contain(message => message.Contains("ProjectFileDirectory is required", StringComparison.Ordinal));
+    }
+
+    [Test]
+    public void DiscoverRefitterFiles_Should_Return_False_When_Project_Directory_Does_Not_Exist()
+    {
+        var errors = new List<string>();
+        var missingDirectory = Path.Combine(AppContext.BaseDirectory, "RefitterGenerateTaskTests", Guid.NewGuid().ToString("N"));
+
+        var result = RefitterGenerateTask.DiscoverRefitterFiles(
+            missingDirectory,
+            "",
+            _ => { },
+            errors.Add,
+            out var failed);
+
+        failed.Should().BeTrue();
+        result.Should().BeEmpty();
+        errors.Should().Contain(message => message.Contains("does not exist", StringComparison.Ordinal));
+    }
+
+    [Test]
+    public void DiscoverRefitterFiles_Should_Skip_Build_And_Repository_Metadata_Directories()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            var rootFile = Path.Combine(workspace, "petstore.refitter");
+            File.WriteAllText(rootFile, "{}");
+
+            foreach (var skippedDirectoryName in new[] { "bin", "obj", ".git", ".vs" })
+            {
+                var skippedDirectory = Path.Combine(workspace, skippedDirectoryName);
+                Directory.CreateDirectory(skippedDirectory);
+                File.WriteAllText(Path.Combine(skippedDirectory, "ignored.refitter"), "{}");
+            }
+
+            var messages = new List<string>();
+
+            var result = RefitterGenerateTask.DiscoverRefitterFiles(
+                workspace,
+                "",
+                messages.Add,
+                _ => { },
+                out var failed);
+
+            failed.Should().BeFalse();
+            result.Should().ContainSingle().Which.Should().Be(rootFile);
+            messages.Should().Contain(message => message.Contains("Skipping .refitter discovery", StringComparison.Ordinal));
+        }
+        finally
+        {
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
     public void ParseGeneratedFilePath_Should_Return_File_Path_From_Marker()
     {
         var generatedFile = Path.Combine("C:", "repo", "Generated", "Petstore.cs");

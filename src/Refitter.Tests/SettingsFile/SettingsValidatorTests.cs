@@ -405,6 +405,98 @@ public class SettingsValidatorTests
     }
 
     [Test]
+    public void Validate_Should_Fail_When_Settings_File_Does_Not_Exist()
+    {
+        var settingsFile = Path.Combine(AppContext.BaseDirectory, "missing-settings", $"{Guid.NewGuid():N}.refitter");
+        var settings = new Refitter.Settings
+        {
+            SettingsFilePath = settingsFile
+        };
+
+        var result = SettingsValidator.Validate(settings);
+
+        result.Successful.Should().BeFalse();
+        result.Message.Should().Contain("Unable to read settings file");
+        result.Message.Should().Contain(settingsFile);
+    }
+
+    [Test]
+    public void Validate_Should_Fail_When_Relative_OpenApiPath_From_Settings_File_Does_Not_Exist()
+    {
+        var workspace = Path.Combine(AppContext.BaseDirectory, "SettingsValidatorTests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(workspace);
+
+        try
+        {
+            var settingsFile = Path.Combine(workspace, "test.refitter");
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPath = "specs/missing.json"
+            };
+            File.WriteAllText(settingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Refitter.Settings
+            {
+                SettingsFilePath = settingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings);
+
+            result.Successful.Should().BeFalse();
+            result.Message.Should().Contain("File not found");
+            result.Message.Should().Contain(Path.Combine(workspace, "specs", "missing.json"));
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+            {
+                Directory.Delete(workspace, recursive: true);
+            }
+        }
+    }
+
+    [Test]
+    public void Validate_Should_Succeed_When_Relative_OpenApiPath_From_Settings_File_Exists()
+    {
+        var workspace = Path.Combine(AppContext.BaseDirectory, "SettingsValidatorTests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(workspace);
+
+        try
+        {
+            var specsDirectory = Path.Combine(workspace, "specs");
+            Directory.CreateDirectory(specsDirectory);
+            var specFile = Path.Combine(specsDirectory, "openapi.json");
+            File.WriteAllText(specFile, "{}");
+
+            var settingsFile = Path.Combine(workspace, "test.refitter");
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPath = "specs/openapi.json"
+            };
+            File.WriteAllText(settingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Refitter.Settings
+            {
+                SettingsFilePath = settingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings, out var cachedSettings);
+
+            result.Successful.Should().BeTrue();
+            settings.OpenApiPath.Should().Be(specFile);
+            cachedSettings.Should().NotBeNull();
+            cachedSettings!.OpenApiPath.Should().Be(specFile);
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+            {
+                Directory.Delete(workspace, recursive: true);
+            }
+        }
+    }
+
+    [Test]
     public void Validate_Should_Fail_When_Settings_File_Has_Empty_OpenApiPaths()
     {
         var tempSettingsFile = Path.GetTempFileName();
