@@ -15,7 +15,10 @@
 
 **Merged pull requests:**
 
+- Fix default solution path and update .NET version in VS Code config [\#1082](https://github.com/christianhelle/refitter/pull/1082) ([christianhelle](https://github.com/christianhelle))
+- Fix docker smoke tests [\#1081](https://github.com/christianhelle/refitter/pull/1081) ([christianhelle](https://github.com/christianhelle))
 - House Keeping [\#1080](https://github.com/christianhelle/refitter/pull/1080) ([christianhelle](https://github.com/christianhelle))
+- chore\(deps\): update dependency tunit to 1.41.0 [\#1078](https://github.com/christianhelle/refitter/pull/1078) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.0.0-preview.107](https://github.com/christianhelle/refitter/tree/2.0.0-preview.107) (2026-04-28)
 
