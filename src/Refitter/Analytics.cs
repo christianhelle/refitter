@@ -68,10 +68,7 @@ public static class Analytics
         {
             telemetryClient.TrackEvent(
                 "settings-file",
-                new Dictionary<string, string>
-                {
-                    { "settings", Serializer.Serialize(refitGeneratorSettings) }
-                });
+                GetTelemetryProperties(settings, refitGeneratorSettings));
             telemetryClient.Flush();
         }
     }
@@ -109,8 +106,10 @@ public static class Analytics
         if (settings.NoLogging)
             return;
 
-        string json = Serializer.Serialize(settings);
-        var properties = Serializer.Deserialize<Dictionary<string, object>>(json)!;
+        var properties = GetTelemetryProperties(settings)
+            .ToDictionary(
+                pair => pair.Key,
+                pair => (object)pair.Value);
         exception
             .ToExceptionless(
                 new ContextData(
@@ -121,9 +120,53 @@ public static class Analytics
 
         telemetryClient.TrackException(
             exception,
-            new Dictionary<string, string>
-            {
-                { "settings", json }
-            });
+            GetTelemetryProperties(settings));
+    }
+
+    private static Dictionary<string, string> GetTelemetryProperties(
+        Settings settings,
+        RefitGeneratorSettings? refitGeneratorSettings = null)
+    {
+        var properties = new Dictionary<string, string>
+        {
+            ["usedSettingsFile"] = (!string.IsNullOrWhiteSpace(settings.SettingsFilePath)).ToString(),
+            ["hasOpenApiPath"] = (!string.IsNullOrWhiteSpace(settings.OpenApiPath)).ToString(),
+            ["skipValidation"] = settings.SkipValidation.ToString(),
+            ["multipleInterfaces"] = settings.MultipleInterfaces.ToString(),
+            ["operationNameGenerator"] = settings.OperationNameGenerator.ToString(),
+            ["useApizr"] = settings.UseApizr.ToString(),
+            ["generateMultipleFiles"] = settings.GenerateMultipleFiles.ToString(),
+            ["includeTagsCount"] = (settings.Tags?.Length ?? 0).ToString(),
+            ["matchPathsCount"] = (settings.MatchPaths?.Length ?? 0).ToString(),
+            ["additionalNamespacesCount"] = (settings.AdditionalNamespaces?.Length ?? 0).ToString(),
+            ["ignoredOperationHeadersCount"] = (settings.IgnoredOperationHeaders?.Length ?? 0).ToString(),
+            ["hasCustomTemplateDirectory"] = (!string.IsNullOrWhiteSpace(settings.CustomTemplateDirectory)).ToString(),
+            ["hasContractsOutputPath"] = (!string.IsNullOrWhiteSpace(settings.ContractsOutputPath)).ToString(),
+            ["hasContractsNamespace"] = (!string.IsNullOrWhiteSpace(settings.ContractsNamespace)).ToString(),
+            ["hasOperationNameTemplate"] = (!string.IsNullOrWhiteSpace(settings.OperationNameTemplate)).ToString(),
+            ["hasSecurityScheme"] = (!string.IsNullOrWhiteSpace(settings.SecurityScheme)).ToString()
+        };
+
+        if (refitGeneratorSettings is null)
+        {
+            return properties;
+        }
+
+        properties["openApiPathsCount"] = (refitGeneratorSettings.OpenApiPaths?.Length ?? 0).ToString();
+        properties["generateClients"] = refitGeneratorSettings.GenerateClients.ToString();
+        properties["generateContracts"] = refitGeneratorSettings.GenerateContracts.ToString();
+        properties["generateMultipleFilesFromSettings"] = refitGeneratorSettings.GenerateMultipleFiles.ToString();
+        properties["usePolymorphicSerialization"] = refitGeneratorSettings.UsePolymorphicSerialization.ToString();
+        properties["generateJsonSerializerContext"] = refitGeneratorSettings.GenerateJsonSerializerContext.ToString();
+        properties["hasDependencyInjectionSettings"] = (refitGeneratorSettings.DependencyInjectionSettings is not null).ToString();
+        properties["hasApizrSettings"] = (refitGeneratorSettings.ApizrSettings is not null).ToString();
+        properties["hasCustomTemplateDirectoryFromSettings"] = (!string.IsNullOrWhiteSpace(refitGeneratorSettings.CustomTemplateDirectory)).ToString();
+        properties["hasOutputFolder"] = (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder)).ToString();
+        properties["hasOutputFilename"] = (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFilename)).ToString();
+        properties["hasContractsOutputFolder"] = (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder)).ToString();
+        properties["includePathMatchesCount"] = refitGeneratorSettings.IncludePathMatches.Length.ToString();
+        properties["includeTagsFromSettingsCount"] = refitGeneratorSettings.IncludeTags.Length.ToString();
+
+        return properties;
     }
 }
