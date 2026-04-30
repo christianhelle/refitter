@@ -480,6 +480,7 @@ function RunTests
         -processPath $processPath `
         -useDocker $UseDocker
     $p | Wait-Process
+    if ($p.ExitCode -ne 0) { throw "Generate-only test failed: MultipleInterfacesWithCustomName; exit code $($p.ExitCode)" }
     if (-not (Test-Path $customNameOutput)) { throw "Generate-only test failed: MultipleInterfacesWithCustomName" }
     Remove-Item $customNameOutput -Force
     Write-Host "Generate-only test passed: MultipleInterfacesWithCustomName"
