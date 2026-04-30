@@ -208,6 +208,19 @@ public class OperationNameGeneratorTypesTests
     }
 
     [Test]
+    public async Task Can_Build_Generated_Code_With_Invalid_Characters_In_OperationNameTemplate()
+    {
+        string generatedCode = await GenerateCode(operationNameTemplate: "{operationName}-Async");
+
+        generatedCode.Should().Contain("ListPets_Async");
+        generatedCode.Should().NotContain("ListPets-Async");
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Test]
     public async Task Generated_Code_Contains_Multiple_Interfaces_For_MultipleClientsFromOperationId()
     {
         string generatedCode = await GenerateCode(OperationNameGeneratorTypes.MultipleClientsFromOperationId);
@@ -235,7 +248,9 @@ public class OperationNameGeneratorTypesTests
         generatedCode.Should().Contain("ListOrders");
     }
 
-    private static async Task<string> GenerateCode(OperationNameGeneratorTypes generatorType = OperationNameGeneratorTypes.Default)
+    private static async Task<string> GenerateCode(
+        OperationNameGeneratorTypes generatorType = OperationNameGeneratorTypes.Default,
+        string? operationNameTemplate = null)
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         try
@@ -243,7 +258,8 @@ public class OperationNameGeneratorTypesTests
             var settings = new RefitGeneratorSettings
             {
                 OpenApiPath = swaggerFile,
-                OperationNameGenerator = generatorType
+                OperationNameGenerator = generatorType,
+                OperationNameTemplate = operationNameTemplate
             };
             var generator = await RefitGenerator.CreateAsync(settings);
             return generator.Generate();

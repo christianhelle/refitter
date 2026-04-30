@@ -394,12 +394,22 @@ public static class OpenApiDocumentFactory
     /// <returns>A new instance of the <see cref="NSwag.OpenApiDocument"/> class.</returns>
     public static async Task<OpenApiDocument> CreateAsync(string openApiPath)
     {
+        Result readResult;
         try
         {
-            var readResult = await OpenApiMultiFileReader.Read(openApiPath).ConfigureAwait(false);
-            if (!readResult.ContainedExternalReferences)
-                return await CreateUsingNSwagAsync(openApiPath).ConfigureAwait(false);
+            readResult = await OpenApiMultiFileReader.Read(openApiPath).ConfigureAwait(false);
+        }
+        catch (Exception openApiReaderException)
+        {
+            // Fallback to NSwag if OpenApiMultiFileReader fails (e.g., for files without external references)
+            return await CreateUsingNSwagOrThrowAggregateAsync(openApiPath, openApiReaderException).ConfigureAwait(false);
+        }
 
+        if (!readResult.ContainedExternalReferences)
+            return await CreateUsingNSwagAsync(openApiPath).ConfigureAwait(false);
+
+        try
+        {
             var specificationVersion = readResult.OpenApiDiagnostic.SpecificationVersion;
             PopulateMissingRequiredFields(openApiPath, readResult);
 
@@ -412,10 +422,26 @@ public static class OpenApiDocumentFactory
             var json = await readResult.OpenApiDocument.SerializeAsJsonAsync(specificationVersion).ConfigureAwait(false);
             return await OpenApiDocument.FromJsonAsync(json).ConfigureAwait(false);
         }
-        catch (Exception)
+        catch (Exception openApiReaderException)
         {
-            // Fallback to NSwag if OpenApiMultiFileReader fails (e.g., for files without external references)
+            return await CreateUsingNSwagOrThrowAggregateAsync(openApiPath, openApiReaderException).ConfigureAwait(false);
+        }
+    }
+
+    private static async Task<OpenApiDocument> CreateUsingNSwagOrThrowAggregateAsync(
+        string openApiPath,
+        Exception openApiReaderException)
+    {
+        try
+        {
             return await CreateUsingNSwagAsync(openApiPath).ConfigureAwait(false);
+        }
+        catch (Exception nswagException)
+        {
+            throw new AggregateException(
+                "Failed to read the OpenAPI document using both Microsoft.OpenApi and NSwag readers.",
+                openApiReaderException,
+                nswagException);
         }
     }
 
@@ -482,7 +508,12 @@ public static class OpenApiDocumentFactory
     /// <returns>True if the path is a YAML file, otherwise false.</returns>
     private static bool IsYaml(string path)
     {
-        return path.EndsWith("yaml", StringComparison.OrdinalIgnoreCase) ||
-               path.EndsWith("yml", StringComparison.OrdinalIgnoreCase);
+        var extensionPath = IsHttp(path) && Uri.TryCreate(path, UriKind.Absolute, out var uri)
+            ? uri.AbsolutePath
+            : path;
+        var extension = Path.GetExtension(extensionPath);
+
+        return extension.Equals(".yaml", StringComparison.OrdinalIgnoreCase) ||
+               extension.Equals(".yml", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -1,3 +1,4 @@
+using System.Reflection;
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Resources;
@@ -161,6 +162,36 @@ paths:
     }
 
     [Test]
+    public void IsYaml_Uses_Uri_AbsolutePath_For_Url_Extensions()
+    {
+        InvokeIsYaml("https://example.test/openapi.yaml?format=json").Should().BeTrue();
+        InvokeIsYaml("https://example.test/openapi.yml?download=true").Should().BeTrue();
+        InvokeIsYaml("https://example.test/openapi.json?format=yaml").Should().BeFalse();
+    }
+
+    [Test]
+    public void IsYaml_Uses_Path_Extension_For_Local_Paths()
+    {
+        InvokeIsYaml(Path.Combine("specs", "openapi.yaml")).Should().BeTrue();
+        InvokeIsYaml(Path.Combine("specs", "openapi.yml")).Should().BeTrue();
+        InvokeIsYaml(Path.Combine("specs", "openapi.json")).Should().BeFalse();
+        InvokeIsYaml(Path.Combine("specs", "openapiyaml")).Should().BeFalse();
+    }
+
+    [Test]
+    public async Task Create_Preserves_OpenApiReader_And_NSwag_Failures_When_Both_Readers_Fail()
+    {
+        var swaggerFile = Path.Combine(AppContext.BaseDirectory, $"{Guid.NewGuid():N}.json");
+
+        var act = async () => await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+
+        var exception = await act.Should().ThrowAsync<AggregateException>();
+        exception.Which.Message.Should().Contain("both Microsoft.OpenApi and NSwag");
+        exception.Which.InnerExceptions.Should().HaveCount(2);
+        exception.Which.InnerExceptions.Should().OnlyContain(innerException => !string.IsNullOrWhiteSpace(innerException.Message));
+    }
+
+    [Test]
     public async Task Create_From_Invalid_File_Falls_Back_To_NSwag()
     {
         var spec = @"{
@@ -186,6 +217,13 @@ paths:
 
         document.Should().NotBeNull();
         document.Info.Title.Should().Be("Fallback Test");
+    }
+
+    private static bool InvokeIsYaml(string path)
+    {
+        var method = typeof(OpenApiDocumentFactory).GetMethod("IsYaml", BindingFlags.NonPublic | BindingFlags.Static);
+        method.Should().NotBeNull();
+        return (bool)method!.Invoke(null, [path])!;
     }
 
     [Test]

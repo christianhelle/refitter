@@ -31,9 +31,7 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
 
                 var returnType = GetTypeName(operation);
                 var verb = operations.Key.CapitalizeFirstCharacter();
-                var methodName = !string.IsNullOrWhiteSpace(settings.OperationNameTemplate)
-                    ? settings.OperationNameTemplate!.Replace("{operationName}", "Execute")
-                    : "Execute";
+                var methodName = ApplyOperationNameTemplate("Execute", useTemplateWithoutPlaceholder: true);
                 var code = new StringBuilder();
 
                 this.docGenerator.AppendInterfaceDocumentationByEndpoint(operation, code);
@@ -63,9 +61,9 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateHeaders(operations, operationModel, code);
 
-                code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
+                code.AppendLine($"{Separator}{Separator}[{verb}({CSharpStringLiteral.Format(kv.Key)})]")
                     .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
-                    .AppendLine($"{Separator}}}");
+                    .AppendLine();
 
                 if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
                 {
@@ -76,10 +74,12 @@ internal class RefitMultipleInterfaceGenerator : RefitInterfaceGenerator
 
                     parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
-                    code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
+                    code.AppendLine($"{Separator}{Separator}[{verb}({CSharpStringLiteral.Format(kv.Key)})]")
                         .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
                         .AppendLine();
                 }
+
+                code.AppendLine($"{Separator}}}");
 
                 yield return new GeneratedCode(interfaceName, code.ToString());
             }

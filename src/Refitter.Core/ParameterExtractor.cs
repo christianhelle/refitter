@@ -55,7 +55,7 @@ internal static class ParameterExtractor
                 .Select(p =>
                 {
                     var variableName = GetVariableName(p);
-                    return $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {variableName}";
+                    return $"{JoinAttributes($"Header({CSharpStringLiteral.Format(p.Name)})")}{GetParameterType(p, settings)} {variableName}";
                 })
                 .ToList();
         }
@@ -75,7 +75,7 @@ internal static class ParameterExtractor
                     && securityScheme.In == OpenApiSecurityApiKeyLocation.Header
                     && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
                 {
-                    headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {ReplaceUnsafeCharacters(securityScheme.Name)}");
+                    headerParameters.Add($"[Header({CSharpStringLiteral.Format(securityScheme.Name)})] string {ReplaceUnsafeCharacters(securityScheme.Name)}");
                 }
                 else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http }
                     && string.Equals(securityScheme.Scheme, "bearer", StringComparison.OrdinalIgnoreCase))
@@ -90,6 +90,10 @@ internal static class ParameterExtractor
         var seenFormParameterNames = new HashSet<string>(StringComparer.Ordinal);
         var formParameters = new List<string>();
 
+        var multipartRequiredProperties = operation.RequestBody?.Content?.TryGetValue("multipart/form-data", out var formDataContent) == true
+            ? formDataContent.Schema?.RequiredProperties
+            : null;
+
         foreach (var p in operationModel.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter))
         {
             // Use VariableName (NSwag's processed name) not Name (original OpenAPI name)
@@ -97,7 +101,8 @@ internal static class ParameterExtractor
             // Only add if this sanitized identifier hasn't been seen
             if (seenFormParameterNames.Add(variableName))
             {
-                formParameters.Add($"{JoinAttributes(GetAliasAsAttribute(p.Name, variableName))}{GetParameterType(p, settings)} {variableName}");
+                var isRequired = multipartRequiredProperties?.Contains(p.Name);
+                formParameters.Add($"{JoinAttributes(GetAliasAsAttribute(p.Name, variableName))}{GetParameterType(p, settings, isRequired)} {variableName}");
             }
         }
 
@@ -122,7 +127,8 @@ internal static class ParameterExtractor
                     if (!isBinary)
                     {
                         // Generate proper C# type for the property
-                        var propertyType = GetCSharpType(propertySchema, settings);
+                        var isRequired = schema.RequiredProperties.Contains(property.Key);
+                        var propertyType = GetCSharpType(propertySchema, settings, isRequired);
                         var variableName = ConvertToVariableName(property.Key);
 
                         // Deduplicate by sanitized C# identifier, not original OpenAPI name (#1018)
@@ -231,12 +237,40 @@ internal static class ParameterExtractor
         return type switch
         {
             "bool" => defaultValue.ToString()?.ToLowerInvariant() ?? "default",
-            "string" => $"\"{EscapeString(defaultValue.ToString() ?? string.Empty)}\"",
+            "string" => CSharpStringLiteral.Format(defaultValue.ToString() ?? string.Empty),
             _ when IsNumericType(type) => FormatNumericValue(defaultValue, type),
             _ => "default"
         };
     }
 
+
+    private static string FormatNumericValue(object defaultValue, string type)
+    {
+        var numericString = defaultValue is IFormattable formattable
+            ? formattable.ToString(null, CultureInfo.InvariantCulture)
+            : (defaultValue.ToString() ?? "default");
+
+        return type switch
+        {
+            "float" or "Single" => $"{numericString}f",
+            "decimal" or "Decimal" => $"{numericString}m",
+            "double" or "Double" => FormatDoubleLiteral(numericString),
+            "long" or "Int64" => $"{numericString}L",
+            "ulong" or "UInt64" => $"{numericString}UL",
+            "uint" or "UInt32" => $"{numericString}U",
+            _ => numericString
+        };
+    }
+
+    private static string FormatDoubleLiteral(string numericString)
+    {
+        // If the string already contains a decimal point or exponent, return as-is
+        if (numericString.Contains('.') || numericString.Contains('e') || numericString.Contains('E'))
+            return numericString;
+
+        // Otherwise, append .0 to make it a double literal
+        return numericString + ".0";
+    }
 
     private static string EscapeString(string value)
     {
@@ -277,36 +311,10 @@ internal static class ParameterExtractor
                     break;
             }
         }
+
         return sb.ToString();
     }
 
-    private static string FormatNumericValue(object defaultValue, string type)
-    {
-        var numericString = defaultValue is IFormattable formattable
-            ? formattable.ToString(null, CultureInfo.InvariantCulture)
-            : (defaultValue.ToString() ?? "default");
-
-        return type switch
-        {
-            "float" or "Single" => $"{numericString}f",
-            "decimal" or "Decimal" => $"{numericString}m",
-            "double" or "Double" => FormatDoubleLiteral(numericString),
-            "long" or "Int64" => $"{numericString}L",
-            "ulong" or "UInt64" => $"{numericString}UL",
-            "uint" or "UInt32" => $"{numericString}U",
-            _ => numericString
-        };
-    }
-
-    private static string FormatDoubleLiteral(string numericString)
-    {
-        // If the string already contains a decimal point or exponent, return as-is
-        if (numericString.Contains('.') || numericString.Contains('e') || numericString.Contains('E'))
-            return numericString;
-
-        // Otherwise, append .0 to make it a double literal
-        return numericString + ".0";
-    }
 
     private static bool IsNumericType(string type)
     {
@@ -340,11 +348,11 @@ internal static class ParameterExtractor
             { parameter.IsDate: true, settings.UseIsoDateFormat: true }
                 => "Query(Format = \"yyyy-MM-dd\")",
             { parameter.IsDate: true, settings.CodeGeneratorSettings.DateFormat: not null }
-                => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateFormat}\")",
+                => $"Query(Format = {CSharpStringLiteral.Format(settings.CodeGeneratorSettings.DateFormat)})",
             {
                 parameter.IsDateOrDateTime: true, parameter.Schema.Format: "date-time",
                 settings.CodeGeneratorSettings.DateTimeFormat: not null
-            } => $"Query(Format = \"{settings.CodeGeneratorSettings?.DateTimeFormat}\")",
+            } => $"Query(Format = {CSharpStringLiteral.Format(settings.CodeGeneratorSettings.DateTimeFormat)})",
             _ => "Query",
         };
     }
@@ -352,12 +360,12 @@ internal static class ParameterExtractor
     private static string GetAliasAsAttribute(CSharpParameterModel parameterModel) =>
         string.Equals(parameterModel.Name, parameterModel.VariableName)
             ? string.Empty
-            : $"AliasAs(\"{EscapeString(parameterModel.Name)}\")";
+            : $"AliasAs({CSharpStringLiteral.Format(parameterModel.Name)})";
 
     private static string GetAliasAsAttribute(string originalName, string variableName) =>
         string.Equals(originalName, variableName, StringComparison.Ordinal)
             ? string.Empty
-            : $"AliasAs(\"{EscapeString(originalName)}\")";
+            : $"AliasAs({CSharpStringLiteral.Format(originalName)})";
 
     private static string JoinAttributes(params string[] attributes)
     {
@@ -373,7 +381,8 @@ internal static class ParameterExtractor
 
     private static string GetParameterType(
         ParameterModelBase parameterModel,
-        RefitGeneratorSettings settings)
+        RefitGeneratorSettings settings,
+        bool? isRequiredOverride = null)
     {
         var type = WellKnownNamespaces
             .TrimImportedNamespaces(
@@ -382,11 +391,18 @@ internal static class ParameterExtractor
 
         if (settings.OptionalParameters &&
             !type.EndsWith("?") &&
-            (parameterModel.IsNullable || parameterModel.IsOptional || !parameterModel.IsRequired))
+            IsOptionalParameter(parameterModel, isRequiredOverride))
             type += "?";
 
         return type;
     }
+
+    private static bool IsOptionalParameter(
+        ParameterModelBase parameterModel,
+        bool? isRequiredOverride) =>
+        isRequiredOverride is bool isRequired
+            ? !isRequired
+            : parameterModel.IsNullable || parameterModel.IsOptional || !parameterModel.IsRequired;
 
     private static string GetQueryParameterType(
         ParameterModelBase parameterModel,
@@ -553,7 +569,10 @@ $$"""
         codeBuilder.AppendLine();
     }
 
-    private static string GetCSharpType(JsonSchema propertySchema, RefitGeneratorSettings settings)
+    private static string GetCSharpType(JsonSchema propertySchema, RefitGeneratorSettings settings) =>
+        GetCSharpType(propertySchema, settings, null);
+
+    private static string GetCSharpType(JsonSchema propertySchema, RefitGeneratorSettings settings, bool? isRequired)
     {
         var type = propertySchema.Type switch
         {
@@ -567,7 +586,8 @@ $$"""
         };
 
         // Add nullable modifier if needed
-        if (settings.OptionalParameters && propertySchema.IsNullable(SchemaType.OpenApi3))
+        if (settings.OptionalParameters &&
+            (isRequired is false || (isRequired is null && propertySchema.IsNullable(SchemaType.OpenApi3))))
         {
             type += "?";
         }

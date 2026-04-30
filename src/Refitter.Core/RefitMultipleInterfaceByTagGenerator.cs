@@ -94,7 +94,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
                 GenerateForMultipartFormData(operationModel, sb);
                 GenerateHeaders(operations, operationModel, sb);
 
-                sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
+                sb.AppendLine($"{Separator}{Separator}[{verb}({CSharpStringLiteral.Format(op.PathItem.Key)})]")
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                     .AppendLine();
 
@@ -107,7 +107,7 @@ internal class RefitMultipleInterfaceByTagGenerator : RefitInterfaceGenerator
 
                     parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
-                    sb.AppendLine($"{Separator}{Separator}[{verb}(\"{op.PathItem.Key}\")]")
+                    sb.AppendLine($"{Separator}{Separator}[{verb}({CSharpStringLiteral.Format(op.PathItem.Key)})]")
                         .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                         .AppendLine();
                 }

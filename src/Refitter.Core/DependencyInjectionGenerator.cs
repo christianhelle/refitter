@@ -36,7 +36,7 @@ internal static class DependencyInjectionGenerator
 
         var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
-            : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
+            : $".ConfigureHttpClient(c => c.BaseAddress = new Uri({CSharpStringLiteral.Format(iocSettings.BaseUrl!)}))";
 
         var usings = iocSettings.TransientErrorHandler switch
         {

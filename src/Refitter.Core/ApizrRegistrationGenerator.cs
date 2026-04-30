@@ -52,7 +52,7 @@ internal static class ApizrRegistrationGenerator
             optionsCodeBuilder.AppendLine();
             optionsCodeBuilder.Append(
                 $$"""               
-                                .WithBaseAddress("{{iocSettings!.BaseUrl}}", ApizrDuplicateStrategy.Ignore)
+                                .WithBaseAddress({{CSharpStringLiteral.Format(iocSettings!.BaseUrl!)}}, ApizrDuplicateStrategy.Ignore)
                 """);
         }
 

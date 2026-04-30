@@ -86,7 +86,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
                 GenerateForMultipartFormData(operationModel, code);
                 GenerateHeaders(operations, operationModel, code);
 
-                code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
+                code.AppendLine($"{Separator}{Separator}[{verb}({CSharpStringLiteral.Format(kv.Key)})]")
                     .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                     .AppendLine();
 
@@ -102,7 +102,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
                     parametersString = string.Join(", ", parameters.Where(parameter => !parameter.Contains("?")));
 
-                    code.AppendLine($"{Separator}{Separator}[{verb}(\"{kv.Key}\")]")
+                    code.AppendLine($"{Separator}{Separator}[{verb}({CSharpStringLiteral.Format(kv.Key)})]")
                         .AppendLine($"{Separator}{Separator}{returnType} {operationName}({parametersString});")
                         .AppendLine();
                 }
@@ -128,8 +128,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         }
 
         // First check for explicit success status codes
-        var successCodes = new[] { "200", "201", "203", "206" };
-        var returnTypeParameter = successCodes
+        var returnTypeParameter = GetExplicitNumericSuccessCodes(operation)
             .Where(operation.Responses.ContainsKey)
             .Select(code => GetTypeName(code, operation))
             .FirstOrDefault();
@@ -156,9 +155,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
     /// <returns>True if the response is a file stream, false otherwise.</returns>
     private static bool IsFileStreamResponse(OpenApiOperation operation)
     {
-        var successCodes = new[] { "200", "201", "203", "206", "2XX" };
-
-        foreach (var code in successCodes)
+        foreach (var code in GetFileResponseSuccessCodes(operation))
         {
             if (!operation.Responses.TryGetValue(code, out var apiResponse))
                 continue;
@@ -197,6 +194,18 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
              !contentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase));
     }
 
+    private static IEnumerable<string> GetExplicitNumericSuccessCodes(OpenApiOperation operation) =>
+        operation.Responses.Keys.Where(IsExplicitNumericSuccessCode);
+
+    private static IEnumerable<string> GetFileResponseSuccessCodes(OpenApiOperation operation) =>
+        GetExplicitNumericSuccessCodes(operation)
+            .Concat(operation.Responses.ContainsKey("2XX") ? ["2XX"] : []);
+
+    private static bool IsExplicitNumericSuccessCode(string code) =>
+        code.Length == 3 &&
+        int.TryParse(code, out var statusCode) &&
+        statusCode is >= 200 and <= 299;
+
     private string GetTypeName(string code, OpenApiOperation operation)
     {
         var schema = operation.Responses[code].ActualResponse.Schema;
@@ -219,8 +228,6 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         OpenApiOperation operation,
         bool capitalizeFirstCharacter = false)
     {
-        const string operationNamePlaceholder = "{operationName}";
-
         var operationName = generator
             .BaseSettings
             .OperationNameGenerator
@@ -229,13 +236,26 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
         if (capitalizeFirstCharacter)
             operationName = operationName.CapitalizeFirstCharacter();
 
+        return ApplyOperationNameTemplate(operationName);
+    }
+
+    protected string ApplyOperationNameTemplate(
+        string operationName,
+        bool useTemplateWithoutPlaceholder = false)
+    {
+        const string operationNamePlaceholder = "{operationName}";
+
         if (settings.OperationNameTemplate?.Contains(operationNamePlaceholder) ?? false)
         {
             operationName = settings.OperationNameTemplate!
                 .Replace(operationNamePlaceholder, operationName);
         }
+        else if (useTemplateWithoutPlaceholder && !string.IsNullOrWhiteSpace(settings.OperationNameTemplate))
+        {
+            operationName = settings.OperationNameTemplate!;
+        }
 
-        return operationName;
+        return IdentifierUtils.ToCompilableIdentifier(operationName);
     }
 
     protected static void GenerateForMultipartFormData(CSharpOperationModel operationModel, StringBuilder code)
@@ -270,7 +290,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
             if (uniqueContentTypes.Any())
             {
-                headers.Add($"\"Accept: {string.Join(", ", uniqueContentTypes)}\"");
+                headers.Add(CSharpStringLiteral.Format($"Accept: {string.Join(", ", uniqueContentTypes)}"));
             }
         }
 
@@ -283,7 +303,7 @@ internal class RefitInterfaceGenerator : IRefitInterfaceGenerator
 
             if (!string.IsNullOrWhiteSpace(contentType) && !operationModel.Consumes.Contains("multipart/form-data"))
             {
-                headers.Add($"\"Content-Type: {contentType}\"");
+                headers.Add(CSharpStringLiteral.Format($"Content-Type: {contentType}"));
             }
         }
 

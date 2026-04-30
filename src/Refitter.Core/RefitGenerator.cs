@@ -168,7 +168,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                     (current, import) => current.Replace($"{import}.", string.Empty));
         }
 
-        var refitInterfaces = GenerateClient(interfaceGenerator);
+        var refitInterfaces = settings.GenerateClients
+            ? GenerateClient(interfaceGenerator)
+            : [];
         var interfaceNames = refitInterfaces.Select(c => c.TypeName).ToArray();
         var refitInterfacesCode = string.Join("", refitInterfaces.Select(c => c.Content));
         var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
@@ -218,7 +220,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         var generatedFiles = new List<GeneratedCode>();
 
-        var refitInterfaces = GenerateClient(interfaceGenerator);
+        var refitInterfaces = settings.GenerateClients
+            ? GenerateClient(interfaceGenerator)
+            : [];
         generatedFiles.AddRange(refitInterfaces);
 
         if (settings.GenerateContracts)
@@ -392,6 +396,10 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
 
         var refitInterfaces = interfaceGenerator.GenerateCode();
         var generatedCodes = refitInterfaces as GeneratedCode[] ?? refitInterfaces.ToArray();
+        if (generatedCodes.Length == 0)
+        {
+            throw new InvalidOperationException("No Refit interfaces were generated from the OpenAPI document. Check path/tag filters and deprecated operation settings.");
+        }
 
         if (settings.GenerateMultipleFiles)
         {
