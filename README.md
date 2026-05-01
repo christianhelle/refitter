@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-95-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-96-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1476,6 +1476,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/dimyle"><img src="https://avatars.githubusercontent.com/u/54911257?v=4?s=100" width="100px;" alt="Dmitry"/><br /><sub><b>Dmitry</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adimyle" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Timovzl"><img src="https://avatars.githubusercontent.com/u/655426?v=4?s=100" width="100px;" alt="Timo van Zijll Langhout"/><br /><sub><b>Timo van Zijll Langhout</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3ATimovzl" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/AntonTeyken"><img src="https://avatars.githubusercontent.com/u/162133784?v=4?s=100" width="100px;" alt="Anton"/><br /><sub><b>Anton</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AAntonTeyken" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://umair.me"><img src="https://avatars.githubusercontent.com/u/834935?v=4?s=100" width="100px;" alt="Muhammad Umair Irshad"/><br /><sub><b>Muhammad Umair Irshad</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Aumair-me" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
