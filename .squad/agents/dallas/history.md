@@ -1,3 +1,11 @@
+## Squad Session: Issue #1083 Resolution [2026-05-01T13.14.05.273Z]
+
+Parker, Lambert, and Dallas completed issue #1083 resolution:
+- Core generation fix for schema type names
+- Regression test coverage (inline scenario, collision/trailing-dot cases)
+- Adjacent surface validation (CLI, MSBuild, Source Generator)
+- All tests passing, generated code compiles successfully
+
 # Dallas History
 
 ## Context
@@ -7,6 +15,8 @@
 - Stack: .NET, Refit, NSwag, Source Generator, MSBuild, Microsoft OpenAPI.NET
 
 ## Learnings
+
+- **2026-05-01T14:34:56.630+02:00 issue #1083 tooling follow-up:** the dotted-schema-name fix is a core generator concern, so CLI/MSBuild wiring and README help text do not need parity changes; the only adjacent tooling work worth landing is source-generator regression coverage so compile-time generation proves the same sanitized DTO/return-type behavior as the CLI path.
 
 - **2026-04-28T15:21:48.369+02:00 e-conomic multi-spec tooling verdict:** `test\economic.refitter` parses correctly and resolves both relative `openApiPaths`; CLI/MSBuild/source-generator all reach core multi-document merge, where duplicate equivalent schemas (`Error`, then `ProblemDetails`) trigger the fail-fast merge path before validation, so `--skip-validation` cannot help.
 

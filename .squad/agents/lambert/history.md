@@ -1,3 +1,11 @@
+## Squad Session: Issue #1083 Resolution [2026-05-01T13.14.05.273Z]
+
+Parker, Lambert, and Dallas completed issue #1083 resolution:
+- Core generation fix for schema type names
+- Regression test coverage (inline scenario, collision/trailing-dot cases)
+- Adjacent surface validation (CLI, MSBuild, Source Generator)
+- All tests passing, generated code compiles successfully
+
 # Lambert History
 
 ## Context
@@ -7,6 +15,12 @@
 - Stack: .NET, Refit, NSwag, Source Generator, MSBuild, Microsoft OpenAPI.NET
 
 ## Learnings
+
+- **2026-05-01T14:34:56.630+02:00 issue #1083 regression contract:** Kept coverage isolated in `Issue1083_SchemaTypeNameSanitizationTests` with a 1-endpoint inline Swagger 2 fixture. The durable assertions are: no blank `partial class`, no `Task<>`, the sanitized DTO name `LookUpErnResponse` appears in both the contract and interface signature, and generated code must compile.
+
+- **2026-05-01T14:04:19.681+02:00 issue #1083 repro:** Current HEAD reproduces issue #1083 with both the real Revenue schema name `LookUpErnResponse.` and a 1-endpoint minimal Swagger 2 fixture. Refitter emits `Task<> LookUpERN(...)` plus `partial class` with a blank identifier, and isolated compile checks fail with `CS1001 Identifier expected`.
+
+- **2026-05-01T14:04:19.681+02:00 issue #1083 coverage gap:** Existing identifier/property-name coverage (`PropertyNamingPolicyTests`, `PR1064BlockerRegressions`, `IdentifierUtilsTests`) stays green because it exercises property/parameter sanitization, not schema/type-name generation. The durable regression contract is a new scenario test around a dotted schema key plus a compile-backed assertion, with optional helper-level identifier assertions only if the fix routes through shared identifier utilities.
 
 - **2026-04-28T15:21:48.369+02:00 e-conomic OpenApiPaths regression coverage:** Added intended compile-backed regression coverage for the real `economic-products.json` + `economic-webhooks.json` inputs through `RefitGeneratorSettings.OpenApiPaths`. Current HEAD fails before code generation with duplicate schema `Error`, so the non-empty/buildable assertions become active evidence once the merge fix lands.
 
