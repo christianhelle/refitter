@@ -1,3 +1,119 @@
+### 2026-05-01T14:04:19.681+02:00: Issue #1083 response framing
+**By:** Bishop
+**What:** Treat issue #1083 as a likely product bug rather than a documentation dispute; current docs scope identifier sanitization to contract properties under propertyNamingPolicy, not schema or contract type names.
+**Why:** The maintainer reply should acknowledge the broken generated output without inaccurately claiming the docs already promised schema-type sanitization.
+
+### 2026-05-01T14:04:19.681+02:00: User directive
+**By:** Christian Helle (via Copilot)
+**What:** Use GPT-5.5 for all agents for the rest of this session only.
+**Why:** User request — captured for team memory
+
+### 2026-05-01T14:34:56.630+02:00: Issue #1083 adjacent tooling verdict
+
+**By:** Dallas
+
+**Decision:** Do not add CLI, MSBuild, or README follow-up for #1083. The bug and its fix live in shared core type-name generation, so those surfaces inherit the corrected behavior without new wiring or user-facing settings. Add only source-generator regression coverage to prove the compile-time surface emits the sanitized DTO type and method return type for dotted schema names.
+
+**Why:** #1083 does not introduce a new option, command contract, settings shape, or consumer workflow. The adjacent risk was validation drift in the source-generator lane, so a focused generated-code test is the smallest correctness guard that keeps scope tight.
+
+# Lambert issue #1083 repro decision
+
+- **Date:** 2026-05-01T14:04:19.681+02:00
+- **Requester:** Christian Helle
+- **Decision:** Treat GitHub issue #1083 as a valid current-HEAD bug and anchor the regression on a minimal inline Swagger 2 fixture that uses the exact dotted schema key `LookUpErnResponse.`. Keep any real Revenue-spec check as optional evidence only, not as the primary automated regression, to avoid live-network coupling.
+
+## Evidence
+
+- Minimal fixture generation produced `Task<> LookUpERN(...)` and `public partial class` with no identifier.
+- Real Revenue spec generation produced the same failure shape in `IPAYEEnhancedReportingNotificationRESTAPIApi.cs` and `Contracts.cs`.
+- Isolated compile checks failed with `CS1001 Identifier expected` for both generated outputs.
+
+## Required regression coverage
+
+1. Add a focused scenario test file in `src\Refitter.Tests\Scenarios` for invalid schema/type names.
+2. Use an inline fixture with one endpoint whose 200-response references `#/definitions/LookUpErnResponse.`.
+3. Assert generated code does **not** contain `Task<>` or `partial class` followed by a blank name.
+4. Assert generated code **does** contain a concrete sanitized DTO identifier and that the response method returns that identifier.
+5. Add a `BuildHelper.BuildCSharp(generatedCode).Should().BeTrue()` assertion so the regression proves compilable output, not just string replacement.
+6. Only add/update `IdentifierUtilsTests` if the implementation explicitly routes schema/type-name sanitization through shared identifier utilities; otherwise keep coverage at the scenario level.
+
+## 2026-05-01T14:34:56.630+02:00
+
+- Decision: keep issue #1083 coverage in a dedicated scenario test file instead of widening `PR1064BlockerRegressions`, `PropertyNamingPolicyTests`, or `IdentifierUtilsTests`.
+- Why: the failure is schema/type-name generation, not property/parameter sanitization; isolating it behind a minimal inline fixture keeps the regression signal focused and avoids coupling unrelated suites to dotted-schema behavior.
+- Required assertions: no blank `partial class`, no `Task<>`, `LookUpErnResponse` used consistently in generated contracts and interface signatures, plus a compile gate.
+
+---
+timestamp: 2026-05-01T14:34:56.630+02:00
+agent: parker
+issue: 1083
+---
+
+# Decision
+
+Implement issue #1083 at the schema type-name generation hook in `src\Refitter.Core\CSharpClientGeneratorFactory.cs`, not in downstream interface or contract post-processing.
+
+# Why
+
+- The failure starts in NSwag/NJsonSchema type resolution when a schema hint ends with an empty `.` segment.
+- Repairing the hint before `DefaultTypeNameGenerator` runs fixes both DTO declarations and response signatures with one narrow change.
+- To preserve normal behavior, malformed keys only normalize empty segments; if that normalized name collides with an existing clean schema key, the malformed schema is forced onto the counted suffix so the clean schema keeps the unsuffixed base name.
+
+# Validation
+
+- `dotnet format src\Refitter.slnx`
+- `dotnet build -c Release src\Refitter.slnx`
+- `dotnet test -c Release src\Refitter.slnx --no-build` (remaining failures were the known external-URL timeout lane in `PathParametersWithUrlTests`)
+- `dotnet format --verify-no-changes src\Refitter.slnx`
+- Manual CLI generation + scratch-project compilation for single-schema and collision fixtures
+
+# Parker Plan: Issue #1083
+
+**Date:** 2026-05-01T14:04:19.681+02:00  
+**Owner:** Parker  
+**Status:** Planning only
+
+## Decision
+
+Issue #1083 is a valid current bug in Refitter's generator pipeline.
+
+
+- Reproduced at HEAD against `https://revenue-ie.github.io/paye-employers-documentation/PIT3/rest/paye-employers-rest-api-pit3.json`.
+- Generated output contains both:
+  - `internal partial class` with no type name
+  - `Task<> LookUpERN(...)`
+- The offending Swagger 2 definition key is `LookUpErnResponse.` and the `GET /ern/{employerRegistrationNumber}/{taxYear}` response references `#/definitions/LookUpErnResponse.`
+
+## Root Cause
+
+- Refitter currently relies on NSwag/NJsonSchema default type naming for schema names.
+- NJsonSchema's `DefaultTypeNameGenerator` treats `.` as a segment separator and uses the last segment.
+- For a trailing-dot name like `LookUpErnResponse.`, the last segment is empty, and the fallback path also returns an empty string instead of a usable anonymous name.
+- That empty type name flows into both DTO emission and `generator.GetTypeName(...)`, producing the blank class declaration and empty generic return type.
+
+## Safest Fix Shape
+
+1. Add a Refitter-owned custom type-name generator that preserves current NSwag naming behavior for normal inputs.
+2. Only special-case malformed hints whose final segment is empty or whose generated type name is blank.
+3. Normalize those cases to the last non-empty segment (for example `LookUpErnResponse.` -> `LookUpErnResponse`) and still route the final identifier through Refitter-safe identifier sanitization.
+4. Inject that generator in `CSharpClientGeneratorFactory` so the fix applies once at the DTO/type-resolution layer.
+
+## Main Files Likely Needed
+
+- `src\Refitter.Core\CSharpClientGeneratorFactory.cs`
+- new core generator file such as `src\Refitter.Core\RefitterTypeNameGenerator.cs`
+- possibly `src\Refitter.Core\IdentifierUtils.cs` if a shared helper is introduced for final identifier normalization
+- regression coverage in `src\Refitter.Tests\Scenarios\PR1064BlockerRegressions.cs` or a dedicated scenario test file
+- possibly `src\Refitter.Tests\IdentifierUtilsTests.cs` if helper behavior moves into `IdentifierUtils`
+
+## Risks / Tradeoffs
+
+- Any type-name generator change can rename emitted contracts for malformed schema names, so tests should pin current behavior for ordinary names.
+- Avoid broad dot replacement: dotted names may already rely on NSwag's "use last segment" behavior, so the fix should target only empty-tail cases.
+- Collisions remain possible if multiple malformed names normalize to the same identifier; rely on NSwag's reserved-name flow or add focused collision coverage.
+- Rewriting schema keys and refs in the OpenAPI document would be much riskier because it can disturb references, exclusions, and other preprocessing logic.
+
+
 # Squad Decisions
 
 ## 2026-04-21

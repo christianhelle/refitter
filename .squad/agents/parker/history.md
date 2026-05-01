@@ -1,3 +1,11 @@
+## Squad Session: Issue #1083 Resolution [2026-05-01T13.14.05.273Z]
+
+Parker, Lambert, and Dallas completed issue #1083 resolution:
+- Core generation fix for schema type names
+- Regression test coverage (inline scenario, collision/trailing-dot cases)
+- Adjacent surface validation (CLI, MSBuild, Source Generator)
+- All tests passing, generated code compiles successfully
+
 # Parker History
 
 ## Context
@@ -17,6 +25,7 @@
 - 2026-04-26: The generator pipeline is duplicated between src\Refitter.Core\RefitGenerator.cs Generate()/GenerateMultipleFiles() and among src\Refitter.Core\RefitInterfaceGenerator.cs, RefitMultipleInterfaceGenerator.cs, and RefitMultipleInterfaceByTagGenerator.cs; treat those as Ash-review cleanups because ordering and emitted signature shape are behavior-sensitive.
 - 2026-04-28T12:02:17.298+02:00: Issue #1045 is outdated at current HEAD for Refitter.Core. RefitGenerator.CreateAsync() leaves RefitGeneratorSettings.OpenApiPath null when only OpenApiPaths is supplied, but the core path loader branches on OpenApiPaths first and no downstream Refitter.Core consumer dereferences OpenApiPath afterward; mutating OpenApiPath inside core would be an observable settings-semantics change that conflicts with existing regression expectations.
 - 2026-04-28T15:21:48.369+02:00: e-conomic multi-spec generation fails before code emission in OpenApiDocumentFactory.Merge() on duplicate schema Error; the vendor specs define identical Error schemas, but AreEquivalent() uses System.Text.Json Serializer.Serialize() on NJsonSchema objects, which can hit object cycles and incorrectly treats equivalent shared schemas as conflicts.
+- 2026-05-01T14:04:19.681+02:00: Issue #1083 is valid at current HEAD. NJsonSchema.DefaultTypeNameGenerator treats `.` as a namespace separator; when a schema key ends with `.`, both GetLastSegment() and the anonymous-name fallback can return an empty string, which then propagates through Refitter into blank `partial class` declarations and `Task<>` return types. The lowest-risk Refitter fix shape is a custom type-name generator wired in CSharpClientGeneratorFactory that normalizes trailing-dot/empty-segment hints before delegating to NSwag, rather than rewriting schema keys or patching interface return types downstream.
 
 ## Core Context
 
@@ -70,3 +79,4 @@
 - Maintains clone-first/fail-fast merge contract without carrying obsolete API forward.
 - Validation: release build ✓, full test suite ✓, format verification ✓
 - Outcome: Approved by Ash and Lambert after focused regression coverage confirmed schema-type preservation.
+- 2026-05-01T14:34:56.630+02:00: Issue #1083 fix belongs in `CSharpClientGeneratorFactory` via a custom `ITypeNameGenerator` wrapper that strips empty dot-separated schema-name segments before delegating to `DefaultTypeNameGenerator`; when a malformed key normalizes onto a real clean schema key, reserve the clean hint so the malformed schema gets the suffixed collision name and normal schemas keep their existing base names.
