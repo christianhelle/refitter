@@ -885,6 +885,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "umair-me",
+      "name": "Muhammad Umair Irshad",
+      "avatar_url": "https://avatars.githubusercontent.com/u/834935?v=4",
+      "profile": "http://umair.me",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
