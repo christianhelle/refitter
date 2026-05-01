@@ -1,5 +1,3 @@
-
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using NJsonSchema;
 using NJsonSchema.CodeGeneration;
@@ -34,32 +32,36 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             CodeGeneratorSettings =
             {
                 PropertyNameGenerator = CreatePropertyNameGenerator(),
-                TypeNameGenerator = CreateTypeNameGenerator()
+                TypeNameGenerator = CreateTypeNameGenerator(),
             },
             CSharpGeneratorSettings =
             {
                 Namespace = settings.ContractsNamespace ?? settings.Namespace,
                 JsonLibrary = CSharpJsonLibrary.SystemTextJson,
-                JsonPolymorphicSerializationStyle = settings.UsePolymorphicSerialization ? CSharpJsonPolymorphicSerializationStyle.SystemTextJson : CSharpJsonPolymorphicSerializationStyle.NJsonSchema,
+                JsonPolymorphicSerializationStyle =
+                    settings.UsePolymorphicSerialization
+                        ? CSharpJsonPolymorphicSerializationStyle.SystemTextJson
+                        : CSharpJsonPolymorphicSerializationStyle.NJsonSchema,
                 TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant(),
                 ClassStyle =
                     settings.ImmutableRecords ||
                     settings.CodeGeneratorSettings?.GenerateNativeRecords is true
-                    ? CSharpClassStyle.Record
-                    : CSharpClassStyle.Poco,
+                        ? CSharpClassStyle.Record
+                        : CSharpClassStyle.Poco,
                 GenerateNativeRecords =
                     settings.ImmutableRecords ||
                     settings.CodeGeneratorSettings?.GenerateNativeRecords is true,
                 TemplateDirectory = settings.CustomTemplateDirectory,
-            }
+            },
         };
 
-        if (settings.ParameterNameGenerator != default)
+        if (settings.ParameterNameGenerator != null)
         {
             csharpClientGeneratorSettings.ParameterNameGenerator = settings.ParameterNameGenerator;
         }
 
-        csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory = new CustomTemplateFactory(csharpClientGeneratorSettings.CSharpGeneratorSettings);
+        csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory
+            = new CustomTemplateFactory(csharpClientGeneratorSettings.CSharpGeneratorSettings);
 
         var generator = new CustomCSharpClientGenerator(
             document,
@@ -86,20 +88,19 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         };
     }
 
-    private ITypeNameGenerator CreateTypeNameGenerator()
+    private SafeSchemaTypeNameGenerator CreateTypeNameGenerator()
     {
-        var preferredExactTypeNameHints = EnumerateNamedSchemaHints()
+        var preferredExactTypeNameHints = GetNamedSchemaHints()
             .Where(typeNameHint => string.Equals(
                 IdentifierUtils.NormalizeSchemaTypeNameHint(typeNameHint),
                 typeNameHint,
                 StringComparison.Ordinal))
             .ToList();
 
-        return new SafeSchemaTypeNameGenerator(
-            new HashSet<string>(preferredExactTypeNameHints, StringComparer.Ordinal));
+        return new(new(preferredExactTypeNameHints, StringComparer.Ordinal));
     }
 
-    private IEnumerable<string> EnumerateNamedSchemaHints()
+    private IEnumerable<string> GetNamedSchemaHints()
     {
         if (document.Components?.Schemas != null)
         {
@@ -109,12 +110,14 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             }
         }
 
-        if (document.Definitions != null)
+        if (document.Definitions == null)
         {
-            foreach (var definition in document.Definitions.Keys)
-            {
-                yield return definition;
-            }
+            yield break;
+        }
+
+        foreach (var definition in document.Definitions.Keys)
+        {
+            yield return definition;
         }
     }
 
@@ -312,7 +315,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         yield return schema.DictionaryKey;
         yield return schema.Item;
 
-        if (schema.Items != null)
+        if (schema.Items.Count != 0)
         {
             foreach (var item in schema.Items)
             {
@@ -420,51 +423,50 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             };
         }
     }
+}
 
-    private sealed class JsonSchemaReferenceComparer : IEqualityComparer<JsonSchema>
+internal sealed class JsonSchemaReferenceComparer : IEqualityComparer<JsonSchema>
+{
+    public static JsonSchemaReferenceComparer Instance { get; } = new();
+
+    public bool Equals(JsonSchema? x, JsonSchema? y) =>
+        ReferenceEquals(x, y);
+
+    public int GetHashCode(JsonSchema obj) =>
+        RuntimeHelpers.GetHashCode(obj);
+}
+
+internal sealed class SafeSchemaTypeNameGenerator(
+    HashSet<string> preferredExactTypeNameHints) : ITypeNameGenerator
+{
+    private const string AnonymousTypeName = "Anonymous";
+    private readonly DefaultTypeNameGenerator inner = new();
+
+    public string Generate(
+        JsonSchema schema,
+        string? typeNameHint,
+        IEnumerable<string> reservedTypeNames)
     {
-        public static JsonSchemaReferenceComparer Instance { get; } = new();
+        var normalizedHint = IdentifierUtils.NormalizeSchemaTypeNameHint(typeNameHint)
+                          ?? IdentifierUtils.NormalizeSchemaTypeNameHint(schema.Title)
+                          ?? AnonymousTypeName;
 
-        public bool Equals(JsonSchema? x, JsonSchema? y) =>
-            ReferenceEquals(x, y);
-
-        public int GetHashCode(JsonSchema obj) =>
-            RuntimeHelpers.GetHashCode(obj);
-    }
-
-    private sealed class SafeSchemaTypeNameGenerator : ITypeNameGenerator
-    {
-        private const string AnonymousTypeName = "Anonymous";
-        private readonly DefaultTypeNameGenerator inner = new();
-        private readonly HashSet<string> preferredExactTypeNameHints;
-
-        public SafeSchemaTypeNameGenerator(HashSet<string> preferredExactTypeNameHints)
+        var typeNames = reservedTypeNames as string[] ?? reservedTypeNames.ToArray();
+        if (!string.IsNullOrEmpty(typeNameHint) &&
+            !string.Equals(typeNameHint, normalizedHint, StringComparison.Ordinal) &&
+            preferredExactTypeNameHints.Contains(normalizedHint))
         {
-            this.preferredExactTypeNameHints = preferredExactTypeNameHints;
+            var reservedHints = typeNames
+                .Concat(preferredExactTypeNameHints);
+
+            var reservedHintSet = new HashSet<string>(reservedHints, StringComparer.Ordinal);
+
+            normalizedHint = IdentifierUtils.Counted(reservedHintSet, normalizedHint);
         }
 
-        public string Generate(JsonSchema schema, string? typeNameHint, IEnumerable<string> reservedTypeNames)
-        {
-            var normalizedHint = IdentifierUtils.NormalizeSchemaTypeNameHint(typeNameHint)
-                ?? IdentifierUtils.NormalizeSchemaTypeNameHint(schema.Title)
-                ?? AnonymousTypeName;
-
-            if (!string.IsNullOrEmpty(typeNameHint) &&
-                !string.Equals(typeNameHint, normalizedHint, StringComparison.Ordinal) &&
-                preferredExactTypeNameHints.Contains(normalizedHint))
-            {
-                var reservedHints = reservedTypeNames
-                    .Concat(preferredExactTypeNameHints);
-
-                var reservedHintSet = new HashSet<string>(reservedHints, StringComparer.Ordinal);
-
-                normalizedHint = IdentifierUtils.Counted(reservedHintSet, normalizedHint);
-            }
-
-            var generatedTypeName = inner.Generate(schema, normalizedHint, reservedTypeNames);
-            return string.IsNullOrWhiteSpace(generatedTypeName)
-                ? inner.Generate(schema, AnonymousTypeName, reservedTypeNames)
-                : generatedTypeName;
-        }
+        var generatedTypeName = inner.Generate(schema, normalizedHint, typeNames);
+        return string.IsNullOrWhiteSpace(generatedTypeName)
+            ? inner.Generate(schema, AnonymousTypeName, typeNames)
+            : generatedTypeName;
     }
 }
