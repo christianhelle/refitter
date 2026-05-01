@@ -88,8 +88,13 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         };
     }
 
-    private SafeSchemaTypeNameGenerator CreateTypeNameGenerator()
+    private ITypeNameGenerator CreateTypeNameGenerator()
     {
+        if (settings.CodeGeneratorSettings?.TypeNameGenerator is { } typeNameGenerator)
+        {
+            return typeNameGenerator;
+        }
+
         var preferredExactTypeNameHints = GetNamedSchemaHints()
             .Where(typeNameHint => string.Equals(
                 IdentifierUtils.NormalizeSchemaTypeNameHint(typeNameHint),
@@ -97,7 +102,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
                 StringComparison.Ordinal))
             .ToList();
 
-        return new(new(preferredExactTypeNameHints, StringComparer.Ordinal));
+        return new SafeSchemaTypeNameGenerator(new(preferredExactTypeNameHints, StringComparer.Ordinal));
     }
 
     private IEnumerable<string> GetNamedSchemaHints()
