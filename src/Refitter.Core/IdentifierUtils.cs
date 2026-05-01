@@ -124,6 +124,35 @@ internal static class IdentifierUtils
     ];
 
     /// <summary>
+    /// Normalizes schema-derived type name hints by removing empty namespace segments.
+    /// </summary>
+    /// <param name="value">The raw schema-derived type name hint.</param>
+    /// <returns>The normalized hint, or <c>null</c> when no usable segments remain.</returns>
+    public static string? NormalizeSchemaTypeNameHint(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var nonEmptyValue = value!;
+
+        if (nonEmptyValue.IndexOf('.') < 0)
+        {
+            return nonEmptyValue;
+        }
+
+        var segments = nonEmptyValue
+            .Split('.')
+            .Where(segment => !string.IsNullOrWhiteSpace(segment))
+            .ToArray();
+
+        return segments.Length == 0
+            ? null
+            : string.Join(".", segments);
+    }
+
+    /// <summary>
     /// Removes invalid character from an identifier string
     /// </summary>
     public static string Sanitize(this string value)

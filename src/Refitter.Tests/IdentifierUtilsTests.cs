@@ -78,6 +78,27 @@ public class IdentifierUtilsTests
     }
 
     [Test]
+    public void NormalizeSchemaTypeNameHint_Preserves_Normal_Dotted_Names()
+    {
+        var result = IdentifierUtils.NormalizeSchemaTypeNameHint("Namespace.LookUpErnResponse");
+        result.Should().Be("Namespace.LookUpErnResponse");
+    }
+
+    [Test]
+    public void NormalizeSchemaTypeNameHint_Removes_Empty_Segments()
+    {
+        var result = IdentifierUtils.NormalizeSchemaTypeNameHint("Namespace..LookUpErnResponse.");
+        result.Should().Be("Namespace.LookUpErnResponse");
+    }
+
+    [Test]
+    public void NormalizeSchemaTypeNameHint_Returns_Null_When_No_Usable_Segments_Exist()
+    {
+        var result = IdentifierUtils.NormalizeSchemaTypeNameHint("...");
+        result.Should().BeNull();
+    }
+
+    [Test]
     public void Sanitize_Removes_Spaces()
     {
         var result = "Test Name".Sanitize();
