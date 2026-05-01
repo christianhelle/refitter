@@ -31,7 +31,11 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             GenerateDtoTypes = true,
             GenerateClientInterfaces = false,
             GenerateExceptionClasses = false,
-            CodeGeneratorSettings = { PropertyNameGenerator = CreatePropertyNameGenerator() },
+            CodeGeneratorSettings =
+            {
+                PropertyNameGenerator = CreatePropertyNameGenerator(),
+                TypeNameGenerator = CreateTypeNameGenerator()
+            },
             CSharpGeneratorSettings =
             {
                 Namespace = settings.ContractsNamespace ?? settings.Namespace,
@@ -80,6 +84,38 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
             PropertyNamingPolicy.PreserveOriginal => new PreserveOriginalPropertyNameGenerator(),
             _ => new CustomCSharpPropertyNameGenerator(),
         };
+    }
+
+    private ITypeNameGenerator CreateTypeNameGenerator()
+    {
+        var preferredExactTypeNameHints = EnumerateNamedSchemaHints()
+            .Where(typeNameHint => string.Equals(
+                IdentifierUtils.NormalizeSchemaTypeNameHint(typeNameHint),
+                typeNameHint,
+                StringComparison.Ordinal))
+            .ToList();
+
+        return new SafeSchemaTypeNameGenerator(
+            new HashSet<string>(preferredExactTypeNameHints, StringComparer.Ordinal));
+    }
+
+    private IEnumerable<string> EnumerateNamedSchemaHints()
+    {
+        if (document.Components?.Schemas != null)
+        {
+            foreach (var schema in document.Components.Schemas.Keys)
+            {
+                yield return schema;
+            }
+        }
+
+        if (document.Definitions != null)
+        {
+            foreach (var definition in document.Definitions.Keys)
+            {
+                yield return definition;
+            }
+        }
     }
 
     /// <summary>
@@ -394,5 +430,41 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
 
         public int GetHashCode(JsonSchema obj) =>
             RuntimeHelpers.GetHashCode(obj);
+    }
+
+    private sealed class SafeSchemaTypeNameGenerator : ITypeNameGenerator
+    {
+        private const string AnonymousTypeName = "Anonymous";
+        private readonly DefaultTypeNameGenerator inner = new();
+        private readonly HashSet<string> preferredExactTypeNameHints;
+
+        public SafeSchemaTypeNameGenerator(HashSet<string> preferredExactTypeNameHints)
+        {
+            this.preferredExactTypeNameHints = preferredExactTypeNameHints;
+        }
+
+        public string Generate(JsonSchema schema, string? typeNameHint, IEnumerable<string> reservedTypeNames)
+        {
+            var normalizedHint = IdentifierUtils.NormalizeSchemaTypeNameHint(typeNameHint)
+                ?? IdentifierUtils.NormalizeSchemaTypeNameHint(schema.Title)
+                ?? AnonymousTypeName;
+
+            if (!string.IsNullOrEmpty(typeNameHint) &&
+                !string.Equals(typeNameHint, normalizedHint, StringComparison.Ordinal) &&
+                preferredExactTypeNameHints.Contains(normalizedHint))
+            {
+                var reservedHints = reservedTypeNames
+                    .Concat(preferredExactTypeNameHints);
+
+                var reservedHintSet = new HashSet<string>(reservedHints, StringComparer.Ordinal);
+
+                normalizedHint = IdentifierUtils.Counted(reservedHintSet, normalizedHint);
+            }
+
+            var generatedTypeName = inner.Generate(schema, normalizedHint, reservedTypeNames);
+            return string.IsNullOrWhiteSpace(generatedTypeName)
+                ? inner.Generate(schema, AnonymousTypeName, reservedTypeNames)
+                : generatedTypeName;
+        }
     }
 }
