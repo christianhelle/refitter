@@ -7,7 +7,12 @@
 **Implemented enhancements:**
 
 - AnyType + BodySerializationMethod [\#423](https://github.com/christianhelle/refitter/issues/423)
+- Sanitize malformed schema type names without renaming clean schemas [\#1085](https://github.com/christianhelle/refitter/pull/1085) ([christianhelle](https://github.com/christianhelle))
 - Tighten warning handling across Refitter builds [\#1079](https://github.com/christianhelle/refitter/pull/1079) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Class name not generated if schema contains non alphanumeric character [\#1083](https://github.com/christianhelle/refitter/issues/1083)
 
 **Closed issues:**
 
@@ -15,6 +20,7 @@
 
 **Merged pull requests:**
 
+- docs: add umair-me as a contributor for bug [\#1084](https://github.com/christianhelle/refitter/pull/1084) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Fix default solution path and update .NET version in VS Code config [\#1082](https://github.com/christianhelle/refitter/pull/1082) ([christianhelle](https://github.com/christianhelle))
 - Fix docker smoke tests [\#1081](https://github.com/christianhelle/refitter/pull/1081) ([christianhelle](https://github.com/christianhelle))
 - House Keeping [\#1080](https://github.com/christianhelle/refitter/pull/1080) ([christianhelle](https://github.com/christianhelle))
