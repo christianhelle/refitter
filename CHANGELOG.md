@@ -1,225 +1,26 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [2.0.0](https://github.com/christianhelle/refitter/tree/2.0.0) (2026-05-01)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0-preview.107...HEAD)
-
-**Implemented enhancements:**
-
-- AnyType + BodySerializationMethod [\#423](https://github.com/christianhelle/refitter/issues/423)
-- Sanitize malformed schema type names without renaming clean schemas [\#1085](https://github.com/christianhelle/refitter/pull/1085) ([christianhelle](https://github.com/christianhelle))
-- Tighten warning handling across Refitter builds [\#1079](https://github.com/christianhelle/refitter/pull/1079) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- Class name not generated if schema contains non alphanumeric character [\#1083](https://github.com/christianhelle/refitter/issues/1083)
-
-**Closed issues:**
-
-- \[v2.0 audit\] Tracking epic — 46 findings since 1.7.3 [\#1057](https://github.com/christianhelle/refitter/issues/1057)
-
-**Merged pull requests:**
-
-- docs: add umair-me as a contributor for bug [\#1084](https://github.com/christianhelle/refitter/pull/1084) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Fix default solution path and update .NET version in VS Code config [\#1082](https://github.com/christianhelle/refitter/pull/1082) ([christianhelle](https://github.com/christianhelle))
-- Fix docker smoke tests [\#1081](https://github.com/christianhelle/refitter/pull/1081) ([christianhelle](https://github.com/christianhelle))
-- House Keeping [\#1080](https://github.com/christianhelle/refitter/pull/1080) ([christianhelle](https://github.com/christianhelle))
-- chore\(deps\): update dependency tunit to 1.41.0 [\#1078](https://github.com/christianhelle/refitter/pull/1078) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency ruby to v4.0.3 [\#1068](https://github.com/christianhelle/refitter/pull/1068) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [2.0.0-preview.107](https://github.com/christianhelle/refitter/tree/2.0.0-preview.107) (2026-04-28)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0-preview.106...2.0.0-preview.107)
-
-**Implemented enhancements:**
-
-- Handle equivalent duplicate schemas in multi-spec merge [\#1076](https://github.com/christianhelle/refitter/pull/1076) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
-- \[v2.0 audit\]\[L13\] IdentifierUtils.Counted uses fresh HashSet per GenerateCode\(\) call [\#1056](https://github.com/christianhelle/refitter/issues/1056)
-- \[v2.0 audit\]\[L4\] MSBuild task does regex-based JSON parsing of .refitter files [\#1047](https://github.com/christianhelle/refitter/issues/1047)
-- \[v2.0 audit\]\[L2\] OpenApiPath remains null! when OpenApiPaths is set → NRE for library consumers [\#1045](https://github.com/christianhelle/refitter/issues/1045)
-- \[v2.0 audit\]\[M15\] Spectre.Console.Cli 0.53 → 0.55 pre-1.0 minor bump may shift CLI parsing [\#1042](https://github.com/christianhelle/refitter/issues/1042)
-- \[v2.0 audit\]\[M5\] InlineJsonConverters semantics silently changed: per-property → per-type \(custom JsonNamingPolicy regression risk\) [\#1032](https://github.com/christianhelle/refitter/issues/1032)
-
-**Merged pull requests:**
-
-- docs: add AntonTeyken as a contributor for bug [\#1077](https://github.com/christianhelle/refitter/pull/1077) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Update actions/github-script action to v9 [\#1073](https://github.com/christianhelle/refitter/pull/1073) ([renovate[bot]](https://github.com/apps/renovate))
-- Update actions/checkout action to v6 [\#1072](https://github.com/christianhelle/refitter/pull/1072) ([renovate[bot]](https://github.com/apps/renovate))
-- Harden generation flows [\#1071](https://github.com/christianhelle/refitter/pull/1071) ([christianhelle](https://github.com/christianhelle))
-- Breaking changes and Migration Guide for v2.0.0 [\#1009](https://github.com/christianhelle/refitter/pull/1009) ([christianhelle](https://github.com/christianhelle))
-
-## [2.0.0-preview.106](https://github.com/christianhelle/refitter/tree/2.0.0-preview.106) (2026-04-25)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0-preview.105...2.0.0-preview.106)
-
-**Fixed bugs:**
-
-- \[v2.0 audit\]\[M16\] CLI --generate-authentication-header changed from bool flag to enum value \(silent script breakage\) [\#1043](https://github.com/christianhelle/refitter/issues/1043)
-- \[v2.0 audit\]\[M14\] MSBuild task: dotnet --list-runtimes invocation is fragile \(NRE, unquoted args, no fallback when target TFM dll missing\) [\#1041](https://github.com/christianhelle/refitter/issues/1041)
-- \[v2.0 audit\]\[M12\] GetQueryParameters mutates the shared operationModel.Parameters collection [\#1039](https://github.com/christianhelle/refitter/issues/1039)
-- \[v2.0 audit\]\[M7\] Merge mutates input documents\[0\] and silently drops conflicting paths/schemas without warning [\#1034](https://github.com/christianhelle/refitter/issues/1034)
-- \[v2.0 audit\]\[M6\] Hard-coded \n in regex replacement → mixed CRLF/LF on Windows [\#1033](https://github.com/christianhelle/refitter/issues/1033)
-- \[v2.0 audit\]\[M2\] SourceGenerator user-visible warnings only emit to Debug.WriteLine \(no-op in Release\) [\#1029](https://github.com/christianhelle/refitter/issues/1029)
-- \[v2.0 audit\]\[M1\] SourceGenerator pipeline output uses List\<Diagnostic\> \(defeats incremental caching\) [\#1028](https://github.com/christianhelle/refitter/issues/1028)
-- \[v2.0 audit\]\[H10\] Auto-enabling GenerateOptionalPropertiesAsNullable is a silent breaking shape change [\#1026](https://github.com/christianhelle/refitter/issues/1026)
-- \[v2.0 audit\]\[H8\] Refit major bump 9 → 10 silently leaks to Refitter.SourceGenerator consumers [\#1024](https://github.com/christianhelle/refitter/issues/1024)
-- \[v2.0 audit\]\[H7\] MSBuild IncludePatterns is substring-matched, over-includes files [\#1023](https://github.com/christianhelle/refitter/issues/1023)
-- \[v2.0 audit\]\[H6\] MSBuild predicted output paths diverge from CLI actual paths → silent missing compile items [\#1022](https://github.com/christianhelle/refitter/issues/1022)
-- \[v2.0 audit\]\[H1\] JsonSerializerContextGenerator emits non-compiling AOT context \(generics, namespaces, polymorphism, nested types\) [\#1017](https://github.com/christianhelle/refitter/issues/1017)
-
-**Merged pull requests:**
-
-- \[v2.0 audit\] Close remaining verified \#1057 regressions [\#1070](https://github.com/christianhelle/refitter/pull/1070) ([christianhelle](https://github.com/christianhelle))
-- Resolve high-severity audit findings from \#1057 [\#1067](https://github.com/christianhelle/refitter/pull/1067) ([christianhelle](https://github.com/christianhelle))
-- Update nswag monorepo to 14.7.1 [\#1065](https://github.com/christianhelle/refitter/pull/1065) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [2.0.0-preview.105](https://github.com/christianhelle/refitter/tree/2.0.0-preview.105) (2026-04-21)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.103...2.0.0-preview.105)
-
-**Fixed bugs:**
-
-- \[v2.0 audit\]\[L12\] Reordering of interface-generator construction in Generate\(\) is correct but fragile [\#1055](https://github.com/christianhelle/refitter/issues/1055)
-- \[v2.0 audit\]\[L11\] OpenApiDocumentFactory.CreateAsync\(IEnumerable\<string\>\) throws wrong exception type on null [\#1054](https://github.com/christianhelle/refitter/issues/1054)
-- \[v2.0 audit\]\[L10\] IdentifierUtils.ReservedKeywords incomplete; Sanitize\(\) does not escape keywords [\#1053](https://github.com/christianhelle/refitter/issues/1053)
-- \[v2.0 audit\]\[L9\] OperationNameGenerator.CheckForDuplicateOperationIds runs full pipeline twice in constructor [\#1052](https://github.com/christianhelle/refitter/issues/1052)
-- \[v2.0 audit\]\[L8\] XmlDocumentationGenerator.DecodeJsonEscapedText mishandles malformed \u sequences [\#1051](https://github.com/christianhelle/refitter/issues/1051)
-- \[v2.0 audit\]\[L7\] Enum-deserialization errors in .refitter give unhelpful JsonException [\#1050](https://github.com/christianhelle/refitter/issues/1050)
-- \[v2.0 audit\]\[L6\] Library code missing ConfigureAwait\(false\) — sync-over-async deadlock risk for hosted callers [\#1049](https://github.com/christianhelle/refitter/issues/1049)
-- \[v2.0 audit\]\[L5\] CLI reads .refitter twice \(validator + execute\), risks drift [\#1048](https://github.com/christianhelle/refitter/issues/1048)
-- \[v2.0 audit\]\[L3\] Default OpenApiPaths = Array.Empty\<string\>\(\) round-trips into saved settings as "openApiPaths": \[\] [\#1046](https://github.com/christianhelle/refitter/issues/1046)
-- \[v2.0 audit\]\[L1\] OpenApiPath + OpenApiPaths precedence is silent; no validation [\#1044](https://github.com/christianhelle/refitter/issues/1044)
-- \[v2.0 audit\]\[M13\] Static HttpClient has no timeout, no cancellation, no User-Agent [\#1040](https://github.com/christianhelle/refitter/issues/1040)
-- \[v2.0 audit\]\[M11\] CustomCSharpTypeResolver appends ? to mapped reference-type aliases regardless of nullable-reference-type setting [\#1038](https://github.com/christianhelle/refitter/issues/1038)
-- \[v2.0 audit\]\[M10\] RefitInterfaceImports.GenerateNamespaceImports throws on empty namespace list [\#1037](https://github.com/christianhelle/refitter/issues/1037)
-- \[v2.0 audit\]\[M9\] ReOrderNullableParameters mis-classifies generic parameters that contain ? [\#1036](https://github.com/christianhelle/refitter/issues/1036)
-- \[v2.0 audit\]\[M8\] XML doc emission does not escape user-supplied parameter / dynamic-querystring descriptions [\#1035](https://github.com/christianhelle/refitter/issues/1035)
-- \[v2.0 audit\]\[M4\] ValidateOpenApiSpec does not resolve relative spec paths from settings-file directory [\#1031](https://github.com/christianhelle/refitter/issues/1031)
-- \[v2.0 audit\]\[M3\] SettingsValidator only validates the first entry of openApiPaths [\#1030](https://github.com/christianhelle/refitter/issues/1030)
-- \[v2.0 audit\]\[H11\] RefitInterfaceGenerator NRE when an OpenAPI response has no content [\#1027](https://github.com/christianhelle/refitter/issues/1027)
-- \[v2.0 audit\]\[H9\] Microsoft.OpenApi.Readers 1.x → 3.x silently changes parsing/codegen for users [\#1025](https://github.com/christianhelle/refitter/issues/1025)
-- \[v2.0 audit\]\[H5\] CLI: --output / -o no longer overrides settings-file outputFolder \(script regression\) [\#1021](https://github.com/christianhelle/refitter/issues/1021)
-- \[v2.0 audit\]\[H4\] Dynamic-querystring constructor self-assigns when parameter name starts with non-letter [\#1020](https://github.com/christianhelle/refitter/issues/1020)
-- \[v2.0 audit\]\[H3\] Security-scheme header parameter name not safely sanitized [\#1019](https://github.com/christianhelle/refitter/issues/1019)
-- \[v2.0 audit\]\[H2\] ParameterExtractor.ConvertToVariableName produces invalid C\# identifiers \(multipart form-data fields\) [\#1018](https://github.com/christianhelle/refitter/issues/1018)
-- \[v2.0 audit\]\[C6\] Multi-spec merge silently drops all schemas when first spec has no components [\#1016](https://github.com/christianhelle/refitter/issues/1016)
-- \[v2.0 audit\]\[C5\] ConvertOneOfWithDiscriminatorToAllOf NRE on Swagger 2 / OpenAPI 3 docs without components [\#1015](https://github.com/christianhelle/refitter/issues/1015)
-- \[v2.0 audit\]\[C4\] Forced JsonStringEnumConverter injection breaks Newtonsoft users and silently regresses internal enums [\#1014](https://github.com/christianhelle/refitter/issues/1014)
-- \[v2.0 audit\]\[C3\] ContractTypeSuffixApplier corrupts code via raw word-boundary regex \(renames members, comments, strings; double-suffix on rerun\) [\#1013](https://github.com/christianhelle/refitter/issues/1013)
-- \[v2.0 audit\]\[C2\] MSBuild task swallows CLI failures; build always reports success with stale/missing output [\#1012](https://github.com/christianhelle/refitter/issues/1012)
-- \[v2.0 audit\]\[C1\] SourceGenerator: hint-name collisions when two .refitter files share a filename [\#1011](https://github.com/christianhelle/refitter/issues/1011)
-
-**Merged pull requests:**
-
-- \[v2.0 audit\] Fix pre-release regressions from \#1057 [\#1064](https://github.com/christianhelle/refitter/pull/1064) ([christianhelle](https://github.com/christianhelle))
-- Update dependency coverlet.collector to v10 [\#1007](https://github.com/christianhelle/refitter/pull/1007) ([renovate[bot]](https://github.com/apps/renovate))
-- Update actions/github-script action to v9 [\#1006](https://github.com/christianhelle/refitter/pull/1006) ([renovate[bot]](https://github.com/apps/renovate))
-- Update actions/checkout action to v6 [\#1005](https://github.com/christianhelle/refitter/pull/1005) ([renovate[bot]](https://github.com/apps/renovate))
-- Upgrade Squad to v0.9.1 [\#1004](https://github.com/christianhelle/refitter/pull/1004) ([christianhelle](https://github.com/christianhelle))
-
-## [1.8.0-preview.103](https://github.com/christianhelle/refitter/tree/1.8.0-preview.103) (2026-04-17)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.102...1.8.0-preview.103)
-
-**Implemented enhancements:**
-
-- Harden .refitter settings deserialization and output path handling [\#1000](https://github.com/christianhelle/refitter/pull/1000) ([christianhelle](https://github.com/christianhelle))
-- Verify alias handling and sanitize PascalCase properties [\#997](https://github.com/christianhelle/refitter/pull/997) ([christianhelle](https://github.com/christianhelle))
-- Enhance schema alias handling and property name generation [\#996](https://github.com/christianhelle/refitter/pull/996) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- Refitter.MSBuild 1.7.3 on .NET 10 ignores output file path [\#998](https://github.com/christianhelle/refitter/issues/998)
-- OpenApi client generates invalid schema property name if it starts with a digit [\#992](https://github.com/christianhelle/refitter/issues/992)
-- OpenApi client generate fails with System.ArgumentException: An item with the same key has already been added [\#991](https://github.com/christianhelle/refitter/issues/991)
-
-**Merged pull requests:**
-
-- Update dependency TUnit to 1.35.2 [\#1003](https://github.com/christianhelle/refitter/pull/1003) ([renovate[bot]](https://github.com/apps/renovate))
-- Special-case the default .refitter filename before deriving OutputFilename [\#1002](https://github.com/christianhelle/refitter/pull/1002) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
-- CodeRabbit auto-fixes for PR \#1000 [\#1001](https://github.com/christianhelle/refitter/pull/1001) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
-- docs: add Timovzl as a contributor for bug [\#999](https://github.com/christianhelle/refitter/pull/999) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Update dependency TUnit to 1.34.5 [\#995](https://github.com/christianhelle/refitter/pull/995) ([renovate[bot]](https://github.com/apps/renovate))
-- docs: add dimyle as a contributor for bug [\#994](https://github.com/christianhelle/refitter/pull/994) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Update dependency TUnit to 1.31.0 [\#989](https://github.com/christianhelle/refitter/pull/989) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency AutoMapper to v16 [\#988](https://github.com/christianhelle/refitter/pull/988) ([renovate[bot]](https://github.com/apps/renovate))
-- Bump the nuget group with 1 update [\#987](https://github.com/christianhelle/refitter/pull/987) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Update Spectre.Console.Cli to v0.55.0 [\#985](https://github.com/christianhelle/refitter/pull/985) ([christianhelle](https://github.com/christianhelle))
-- Update actions/github-script action to v9 [\#984](https://github.com/christianhelle/refitter/pull/984) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency TUnit to 1.30.8 [\#983](https://github.com/christianhelle/refitter/pull/983) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency tunit to 1.30.0 [\#981](https://github.com/christianhelle/refitter/pull/981) ([renovate[bot]](https://github.com/apps/renovate))
-- Update NSwag to v14.7.0 [\#980](https://github.com/christianhelle/refitter/pull/980) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency tunit to 1.29.0 [\#976](https://github.com/christianhelle/refitter/pull/976) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.8.0-preview.102](https://github.com/christianhelle/refitter/tree/1.8.0-preview.102) (2026-04-01)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.101...1.8.0-preview.102)
-
-**Implemented enhancements:**
-
-- Made Header Parameters for Security Schemes safe to use as C\# variable name [\#977](https://github.com/christianhelle/refitter/pull/977) ([smoerijf](https://github.com/smoerijf))
-
-**Merged pull requests:**
-
-- docs: add smoerijf as a contributor for bug, and code [\#978](https://github.com/christianhelle/refitter/pull/978) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- chore\(deps\): update dependency tunit to 1.22.6 [\#975](https://github.com/christianhelle/refitter/pull/975) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency tunit to 1.22.3 [\#974](https://github.com/christianhelle/refitter/pull/974) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dotnet monorepo [\#960](https://github.com/christianhelle/refitter/pull/960) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.8.0-preview.101](https://github.com/christianhelle/refitter/tree/1.8.0-preview.101) (2026-03-27)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.100...1.8.0-preview.101)
-
-**Implemented enhancements:**
-
-- Fix recursive schema stack overflows [\#971](https://github.com/christianhelle/refitter/pull/971) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- StackOverflowException in recursive schema traversal [\#973](https://github.com/christianhelle/refitter/issues/973)
-- how to keep contract Property Name as original name without Serialization ? [\#967](https://github.com/christianhelle/refitter/issues/967)
-
-**Merged pull requests:**
-
-- Bump codecov/codecov-action from 5 to 6 [\#972](https://github.com/christianhelle/refitter/pull/972) ([dependabot[bot]](https://github.com/apps/dependabot))
-- chore\(deps\): update dependency swashbuckle.aspnetcore to 10.1.7 [\#966](https://github.com/christianhelle/refitter/pull/966) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency tunit to 1.21.30 [\#965](https://github.com/christianhelle/refitter/pull/965) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.8.0-preview.100](https://github.com/christianhelle/refitter/tree/1.8.0-preview.100) (2026-03-25)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.8.0-preview.99...1.8.0-preview.100)
-
-**Implemented enhancements:**
-
-- Add PropertyNamingPolicy support for JSON property naming [\#969](https://github.com/christianhelle/refitter/pull/969) ([christianhelle](https://github.com/christianhelle))
-- chore\(deps\): update dependency tunit to 1.20.0 [\#962](https://github.com/christianhelle/refitter/pull/962) ([renovate[bot]](https://github.com/apps/renovate))
-
-**Merged pull requests:**
-
-- docs: add naji-makhoul as a contributor for ideas [\#968](https://github.com/christianhelle/refitter/pull/968) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- chore\(deps\): update dependency tunit to 1.21.0 [\#964](https://github.com/christianhelle/refitter/pull/964) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency oasreader to 3.5.0.19 [\#963](https://github.com/christianhelle/refitter/pull/963) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update refit monorepo to 10.1.6 [\#961](https://github.com/christianhelle/refitter/pull/961) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency coverlet.collector to 8.0.1 [\#959](https://github.com/christianhelle/refitter/pull/959) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency ruby to v4.0.2 [\#958](https://github.com/christianhelle/refitter/pull/958) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency fluentassertions to 7.2.2 [\#956](https://github.com/christianhelle/refitter/pull/956) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency swashbuckle.aspnetcore to 10.1.5 [\#952](https://github.com/christianhelle/refitter/pull/952) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dependency tunit to 1.19.74 [\#951](https://github.com/christianhelle/refitter/pull/951) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.8.0-preview.99](https://github.com/christianhelle/refitter/tree/1.8.0-preview.99) (2026-03-08)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.3...1.8.0-preview.99)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.3...2.0.0)
 
 **Implemented enhancements:**
 
 - Support custom format-mappings via Key-Value configuration [\#438](https://github.com/christianhelle/refitter/issues/438)
+- AnyType + BodySerializationMethod [\#423](https://github.com/christianhelle/refitter/issues/423)
 - Generate the client from multiple versions [\#350](https://github.com/christianhelle/refitter/issues/350)
 - Config parameter to add suffix to contract types [\#193](https://github.com/christianhelle/refitter/issues/193)
 - Add SourceGenerator support to the standalone tool [\#179](https://github.com/christianhelle/refitter/issues/179)
+- Sanitize malformed schema type names without renaming clean schemas [\#1085](https://github.com/christianhelle/refitter/pull/1085) ([christianhelle](https://github.com/christianhelle))
+- Tighten warning handling across Refitter builds [\#1079](https://github.com/christianhelle/refitter/pull/1079) ([christianhelle](https://github.com/christianhelle))
+- Handle equivalent duplicate schemas in multi-spec merge [\#1076](https://github.com/christianhelle/refitter/pull/1076) ([christianhelle](https://github.com/christianhelle))
+- Harden .refitter settings deserialization and output path handling [\#1000](https://github.com/christianhelle/refitter/pull/1000) ([christianhelle](https://github.com/christianhelle))
+- Verify alias handling and sanitize PascalCase properties [\#997](https://github.com/christianhelle/refitter/pull/997) ([christianhelle](https://github.com/christianhelle))
+- Enhance schema alias handling and property name generation [\#996](https://github.com/christianhelle/refitter/pull/996) ([christianhelle](https://github.com/christianhelle))
+- Made Header Parameters for Security Schemes safe to use as C\# variable name [\#977](https://github.com/christianhelle/refitter/pull/977) ([smoerijf](https://github.com/smoerijf))
+- Fix recursive schema stack overflows [\#971](https://github.com/christianhelle/refitter/pull/971) ([christianhelle](https://github.com/christianhelle))
+- Add PropertyNamingPolicy support for JSON property naming [\#969](https://github.com/christianhelle/refitter/pull/969) ([christianhelle](https://github.com/christianhelle))
+- chore\(deps\): update dependency tunit to 1.20.0 [\#962](https://github.com/christianhelle/refitter/pull/962) ([renovate[bot]](https://github.com/apps/renovate))
 - Add Unicode support for XML doc comment generation [\#948](https://github.com/christianhelle/refitter/pull/948) ([christianhelle](https://github.com/christianhelle))
 - Fix broken CLI tool help text [\#940](https://github.com/christianhelle/refitter/pull/940) ([christianhelle](https://github.com/christianhelle))
 - Move \[JsonConverter\] from enum properties to enum types [\#938](https://github.com/christianhelle/refitter/pull/938) ([christianhelle](https://github.com/christianhelle))
@@ -243,6 +44,59 @@
 
 **Fixed bugs:**
 
+- Class name not generated if schema contains non alphanumeric character [\#1083](https://github.com/christianhelle/refitter/issues/1083)
+- Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
+- \[v2.0 audit\]\[L13\] IdentifierUtils.Counted uses fresh HashSet per GenerateCode\(\) call [\#1056](https://github.com/christianhelle/refitter/issues/1056)
+- \[v2.0 audit\]\[L12\] Reordering of interface-generator construction in Generate\(\) is correct but fragile [\#1055](https://github.com/christianhelle/refitter/issues/1055)
+- \[v2.0 audit\]\[L11\] OpenApiDocumentFactory.CreateAsync\(IEnumerable\<string\>\) throws wrong exception type on null [\#1054](https://github.com/christianhelle/refitter/issues/1054)
+- \[v2.0 audit\]\[L10\] IdentifierUtils.ReservedKeywords incomplete; Sanitize\(\) does not escape keywords [\#1053](https://github.com/christianhelle/refitter/issues/1053)
+- \[v2.0 audit\]\[L9\] OperationNameGenerator.CheckForDuplicateOperationIds runs full pipeline twice in constructor [\#1052](https://github.com/christianhelle/refitter/issues/1052)
+- \[v2.0 audit\]\[L8\] XmlDocumentationGenerator.DecodeJsonEscapedText mishandles malformed \u sequences [\#1051](https://github.com/christianhelle/refitter/issues/1051)
+- \[v2.0 audit\]\[L7\] Enum-deserialization errors in .refitter give unhelpful JsonException [\#1050](https://github.com/christianhelle/refitter/issues/1050)
+- \[v2.0 audit\]\[L6\] Library code missing ConfigureAwait\(false\) — sync-over-async deadlock risk for hosted callers [\#1049](https://github.com/christianhelle/refitter/issues/1049)
+- \[v2.0 audit\]\[L5\] CLI reads .refitter twice \(validator + execute\), risks drift [\#1048](https://github.com/christianhelle/refitter/issues/1048)
+- \[v2.0 audit\]\[L4\] MSBuild task does regex-based JSON parsing of .refitter files [\#1047](https://github.com/christianhelle/refitter/issues/1047)
+- \[v2.0 audit\]\[L3\] Default OpenApiPaths = Array.Empty\<string\>\(\) round-trips into saved settings as "openApiPaths": \[\] [\#1046](https://github.com/christianhelle/refitter/issues/1046)
+- \[v2.0 audit\]\[L2\] OpenApiPath remains null! when OpenApiPaths is set → NRE for library consumers [\#1045](https://github.com/christianhelle/refitter/issues/1045)
+- \[v2.0 audit\]\[L1\] OpenApiPath + OpenApiPaths precedence is silent; no validation [\#1044](https://github.com/christianhelle/refitter/issues/1044)
+- \[v2.0 audit\]\[M16\] CLI --generate-authentication-header changed from bool flag to enum value \(silent script breakage\) [\#1043](https://github.com/christianhelle/refitter/issues/1043)
+- \[v2.0 audit\]\[M15\] Spectre.Console.Cli 0.53 → 0.55 pre-1.0 minor bump may shift CLI parsing [\#1042](https://github.com/christianhelle/refitter/issues/1042)
+- \[v2.0 audit\]\[M14\] MSBuild task: dotnet --list-runtimes invocation is fragile \(NRE, unquoted args, no fallback when target TFM dll missing\) [\#1041](https://github.com/christianhelle/refitter/issues/1041)
+- \[v2.0 audit\]\[M13\] Static HttpClient has no timeout, no cancellation, no User-Agent [\#1040](https://github.com/christianhelle/refitter/issues/1040)
+- \[v2.0 audit\]\[M12\] GetQueryParameters mutates the shared operationModel.Parameters collection [\#1039](https://github.com/christianhelle/refitter/issues/1039)
+- \[v2.0 audit\]\[M11\] CustomCSharpTypeResolver appends ? to mapped reference-type aliases regardless of nullable-reference-type setting [\#1038](https://github.com/christianhelle/refitter/issues/1038)
+- \[v2.0 audit\]\[M10\] RefitInterfaceImports.GenerateNamespaceImports throws on empty namespace list [\#1037](https://github.com/christianhelle/refitter/issues/1037)
+- \[v2.0 audit\]\[M9\] ReOrderNullableParameters mis-classifies generic parameters that contain ? [\#1036](https://github.com/christianhelle/refitter/issues/1036)
+- \[v2.0 audit\]\[M8\] XML doc emission does not escape user-supplied parameter / dynamic-querystring descriptions [\#1035](https://github.com/christianhelle/refitter/issues/1035)
+- \[v2.0 audit\]\[M7\] Merge mutates input documents\[0\] and silently drops conflicting paths/schemas without warning [\#1034](https://github.com/christianhelle/refitter/issues/1034)
+- \[v2.0 audit\]\[M6\] Hard-coded \n in regex replacement → mixed CRLF/LF on Windows [\#1033](https://github.com/christianhelle/refitter/issues/1033)
+- \[v2.0 audit\]\[M5\] InlineJsonConverters semantics silently changed: per-property → per-type \(custom JsonNamingPolicy regression risk\) [\#1032](https://github.com/christianhelle/refitter/issues/1032)
+- \[v2.0 audit\]\[M4\] ValidateOpenApiSpec does not resolve relative spec paths from settings-file directory [\#1031](https://github.com/christianhelle/refitter/issues/1031)
+- \[v2.0 audit\]\[M3\] SettingsValidator only validates the first entry of openApiPaths [\#1030](https://github.com/christianhelle/refitter/issues/1030)
+- \[v2.0 audit\]\[M2\] SourceGenerator user-visible warnings only emit to Debug.WriteLine \(no-op in Release\) [\#1029](https://github.com/christianhelle/refitter/issues/1029)
+- \[v2.0 audit\]\[M1\] SourceGenerator pipeline output uses List\<Diagnostic\> \(defeats incremental caching\) [\#1028](https://github.com/christianhelle/refitter/issues/1028)
+- \[v2.0 audit\]\[H11\] RefitInterfaceGenerator NRE when an OpenAPI response has no content [\#1027](https://github.com/christianhelle/refitter/issues/1027)
+- \[v2.0 audit\]\[H10\] Auto-enabling GenerateOptionalPropertiesAsNullable is a silent breaking shape change [\#1026](https://github.com/christianhelle/refitter/issues/1026)
+- \[v2.0 audit\]\[H9\] Microsoft.OpenApi.Readers 1.x → 3.x silently changes parsing/codegen for users [\#1025](https://github.com/christianhelle/refitter/issues/1025)
+- \[v2.0 audit\]\[H8\] Refit major bump 9 → 10 silently leaks to Refitter.SourceGenerator consumers [\#1024](https://github.com/christianhelle/refitter/issues/1024)
+- \[v2.0 audit\]\[H7\] MSBuild IncludePatterns is substring-matched, over-includes files [\#1023](https://github.com/christianhelle/refitter/issues/1023)
+- \[v2.0 audit\]\[H6\] MSBuild predicted output paths diverge from CLI actual paths → silent missing compile items [\#1022](https://github.com/christianhelle/refitter/issues/1022)
+- \[v2.0 audit\]\[H5\] CLI: --output / -o no longer overrides settings-file outputFolder \(script regression\) [\#1021](https://github.com/christianhelle/refitter/issues/1021)
+- \[v2.0 audit\]\[H4\] Dynamic-querystring constructor self-assigns when parameter name starts with non-letter [\#1020](https://github.com/christianhelle/refitter/issues/1020)
+- \[v2.0 audit\]\[H3\] Security-scheme header parameter name not safely sanitized [\#1019](https://github.com/christianhelle/refitter/issues/1019)
+- \[v2.0 audit\]\[H2\] ParameterExtractor.ConvertToVariableName produces invalid C\# identifiers \(multipart form-data fields\) [\#1018](https://github.com/christianhelle/refitter/issues/1018)
+- \[v2.0 audit\]\[H1\] JsonSerializerContextGenerator emits non-compiling AOT context \(generics, namespaces, polymorphism, nested types\) [\#1017](https://github.com/christianhelle/refitter/issues/1017)
+- \[v2.0 audit\]\[C6\] Multi-spec merge silently drops all schemas when first spec has no components [\#1016](https://github.com/christianhelle/refitter/issues/1016)
+- \[v2.0 audit\]\[C5\] ConvertOneOfWithDiscriminatorToAllOf NRE on Swagger 2 / OpenAPI 3 docs without components [\#1015](https://github.com/christianhelle/refitter/issues/1015)
+- \[v2.0 audit\]\[C4\] Forced JsonStringEnumConverter injection breaks Newtonsoft users and silently regresses internal enums [\#1014](https://github.com/christianhelle/refitter/issues/1014)
+- \[v2.0 audit\]\[C3\] ContractTypeSuffixApplier corrupts code via raw word-boundary regex \(renames members, comments, strings; double-suffix on rerun\) [\#1013](https://github.com/christianhelle/refitter/issues/1013)
+- \[v2.0 audit\]\[C2\] MSBuild task swallows CLI failures; build always reports success with stale/missing output [\#1012](https://github.com/christianhelle/refitter/issues/1012)
+- \[v2.0 audit\]\[C1\] SourceGenerator: hint-name collisions when two .refitter files share a filename [\#1011](https://github.com/christianhelle/refitter/issues/1011)
+- Refitter.MSBuild 1.7.3 on .NET 10 ignores output file path [\#998](https://github.com/christianhelle/refitter/issues/998)
+- OpenApi client generates invalid schema property name if it starts with a digit [\#992](https://github.com/christianhelle/refitter/issues/992)
+- OpenApi client generate fails with System.ArgumentException: An item with the same key has already been added [\#991](https://github.com/christianhelle/refitter/issues/991)
+- StackOverflowException in recursive schema traversal [\#973](https://github.com/christianhelle/refitter/issues/973)
+- how to keep contract Property Name as original name without Serialization ? [\#967](https://github.com/christianhelle/refitter/issues/967)
 - Non-ASCII response descriptions become \uXXXX in XML comments [\#944](https://github.com/christianhelle/refitter/issues/944)
 - Resolve SonarCloud Code Quality Issues [\#931](https://github.com/christianhelle/refitter/issues/931)
 - format: int32 quirk =\> Serializes to "object" when open api spec contains pattern [\#867](https://github.com/christianhelle/refitter/issues/867)
@@ -259,8 +113,62 @@
 - The using of StringEnumConverter end up generating unserializable data when different NamingPolicy is needed [\#178](https://github.com/christianhelle/refitter/issues/178)
 - Base type not generated for types specified by oneOf in the schema [\#175](https://github.com/christianhelle/refitter/issues/175)
 
+**Closed issues:**
+
+- \[v2.0 audit\] Tracking epic — 46 findings since 1.7.3 [\#1057](https://github.com/christianhelle/refitter/issues/1057)
+
 **Merged pull requests:**
 
+- docs: add umair-me as a contributor for bug [\#1084](https://github.com/christianhelle/refitter/pull/1084) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Fix default solution path and update .NET version in VS Code config [\#1082](https://github.com/christianhelle/refitter/pull/1082) ([christianhelle](https://github.com/christianhelle))
+- Fix docker smoke tests [\#1081](https://github.com/christianhelle/refitter/pull/1081) ([christianhelle](https://github.com/christianhelle))
+- House Keeping [\#1080](https://github.com/christianhelle/refitter/pull/1080) ([christianhelle](https://github.com/christianhelle))
+- chore\(deps\): update dependency tunit to 1.41.0 [\#1078](https://github.com/christianhelle/refitter/pull/1078) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add AntonTeyken as a contributor for bug [\#1077](https://github.com/christianhelle/refitter/pull/1077) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Update actions/github-script action to v9 [\#1073](https://github.com/christianhelle/refitter/pull/1073) ([renovate[bot]](https://github.com/apps/renovate))
+- Update actions/checkout action to v6 [\#1072](https://github.com/christianhelle/refitter/pull/1072) ([renovate[bot]](https://github.com/apps/renovate))
+- Harden generation flows [\#1071](https://github.com/christianhelle/refitter/pull/1071) ([christianhelle](https://github.com/christianhelle))
+- \[v2.0 audit\] Close remaining verified \#1057 regressions [\#1070](https://github.com/christianhelle/refitter/pull/1070) ([christianhelle](https://github.com/christianhelle))
+- chore\(deps\): update dependency ruby to v4.0.3 [\#1068](https://github.com/christianhelle/refitter/pull/1068) ([renovate[bot]](https://github.com/apps/renovate))
+- Resolve high-severity audit findings from \#1057 [\#1067](https://github.com/christianhelle/refitter/pull/1067) ([christianhelle](https://github.com/christianhelle))
+- Update nswag monorepo to 14.7.1 [\#1065](https://github.com/christianhelle/refitter/pull/1065) ([renovate[bot]](https://github.com/apps/renovate))
+- \[v2.0 audit\] Fix pre-release regressions from \#1057 [\#1064](https://github.com/christianhelle/refitter/pull/1064) ([christianhelle](https://github.com/christianhelle))
+- Breaking changes and Migration Guide for v2.0.0 [\#1009](https://github.com/christianhelle/refitter/pull/1009) ([christianhelle](https://github.com/christianhelle))
+- Update dependency coverlet.collector to v10 [\#1007](https://github.com/christianhelle/refitter/pull/1007) ([renovate[bot]](https://github.com/apps/renovate))
+- Update actions/github-script action to v9 [\#1006](https://github.com/christianhelle/refitter/pull/1006) ([renovate[bot]](https://github.com/apps/renovate))
+- Update actions/checkout action to v6 [\#1005](https://github.com/christianhelle/refitter/pull/1005) ([renovate[bot]](https://github.com/apps/renovate))
+- Upgrade Squad to v0.9.1 [\#1004](https://github.com/christianhelle/refitter/pull/1004) ([christianhelle](https://github.com/christianhelle))
+- Update dependency TUnit to 1.35.2 [\#1003](https://github.com/christianhelle/refitter/pull/1003) ([renovate[bot]](https://github.com/apps/renovate))
+- Special-case the default .refitter filename before deriving OutputFilename [\#1002](https://github.com/christianhelle/refitter/pull/1002) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
+- CodeRabbit auto-fixes for PR \#1000 [\#1001](https://github.com/christianhelle/refitter/pull/1001) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
+- docs: add Timovzl as a contributor for bug [\#999](https://github.com/christianhelle/refitter/pull/999) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Update dependency TUnit to 1.34.5 [\#995](https://github.com/christianhelle/refitter/pull/995) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add dimyle as a contributor for bug [\#994](https://github.com/christianhelle/refitter/pull/994) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Update dependency TUnit to 1.31.0 [\#989](https://github.com/christianhelle/refitter/pull/989) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency AutoMapper to v16 [\#988](https://github.com/christianhelle/refitter/pull/988) ([renovate[bot]](https://github.com/apps/renovate))
+- Bump the nuget group with 1 update [\#987](https://github.com/christianhelle/refitter/pull/987) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update Spectre.Console.Cli to v0.55.0 [\#985](https://github.com/christianhelle/refitter/pull/985) ([christianhelle](https://github.com/christianhelle))
+- Update actions/github-script action to v9 [\#984](https://github.com/christianhelle/refitter/pull/984) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.30.8 [\#983](https://github.com/christianhelle/refitter/pull/983) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.30.0 [\#981](https://github.com/christianhelle/refitter/pull/981) ([renovate[bot]](https://github.com/apps/renovate))
+- Update NSwag to v14.7.0 [\#980](https://github.com/christianhelle/refitter/pull/980) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add smoerijf as a contributor for bug, and code [\#978](https://github.com/christianhelle/refitter/pull/978) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency tunit to 1.29.0 [\#976](https://github.com/christianhelle/refitter/pull/976) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.22.6 [\#975](https://github.com/christianhelle/refitter/pull/975) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.22.3 [\#974](https://github.com/christianhelle/refitter/pull/974) ([renovate[bot]](https://github.com/apps/renovate))
+- Bump codecov/codecov-action from 5 to 6 [\#972](https://github.com/christianhelle/refitter/pull/972) ([dependabot[bot]](https://github.com/apps/dependabot))
+- docs: add naji-makhoul as a contributor for ideas [\#968](https://github.com/christianhelle/refitter/pull/968) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 10.1.7 [\#966](https://github.com/christianhelle/refitter/pull/966) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.21.30 [\#965](https://github.com/christianhelle/refitter/pull/965) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.21.0 [\#964](https://github.com/christianhelle/refitter/pull/964) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency oasreader to 3.5.0.19 [\#963](https://github.com/christianhelle/refitter/pull/963) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update refit monorepo to 10.1.6 [\#961](https://github.com/christianhelle/refitter/pull/961) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dotnet monorepo [\#960](https://github.com/christianhelle/refitter/pull/960) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency coverlet.collector to 8.0.1 [\#959](https://github.com/christianhelle/refitter/pull/959) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency ruby to v4.0.2 [\#958](https://github.com/christianhelle/refitter/pull/958) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency fluentassertions to 7.2.2 [\#956](https://github.com/christianhelle/refitter/pull/956) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 10.1.5 [\#952](https://github.com/christianhelle/refitter/pull/952) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.19.74 [\#951](https://github.com/christianhelle/refitter/pull/951) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add send0xx as a contributor for bug [\#946](https://github.com/christianhelle/refitter/pull/946) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Microsoft.OpenApi v3.4 [\#945](https://github.com/christianhelle/refitter/pull/945) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency tunit to 1.19.0 [\#942](https://github.com/christianhelle/refitter/pull/942) ([renovate[bot]](https://github.com/apps/renovate))
