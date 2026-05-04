@@ -32,6 +32,7 @@ Parker, Lambert, and Dallas completed issue #1083 resolution:
 - **2026-04-26 tooling test smell:** `src\Refitter.Tests\GenerateCommandTests.cs`, `src\Refitter.Tests\Examples\SettingsFileOutputPathTests.cs`, and `src\Refitter.Tests\RefitterGenerateTaskTests.cs` lean heavily on reflection into private helpers and duplicated process/workspace harness code, which is a high-confidence cleanup target before larger tooling refactors.
 - **2026-04-26 workflow audit note:** `.github\workflows\build.yml`, `msbuild.yml`, `pr.yml`, `smoke-tests.yml`, `regression-tests.yml`, and `production-tests.yml` use `paths-ignore` with negated `!` patterns; GitHub's documented include/exclude model expects `paths` for mixed include/exclude filters, so those trigger rules are a tooling-contract review seam.
 - **2026-05-04T13:23:00Z issue #1088 coordination gate:** Ripley has blocked tooling/code changes until the team can reproduce the reported compile failure with the full user repro or a minimized repo-local case on the same consumer dependency lane; the current local casing matrix still compiles across Refit.HttpClientFactory 8.0.0, 9.0.2, and 10.1.6.
+- **2026-05-04T13:23:00.022Z issue #1088 tooling gate:** The richer repro keeps #1088 out of the tooling lane for now: CLI/source-generator/MSBuild still share the same core naming output, and the reconstructed GET+POST `/form` case compiles cleanly on Refit.HttpClientFactory 8.0.0, 9.0.2, and 10.1.6. Do not start tooling-facing changes without a failing consumer matrix.
 
 ## Core Context
 

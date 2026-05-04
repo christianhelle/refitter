@@ -242,54 +242,32 @@ Parker and Dallas may begin code/test changes only after **one** of these is tru
 
 If neither condition is met, the correct next step is to request more issue detail rather than invent a failing case and patch blind.
 
-# Lambert issue #1088 repro outcome
-
-- **Date:** 2026-05-04T15:23:00.022+02:00
-- **Requester:** Christian Helle
-- **Decision:** Treat the current local evidence as a confirmed casing-shape regression between Refitter versions, but **not yet** as a reproduced consumer compile failure. Keep the next step focused on compile-backed coverage that proves whether any remaining failure requires source-generator-specific wiring or a user-package/version skew.
-
-## Confirmed facts
-
-1. The reporter's GET-only comment snippet does **not** reproduce the FormGet/FormGET split by itself; all tested versions generate Form(...) when only one verb exists on the path.
-2. A minimized shape with both GET and POST on /api/process/element/{elementType}/{elementInstance}/form reproduces the casing boundary:
-   - 1.7.3 emits FormGET / FormPOST
-   - 2.0.0 emits FormGet / FormPost
-   - current HEAD emits FormGet / FormPost
-3. Local consumer compilation of the generated interface succeeded for every tested pairing with Refit.HttpClientFactory 8.0.0, 9.0.2, and 10.1.6, so the exact interface/implementation mismatch remains unconfirmed here.
-4. Relevant package lanes observed in repo:
-   - src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj at 2.0.0 references Refit 9.0.2.
-   - current HEAD references Refit 10.1.6.
-   - generated-code build fixtures still pin Refit.HttpClientFactory 8.0.0.
-
-## Implication
-
-The safest follow-up is to add regression coverage around the confirmed 1.7.3 -> 2.0.0 casing change and then probe any remaining mismatch through a source-generator/consumer-version lane, rather than assuming the reported compile break is reproducible from Refitter output alone.
-
 ---
 date: 2026-05-04T15:23:00.022+02:00
-agent: ripley
+agent: lambert
 issue: 1088
 ---
 
 # Decision
 
-Do not start production or regression-test changes for issue #1088 until the team has an exact compile-backed repro that matches the reporter's failure shape, or a minimized equivalent proven to fail across the same dependency lane.
+Treat issue #1088 as a confirmed same-path multi-verb naming-shape change, but not yet as a reproduced consumer compile mismatch.
 
 # Why
 
-- The reporter-provided artifact is still partial: one path snippet and one schema, but no full spec, `.refitter` settings, or package matrix.
-- Reconstructing the obvious minimized case required **both** GET and POST on `/api/process/element/{elementType}/{elementInstance}/form`; that produced `FormGet`/`FormPost` as expected, but it compiled successfully on:
-  - Refitter `2.0.0` + Refit `10.1.6`
-  - current HEAD + Refit `10.1.6`
-  - current HEAD + Refit `8.0.0`
-- A hand-written Refit interface with `FormGet`/`FormPost` also compiled cleanly on Refit `8.0.0` and `10.1.6`, so the mismatch is not proven to be a generic Refit source-generator bug either.
-- The remaining current evidence is therefore insufficient to justify changing `OperationNameGenerator`, `StringCasingExtensions`, or adjacent tests.
+- The reporter-provided GET snippet and `Form` schema only reproduce the verb suffix boundary once a same-path POST operation is added.
+- In that minimized shape, Refitter 1.7.3 emits `FormGET` / `FormPOST`, while Refitter 2.0.0 and current HEAD emit `FormGet` / `FormPost`.
+- Tag changes did not change the method names in the reconstructed repro.
+- Compile-backed consumer probes showed Refit-generated implementation stubs matching the interface names on Refit.HttpClientFactory 8.0.0, 9.0.2, and 10.1.6.
 
-# Gate for Parker and Dallas
+# Evidence
 
-Parker and Dallas may begin code/test changes only after **one** of these is true:
+- `.test-work\issue-1088-repro\outputs\1.7.3.cs`
+- `.test-work\issue-1088-repro\outputs\2.0.0.cs`
+- `.test-work\issue-1088-repro\outputs\head-default-get.cs`
+- `.test-work\issue-1088-repro\outputs\head-default-post.cs`
+- `.test-work\issue-1088-repro\outputs\head-default-getpost.cs`
+- `.test-work\issue-1088-repro\compile-fixed\`
 
-1. The exact user repro is available (full spec or sanitized equivalent, `.refitter` settings, and package versions) and fails in a compile-backed harness; or
-2. A minimized repo-local fixture reproduces the same interface/implementation mismatch and is shown to fail under the same Refitter/Refit version lane that users actually consume.
+# Consequence
 
-If neither condition is met, the correct next step is to request more issue detail rather than invent a failing case and patch blind.
+Do not patch `src\Refitter.Core\OperationNameGenerator.cs` or adjacent tests yet unless a failing consumer lane is found, or the reporter supplies the missing full spec/settings/package matrix.
