@@ -16,6 +16,8 @@ Parker, Lambert, and Dallas completed issue #1083 resolution:
 
 ## Learnings
 
+- **2026-05-04T08:59:00.400+02:00 issue #1088 tooling triage:** CLI (`src\Refitter\GenerateCommand.cs`), source generator (`src\Refitter.SourceGenerator\RefitterSourceGenerator.cs`), and MSBuild (`src\Refitter.MSBuild\RefitterGenerateTask.cs`) all converge on `Refitter.Core.RefitGenerator`, so method-name casing regressions are shared-core or downstream-Refit compatibility issues rather than duplicated tooling logic. Existing source-generator tests mostly prove attributes/types compile, but acronym-casing regressions need a parity harness that builds generated interfaces against the current `Refit.HttpClientFactory` source-generator path, not just the repo's older `BuildHelper` package template.
+
 - **2026-05-01T14:34:56.630+02:00 issue #1083 tooling follow-up:** the dotted-schema-name fix is a core generator concern, so CLI/MSBuild wiring and README help text do not need parity changes; the only adjacent tooling work worth landing is source-generator regression coverage so compile-time generation proves the same sanitized DTO/return-type behavior as the CLI path.
 
 - **2026-04-28T15:21:48.369+02:00 e-conomic multi-spec tooling verdict:** `test\economic.refitter` parses correctly and resolves both relative `openApiPaths`; CLI/MSBuild/source-generator all reach core multi-document merge, where duplicate equivalent schemas (`Error`, then `ProblemDetails`) trigger the fail-fast merge path before validation, so `--skip-validation` cannot help.
@@ -85,4 +87,4 @@ Parker, Lambert, and Dallas completed issue #1083 resolution:
 - Root cause confirmed in `Refitter.Core` not tooling; `--skip-validation` cannot help because merge happens before validation.
 - Proposal: primary fix belongs in core merge semantics (allow duplicate paths/schemas when semantically equivalent); do not split `.refitter` into multiple generation runs.
 - Tooling follow-up (post-core-fix): improve CLI error guidance for merge failures, add `openApiPaths` regression coverage, add relative-path resolution tests, add merge-failure diagnostic tests.
-
+- **2026-05-04T06:59:00Z issue #1088 squad alignment:** Ripley, Parker, Dallas, and Lambert converged on a repro-first plan: add exact casing assertions plus compile-backed core/source-generator parity coverage before any shared naming patch. Current evidence still points to a contract-sensitive generated-interface boundary or downstream Refit interaction, not separate CLI/MSBuild/source-generator wiring bugs.

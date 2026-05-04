@@ -12,6 +12,7 @@
 - 2026-04-28T12:02:17.298+02:00: Issue #1045's new multi-path `.refitter` comment does not reproduce at current HEAD; current CLI validation accepts `openApiPaths`, normalizes relative entries, and the live repro instead surfaced expected merge-collision behavior only when duplicate path specs were used.
 - 2026-04-28T15:21:48.369+02:00: The e-conomic multi-spec failure is a core `OpenApiDocumentFactory` merge-equivalence problem: `economic-products.json` and `economic-webhooks.json` share equivalent `Error` and `ProblemDetails` component schemas, but current NSwag-object serialization comparison false-negatives and throws before validation/generation.
 - 2026-04-29T11:51:36.530+02:00: PR assembly for `build-warnings` should target `main` and be framed as a branch-wide warning-hardening pass, not only the latest `OpenApiDocumentFactory` change; the landed scope spans `src\Refitter.Core\OpenApiDocumentFactory.cs`, `src\Refitter.Core\Refitter.Core.csproj`, `src\Refitter.Tests\OpenApiDocumentFactoryMergeTests.cs`, `src\Refitter.Tests\Refitter.Tests.csproj`, `src\Refitter\Refitter.csproj`, and the carried `.squad` history/decision sync.
+- 2026-05-04T08:59:00.400+02:00: Issue #1088 triage points to a contract-sensitive method-casing regression at the generated-interface boundary, not a confirmed broad string-helper rewrite: `src\Refitter.Core\OperationNameGenerator.cs` and `src\Refitter.Core\StringCasingExtensions.cs` are unchanged across the 1.7.3 → 2.0.0 comparison, current naming scenario tests still pass, and the missing safety net is compile-backed acronym/HTTP-verb coverage spanning `src\Refitter.Tests\Scenarios\*Naming*Tests.cs` and `src\Refitter.SourceGenerator.Tests\*.cs`.
 
 ## Core Context
 
@@ -50,3 +51,4 @@
 - **Key files**: `src\Refitter.Core\OpenApiDocumentFactory.cs`, `src\Refitter.Tests\OpenApiDocumentFactoryMergeTests.cs`, `src\Refitter.Core\Refitter.Core.csproj`, `src\Refitter.Tests\Refitter.Tests.csproj`, `src\Refitter\Refitter.csproj`, `.squad` sync.
 - **PR assembly decision recorded** to decisions.md (2026-04-29).
 - **Branch pushed** with squad metadata committed.
+- **2026-05-04T06:59:00Z issue #1088 squad alignment:** Ripley, Parker, Dallas, and Lambert converged on a repro-first plan: add exact casing assertions plus compile-backed core/source-generator parity coverage before any shared naming patch. Current evidence still points to a contract-sensitive generated-interface boundary or downstream Refit interaction, not separate CLI/MSBuild/source-generator wiring bugs.
