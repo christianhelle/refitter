@@ -271,3 +271,108 @@ Treat issue #1088 as a confirmed same-path multi-verb naming-shape change, but n
 # Consequence
 
 Do not patch `src\Refitter.Core\OperationNameGenerator.cs` or adjacent tests yet unless a failing consumer lane is found, or the reporter supplies the missing full spec/settings/package matrix.
+
+---
+date: 2026-05-04T15:23:00.022+02:00
+agent: bishop
+issue: 1088
+---
+
+# Decision
+
+Draft the issue follow-up as a compatibility update, not as a fully reproduced compile-failure confirmation.
+
+# Why
+
+- Local validation confirmed a narrow behavior regression: for path-derived same-path multi-verb operation names, Refitter 1.7.3 emitted `FormGET`/`FormPOST`, while 2.0.0 and current HEAD emitted `FormGet`/`FormPost`.
+- The exact interface/implementation compile break reported by the user did not reproduce locally, so the maintainer reply should avoid overstating certainty on that point.
+- The approved fix is intentionally narrow in `src\Refitter.Core\OperationNameGenerator.cs`: restore legacy all-caps verb suffixes only for the path-derived same-path multi-verb case, while leaving explicit `operationId` names such as `FormGet` unchanged.
+- Current docs do not promise specific HTTP-verb casing for generated method names, so no immediate README correction is required unless new evidence shows a documentation misunderstanding.
+
+---
+date: 2026-05-04T15:23:00.022+02:00
+agent: dallas
+issue: 1088
+---
+
+# Decision
+
+Keep the shared generated-code build fixture on the legacy Refit 8.x lane, and add a separate current-tooling fixture for issue #1088 compatibility coverage.
+
+# Why
+
+- `src\Refitter.Tests\Build\ProjectFileContents.cs` is used broadly by compile-gate tests, including Apizr scenarios that still depend on older Refit-compatible package combinations.
+- Globally bumping that fixture to `Refit.HttpClientFactory` 10.1.6 broke many unrelated compile tests even though the new issue #1088 parity check only needed one focused current-lane build.
+- A dedicated `Net80AppCurrentTooling` fixture plus `BuildHelper.BuildCSharpWithProject(...)` lets Dallas validate source-generator/current-Refit compatibility without destabilizing the repo-wide legacy compile harness.
+
+# Applied files
+
+- `src\Refitter.Tests\Build\ProjectFileContents.cs`
+- `src\Refitter.Tests\Build\BuildHelper.cs`
+- `src\Refitter.SourceGenerator.Tests\Build\ProjectFileContents.cs`
+- `src\Refitter.SourceGenerator.Tests\Build\BuildHelper.cs`
+- `src\Refitter.SourceGenerator.Tests\SourceGeneratorCompatibilityTests.cs`
+- `src\Refitter.SourceGenerator.Tests\SourceGeneratorPackageReferenceTests.cs`
+
+# Lambert issue #1088 test scope
+
+- **Date:** 2026-05-04T15:23:00.022+02:00
+- **Requester:** Christian Helle
+- **Decision:** Keep the issue #1088 regression tightening in test-only scope by adding one dedicated same-path multi-verb scenario plus exact by-tag assertions, instead of widening the broad generator-matrix tests right now.
+
+## Why
+
+- The confirmed boundary is specific: same-path GET/POST operations changed from `FormGET`/`FormPOST` in 1.7.3 to `FormGet`/`FormPost` in 2.0.0 and HEAD.
+- `MultipleInterfacesByTagsWithSamePathSegmentTests.cs` already sat adjacent to the bug but hid it by permitting both `InfoGet` and `InfoGET`; that file needed a narrow correction.
+- A dedicated scenario file reduces merge overlap with Parker while still pinning the consumer-facing contract with a compile-backed build check.
+
+---
+date: 2026-05-04T15:23:00.022+02:00
+agent: parker
+issue: 1088
+---
+
+# Decision
+
+Restore the legacy all-caps HTTP verb suffix only in the shared `OperationNameGenerator` path, and only for same-path multi-verb operations whose names are path-derived.
+
+# Why
+
+- The confirmed compatibility drift is limited to same-path multi-verb names such as `FormGET` / `FormPOST` becoming `FormGet` / `FormPost`.
+- A broad `StringCasingExtensions` rewrite would risk changing unrelated identifiers, including explicit operation IDs that intentionally end with `Get` / `Post`.
+- Guarding the normalization behind same-path multi-verb detection plus path-derived naming keeps explicit operation-id casing untouched while restoring the 1.7.3-compatible suffix shape where the regression was observed.
+
+# Validation
+
+- `dotnet build -c Release src\Refitter.Tests\Refitter.Tests.csproj --no-restore`
+- Built and ran a temporary `.test-work\issue-1088-validation` harness that invoked the new regression methods directly, then removed the scratch files after the run.
+- `dotnet format --verify-no-changes src\Refitter.slnx --no-restore`
+
+---
+date: 2026-05-04T15:23:00.022+02:00
+agent: ripley
+issue: 1088
+---
+
+# Decision
+
+Approve the narrow compatibility fix for the observed 1.7.3 -> 2.0.0 same-path multi-verb casing change.
+
+# Why
+
+- The only production change is localized to `src\Refitter.Core\OperationNameGenerator.cs`, which is the shared naming seam for generated interface methods.
+- The patch restores legacy `GET`/`POST` suffix casing only when the generated name is path-derived on a route that has multiple verbs, which matches the confirmed drift without broadening the casing rules.
+- Explicit operation-id-driven names remain on the current PascalCase contract (`FormGet`/`FormPost`), so the fix does not rewrite user-authored operation IDs.
+- The adjacent test changes tighten previously permissive coverage, add a dedicated issue repro, and add compile-backed source-generator coverage against the current tooling lane without changing CLI or source-generator production wiring.
+
+# Validation
+
+- `dotnet build -c Release src\Refitter.slnx`
+- `dotnet test -c Release src\Refitter.SourceGenerator.Tests\Refitter.SourceGenerator.Tests.csproj`
+- `dotnet test -c Release src\Refitter.Tests\Refitter.Tests.csproj` *(only the known live-URL timeout lane failed: `OpenApiDocumentFactoryTests.Create_From_Http_Url_Returns_NotNull` and `OpenApiDocumentFactoryTests.IsHttp_Detects_Http_Protocol`)*
+- `dotnet format --verify-no-changes src\Refitter.slnx`
+
+# Residual risk
+
+- The fix intentionally reintroduces the legacy all-caps suffix only for path-derived same-path multi-verb names; if a downstream consumer depends on the 2.0.0+ PascalCase form for that narrow shape, this is a compatibility trade back toward 1.7.3 behavior.
+- The consumer compile mismatch originally reported still was not reproduced locally; this batch safely restores the old method names and hardens the regression net, but it does not prove a separate external package/version interaction cannot still exist in the reporter's environment.
