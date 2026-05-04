@@ -188,4 +188,108 @@ Issue #1083 is a valid current bug in Refitter's generator pipeline.
   1. Add one minimal inline OpenAPI scenario reproducing the exact casing contract once the reporter snippet or a repo-local failing shape is known.
   2. Assert the generated interface contains the expected method name and does not contain the alternate casing.
   3. Compile the generated code so Refit source-generation mismatches are caught.
-  4. If the fix changes helper semantics, add narrow helper-level tests for acronym inputs such as `form-GET`, `form GET`, and `formGET`.
+4. If the fix changes helper semantics, add narrow helper-level tests for acronym inputs such as `form-GET`, `form GET`, and `formGET`.
+
+# Lambert issue #1088 repro outcome
+
+- **Date:** 2026-05-04T15:23:00.022+02:00
+- **Requester:** Christian Helle
+- **Decision:** Treat the current local evidence as a confirmed casing-shape regression between Refitter versions, but **not yet** as a reproduced consumer compile failure. Keep the next step focused on compile-backed coverage that proves whether any remaining failure requires source-generator-specific wiring or a user-package/version skew.
+
+## Confirmed facts
+
+1. The reporter's GET-only comment snippet does **not** reproduce the FormGet/FormGET split by itself; all tested versions generate Form(...) when only one verb exists on the path.
+2. A minimized shape with both GET and POST on /api/process/element/{elementType}/{elementInstance}/form reproduces the casing boundary:
+   - 1.7.3 emits FormGET / FormPOST
+   - 2.0.0 emits FormGet / FormPost
+   - current HEAD emits FormGet / FormPost
+3. Local consumer compilation of the generated interface succeeded for every tested pairing with Refit.HttpClientFactory 8.0.0, 9.0.2, and 10.1.6, so the exact interface/implementation mismatch remains unconfirmed here.
+4. Relevant package lanes observed in repo:
+   - src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj at 2.0.0 references Refit 9.0.2.
+   - current HEAD references Refit 10.1.6.
+   - generated-code build fixtures still pin Refit.HttpClientFactory 8.0.0.
+
+## Implication
+
+The safest follow-up is to add regression coverage around the confirmed 1.7.3 -> 2.0.0 casing change and then probe any remaining mismatch through a source-generator/consumer-version lane, rather than assuming the reported compile break is reproducible from Refitter output alone.
+
+---
+date: 2026-05-04T15:23:00.022+02:00
+agent: ripley
+issue: 1088
+---
+
+# Decision
+
+Do not start production or regression-test changes for issue #1088 until the team has an exact compile-backed repro that matches the reporter's failure shape, or a minimized equivalent proven to fail across the same dependency lane.
+
+# Why
+
+- The reporter-provided artifact is still partial: one path snippet and one schema, but no full spec, `.refitter` settings, or package matrix.
+- Reconstructing the obvious minimized case required **both** GET and POST on `/api/process/element/{elementType}/{elementInstance}/form`; that produced `FormGet`/`FormPost` as expected, but it compiled successfully on:
+  - Refitter `2.0.0` + Refit `10.1.6`
+  - current HEAD + Refit `10.1.6`
+  - current HEAD + Refit `8.0.0`
+- A hand-written Refit interface with `FormGet`/`FormPost` also compiled cleanly on Refit `8.0.0` and `10.1.6`, so the mismatch is not proven to be a generic Refit source-generator bug either.
+- The remaining current evidence is therefore insufficient to justify changing `OperationNameGenerator`, `StringCasingExtensions`, or adjacent tests.
+
+# Gate for Parker and Dallas
+
+Parker and Dallas may begin code/test changes only after **one** of these is true:
+
+1. The exact user repro is available (full spec or sanitized equivalent, `.refitter` settings, and package versions) and fails in a compile-backed harness; or
+2. A minimized repo-local fixture reproduces the same interface/implementation mismatch and is shown to fail under the same Refitter/Refit version lane that users actually consume.
+
+If neither condition is met, the correct next step is to request more issue detail rather than invent a failing case and patch blind.
+
+# Lambert issue #1088 repro outcome
+
+- **Date:** 2026-05-04T15:23:00.022+02:00
+- **Requester:** Christian Helle
+- **Decision:** Treat the current local evidence as a confirmed casing-shape regression between Refitter versions, but **not yet** as a reproduced consumer compile failure. Keep the next step focused on compile-backed coverage that proves whether any remaining failure requires source-generator-specific wiring or a user-package/version skew.
+
+## Confirmed facts
+
+1. The reporter's GET-only comment snippet does **not** reproduce the FormGet/FormGET split by itself; all tested versions generate Form(...) when only one verb exists on the path.
+2. A minimized shape with both GET and POST on /api/process/element/{elementType}/{elementInstance}/form reproduces the casing boundary:
+   - 1.7.3 emits FormGET / FormPOST
+   - 2.0.0 emits FormGet / FormPost
+   - current HEAD emits FormGet / FormPost
+3. Local consumer compilation of the generated interface succeeded for every tested pairing with Refit.HttpClientFactory 8.0.0, 9.0.2, and 10.1.6, so the exact interface/implementation mismatch remains unconfirmed here.
+4. Relevant package lanes observed in repo:
+   - src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj at 2.0.0 references Refit 9.0.2.
+   - current HEAD references Refit 10.1.6.
+   - generated-code build fixtures still pin Refit.HttpClientFactory 8.0.0.
+
+## Implication
+
+The safest follow-up is to add regression coverage around the confirmed 1.7.3 -> 2.0.0 casing change and then probe any remaining mismatch through a source-generator/consumer-version lane, rather than assuming the reported compile break is reproducible from Refitter output alone.
+
+---
+date: 2026-05-04T15:23:00.022+02:00
+agent: ripley
+issue: 1088
+---
+
+# Decision
+
+Do not start production or regression-test changes for issue #1088 until the team has an exact compile-backed repro that matches the reporter's failure shape, or a minimized equivalent proven to fail across the same dependency lane.
+
+# Why
+
+- The reporter-provided artifact is still partial: one path snippet and one schema, but no full spec, `.refitter` settings, or package matrix.
+- Reconstructing the obvious minimized case required **both** GET and POST on `/api/process/element/{elementType}/{elementInstance}/form`; that produced `FormGet`/`FormPost` as expected, but it compiled successfully on:
+  - Refitter `2.0.0` + Refit `10.1.6`
+  - current HEAD + Refit `10.1.6`
+  - current HEAD + Refit `8.0.0`
+- A hand-written Refit interface with `FormGet`/`FormPost` also compiled cleanly on Refit `8.0.0` and `10.1.6`, so the mismatch is not proven to be a generic Refit source-generator bug either.
+- The remaining current evidence is therefore insufficient to justify changing `OperationNameGenerator`, `StringCasingExtensions`, or adjacent tests.
+
+# Gate for Parker and Dallas
+
+Parker and Dallas may begin code/test changes only after **one** of these is true:
+
+1. The exact user repro is available (full spec or sanitized equivalent, `.refitter` settings, and package versions) and fails in a compile-backed harness; or
+2. A minimized repo-local fixture reproduces the same interface/implementation mismatch and is shown to fail under the same Refitter/Refit version lane that users actually consume.
+
+If neither condition is met, the correct next step is to request more issue detail rather than invent a failing case and patch blind.

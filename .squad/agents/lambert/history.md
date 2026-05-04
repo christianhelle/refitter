@@ -16,7 +16,9 @@
 - **2026-04-26 validation baseline:** The durable local baseline is release build + release tests + format verification; live-URL tests stay environment-sensitive and should not drive pass/fail conclusions.
 - **2026-04-25 CLI help contract:** Spectre.Console.Cli help regressions should be asserted semantically after output normalization, not by exact formatter spacing.
 - **2026-04-25 blocker-test pattern:** When blocker work is still moving, prefer minimal repro specs plus compilation gates first, then tighten focused assertions after the implementation lane lands.
+- **2026-05-04T13:23:00Z issue #1088 execution gate:** Ripley has now blocked code/test work until the team has the full user repro (spec + .refitter + package versions) or a minimized repo-local case that fails on the same consumer dependency lane. The current local matrix still compiles against Refit.HttpClientFactory 8.0.0, 9.0.2, and 10.1.6.
 
 ## Archived Detail
 
 - Older detailed tester notes and evidence were summarized into `history-archive.md` on 2026-05-04T06:59:00Z to keep this file scannable.
+- **2026-05-04T15:23:00.022+02:00 issue #1088 repro matrix:** The exact FormGet interface vs FormGET implementation mismatch is still not locally reproducible. A minimized GET+POST-on-the-same-path spec confirms the naming boundary instead: src\Refitter at 1.7.3 emits FormGET/FormPOST, while 2.0.0 and current HEAD emit FormGet/FormPost; local consumer builds against Refit.HttpClientFactory 8.0.0, 9.0.2, and 10.1.6 all compiled successfully.
