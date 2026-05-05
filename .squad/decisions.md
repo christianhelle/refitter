@@ -376,3 +376,153 @@ Approve the narrow compatibility fix for the observed 1.7.3 -> 2.0.0 same-path m
 
 - The fix intentionally reintroduces the legacy all-caps suffix only for path-derived same-path multi-verb names; if a downstream consumer depends on the 2.0.0+ PascalCase form for that narrow shape, this is a compatibility trade back toward 1.7.3 behavior.
 - The consumer compile mismatch originally reported still was not reproduced locally; this batch safely restores the old method names and hardens the regression net, but it does not prove a separate external package/version interaction cannot still exist in the reporter's environment.
+
+# Ash review decision: Issue 1088 source-generator angle
+
+Primary source-generator investigation should focus on build-time duplication and generator ordering, not core operation-name casing.
+
+## Why
+- `Refitter.SourceGenerator.props` already includes `**/*.refitter` as `AdditionalFiles`, so a consuming project that also declares `<AdditionalFiles Include=".refitter" />` can feed the same config into the generator twice.
+- `RefitterSourceGenerator` does not deduplicate `AdditionalText` inputs before calling `AddSource`, and its hint name is path-based, so duplicate inclusion can create same-source/hint conflicts or duplicate surfaces.
+- The source-generator README explicitly recommends `Refitter.MSBuild` when Refit source generation is involved because pre-compile generation avoids rebuild/order issues.
+- Legacy/sample build integration under `test\SourceGenerator` still compiles checked-in `Generated\*.cs`, which is the exact stale-artifact pattern to rule out in consumers migrating from older generator behavior.
+
+## Revised plan targets
+1. Reproduce with and without manual `<AdditionalFiles Include=".refitter" />`.
+2. Compare first build vs second build when Refit's generator is present.
+3. Remove any checked-in/generated `.g.cs` compile items and compare results.
+4. Keep core naming output fixed while varying only source-generator/build inputs.
+
+---
+date: 2026-05-05T14:18:05.572+02:00
+agent: dallas
+issue: 1088
+---
+
+# Decision
+
+Handle the source-generator-side issue #1088 follow-up as a build-integration fix in the package targets, not as a shared naming change.
+
+# Why
+
+- The strongest proven reporter-style repro is now rebuild-sensitive: first build emits `FormGet`/`FormPost` successfully, then rebuild fails because stale `Generated\Refitter.SourceGenerator\...\*.g.cs` files are compiled again alongside fresh source-generator output.
+- The same repro shape also carries duplicate `.refitter` inputs when consumers rely on the packaged auto-include and keep a manual `<AdditionalFiles Include=".refitter" />`.
+- Local source-generator consumer rebuilds still matched `FormGet`/`FormPost`, so the originally reported interface/implementation casing mismatch remained unproven in the tooling lane.
+- A narrow `Refitter.SourceGenerator.targets` fix can solve both proven build-integration hazards—deduplicating `.refitter` `AdditionalFiles` and removing `$(CompilerGeneratedFilesOutputPath)\**\*.cs` from `Compile` before `CoreCompile`—without touching shared core naming behavior.
+
+# Applied files
+
+- `src\Refitter.SourceGenerator\Refitter.SourceGenerator.targets`
+- `src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj`
+- `src\Refitter.SourceGenerator.Tests\SourceGeneratorPackageReferenceTests.cs`
+- `src\Refitter.SourceGenerator.Tests\Issue1088SourceGeneratorConsumerRebuildTests.cs`
+
+# Dallas decision: Issue 1088 source-generator reinvestigation
+
+- Treat FormGET/FormPOST -> FormGet/FormPost as intentional shared-core behavior, not the bug target.
+- Focus the follow-up plan on source-generator-only divergence:
+  1. package props auto-including `**/*.refitter` while consumers may also add `<AdditionalFiles Include=".refitter" />`, risking duplicate processing;
+  2. source generator bypassing CLI settings normalization/validation (`ApplySettingsFileDefaults`, `SettingsValidator`);
+  3. source generator always calling `Generate()` instead of `GenerateMultipleFiles()`, so source-generator behavior diverges from CLI for `generateMultipleFiles`/output settings;
+  4. no end-to-end source-generator test currently verifies the downstream Refit implementation still matches the generated interface when `useCancellationTokens`, DI, and package-consumer semantics are involved.
+- Best follow-up test target: a package-consumer integration test that builds a small project using the packed source-generator package, `EmitCompilerGeneratedFiles`, the issue 1088-style `.refitter`, and asserts no duplicate/stale generated sources plus a successful build of the Refit-generated implementation.
+
+# Dallas decision: issue #1088 validation matrix
+
+- Date: 2026-05-05T14:18:05.572+02:00
+- Requested by: Christian Helle
+
+## Decision
+
+Treat issue #1088 as **shared-core naming with source-generator consumer validation**, not as three separate tooling bugs.
+
+## Why
+
+- CLI settings-file mode deserializes `.refitter` JSON into `RefitGeneratorSettings`, applies settings-file defaults, then calls `RefitGenerator.CreateAsync(...)` and `Generate()`/`GenerateMultipleFiles()`.
+- The source generator also deserializes `.refitter` JSON into `RefitGeneratorSettings`, resolves relative spec paths, then calls the same `RefitGenerator.CreateAsync(...)` and `Generate()`.
+- MSBuild does not implement naming itself; it shells the bundled CLI with `--settings-file`.
+- The reported flags (`returnIApiResponse`, `useCancellationTokens`, `usePolymorphicSerialization`, `generateDisposableClients`) affect signature shape or emitted attributes, but not the operation-name casing pipeline.
+- The only meaningful surface-specific difference in this area is that the source generator always emits a single `AddSource()` payload and does not honor CLI multi-file/output-folder behavior, so `generateMultipleFiles` should be treated as an adjacent tooling parity concern, not the likely root cause of a casing-only interface/implementation mismatch.
+
+## Required validation matrix
+
+1. **Core regression proof**
+   - Add exact naming assertions for the simplified `/form` GET+POST repro in `Refitter.Core` coverage.
+   - Add a compile-backed check for the reporter-style settings shape (`ProcessEngineClient`, `returnIApiResponse`, `useCancellationTokens`, `usePolymorphicSerialization`, `generateDisposableClients`).
+
+2. **Source-generator consumer proof**
+   - Add an end-to-end source-generator test that feeds a real `.refitter` file through Roslyn/consumer compilation and verifies the generated interface compiles on the **current Refit lane** (the lane that exercises Refit source generation, not only the legacy Refit 8.x helper template).
+   - Include the reporter-style settings in that test, because those flags change the interface signature the downstream Refit tooling must implement.
+
+3. **CLI parity proof**
+   - Add or update a settings-file-driven CLI test proving the same `.refitter` input produces the same interface/member names as the core/source-generator path.
+   - If the eventual fix touches multi-file generation, include a `GenerateMultipleFiles()` assertion too.
+
+4. **MSBuild smoke proof**
+   - Keep MSBuild coverage lightweight: one task-level smoke/integration test showing a `.refitter` file flows through the CLI path and reports generated files successfully.
+   - Do not duplicate naming assertions here unless the fix changes CLI process orchestration.
+
+## Consequence
+
+Implementation should stay focused on shared naming behavior unless a new failing repro proves the source generator diverges beyond its known single-file `AddSource()` behavior.
+
+# Lambert issue #1088 source-generator tests
+
+- **Date:** 2026-05-05T14:18:05.572+02:00
+- **Decision:** Anchor Lambert's source-generator coverage for issue #1088 in a dedicated reporter-style consumer rebuild repro instead of trying to lock in the unproven `FormGet`/`FormGET` mismatch.
+- **Why:** Current HEAD still does not reproduce the reported interface/implementation casing split, but it does reproducibly fail on the analyzer path when a consumer emits compiler-generated files into a project-local `Generated\` folder and rebuilds. The first build succeeds and emits `FormGet`/`FormPost`; the second build fails because the stale emitted `.g.cs` file is compiled alongside the in-memory source-generator output.
+- **Test file:** `src\Refitter.SourceGenerator.Tests\Issue1088SourceGeneratorConsumerRebuildTests.cs`
+- **Scope guardrails:** Treat the `FormGET` -> `FormGet` naming drift as intentional/out of scope here; use this repro as the closest verified gap until the exact reporter setup can be proven locally.
+
+# Lambert issue #1088 source-generator validation
+
+- **Date:** 2026-05-05T14:18:05.572+02:00
+- **Decision:** Treat `issue-1088-add-sourcegen-regressions` as complete on the current source-generator lane.
+- **Why:** The current package now ships `Refitter.SourceGenerator.targets`, package tests prove the targets are present, the build-targets test proves duplicate `.refitter` AdditionalFiles are deduped, and the reporter-style consumer rebuild test proves `$(CompilerGeneratedFilesOutputPath)\**\*.cs` is excluded from `Compile` so first build and rebuild both succeed.
+- **Remaining blocker assessment:** No remaining verified source-generator regression gap should block `issue-1088-patch-sourcegen-seam`. The only unresolved mismatch is the historical `FormGET` versus `FormGet` report itself, which remains unproven on current HEAD and is intentionally out of scope for this source-generator seam fix.
+
+# Lambert decision: issue #1088 validation status
+
+- Date: 2026-05-05T14:18:05.572+02:00
+- Requested by: Christian Helle
+
+## Decision
+
+Treat issue #1088 as **partly proven**, not fully proven, on the current repo state.
+
+## Why
+
+- The user and maintainer comments, plus current repo-local reproduction, consistently prove one narrow behavior change: when a path has multiple verbs and no explicit `operationId`, Refitter now emits `FormGet` / `FormPost` instead of the legacy `FormGET` / `FormPOST`.
+- The repo does **not** currently contain a dedicated regression test that pins that boundary in either `src\Refitter.Tests` or `src\Refitter.SourceGenerator.Tests`; adjacent by-tag coverage still only guards against numeric suffixes.
+- A fresh CLI-generated consumer build against `Refit.HttpClientFactory` `10.1.6` compiled successfully with `FormGet` / `FormPost`.
+- A fresh analyzer-backed source-generator consumer build using the reporter-style `.refitter` settings (`returnIApiResponse`, `useCancellationTokens`, `usePolymorphicSerialization`, `generateDisposableClients`, `generateMultipleFiles`) also compiled successfully and emitted `FormGet` / `FormPost`.
+- That means the exact reported failure shape — interface expects `FormGet(...)` while generated implementation emits `FormGET(...)` — is still unproven here even though the naming-contract drift is real.
+
+## Smallest missing tests
+
+1. **One core regression scenario**
+   - Inline OpenAPI spec with the same `/api/process/element/{elementType}/{elementInstance}/form` GET+POST shape and no `operationId`.
+   - Assert the exact generated member names and reject the alternate casing.
+   - Add a compile-backed check so downstream Refit implementation mismatches surface.
+
+2. **One source-generator end-to-end consumer test**
+   - Feed a real `.refitter` file through the analyzer path with the reporter-style settings and current Refit lane.
+   - Build a minimal consumer project with `EmitCompilerGeneratedFiles=true`.
+   - Assert the emitted member names and successful consumer compilation.
+
+No broader matrix is needed until one of those two tests fails.
+
+## Ambiguities the implementation plan must resolve
+
+- The first user snippet only showed `get`; the naming split only appears once a same-path sibling verb is present, so investigation must explicitly decide whether the missing `post` shape is part of the real repro.
+- The issue body cites an interface/implementation mismatch, but the current local source-generator lane does not reproduce that mismatch; the plan should ask whether the user’s failing package matrix or generated artifacts differ from current HEAD.
+- The report does not confirm whether `operationId` is absent on both operations; that matters because explicit operation IDs follow a different naming path.
+- The report mentions source generator plus `generateMultipleFiles`, but Refitter’s source generator emits a single `AddSource()` payload; the plan should treat multi-file intent as adjacent parity context unless evidence shows it changes the failing artifact.
+
+## Parker issue #1088 validation — 2026-05-05T14:18:05.572+02:00
+
+- Shared naming path confirmed: source-generator output flows through `Refitter.SourceGenerator\RefitterSourceGenerator.cs` into `Refitter.Core\RefitGenerator.Generate()`, then `RefitInterfaceGenerator.GenerateOperationName()` and `OperationNameGenerator.GetOperationName()`.
+- Current HEAD behavior for missing-operationId same-path multi-verb operations is still `FormGet` / `FormPost`, not legacy `FormGET` / `FormPOST`.
+- I reproduced the reporter-shaped `.refitter` settings and inspected emitted source-generator output; interface methods were `FormGet` / `FormPost`.
+- I also compiled minimal consumer projects against Refit.HttpClientFactory 8.0.0, 9.0.2, and 10.1.6 with the generated interface, and those builds succeeded, so the interface/implementation mismatch is not yet reproduced locally.
+- Planning conclusion: if the team chooses to pursue compatibility restoration anyway, the narrowest likely fix surface remains `src\Refitter.Core\OperationNameGenerator.cs`, with minimum regression coverage split across existing core naming scenarios plus a dedicated `Refitter.SourceGenerator.Tests` compile-backed repro in the reporter's dependency lane.

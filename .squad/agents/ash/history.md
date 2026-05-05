@@ -8,6 +8,7 @@
 
 ## Learnings
 
+- **2026-05-05T13:02:25Z issue #1088 squad update:** Dallas has landed the packaged target fix for duplicate `.refitter` `AdditionalFiles` plus stale compiler-generated `Generated\**\*.g.cs` rebuild artifacts, and Lambert's dedicated consumer rebuild repro is the active validation harness. Keep Ash review scoped to the package/build seam and parity checks, not a core operation-name rewrite.
 - Added to the squad on 2026-04-20 as a specialist reviewer for PR #1064 / #1057 safety gates.
 - For suffix rewrites, block both source-name corruption and suffix-target collisions (Pet + PetDto cannot both land on PetDto).
 - For multipart/query parameter extraction, deduplicate by the emitted C# identifier, not the original OpenAPI key.
