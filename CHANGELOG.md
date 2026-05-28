@@ -1,5 +1,19 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...HEAD)
+
+**Fixed bugs:**
+
+- Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
+
+**Merged pull requests:**
+
+- Update dependency coverlet.collector to 10.0.1 [\#1091](https://github.com/christianhelle/refitter/pull/1091) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Refitter.SourceGenerator to v2 [\#1087](https://github.com/christianhelle/refitter/pull/1087) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Microsoft.CodeAnalysis.CSharp to v5 [\#1066](https://github.com/christianhelle/refitter/pull/1066) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [2.0.0](https://github.com/christianhelle/refitter/tree/2.0.0) (2026-05-01)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.3...2.0.0)
@@ -14,6 +28,7 @@
 - Sanitize malformed schema type names without renaming clean schemas [\#1085](https://github.com/christianhelle/refitter/pull/1085) ([christianhelle](https://github.com/christianhelle))
 - Tighten warning handling across Refitter builds [\#1079](https://github.com/christianhelle/refitter/pull/1079) ([christianhelle](https://github.com/christianhelle))
 - Handle equivalent duplicate schemas in multi-spec merge [\#1076](https://github.com/christianhelle/refitter/pull/1076) ([christianhelle](https://github.com/christianhelle))
+- Special-case the default .refitter filename before deriving OutputFilename [\#1002](https://github.com/christianhelle/refitter/pull/1002) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
 - Harden .refitter settings deserialization and output path handling [\#1000](https://github.com/christianhelle/refitter/pull/1000) ([christianhelle](https://github.com/christianhelle))
 - Verify alias handling and sanitize PascalCase properties [\#997](https://github.com/christianhelle/refitter/pull/997) ([christianhelle](https://github.com/christianhelle))
 - Enhance schema alias handling and property name generation [\#996](https://github.com/christianhelle/refitter/pull/996) ([christianhelle](https://github.com/christianhelle))
@@ -22,8 +37,10 @@
 - Add PropertyNamingPolicy support for JSON property naming [\#969](https://github.com/christianhelle/refitter/pull/969) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency tunit to 1.20.0 [\#962](https://github.com/christianhelle/refitter/pull/962) ([renovate[bot]](https://github.com/apps/renovate))
 - Add Unicode support for XML doc comment generation [\#948](https://github.com/christianhelle/refitter/pull/948) ([christianhelle](https://github.com/christianhelle))
+- Microsoft.OpenApi v3.4 [\#945](https://github.com/christianhelle/refitter/pull/945) ([christianhelle](https://github.com/christianhelle))
 - Fix broken CLI tool help text [\#940](https://github.com/christianhelle/refitter/pull/940) ([christianhelle](https://github.com/christianhelle))
 - Move \[JsonConverter\] from enum properties to enum types [\#938](https://github.com/christianhelle/refitter/pull/938) ([christianhelle](https://github.com/christianhelle))
+- Improve OpenAPI parse + codegen throughput by removing avoidable allocations and repeated regex work [\#937](https://github.com/christianhelle/refitter/pull/937) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Fix PR \#897 review feedback and add comprehensive bearer auth tests [\#936](https://github.com/christianhelle/refitter/pull/936) ([christianhelle](https://github.com/christianhelle))
 - Fix SonarCloud Code Quality Issues [\#932](https://github.com/christianhelle/refitter/pull/932) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Fix multipart form-data parameter extraction [\#928](https://github.com/christianhelle/refitter/pull/928) ([christianhelle](https://github.com/christianhelle))
@@ -45,7 +62,6 @@
 **Fixed bugs:**
 
 - Class name not generated if schema contains non alphanumeric character [\#1083](https://github.com/christianhelle/refitter/issues/1083)
-- Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
 - \[v2.0 audit\]\[L13\] IdentifierUtils.Counted uses fresh HashSet per GenerateCode\(\) call [\#1056](https://github.com/christianhelle/refitter/issues/1056)
 - \[v2.0 audit\]\[L12\] Reordering of interface-generator construction in Generate\(\) is correct but fragile [\#1055](https://github.com/christianhelle/refitter/issues/1055)
 - \[v2.0 audit\]\[L11\] OpenApiDocumentFactory.CreateAsync\(IEnumerable\<string\>\) throws wrong exception type on null [\#1054](https://github.com/christianhelle/refitter/issues/1054)
@@ -139,7 +155,6 @@
 - Update actions/checkout action to v6 [\#1005](https://github.com/christianhelle/refitter/pull/1005) ([renovate[bot]](https://github.com/apps/renovate))
 - Upgrade Squad to v0.9.1 [\#1004](https://github.com/christianhelle/refitter/pull/1004) ([christianhelle](https://github.com/christianhelle))
 - Update dependency TUnit to 1.35.2 [\#1003](https://github.com/christianhelle/refitter/pull/1003) ([renovate[bot]](https://github.com/apps/renovate))
-- Special-case the default .refitter filename before deriving OutputFilename [\#1002](https://github.com/christianhelle/refitter/pull/1002) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
 - CodeRabbit auto-fixes for PR \#1000 [\#1001](https://github.com/christianhelle/refitter/pull/1001) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
 - docs: add Timovzl as a contributor for bug [\#999](https://github.com/christianhelle/refitter/pull/999) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Update dependency TUnit to 1.34.5 [\#995](https://github.com/christianhelle/refitter/pull/995) ([renovate[bot]](https://github.com/apps/renovate))
@@ -170,10 +185,8 @@
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 10.1.5 [\#952](https://github.com/christianhelle/refitter/pull/952) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): update dependency tunit to 1.19.74 [\#951](https://github.com/christianhelle/refitter/pull/951) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add send0xx as a contributor for bug [\#946](https://github.com/christianhelle/refitter/pull/946) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Microsoft.OpenApi v3.4 [\#945](https://github.com/christianhelle/refitter/pull/945) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): update dependency tunit to 1.19.0 [\#942](https://github.com/christianhelle/refitter/pull/942) ([renovate[bot]](https://github.com/apps/renovate))
 - Improve code coverage to \>90% [\#941](https://github.com/christianhelle/refitter/pull/941) ([christianhelle](https://github.com/christianhelle))
-- Improve OpenAPI parse + codegen throughput by removing avoidable allocations and repeated regex work [\#937](https://github.com/christianhelle/refitter/pull/937) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - chore\(deps\): update dependency polly to 8.6.6 [\#935](https://github.com/christianhelle/refitter/pull/935) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.18.21 [\#934](https://github.com/christianhelle/refitter/pull/934) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix smoke tests: --interface-only variant missing using directive for contract types [\#933](https://github.com/christianhelle/refitter/pull/933) ([Copilot](https://github.com/apps/copilot-swe-agent))
