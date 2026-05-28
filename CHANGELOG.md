@@ -11,7 +11,9 @@
 **Merged pull requests:**
 
 - Update dependency coverlet.collector to 10.0.1 [\#1091](https://github.com/christianhelle/refitter/pull/1091) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency ruby to v4.0.5 [\#1089](https://github.com/christianhelle/refitter/pull/1089) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refitter.SourceGenerator to v2 [\#1087](https://github.com/christianhelle/refitter/pull/1087) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.45.29 [\#1086](https://github.com/christianhelle/refitter/pull/1086) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Microsoft.CodeAnalysis.CSharp to v5 [\#1066](https://github.com/christianhelle/refitter/pull/1066) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.0.0](https://github.com/christianhelle/refitter/tree/2.0.0) (2026-05-01)
