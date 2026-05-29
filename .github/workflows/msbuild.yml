@@ -3,17 +3,23 @@ name: MSBuild Tasks
 on:
   workflow_dispatch:
   push:
-    paths-ignore:
-      - '**/*'
-      - '!.github/workflows/msbuild.yml'
-      - '!src/**/*.csproj'
-      - '!src/**/*.cs'
+    paths:
+      - '.github/workflows/msbuild.yml'
+      - 'src/**/*.csproj'
+      - 'src/**/*.cs'
+      - 'src/**/*.targets'
+      - 'src/Refitter.MSBuild/README.md'
+      - 'docs/docfx_project/articles/msbuild.md'
+      - 'test/MSBuild/**'
   pull_request:
-    paths-ignore:
-      - '**/*'
-      - '!.github/workflows/msbuild.yml'
-      - '!src/**/*.csproj'
-      - '!src/**/*.cs'
+    paths:
+      - '.github/workflows/msbuild.yml'
+      - 'src/**/*.csproj'
+      - 'src/**/*.cs'
+      - 'src/**/*.targets'
+      - 'src/Refitter.MSBuild/README.md'
+      - 'docs/docfx_project/articles/msbuild.md'
+      - 'test/MSBuild/**'
 
 jobs:
   build:
@@ -31,20 +37,49 @@ jobs:
         dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
         nuget add .\Refitter.MSBuild.1.0.0.nupkg -source .
         dotnet add package Refitter.MSBuild -s .
-    - name: 🛠️ Build (default naming)
+    - name: 🛠️ Build (auto-scan enabled)
       working-directory: test/MSBuild
-      run: dotnet build -v d -filelogger -p:RefitterIncludePatterns="petstore.refitter"
-    - name: 🧪 Build Output (default)
+      shell: pwsh
+      run: |
+        Remove-Item Generated -Force -Recurse -ErrorAction SilentlyContinue
+        dotnet build -c release -v d -filelogger '-flp:logfile=msbuild.log;verbosity=diagnostic' -p:RefitterIncludePatterns="petstore.refitter"
+        if (!(Test-Path "Generated\Petstore.cs")) {
+          throw "Expected Generated\Petstore.cs when RefitterAutoScan is enabled."
+        }
+    - name: 🧪 Build Output (auto-scan enabled)
       working-directory: test/MSBuild
       run: cat msbuild.log
-    - name: 🛠️ Build (PreserveOriginal naming)
+    - name: 🛠️ Build (explicit generate target)
       working-directory: test/MSBuild
+      shell: pwsh
       run: |
         dotnet clean -c release --nologo
-        dotnet build -c release -v d -filelogger -p:RefitterIncludePatterns="petstore-preserve-original.refitter"
-    - name: 🧪 Build Output (PreserveOriginal)
+        Remove-Item Generated -Force -Recurse -ErrorAction SilentlyContinue
+        dotnet build -c release -t:RefitterGenerate -v d -filelogger '-flp:logfile=msbuild-explicit.log;verbosity=diagnostic' -p:RefitterAutoScan=false -p:RefitterIncludePatterns="petstore.refitter"
+        if (!(Test-Path "Generated\Petstore.cs")) {
+          throw "Expected Generated\Petstore.cs after dotnet build -t:RefitterGenerate."
+        }
+        if (!(Select-String -Path msbuild-explicit.log -Pattern "Starting RefitterGenerateTask" -Quiet)) {
+          throw "Explicit RefitterGenerate target did not execute RefitterGenerateTask."
+        }
+    - name: 🧪 Build Output (explicit generate target)
       working-directory: test/MSBuild
-      run: cat msbuild.log
+      run: cat msbuild-explicit.log
+    - name: 🛠️ Build (auto-scan disabled)
+      working-directory: test/MSBuild
+      shell: pwsh
+      run: |
+        dotnet clean -c release --nologo
+        dotnet build -c release -v d -filelogger '-flp:logfile=msbuild-disabled.log;verbosity=diagnostic' -p:RefitterAutoScan=false
+        if (!(Test-Path "Generated\Petstore.cs")) {
+          throw "Expected previously generated code to remain available when RefitterAutoScan=false."
+        }
+        if (Select-String -Path msbuild-disabled.log -Pattern "Starting RefitterGenerateTask" -Quiet) {
+          throw "RefitterGenerateTask ran during a normal build even though RefitterAutoScan=false."
+        }
+    - name: 🧪 Build Output (auto-scan disabled)
+      working-directory: test/MSBuild
+      run: cat msbuild-disabled.log
     - name: 🗳️ Upload
       uses: actions/upload-artifact@v7
       with:
