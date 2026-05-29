@@ -44,3 +44,9 @@ Gate Refitter's automatic MSBuild hook behind a new wrapper target instead of co
 - Decision: approve the current working-tree implementation as matching the requirement.
 - Evidence: the actual diff is present in the four expected files; `src\Refitter.MSBuild\Refitter.MSBuild.targets` defaults `RefitterAutoScan` to `true` and gates normal builds through `_RefitterGenerateOnBuild`; local validation passed for auto-scan enabled builds, explicit `dotnet build -t:RefitterGenerate -p:RefitterAutoScan=false`, and normal `dotnet build -p:RefitterAutoScan=false` without `RefitterGenerateTask`; README, docfx docs, and `.github\workflows\msbuild.yml` describe and verify the same behavior.
 
+## 2026-05-29T15:07:47.442+02:00 - Commit grouping for issue #1094
+
+- Context: the issue #1094 working tree already contained the product changes across MSBuild targets, CI coverage, and user-facing docs, plus a stale `.squad\commit-msg.txt` deletion from earlier automation.
+- Decision: group the product diff into two user-facing commits (`tooling or CI` and `docs`) and keep the stale automation cleanup plus Squad bookkeeping in a separate housekeeping commit with no co-author trailer.
+- Consequence: reviewers can reason about behavior changes separately from documentation and repository hygiene, while the branch still finishes with a clean working tree.
+

@@ -40,3 +40,14 @@ For historical context on issues #1083, #1057, #1045, #1034, #1039, and earlier 
 - Verified implementation against requirements
 
 **Outcome:** APPROVED - ready for merge
+
+## 2026-05-29T15:07:47 - Scribe: Issue #1094 Commit Grouping Decision
+
+**Session:** commit-grouping-decision  
+**Context:** Finalized commit grouping and Squad documentation for issue #1094.
+
+**Work:**
+- Decision recorded: split product changes (tooling/CI, docs) and housekeeping (stale automation + Squad bookkeeping) into three separate commits
+- Housekeeping commit intentionally excludes co-author trailer per Dallas decision
+- Squad cross-agent updates and logs created
+- Branch ready for merge after Squad documentation

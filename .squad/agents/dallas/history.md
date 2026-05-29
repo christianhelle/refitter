@@ -101,3 +101,14 @@ Parker, Lambert, and Dallas completed issue #1083 resolution:
 - Implementation matches decision requirements
 
 **Outcome:** Ready for merge
+
+## 2026-05-29T15:07:47 - Scribe: Issue #1094 Squad Documentation
+
+**Session:** commit-grouping-decision  
+**Context:** Dallas finalized commit grouping with decision to split product changes into two commits and housekeeping cleanup (no co-author trailer).
+
+**Squad Update:**
+- Decision recorded: two product commits (tooling/CI and docs) plus one housekeeping commit for stale automation cleanup
+- Inbox merged into decisions.md with commit grouping rationale
+- Orchestration and session logs created
+- Cross-agent history updated for Bishop and Lambert
