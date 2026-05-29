@@ -16,6 +16,8 @@ Parker, Lambert, and Dallas completed issue #1083 resolution:
 
 ## Learnings
 
+- **2026-05-29T15:07:47.442+02:00 commit-grouping hygiene:** when issue work is already implemented, keep product commits split by behavior lane (tooling or CI first, docs second) and move stale automation artifacts like `.squad\commit-msg.txt` plus Squad bookkeeping into a final housekeeping commit so review stays focused and the branch ends clean.
+
 - **2026-05-29T14:24:16.307+02:00 issue #1094 tooling contract:** `src\Refitter.MSBuild\Refitter.MSBuild.targets` should keep `RefitterGenerate` explicitly invokable and move the automatic build hook into a separate target gated by `RefitterAutoScan`; with `RefitterAutoScan=false`, clean builds need an earlier `dotnet build -t:RefitterGenerate` pass so subsequent normal builds can compile the already-generated `.cs` files without re-running Refitter.
 
 - **2026-05-01T14:34:56.630+02:00 issue #1083 tooling follow-up:** the dotted-schema-name fix is a core generator concern, so CLI/MSBuild wiring and README help text do not need parity changes; the only adjacent tooling work worth landing is source-generator regression coverage so compile-time generation proves the same sanitized DTO/return-type behavior as the CLI path.
