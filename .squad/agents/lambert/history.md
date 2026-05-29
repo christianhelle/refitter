@@ -19,8 +19,24 @@
 - Documentation in README.md and docfx article now accurately describes the feature
 - No documentation-to-implementation mismatch remains
 
+## Learnings
+
+- **2026-05-29T14:24:16.307+02:00 issue #1094 working-tree validation:** The real local diff is present in `.github\workflows\msbuild.yml`, `docs\docfx_project\articles\msbuild.md`, `src\Refitter.MSBuild\README.md`, and `src\Refitter.MSBuild\Refitter.MSBuild.targets`; local MSBuild validation confirmed `RefitterAutoScan` defaults to `true`, `dotnet build -t:RefitterGenerate -p:RefitterAutoScan=false` still runs generation, and normal builds with `RefitterAutoScan=false` skip `RefitterGenerateTask` while reusing generated code.
+
 ---
 
 ## Archive
 
 For historical context on issues #1083, #1057, #1045, #1034, #1039, and earlier audit work, see history-archive.md.
+## 2026-05-29T14:24:16 - Issue #1094: RefitterAutoScan Implementation Validation
+
+**Session:** issue-1094-real-implementation  
+**Status:** COMPLETE  
+**Role:** Code review and validation
+
+**Work:**
+- Reviewed Dallas's actual working-tree diff (4 files)
+- Re-ran full MSBuild validation flow: restore, build, test, format
+- Verified implementation against requirements
+
+**Outcome:** APPROVED - ready for merge

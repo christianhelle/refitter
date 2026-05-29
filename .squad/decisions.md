@@ -29,3 +29,18 @@ Gate Refitter's automatic MSBuild hook behind a new wrapper target instead of co
 **Date:** 2026-05-29T12:44:43.282+02:00  
 **What:** Use claude-opus-4.8 for all agent work for the rest of this session only.  
 **Why:** User request — captured for team memory
+
+
+## 2026-05-29T14:24:16.307+02:00 - RefitterAutoScan build gating
+
+- Context: issue #1094 needs MSBuild users to disable automatic `.refitter` scanning during ordinary builds without losing the explicit `RefitterGenerate` entry point.
+- Decision: keep `RefitterGenerate` as the standalone generation target, default `RefitterAutoScan` to `true`, and move the normal-build hook into a separate target that depends on `RefitterGenerate` only when `RefitterAutoScan` is not `false`.
+- Consequence: `dotnet build -t:RefitterGenerate -p:RefitterAutoScan=false` still generates code on demand, while later `dotnet build -p:RefitterAutoScan=false` runs compile against the already-generated `.cs` files without re-running Refitter.
+
+
+## 2026-05-29T14:24:16.307+02:00 - Lambert validation for issue #1094
+
+- Context: Christian Helle requested validation of the real working-tree implementation for the RefitterAutoScan behavior change in issue #1094.
+- Decision: approve the current working-tree implementation as matching the requirement.
+- Evidence: the actual diff is present in the four expected files; `src\Refitter.MSBuild\Refitter.MSBuild.targets` defaults `RefitterAutoScan` to `true` and gates normal builds through `_RefitterGenerateOnBuild`; local validation passed for auto-scan enabled builds, explicit `dotnet build -t:RefitterGenerate -p:RefitterAutoScan=false`, and normal `dotnet build -p:RefitterAutoScan=false` without `RefitterGenerateTask`; README, docfx docs, and `.github\workflows\msbuild.yml` describe and verify the same behavior.
+
