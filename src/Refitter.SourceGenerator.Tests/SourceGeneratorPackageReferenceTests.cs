@@ -68,9 +68,13 @@ public class SourceGeneratorPackageReferenceTests
         var repoRoot = GetRepositoryRoot();
         var projectFile = Path.Combine(repoRoot, "src", "Refitter.SourceGenerator", "Refitter.SourceGenerator.csproj");
         var packageOutputPath = Path.Combine(workspace, "packages");
+        var buildOutputPath = Path.Combine(workspace, "build");
+        var intermediateOutputPath = Path.Combine(workspace, "obj");
 
         Directory.CreateDirectory(packageOutputPath);
-        BuildSourceGeneratorProject(repoRoot, projectFile, version);
+        Directory.CreateDirectory(buildOutputPath);
+        Directory.CreateDirectory(intermediateOutputPath);
+        BuildSourceGeneratorProject(repoRoot, projectFile, version, buildOutputPath, intermediateOutputPath);
 
         var startInfo = CreateDotNetStartInfo(
             repoRoot,
@@ -81,7 +85,9 @@ public class SourceGeneratorPackageReferenceTests
             "--no-build",
             "--no-restore",
             $"-p:PackageVersion={version}",
-            $"-p:PackageOutputPath={packageOutputPath}");
+            $"-p:PackageOutputPath={packageOutputPath}",
+            $"-p:OutputPath={buildOutputPath}{Path.DirectorySeparatorChar}",
+            $"-p:IntermediateOutputPath={intermediateOutputPath}{Path.DirectorySeparatorChar}");
 
         using var process = System.Diagnostics.Process.Start(startInfo);
         process.Should().NotBeNull();
@@ -102,7 +108,9 @@ public class SourceGeneratorPackageReferenceTests
     private static void BuildSourceGeneratorProject(
         string repoRoot,
         string projectFile,
-        string version)
+        string version,
+        string buildOutputPath,
+        string intermediateOutputPath)
     {
         var startInfo = CreateDotNetStartInfo(
             repoRoot,
@@ -111,7 +119,9 @@ public class SourceGeneratorPackageReferenceTests
             "-c",
             "Release",
             "-p:GeneratePackageOnBuild=false",
-            $"-p:PackageVersion={version}");
+            $"-p:PackageVersion={version}",
+            $"-p:OutputPath={buildOutputPath}{Path.DirectorySeparatorChar}",
+            $"-p:IntermediateOutputPath={intermediateOutputPath}{Path.DirectorySeparatorChar}");
 
         using var process = System.Diagnostics.Process.Start(startInfo);
         process.Should().NotBeNull();
