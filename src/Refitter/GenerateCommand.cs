@@ -77,14 +77,15 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 version += " (local build)";
 
             // Header with branding
-            _reporter.ReportHeader(version);
+            if (!settings.NoBanner)
+                _reporter.ReportHeader(version);
 
             // Support information
-            var supportKey = settings.NoLogging
-                ? "Unavailable when logging is disabled"
-                : SupportInformation.GetSupportKey();
-
-            _reporter.ReportSupportKey(supportKey);
+            if (!settings.NoLogging)
+            {
+                var supportKey = SupportInformation.GetSupportKey();
+                _reporter.ReportSupportKey(supportKey);
+            }
 
             if (context.Arguments.Any(a => a.Equals("--version", StringComparison.OrdinalIgnoreCase)) ||
                 context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase)))

@@ -25,6 +25,10 @@ public static class RefitterSettingsLoader
     public static RefitGeneratorSettings Load(string json, string baseDirectory)
     {
         var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+        if (settings is null)
+        {
+            throw new System.Text.Json.JsonException("Failed to deserialize settings: result was null");
+        }
         ResolveRelativeSpecPaths(settings, baseDirectory);
         return settings;
     }
@@ -49,6 +53,8 @@ public static class RefitterSettingsLoader
             for (var i = 0; i < settings.OpenApiPaths.Length; i++)
             {
                 var path = settings.OpenApiPaths[i];
+                if (string.IsNullOrWhiteSpace(path))
+                    continue;
                 if (!IsUrl(path) && !Path.IsPathRooted(path))
                 {
                     settings.OpenApiPaths[i] = Path.GetFullPath(Path.Combine(baseDirectory, path));
