@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Introduce RefitterAutoScan option in MSBuild package [\#1098](https://github.com/christianhelle/refitter/pull/1098) ([christianhelle](https://github.com/christianhelle))
 - Refactor GenerateCommand into focused modules and stabilize package-reference builds [\#1095](https://github.com/christianhelle/refitter/pull/1095) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
