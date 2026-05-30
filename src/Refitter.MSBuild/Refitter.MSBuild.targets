@@ -1,10 +1,14 @@
 <Project>
 
+    <PropertyGroup>
+        <RefitterAutoScan Condition="'$(RefitterAutoScan)' == ''">true</RefitterAutoScan>
+    </PropertyGroup>
+
     <UsingTask TaskName="RefitterGenerateTask"
                AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll"
                Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
 
-    <Target Name="RefitterGenerate" BeforeTargets="CoreCompile">
+    <Target Name="RefitterGenerate">
         <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                               DisableLogging="$(RefitterNoLogging)"
                               SkipValidation="$(RefitterSkipValidation)"
@@ -15,5 +19,10 @@
             <Compile Include="@(RefitterGeneratedFiles)" />
         </ItemGroup>
     </Target>
+
+    <Target Name="_RefitterGenerateOnBuild"
+            BeforeTargets="CoreCompile"
+            DependsOnTargets="RefitterGenerate"
+            Condition="'$(RefitterAutoScan)' != 'false'" />
 
 </Project>

@@ -13,22 +13,30 @@ dotnet add package Refitter.MSBuild
 The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task and looks something like this:
 
 ```xml
+<PropertyGroup>
+    <RefitterAutoScan Condition="'$(RefitterAutoScan)' == ''">true</RefitterAutoScan>
+</PropertyGroup>
 <UsingTask TaskName="RefitterGenerateTask"
            AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll"
            Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
-<Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
+<Target Name="RefitterGenerate">
     <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                           DisableLogging="$(RefitterNoLogging)"
-                          SkipValidation="$(RefitterSkipValidation)">
+                          SkipValidation="$(RefitterSkipValidation)"
+                          IncludePatterns="$(RefitterIncludePatterns)">
         <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
     </RefitterGenerateTask>
     <ItemGroup>
         <Compile Include="@(RefitterGeneratedFiles)" />
     </ItemGroup>
 </Target>
+<Target Name="_RefitterGenerateOnBuild"
+        BeforeTargets="CoreCompile"
+        DependsOnTargets="RefitterGenerate"
+        Condition="'$(RefitterAutoScan)' != 'false'" />
 ```
 
-The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and execute them all.
+The `RefitterGenerateTask` task scans the project folder for `.refitter` files and executes them all. `RefitterAutoScan` defaults to `true`, so normal builds keep generating code automatically. Set `<RefitterAutoScan>false</RefitterAutoScan>` to skip that automatic build hook while keeping `dotnet build -t:RefitterGenerate` available for explicit generation.
 
 ## Configuration
 
@@ -48,6 +56,16 @@ You can also skip OpenAPI validation by setting:
 </PropertyGroup>
 ```
 
+To disable automatic scanning during normal builds, but still allow explicit generation, set:
+
+```xml
+<PropertyGroup>
+  <RefitterAutoScan>false</RefitterAutoScan>
+</PropertyGroup>
+```
+
+Then run `dotnet build -t:RefitterGenerate` whenever you want Refitter to scan the project and regenerate code on demand. After that explicit generation step, regular `dotnet build` invocations can reuse the generated `.cs` files without re-running the Refitter task.
+
 ## Example
 
 Create a `.refitter` file in your project:
@@ -60,7 +78,7 @@ Create a `.refitter` file in your project:
 }
 ```
 
-Now, every time you build your project, Refitter will automatically generate the API client code based on your OpenAPI specification.
+Now, every time you build your project, Refitter will automatically generate the API client code based on your OpenAPI specification unless you set `RefitterAutoScan` to `false`.
 
 
 ### .Refitter File format

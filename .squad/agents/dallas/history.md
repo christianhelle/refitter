@@ -16,6 +16,10 @@ Parker, Lambert, and Dallas completed issue #1083 resolution:
 
 ## Learnings
 
+- **2026-05-29T15:07:47.442+02:00 commit-grouping hygiene:** when issue work is already implemented, keep product commits split by behavior lane (tooling or CI first, docs second) and move stale automation artifacts like `.squad\commit-msg.txt` plus Squad bookkeeping into a final housekeeping commit so review stays focused and the branch ends clean.
+
+- **2026-05-29T14:24:16.307+02:00 issue #1094 tooling contract:** `src\Refitter.MSBuild\Refitter.MSBuild.targets` should keep `RefitterGenerate` explicitly invokable and move the automatic build hook into a separate target gated by `RefitterAutoScan`; with `RefitterAutoScan=false`, clean builds need an earlier `dotnet build -t:RefitterGenerate` pass so subsequent normal builds can compile the already-generated `.cs` files without re-running Refitter.
+
 - **2026-05-01T14:34:56.630+02:00 issue #1083 tooling follow-up:** the dotted-schema-name fix is a core generator concern, so CLI/MSBuild wiring and README help text do not need parity changes; the only adjacent tooling work worth landing is source-generator regression coverage so compile-time generation proves the same sanitized DTO/return-type behavior as the CLI path.
 
 - **2026-04-28T15:21:48.369+02:00 e-conomic multi-spec tooling verdict:** `test\economic.refitter` parses correctly and resolves both relative `openApiPaths`; CLI/MSBuild/source-generator all reach core multi-document merge, where duplicate equivalent schemas (`Error`, then `ProblemDetails`) trigger the fail-fast merge path before validation, so `--skip-validation` cannot help.
@@ -85,4 +89,26 @@ Parker, Lambert, and Dallas completed issue #1083 resolution:
 - Root cause confirmed in `Refitter.Core` not tooling; `--skip-validation` cannot help because merge happens before validation.
 - Proposal: primary fix belongs in core merge semantics (allow duplicate paths/schemas when semantically equivalent); do not split `.refitter` into multiple generation runs.
 - Tooling follow-up (post-core-fix): improve CLI error guidance for merge failures, add `openApiPaths` regression coverage, add relative-path resolution tests, add merge-failure diagnostic tests.
+## 2026-05-29T14:24:16 - Issue #1094: RefitterAutoScan MSBuild Implementation
 
+**Session:** issue-1094-real-implementation  
+**Status:** COMPLETE  
+**Approval:** Lambert validated implementation as correct and complete.
+
+**Work:**
+- Edited 4 files for RefitterAutoScan MSBuild gating behavior
+- Local validation: auto-scan enabled, explicit target with disable flag, normal build without task
+- Implementation matches decision requirements
+
+**Outcome:** Ready for merge
+
+## 2026-05-29T15:07:47 - Scribe: Issue #1094 Squad Documentation
+
+**Session:** commit-grouping-decision  
+**Context:** Dallas finalized commit grouping with decision to split product changes into two commits and housekeeping cleanup (no co-author trailer).
+
+**Squad Update:**
+- Decision recorded: two product commits (tooling/CI and docs) plus one housekeeping commit for stale automation cleanup
+- Inbox merged into decisions.md with commit grouping rationale
+- Orchestration and session logs created
+- Cross-agent history updated for Bishop and Lambert

@@ -18,3 +18,13 @@
 - **Issue #1025 OpenAPI Parser Migration (2026-04-20):** Added silent behavioral change section to breaking-changes guide documenting Microsoft.OpenApi.Readers upgrade (1.x → 3.x). Clarifies that users will see different generated code due to improved parser schema interpretation (nullability, discriminators, refs, Swagger 2.0). Adds actionable migration steps: regenerate + review diff + test. Includes checklist item and evidence links (PR #907, #945). Commit: ccf293e7. Closes #1025.
 - **PR #1067 Doc Closure Review (2026-04-21):** Corrected stale source-generator docs that still described disk output, added explicit `Refit`/`Refit.HttpClientFactory` consumer guidance, clarified `RefitterIncludePatterns` is exact-match only, and reframed #1025 as migration mitigation rather than a fully proven behavioral fix. If PR wording mentions #1025 as fully fixed, it should be narrowed to "documents migration guidance for #1025."
 - **Issue #1083 communication triage (2026-05-01T14:04:19.681+02:00):** Reproduced the reporter's case against the current CLI: the schema name LookUpErnResponse. yields an empty internal partial class declaration and a Task<> return type. Current README/docfx wording only promises identifier sanitization in the propertyNamingPolicy / contract-property context, so this should be framed as a real product bug with docs that are technically correct but easy to over-read.
+
+## 2026-05-29T15:07:47 - Scribe: Issue #1094 Cross-Agent Update
+
+**Session:** commit-grouping-decision  
+**Context:** Dallas completed product implementation and created logical commits for issue #1094 (MSBuild RefitterAutoScan gating with explicit target fallback).
+
+**Team Status:**
+- Lambert validated implementation as correct
+- Decision recorded: split product changes into tooling/CI and documentation commits; housekeeping cleanup (stale automation + Squad bookkeeping) in separate commit with no co-author trailer
+- Branch ready for review after Squad documentation completed

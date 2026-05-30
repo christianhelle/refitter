@@ -57,18 +57,37 @@ To use the package, install `Refitter.MSBuild`
 The MSBuild package includes a custom `.target` file which executes the `RefitterGenerateTask` custom task and looks something like this:
 
 ```xml
+<PropertyGroup>
+    <RefitterAutoScan Condition="'$(RefitterAutoScan)' == ''">true</RefitterAutoScan>
+</PropertyGroup>
 <UsingTask TaskName="RefitterGenerateTask" 
            AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll" 
            Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
-<Target Name="RefitterGenerate" BeforeTargets="BeforeCompile">
+<Target Name="RefitterGenerate">
     <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
-                          DisableLogging="$(RefitterNoLogging)">
+                          DisableLogging="$(RefitterNoLogging)"
+                          SkipValidation="$(RefitterSkipValidation)"
+                          IncludePatterns="$(RefitterIncludePatterns)">
         <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
     </RefitterGenerateTask>
     <ItemGroup>
         <Compile Include="@(RefitterGeneratedFiles)" />
     </ItemGroup>
 </Target>
+<Target Name="_RefitterGenerateOnBuild"
+        BeforeTargets="CoreCompile"
+        DependsOnTargets="RefitterGenerate"
+        Condition="'$(RefitterAutoScan)' != 'false'" />
 ```
 
-The `RefitterGenerateTask` task will scan the project folder for `.refitter` files and executes them all. By default, telemetry collection is enabled, and to opt-out of it you must specify `<RefitterNoLogging>true</RefitterNoLogging>` in the `.csproj` `<PropertyGroup>`
+The `RefitterGenerateTask` task scans the project folder for `.refitter` files and executes them all. `RefitterAutoScan` defaults to `true`, so regular builds keep their current behavior. Set `<RefitterAutoScan>false</RefitterAutoScan>` to disable the automatic build hook while still allowing explicit generation through `dotnet build -t:RefitterGenerate`.
+
+By default, telemetry collection is enabled, and to opt-out of it you must specify `<RefitterNoLogging>true</RefitterNoLogging>` in the `.csproj` `<PropertyGroup>`.
+
+```xml
+<PropertyGroup>
+    <RefitterAutoScan>false</RefitterAutoScan>
+</PropertyGroup>
+```
+
+When `RefitterAutoScan` is `false`, run `dotnet build -t:RefitterGenerate` whenever you want MSBuild to regenerate code from `.refitter` files without re-enabling generation on every normal build. After that explicit generation step, regular `dotnet build` invocations can reuse the generated `.cs` files without re-running the Refitter task.
