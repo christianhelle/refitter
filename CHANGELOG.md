@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...HEAD)
 
+**Implemented enhancements:**
+
+- Refactor GenerateCommand into focused modules and stabilize package-reference builds [\#1095](https://github.com/christianhelle/refitter/pull/1095) ([christianhelle](https://github.com/christianhelle))
+
 **Fixed bugs:**
 
 - Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
