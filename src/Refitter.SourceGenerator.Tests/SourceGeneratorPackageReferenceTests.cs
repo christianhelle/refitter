@@ -65,6 +65,8 @@ public class SourceGeneratorPackageReferenceTests
 
     private static string PackSourceGeneratorPackage(string workspace, string version)
     {
+        using var buildLock = AcquireBuildLock();
+
         var repoRoot = GetRepositoryRoot();
         var projectFile = Path.Combine(repoRoot, "src", "Refitter.SourceGenerator", "Refitter.SourceGenerator.csproj");
         var packageOutputPath = Path.Combine(workspace, "packages");
@@ -123,6 +125,25 @@ public class SourceGeneratorPackageReferenceTests
         var error = errorTask.Result;
 
         process.ExitCode.Should().Be(0, $"dotnet build should succeed before pack{Environment.NewLine}{output}{Environment.NewLine}{error}");
+    }
+
+    private static FileStream AcquireBuildLock()
+    {
+        var lockFilePath = Path.Combine(Path.GetTempPath(), "refitter-source-generator-package-tests.lock");
+        var timeout = TimeSpan.FromMinutes(2);
+        var startedAt = DateTime.UtcNow;
+
+        while (true)
+        {
+            try
+            {
+                return new FileStream(lockFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            }
+            catch (IOException) when (DateTime.UtcNow - startedAt < timeout)
+            {
+                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            }
+        }
     }
 
     private static string CreateWorkspace()

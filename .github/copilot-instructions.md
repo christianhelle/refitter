@@ -257,3 +257,6 @@ dotnet run --project src/Refitter --configuration Release --framework net9.0 -- 
 - Commit messages should be brief, clear and descriptive of the changes made
 - Avoid using multi-line commit messages; if necessary, use bullet points for clarity
 - Commit changes in small logical units to facilitate easier code review and debugging
+- **AI agents MUST commit after every logical unit of work** — do not accumulate all changes into a single end-of-task commit. Commit each independently-releasable unit (e.g. new file, new feature, refactor step) as soon as it is ready and building.
+- **NEVER add a co-author to commits.** Do not include `Co-authored-by:` trailers or any attribution to AI tools in commit messages. Commits are owned by the developer.
+- This commit policy is automatic and applies to all agentic work — do not wait for the user to request it.
