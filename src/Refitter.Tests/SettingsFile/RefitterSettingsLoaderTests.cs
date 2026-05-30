@@ -73,6 +73,40 @@ public class RefitterSettingsLoaderTests
     }
 
     [Test]
+    public void Leaves_Rooted_Entry_In_OpenApiPaths_Untouched()
+    {
+        var rootedPath = Path.GetFullPath(Path.Combine(BaseDirectory, "absolute", "spec.json"));
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPaths = new[] { rootedPath }
+        };
+
+        RefitterSettingsLoader.ResolveRelativeSpecPaths(settings, BaseDirectory);
+
+        settings.OpenApiPaths![0].Should().Be(rootedPath);
+    }
+
+    [Test]
+    public void Does_Not_Modify_OpenApiPath_When_Null_Or_Empty()
+    {
+        var settings = new RefitGeneratorSettings { OpenApiPath = null };
+
+        RefitterSettingsLoader.ResolveRelativeSpecPaths(settings, BaseDirectory);
+
+        settings.OpenApiPath.Should().BeNull();
+    }
+
+    [Test]
+    public void Does_Not_Modify_OpenApiPaths_When_Empty_Array()
+    {
+        var settings = new RefitGeneratorSettings { OpenApiPaths = Array.Empty<string>() };
+
+        RefitterSettingsLoader.ResolveRelativeSpecPaths(settings, BaseDirectory);
+
+        settings.OpenApiPaths.Should().BeEmpty();
+    }
+
+    [Test]
     [Arguments("https://example.com/openapi.json", true)]
     [Arguments("http://example.com/openapi.json", true)]
     [Arguments("specs/openapi.json", false)]
