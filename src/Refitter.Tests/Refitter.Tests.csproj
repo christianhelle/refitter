@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="8.8.0" />
+        <PackageReference Include="FluentAssertions" Version="8.10.0" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.4.0" PrivateAssets="all" />
         <PackageReference Include="TUnit" Version="1.45.29" />
         <PackageReference Include="coverlet.collector" Version="10.0.1">
