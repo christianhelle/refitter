@@ -1,29 +1,19 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [2.0.1-preview.109](https://github.com/christianhelle/refitter/tree/2.0.1-preview.109) (2026-06-02)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.1-preview.108...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...2.0.1-preview.109)
 
 **Implemented enhancements:**
 
 - Refitter.MSBuild RefitterAutoScan false property [\#1094](https://github.com/christianhelle/refitter/issues/1094)
 - Fix sanitized reserved keywords in type names [\#1103](https://github.com/christianhelle/refitter/pull/1103) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- Broken generation for an api named "Public" [\#1102](https://github.com/christianhelle/refitter/issues/1102)
-
-## [2.0.1-preview.108](https://github.com/christianhelle/refitter/tree/2.0.1-preview.108) (2026-05-30)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...2.0.1-preview.108)
-
-**Implemented enhancements:**
-
 - Introduce RefitterAutoScan option in MSBuild package [\#1098](https://github.com/christianhelle/refitter/pull/1098) ([christianhelle](https://github.com/christianhelle))
 - Refactor GenerateCommand into focused modules and stabilize package-reference builds [\#1095](https://github.com/christianhelle/refitter/pull/1095) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
+- Broken generation for an api named "Public" [\#1102](https://github.com/christianhelle/refitter/issues/1102)
 - Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
 
 **Merged pull requests:**
