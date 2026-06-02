@@ -296,7 +296,7 @@ internal static class IdentifierUtils
     /// <returns>A sanitized, title-cased identifier string.</returns>
     public static string SanitizeControllerTag(this string tag)
     {
-        return tag.Sanitize().CapitalizeFirstCharacter();
+        return tag.CapitalizeFirstCharacter().Sanitize();
     }
 
     private static bool IsValidIdentifierCore(string value)

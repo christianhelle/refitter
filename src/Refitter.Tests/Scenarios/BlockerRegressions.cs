@@ -9,7 +9,7 @@ namespace Refitter.Tests.Scenarios;
 /// <summary>
 /// Regression tests for PR #1064 blockers: #1013, #1018, #1053
 /// </summary>
-public class PR1064BlockerRegressions
+public class BlockerRegressions
 {
     #region Issue #1013 - Suffix Target Collision Prevention
 
@@ -332,6 +332,125 @@ public class PR1064BlockerRegressions
         // Prove that keyword handling produces compilable code
         var generatedCode = await GenerateCode(OpenApiSpecWithKeywordsAndTitle);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    #endregion
+
+    #region Issue #1102 - Reserved Keyword Tag Name Produces Invalid Interface Name
+
+    private const string OpenApiSpecWithReservedKeywordTag = """
+        {
+          "openapi": "3.0.1",
+          "info": {
+            "title": "Public API",
+            "version": "v1"
+          },
+          "paths": {
+            "/api/data": {
+              "get": {
+                "operationId": "GetData",
+                "tags": ["public"],
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "id": { "type": "integer" },
+                            "name": { "type": "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Issue1102_TagNamedPublic_DoesNotProduceIAtPublicApi()
+    {
+        // Repro: Tag "public" (lowercase reserved keyword) should not produce I@publicApi
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecWithReservedKeywordTag),
+            MultipleInterfaces = MultipleInterfaces.ByTag
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+
+        // Should NOT contain the invalid I@publicApi pattern
+        generatedCode.Should().NotContain("I@publicApi", "interface name should not contain @ prefix from keyword escaping");
+        generatedCode.Should().NotContain("I@public", "interface name should not contain @ prefix from keyword escaping");
+
+        // Should contain a valid interface name
+        generatedCode.Should().Contain("interface IPublicApi");
+    }
+
+    [Test]
+    public async Task Issue1102_TagNamedPublic_GeneratedCode_Compiles()
+    {
+        // Prove that the fix produces compilable code
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecWithReservedKeywordTag),
+            MultipleInterfaces = MultipleInterfaces.ByTag
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue(
+            "generated code must compile (I@publicApi is invalid and would not compile)");
+    }
+
+    [Test]
+    public async Task Issue1102_TagNamedPublic_AllReservedKeywordsHandled()
+    {
+        // Verify all reserved keywords in tags are handled correctly
+        var reservedKeywords = new[] { "public", "private", "class", "interface", "namespace", "string" };
+
+        foreach (var keyword in reservedKeywords)
+        {
+            var spec = """
+                {
+                  "openapi": "3.0.1",
+                  "info": {
+                    "title": "Test API",
+                    "version": "v1"
+                  },
+                  "paths": {
+                    "/api/test": {
+                      "get": {
+                        "operationId": "GetTest",
+                        "tags": ["TAG"],
+                        "responses": {
+                          "200": { "description": "Success" }
+                        }
+                      }
+                    }
+                  }
+                }
+                """.Replace("TAG", keyword);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = await SwaggerFileHelper.CreateSwaggerFile(spec),
+                MultipleInterfaces = MultipleInterfaces.ByTag
+            };
+
+            var sut = await RefitGenerator.CreateAsync(settings);
+            var generatedCode = sut.Generate();
+
+            generatedCode.Should().NotContain($"I@{keyword}");
+            generatedCode.Should().NotContain($"@{keyword}");
+        }
     }
 
     #endregion
