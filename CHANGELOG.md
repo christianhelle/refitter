@@ -2,7 +2,20 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.1-preview.108...HEAD)
+
+**Implemented enhancements:**
+
+- Refitter.MSBuild RefitterAutoScan false property [\#1094](https://github.com/christianhelle/refitter/issues/1094)
+- Fix sanitized reserved keywords in type names [\#1103](https://github.com/christianhelle/refitter/pull/1103) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Broken generation for an api named "Public" [\#1102](https://github.com/christianhelle/refitter/issues/1102)
+
+## [2.0.1-preview.108](https://github.com/christianhelle/refitter/tree/2.0.1-preview.108) (2026-05-30)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...2.0.1-preview.108)
 
 **Implemented enhancements:**
 
@@ -15,6 +28,8 @@
 
 **Merged pull requests:**
 
+- docs: add jzabroski as a contributor for ideas [\#1101](https://github.com/christianhelle/refitter/pull/1101) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 10.2.0 [\#1099](https://github.com/christianhelle/refitter/pull/1099) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency coverlet.collector to 10.0.1 [\#1091](https://github.com/christianhelle/refitter/pull/1091) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency ruby to v4.0.5 [\#1089](https://github.com/christianhelle/refitter/pull/1089) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refitter.SourceGenerator to v2 [\#1087](https://github.com/christianhelle/refitter/pull/1087) ([renovate[bot]](https://github.com/apps/renovate))
