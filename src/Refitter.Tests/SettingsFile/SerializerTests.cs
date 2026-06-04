@@ -126,4 +126,28 @@ public class SerializerTests
 
         json.Should().Contain("\"propertyNamingPolicy\": \"PreserveOriginal\"");
     }
+
+    [Test]
+    public void Can_Serialize_CodeGeneratorSettings_With_JsonLibraryVersion()
+    {
+        var settings = new CodeGeneratorSettings { JsonLibraryVersion = 9.0m };
+        var json = Serializer.Serialize(settings);
+        json.Should().Contain("\"jsonLibraryVersion\": 9");
+    }
+
+    [Test]
+    public void Can_Deserialize_CodeGeneratorSettings_With_JsonLibraryVersion()
+    {
+        const string json = """{"jsonLibraryVersion": 9.0}""";
+        var settings = Serializer.Deserialize<CodeGeneratorSettings>(json);
+        settings.Should().NotBeNull();
+        settings.JsonLibraryVersion.Should().Be(9.0m);
+    }
+
+    [Test]
+    public void Default_JsonLibraryVersion_Should_Be_8_0()
+    {
+        var settings = new CodeGeneratorSettings();
+        settings.JsonLibraryVersion.Should().Be(8.0m);
+    }
 }
