@@ -81,6 +81,7 @@ EXAMPLES:
     refitter ./openapi.json --collection-format Csv
     refitter ./openapi.json --simple-output
     refitter ./openapi.json --no-inline-json-converters
+    refitter ./openapi.json --json-library-version 9.0
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -157,6 +158,7 @@ OPTIONS:
         --json-serializer-context                                Generate JsonSerializerContext for AOT compilation support
         --no-inline-json-converters                              Don't inline JsonConverter attributes for enum types. When disabled, no [JsonConverter(typeof(JsonStringEnumConverter))] attributes are emitted. By default (enabled), the attribute is placed on the enum type declaration (not on properties), allowing custom converters to be registered via JsonSerializerOptions.Converters
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
+        --json-library-version                                     JSON library version for System.Text.Json (default: 8.0). When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names. Cannot be used with a settings file that also specifies a non-default value
         --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
         --generate-authentication-header [STYLE]                  Controls generation of Authorization header support.
                                                                    Options: None (no authentication code is generated),
@@ -336,6 +338,7 @@ The following is an example `.refitter` file using a single OpenAPI specificatio
       "ExcludedTypeBar"
     ],
     "customTemplateDirectory": "./path/to/directory/" // Optional. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+    "jsonLibraryVersion": 8.0 // Optional. Default=8.0. JSON library version for System.Text.Json. When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names
   }
 }
 ```
@@ -443,6 +446,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
   - `excludedTypeNames` - Default is empty
+  - `jsonLibraryVersion` - Default is `8.0`. JSON library version for System.Text.Json. When set to `9.0` or higher, enables .NET 9+ `JsonStringEnumMemberName` support for custom enum value names
 
 ## MSBuild
 
