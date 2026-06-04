@@ -129,6 +129,40 @@ public class JsonLibraryVersionTests
     }
 
     [Test]
+    public async Task JsonLibraryVersion_9_0_Should_Generate_JsonStringEnumMemberName()
+    {
+        string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
+
+        using (new AssertionScope())
+        {
+            generatedCode.Should().Contain(@"[JsonStringEnumMemberName(@""Active"")]");
+            generatedCode.Should().Contain(@"[JsonStringEnumMemberName(@""Inactive"")]");
+            generatedCode.Should().Contain(@"[JsonStringEnumMemberName(@""Blocked"")]");
+        }
+    }
+
+    [Test]
+    public async Task JsonLibraryVersion_9_0_Should_Also_Generate_EnumMember()
+    {
+        string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
+
+        using (new AssertionScope())
+        {
+            generatedCode.Should().Contain(@"[System.Runtime.Serialization.EnumMember(Value = @""Active"")]");
+            generatedCode.Should().Contain(@"[System.Runtime.Serialization.EnumMember(Value = @""Inactive"")]");
+            generatedCode.Should().Contain(@"[System.Runtime.Serialization.EnumMember(Value = @""Blocked"")]");
+        }
+    }
+
+    [Test]
+    public async Task JsonLibraryVersion_9_0_Should_Have_JsonConverter_On_Enum()
+    {
+        string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
+
+        generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter))]");
+    }
+
+    [Test]
     public async Task JsonLibraryVersion_9_0_Sets_Value_Correctly()
     {
         var settings = new RefitGeneratorSettings
