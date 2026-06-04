@@ -37,6 +37,16 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             _cachedSettings = refitSettings;
         }
 
+        // Detect conflict: both CLI and settings file specify non-default jsonLibraryVersion
+        if (settings.JsonLibraryVersion is { } cliValue &&
+            cliValue != 8.0m &&
+            refitSettings?.CodeGeneratorSettings?.JsonLibraryVersion is { } fileValue &&
+            fileValue != 8.0m)
+        {
+            return ValidationResult.Error(
+                "Cannot specify --json-library-version via CLI when the settings file also specifies a non-default value. Use only one source.");
+        }
+
         return validationResult;
     }
 
@@ -220,7 +230,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
                 InlineJsonConverters = !settings.NoInlineJsonConverters,
-                IntegerType = settings.IntegerType
+                IntegerType = settings.IntegerType,
+                JsonLibraryVersion = settings.JsonLibraryVersion ?? 8.0m,
             },
             CustomTemplateDirectory = settings.CustomTemplateDirectory,
             AuthenticationHeaderStyle = authenticationHeaderStyle,
