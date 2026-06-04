@@ -121,6 +121,45 @@ public class JsonLibraryVersionTests
             .BeTrue();
     }
 
+    [Test]
+    public async Task Can_Generate_Code_With_JsonLibraryVersion_9_0()
+    {
+        string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task JsonLibraryVersion_9_0_Sets_Value_Correctly()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec),
+            CodeGeneratorSettings = new CodeGeneratorSettings { JsonLibraryVersion = 9.0m }
+        };
+
+        var generator = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = generator.Generate();
+
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        settings.CodeGeneratorSettings.JsonLibraryVersion.Should().Be(9.0m);
+    }
+
+    [Test]
+    public async Task JsonLibraryVersion_8_0_Sets_Value_Correctly()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec),
+            CodeGeneratorSettings = new CodeGeneratorSettings { JsonLibraryVersion = 8.0m }
+        };
+
+        var generator = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = generator.Generate();
+
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        settings.CodeGeneratorSettings.JsonLibraryVersion.Should().Be(8.0m);
+    }
+
     private static async Task<string> GenerateCode(decimal? jsonLibraryVersion = null)
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
