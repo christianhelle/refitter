@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using NJsonSchema.CodeGeneration;
+using NJsonSchema.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 
@@ -286,4 +287,12 @@ public class CodeGeneratorSettings
     /// </summary>
     [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
     public string? CustomTemplateDirectory { get; set; }
+
+    /// <summary>
+    /// Gets or sets the JSON library version to use (applies only to System.Text.Json, default: 8.0).
+    /// When set to 9.0 or higher, enums will use [JsonStringEnum] attributes with member name support,
+    /// enabling .NET 9+ JsonStringEnumMemberName support for custom enum value names.
+    /// </summary>
+    [Description("Gets or sets the JSON library version to use (applies only to System.Text.Json, default: 8.0). When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support.")]
+    public decimal JsonLibraryVersion { get; set; } = 8.0m;
 }
