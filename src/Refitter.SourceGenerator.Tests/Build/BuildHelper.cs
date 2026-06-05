@@ -7,11 +7,21 @@ public static class BuildHelper
 {
     public static bool BuildCSharp(params string[] generatedCode)
     {
+        return BuildCSharp("net8.0", generatedCode);
+    }
+
+    public static bool BuildCSharp(string targetFramework, params string[] generatedCode)
+    {
         var folder = Path.GetDirectoryName(typeof(BuildHelper).Assembly.Location) ?? Path.GetTempPath();
         var path = Path.Combine(folder, Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(path);
         var projectFile = Path.Combine(path, "Project.csproj");
-        File.WriteAllText(projectFile, ProjectFileContents.Net80App);
+        var projectContent = targetFramework switch
+        {
+            "net9.0" => ProjectFileContents.Net90App,
+            _ => ProjectFileContents.Net80App
+        };
+        File.WriteAllText(projectFile, projectContent);
 
         for (int i = 0; i < generatedCode.Length; i++)
         {

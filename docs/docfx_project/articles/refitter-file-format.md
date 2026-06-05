@@ -127,6 +127,7 @@ The following is an example `.refitter` file
       "ExcludedTypeBar"
     ],
     "customTemplateDirectory": "./path/to/directory/" //Optional. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+    "jsonLibraryVersion": 8.0 // Optional. Default=8.0. JSON library version for System.Text.Json. When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names
   }
 }
 ```
@@ -238,6 +239,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
   - `excludedTypeNames` - Default is empty
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
+  - `jsonLibraryVersion` - Default is `8.0`. JSON library version for System.Text.Json. When set to `9.0` or higher, enables .NET 9+ `JsonStringEnumMemberName` support for custom enum value names
 
 ### JSON Schema
 
@@ -616,6 +618,10 @@ When using `openApiPaths`, the documents are merged into a single generated clie
                 },
                 "dateTimeFormat": {
                     "type": "string"
+                },
+                "jsonLibraryVersion": {
+                    "type": "number",
+                    "description": "JSON library version for System.Text.Json. Default is 8.0. When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support."
                 }
             },
         }

@@ -60,6 +60,7 @@ public class SettingsTests
         settings.CustomTemplateDirectory.Should().BeNull();
         settings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PascalCase);
         settings.GenerateAuthenticationHeader.Should().BeNull();
+        settings.JsonLibraryVersion.Should().BeNull();
     }
 
     [Test]
