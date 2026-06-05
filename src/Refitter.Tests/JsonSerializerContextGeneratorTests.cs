@@ -155,7 +155,7 @@ public class JsonSerializerContextGeneratorTests
 
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Outer))]");
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Outer.Inner))]");
-        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
     [Test]
@@ -184,7 +184,7 @@ public class JsonSerializerContextGeneratorTests
 
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Pet>))]");
         result.Should().NotContain("typeof(Envelope))");
-        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
     [Test]
@@ -219,7 +219,7 @@ public class JsonSerializerContextGeneratorTests
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Pet>))]");
         result.Should().NotContain("typeof(Envelope<T>))");
         result.Should().NotContain("typeof(Wrapper))");
-        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
     [Test]
@@ -245,7 +245,7 @@ public class JsonSerializerContextGeneratorTests
 
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(LocalModel))]");
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(global::Shared.Contracts.SharedModel))]");
-        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
     [Test]
@@ -278,7 +278,7 @@ public class JsonSerializerContextGeneratorTests
         var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Container<Envelope<Pet>[]?>))]");
-        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
     [Test]
@@ -311,7 +311,7 @@ public class JsonSerializerContextGeneratorTests
         var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Container<global::My.Contracts.Envelope<global::My.Contracts.Pet>>))]");
-        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
     [Test]
@@ -344,7 +344,7 @@ public class JsonSerializerContextGeneratorTests
 
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]");
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Pet>))]");
-        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
     [Test]
@@ -374,7 +374,7 @@ public class JsonSerializerContextGeneratorTests
         var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Envelope<Dictionary<string, Pet>>))]");
-        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
     [Test]
@@ -389,7 +389,7 @@ public class JsonSerializerContextGeneratorTests
         var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
 
         result.Should().Contain("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]");
-        BuildHelper.BuildCSharp(contracts, result).Should().BeTrue();
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
     private static RefitGeneratorSettings CreateSettings(
