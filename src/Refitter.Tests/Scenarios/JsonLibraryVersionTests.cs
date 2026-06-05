@@ -9,7 +9,7 @@ namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Tests for JsonLibraryVersion setting that controls enum attribute generation.
-/// When JsonLibraryVersion is set to 9.0+, enums may use [JsonStringEnum] attributes
+/// When JsonLibraryVersion is set to 9.0+, enums may use [JsonStringEnumMemberName] attributes
 /// (requires NSwag/NJsonSchema version that supports this in their Enum.liquid template).
 /// When JsonLibraryVersion is 8.0 or below (default), enums use [EnumMember] attributes.
 /// </summary>
@@ -115,6 +115,16 @@ public class JsonLibraryVersionTests
     public async Task Can_Build_Generated_Code_With_JsonLibraryVersion_8_0()
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 8.0m);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Test]
+    public async Task Can_Build_Generated_Code_With_JsonLibraryVersion_9_0()
+    {
+        string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
         BuildHelper
             .BuildCSharp(generatedCode)
             .Should()
