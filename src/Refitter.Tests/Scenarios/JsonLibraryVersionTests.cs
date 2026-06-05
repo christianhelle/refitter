@@ -126,7 +126,7 @@ public class JsonLibraryVersionTests
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
         BuildHelper
-            .BuildCSharp(generatedCode)
+            .BuildCSharp("net9.0", generatedCode)
             .Should()
             .BeTrue();
     }
