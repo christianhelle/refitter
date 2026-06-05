@@ -32,7 +32,7 @@
   "operationNameTemplate": null,
   "optionalParameters": false,
   "outputFolder": "./Generated",
-  "contractsOutputFolder": "./test-90.cs",
+  "contractsOutputFolder": "./Generated/Contracts",
   "outputFilename": null,
   "dependencyInjectionSettings": null,
   "codeGeneratorSettings": {
