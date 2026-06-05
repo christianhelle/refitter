@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.1-preview.109...HEAD)
+
+**Merged pull requests:**
+
+- Upgrade Refit to v10.2.0 due to critical bugs found in 10.1.6 [\#1108](https://github.com/christianhelle/refitter/pull/1108) ([christianhelle](https://github.com/christianhelle))
+- docs: add dammitjanet as a contributor for bug [\#1104](https://github.com/christianhelle/refitter/pull/1104) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
 ## [2.0.1-preview.109](https://github.com/christianhelle/refitter/tree/2.0.1-preview.109) (2026-06-02)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...2.0.1-preview.109)
