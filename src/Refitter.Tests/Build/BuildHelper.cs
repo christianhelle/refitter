@@ -19,6 +19,7 @@ public static class BuildHelper
         var projectContent = targetFramework switch
         {
             "net9.0" => ProjectFileContents.Net90App,
+            "net10.0" => ProjectFileContents.Net100App,
             _ => ProjectFileContents.Net80App
         };
         File.WriteAllText(projectFile, projectContent);
