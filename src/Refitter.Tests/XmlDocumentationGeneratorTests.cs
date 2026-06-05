@@ -58,7 +58,7 @@ public class XmlDocumentationGeneratorTests
 
         this._generator.AppendInterfaceDocumentationByTag(document, "TestController", docs);
 
-        docs.ToString().Trim().Should().BeEmpty();
+        docs.ToString().Trim().Should().Be("/// <summary>Operations for TestController.</summary>");
     }
 
     [Test]
