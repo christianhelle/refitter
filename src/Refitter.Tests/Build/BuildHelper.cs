@@ -28,8 +28,12 @@ public static class BuildHelper
         var projectFile = Path.Combine(path, "Project.csproj");
         var projectContent = (targetFramework, warningsAsErrors) switch
         {
+            ("net8.0", true) => ProjectFileContents.Net80AppWithWarningsAsErrors,
+            ("net8.0", false) => ProjectFileContents.Net80App,
             ("net9.0", true) => ProjectFileContents.Net90AppWithWarningsAsErrors,
             ("net9.0", false) => ProjectFileContents.Net90App,
+            ("net10.0", true) => ProjectFileContents.Net100AppWithWarningsAsErrors,
+            ("net10.0", false) => ProjectFileContents.Net100App,
             (_, true) => ProjectFileContents.Net80AppWithWarningsAsErrors,
             _ => ProjectFileContents.Net80App
         };
