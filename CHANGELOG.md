@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
+- Ensure Refit v11 compatibility [\#1111](https://github.com/christianhelle/refitter/pull/1111) ([christianhelle](https://github.com/christianhelle))
 - Add JsonLibraryVersion property and CLI support for code generation [\#1106](https://github.com/christianhelle/refitter/pull/1106) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
