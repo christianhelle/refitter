@@ -64,7 +64,7 @@ public class GenerateJsonSerializerContextPolymorphismTests
             <RestorePackagesPath>packages</RestorePackagesPath>
           </PropertyGroup>
           <ItemGroup>
-            <PackageReference Include="Refit.HttpClientFactory" Version="10.2.0" />
+            <PackageReference Include="Refit.HttpClientFactory" Version="11.0.1" />
           </ItemGroup>
         </Project>
         """;
