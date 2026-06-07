@@ -49,10 +49,8 @@ public class XmlDocumentationGenerator
 
         var controllerTag = document.Tags?.FirstOrDefault(t => t.Name.SanitizeControllerTag() == tag);
         var controllerDescription = controllerTag?.Description;
-        if (!string.IsNullOrEmpty(controllerDescription))
-        {
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(controllerDescription!), code, indent: Separator);
-        }
+        var fallbackSummary = $"Operations for {EscapeSymbols(tag)}.";
+        this.AppendInterfaceSummary(controllerDescription, fallbackSummary, code);
     }
 
     /// <summary>
@@ -68,10 +66,11 @@ public class XmlDocumentationGenerator
         }
 
         var summary = endpoint.Summary;
-        if (!string.IsNullOrEmpty(summary))
-        {
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(summary), code, indent: Separator);
-        }
+        var operationId = endpoint.OperationId;
+        var fallbackSummary = !string.IsNullOrWhiteSpace(operationId)
+            ? $"Operations for {EscapeSymbols(operationId!)}."
+            : "Operations for endpoint.";
+        this.AppendInterfaceSummary(summary, fallbackSummary, code);
     }
 
     /// <summary>
@@ -259,6 +258,17 @@ public class XmlDocumentationGenerator
             // When the content only has a single line, place it on the same line as the tag.
             code.AppendLine($"{content}</{tagName}>");
         }
+    }
+
+    private void AppendInterfaceSummary(string? preferredSummary, string fallbackSummary, StringBuilder code)
+    {
+        var summary = fallbackSummary;
+        if (!string.IsNullOrWhiteSpace(preferredSummary))
+        {
+            summary = EscapeSymbols(preferredSummary!);
+        }
+
+        this.AppendXmlCommentBlock(SummaryTag, summary, code, indent: Separator);
     }
 
     /// <summary>
