@@ -11,8 +11,13 @@
 - Fix missing interface XML docs in multi-interface generation [\#1110](https://github.com/christianhelle/refitter/pull/1110) ([christianhelle](https://github.com/christianhelle))
 - Add JsonLibraryVersion property and CLI support for code generation [\#1106](https://github.com/christianhelle/refitter/pull/1106) ([christianhelle](https://github.com/christianhelle))
 
+**Fixed bugs:**
+
+- Build Error CS1591 Missing XML comment for publicly visible type or member [\#1109](https://github.com/christianhelle/refitter/issues/1109)
+
 **Merged pull requests:**
 
+- Remove Squad [\#1112](https://github.com/christianhelle/refitter/pull/1112) ([christianhelle](https://github.com/christianhelle))
 - Upgrade Refit to v10.2.0 due to critical bugs found in 10.1.6 [\#1108](https://github.com/christianhelle/refitter/pull/1108) ([christianhelle](https://github.com/christianhelle))
 - docs: add Jappinen as a contributor for ideas [\#1107](https://github.com/christianhelle/refitter/pull/1107) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add dammitjanet as a contributor for bug [\#1104](https://github.com/christianhelle/refitter/pull/1104) ([allcontributors[bot]](https://github.com/apps/allcontributors))
