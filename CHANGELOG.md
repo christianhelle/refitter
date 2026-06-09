@@ -17,10 +17,12 @@
 
 **Merged pull requests:**
 
+- build\(deps\): bump codecov/codecov-action from 6 to 7 [\#1113](https://github.com/christianhelle/refitter/pull/1113) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Remove Squad [\#1112](https://github.com/christianhelle/refitter/pull/1112) ([christianhelle](https://github.com/christianhelle))
 - Upgrade Refit to v10.2.0 due to critical bugs found in 10.1.6 [\#1108](https://github.com/christianhelle/refitter/pull/1108) ([christianhelle](https://github.com/christianhelle))
 - docs: add Jappinen as a contributor for ideas [\#1107](https://github.com/christianhelle/refitter/pull/1107) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add dammitjanet as a contributor for bug [\#1104](https://github.com/christianhelle/refitter/pull/1104) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency tunit to 1.47.0 [\#1093](https://github.com/christianhelle/refitter/pull/1093) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.0.1-preview.109](https://github.com/christianhelle/refitter/tree/2.0.1-preview.109) (2026-06-02)
 
