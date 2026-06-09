@@ -23,6 +23,7 @@
 - docs: add Jappinen as a contributor for ideas [\#1107](https://github.com/christianhelle/refitter/pull/1107) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add dammitjanet as a contributor for bug [\#1104](https://github.com/christianhelle/refitter/pull/1104) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency tunit to 1.47.0 [\#1093](https://github.com/christianhelle/refitter/pull/1093) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dotnet monorepo and resolve merge conflicts [\#1092](https://github.com/christianhelle/refitter/pull/1092) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.0.1-preview.109](https://github.com/christianhelle/refitter/tree/2.0.1-preview.109) (2026-06-02)
 
