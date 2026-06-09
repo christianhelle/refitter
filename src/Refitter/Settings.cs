@@ -303,6 +303,10 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool GenerateJsonSerializerContext { get; set; }
 
+    [Description("JSON library version for System.Text.Json (default: 8.0). When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names. Cannot be used with a settings file that also specifies jsonLibraryVersion.")]
+    [CommandOption("--json-library-version")]
+    public decimal? JsonLibraryVersion { get; set; }
+
     internal bool TryGetAuthenticationHeaderStyle(out AuthenticationHeaderStyle style, out string? errorMessage)
     {
         style = AuthenticationHeaderStyle.None;

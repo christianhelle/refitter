@@ -405,7 +405,7 @@ internal class CSharpClientGeneratorFactory(RefitGeneratorSettings settings, Ope
         /// <summary>Initializes a new instance of the <see cref="CustomTemplateFactory" /> class.</summary>
         /// <param name="settings">The settings.</param>
         public CustomTemplateFactory(CodeGeneratorSettingsBase settings)
-            : base(settings, [typeof(CSharpGenerator).Assembly, typeof(CSharpGeneratorBaseSettings).Assembly])
+            : base(settings, [typeof(CSharpGenerator).Assembly, typeof(CSharpGeneratorBaseSettings).Assembly, typeof(NJsonSchema.CodeGeneration.CSharp.CSharpGeneratorSettings).Assembly])
         {
         }
 

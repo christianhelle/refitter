@@ -7,11 +7,37 @@ public static class BuildHelper
 {
     public static bool BuildCSharp(params string[] generatedCode)
     {
+        return BuildCSharp("net8.0", warningsAsErrors: false, generatedCode);
+    }
+
+    public static bool BuildCSharp(bool warningsAsErrors, params string[] generatedCode)
+    {
+        return BuildCSharp("net8.0", warningsAsErrors, generatedCode);
+    }
+
+    public static bool BuildCSharp(string targetFramework, params string[] generatedCode)
+    {
+        return BuildCSharp(targetFramework, warningsAsErrors: false, generatedCode);
+    }
+
+    public static bool BuildCSharp(string targetFramework, bool warningsAsErrors, params string[] generatedCode)
+    {
         var folder = Path.GetDirectoryName(typeof(BuildHelper).Assembly.Location) ?? Path.GetTempPath();
         var path = Path.Combine(folder, Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(path);
         var projectFile = Path.Combine(path, "Project.csproj");
-        File.WriteAllText(projectFile, ProjectFileContents.Net80App);
+        var projectContent = (targetFramework, warningsAsErrors) switch
+        {
+            ("net8.0", true) => ProjectFileContents.Net80AppWithWarningsAsErrors,
+            ("net8.0", false) => ProjectFileContents.Net80App,
+            ("net9.0", true) => ProjectFileContents.Net90AppWithWarningsAsErrors,
+            ("net9.0", false) => ProjectFileContents.Net90App,
+            ("net10.0", true) => ProjectFileContents.Net100AppWithWarningsAsErrors,
+            ("net10.0", false) => ProjectFileContents.Net100App,
+            (_, true) => ProjectFileContents.Net80AppWithWarningsAsErrors,
+            _ => ProjectFileContents.Net80App
+        };
+        File.WriteAllText(projectFile, projectContent);
 
         for (int i = 0; i < generatedCode.Length; i++)
         {

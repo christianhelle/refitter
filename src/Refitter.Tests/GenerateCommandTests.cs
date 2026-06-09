@@ -127,6 +127,54 @@ public class GenerateCommandTests
     }
 
     [Test]
+    public void CreateRefitGeneratorSettings_Should_Map_JsonLibraryVersion_From_CLI()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            JsonLibraryVersion = 9.0m
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "CreateRefitGeneratorSettings",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+
+        var refitSettings = method!
+            .Invoke(null, [settings])
+            .Should()
+            .BeOfType<RefitGeneratorSettings>()
+            .Subject;
+
+        refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(9.0m);
+    }
+
+    [Test]
+    public void CreateRefitGeneratorSettings_Should_Use_Default_JsonLibraryVersion_When_CLI_Not_Set()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            JsonLibraryVersion = null
+        };
+
+        var method = typeof(GenerateCommand).GetMethod(
+            "CreateRefitGeneratorSettings",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        method.Should().NotBeNull();
+
+        var refitSettings = method!
+            .Invoke(null, [settings])
+            .Should()
+            .BeOfType<RefitGeneratorSettings>()
+            .Subject;
+
+        refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(8.0m);
+    }
+
+    [Test]
     public void Command_Should_Have_Protected_Validate_Method()
     {
         var command = new GenerateCommand();

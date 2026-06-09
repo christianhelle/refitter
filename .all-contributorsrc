@@ -394,7 +394,8 @@
       "profile": "https://github.com/dammitjanet",
       "contributions": [
         "ideas",
-        "code"
+        "code",
+        "bug"
       ]
     },
     {
@@ -412,7 +413,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/44408497?v=4",
       "profile": "https://github.com/Jappinen",
       "contributions": [
-        "bug"
+        "bug",
+        "ideas"
       ]
     },
     {
@@ -893,6 +895,15 @@
       "profile": "http://umair.me",
       "contributions": [
         "bug"
+      ]
+    },
+    {
+      "login": "jzabroski",
+      "name": "John Zabroski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/447485?v=4",
+      "profile": "http://z-bo.tumblr.com",
+      "contributions": [
+        "ideas"
       ]
     }
   ],

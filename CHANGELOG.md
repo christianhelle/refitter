@@ -2,18 +2,48 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.1-preview.109...HEAD)
 
 **Implemented enhancements:**
 
+- Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
+- Ensure Refit v11 compatibility [\#1111](https://github.com/christianhelle/refitter/pull/1111) ([christianhelle](https://github.com/christianhelle))
+- Fix missing interface XML docs in multi-interface generation [\#1110](https://github.com/christianhelle/refitter/pull/1110) ([christianhelle](https://github.com/christianhelle))
+- Add JsonLibraryVersion property and CLI support for code generation [\#1106](https://github.com/christianhelle/refitter/pull/1106) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Build Error CS1591 Missing XML comment for publicly visible type or member [\#1109](https://github.com/christianhelle/refitter/issues/1109)
+
+**Merged pull requests:**
+
+- build\(deps\): bump codecov/codecov-action from 6 to 7 [\#1113](https://github.com/christianhelle/refitter/pull/1113) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Remove Squad [\#1112](https://github.com/christianhelle/refitter/pull/1112) ([christianhelle](https://github.com/christianhelle))
+- Upgrade Refit to v10.2.0 due to critical bugs found in 10.1.6 [\#1108](https://github.com/christianhelle/refitter/pull/1108) ([christianhelle](https://github.com/christianhelle))
+- docs: add Jappinen as a contributor for ideas [\#1107](https://github.com/christianhelle/refitter/pull/1107) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add dammitjanet as a contributor for bug [\#1104](https://github.com/christianhelle/refitter/pull/1104) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency tunit to 1.47.0 [\#1093](https://github.com/christianhelle/refitter/pull/1093) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [2.0.1-preview.109](https://github.com/christianhelle/refitter/tree/2.0.1-preview.109) (2026-06-02)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...2.0.1-preview.109)
+
+**Implemented enhancements:**
+
+- Refitter.MSBuild RefitterAutoScan false property [\#1094](https://github.com/christianhelle/refitter/issues/1094)
+- Fix sanitized reserved keywords in type names [\#1103](https://github.com/christianhelle/refitter/pull/1103) ([christianhelle](https://github.com/christianhelle))
+- Introduce RefitterAutoScan option in MSBuild package [\#1098](https://github.com/christianhelle/refitter/pull/1098) ([christianhelle](https://github.com/christianhelle))
 - Refactor GenerateCommand into focused modules and stabilize package-reference builds [\#1095](https://github.com/christianhelle/refitter/pull/1095) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
+- Broken generation for an api named "Public" [\#1102](https://github.com/christianhelle/refitter/issues/1102)
 - Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
 
 **Merged pull requests:**
 
+- docs: add jzabroski as a contributor for ideas [\#1101](https://github.com/christianhelle/refitter/pull/1101) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency swashbuckle.aspnetcore to 10.2.0 [\#1099](https://github.com/christianhelle/refitter/pull/1099) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency coverlet.collector to 10.0.1 [\#1091](https://github.com/christianhelle/refitter/pull/1091) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency ruby to v4.0.5 [\#1089](https://github.com/christianhelle/refitter/pull/1089) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refitter.SourceGenerator to v2 [\#1087](https://github.com/christianhelle/refitter/pull/1087) ([renovate[bot]](https://github.com/apps/renovate))

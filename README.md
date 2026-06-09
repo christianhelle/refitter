@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-96-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-97-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -81,6 +81,7 @@ EXAMPLES:
     refitter ./openapi.json --collection-format Csv
     refitter ./openapi.json --simple-output
     refitter ./openapi.json --no-inline-json-converters
+    refitter ./openapi.json --json-library-version 9.0
 
 ARGUMENTS:
     [URL or input file]    URL or file path to OpenAPI Specification file
@@ -157,6 +158,7 @@ OPTIONS:
         --json-serializer-context                                Generate JsonSerializerContext for AOT compilation support
         --no-inline-json-converters                              Don't inline JsonConverter attributes for enum types. When disabled, no [JsonConverter(typeof(JsonStringEnumConverter))] attributes are emitted. By default (enabled), the attribute is placed on the enum type declaration (not on properties), allowing custom converters to be registered via JsonSerializerOptions.Converters
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
+        --json-library-version                                     JSON library version for System.Text.Json (default: 8.0). When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names. Cannot be used with a settings file that also specifies a non-default value
         --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
         --generate-authentication-header [STYLE]                  Controls generation of Authorization header support.
                                                                    Options: None (no authentication code is generated),
@@ -336,6 +338,7 @@ The following is an example `.refitter` file using a single OpenAPI specificatio
       "ExcludedTypeBar"
     ],
     "customTemplateDirectory": "./path/to/directory/" // Optional. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+    "jsonLibraryVersion": 8.0 // Optional. Default=8.0. JSON library version for System.Text.Json. When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names
   }
 }
 ```
@@ -443,6 +446,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
   - `excludedTypeNames` - Default is empty
+  - `jsonLibraryVersion` - Default is `8.0`. JSON library version for System.Text.Json. When set to `9.0` or higher, enables .NET 9+ `JsonStringEnumMemberName` support for custom enum value names
 
 ## MSBuild
 
@@ -1406,11 +1410,11 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/janfolbrecht"><img src="https://avatars.githubusercontent.com/u/42186604?v=4?s=100" width="100px;" alt="janfolbrecht"/><br /><sub><b>janfolbrecht</b></sub></a><br /><a href="#ideas-janfolbrecht" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=janfolbrecht" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/osc-nseguin"><img src="https://avatars.githubusercontent.com/u/133910309?v=4?s=100" width="100px;" alt="Nick Seguin"/><br /><sub><b>Nick Seguin</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=osc-nseguin" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/david-brink-talogy"><img src="https://avatars.githubusercontent.com/u/43828739?v=4?s=100" width="100px;" alt="David Brink"/><br /><sub><b>David Brink</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Adavid-brink-talogy" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=david-brink-talogy" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dammitjanet"><img src="https://avatars.githubusercontent.com/u/952723?v=4?s=100" width="100px;" alt="Stu Wilson"/><br /><sub><b>Stu Wilson</b></sub></a><br /><a href="#ideas-dammitjanet" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=dammitjanet" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dammitjanet"><img src="https://avatars.githubusercontent.com/u/952723?v=4?s=100" width="100px;" alt="Stu Wilson"/><br /><sub><b>Stu Wilson</b></sub></a><br /><a href="#ideas-dammitjanet" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=dammitjanet" title="Code">💻</a> <a href="https://github.com/christianhelle/refitter/issues?q=author%3Adammitjanet" title="Bug reports">🐛</a></td>
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sharpzilla"><img src="https://avatars.githubusercontent.com/u/16763634?v=4?s=100" width="100px;" alt="sharpzilla"/><br /><sub><b>sharpzilla</b></sub></a><br /><a href="#ideas-sharpzilla" title="Ideas, Planning, & Feedback">🤔</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Jappinen"><img src="https://avatars.githubusercontent.com/u/44408497?v=4?s=100" width="100px;" alt="Tatu"/><br /><sub><b>Tatu</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AJappinen" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Jappinen"><img src="https://avatars.githubusercontent.com/u/44408497?v=4?s=100" width="100px;" alt="Tatu"/><br /><sub><b>Tatu</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AJappinen" title="Bug reports">🐛</a> <a href="#ideas-Jappinen" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.respawnsive.com"><img src="https://avatars.githubusercontent.com/u/4272307?v=4?s=100" width="100px;" alt="Jérémy BRUN-PICARD"/><br /><sub><b>Jérémy BRUN-PICARD</b></sub></a><br /><a href="#ideas-JeremyBP" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/christianhelle/refitter/commits?author=JeremyBP" title="Code">💻</a> <a href="https://github.com/christianhelle/refitter/commits?author=JeremyBP" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ebarnard"><img src="https://avatars.githubusercontent.com/u/1059683?v=4?s=100" width="100px;" alt="Ed Barnard"/><br /><sub><b>Ed Barnard</b></sub></a><br /><a href="#ideas-ebarnard" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/bastiennoel93"><img src="https://avatars.githubusercontent.com/u/18250350?v=4?s=100" width="100px;" alt="bastien.noel"/><br /><sub><b>bastien.noel</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Abastiennoel93" title="Bug reports">🐛</a></td>
@@ -1477,6 +1481,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Timovzl"><img src="https://avatars.githubusercontent.com/u/655426?v=4?s=100" width="100px;" alt="Timo van Zijll Langhout"/><br /><sub><b>Timo van Zijll Langhout</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3ATimovzl" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/AntonTeyken"><img src="https://avatars.githubusercontent.com/u/162133784?v=4?s=100" width="100px;" alt="Anton"/><br /><sub><b>Anton</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AAntonTeyken" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://umair.me"><img src="https://avatars.githubusercontent.com/u/834935?v=4?s=100" width="100px;" alt="Muhammad Umair Irshad"/><br /><sub><b>Muhammad Umair Irshad</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Aumair-me" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://z-bo.tumblr.com"><img src="https://avatars.githubusercontent.com/u/447485?v=4?s=100" width="100px;" alt="John Zabroski"/><br /><sub><b>John Zabroski</b></sub></a><br /><a href="#ideas-jzabroski" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>

@@ -20,7 +20,7 @@ on:
       - '*'
 
 env:
-  VERSION: 2.0.0.${{ github.run_number }}
+  VERSION: 2.0.1.${{ github.run_number }}
   CODECOV_TOKEN: cbd141f8-4d0d-4bc1-84a7-970f9f9b87ac
 
 jobs:
@@ -56,7 +56,7 @@ jobs:
       continue-on-error: true
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@v7
       with:
         files: '**/coverage.cobertura.xml'
         flags: unittests
