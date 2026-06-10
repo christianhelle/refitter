@@ -5,16 +5,16 @@ namespace Refitter.Core;
 
 internal class ByTagInterfacePartitioning : IInterfacePartitioning
 {
-    private readonly RefitGeneratorSettings _settings;
-    private readonly string _ungroupedTitle;
+    private readonly RefitGeneratorSettings settings;
+    private readonly string ungroupedTitle;
 
     public ByTagInterfacePartitioning(RefitGeneratorSettings settings, OpenApiDocument document)
     {
-        _settings = settings;
-        _ungroupedTitle = settings.Naming.UseOpenApiTitle
-            ? IdentifierUtils.Sanitize(document.Info?.Title ?? "ApiClient")
+        this.settings = settings;
+        ungroupedTitle = settings.Naming.UseOpenApiTitle
+            ? (document.Info?.Title ?? "ApiClient").Sanitize()
             : settings.Naming.InterfaceName;
-        _ungroupedTitle = _ungroupedTitle.CapitalizeFirstCharacter();
+        ungroupedTitle = ungroupedTitle.CapitalizeFirstCharacter();
     }
 
     public string GetGroupKey(OpenApiOperationInfo operation)
@@ -22,7 +22,7 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
         var tag = operation.Operation.Tags.FirstOrDefault();
         return !string.IsNullOrWhiteSpace(tag)
             ? tag.SanitizeControllerTag()
-            : _ungroupedTitle;
+            : ungroupedTitle;
     }
 
     public string GetInterfaceName(string groupKey, string title, string baseOperationName) =>
@@ -33,9 +33,9 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
     public string GetMethodName(OpenApiOperationInfo operation, string interfaceName, string baseOperationName)
     {
         var methodName = baseOperationName.CapitalizeFirstCharacter();
-        if (_settings.OperationNameTemplate?.Contains("{operationName}") ?? false)
+        if (settings.OperationNameTemplate?.Contains("{operationName}") ?? false)
         {
-            methodName = _settings.OperationNameTemplate!.Replace("{operationName}", methodName);
+            methodName = settings.OperationNameTemplate!.Replace("{operationName}", methodName);
         }
 
         return methodName;

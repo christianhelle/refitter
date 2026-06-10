@@ -3,14 +3,9 @@ using NSwag;
 
 namespace Refitter.Core;
 
-internal class SingleInterfacePartitioning : IInterfacePartitioning
+internal class SingleInterfacePartitioning(
+    RefitGeneratorSettings settings) : IInterfacePartitioning
 {
-    private readonly RefitGeneratorSettings _settings;
-
-    public SingleInterfacePartitioning(RefitGeneratorSettings settings)
-    {
-        _settings = settings;
-    }
 
     public string GetGroupKey(OpenApiOperationInfo operation) => string.Empty;
 
@@ -22,9 +17,9 @@ internal class SingleInterfacePartitioning : IInterfacePartitioning
     public string GetMethodName(OpenApiOperationInfo operation, string interfaceName, string baseOperationName)
     {
         var methodName = baseOperationName;
-        if (_settings.OperationNameTemplate?.Contains("{operationName}") ?? false)
+        if (settings.OperationNameTemplate?.Contains("{operationName}") ?? false)
         {
-            methodName = _settings.OperationNameTemplate!.Replace("{operationName}", methodName);
+            methodName = settings.OperationNameTemplate!.Replace("{operationName}", methodName);
         }
 
         return methodName;

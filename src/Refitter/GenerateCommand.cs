@@ -13,8 +13,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 {
     internal const string GeneratedFileMarker = "GeneratedFile: ";
 
-    private RefitGeneratorSettings? _cachedSettings;
-    private IGenerationReporter _reporter = new RichGenerationReporter();
+    private RefitGeneratorSettings? cachedSettings;
+    private IGenerationReporter reporter = new RichGenerationReporter();
 
     private static IGenerationReporter CreateReporter(Settings settings) =>
         settings.SimpleOutput
@@ -34,7 +34,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         var validationResult = SettingsValidator.Validate(settings, out var refitSettings);
         if (refitSettings != null)
         {
-            _cachedSettings = refitSettings;
+            cachedSettings = refitSettings;
         }
 
         // Detect conflict: both CLI and settings file specify non-default jsonLibraryVersion
@@ -54,15 +54,15 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     {
         RefitGeneratorSettings refitGeneratorSettings;
 
-        _reporter = CreateReporter(settings);
+        reporter = CreateReporter(settings);
 
         try
         {
             // Use cached settings from Validate() if available
-            if (_cachedSettings != null)
+            if (cachedSettings != null)
             {
-                refitGeneratorSettings = _cachedSettings;
-                _cachedSettings = null; // Clear cache after use
+                refitGeneratorSettings = cachedSettings;
+                cachedSettings = null; // Clear cache after use
             }
             else if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
             {
@@ -87,14 +87,14 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 version += " (local build)";
 
             // Header with branding
-            _reporter.ReportHeader(version);
+            reporter.ReportHeader(version);
 
             // Support information
             var supportKey = settings.NoLogging
                 ? "Unavailable when logging is disabled"
                 : SupportInformation.GetSupportKey();
 
-            _reporter.ReportSupportKey(supportKey);
+            reporter.ReportSupportKey(supportKey);
 
             if (context.Arguments.Any(a => a.Equals("--version", StringComparison.OrdinalIgnoreCase)) ||
                 context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase)))
@@ -114,13 +114,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 if (refitGeneratorSettings.OpenApiPaths == null || refitGeneratorSettings.OpenApiPaths.Length == 0)
                 {
                     var specPath = refitGeneratorSettings.OpenApiPath!;
-                    await ValidateOpenApiSpec(specPath, _reporter);
+                    await ValidateOpenApiSpec(specPath, reporter);
                 }
                 else
                 {
                     foreach (var specPath in refitGeneratorSettings.OpenApiPaths)
                     {
-                        await ValidateOpenApiSpec(specPath, _reporter);
+                        await ValidateOpenApiSpec(specPath, reporter);
                     }
                 }
             }
@@ -140,16 +140,16 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (refitGeneratorSettings.IncludePathMatches.Length > 0 &&
                 generator.OpenApiDocument.Paths.Count == 0)
             {
-                _reporter.ReportAllPathsFilteredWarning(refitGeneratorSettings.IncludePathMatches);
+                reporter.ReportAllPathsFilteredWarning(refitGeneratorSettings.IncludePathMatches);
             }
 
             // Success summary with performance metrics
             stopwatch.Stop();
-            _reporter.ReportSuccess(stopwatch.Elapsed, refitGeneratorSettings.GenerateMultipleFiles);
+            reporter.ReportSuccess(stopwatch.Elapsed, refitGeneratorSettings.GenerateMultipleFiles);
 
             if (!settings.NoBanner)
             {
-                _reporter.ReportDonationBanner();
+                reporter.ReportDonationBanner();
             }
 
             ShowWarnings(refitGeneratorSettings, settings);
@@ -158,24 +158,24 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         catch (Exception exception)
         {
             // Error summary panel
-            _reporter.ReportGenerationFailed();
+            reporter.ReportGenerationFailed();
 
             if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
             {
-                _reporter.ReportUnsupportedVersion(unsupportedSpecVersionException.SpecificationVersion);
+                reporter.ReportUnsupportedVersion(unsupportedSpecVersionException.SpecificationVersion);
             }
 
             if (exception is not OpenApiValidationException)
             {
-                _reporter.ReportExceptionDetails(exception);
+                reporter.ReportExceptionDetails(exception);
             }
 
             if (!settings.SkipValidation)
             {
-                _reporter.ReportSkipValidationSuggestion();
+                reporter.ReportSkipValidationSuggestion();
             }
 
-            _reporter.ReportSupportHelp();
+            reporter.ReportSupportHelp();
 
             await Analytics.LogError(exception, settings);
             return exception.HResult;
@@ -244,7 +244,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings)
     {
-        await _reporter.ReportSingleFileGenerationProgressAsync();
+        await reporter.ReportSingleFileGenerationProgressAsync();
 
         var code = generator.Generate().ReplaceLineEndings();
         var planned = OutputPlanner.PlanSingleFile(settings, refitGeneratorSettings, code);
@@ -254,10 +254,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         var sizeFormatted = FormatFileSize(code.Length);
         var lines = code.Split('\n').Length;
 
-        _reporter.ReportSingleFileOutput(fileName, directory, sizeFormatted, lines);
+        reporter.ReportSingleFileOutput(fileName, directory, sizeFormatted, lines);
 
         await FileWriter.WriteAsync(planned);
-        _reporter.ReportFileWritten(planned.Path);
+        reporter.ReportFileWritten(planned.Path);
     }
 
     private static string FormatFileSize(long bytes)
@@ -279,13 +279,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings)
     {
-        var generatorOutput = await _reporter.GenerateMultipleFilesWithProgressAsync(generator.GenerateMultipleFiles);
+        var generatorOutput = await reporter.GenerateMultipleFilesWithProgressAsync(generator.GenerateMultipleFiles);
         var planned = OutputPlanner.PlanMultipleFiles(settings, refitGeneratorSettings, generatorOutput);
 
         var totalSize = 0L;
         var totalLines = 0;
 
-        var report = _reporter.BeginMultiFileOutput();
+        var report = reporter.BeginMultiFileOutput();
 
         for (var i = 0; i < generatorOutput.Files.Count; i++)
         {
@@ -302,7 +302,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             totalLines += lines;
 
             await FileWriter.WriteAsync(plannedFile);
-            _reporter.ReportFileWritten(plannedFile.Path);
+            reporter.ReportFileWritten(plannedFile.Path);
         }
 
         report.Complete(generatorOutput.Files.Count, FormatFileSize(totalSize), totalLines);
@@ -333,7 +333,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         if (warnings.Any())
         {
-            _reporter.ReportConfigurationWarnings(warnings);
+            reporter.ReportConfigurationWarnings(warnings);
         }
     }
     private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings) =>

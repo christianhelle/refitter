@@ -7,14 +7,14 @@ namespace Refitter.Core;
 
 internal class InterfaceGenerator
 {
-    protected const string Separator = "    ";
+    private const string Separator = "    ";
     private static readonly Regex HttpResponseMessageTypeRegex = new("(Task|IObservable)<HttpResponseMessage>", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
     private static readonly Regex ApiResponseTypeRegex = new("(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
-    private readonly RefitGeneratorSettings _settings;
-    private readonly OpenApiDocument _document;
-    private readonly CustomCSharpClientGenerator _generator;
-    private readonly XmlDocumentationGenerator _docGenerator;
+    private readonly RefitGeneratorSettings settings;
+    private readonly OpenApiDocument document;
+    private readonly CustomCSharpClientGenerator generator;
+    private readonly XmlDocumentationGenerator docGenerator;
 
     internal InterfaceGenerator(
         RefitGeneratorSettings settings,
@@ -22,16 +22,16 @@ internal class InterfaceGenerator
         CustomCSharpClientGenerator generator,
         XmlDocumentationGenerator docGenerator)
     {
-        _settings = settings;
-        _document = document;
-        _generator = generator;
-        _docGenerator = docGenerator;
+        this.settings = settings;
+        this.document = document;
+        this.generator = generator;
+        this.docGenerator = docGenerator;
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
     public IEnumerable<GeneratedCode> Generate(IInterfacePartitioning partitioning)
     {
-        var operations = _document.Paths
+        var operations = document.Paths
             .SelectMany(path => path.Value, (path, op) => new OpenApiOperationInfo(path.Key, op.Key, op.Value))
             .ToList();
 
@@ -40,9 +40,9 @@ internal class InterfaceGenerator
             .ToList();
 
         var knownInterfaceIdentifiers = new HashSet<string>();
-        var title = _settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(_document.Info?.Title)
-            ? _document.Info!.Title.Sanitize()
-            : _settings.Naming.InterfaceName;
+        var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
+            ? document.Info!.Title.Sanitize()
+            : settings.Naming.InterfaceName;
 
         if (partitioning.IsSingleInterface)
         {
@@ -54,7 +54,7 @@ internal class InterfaceGenerator
             foreach (var group in groups)
             {
                 var nonDeprecatedOperations = group
-                    .Where(op => _settings.GenerateDeprecatedOperations || !op.Operation.IsDeprecated)
+                    .Where(op => settings.GenerateDeprecatedOperations || !op.Operation.IsDeprecated)
                     .ToList();
 
                 if (nonDeprecatedOperations.Count == 0)
@@ -84,7 +84,7 @@ internal class InterfaceGenerator
         var representativeOperation = operations.Count > 0
             ? operations[0]
             : new OpenApiOperationInfo(string.Empty, string.Empty, new OpenApiOperation());
-        partitioning.AppendInterfaceDocumentation(_document, _docGenerator, string.Empty, representativeOperation, code);
+        partitioning.AppendInterfaceDocumentation(document, docGenerator, string.Empty, representativeOperation, code);
         var interfaceDeclaration = GenerateInterfaceDeclaration(interfaceName, partitioning.IsSingleInterface);
         code.AppendLine(interfaceDeclaration);
         code.AppendLine($"{Separator}{{");
@@ -120,7 +120,7 @@ internal class InterfaceGenerator
         var interfaceName = IdentifierUtils.Counted(knownInterfaceIdentifiers, rawInterfaceName, interfaceNameSuffix);
 
         var code = new StringBuilder();
-        partitioning.AppendInterfaceDocumentation(_document, _docGenerator, groupKey, representativeOperation, code);
+        partitioning.AppendInterfaceDocumentation(document, docGenerator, groupKey, representativeOperation, code);
         var interfaceDeclaration = GenerateInterfaceDeclaration(interfaceName, partitioning.IsSingleInterface);
         code.AppendLine(interfaceDeclaration);
         code.AppendLine($"{Separator}{{");
@@ -150,7 +150,7 @@ internal class InterfaceGenerator
     {
         var operation = op.Operation;
 
-        if (!_settings.GenerateDeprecatedOperations && operation.IsDeprecated)
+        if (!settings.GenerateDeprecatedOperations && operation.IsDeprecated)
         {
             return (string.Empty, string.Empty);
         }
@@ -163,18 +163,18 @@ internal class InterfaceGenerator
         knownMethodIdentifiers.Add(methodName);
 
         var dynamicQuerystringParameterType = partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
-        var operationModel = _generator.CreateOperationModel(operation);
-        var parameters = ParameterExtractor.GetParameters(operationModel, operation, _settings, dynamicQuerystringParameterType, out var operationDynamicQuerystringParameters).ToList();
+        var operationModel = generator.CreateOperationModel(operation);
+        var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, dynamicQuerystringParameterType, out var operationDynamicQuerystringParameters).ToList();
 
         var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
         var parametersString = string.Join(", ", parameters);
-        var hasApizrRequestOptionsParameter = _settings.ApizrSettings?.WithRequestOptions == true;
-        var hasCancellationToken = _settings.UseCancellationTokens && !hasApizrRequestOptionsParameter;
+        var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
+        var hasCancellationToken = settings.UseCancellationTokens && !hasApizrRequestOptionsParameter;
         var isApiResponseType = IsApiResponseType(returnType);
 
-        if (_settings.GenerateXmlDocCodeComments)
+        if (settings.GenerateXmlDocCodeComments)
         {
-            _docGenerator.AppendMethodDocumentation(operationModel, isApiResponseType, hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, hasCancellationToken, code);
+            docGenerator.AppendMethodDocumentation(operationModel, isApiResponseType, hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, hasCancellationToken, code);
         }
 
         GenerateObsoleteAttribute(operation, code);
@@ -185,11 +185,11 @@ internal class InterfaceGenerator
             .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
             .AppendLine();
 
-        if (parametersString.Contains("?") && _settings is { OptionalParameters: true, ApizrSettings: not null })
+        if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
         {
-            if (_settings.GenerateXmlDocCodeComments)
+            if (settings.GenerateXmlDocCodeComments)
             {
-                _docGenerator.AppendMethodDocumentation(operationModel, isApiResponseType, false, hasApizrRequestOptionsParameter, hasCancellationToken, code);
+                docGenerator.AppendMethodDocumentation(operationModel, isApiResponseType, false, hasApizrRequestOptionsParameter, hasCancellationToken, code);
             }
 
             GenerateObsoleteAttribute(operation, code);
@@ -208,15 +208,15 @@ internal class InterfaceGenerator
 
     private string GetBaseOperationName(OpenApiOperationInfo op)
     {
-        return _generator
+        return generator
             .BaseSettings
             .OperationNameGenerator
-            .GetOperationName(_document, op.Path, op.Verb, op.Operation);
+            .GetOperationName(document, op.Path, op.Verb, op.Operation);
     }
 
     private string GetTypeName(OpenApiOperation operation)
     {
-        if (_settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
+        if (settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
         {
             return type is null or "void"
                 ? GetAsyncOperationType(true)
@@ -293,14 +293,14 @@ internal class InterfaceGenerator
     private string GetTypeName(string code, OpenApiOperation operation)
     {
         var schema = operation.Responses[code].ActualResponse.Schema;
-        var typeName = _generator.GetTypeName(schema, false, null);
+        var typeName = generator.GetTypeName(schema, false, null);
 
-        if (!string.IsNullOrWhiteSpace(_settings.CodeGeneratorSettings?.ArrayType) &&
+        if (!string.IsNullOrWhiteSpace(settings.CodeGeneratorSettings?.ArrayType) &&
             schema?.Type == NJsonSchema.JsonObjectType.Array)
         {
             typeName = typeName
-                .Replace("ICollection", _settings.CodeGeneratorSettings!.ArrayType)
-                .Replace("IEnumerable", _settings.CodeGeneratorSettings!.ArrayType);
+                .Replace("ICollection", settings.CodeGeneratorSettings!.ArrayType)
+                .Replace("IEnumerable", settings.CodeGeneratorSettings!.ArrayType);
         }
 
         return typeName;
@@ -316,7 +316,7 @@ internal class InterfaceGenerator
     private string GetDefaultReturnType()
     {
         var asyncType = GetAsyncOperationType(true);
-        return _settings.ReturnIApiResponse
+        return settings.ReturnIApiResponse
             ? $"{asyncType}<IApiResponse>"
             : asyncType;
     }
@@ -324,7 +324,7 @@ internal class InterfaceGenerator
     private string GetConfiguredReturnType(string returnTypeParameter)
     {
         var asyncType = GetAsyncOperationType(false);
-        return _settings.ReturnIApiResponse
+        return settings.ReturnIApiResponse
             ? $"{asyncType}<IApiResponse<{WellKnownNamespaces.TrimImportedNamespaces(returnTypeParameter)}>>"
             : $"{asyncType}<{WellKnownNamespaces.TrimImportedNamespaces(returnTypeParameter)}>";
     }
@@ -332,7 +332,7 @@ internal class InterfaceGenerator
     private string GetAsyncOperationType(bool withVoidReturnType)
     {
         var type = withVoidReturnType ? "<Unit>" : string.Empty;
-        return _settings.ReturnIObservable
+        return settings.ReturnIObservable
             ? "IObservable" + type
             : "Task";
     }
@@ -365,7 +365,7 @@ internal class InterfaceGenerator
     {
         var headers = new List<string>();
 
-        if (_settings.AddAcceptHeaders && _document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
+        if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
         {
             var uniqueContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var response in operation.Responses.Values)
@@ -385,7 +385,7 @@ internal class InterfaceGenerator
             }
         }
 
-        if (_settings.AddContentTypeHeaders && _document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
+        if (settings.AddContentTypeHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
         {
             var uniqueContentTypes = operation.RequestBody?.Content.Keys ?? Array.Empty<string>();
             var contentType =
@@ -398,12 +398,12 @@ internal class InterfaceGenerator
             }
         }
 
-        if (_settings.AuthenticationHeaderStyle == AuthenticationHeaderStyle.Method)
+        if (settings.AuthenticationHeaderStyle == AuthenticationHeaderStyle.Method)
         {
             foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
             {
-                if ((_settings.SecurityScheme != null && securitySchemeName != _settings.SecurityScheme) ||
-                    !_document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
+                if ((settings.SecurityScheme != null && securitySchemeName != settings.SecurityScheme) ||
+                    !document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
                 {
                     continue;
                 }
@@ -424,11 +424,11 @@ internal class InterfaceGenerator
 
     private string GenerateInterfaceDeclaration(string interfaceName, bool isSingleInterface)
     {
-        var inheritance = isSingleInterface && _settings.GenerateDisposableClients
+        var inheritance = isSingleInterface && settings.GenerateDisposableClients
             ? " : IDisposable"
             : null;
 
-        var modifier = _settings.TypeAccessibility.ToString().ToLowerInvariant();
+        var modifier = settings.TypeAccessibility.ToString().ToLowerInvariant();
         return $"""
                 {Separator}{GetGeneratedCodeAttribute()}
                 {Separator}{modifier} partial interface {interfaceName}{inheritance}

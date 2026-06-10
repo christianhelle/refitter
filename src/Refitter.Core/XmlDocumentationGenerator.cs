@@ -10,19 +10,8 @@ namespace Refitter.Core;
 /// </summary>
 public class XmlDocumentationGenerator
 {
-    /// <summary>
-    /// The global code generation settings.
-    /// </summary>
-    private readonly RefitGeneratorSettings _settings;
-
-    /// <summary>
-    /// The whitespace to use for a single level of indentation.
-    /// </summary>
+    private readonly RefitGeneratorSettings settings;
     private const string Separator = "    ";
-
-    /// <summary>
-    /// The name of the XML documentation tag used for summaries.
-    /// </summary>
     private const string SummaryTag = "summary";
 
     /// <summary>
@@ -31,7 +20,7 @@ public class XmlDocumentationGenerator
     /// <param name="settings">The code generation settings to use.</param>
     internal XmlDocumentationGenerator(RefitGeneratorSettings settings)
     {
-        this._settings = settings;
+        this.settings = settings;
     }
 
     /// <summary>
@@ -42,7 +31,7 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendInterfaceDocumentationByTag(OpenApiDocument document, string tag, StringBuilder code)
     {
-        if (!_settings.GenerateXmlDocCodeComments)
+        if (!settings.GenerateXmlDocCodeComments)
         {
             return;
         }
@@ -60,7 +49,7 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendInterfaceDocumentationByEndpoint(OpenApiOperation endpoint, StringBuilder code)
     {
-        if (!_settings.GenerateXmlDocCodeComments)
+        if (!settings.GenerateXmlDocCodeComments)
         {
             return;
         }
@@ -80,7 +69,7 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendSingleInterfaceDocumentation(OpenApiDocument document, StringBuilder code)
     {
-        if (!_settings.GenerateXmlDocCodeComments)
+        if (!settings.GenerateXmlDocCodeComments)
         {
             return;
         }
@@ -109,7 +98,7 @@ public class XmlDocumentationGenerator
         bool hasCancellationToken,
         StringBuilder code)
     {
-        if (!_settings.GenerateXmlDocCodeComments)
+        if (!settings.GenerateXmlDocCodeComments)
             return;
 
         if (!string.IsNullOrWhiteSpace(method.Summary))
@@ -309,7 +298,7 @@ public class XmlDocumentationGenerator
         var description = new StringBuilder(text);
         var responseList = responses.ToList();
 
-        if (!this._settings.GenerateStatusCodeComments || !responseList.Any())
+        if (!this.settings.GenerateStatusCodeComments || !responseList.Any())
             return description.Append(".").ToString();
 
         description.AppendLine(":")
