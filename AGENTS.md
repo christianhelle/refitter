@@ -60,6 +60,13 @@ Run these first if source generator tests fail with missing generated types.
 - **Source generator `.refitter` files** are automatically included as `AdditionalFiles` via the package props. The test project explicitly excludes `PropertyNamingPolicy.refitter` during design-time builds (`Condition="'$(DesignTimeBuild)' != 'true'"`).
 - **MSBuild** package includes a custom `.targets` file that runs `RefitterGenerateTask` before `BeforeCompile`.
 
+## Commit Discipline
+
+- **Commit as often as possible** in small, logical groups. Each commit should represent one coherent change (e.g., one file created, one bug fix, one adapter added).
+- **Build and run tests before every commit.** The minimum check is `dotnet build -c Release src/Refitter.slnx` followed by `dotnet test --solution src/Refitter.slnx -c Release --no-build`.
+- **Never commit broken code.** If tests fail, fix them before committing. If the fix requires additional changes, commit those together as a "fix: ..." commit.
+- **Commit messages** follow the pattern: `type: description` where type is one of `feat`, `fix`, `refactor`, `docs`, `test`, `chore`. Keep the subject line under 50 characters when possible.
+
 ## Documentation
 
 - API docs are generated with DocFX from `docs/docfx_project/docfx.json`. To build locally:
