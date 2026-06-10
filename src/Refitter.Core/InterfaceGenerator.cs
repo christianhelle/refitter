@@ -46,13 +46,21 @@ internal class InterfaceGenerator
 
         if (partitioning.IsSingleInterface)
         {
-            yield return GenerateSingleInterface(groups[0].ToList(), partitioning, title, knownInterfaceIdentifiers);
+            var singleGroup = groups.Count > 0 ? groups[0].ToList() : new List<OpenApiOperationInfo>();
+            yield return GenerateSingleInterface(singleGroup, partitioning, title, knownInterfaceIdentifiers);
         }
         else
         {
             foreach (var group in groups)
             {
-                foreach (var generatedCode in GenerateMultipleInterface(group.ToList(), partitioning, title, knownInterfaceIdentifiers))
+                var nonDeprecatedOperations = group
+                    .Where(op => _settings.GenerateDeprecatedOperations || !op.Operation.IsDeprecated)
+                    .ToList();
+
+                if (nonDeprecatedOperations.Count == 0)
+                    continue;
+
+                foreach (var generatedCode in GenerateMultipleInterface(nonDeprecatedOperations, partitioning, title, knownInterfaceIdentifiers))
                 {
                     yield return generatedCode;
                 }
@@ -66,14 +74,16 @@ internal class InterfaceGenerator
         string title,
         HashSet<string> knownInterfaceIdentifiers)
     {
-        var representativeOperation = operations[0];
-        var baseOperationName = GetBaseOperationName(representativeOperation);
+        var baseOperationName = operations.Count > 0 ? GetBaseOperationName(operations[0]) : string.Empty;
         var rawInterfaceName = partitioning.GetInterfaceName(string.Empty, title, baseOperationName);
         var interfaceNameSuffix = partitioning.GetInterfaceNameSuffix();
         var interfaceName = IdentifierUtils.Counted(knownInterfaceIdentifiers, rawInterfaceName, interfaceNameSuffix);
 
         var code = new StringBuilder();
         var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
+        var representativeOperation = operations.Count > 0
+            ? operations[0]
+            : new OpenApiOperationInfo(string.Empty, string.Empty, new OpenApiOperation());
         partitioning.AppendInterfaceDocumentation(_document, _docGenerator, string.Empty, representativeOperation, code);
         var interfaceDeclaration = GenerateInterfaceDeclaration(interfaceName, partitioning.IsSingleInterface);
         code.AppendLine(interfaceDeclaration);

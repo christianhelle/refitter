@@ -26,6 +26,11 @@ internal interface IInterfacePartitioning
     string GetDynamicQuerystringParameterType(string interfaceName, string methodName);
 
     /// <summary>
+    /// Gets the suffix appended to the interface name for deduplication.
+    /// </summary>
+    string GetInterfaceNameSuffix();
+
+    /// <summary>
     /// True if this partitioning generates exactly one interface.
     /// </summary>
     bool IsSingleInterface { get; }
