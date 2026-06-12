@@ -15,17 +15,20 @@ internal class InterfaceGenerator
     private readonly OpenApiDocument document;
     private readonly CustomCSharpClientGenerator generator;
     private readonly XmlDocumentationGenerator docGenerator;
+    private readonly IParameterExtractor parameterExtractor;
 
     internal InterfaceGenerator(
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
-        XmlDocumentationGenerator docGenerator)
+        XmlDocumentationGenerator docGenerator,
+        IParameterExtractor? parameterExtractor = null)
     {
         this.settings = settings;
         this.document = document;
         this.generator = generator;
         this.docGenerator = docGenerator;
+        this.parameterExtractor = parameterExtractor ?? new ParameterAggregator();
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
@@ -164,7 +167,7 @@ internal class InterfaceGenerator
 
         var dynamicQuerystringParameterType = partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
         var operationModel = generator.CreateOperationModel(operation);
-        var parameters = ParameterExtractor.GetParameters(operationModel, operation, settings, dynamicQuerystringParameterType, out var operationDynamicQuerystringParameters).ToList();
+        var parameters = parameterExtractor.ExtractParameters(operationModel, operation, settings, dynamicQuerystringParameterType, out var operationDynamicQuerystringParameters).ToList();
 
         var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
         var parametersString = string.Join(", ", parameters);

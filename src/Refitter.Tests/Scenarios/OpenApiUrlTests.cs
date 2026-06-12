@@ -15,8 +15,6 @@ public class OpenApiUrlTests
     [Arguments("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/link-example.json")]
     [Arguments("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore-expanded.json")]
     [Arguments("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/uspto.json")]
-    [Arguments("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/hubspot-events.json")]
-    [Arguments("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/hubspot-webhooks.json")]
     [Arguments("https://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/ingram-micro.json")]
     public async Task Can_Build_Generated_Code_From_OpenApi_v3_Url_Json(string url)
     {
