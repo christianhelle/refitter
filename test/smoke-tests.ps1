@@ -182,12 +182,12 @@ function CleanGeneratedCode
 {
     try {
         if (Test-Path './GeneratedCode') {
-            Get-ChildItem './GeneratedCode' -Recurse -Include '*.cs' -ErrorAction SilentlyContinue |
-                ForEach-Object { Remove-Item -Path $_.FullName -Force }
-            Get-ChildItem './GeneratedCode' -Directory -ErrorAction SilentlyContinue |
-                ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force }
+            Remove-Item -Path './GeneratedCode' -Recurse -Force
         }
-    } catch { }
+        New-Item -ItemType Directory -Path './GeneratedCode' -Force | Out-Null
+    } catch {
+        Write-Log "Warning: Could not fully clean GeneratedCode directory: $_"
+    }
 }
 
 function RunGenerationTasks
@@ -332,6 +332,7 @@ function RunTests
     GenerateFromSettingsFile -settingsFile "./Apizr/petstore.apizr.refitter" -processPath $processPath -useDocker $UseDocker
     BuildSolution -solution "./Apizr/Sample.csproj" -noRestore
 
+    CleanGeneratedCode
     GenerateFromSettingsFile -settingsFile "./MultipleFiles/petstore.refitter" -processPath $processPath -useDocker $UseDocker
     BuildSolution -solution "MultipleFiles/Client/Client.csproj"
 
@@ -565,6 +566,7 @@ function RunTests
     Write-Log ""
     Write-Log "=== Phase 4b: Generate-only: MultipleInterfacesWithCustomName (petstore) ==="
     Write-Log ""
+    CleanGeneratedCode
     $customNameSpec = "./OpenAPI/v3.0/petstore.json"
     $customNameArgs = "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync"
     $customNameOutput = "./GeneratedCode/MultipleInterfacesWithCustomName_generateonly.cs"
@@ -605,11 +607,6 @@ function RunTests
         $urlFormat = if ($url.EndsWith(".json")) { "json" } else { "yaml" }
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.generated.cs"
-
-        try {
-            Get-ChildItem './GeneratedCode/*.cs' -Recurse -ErrorAction SilentlyContinue |
-                ForEach-Object { Remove-Item -Path $_.FullName -Force }
-        } catch { }
 
         $result = StartRefitter `
             -arguments """$url"" --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging" `
