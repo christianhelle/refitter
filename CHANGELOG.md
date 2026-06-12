@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - \[Architecture\] Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1123](https://github.com/christianhelle/refitter/issues/1123)
+- \[Architecture\] Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
 - Ensure Refit v11 compatibility [\#1111](https://github.com/christianhelle/refitter/pull/1111) ([christianhelle](https://github.com/christianhelle))
 - Fix missing interface XML docs in multi-interface generation [\#1110](https://github.com/christianhelle/refitter/pull/1110) ([christianhelle](https://github.com/christianhelle))
@@ -18,6 +19,7 @@
 
 **Merged pull requests:**
 
+- Refactor ParameterExtractor by splitting into parameter-type extractors [\#1125](https://github.com/christianhelle/refitter/pull/1125) ([christianhelle](https://github.com/christianhelle))
 - Refactor interface generator [\#1114](https://github.com/christianhelle/refitter/pull/1114) ([christianhelle](https://github.com/christianhelle))
 - build\(deps\): bump codecov/codecov-action from 6 to 7 [\#1113](https://github.com/christianhelle/refitter/pull/1113) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Remove Squad [\#1112](https://github.com/christianhelle/refitter/pull/1112) ([christianhelle](https://github.com/christianhelle))
