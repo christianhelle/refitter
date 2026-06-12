@@ -26,7 +26,7 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
     }
 
     public string GetInterfaceName(string groupKey, string title, string baseOperationName) =>
-        $"I{groupKey.CapitalizeFirstCharacter()}";
+        $"I{groupKey.CapitalizeFirstCharacter()}".Sanitize();
 
     public string GetInterfaceNameSuffix() => "Api";
 

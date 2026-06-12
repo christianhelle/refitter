@@ -10,7 +10,7 @@ internal class ByEndpointInterfacePartitioning(
     public string GetGroupKey(OpenApiOperationInfo operation) => $"{operation.Path}#{operation.Verb}";
 
     public string GetInterfaceName(string groupKey, string title, string baseOperationName) =>
-        "I" + baseOperationName.CapitalizeFirstCharacter();
+        $"I{baseOperationName.CapitalizeFirstCharacter()}".Sanitize();
 
     public string GetInterfaceNameSuffix() => "Endpoint";
 
