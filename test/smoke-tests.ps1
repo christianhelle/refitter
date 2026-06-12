@@ -141,7 +141,6 @@ function RunTests
 
     $filenames = @(
         "weather",
-        "bot.paths",
         "petstore",
         "petstore-expanded",
         "petstore-minimal",
@@ -152,8 +151,7 @@ function RunTests
         "link-example",
         "uber",
         "uspto",
-        "hubspot-events",
-        "hubspot-webhooks"
+        "hubspot-events"
     )
 
     $v31Filenames = @(

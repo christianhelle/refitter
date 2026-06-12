@@ -5,7 +5,7 @@ namespace Refitter.Tests.Apizr;
 
 public class ApizrGeneratorWithPollyTests
 {
-    private readonly RefitGeneratorSettings _extendedSettings = new()
+    private readonly RefitGeneratorSettings extendedSettings = new()
     {
         DependencyInjectionSettings = new DependencyInjectionSettings
         {
@@ -35,7 +35,7 @@ public class ApizrGeneratorWithPollyTests
     public void Can_Generate_Extended_Registration_For_Single_Interface()
     {
         string code = ApizrRegistrationGenerator.Generate(
-            _extendedSettings,
+            extendedSettings,
             [
                 "IPetApi"
             ],
@@ -48,7 +48,7 @@ public class ApizrGeneratorWithPollyTests
     public void Can_Generate_Extended_Registration_For_Multiple_Interfaces()
     {
         string code = ApizrRegistrationGenerator.Generate(
-            _extendedSettings,
+            extendedSettings,
             [
                 "IPetApi",
                 "IStoreApi"
@@ -63,7 +63,7 @@ public class ApizrGeneratorWithPollyTests
     public void Can_Generate_With_HttpMessageHandlers()
     {
         string code = ApizrRegistrationGenerator.Generate(
-            _extendedSettings,
+            extendedSettings,
             new[]
             {
                 "IPetApi",
@@ -78,7 +78,7 @@ public class ApizrGeneratorWithPollyTests
     public void Can_Generate_With_Polly()
     {
         string code = ApizrRegistrationGenerator.Generate(
-            _extendedSettings,
+            extendedSettings,
             new[]
             {
                 "IPetApi",
@@ -93,9 +93,9 @@ public class ApizrGeneratorWithPollyTests
     [Test]
     public void Can_Generate_Without_Polly()
     {
-        _extendedSettings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
+        extendedSettings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
         string code = ApizrRegistrationGenerator.Generate(
-            _extendedSettings,
+            extendedSettings,
             new[]
             {
                 "IPetApi",
@@ -111,9 +111,9 @@ public class ApizrGeneratorWithPollyTests
     [Test]
     public void Can_Generate_Without_BaseUrl()
     {
-        _extendedSettings.DependencyInjectionSettings!.BaseUrl = null;
+        extendedSettings.DependencyInjectionSettings!.BaseUrl = null;
         string code = ApizrRegistrationGenerator.Generate(
-            _extendedSettings,
+            extendedSettings,
             new[]
             {
                 "IPetApi",
