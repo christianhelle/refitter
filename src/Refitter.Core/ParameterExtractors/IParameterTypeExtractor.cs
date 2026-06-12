@@ -9,8 +9,14 @@ internal interface IParameterTypeExtractor
 {
     bool CanExtract(OpenApiParameterKind kind);
 
-    IEnumerable<string> Extract(
+    bool CanExtract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings);
+
+    IEnumerable<string> Extract(
+        CSharpOperationModel operationModel,
+        OpenApiOperation operation,
+        RefitGeneratorSettings settings,
+        string? dynamicQuerystringParameterType = null);
 }

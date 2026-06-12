@@ -10,10 +10,19 @@ internal sealed class QueryParameterExtractor : IParameterTypeExtractor
 {
     public bool CanExtract(OpenApiParameterKind kind) => kind == OpenApiParameterKind.Query;
 
-    public IEnumerable<string> Extract(
+    public bool CanExtract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
+    {
+        return operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Query);
+    }
+
+    public IEnumerable<string> Extract(
+        CSharpOperationModel operationModel,
+        OpenApiOperation operation,
+        RefitGeneratorSettings settings,
+        string? dynamicQuerystringParameterType = null)
     {
         var queryParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
@@ -74,7 +83,11 @@ internal sealed class QueryParameterExtractor : IParameterTypeExtractor
                 propertiesCodeBuilder.AppendLine();
             }
 
-            var dynamicQuerystringParameterType = $"QueryParamsFor{queryParameters.Count}";
+            // Use the caller-supplied type name, or fall back to a generated name
+            if (string.IsNullOrEmpty(dynamicQuerystringParameterType))
+            {
+                dynamicQuerystringParameterType = $"QueryParamsFor{queryParameters.Count}";
+            }
 
             var codeBuilder = new StringBuilder();
             codeBuilder.AppendLine(

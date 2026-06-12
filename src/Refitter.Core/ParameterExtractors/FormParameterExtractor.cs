@@ -11,10 +11,27 @@ internal sealed class FormParameterExtractor : IParameterTypeExtractor
 {
     public bool CanExtract(OpenApiParameterKind kind) => kind == OpenApiParameterKind.FormData;
 
-    public IEnumerable<string> Extract(
+    public bool CanExtract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
+    {
+        // Check if there are form data parameters in operationModel.Parameters
+        if (operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.FormData))
+            return true;
+
+        // Check if there's a multipart/form-data request body
+        if (operation.RequestBody?.Content?.ContainsKey("multipart/form-data") == true)
+            return true;
+
+        return false;
+    }
+
+    public IEnumerable<string> Extract(
+        CSharpOperationModel operationModel,
+        OpenApiOperation operation,
+        RefitGeneratorSettings settings,
+        string? dynamicQuerystringParameterType = null)
     {
         var seenFormParameterNames = new HashSet<string>(StringComparer.Ordinal);
         var formParameters = new List<string>();

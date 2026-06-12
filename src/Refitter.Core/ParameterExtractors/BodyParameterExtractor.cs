@@ -10,10 +10,19 @@ internal sealed class BodyParameterExtractor : IParameterTypeExtractor
 {
     public bool CanExtract(OpenApiParameterKind kind) => kind == OpenApiParameterKind.Body;
 
-    public IEnumerable<string> Extract(
+    public bool CanExtract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
+    {
+        return operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Body);
+    }
+
+    public IEnumerable<string> Extract(
+        CSharpOperationModel operationModel,
+        OpenApiOperation operation,
+        RefitGeneratorSettings settings,
+        string? dynamicQuerystringParameterType = null)
     {
         var parameters = new List<string>();
 

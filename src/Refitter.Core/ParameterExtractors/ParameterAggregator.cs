@@ -33,18 +33,14 @@ internal sealed class ParameterAggregator : IParameterExtractor
     {
         var parameters = new List<string>();
 
+        // Iterate through extractors and call CanExtract/Extract
         foreach (var extractor in _extractors)
         {
-            var kind = GetKindForExtractor(extractor);
-            if (kind == null)
-                continue;
-
-            var hasParameters = operationModel.Parameters.Any(p => p.Kind == kind);
-            if (!hasParameters)
-                continue;
-
-            var extracted = extractor.Extract(operationModel, operation, settings);
-            parameters.AddRange(extracted);
+            if (extractor.CanExtract(operationModel, operation, settings))
+            {
+                var extracted = extractor.Extract(operationModel, operation, settings, dynamicQuerystringParameterType);
+                parameters.AddRange(extracted);
+            }
         }
 
         // Extract dynamic querystring parameters code
@@ -76,18 +72,6 @@ internal sealed class ParameterAggregator : IParameterExtractor
         return parameters;
     }
 
-    private static OpenApiParameterKind? GetKindForExtractor(IParameterTypeExtractor extractor)
-    {
-        return extractor switch
-        {
-            RouteParameterExtractor => OpenApiParameterKind.Path,
-            QueryParameterExtractor => OpenApiParameterKind.Query,
-            BodyParameterExtractor => OpenApiParameterKind.Body,
-            HeaderParameterExtractor => OpenApiParameterKind.Header,
-            FormParameterExtractor => OpenApiParameterKind.FormData,
-            _ => null
-        };
-    }
 
     private static string ExtractDynamicQuerystringCode(
         CSharpOperationModel operationModel,

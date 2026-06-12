@@ -10,10 +10,19 @@ internal sealed class RouteParameterExtractor : IParameterTypeExtractor
 {
     public bool CanExtract(OpenApiParameterKind kind) => kind == OpenApiParameterKind.Path;
 
-    public IEnumerable<string> Extract(
+    public bool CanExtract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
+    {
+        return operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Path);
+    }
+
+    public IEnumerable<string> Extract(
+        CSharpOperationModel operationModel,
+        OpenApiOperation operation,
+        RefitGeneratorSettings settings,
+        string? dynamicQuerystringParameterType = null)
     {
         return operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Path)

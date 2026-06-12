@@ -17,10 +17,49 @@ internal sealed class HeaderParameterExtractor : IParameterTypeExtractor
 
     public bool CanExtract(OpenApiParameterKind kind) => kind == OpenApiParameterKind.Header;
 
-    public IEnumerable<string> Extract(
+    public bool CanExtract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
+    {
+        // Check if there are header parameters in operationModel.Parameters
+        if (_settings.GenerateOperationHeaders &&
+            operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader))
+            return true;
+
+        // Check if there are security headers to generate
+        if (_settings.AuthenticationHeaderStyle == AuthenticationHeaderStyle.Parameter)
+        {
+            var document = operation.Parent.Parent;
+            foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
+            {
+                if ((_settings.SecurityScheme != null && securitySchemeName != _settings.SecurityScheme) ||
+                    !document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
+                {
+                    continue;
+                }
+
+                if (securityScheme.Type == OpenApiSecuritySchemeType.ApiKey
+                    && securityScheme.In == OpenApiSecurityApiKeyLocation.Header)
+                {
+                    return true;
+                }
+                else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http }
+                    && string.Equals(securityScheme.Scheme, "bearer", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public IEnumerable<string> Extract(
+        CSharpOperationModel operationModel,
+        OpenApiOperation operation,
+        RefitGeneratorSettings settings,
+        string? dynamicQuerystringParameterType = null)
     {
         var headerParameters = new List<string>();
 
