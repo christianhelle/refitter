@@ -221,6 +221,8 @@ function RunTests
 
     $processPath = GetProcessPath -buildFromSource $BuildFromSource -useDocker $UseDocker
 
+    CleanGeneratedCode
+
     $filenames = @(
         "weather",
         "bot.paths",
@@ -710,6 +712,8 @@ function RunTests
         if ($result.ExitCode -ne 0) { throw "Combination test FAILED: '$($combo.Name)' [exit: $($result.ExitCode)]`n  Args: $($combo.Args)`n  Command: $($result.Command)`n  Output: $($result.Output)" }
     }
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore -smokeTest
+
+    CleanGeneratedCode
 }
 
 if ($UseProduction)
