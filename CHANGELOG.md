@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- \[Architecture\] Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1123](https://github.com/christianhelle/refitter/issues/1123)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
 - Ensure Refit v11 compatibility [\#1111](https://github.com/christianhelle/refitter/pull/1111) ([christianhelle](https://github.com/christianhelle))
 - Fix missing interface XML docs in multi-interface generation [\#1110](https://github.com/christianhelle/refitter/pull/1110) ([christianhelle](https://github.com/christianhelle))
@@ -17,6 +18,7 @@
 
 **Merged pull requests:**
 
+- Refactor interface generator [\#1114](https://github.com/christianhelle/refitter/pull/1114) ([christianhelle](https://github.com/christianhelle))
 - build\(deps\): bump codecov/codecov-action from 6 to 7 [\#1113](https://github.com/christianhelle/refitter/pull/1113) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Remove Squad [\#1112](https://github.com/christianhelle/refitter/pull/1112) ([christianhelle](https://github.com/christianhelle))
 - Upgrade Refit to v10.2.0 due to critical bugs found in 10.1.6 [\#1108](https://github.com/christianhelle/refitter/pull/1108) ([christianhelle](https://github.com/christianhelle))
