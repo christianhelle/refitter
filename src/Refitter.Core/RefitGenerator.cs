@@ -153,7 +153,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         // (pre-generation) operation IDs. GenerateFile() auto-populates operation IDs
         // with globally unique names which would prevent the switch to the path segments
         // generator, causing unnecessary numeric suffixes in ByTag mode.
-        var interfaceGenerator = CreateInterfaceGenerator(generator, docGenerator);
+        var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
 
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
@@ -210,7 +210,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         // (pre-generation) operation IDs. GenerateFile() auto-populates operation IDs
         // with globally unique names which would prevent the switch to the path segments
         // generator, causing unnecessary numeric suffixes in ByTag mode.
-        var interfaceGenerator = CreateInterfaceGenerator(generator, docGenerator);
+        var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
 
         var contracts = generator.GenerateFile();
         contracts = SanitizeGeneratedContracts(contracts);
@@ -269,17 +269,6 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         }
 
         return new GeneratorOutput(generatedFiles);
-    }
-
-    /// <summary>
-    /// Creates the interface generator based on settings.
-    /// This must be called before GenerateFile() to ensure operation ID detection works correctly.
-    /// </summary>
-    private InterfaceGenerator CreateInterfaceGenerator(
-        CustomCSharpClientGenerator generator,
-        XmlDocumentationGenerator docGenerator)
-    {
-        return new InterfaceGenerator(settings, document, generator, docGenerator);
     }
 
     private IInterfacePartitioning GetInterfacePartitioning()
