@@ -36,7 +36,7 @@ internal class InterfaceGenerator
             .ToList();
 
         var groups = operations
-            .GroupBy(op => partitioning.GetGroupKey(op))
+            .GroupBy(partitioning.GetGroupKey)
             .ToList();
 
         var knownInterfaceIdentifiers = new HashSet<string>();
