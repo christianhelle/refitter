@@ -11,23 +11,6 @@ namespace Refitter.Tests;
 public class FormParameterExtractorTests
 {
     [Test]
-    public void CanExtract_Returns_True_For_FormData()
-    {
-        var extractor = new FormParameterExtractor();
-        extractor.CanExtract(OpenApiParameterKind.FormData).Should().BeTrue();
-    }
-
-    [Test]
-    public void CanExtract_Returns_False_For_Non_FormData()
-    {
-        var extractor = new FormParameterExtractor();
-        extractor.CanExtract(OpenApiParameterKind.Query).Should().BeFalse();
-        extractor.CanExtract(OpenApiParameterKind.Path).Should().BeFalse();
-        extractor.CanExtract(OpenApiParameterKind.Header).Should().BeFalse();
-        extractor.CanExtract(OpenApiParameterKind.Body).Should().BeFalse();
-    }
-
-    [Test]
     public void Extract_Returns_Empty_When_No_FormData_Parameters()
     {
         var extractor = new FormParameterExtractor();
