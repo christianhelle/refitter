@@ -46,7 +46,10 @@ public class RefitterGenerateTask : MSBuildTask
 
     public RefitterGenerateTask()
     {
-        var processRunner = new DefaultProcessRunner();
+        var processRunner = new DefaultProcessRunner
+        {
+            TimeoutMilliseconds = ProcessTimeoutMilliseconds
+        };
         ProcessRunner = processRunner;
         RuntimeResolver = new DefaultRuntimeResolver(processRunner);
         FileExists = System.IO.File.Exists;
