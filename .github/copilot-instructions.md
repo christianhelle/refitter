@@ -111,28 +111,34 @@ images/                 # Project images and assets
 
 ### Unit Testing Patterns
 
-All new code must include unit tests following the pattern used in `Refitter.Tests.Scenarios` namespace:
+All new code must include unit tests following the pattern used in `Refitter.Tests.Scenarios` namespace.
+
+The project uses **TUnit v1.47.0** as its testing framework (not xUnit). TUnit provides significantly faster test execution (3x faster than xUnit), which improves both local development and CI/CD pipeline performance.
+
+Use TUnit's `[Test]` attribute for test methods:
 
 ```csharp
+using TUnit.Core;
+
 public class MyFeatureTests
 {
     private const string OpenApiSpec = @"..."; // OpenAPI specification
 
-    [Fact]
+    [Test]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Test]
     public async Task Generated_Code_Contains_Expected_Pattern()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("ExpectedPattern");
     }
 
-    [Fact]
+    [Test]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
