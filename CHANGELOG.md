@@ -23,6 +23,7 @@
 
 **Merged pull requests:**
 
+- Inline FileWriter and WellKnownNamespaces utility modules [\#1130](https://github.com/christianhelle/refitter/pull/1130) ([christianhelle](https://github.com/christianhelle))
 - Extract GenerationOrchestrator from GenerateCommand [\#1128](https://github.com/christianhelle/refitter/pull/1128) ([christianhelle](https://github.com/christianhelle))
 - Extract GenerationPipeline from RefitGenerator orchestration [\#1127](https://github.com/christianhelle/refitter/pull/1127) ([christianhelle](https://github.com/christianhelle))
 - Refactor ParameterExtractor by splitting into parameter-type extractors [\#1125](https://github.com/christianhelle/refitter/pull/1125) ([christianhelle](https://github.com/christianhelle))
