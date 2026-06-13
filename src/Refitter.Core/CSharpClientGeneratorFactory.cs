@@ -74,11 +74,8 @@ internal class CSharpClientGeneratorFactory
             csharpClientGeneratorSettings.ParameterNameGenerator = settings.ParameterNameGenerator;
         }
 
-        if (settings.UsePolymorphicSerialization)
-        {
-            csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory
-                = new CustomTemplateFactory(csharpClientGeneratorSettings.CSharpGeneratorSettings);
-        }
+        csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory
+            = new CustomTemplateFactory(csharpClientGeneratorSettings.CSharpGeneratorSettings);
 
         var generator = new CustomCSharpClientGenerator(
             document,
