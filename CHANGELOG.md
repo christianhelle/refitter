@@ -7,8 +7,11 @@
 **Implemented enhancements:**
 
 - \[Architecture\] Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1123](https://github.com/christianhelle/refitter/issues/1123)
+- \[Architecture\] Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1122](https://github.com/christianhelle/refitter/issues/1122)
+- \[Architecture\] Deepen RefitterGenerateTask: Replace AsyncLocal test hooks with real seams [\#1121](https://github.com/christianhelle/refitter/issues/1121)
 - \[Architecture\] Fix RefitterSourceGenerator: Remove blocking I/O and async-over-sync in source generator [\#1120](https://github.com/christianhelle/refitter/issues/1120)
 - \[Architecture\] Inline shallow utility modules: CustomCSharpClientGenerator, FileWriter, Serializer, etc. [\#1119](https://github.com/christianhelle/refitter/issues/1119)
+- Architecture Deepening: Refitter Core Code Generation Modules [\#1118](https://github.com/christianhelle/refitter/issues/1118)
 - \[Architecture\] Deepen GenerateCommand: Extract GenerationOrchestrator from thick CLI command [\#1117](https://github.com/christianhelle/refitter/issues/1117)
 - \[Architecture\] Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
 - \[Architecture\] Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
@@ -23,6 +26,7 @@
 
 **Merged pull requests:**
 
+- Improve code coverage [\#1132](https://github.com/christianhelle/refitter/pull/1132) ([christianhelle](https://github.com/christianhelle))
 - Refactor RefitGenerator to add synchronous factory method and fix RS1035 [\#1131](https://github.com/christianhelle/refitter/pull/1131) ([christianhelle](https://github.com/christianhelle))
 - Inline FileWriter and WellKnownNamespaces utility modules [\#1130](https://github.com/christianhelle/refitter/pull/1130) ([christianhelle](https://github.com/christianhelle))
 - Refactor MSBuild [\#1129](https://github.com/christianhelle/refitter/pull/1129) ([christianhelle](https://github.com/christianhelle))
