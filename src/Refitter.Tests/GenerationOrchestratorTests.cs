@@ -183,7 +183,7 @@ public class GenerationOrchestratorTests
     }
 
     [Test]
-    public async Task RunAsync_With_NoBanner_True_Still_Completes_Successfully()
+    public async Task RunAsync_With_NoBanner_False_Still_Completes_Successfully()
     {
         var workspace = Path.Combine(
             AppContext.BaseDirectory,
@@ -361,12 +361,16 @@ public class GenerationOrchestratorTests
                 SkipValidation = true,
             };
 
-            var reporter = new SimpleGenerationReporter();
+            var reporter = new TestGenerationReporter();
             var orchestrator = new GenerationOrchestrator();
             var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
+
+            reporter.ConfigurationWarnings.Should().ContainSingle();
+            reporter.ConfigurationWarnings[0].Title.Should().Be("Date Format Override");
+            reporter.ConfigurationWarnings[0].Description.Should().Contain("useIsoDateFormat");
         }
         finally
         {
@@ -429,12 +433,16 @@ public class GenerationOrchestratorTests
                 SkipValidation = true,
             };
 
-            var reporter = new SimpleGenerationReporter();
+            var reporter = new TestGenerationReporter();
             var orchestrator = new GenerationOrchestrator();
             var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
+
+            reporter.ConfigurationWarnings.Should().ContainSingle();
+            reporter.ConfigurationWarnings[0].Title.Should().Be("Deprecated Setting");
+            reporter.ConfigurationWarnings[0].Description.Should().Contain("usePolly");
         }
         finally
         {
@@ -492,11 +500,14 @@ public class GenerationOrchestratorTests
                 SkipValidation = true,
             };
 
-            var reporter = new SimpleGenerationReporter();
+            var reporter = new TestGenerationReporter();
             var orchestrator = new GenerationOrchestrator();
             var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
+            reporter.AllPathsFilteredWarningCalled.Should().BeTrue();
+            reporter.AllPathsFilteredMatchPatterns.Should().ContainSingle()
+                .Which.Should().Be("^/nonexistent$");
         }
         finally
         {
@@ -558,4 +569,51 @@ public class GenerationOrchestratorTests
         exactly1M.Should().Match("1* MB");
     }
 
+    /// <summary>
+    /// Test implementation of IGenerationReporter that captures warnings for verification.
+    /// </summary>
+    private sealed class TestGenerationReporter : IGenerationReporter
+    {
+        public List<(string Title, string Description)> ConfigurationWarnings { get; } = [];
+        public bool AllPathsFilteredWarningCalled { get; private set; }
+        public IReadOnlyList<string> AllPathsFilteredMatchPatterns { get; private set; } = [];
+
+        public void ReportHeader(string version) { }
+        public void ReportSupportKey(string supportKey) { }
+        public Task ReportSingleFileGenerationProgressAsync() => Task.CompletedTask;
+        public void ReportSingleFileOutput(string fileName, string directory, string sizeFormatted, int lines) { }
+        public Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate) => Task.FromResult(generate());
+        public IMultiFileOutputReport BeginMultiFileOutput() => new TestMultiFileOutputReport();
+        public void ReportFileWritten(string outputPath) { }
+        public async Task<OpenApiValidationResult> ValidateWithProgressAsync(Func<Task<OpenApiValidationResult>> validate) => await validate();
+        public void ReportValidationFailed() { }
+        public void ReportValidationDiagnostic(OpenApiError error, bool isError) { }
+        public void ReportValidationStatistics(OpenApiValidationResult validationResult) { }
+        public void ReportSuccess(TimeSpan duration, bool multipleFiles) { }
+        public void ReportDonationBanner() { }
+
+        public void ReportConfigurationWarnings(IReadOnlyList<(string Title, string Description)> warnings)
+        {
+            ConfigurationWarnings.AddRange(warnings);
+        }
+
+        public void ReportAllPathsFilteredWarning(IReadOnlyList<string> matchPatterns)
+        {
+            AllPathsFilteredWarningCalled = true;
+            AllPathsFilteredMatchPatterns = matchPatterns;
+        }
+
+        public void ReportSettingsFileGenerated(string settingsFilePath) { }
+        public void ReportGenerationFailed() { }
+        public void ReportUnsupportedVersion(string specificationVersion) { }
+        public void ReportExceptionDetails(Exception exception) { }
+        public void ReportSkipValidationSuggestion() { }
+        public void ReportSupportHelp() { }
+
+        private sealed class TestMultiFileOutputReport : IMultiFileOutputReport
+        {
+            public void AddFile(string fileName, string directory, string sizeFormatted, int lines) { }
+            public void Complete(int fileCount, string totalSizeFormatted, int totalLines) { }
+        }
+    }
 }
