@@ -217,13 +217,18 @@ internal class InterfaceGenerator
             .GetOperationName(document, op.Path, op.Verb, op.Operation);
     }
 
+    private static string TrimImportedNamespaces(string returnTypeParameter) =>
+        returnTypeParameter.StartsWith("System.Collections.Generic.", StringComparison.OrdinalIgnoreCase)
+            ? returnTypeParameter.Replace("System.Collections.Generic.", string.Empty)
+            : returnTypeParameter;
+
     private string GetTypeName(OpenApiOperation operation)
     {
         if (settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
         {
             return type is null or "void"
                 ? GetAsyncOperationType(true)
-                : $"{GetAsyncOperationType(false)}<{WellKnownNamespaces.TrimImportedNamespaces(type)}>";
+                : $"{GetAsyncOperationType(false)}<{TrimImportedNamespaces(type)}>";
         }
 
         if (IsFileStreamResponse(operation))
@@ -328,8 +333,8 @@ internal class InterfaceGenerator
     {
         var asyncType = GetAsyncOperationType(false);
         return settings.ReturnIApiResponse
-            ? $"{asyncType}<IApiResponse<{WellKnownNamespaces.TrimImportedNamespaces(returnTypeParameter)}>>"
-            : $"{asyncType}<{WellKnownNamespaces.TrimImportedNamespaces(returnTypeParameter)}>";
+            ? $"{asyncType}<IApiResponse<{TrimImportedNamespaces(returnTypeParameter)}>>"
+            : $"{asyncType}<{TrimImportedNamespaces(returnTypeParameter)}>";
     }
 
     private string GetAsyncOperationType(bool withVoidReturnType)
