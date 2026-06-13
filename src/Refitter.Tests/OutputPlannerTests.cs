@@ -147,4 +147,131 @@ public class OutputPlannerTests
         planned.Content.Should().Be("// generated");
         planned.Path.Should().Be(Path.Combine("Generated", "Api.cs"));
     }
+
+    [Test]
+    public void SingleFile_SettingsFile_CliOverride_Output_Uses_CliPath()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings
+        {
+            SettingsFilePath = settingsFilePath,
+            OutputPath = Path.Combine("CustomCli", "Override.cs")
+        };
+        var refitSettings = new RefitGeneratorSettings { OutputFolder = "./Generated", OutputFilename = "Output.cs" };
+
+        var expected = Path.Combine(
+            Path.GetDirectoryName(settingsFilePath)!,
+            "CustomCli",
+            "Override.cs");
+        OutputPlanner.GetSingleFileOutputPath(settings, refitSettings).Should().Be(expected);
+    }
+
+    [Test]
+    public void SingleFile_SettingsFile_NoOutputOverride_Uses_SettingsFile_OutputFolder_And_Filename()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings { SettingsFilePath = settingsFilePath, OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings { OutputFolder = "./CustomFolder", OutputFilename = "CustomOutput.cs" };
+
+        var expected = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./CustomFolder", "CustomOutput.cs");
+        OutputPlanner.GetSingleFileOutputPath(settings, refitSettings).Should().Be(expected);
+    }
+
+    [Test]
+    public void SingleFile_SettingsFile_DefaultOutputFolder_Uses_DefaultFolder()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings { SettingsFilePath = settingsFilePath, OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings { OutputFilename = "ApiClient.cs" };
+
+        var expected = Path.Combine(
+            Path.GetDirectoryName(settingsFilePath)!,
+            RefitGeneratorSettings.DefaultOutputFolder,
+            "ApiClient.cs");
+        OutputPlanner.GetSingleFileOutputPath(settings, refitSettings).Should().Be(expected);
+    }
+
+    [Test]
+    public void SingleFile_SettingsFile_Rooted_Path_Does_Not_Combine_With_Root()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings { SettingsFilePath = settingsFilePath, OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings { OutputFolder = Path.GetTempPath() };
+
+        var expected = Path.Combine(Path.GetTempPath(), "Output.cs");
+        OutputPlanner.GetSingleFileOutputPath(settings, refitSettings).Should().Be(expected);
+    }
+
+    [Test]
+    public void SingleFile_DirectCli_Defaults_To_DefaultOutputPath()
+    {
+        var settings = new Settings { SettingsFilePath = null, OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings();
+
+        OutputPlanner.GetSingleFileOutputPath(settings, refitSettings).Should().Be(Settings.DefaultOutputPath);
+    }
+
+    [Test]
+    public void SingleFile_DirectCli_Empty_SettingsFilePath_Defaults()
+    {
+        var settings = new Settings { SettingsFilePath = string.Empty, OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings();
+
+        OutputPlanner.GetSingleFileOutputPath(settings, refitSettings).Should().Be(Settings.DefaultOutputPath);
+    }
+
+    [Test]
+    public void MultiFile_DirectCli_Default_Output_Uses_Current_Directory()
+    {
+        var settings = new Settings { OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings { OutputFolder = "./Generated" };
+
+        OutputPlanner.GetMultiFileOutputPath(settings, refitSettings, new GeneratedCode("RefitInterfaces", "// code"))
+            .Should().Be(Path.Combine(".", "RefitInterfaces.cs"));
+    }
+
+    [Test]
+    public void MultiFile_SettingsFile_Uses_RefitGeneratorSettings_OutputFolder()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings { SettingsFilePath = settingsFilePath, OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings { OutputFolder = "./ApiClient" };
+
+        var expected = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./ApiClient", "RefitInterfaces.cs");
+        OutputPlanner.GetMultiFileOutputPath(settings, refitSettings, new GeneratedCode("RefitInterfaces", "// code"))
+            .Should().Be(expected);
+    }
+
+    [Test]
+    public void MultiFile_SettingsFile_Rooted_OutputFolder_Does_Not_Combine_With_Root()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings { SettingsFilePath = settingsFilePath, OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings { OutputFolder = Path.GetTempPath() };
+
+        var expected = Path.Combine(Path.GetTempPath(), "RefitInterfaces.cs");
+        OutputPlanner.GetMultiFileOutputPath(settings, refitSettings, new GeneratedCode("RefitInterfaces", "// code"))
+            .Should().Be(expected);
+    }
+
+    [Test]
+    public void ShouldReroute_Is_False_When_Contracts_Folder_Equals_DefaultOutputFolder()
+    {
+        var refitSettings = new RefitGeneratorSettings { ContractsOutputFolder = "./Generated" };
+
+        OutputPlanner.ShouldRerouteToContractsFolder(refitSettings, new GeneratedCode(TypenameConstants.Contracts, "// code"))
+            .Should().BeFalse();
+    }
+
+    [Test]
+    public void GetContractsOutputPath_Without_SettingsFilePath_Uses_ContractsFolder_Directly()
+    {
+        var settings = new Settings();
+        var refitSettings = new RefitGeneratorSettings { ContractsOutputFolder = "./Contracts" };
+        var outputFile = new GeneratedCode(TypenameConstants.Contracts, "// code");
+
+        var contractsFolder = Path.GetFullPath("./Contracts");
+        OutputPlanner.GetContractsOutputPath(settings, refitSettings, outputFile)
+            .Should().Be(Path.Combine(contractsFolder, TypenameConstants.Contracts + ".cs"));
+    }
 }
