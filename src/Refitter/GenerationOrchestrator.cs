@@ -100,7 +100,10 @@ public sealed class GenerationOrchestrator : IGenerationOrchestrator
 
         reporter.ReportSingleFileOutput(fileName, directory, sizeFormatted, lines);
 
-        await FileWriter.WriteAsync(planned);
+        var dir = Path.GetDirectoryName(planned.Path);
+        if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
+        await File.WriteAllTextAsync(planned.Path, planned.Content);
         reporter.ReportFileWritten(planned.Path);
     }
 
@@ -136,7 +139,10 @@ public sealed class GenerationOrchestrator : IGenerationOrchestrator
             totalSize += size;
             totalLines += lines;
 
-            await FileWriter.WriteAsync(plannedFile);
+            var plannedDir = Path.GetDirectoryName(plannedFile.Path);
+            if (!string.IsNullOrWhiteSpace(plannedDir) && !Directory.Exists(plannedDir))
+                Directory.CreateDirectory(plannedDir);
+            await File.WriteAllTextAsync(plannedFile.Path, plannedFile.Content);
             reporter.ReportFileWritten(plannedFile.Path);
         }
 

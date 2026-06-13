@@ -165,12 +165,16 @@ internal static class ParameterShared
         return typeName;
     }
 
+    private static string TrimImportedNamespaces(string returnTypeParameter) =>
+        returnTypeParameter.StartsWith("System.Collections.Generic.", StringComparison.OrdinalIgnoreCase)
+            ? returnTypeParameter.Replace("System.Collections.Generic.", string.Empty)
+            : returnTypeParameter;
+
     public static string GetParameterType(
         ParameterModelBase parameterModel,
         RefitGeneratorSettings settings)
     {
-        var type = WellKnownNamespaces
-            .TrimImportedNamespaces(
+        var type = TrimImportedNamespaces(
                 FindSupportedType(
                     parameterModel.Type));
 
@@ -198,7 +202,7 @@ internal static class ParameterShared
     public static string GetBodyAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
     {
         var anyType = settings.CodeGeneratorSettings?.AnyType ?? "object";
-        var parameterType = WellKnownNamespaces.TrimImportedNamespaces(FindSupportedType(parameter.Type));
+        var parameterType = TrimImportedNamespaces(FindSupportedType(parameter.Type));
 
         if (parameterType.Equals(anyType, StringComparison.OrdinalIgnoreCase) ||
             parameterType.Contains("JsonElement", StringComparison.OrdinalIgnoreCase))
