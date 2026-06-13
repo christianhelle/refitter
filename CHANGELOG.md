@@ -7,10 +7,12 @@
 **Implemented enhancements:**
 
 - \[Architecture\] Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1123](https://github.com/christianhelle/refitter/issues/1123)
+- Architecture Deepening: Refitter Core Code Generation Modules [\#1118](https://github.com/christianhelle/refitter/issues/1118)
 - \[Architecture\] Deepen GenerateCommand: Extract GenerationOrchestrator from thick CLI command [\#1117](https://github.com/christianhelle/refitter/issues/1117)
 - \[Architecture\] Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
 - \[Architecture\] Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
+- Refactor MSBuild [\#1129](https://github.com/christianhelle/refitter/pull/1129) ([christianhelle](https://github.com/christianhelle))
 - Ensure Refit v11 compatibility [\#1111](https://github.com/christianhelle/refitter/pull/1111) ([christianhelle](https://github.com/christianhelle))
 - Fix missing interface XML docs in multi-interface generation [\#1110](https://github.com/christianhelle/refitter/pull/1110) ([christianhelle](https://github.com/christianhelle))
 - Add JsonLibraryVersion property and CLI support for code generation [\#1106](https://github.com/christianhelle/refitter/pull/1106) ([christianhelle](https://github.com/christianhelle))
