@@ -274,4 +274,59 @@ public class OutputPlannerTests
         OutputPlanner.GetContractsOutputPath(settings, refitSettings, outputFile)
             .Should().Be(Path.Combine(contractsFolder, TypenameConstants.Contracts + ".cs"));
     }
+
+    [Test]
+    public void SingleFile_SettingsFile_NullOutputFilename_Uses_Default()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings { SettingsFilePath = settingsFilePath, OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./CustomFolder",
+            OutputFilename = null!
+        };
+
+        var expected = Path.Combine(
+            Path.GetDirectoryName(settingsFilePath)!,
+            "./CustomFolder",
+            "Output.cs");
+        OutputPlanner.GetSingleFileOutputPath(settings, refitSettings).Should().Be(expected);
+    }
+
+    [Test]
+    public void SingleFile_SettingsFile_NullOutputFolder_Uses_Filename_Directly()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings { SettingsFilePath = settingsFilePath, OutputPath = Settings.DefaultOutputPath };
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = null!,
+            OutputFilename = "ApiClient.cs"
+        };
+
+        var expected = Path.Combine(
+            Path.GetDirectoryName(settingsFilePath)!,
+            "ApiClient.cs");
+        OutputPlanner.GetSingleFileOutputPath(settings, refitSettings).Should().Be(expected);
+    }
+
+    [Test]
+    public void MultiFile_SettingsFile_NullOutputFolder_Uses_Filename_Directly()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var settings = new Settings
+        {
+            SettingsFilePath = settingsFilePath,
+            OutputPath = Settings.DefaultOutputPath
+        };
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = null!,
+        };
+
+        OutputPlanner.GetMultiFileOutputPath(settings, refitSettings, new GeneratedCode("RefitInterfaces", "// code"))
+            .Should().Be(Path.Combine(
+                Path.GetDirectoryName(settingsFilePath)!,
+                "RefitInterfaces.cs"));
+    }
 }
