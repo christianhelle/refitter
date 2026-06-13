@@ -569,6 +569,262 @@ public class GenerationOrchestratorTests
         exactly1M.Should().Match("1* MB");
     }
 
+    [Test]
+    public async Task RunAsync_With_SkipValidation_False_And_Valid_Spec_Succeeds()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "spec.json");
+            var outputPath = Path.Combine(workspace, "Output.cs");
+            Directory.CreateDirectory(workspace);
+
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": { "title": "Test API", "version": "1.0.0" },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "responses": { "200": { "description": "ok" } }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+                GenerateContracts = false,
+                GenerateClients = true,
+            };
+
+            var cliSettings = new Settings
+            {
+                OpenApiPath = openApiPath,
+                OutputPath = outputPath,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = false,
+            };
+
+            var reporter = new CapturingGenerationReporter();
+            var orchestrator = new GenerationOrchestrator();
+            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+
+            result.Should().Be(0);
+            File.Exists(outputPath).Should().BeTrue();
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    [Test]
+    public async Task RunAsync_With_Both_Warnings_Displayed()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "spec.json");
+            var outputPath = Path.Combine(workspace, "Output.cs");
+            Directory.CreateDirectory(workspace);
+
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": { "title": "Test API", "version": "1.0.0" },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "responses": { "200": { "description": "ok" } }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+                GenerateContracts = false,
+                GenerateClients = true,
+                UseIsoDateFormat = true,
+                CodeGeneratorSettings = new CodeGeneratorSettings
+                {
+                    DateFormat = "dd/MM/yyyy"
+                },
+#pragma warning disable CS0618
+                DependencyInjectionSettings = new DependencyInjectionSettings
+                {
+                    UsePolly = true
+                },
+#pragma warning restore CS0618
+            };
+
+            var cliSettings = new Settings
+            {
+                OpenApiPath = openApiPath,
+                OutputPath = outputPath,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = true,
+            };
+
+            var reporter = new TestGenerationReporter();
+            var orchestrator = new GenerationOrchestrator();
+            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+
+            result.Should().Be(0);
+            File.Exists(outputPath).Should().BeTrue();
+
+            reporter.ConfigurationWarnings.Should().HaveCount(2);
+            reporter.ConfigurationWarnings.Should().Contain(w => w.Title == "Date Format Override");
+            reporter.ConfigurationWarnings.Should().Contain(w => w.Title == "Deprecated Setting");
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    [Test]
+    public async Task RunAsync_With_SkipValidation_False_And_Non_Existent_File_Shows_SkipValidation_Suggestion()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "nonexistent.json");
+            Directory.CreateDirectory(workspace);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+            };
+
+            var cliSettings = new Settings
+            {
+                OpenApiPath = openApiPath,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = false,
+            };
+
+            var reporter = new CapturingGenerationReporter();
+            var orchestrator = new GenerationOrchestrator();
+            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+
+            result.Should().NotBe(0);
+            reporter.GenerationFailedCalled.Should().BeTrue();
+            reporter.ExceptionDetailsCalled.Should().BeTrue();
+            reporter.SkipValidationSuggestionCalled.Should().BeTrue();
+            reporter.SupportHelpCalled.Should().BeTrue();
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    [Test]
+    public async Task RunAsync_With_SettingsFilePath_Resolves_Paths_And_Does_Not_Write_Settings_File()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var settingsDir = Path.Combine(workspace, "settings");
+            var openApiPath = Path.Combine(settingsDir, "spec.json");
+            var outputPath = Path.Combine(workspace, "Output.cs");
+            var settingsFilePath = Path.Combine(settingsDir, ".refitter");
+            Directory.CreateDirectory(settingsDir);
+
+            var spec = """
+                {
+                  "openapi": "3.0.0",
+                  "info": { "title": "Test API", "version": "1.0.0" },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "responses": { "200": { "description": "ok" } }
+                      }
+                    }
+                  }
+                }
+                """;
+
+            File.WriteAllText(openApiPath, spec);
+            File.WriteAllText(
+                settingsFilePath,
+                """{"openApiPath": "spec.json", "namespace": "TestNamespace"}""");
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+                GenerateContracts = false,
+                GenerateClients = true,
+            };
+
+            var cliSettings = new Settings
+            {
+                SettingsFilePath = settingsFilePath,
+                OpenApiPath = openApiPath,
+                OutputPath = outputPath,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = true,
+            };
+
+            var reporter = new SimpleGenerationReporter();
+            var orchestrator = new GenerationOrchestrator();
+            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+
+            result.Should().Be(0);
+            File.Exists(outputPath).Should().BeTrue();
+
+            // The .refitter settings file should not have been written because SettingsFilePath is set
+            var refitterFilesInWorkspace = Directory.GetFiles(workspace, "*.refitter", SearchOption.AllDirectories);
+            refitterFilesInWorkspace.Length.Should().Be(1);
+            refitterFilesInWorkspace[0].Should().Be(settingsFilePath);
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
     /// <summary>
     /// Test implementation of IGenerationReporter that captures warnings for verification.
     /// </summary>
@@ -609,6 +865,64 @@ public class GenerationOrchestratorTests
         public void ReportExceptionDetails(Exception exception) { }
         public void ReportSkipValidationSuggestion() { }
         public void ReportSupportHelp() { }
+
+        private sealed class TestMultiFileOutputReport : IMultiFileOutputReport
+        {
+            public void AddFile(string fileName, string directory, string sizeFormatted, int lines) { }
+            public void Complete(int fileCount, string totalSizeFormatted, int totalLines) { }
+        }
+    }
+
+    /// <summary>
+    /// Test implementation of IGenerationReporter that captures all calls for verification.
+    /// </summary>
+    private sealed class CapturingGenerationReporter : IGenerationReporter
+    {
+        public string? SupportKey { get; private set; }
+        public bool GenerationFailedCalled { get; private set; }
+        public bool ExceptionDetailsCalled { get; private set; }
+        public bool SkipValidationSuggestionCalled { get; private set; }
+        public bool SupportHelpCalled { get; private set; }
+        public bool ValidationFailedCalled { get; private set; }
+        public string? UnsupportedVersion { get; private set; }
+        public bool DonationBannerCalled { get; private set; }
+        public List<(string Title, string Description)> ConfigurationWarnings { get; } = [];
+
+        public void ReportHeader(string version) { }
+        public void ReportSupportKey(string supportKey) => SupportKey = supportKey;
+        public Task ReportSingleFileGenerationProgressAsync() => Task.CompletedTask;
+        public void ReportSingleFileOutput(string fileName, string directory, string sizeFormatted, int lines) { }
+
+        public Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate) =>
+            Task.FromResult(generate());
+
+        public IMultiFileOutputReport BeginMultiFileOutput() => new TestMultiFileOutputReport();
+        public void ReportFileWritten(string outputPath) { }
+
+        public async Task<OpenApiValidationResult> ValidateWithProgressAsync(
+            Func<Task<OpenApiValidationResult>> validate) => await validate();
+
+        public void ReportValidationFailed() => ValidationFailedCalled = true;
+
+        public void ReportValidationDiagnostic(OpenApiError error, bool isError) { }
+
+        public void ReportValidationStatistics(OpenApiValidationResult validationResult) { }
+
+        public void ReportSuccess(TimeSpan duration, bool multipleFiles) { }
+        public void ReportDonationBanner() => DonationBannerCalled = true;
+
+        public void ReportConfigurationWarnings(IReadOnlyList<(string Title, string Description)> warnings) =>
+            ConfigurationWarnings.AddRange(warnings);
+
+        public void ReportAllPathsFilteredWarning(IReadOnlyList<string> matchPatterns) { }
+        public void ReportSettingsFileGenerated(string settingsFilePath) { }
+        public void ReportGenerationFailed() => GenerationFailedCalled = true;
+        public void ReportUnsupportedVersion(string specificationVersion) => UnsupportedVersion = specificationVersion;
+
+        public void ReportExceptionDetails(Exception exception) => ExceptionDetailsCalled = true;
+
+        public void ReportSkipValidationSuggestion() => SkipValidationSuggestionCalled = true;
+        public void ReportSupportHelp() => SupportHelpCalled = true;
 
         private sealed class TestMultiFileOutputReport : IMultiFileOutputReport
         {
