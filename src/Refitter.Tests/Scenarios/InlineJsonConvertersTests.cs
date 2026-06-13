@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -131,10 +130,8 @@ public class InlineJsonConvertersTests
             }
         };
 
-        var method = typeof(RefitGenerator).GetMethod("SanitizeGeneratedContracts", BindingFlags.Instance | BindingFlags.NonPublic);
-        method.Should().NotBeNull();
-
-        var result = (string)method!.Invoke(new RefitGenerator(settings, new OpenApiDocument()), new object[] { contracts })!;
+        var injector = new EnumStringConverterInjector();
+        var result = injector.Process(new OpenApiDocument(), settings, contracts);
 
         result.Should().Contain("[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]\r\npublic enum PetStatus");
         Regex.Matches(result, "(?<!\\r)\\n").Should().BeEmpty();
