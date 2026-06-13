@@ -85,6 +85,13 @@ internal class CSharpClientGeneratorFactory
             settings.CodeGeneratorSettings,
             generator.Settings.CSharpGeneratorSettings);
 
+        var useNativeRecords = settings.ImmutableRecords ||
+                               generator.Settings.CSharpGeneratorSettings.GenerateNativeRecords;
+        generator.Settings.CSharpGeneratorSettings.GenerateNativeRecords = useNativeRecords;
+        generator.Settings.CSharpGeneratorSettings.ClassStyle = useNativeRecords
+            ? CSharpClassStyle.Record
+            : CSharpClassStyle.Poco;
+
         return generator;
     }
 
@@ -174,6 +181,7 @@ internal class CSharpClientGeneratorFactory
         destination.GenerateDefaultValues = source.GenerateDefaultValues;
         destination.InlineNamedAny = source.InlineNamedAny;
         destination.ExcludedTypeNames = source.ExcludedTypeNames;
+        destination.JsonLibraryVersion = source.JsonLibraryVersion;
 
         if (source.PropertyNameGenerator != null)
         {
