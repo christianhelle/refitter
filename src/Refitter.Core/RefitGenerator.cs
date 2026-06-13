@@ -17,6 +17,25 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     public OpenApiDocument OpenApiDocument => document;
 
     /// <summary>
+    /// Creates a new instance of the <see cref="RefitGenerator"/> class synchronously
+    /// from a pre-loaded <see cref="OpenApiDocument"/>.
+    /// </summary>
+    /// <param name="document">The pre-loaded OpenAPI document.</param>
+    /// <param name="settings">The settings used to configure the generator.</param>
+    /// <returns>A new instance of the <see cref="RefitGenerator"/> class.</returns>
+    public static RefitGenerator Create(OpenApiDocument document, RefitGeneratorSettings settings)
+    {
+        if (document == null) throw new ArgumentNullException(nameof(document));
+        if (settings == null) throw new ArgumentNullException(nameof(settings));
+
+        ProcessTagFilters(document, settings.IncludeTags);
+        ProcessPathFilters(document, settings.IncludePathMatches);
+        ProcessContractFilter(document, settings.TrimUnusedSchema, settings.KeepSchemaPatterns, settings.IncludeInheritanceHierarchy);
+
+        return new RefitGenerator(settings, document);
+    }
+
+    /// <summary>
     /// Creates a new instance of the <see cref="RefitGenerator"/> class asynchronously.
     /// </summary>
     /// <param name="settings">The settings used to configure the generator.</param>
@@ -24,12 +43,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     public static async Task<RefitGenerator> CreateAsync(RefitGeneratorSettings settings)
     {
         var openApiDocument = await GetOpenApiDocument(settings).ConfigureAwait(false);
-
-        ProcessTagFilters(openApiDocument, settings.IncludeTags);
-        ProcessPathFilters(openApiDocument, settings.IncludePathMatches);
-        ProcessContractFilter(openApiDocument, settings.TrimUnusedSchema, settings.KeepSchemaPatterns, settings.IncludeInheritanceHierarchy);
-
-        return new RefitGenerator(settings, openApiDocument);
+        return Create(openApiDocument, settings);
     }
 
     private static async Task<OpenApiDocument> GetOpenApiDocument(RefitGeneratorSettings settings)
