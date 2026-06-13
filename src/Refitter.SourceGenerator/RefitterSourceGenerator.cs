@@ -60,10 +60,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         }
     }
 
-    [SuppressMessage(
-        "MicrosoftCodeAnalysisCorrectness",
-        "RS1035:Do not use APIs banned for analyzers",
-        Justification = "By design")]
     internal static GeneratedCode GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
@@ -105,8 +101,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            // Create unique hint name based on the full .refitter file path to avoid collisions
-            // when multiple .refitter files with the same name exist in different directories
             var hintName = CreateUniqueHintName(file.Path, settings.OutputFilename);
 
             return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), refit, hintName);
@@ -158,7 +152,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
     private static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings settings)
     {
-        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty;
+        var lastSep = settingsFilePath.LastIndexOfAny(new[] { '/', '\\' });
+        var settingsFileDirectory = lastSep >= 0 ? settingsFilePath.Substring(0, lastSep) : string.Empty;
         RefitterSettingsLoader.ResolveRelativeSpecPaths(settings, settingsFileDirectory);
     }
 
@@ -215,37 +210,33 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 diagnostic.EnabledByDefault),
             Location.None);
 
-    /// <summary>
-    /// Creates a unique hint name for AddSource that prevents collisions when multiple
-    /// .refitter files with the same name exist in different directories.
-    /// </summary>
-    /// <param name="refitterFilePath">The full path to the .refitter file</param>
-    /// <param name="outputFilename">Optional explicit output filename from settings</param>
-    /// <returns>A unique hint name safe for AddSource</returns>
     private static string CreateUniqueHintName(string refitterFilePath, string? outputFilename)
     {
-        // If an explicit output filename is set, use it as the base for the hint name
-        // but still include path disambiguation to prevent collisions
         var baseName = !string.IsNullOrWhiteSpace(outputFilename)
-            ? Path.GetFileNameWithoutExtension(outputFilename)
-            : Path.GetFileNameWithoutExtension(refitterFilePath);
+            ? GetFileNameWithoutExtension(outputFilename!)
+            : GetFileNameWithoutExtension(refitterFilePath);
 
         if (string.IsNullOrEmpty(baseName) || baseName == ".")
         {
             baseName = RefitterDiagnosticTitle;
         }
 
-        // Create a stable unique suffix from the full .refitter path so files in the same
-        // directory can still coexist even when they share the same explicit output filename.
         if (!string.IsNullOrWhiteSpace(refitterFilePath))
         {
-            var normalizedPath = Path.GetFullPath(refitterFilePath)
-                .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var normalizedPath = refitterFilePath.Replace('/', '\\');
             var pathHash = GetStableHash(normalizedPath);
             return $"{baseName}_{pathHash}.g.cs";
         }
 
         return $"{baseName}.g.cs";
+    }
+
+    private static string GetFileNameWithoutExtension(string path)
+    {
+        var lastSep = path.LastIndexOfAny(new[] { '/', '\\' });
+        var fileName = lastSep >= 0 ? path.Substring(lastSep + 1) : path;
+        var lastDot = fileName.LastIndexOf('.');
+        return lastDot >= 0 ? fileName.Substring(0, lastDot) : fileName;
     }
 
     /// <summary>
