@@ -6,15 +6,15 @@
 
 **Implemented enhancements:**
 
-- \[Architecture\] Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1123](https://github.com/christianhelle/refitter/issues/1123)
-- \[Architecture\] Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1122](https://github.com/christianhelle/refitter/issues/1122)
-- \[Architecture\] Deepen RefitterGenerateTask: Replace AsyncLocal test hooks with real seams [\#1121](https://github.com/christianhelle/refitter/issues/1121)
-- \[Architecture\] Fix RefitterSourceGenerator: Remove blocking I/O and async-over-sync in source generator [\#1120](https://github.com/christianhelle/refitter/issues/1120)
-- \[Architecture\] Inline shallow utility modules: CustomCSharpClientGenerator, FileWriter, Serializer, etc. [\#1119](https://github.com/christianhelle/refitter/issues/1119)
+- Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1123](https://github.com/christianhelle/refitter/issues/1123)
+- Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1122](https://github.com/christianhelle/refitter/issues/1122)
+- Deepen RefitterGenerateTask: Replace AsyncLocal test hooks with real seams [\#1121](https://github.com/christianhelle/refitter/issues/1121)
+- Fix RefitterSourceGenerator: Remove blocking I/O and async-over-sync in source generator [\#1120](https://github.com/christianhelle/refitter/issues/1120)
+- Inline shallow utility modules: CustomCSharpClientGenerator, FileWriter, Serializer, etc. [\#1119](https://github.com/christianhelle/refitter/issues/1119)
 - Architecture Deepening: Refitter Core Code Generation Modules [\#1118](https://github.com/christianhelle/refitter/issues/1118)
-- \[Architecture\] Deepen GenerateCommand: Extract GenerationOrchestrator from thick CLI command [\#1117](https://github.com/christianhelle/refitter/issues/1117)
-- \[Architecture\] Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
-- \[Architecture\] Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
+- Deepen GenerateCommand: Extract GenerationOrchestrator from thick CLI command [\#1117](https://github.com/christianhelle/refitter/issues/1117)
+- Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
+- Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
 - Ensure Refit v11 compatibility [\#1111](https://github.com/christianhelle/refitter/pull/1111) ([christianhelle](https://github.com/christianhelle))
 - Fix missing interface XML docs in multi-interface generation [\#1110](https://github.com/christianhelle/refitter/pull/1110) ([christianhelle](https://github.com/christianhelle))
