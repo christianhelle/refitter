@@ -11,7 +11,7 @@ namespace Refitter;
 /// Two adapters implement it: <see cref="SimpleGenerationReporter"/> (plain text,
 /// machine-friendly) and <see cref="RichGenerationReporter"/> (Spectre.Console).
 /// </summary>
-internal interface IGenerationReporter
+public interface IGenerationReporter
 {
     void ReportHeader(string version);
 
@@ -69,7 +69,7 @@ internal interface IGenerationReporter
 /// prints each row as it is added (interleaved with file writes); the rich
 /// reporter buffers rows into a table rendered on <see cref="Complete"/>.
 /// </summary>
-internal interface IMultiFileOutputReport
+public interface IMultiFileOutputReport
 {
     void AddFile(string fileName, string directory, string sizeFormatted, int lines);
 
