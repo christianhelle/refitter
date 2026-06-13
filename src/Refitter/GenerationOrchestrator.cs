@@ -5,7 +5,7 @@ using Refitter.Validation;
 
 namespace Refitter;
 
-public sealed class GenerationOrchestrator : IGenerationOrchestrator
+public sealed class GenerationOrchestrator
 {
     public async Task<int> RunAsync(
         RefitGeneratorSettings refitGeneratorSettings,
