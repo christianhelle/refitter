@@ -95,42 +95,13 @@ internal static class ParameterExtractor
         string dynamicQuerystringParameterType,
         out string? dynamicQuerystringParameters)
     {
-        var queryParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .ToList();
-
-        List<string>? parameters = null;
-        var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
-
-        if (settings.UseDynamicQuerystringParameters && queryParameters.Count >= 2)
+        var extractor = new QueryParameterExtractor
         {
-            var dynamicQuerystringCode = DynamicQuerystringParameterBuilder.Build(
-                queryParameters,
-                dynamicQuerystringParameterType,
-                settings);
-
-            if (!string.IsNullOrWhiteSpace(dynamicQuerystringCode))
-            {
-                dynamicQuerystringParametersCodeBuilder.Append(dynamicQuerystringCode);
-            }
-
-            var allNullable = queryParameters.All(p =>
-                ParameterShared.GetQueryParameterType(p, settings).EndsWith("?"));
-
-            var dynamicQuerystringParameter = $"[Query] {dynamicQuerystringParameterType}";
-            if (allNullable)
-                dynamicQuerystringParameter += "?";
-            dynamicQuerystringParameter += " queryParams";
-            parameters = [dynamicQuerystringParameter];
-        }
-
-        dynamicQuerystringParameters = dynamicQuerystringParametersCodeBuilder.Length > 0
-            ? dynamicQuerystringParametersCodeBuilder.ToString()
-            : null;
-
-        parameters ??= QueryParameterExtractor.ExtractSimple(operationModel, settings).ToList();
-
-        return parameters;
+            DynamicQuerystringParameterType = dynamicQuerystringParameterType
+        };
+        var result = extractor.Extract(operationModel, new OpenApiOperation(), settings).ToList();
+        dynamicQuerystringParameters = extractor.DynamicQuerystringCode;
+        return result;
     }
 
     private static void AppendXmlDocComment(string description, StringBuilder codeBuilder) =>
