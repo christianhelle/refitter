@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 using FluentAssertions;
 using Microsoft.Build.Framework;
 using Refitter.MSBuild;
@@ -386,18 +385,21 @@ public class RefitterGenerateTaskTests
         {
             CreateRefitterSettingsFile(workspace);
             var generatedFile = CreateGeneratedFile(workspace);
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => throw new InvalidOperationException("boom");
-            RefitterGenerateTask.FileExists = path =>
-                path.EndsWith("refitter.dll", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
-            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
-            {
-                startInfo.Arguments.Should().Contain("net8.0");
-                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
-                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
-            };
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.RuntimeResolver = new DelegatingRuntimeResolver { Handler = () => throw new InvalidOperationException("boom") };
+            task.FileExists = path =>
+                path.EndsWith("refitter.dll", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (startInfo, logOutput, _) =>
+                {
+                    startInfo.Arguments.Should().Contain("net8.0");
+                    logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                    return new ProcessExecutionResult(false, 0);
+                }
+            };
 
             var result = task.Execute();
 
@@ -408,7 +410,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -416,26 +417,18 @@ public class RefitterGenerateTaskTests
     [Test]
     public void ResolveRefitterDll_Should_Fall_Back_When_Preferred_Runtime_Binary_Is_Missing()
     {
-        try
-        {
-            var packageFolder = Path.Combine("C:", "repo", "tasks");
-            var messages = new List<string>();
-            RefitterGenerateTask.FileExists = path =>
-                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
-                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase);
+        var packageFolder = Path.Combine("C:", "repo", "tasks");
+        var messages = new List<string>();
 
-            var result = RefitterGenerateTask.ResolveRefitterDll(
-                packageFolder,
-                ["Microsoft.NETCore.App 10.0.1", "Microsoft.NETCore.App 9.0.5"],
-                messages.Add);
+        var result = RefitterGenerateTask.ResolveRefitterDll(
+            packageFolder,
+            ["Microsoft.NETCore.App 10.0.1", "Microsoft.NETCore.App 9.0.5"],
+            messages.Add,
+            path => path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                    path.Contains("net8.0", StringComparison.OrdinalIgnoreCase));
 
-            result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net9.0", "refitter.dll")));
-            messages.Should().Contain(message => message.Contains("Detected .NET 9.0 runtime", StringComparison.Ordinal));
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net9.0", "refitter.dll")));
+        messages.Should().Contain(message => message.Contains("Detected .NET 9.0 runtime", StringComparison.Ordinal));
     }
 
     [Test]
@@ -443,7 +436,7 @@ public class RefitterGenerateTaskTests
     {
         var messages = new List<string>();
 
-        var result = RefitterGenerateTask.ResolveRefitterDll(" ", ["Microsoft.NETCore.App 10.0.0"], messages.Add);
+        var result = RefitterGenerateTask.ResolveRefitterDll(" ", ["Microsoft.NETCore.App 10.0.0"], messages.Add, _ => true);
 
         result.Should().BeNull();
         messages.Should().BeEmpty();
@@ -452,166 +445,130 @@ public class RefitterGenerateTaskTests
     [Test]
     public void ResolveRefitterDll_Should_Ignore_Whitespace_Runtime_Entries_When_Falling_Back()
     {
-        try
-        {
-            var packageFolder = Path.Combine("C:", "repo", "tasks");
-            var messages = new List<string>();
-            var net8Path = Path.GetFullPath(Path.Combine(packageFolder, "..", "net8.0", "refitter.dll"));
-            RefitterGenerateTask.FileExists = path => string.Equals(path, net8Path, StringComparison.OrdinalIgnoreCase);
+        var packageFolder = Path.Combine("C:", "repo", "tasks");
+        var messages = new List<string>();
+        var net8Path = Path.GetFullPath(Path.Combine(packageFolder, "..", "net8.0", "refitter.dll"));
 
-            var result = RefitterGenerateTask.ResolveRefitterDll(
-                packageFolder,
-                [" ", "Microsoft.NETCore.App 7.0.0"],
-                messages.Add);
+        var result = RefitterGenerateTask.ResolveRefitterDll(
+            packageFolder,
+            [" ", "Microsoft.NETCore.App 7.0.0"],
+            messages.Add,
+            path => string.Equals(path, net8Path, StringComparison.OrdinalIgnoreCase));
 
-            result.Should().Be(net8Path);
-            messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        result.Should().Be(net8Path);
+        messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
     }
 
     [Test]
     public void ResolveRefitterDll_Should_Fall_Back_To_CoLocated_Cli()
     {
-        try
-        {
-            var packageFolder = Path.Combine("C:", "repo", "tasks");
-            var messages = new List<string>();
-            var coLocatedCli = Path.GetFullPath(Path.Combine(packageFolder, "refitter.dll"));
-            RefitterGenerateTask.FileExists = path => string.Equals(path, coLocatedCli, StringComparison.OrdinalIgnoreCase);
+        var packageFolder = Path.Combine("C:", "repo", "tasks");
+        var messages = new List<string>();
+        var coLocatedCli = Path.GetFullPath(Path.Combine(packageFolder, "refitter.dll"));
 
-            var result = RefitterGenerateTask.ResolveRefitterDll(
-                packageFolder,
-                ["Microsoft.NETCore.App 7.0.0"],
-                messages.Add);
+        var result = RefitterGenerateTask.ResolveRefitterDll(
+            packageFolder,
+            ["Microsoft.NETCore.App 7.0.0"],
+            messages.Add,
+            path => string.Equals(path, coLocatedCli, StringComparison.OrdinalIgnoreCase));
 
-            result.Should().Be(coLocatedCli);
-            messages.Should().ContainSingle(message => message.Contains("Falling back to co-located Refitter CLI.", StringComparison.Ordinal));
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        result.Should().Be(coLocatedCli);
+        messages.Should().ContainSingle(message => message.Contains("Falling back to co-located Refitter CLI.", StringComparison.Ordinal));
     }
 
     [Test]
     public void ResolveRefitterDll_Should_Return_First_Bundled_Path_When_No_Binaries_Exist()
     {
-        try
-        {
-            var packageFolder = Path.Combine("C:", "repo", "tasks");
-            var messages = new List<string>();
-            RefitterGenerateTask.FileExists = _ => false;
+        var packageFolder = Path.Combine("C:", "repo", "tasks");
+        var messages = new List<string>();
 
-            var result = RefitterGenerateTask.ResolveRefitterDll(packageFolder, null, messages.Add);
+        var result = RefitterGenerateTask.ResolveRefitterDll(packageFolder, null, messages.Add, _ => false);
 
-            result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net10.0", "refitter.dll")));
-            messages.Should().BeEmpty();
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net10.0", "refitter.dll")));
+        messages.Should().BeEmpty();
     }
 
     [Test]
     public void GetInstalledDotnetRuntimes_Should_Throw_TimeoutException_When_Runtime_Discovery_Times_Out()
     {
-        try
+        var processRunner = new DelegatingProcessRunner
         {
-            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
-            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            Handler = (startInfo, _, _) =>
             {
                 startInfo.FileName.Should().Be("dotnet");
                 startInfo.Arguments.Should().Be("--list-runtimes");
-                return new RefitterGenerateTask.ProcessExecutionResult(true, -1);
-            };
+                return new ProcessExecutionResult(true, -1);
+            }
+        };
 
-            var action = () => InvokeGetInstalledDotnetRuntimes();
+        var resolver = new DefaultRuntimeResolver(processRunner) { TimeoutMilliseconds = 500 };
+        var action = () => resolver.GetInstalledRuntimes();
 
-            action.Should().Throw<TimeoutException>()
-                .WithMessage("*dotnet --list-runtimes timed out after 500 ms*");
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        action.Should().Throw<TimeoutException>()
+            .WithMessage("*dotnet --list-runtimes timed out after 500 ms*");
     }
 
     [Test]
     public void GetInstalledDotnetRuntimes_Should_Include_Termination_Failure_When_Runtime_Discovery_Cannot_Be_Stopped()
     {
-        try
+        var processRunner = new DelegatingProcessRunner
         {
-            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
-            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            Handler = (startInfo, _, _) =>
             {
                 startInfo.FileName.Should().Be("dotnet");
                 startInfo.Arguments.Should().Be("--list-runtimes");
-                return new RefitterGenerateTask.ProcessExecutionResult(true, -1, new InvalidOperationException("kill failed"));
-            };
+                return new ProcessExecutionResult(true, -1, new InvalidOperationException("kill failed"));
+            }
+        };
 
-            var action = () => InvokeGetInstalledDotnetRuntimes();
+        var resolver = new DefaultRuntimeResolver(processRunner) { TimeoutMilliseconds = 500 };
+        var action = () => resolver.GetInstalledRuntimes();
 
-            action.Should().Throw<TimeoutException>()
-                .WithMessage("*dotnet --list-runtimes timed out after 500 ms. Failed to terminate timed-out process: kill failed*")
-                .WithInnerException<InvalidOperationException>()
-                .WithMessage("kill failed");
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        action.Should().Throw<TimeoutException>()
+            .WithMessage("*dotnet --list-runtimes timed out after 500 ms. Failed to terminate timed-out process: kill failed*")
+            .WithInnerException<InvalidOperationException>()
+            .WithMessage("kill failed");
     }
 
     [Test]
     public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero()
     {
-        try
+        var processRunner = new DelegatingProcessRunner
         {
-            RefitterGenerateTask.ProcessRunner = (startInfo, _, logError) =>
+            Handler = (startInfo, _, logError) =>
             {
                 startInfo.FileName.Should().Be("dotnet");
                 startInfo.Arguments.Should().Be("--list-runtimes");
                 logError("runtime probe failed");
-                return new RefitterGenerateTask.ProcessExecutionResult(false, 23);
-            };
+                return new ProcessExecutionResult(false, 23);
+            }
+        };
 
-            var action = () => InvokeGetInstalledDotnetRuntimes();
+        var resolver = new DefaultRuntimeResolver(processRunner);
+        var action = () => resolver.GetInstalledRuntimes();
 
-            action.Should().Throw<InvalidOperationException>()
-                .WithMessage("*dotnet --list-runtimes exited with code 23*runtime probe failed*");
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        action.Should().Throw<InvalidOperationException>()
+            .WithMessage("*dotnet --list-runtimes exited with code 23*runtime probe failed*");
     }
 
     [Test]
     public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero_Without_Error_Output()
     {
-        try
+        var processRunner = new DelegatingProcessRunner
         {
-            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            Handler = (startInfo, _, _) =>
             {
                 startInfo.FileName.Should().Be("dotnet");
                 startInfo.Arguments.Should().Be("--list-runtimes");
-                return new RefitterGenerateTask.ProcessExecutionResult(false, 23);
-            };
+                return new ProcessExecutionResult(false, 23);
+            }
+        };
 
-            var action = () => InvokeGetInstalledDotnetRuntimes();
+        var resolver = new DefaultRuntimeResolver(processRunner);
+        var action = () => resolver.GetInstalledRuntimes();
 
-            action.Should().Throw<InvalidOperationException>()
-                .WithMessage("dotnet --list-runtimes exited with code 23");
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        action.Should().Throw<InvalidOperationException>()
+            .WithMessage("dotnet --list-runtimes exited with code 23");
     }
 
     [Test]
@@ -623,34 +580,35 @@ public class RefitterGenerateTaskTests
         {
             CreateRefitterSettingsFile(workspace);
             var generatedFile = CreateGeneratedFile(workspace);
-            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
-            RefitterGenerateTask.FileExists = path =>
-                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
-            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
-            {
-                if (startInfo.Arguments == "--list-runtimes")
-                {
-                    return new RefitterGenerateTask.ProcessExecutionResult(true, -1);
-                }
-
-                startInfo.Arguments.Should().Contain("net8.0");
-                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
-                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
-            };
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.ProcessTimeoutMilliseconds = 500;
+            task.FileExists = path =>
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
+            task.RuntimeResolver = new DelegatingRuntimeResolver
+            {
+                Handler = () => throw new TimeoutException("dotnet --list-runtimes timed out after 500 ms")
+            };
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (startInfo, logOutput, _) =>
+                {
+                    startInfo.Arguments.Should().Contain("net8.0");
+                    logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                    return new ProcessExecutionResult(false, 0);
+                }
+            };
 
             var result = task.Execute();
 
             result.Should().BeTrue();
             task.GeneratedFiles.Should().ContainSingle().Which.ItemSpec.Should().Be(generatedFile);
-            buildEngine.Messages.Should().Contain(message => message.Contains("Failed to inspect installed .NET runtimes: dotnet --list-runtimes timed out after 500 ms", StringComparison.Ordinal));
+            buildEngine.Messages.Should().Contain(message => message.Contains("Failed to inspect installed .NET runtimes", StringComparison.Ordinal));
             buildEngine.Messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -665,19 +623,21 @@ public class RefitterGenerateTaskTests
             CreateRefitterSettingsFile(workspace);
             var generatedFile = CreateGeneratedFile(workspace);
 
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
-            RefitterGenerateTask.FileExists = path =>
-                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
-                File.Exists(path);
-            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
-            {
-                startInfo.Arguments.Should().Contain("net9.0");
-                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
-                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
-            };
-
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.RuntimeResolver = new DelegatingRuntimeResolver { Handler = () => ["Microsoft.NETCore.App 9.0.0"] };
+            task.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (startInfo, logOutput, _) =>
+                {
+                    startInfo.Arguments.Should().Contain("net9.0");
+                    logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                    return new ProcessExecutionResult(false, 0);
+                }
+            };
 
             var result = task.Execute();
 
@@ -688,7 +648,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -703,19 +662,21 @@ public class RefitterGenerateTaskTests
             CreateRefitterSettingsFile(workspace);
             var generatedFile = CreateGeneratedFile(workspace);
 
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 8.0.0"];
-            RefitterGenerateTask.FileExists = path =>
-                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) ||
-                File.Exists(path);
-            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
-            {
-                startInfo.Arguments.Should().Contain("net8.0");
-                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
-                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
-            };
-
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.RuntimeResolver = new DelegatingRuntimeResolver { Handler = () => ["Microsoft.NETCore.App 8.0.0"] };
+            task.FileExists = path =>
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (startInfo, logOutput, _) =>
+                {
+                    startInfo.Arguments.Should().Contain("net8.0");
+                    logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                    return new ProcessExecutionResult(false, 0);
+                }
+            };
 
             var result = task.Execute();
 
@@ -725,7 +686,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -738,11 +698,10 @@ public class RefitterGenerateTaskTests
         try
         {
             CreateRefitterSettingsFile(workspace);
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => null!;
-            RefitterGenerateTask.FileExists = _ => false;
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.FileExists = _ => false;
 
             var result = task.Execute();
 
@@ -752,7 +711,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -765,11 +723,13 @@ public class RefitterGenerateTaskTests
         try
         {
             CreateRefitterSettingsFile(workspace);
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
-            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(true, -1);
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (_, _, _) => new ProcessExecutionResult(true, -1)
+            };
 
             var result = task.Execute();
 
@@ -779,7 +739,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -792,12 +751,14 @@ public class RefitterGenerateTaskTests
         try
         {
             CreateRefitterSettingsFile(workspace);
-            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
-            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(true, -1);
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.ProcessTimeoutMilliseconds = 500;
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (_, _, _) => new ProcessExecutionResult(true, -1)
+            };
 
             var result = task.Execute();
 
@@ -806,7 +767,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -819,14 +779,16 @@ public class RefitterGenerateTaskTests
         try
         {
             CreateRefitterSettingsFile(workspace);
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
-            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(
-                true,
-                -1,
-                new InvalidOperationException("termination failed"));
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (_, _, _) => new ProcessExecutionResult(
+                    true,
+                    -1,
+                    new InvalidOperationException("termination failed"))
+            };
 
             var result = task.Execute();
 
@@ -835,7 +797,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -848,12 +809,14 @@ public class RefitterGenerateTaskTests
         try
         {
             CreateRefitterSettingsFile(workspace);
-            RefitterGenerateTask.ProcessTimeoutMilliseconds = 1500;
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
-            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(true, -1);
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.ProcessTimeoutMilliseconds = 1500;
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (_, _, _) => new ProcessExecutionResult(true, -1)
+            };
 
             var result = task.Execute();
 
@@ -862,7 +825,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -875,14 +837,16 @@ public class RefitterGenerateTaskTests
         try
         {
             CreateRefitterSettingsFile(workspace);
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
-            RefitterGenerateTask.FileExists = path =>
-                path.Contains("net10.0", StringComparison.OrdinalIgnoreCase) ||
-                File.Exists(path);
-            RefitterGenerateTask.ProcessRunner = (_, _, _) => throw new InvalidOperationException("boom");
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.FileExists = path =>
+                path.Contains("net10.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (_, _, _) => throw new InvalidOperationException("boom")
+            };
 
             var result = task.Execute();
 
@@ -892,7 +856,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -905,11 +868,13 @@ public class RefitterGenerateTaskTests
         try
         {
             CreateRefitterSettingsFile(workspace);
-            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
-            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(false, 23);
 
             var buildEngine = new RecordingBuildEngine();
             var task = CreateTask(workspace, buildEngine);
+            task.ProcessRunner = new DelegatingProcessRunner
+            {
+                Handler = (_, _, _) => new ProcessExecutionResult(false, 23)
+            };
 
             var result = task.Execute();
 
@@ -918,7 +883,6 @@ public class RefitterGenerateTaskTests
         }
         finally
         {
-            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
@@ -926,39 +890,34 @@ public class RefitterGenerateTaskTests
     [Test]
     public void RunProcess_Should_Return_TimedOut_Result_When_Process_Exceeds_Timeout()
     {
-        try
-        {
-            RefitterGenerateTask.ProcessTimeoutMilliseconds = 1;
+        var runner = new DefaultProcessRunner { TimeoutMilliseconds = 1 };
 
-            var result = InvokeRunProcess(CreateSleepProcessStartInfo());
+        var result = runner.Run(
+            CreateSleepProcessStartInfo(),
+            _ => { },
+            _ => { });
 
-            result.TimedOut.Should().BeTrue();
-            result.TerminationException.Should().BeNull();
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        result.TimedOut.Should().BeTrue();
+        result.TerminationException.Should().BeNull();
     }
 
     [Test]
     public void RunProcess_Should_Return_Termination_Exception_When_Kill_Fails_After_Timeout()
     {
-        try
+        var runner = new DefaultProcessRunner
         {
-            RefitterGenerateTask.ProcessTimeoutMilliseconds = 1;
-            RefitterGenerateTask.ProcessTerminator = _ => throw new InvalidOperationException("kill failed");
+            TimeoutMilliseconds = 1,
+            ProcessTerminator = _ => throw new InvalidOperationException("kill failed")
+        };
 
-            var result = InvokeRunProcess(CreateSleepProcessStartInfo());
+        var result = runner.Run(
+            CreateSleepProcessStartInfo(),
+            _ => { },
+            _ => { });
 
-            result.TimedOut.Should().BeTrue();
-            result.TerminationException.Should().BeOfType<InvalidOperationException>()
-                .Which.Message.Should().Be("kill failed");
-        }
-        finally
-        {
-            RefitterGenerateTask.ResetTestHooks();
-        }
+        result.TimedOut.Should().BeTrue();
+        result.TerminationException.Should().BeOfType<InvalidOperationException>()
+            .Which.Message.Should().Be("kill failed");
     }
 
     [Test]
@@ -1038,35 +997,6 @@ public class RefitterGenerateTaskTests
         method!.Invoke(task, arguments);
     }
 
-    private static RefitterGenerateTask.ProcessExecutionResult InvokeRunProcess(ProcessStartInfo startInfo)
-    {
-        var method = typeof(RefitterGenerateTask).GetMethod("RunProcess", BindingFlags.Static | BindingFlags.NonPublic);
-        method.Should().NotBeNull();
-        return method!.Invoke(null, [startInfo, (Action<string?>)(_ => { }), (Action<string?>)(_ => { })])
-            .Should()
-            .BeOfType<RefitterGenerateTask.ProcessExecutionResult>()
-            .Subject;
-    }
-
-    private static List<string> InvokeGetInstalledDotnetRuntimes()
-    {
-        var method = typeof(RefitterGenerateTask).GetMethod("GetInstalledDotnetRuntimes", BindingFlags.Static | BindingFlags.NonPublic);
-        method.Should().NotBeNull();
-
-        try
-        {
-            return method!.Invoke(null, [])!
-                .Should()
-                .BeOfType<List<string>>()
-                .Subject;
-        }
-        catch (TargetInvocationException ex) when (ex.InnerException is not null)
-        {
-            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            throw;
-        }
-    }
-
     private static ProcessStartInfo CreateSleepProcessStartInfo()
     {
         if (OperatingSystem.IsWindows())
@@ -1099,6 +1029,24 @@ public class RefitterGenerateTaskTests
         {
             Directory.Delete(workspace, recursive: true);
         }
+    }
+
+    private sealed class DelegatingProcessRunner : IProcessRunner
+    {
+        public Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult> Handler { get; set; }
+
+        public ProcessExecutionResult Run(
+            ProcessStartInfo startInfo,
+            Action<string?> standardOutput,
+            Action<string?> standardError) =>
+            Handler(startInfo, standardOutput, standardError);
+    }
+
+    private sealed class DelegatingRuntimeResolver : IRuntimeResolver
+    {
+        public Func<List<string>> Handler { get; set; }
+
+        public List<string> GetInstalledRuntimes() => Handler();
     }
 
     private sealed class RecordingBuildEngine : IBuildEngine
