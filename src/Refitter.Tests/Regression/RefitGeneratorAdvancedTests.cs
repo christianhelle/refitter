@@ -1,4 +1,3 @@
-using System.Reflection;
 using FluentAssertions;
 using NJsonSchema;
 using NSwag;
@@ -761,18 +760,18 @@ public class RefitGeneratorAdvancedTests
             }
             """;
 
-        var generator = new RefitGenerator(
-            new RefitGeneratorSettings
+        var normalizer = new Swagger2OptionalReferenceNullabilityNormalizer();
+        var document = new OpenApiDocument { SchemaType = SchemaType.Swagger2 };
+        var settings = new RefitGeneratorSettings
+        {
+            CodeGeneratorSettings = new CodeGeneratorSettings
             {
-                CodeGeneratorSettings = new CodeGeneratorSettings
-                {
-                    GenerateNullableReferenceTypes = true,
-                    GenerateOptionalPropertiesAsNullable = false
-                }
-            },
-            new OpenApiDocument { SchemaType = SchemaType.Swagger2 });
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = false
+            }
+        };
 
-        var normalized = NormalizeSwagger2OptionalReferencePropertyNullability(generator, contracts);
+        var normalized = normalizer.Process(document, settings, contracts);
 
         normalized.Should().Contain("public Pet[] Pets { get; set; }");
         normalized.Should().Contain("public List<Pet> Values { get; set; }");
@@ -885,25 +884,20 @@ public class RefitGeneratorAdvancedTests
             }
             """;
 
-        var generator = new RefitGenerator(
-            new RefitGeneratorSettings
+        var settings = new RefitGeneratorSettings
+        {
+            GenerateJsonSerializerContext = true,
+            GenerateContracts = true,
+            Namespace = "Generated.Clients",
+            ContractsNamespace = "Generated.Contracts",
+            Naming = new NamingSettings
             {
-                GenerateJsonSerializerContext = true,
-                GenerateContracts = true,
-                Namespace = "Generated.Clients",
-                ContractsNamespace = "Generated.Contracts",
-                Naming = new NamingSettings
-                {
-                    UseOpenApiTitle = true,
-                    InterfaceName = "ITestApi"
-                }
-            },
-            new OpenApiDocument
-            {
-                Info = null!
-            });
+                UseOpenApiTitle = true,
+                InterfaceName = "ITestApi"
+            }
+        };
 
-        var serializerContext = GenerateJsonSerializerContext(generator, contracts);
+        var serializerContext = JsonSerializerContextGenerator.Generate(contracts, settings);
 
         serializerContext.Should().Contain("internal partial class TestApiSerializerContext");
     }
@@ -1032,26 +1026,6 @@ public class RefitGeneratorAdvancedTests
     }
 
     #endregion
-
-    private static string NormalizeSwagger2OptionalReferencePropertyNullability(RefitGenerator generator, string contracts)
-    {
-        var method = typeof(RefitGenerator).GetMethod(
-            "NormalizeSwagger2OptionalReferencePropertyNullability",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-
-        method.Should().NotBeNull();
-        return method!.Invoke(generator, [contracts]).Should().BeOfType<string>().Subject;
-    }
-
-    private static string GenerateJsonSerializerContext(RefitGenerator generator, string contracts)
-    {
-        var method = typeof(RefitGenerator).GetMethod(
-            "GenerateJsonSerializerContext",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-
-        method.Should().NotBeNull();
-        return method!.Invoke(generator, [contracts]).Should().BeOfType<string>().Subject;
-    }
 
     private static void CleanupSwaggerFile(string swaggerFile)
     {
