@@ -15,9 +15,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void GetDefaultValueForParameter_Returns_Default_For_Empty_Parameter_String()
     {
-        var result = InvokePrivate<string>(
-            "GetDefaultValueForParameter",
-            [typeof(string), typeof(ICollection<CSharpParameterModel>)],
+        var result = ParameterShared.GetDefaultValueForParameter(
             string.Empty,
             new List<CSharpParameterModel>());
 
@@ -27,17 +25,8 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void FormatDefaultValue_Returns_Default_For_Null_And_Unsupported_Types()
     {
-        var nullResult = InvokePrivate<string>(
-            "FormatDefaultValue",
-            [typeof(object), typeof(string)],
-            null!,
-            "string");
-
-        var unsupportedTypeResult = InvokePrivate<string>(
-            "FormatDefaultValue",
-            [typeof(object), typeof(string)],
-            42,
-            "CustomType");
+        var nullResult = ParameterShared.FormatDefaultValue(null!, "string");
+        var unsupportedTypeResult = ParameterShared.FormatDefaultValue(42, "CustomType");
 
         nullResult.Should().Be("default");
         unsupportedTypeResult.Should().Be("default");
@@ -46,10 +35,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void EscapeString_Handles_Vertical_Tab_And_Null_Characters()
     {
-        var result = InvokePrivate<string>(
-            "EscapeString",
-            [typeof(string)],
-            "before\vbetween\0after");
+        var result = ParameterShared.EscapeString("before\vbetween\0after");
 
         result.Should().Be("before\\vbetween\\0after");
     }
@@ -59,11 +45,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Arguments("UInt32")]
     public void FormatNumericValue_Appends_U_Suffix_For_UInt_Types(string numericType)
     {
-        var result = InvokePrivate<string>(
-            "FormatNumericValue",
-            [typeof(object), typeof(string)],
-            42,
-            numericType);
+        var result = ParameterShared.FormatNumericValue(42, numericType);
 
         result.Should().Be("42U");
     }
@@ -93,10 +75,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Arguments("UInt16")]
     public void IsNumericType_Returns_True_For_Supported_Numeric_Types(string numericType)
     {
-        var result = InvokePrivate<bool>(
-            "IsNumericType",
-            [typeof(string)],
-            numericType);
+        var result = ParameterShared.IsNumericType(numericType);
 
         result.Should().BeTrue();
     }
@@ -108,10 +87,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Arguments("numbers")]
     public void IsNumericType_Returns_False_For_Non_Numeric_Types(string numericType)
     {
-        var result = InvokePrivate<bool>(
-            "IsNumericType",
-            [typeof(string)],
-            numericType);
+        var result = ParameterShared.IsNumericType(numericType);
 
         result.Should().BeFalse();
     }
@@ -122,15 +98,8 @@ public class ParameterExtractorPrivateCoverageTests
         var unchangedName = CreateParameterModel("id", "id");
         var aliasedName = CreateParameterModel("user-id", "userId");
 
-        var method = typeof(ParameterExtractor).GetMethod(
-            "GetAliasAsAttribute",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(CSharpParameterModel)],
-            null);
-
-        var unchangedResult = (string?)method!.Invoke(null, [unchangedName]);
-        var aliasedResult = (string?)method.Invoke(null, [aliasedName]);
+        var unchangedResult = ParameterShared.GetAliasAsAttribute(unchangedName);
+        var aliasedResult = ParameterShared.GetAliasAsAttribute(aliasedName);
 
         unchangedResult.Should().BeEmpty();
         aliasedResult.Should().Be("AliasAs(\"user-id\")");
@@ -139,20 +108,11 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void GetAliasAsAttribute_CSharpParameterModel_Escapes_Special_Characters()
     {
-        // A parameter name containing quotes or backslashes must be escaped
-        // so the generated AliasAs(...) literal is valid C#.
         var withQuote = CreateParameterModel("user\"id", "userQuoteid");
         var withBackslash = CreateParameterModel("user\\id", "userBackslashid");
 
-        var method = typeof(ParameterExtractor).GetMethod(
-            "GetAliasAsAttribute",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(CSharpParameterModel)],
-            null);
-
-        var quoteResult = (string?)method!.Invoke(null, [withQuote]);
-        var backslashResult = (string?)method.Invoke(null, [withBackslash]);
+        var quoteResult = ParameterShared.GetAliasAsAttribute(withQuote);
+        var backslashResult = ParameterShared.GetAliasAsAttribute(withBackslash);
 
         quoteResult.Should().Be("AliasAs(\"user\\\"id\")");
         backslashResult.Should().Be("AliasAs(\"user\\\\id\")");
@@ -161,16 +121,9 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void GetAliasAsAttribute_StringOverload_Escapes_Special_Characters()
     {
-        var method = typeof(ParameterExtractor).GetMethod(
-            "GetAliasAsAttribute",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(string), typeof(string)],
-            null);
-
-        var unchanged = (string?)method!.Invoke(null, ["same", "same"]);
-        var withQuote = (string?)method.Invoke(null, ["user\"id", "userId"]);
-        var withBackslash = (string?)method.Invoke(null, ["user\\id", "userId"]);
+        var unchanged = ParameterShared.GetAliasAsAttribute("same", "same");
+        var withQuote = ParameterShared.GetAliasAsAttribute("user\"id", "userId");
+        var withBackslash = ParameterShared.GetAliasAsAttribute("user\\id", "userId");
 
         unchanged.Should().BeEmpty();
         withQuote.Should().Be("AliasAs(\"user\\\"id\")");
@@ -182,27 +135,19 @@ public class ParameterExtractorPrivateCoverageTests
     {
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
 
-        var numberType = InvokePrivate<string>(
-            "GetCSharpType",
-            [typeof(JsonSchema), typeof(RefitGeneratorSettings)],
+        var numberType = ParameterShared.GetCSharpType(
             new JsonSchema { Type = JsonObjectType.Number },
             settings);
 
-        var objectType = InvokePrivate<string>(
-            "GetCSharpType",
-            [typeof(JsonSchema), typeof(RefitGeneratorSettings)],
+        var objectType = ParameterShared.GetCSharpType(
             new JsonSchema { Type = JsonObjectType.Object },
             settings);
 
-        var unknownType = InvokePrivate<string>(
-            "GetCSharpType",
-            [typeof(JsonSchema), typeof(RefitGeneratorSettings)],
+        var unknownType = ParameterShared.GetCSharpType(
             new JsonSchema { Type = JsonObjectType.None },
             settings);
 
-        var nullableStringType = InvokePrivate<string>(
-            "GetCSharpType",
-            [typeof(JsonSchema), typeof(RefitGeneratorSettings)],
+        var nullableStringType = ParameterShared.GetCSharpType(
             new JsonSchema { Type = JsonObjectType.String, IsNullableRaw = true },
             settings);
 
@@ -217,15 +162,11 @@ public class ParameterExtractorPrivateCoverageTests
     {
         var settings = new RefitGeneratorSettings();
 
-        var int64Type = InvokePrivate<string>(
-            "GetIntegerTypeName",
-            [typeof(JsonSchema), typeof(RefitGeneratorSettings)],
+        var int64Type = ParameterShared.GetIntegerTypeName(
             new JsonSchema { Format = "int64" },
             settings);
 
-        var int32Type = InvokePrivate<string>(
-            "GetIntegerTypeName",
-            [typeof(JsonSchema), typeof(RefitGeneratorSettings)],
+        var int32Type = ParameterShared.GetIntegerTypeName(
             new JsonSchema { Format = "int32" },
             settings);
 
@@ -236,9 +177,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void GetArrayType_Returns_Object_Array_When_Item_Is_Missing()
     {
-        var result = InvokePrivate<string>(
-            "GetArrayType",
-            [typeof(JsonSchema), typeof(RefitGeneratorSettings)],
+        var result = ParameterShared.GetArrayType(
             new JsonSchema { Type = JsonObjectType.Array },
             new RefitGeneratorSettings());
 
@@ -246,7 +185,7 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [Test]
-    public void GetParameters_Adds_Multipart_Text_Fields_When_NSwag_Parameters_Are_Empty()
+    public void ParameterAggregator_ExtractParameters_Adds_Multipart_Text_Fields_When_NSwag_Parameters_Are_Empty()
     {
         var operationModel = CreateOperationModel();
         var operation = new OpenApiOperation
@@ -263,27 +202,20 @@ public class ParameterExtractorPrivateCoverageTests
             Schema = schema
         };
 
-        var method = typeof(ParameterExtractor).GetMethod(
-            "GetParameters",
-            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-
-        var arguments = new object?[]
-        {
+        var aggregator = new ParameterAggregator();
+        var result = aggregator.ExtractParameters(
             operationModel,
             operation,
             new RefitGeneratorSettings(),
             "QueryParams",
-            null
-        };
-
-        var result = (IEnumerable<string>)method!.Invoke(null, arguments)!;
+            out var dynamicQuerystringParameters);
 
         result.Should().ContainSingle().Which.Should().Be("string title");
-        arguments[4].Should().Be(string.Empty);
+        dynamicQuerystringParameters.Should().Be(string.Empty);
     }
 
     [Test]
-    public void GetParameters_Does_Not_Mutate_Query_Parameter_Collection_When_Generating_Dynamic_Querystring_Wrapper()
+    public void ParameterAggregator_Does_Not_Mutate_Query_Parameter_Collection_When_Generating_Dynamic_Querystring_Wrapper()
     {
         var firstParameter = CreateParameterModel(
             "query",
@@ -308,7 +240,8 @@ public class ParameterExtractorPrivateCoverageTests
         var operationModel = CreateOperationModel(firstParameter, secondParameter);
         var operation = new OpenApiOperation();
 
-        var parameters = ParameterExtractor.GetParameters(
+        var aggregator = new ParameterAggregator();
+        var parameters = aggregator.ExtractParameters(
                 operationModel,
                 operation,
                 new RefitGeneratorSettings { UseDynamicQuerystringParameters = true },
@@ -325,10 +258,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void ReplaceUnsafeCharacters_Delegates_To_ParameterShared()
     {
-        var result = InvokePrivate<string>(
-            "ReplaceUnsafeCharacters",
-            [typeof(string)],
-            "unsafe-name!");
+        var result = ParameterShared.ReplaceUnsafeCharacters("unsafe-name!");
         result.Should().NotBeNullOrWhiteSpace();
     }
 
@@ -336,9 +266,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void ReOrderNullableParameters_Delegates_To_OptionalParameterReorderer()
     {
         var parameterModels = new List<CSharpParameterModel>();
-        var result = InvokePrivate<List<string>>(
-            "ReOrderNullableParameters",
-            [typeof(List<string>), typeof(RefitGeneratorSettings), typeof(ICollection<CSharpParameterModel>)],
+        var result = OptionalParameterReorderer.Reorder(
             new List<string> { "string a", "int? b = default" },
             new RefitGeneratorSettings(),
             parameterModels);
@@ -347,38 +275,9 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [Test]
-    public void FormatDoubleLiteral_Returns_AsIs_When_Contains_Dot()
+    public void FormatDefaultValue_Adds_PointZero_For_Double_Integer_Values()
     {
-        var result = InvokePrivate<string>(
-            "FormatDoubleLiteral",
-            [typeof(string)],
-            "3.14");
-        result.Should().Be("3.14");
-    }
-
-    [Test]
-    public void FormatDoubleLiteral_Returns_AsIs_When_Contains_Exponent()
-    {
-        var result = InvokePrivate<string>(
-            "FormatDoubleLiteral",
-            [typeof(string)],
-            "1.5e10");
-        result.Should().Be("1.5e10");
-
-        var resultUpper = InvokePrivate<string>(
-            "FormatDoubleLiteral",
-            [typeof(string)],
-            "1.5E10");
-        resultUpper.Should().Be("1.5E10");
-    }
-
-    [Test]
-    public void FormatDoubleLiteral_Appends_PointZero_For_Integer_String()
-    {
-        var result = InvokePrivate<string>(
-            "FormatDoubleLiteral",
-            [typeof(string)],
-            "42");
+        var result = ParameterShared.FormatDefaultValue(42, "double");
         result.Should().Be("42.0");
     }
 
@@ -386,11 +285,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetBodyAttribute_Returns_Body_For_String_Parameter()
     {
         var param = CreateParameterModel("body", "body", "string");
-        var result = InvokePrivate<string>(
-            "GetBodyAttribute",
-            [typeof(CSharpParameterModel), typeof(RefitGeneratorSettings)],
-            param,
-            new RefitGeneratorSettings());
+        var result = ParameterShared.GetBodyAttribute(param, new RefitGeneratorSettings());
         result.Should().Be("Body");
     }
 
@@ -398,11 +293,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetBodyAttribute_Returns_Serialized_For_Object_Parameter()
     {
         var param = CreateParameterModel("body", "body", "object");
-        var result = InvokePrivate<string>(
-            "GetBodyAttribute",
-            [typeof(CSharpParameterModel), typeof(RefitGeneratorSettings)],
-            param,
-            new RefitGeneratorSettings());
+        var result = ParameterShared.GetBodyAttribute(param, new RefitGeneratorSettings());
         result.Should().Be("Body(BodySerializationMethod.Serialized)");
     }
 
@@ -410,47 +301,28 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetQueryAttribute_Returns_Query_Attribute()
     {
         var param = CreateParameterModel("q", "q");
-        var result = InvokePrivate<string>(
-            "GetQueryAttribute",
-            [typeof(CSharpParameterModel), typeof(RefitGeneratorSettings)],
-            param,
-            new RefitGeneratorSettings());
+        var result = ParameterShared.GetQueryAttribute(param, new RefitGeneratorSettings());
         result.Should().NotBeNull();
     }
 
     [Test]
     public void JoinAttributes_Returns_Empty_For_Empty_Input()
     {
-        var method = typeof(ParameterExtractor).GetMethod(
-            "JoinAttributes",
-            BindingFlags.NonPublic | BindingFlags.Static);
-        method.Should().NotBeNull();
-
-        var result = (string)method!.Invoke(null, [Array.Empty<string>()])!;
+        var result = ParameterShared.JoinAttributes();
         result.Should().Be(string.Empty);
     }
 
     [Test]
     public void JoinAttributes_Returns_Combined_Attributes()
     {
-        var method = typeof(ParameterExtractor).GetMethod(
-            "JoinAttributes",
-            BindingFlags.NonPublic | BindingFlags.Static);
-        method.Should().NotBeNull();
-
-        var result = (string)method!.Invoke(null, [new[] { "AliasAs(\"name\")", "Query()" }])!;
+        var result = ParameterShared.JoinAttributes("AliasAs(\"name\")", "Query()");
         result.Should().Be("[AliasAs(\"name\"), Query()] ");
     }
 
     [Test]
     public void JoinAttributes_Returns_Single_Attribute()
     {
-        var method = typeof(ParameterExtractor).GetMethod(
-            "JoinAttributes",
-            BindingFlags.NonPublic | BindingFlags.Static);
-        method.Should().NotBeNull();
-
-        var result = (string)method!.Invoke(null, [new[] { "AliasAs(\"name\")" }])!;
+        var result = ParameterShared.JoinAttributes("AliasAs(\"name\")");
         result.Should().Be("[AliasAs(\"name\")] ");
     }
 
@@ -458,11 +330,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetParameterType_Uses_CSharpProvider_Model_Type()
     {
         var param = CreateParameterModel("param1", "param1", "int");
-        var result = InvokePrivate<string>(
-            "GetParameterType",
-            [typeof(ParameterModelBase), typeof(RefitGeneratorSettings)],
-            param,
-            new RefitGeneratorSettings());
+        var result = ParameterShared.GetParameterType(param, new RefitGeneratorSettings());
         result.Should().Be("int");
     }
 
@@ -470,41 +338,28 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetQueryParameterType_Returns_Query_Parameter_Type()
     {
         var param = CreateParameterModel("q", "q", "string");
-        var result = InvokePrivate<string>(
-            "GetQueryParameterType",
-            [typeof(ParameterModelBase), typeof(RefitGeneratorSettings)],
-            param,
-            new RefitGeneratorSettings());
+        var result = ParameterShared.GetQueryParameterType(param, new RefitGeneratorSettings());
         result.Should().NotBeNull();
     }
 
     [Test]
     public void FindSupportedType_Passes_Through_Type_Name()
     {
-        var result = InvokePrivate<string>(
-            "FindSupportedType",
-            [typeof(string)],
-            "string");
+        var result = ParameterShared.FindSupportedType("string");
         result.Should().Be("string");
     }
 
     [Test]
     public void ConvertToVariableName_Replaces_Unsafe_Characters()
     {
-        var result = InvokePrivate<string>(
-            "ConvertToVariableName",
-            [typeof(string)],
-            "field-name");
+        var result = ParameterShared.ConvertToVariableName("field-name");
         result.Should().Be("field_name");
     }
 
     [Test]
     public void ConvertToVariableName_Returns_Value_For_Empty_String()
     {
-        var result = InvokePrivate<string>(
-            "ConvertToVariableName",
-            [typeof(string)],
-            string.Empty);
+        var result = ParameterShared.ConvertToVariableName(string.Empty);
         result.Should().Be("value");
     }
 
@@ -512,31 +367,20 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetVariableName_Returns_VariableName_From_Model()
     {
         var param = CreateParameterModel("param-name", "paramName");
-        var result = InvokePrivate<string>(
-            "GetVariableName",
-            [typeof(ParameterModelBase)],
-            param);
+        var result = ParameterShared.GetVariableName(param);
         result.Should().Be("paramName");
     }
 
     [Test]
     public void AppendXmlDocComment_Extends_CodeBuilder()
     {
-        var method = typeof(ParameterExtractor).GetMethod(
-            "AppendXmlDocComment",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(string), typeof(StringBuilder)],
-            null);
-        method.Should().NotBeNull();
-
         var codeBuilder = new StringBuilder();
-        method!.Invoke(null, ["Some description", codeBuilder]);
+        ParameterShared.AppendXmlDocComment("Some description", codeBuilder);
         codeBuilder.ToString().Should().Contain("Some description");
     }
 
     [Test]
-    public void GetQueryParameters_With_No_Dynamic_Returns_Simple_Extraction()
+    public void QueryParameterExtractor_With_No_Dynamic_Returns_Simple_Extraction()
     {
         var param = CreateParameterModel("query", "query", "string",
             parameter: new OpenApiParameter
@@ -548,22 +392,15 @@ public class ParameterExtractorPrivateCoverageTests
         var operationModel = CreateOperationModel(param);
         var settings = new RefitGeneratorSettings();
 
-        var method = typeof(ParameterExtractor).GetMethod(
-            "GetQueryParameters",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(CSharpOperationModel), typeof(RefitGeneratorSettings), typeof(string), typeof(string).MakeByRefType()],
-            null);
-        method.Should().NotBeNull();
-
-        var args = new object?[] { operationModel, settings, "QueryParams", null };
-        var result = (List<string>)method!.Invoke(null, args)!;
+        var extractor = new QueryParameterExtractor();
+        var args = new object?[] { operationModel, new OpenApiOperation(), settings };
+        var result = extractor.Extract(operationModel, new OpenApiOperation(), settings).ToList();
 
         result.Should().ContainSingle().Which.Should().Contain("query");
     }
 
     [Test]
-    public void GetQueryParameters_With_Dynamic_And_All_Nullable()
+    public void QueryParameterExtractor_With_Dynamic_And_All_Nullable()
     {
         var firstParameter = CreateParameterModel(
             "query",
@@ -587,28 +424,20 @@ public class ParameterExtractorPrivateCoverageTests
             });
         var operationModel = CreateOperationModel(firstParameter, secondParameter);
 
-        var method = typeof(ParameterExtractor).GetMethod(
-            "GetQueryParameters",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(CSharpOperationModel), typeof(RefitGeneratorSettings), typeof(string), typeof(string).MakeByRefType()],
-            null);
-        method.Should().NotBeNull();
-
-        var args = new object?[]
+        var extractor = new QueryParameterExtractor
         {
-            operationModel,
-            new RefitGeneratorSettings { UseDynamicQuerystringParameters = true },
-            "SearchQueryParams",
-            null
+            DynamicQuerystringParameterType = "SearchQueryParams"
         };
-        var result = (List<string>)method!.Invoke(null, args)!;
+        var result = extractor.Extract(
+            operationModel,
+            new OpenApiOperation(),
+            new RefitGeneratorSettings { UseDynamicQuerystringParameters = true }).ToList();
 
         result.Should().ContainSingle().Which.Should().Be("[Query] SearchQueryParams? queryParams");
     }
 
     [Test]
-    public void GetQueryParameters_With_Dynamic_And_Not_All_Nullable()
+    public void QueryParameterExtractor_With_Dynamic_And_Not_All_Nullable()
     {
         var firstParameter = CreateParameterModel(
             "query",
@@ -632,38 +461,16 @@ public class ParameterExtractorPrivateCoverageTests
             });
         var operationModel = CreateOperationModel(firstParameter, secondParameter);
 
-        var method = typeof(ParameterExtractor).GetMethod(
-            "GetQueryParameters",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(CSharpOperationModel), typeof(RefitGeneratorSettings), typeof(string), typeof(string).MakeByRefType()],
-            null);
-        method.Should().NotBeNull();
-
-        var args = new object?[]
+        var extractor = new QueryParameterExtractor
         {
-            operationModel,
-            new RefitGeneratorSettings { UseDynamicQuerystringParameters = true },
-            "SearchQueryParams",
-            null
+            DynamicQuerystringParameterType = "SearchQueryParams"
         };
-        var result = (List<string>)method!.Invoke(null, args)!;
+        var result = extractor.Extract(
+            operationModel,
+            new OpenApiOperation(),
+            new RefitGeneratorSettings { UseDynamicQuerystringParameters = true }).ToList();
 
         result.Should().ContainSingle().Which.Should().Be("[Query] SearchQueryParams queryParams");
-    }
-
-    private static T InvokePrivate<T>(string methodName, Type[] parameterTypes, params object?[] arguments)
-    {
-        var method = typeof(ParameterExtractor).GetMethod(
-            methodName,
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            parameterTypes,
-            null);
-
-        method.Should().NotBeNull();
-
-        return (T)method!.Invoke(null, arguments)!;
     }
 
     private static CSharpParameterModel CreateParameterModel(

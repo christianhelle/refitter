@@ -676,12 +676,9 @@ public class IdentifierCorrectnessTests
             .GetField("_parameter", BindingFlags.Instance | BindingFlags.NonPublic)!
             .SetValue(parameterModel, openApiParameter);
 
-        var method = typeof(ParameterExtractor)
-            .GetMethod("GetDefaultValueForParameter", BindingFlags.NonPublic | BindingFlags.Static);
-
-        var result = method!.Invoke(
-            null,
-            ["string? @class", new List<CSharpParameterModel> { parameterModel }]);
+        var result = ParameterShared.GetDefaultValueForParameter(
+            "string? @class",
+            new List<CSharpParameterModel> { parameterModel });
 
         result.Should().Be("\"abc\"");
     }
