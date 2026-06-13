@@ -153,7 +153,23 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     private static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings settings)
     {
         var lastSep = settingsFilePath.LastIndexOfAny(new[] { '/', '\\' });
-        var settingsFileDirectory = lastSep >= 0 ? settingsFilePath.Substring(0, lastSep) : string.Empty;
+        string settingsFileDirectory;
+        if (lastSep < 0)
+        {
+            settingsFileDirectory = string.Empty;
+        }
+        else if (lastSep == 0)
+        {
+            settingsFileDirectory = settingsFilePath.Substring(0, 1);
+        }
+        else if (lastSep == 2 && settingsFilePath.Length > 1 && settingsFilePath[1] == ':')
+        {
+            settingsFileDirectory = settingsFilePath.Substring(0, lastSep + 1);
+        }
+        else
+        {
+            settingsFileDirectory = settingsFilePath.Substring(0, lastSep);
+        }
         RefitterSettingsLoader.ResolveRelativeSpecPaths(settings, settingsFileDirectory);
     }
 

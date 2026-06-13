@@ -25,6 +25,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     /// <returns>A new instance of the <see cref="RefitGenerator"/> class.</returns>
     public static RefitGenerator Create(OpenApiDocument document, RefitGeneratorSettings settings)
     {
+        if (document == null) throw new ArgumentNullException(nameof(document));
+        if (settings == null) throw new ArgumentNullException(nameof(settings));
+
         ProcessTagFilters(document, settings.IncludeTags);
         ProcessPathFilters(document, settings.IncludePathMatches);
         ProcessContractFilter(document, settings.TrimUnusedSchema, settings.KeepSchemaPatterns, settings.IncludeInheritanceHierarchy);
