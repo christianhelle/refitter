@@ -196,6 +196,21 @@ public class FormParameterExtractorTests
         result.Should().BeEmpty();
     }
 
+    [Test]
+    public void Extract_Skips_When_No_Multipart_Content()
+    {
+        var extractor = new FormParameterExtractor();
+        var operationModel = CreateEmptyOperationModel();
+        var operation = new OpenApiOperation
+        {
+            RequestBody = new OpenApiRequestBody()
+        };
+        operation.RequestBody.Content["application/json"] = new OpenApiMediaType();
+
+        var result = extractor.Extract(operationModel, operation, new RefitGeneratorSettings()).ToList();
+        result.Should().BeEmpty();
+    }
+
     private static CSharpOperationModel CreateEmptyOperationModel()
     {
         var operationModel = (CSharpOperationModel)RuntimeHelpers.GetUninitializedObject(typeof(CSharpOperationModel));
