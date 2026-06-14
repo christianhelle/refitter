@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 using NSwag;
 
 namespace Refitter.Core;
