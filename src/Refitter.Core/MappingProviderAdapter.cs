@@ -27,9 +27,9 @@ internal class MappingProviderAdapter : IApizrOptionsAdapter
             case MappingProviderType.Mapster:
                 builder.AddPackage(ApizrPackages.Apizr_Integrations_Mapster);
                 builder.AddUsing("using Mapster;");
-                builder.AddUsing("using MapsterMapper;");
                 if (isDependencyInjectionExtension)
                 {
+                    builder.AddUsing("using MapsterMapper;");
                     builder.AppendOptionsCode("\n                .WithMapsterMappingHandler()");
                 }
                 else
