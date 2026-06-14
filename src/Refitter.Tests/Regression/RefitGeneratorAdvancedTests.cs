@@ -782,6 +782,75 @@ public class RefitGeneratorAdvancedTests
     }
 
     [Test]
+    public void NormalizeSwagger2OptionalReferencePropertyNullability_Incorrectly_Removes_Nullability_From_Struct_Value_Types()
+    {
+        const string contracts = """
+            using System;
+            using System.Collections.Generic;
+
+            public struct MyCustomStruct
+            {
+                public int Value { get; set; }
+            }
+
+            public struct Coordinate
+            {
+                public double X { get; set; }
+                public double Y { get; set; }
+            }
+
+            namespace Generated.Contracts
+            {
+                public partial class Response
+                {
+                    public MyCustomStruct? OptionalStruct { get; set; }
+
+                    public Coordinate? OptionalCoordinate { get; set; }
+
+                    public List<MyCustomStruct>? OptionalStructList { get; set; }
+
+                    public global::MyCustomStruct? QualifiedOptionalStruct { get; set; }
+
+                    public DateTime? BuiltInStruct { get; set; }
+
+                    public int? BuiltInValueType { get; set; }
+                }
+            }
+            """;
+
+        var normalizer = new Swagger2OptionalReferenceNullabilityNormalizer();
+        var document = new OpenApiDocument { SchemaType = SchemaType.Swagger2 };
+        var settings = new RefitGeneratorSettings
+        {
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = false
+            }
+        };
+
+        var normalized = normalizer.Process(document, settings, contracts);
+
+        // Document current behavior: The normalizer incorrectly treats custom struct types
+        // (IdentifierNameSyntax) as reference types and removes their nullability.
+        // This is because IsReferenceType() uses a heuristic that treats all IdentifierNameSyntax
+        // nodes as reference types, which is incorrect for custom struct types.
+        normalized.Should().Contain("public MyCustomStruct OptionalStruct { get; set; }");
+        normalized.Should().Contain("public Coordinate OptionalCoordinate { get; set; }");
+
+        // Generic types are also incorrectly unwrapped when they contain struct types
+        normalized.Should().Contain("public List<MyCustomStruct> OptionalStructList { get; set; }");
+
+        // Qualified names for structs are also unwrapped
+        normalized.Should().Contain("public global::MyCustomStruct QualifiedOptionalStruct { get; set; }");
+
+        // Built-in value types like DateTime and int remain nullable (correct behavior)
+        // because they use PredefinedTypeSyntax or are not matched as reference types
+        normalized.Should().Contain("public DateTime? BuiltInStruct { get; set; }");
+        normalized.Should().Contain("public int? BuiltInValueType { get; set; }");
+    }
+
+    [Test]
     public async Task Generate_Does_Not_Emit_JsonSerializerContext_When_Contracts_Are_Disabled()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
