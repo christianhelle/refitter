@@ -31,6 +31,30 @@ paths:
           description: success
 ";
 
+    private const string SwaggerSpec = @"
+swagger: '2.0'
+info:
+  title: Test API
+  version: '1.0'
+host: api.example.com
+basePath: /v1
+paths:
+  /foo:
+    get:
+      tags: ['Foo']
+      operationId: 'GetAllFoos'
+      responses:
+        '200':
+          description: success
+  /bar:
+    get:
+      tags: ['Bar']
+      operationId: 'GetAllBars'
+      responses:
+        '200':
+          description: success
+";
+
     [Test]
     public async Task Generate_Produces_Valid_Code()
     {
@@ -91,6 +115,45 @@ paths:
     public async Task GenerateMultipleFiles_Produces_Output()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var settings = new RefitGeneratorSettings
+        {
+            Namespace = "TestNamespace",
+            OpenApiPath = swaggerFile,
+            GenerateMultipleFiles = true,
+            GenerateContracts = true,
+            GenerateClients = true
+        };
+
+        var sut = new RefitCodeGenerator();
+        var result = sut.GenerateMultipleFiles(document, settings);
+
+        result.Files.Should().NotBeEmpty();
+        result.Files.Should().Contain(f => f.TypeName == "Contracts");
+    }
+
+    [Test]
+    public async Task Generate_WithSwagger20_Produces_Valid_Code()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var settings = new RefitGeneratorSettings
+        {
+            Namespace = "TestNamespace",
+            OpenApiPath = swaggerFile
+        };
+
+        var sut = new RefitCodeGenerator();
+        var result = sut.Generate(document, settings);
+
+        result.Should().NotBeNullOrWhiteSpace();
+        result.Should().Contain("TestNamespace");
+    }
+
+    [Test]
+    public async Task GenerateMultipleFiles_WithSwagger20_Produces_Output()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);
         var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
         var settings = new RefitGeneratorSettings
         {

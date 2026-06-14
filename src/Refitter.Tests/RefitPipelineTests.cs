@@ -37,6 +37,37 @@ paths:
           description: success
 ";
 
+    private const string SwaggerSpec = @"
+swagger: '2.0'
+info:
+  title: Test API
+  version: '1.0'
+host: api.example.com
+basePath: /v1
+paths:
+  /foo:
+    get:
+      tags: ['Foo']
+      operationId: 'GetAllFoos'
+      responses:
+        '200':
+          description: success
+  /bar:
+    get:
+      tags: ['Bar']
+      operationId: 'GetAllBars'
+      responses:
+        '200':
+          description: success
+  /baz:
+    get:
+      tags: ['Baz']
+      operationId: 'GetAllBazs'
+      responses:
+        '200':
+          description: success
+";
+
     [Test]
     public async Task CreateAsync_LoadsAndProcessesDocument()
     {
@@ -126,5 +157,41 @@ paths:
         var result = sut.GenerateMultipleFiles();
 
         result.Files.Should().NotBeEmpty();
+    }
+
+    [Test]
+    public async Task CreateAsync_WithSwagger20_LoadsAndProcessesDocument()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            Namespace = "PipelineTest",
+            IncludeTags = ["Foo", "Bar"]
+        };
+
+        var sut = await RefitPipeline.CreateAsync(settings);
+
+        sut.Should().NotBeNull();
+        sut.OpenApiDocument.Paths.Should().ContainKey("/foo");
+        sut.OpenApiDocument.Paths.Should().ContainKey("/bar");
+        sut.OpenApiDocument.Paths.Should().NotContainKey("/baz");
+    }
+
+    [Test]
+    public async Task Pipeline_WithSwagger20_Generate_ProducesValidCode()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            Namespace = "PipelineTest"
+        };
+
+        var sut = await RefitPipeline.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain("PipelineTest");
     }
 }

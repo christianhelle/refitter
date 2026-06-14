@@ -22,6 +22,9 @@ public sealed class RefitSchemaCleaner : IRefitSchemaCleaner
         string[] keepSchemaPatterns,
         bool includeInheritanceHierarchy)
     {
+        if (document == null) throw new ArgumentNullException(nameof(document));
+        if (keepSchemaPatterns == null) throw new ArgumentNullException(nameof(keepSchemaPatterns));
+
         if (!removeUnusedSchema)
             return document;
 

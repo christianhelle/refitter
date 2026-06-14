@@ -19,6 +19,9 @@ public static class RefitDocumentFilter
     /// <returns>A new OpenAPI document with only matching operations.</returns>
     public static OpenApiDocument FilterByTags(OpenApiDocument document, string[] includeTags)
     {
+        if (document == null) throw new ArgumentNullException(nameof(document));
+        if (includeTags == null) throw new ArgumentNullException(nameof(includeTags));
+
         if (includeTags.Length == 0)
             return document;
 
@@ -62,6 +65,9 @@ public static class RefitDocumentFilter
     /// <returns>A new OpenAPI document with only matching paths.</returns>
     public static OpenApiDocument FilterByPath(OpenApiDocument document, string[] includePathMatches)
     {
+        if (document == null) throw new ArgumentNullException(nameof(document));
+        if (includePathMatches == null) throw new ArgumentNullException(nameof(includePathMatches));
+
         if (includePathMatches.Length == 0)
             return document;
 

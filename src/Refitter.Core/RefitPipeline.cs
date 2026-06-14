@@ -41,6 +41,8 @@ public static class RefitPipeline
     /// <returns>A new RefitGenerator with the processed document.</returns>
     public static async Task<RefitGenerator> CreateAsync(RefitGeneratorSettings settings)
     {
+        if (settings == null) throw new ArgumentNullException(nameof(settings));
+
         var openApiDocument = await GetOpenApiDocument(settings).ConfigureAwait(false);
         return Create(openApiDocument, settings);
     }
