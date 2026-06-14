@@ -131,7 +131,13 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 {
                     Directory.CreateDirectory(folder);
                 }
-                File.WriteAllText(outputPath, content, Encoding.UTF8);
+
+                var existingContent = File.Exists(outputPath) ? File.ReadAllText(outputPath, Encoding.UTF8) : null;
+                if (existingContent == null || !existingContent.Equals(content, StringComparison.Ordinal))
+                {
+                    File.WriteAllText(outputPath, content, Encoding.UTF8);
+                }
+
                 diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(outputPath));
             }
             catch (Exception e)
