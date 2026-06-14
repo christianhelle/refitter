@@ -3,14 +3,24 @@ using NSwag;
 
 namespace Refitter.Core;
 
+/// <summary>
+/// Generates Refit client and interface code from an OpenAPI document.
+/// Handles both single-file and multi-file output modes.
+/// </summary>
 public sealed class RefitCodeGenerator : IRefitCodeGenerator
 {
+    /// <summary>
+    /// Generates all Refit code as a single string.
+    /// </summary>
     public string Generate(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
         return FormatSingleFile(result, settings);
     }
 
+    /// <summary>
+    /// Generates Refit code as multiple files (interfaces, contracts, DI, serializer context).
+    /// </summary>
     public GeneratorOutput GenerateMultipleFiles(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
