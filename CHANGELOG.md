@@ -31,6 +31,7 @@
 
 **Merged pull requests:**
 
+- Update test assertions for struct nullability and target framework [\#1142](https://github.com/christianhelle/refitter/pull/1142) ([christianhelle](https://github.com/christianhelle))
 - Improve code coverage [\#1132](https://github.com/christianhelle/refitter/pull/1132) ([christianhelle](https://github.com/christianhelle))
 - Refactor RefitGenerator to add synchronous factory method and fix RS1035 [\#1131](https://github.com/christianhelle/refitter/pull/1131) ([christianhelle](https://github.com/christianhelle))
 - Inline FileWriter and WellKnownNamespaces utility modules [\#1130](https://github.com/christianhelle/refitter/pull/1130) ([christianhelle](https://github.com/christianhelle))
