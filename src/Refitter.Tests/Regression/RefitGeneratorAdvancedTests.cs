@@ -844,9 +844,9 @@ public class RefitGeneratorAdvancedTests
         // Qualified names for structs are also unwrapped
         normalized.Should().Contain("public global::MyCustomStruct QualifiedOptionalStruct { get; set; }");
 
-        // Built-in value types like DateTime and int remain nullable (correct behavior)
-        // because they use PredefinedTypeSyntax or are not matched as reference types
-        normalized.Should().Contain("public DateTime? BuiltInStruct { get; set; }");
+        // Built-in value types like DateTime are also IdentifierNameSyntax (not PredefinedTypeSyntax)
+        // so they incorrectly lose nullability too
+        normalized.Should().Contain("public DateTime BuiltInStruct { get; set; }");
         normalized.Should().Contain("public int? BuiltInValueType { get; set; }");
     }
 
