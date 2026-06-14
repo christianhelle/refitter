@@ -380,6 +380,40 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [Test]
+    public void QueryParameterExtractor_Returns_Empty_When_No_Query_Parameters()
+    {
+        var operationModel = CreateOperationModel();
+        var extractor = new QueryParameterExtractor();
+        var result = extractor.Extract(operationModel, new OpenApiOperation(), new RefitGeneratorSettings()).ToList();
+
+        result.Should().BeEmpty();
+        extractor.DynamicQuerystringCode.Should().Be(string.Empty);
+    }
+
+    [Test]
+    public void QueryParameterExtractor_With_Dynamic_Enabled_But_Single_Query_Param_Falls_Back_To_Simple()
+    {
+        var param = CreateParameterModel("query", "query", "string",
+            parameter: new OpenApiParameter
+            {
+                Name = "query",
+                Kind = OpenApiParameterKind.Query,
+                Schema = new JsonSchema { Type = JsonObjectType.String }
+            });
+        var operationModel = CreateOperationModel(param);
+        var settings = new RefitGeneratorSettings { UseDynamicQuerystringParameters = true };
+
+        var extractor = new QueryParameterExtractor
+        {
+            DynamicQuerystringParameterType = "QueryParams"
+        };
+        var result = extractor.Extract(operationModel, new OpenApiOperation(), settings).ToList();
+
+        result.Should().ContainSingle().Which.Should().Contain("query");
+        extractor.DynamicQuerystringCode.Should().Be(string.Empty);
+    }
+
+    [Test]
     public void QueryParameterExtractor_With_No_Dynamic_Returns_Simple_Extraction()
     {
         var param = CreateParameterModel("query", "query", "string",
@@ -393,10 +427,10 @@ public class ParameterExtractorPrivateCoverageTests
         var settings = new RefitGeneratorSettings();
 
         var extractor = new QueryParameterExtractor();
-        var args = new object?[] { operationModel, new OpenApiOperation(), settings };
         var result = extractor.Extract(operationModel, new OpenApiOperation(), settings).ToList();
 
         result.Should().ContainSingle().Which.Should().Contain("query");
+        extractor.DynamicQuerystringCode.Should().Be(string.Empty);
     }
 
     [Test]
@@ -434,6 +468,7 @@ public class ParameterExtractorPrivateCoverageTests
             new RefitGeneratorSettings { UseDynamicQuerystringParameters = true }).ToList();
 
         result.Should().ContainSingle().Which.Should().Be("[Query] SearchQueryParams? queryParams");
+        extractor.DynamicQuerystringCode.Should().Contain("class SearchQueryParams");
     }
 
     [Test]
@@ -471,6 +506,7 @@ public class ParameterExtractorPrivateCoverageTests
             new RefitGeneratorSettings { UseDynamicQuerystringParameters = true }).ToList();
 
         result.Should().ContainSingle().Which.Should().Be("[Query] SearchQueryParams queryParams");
+        extractor.DynamicQuerystringCode.Should().Contain("class SearchQueryParams");
     }
 
     private static CSharpParameterModel CreateParameterModel(
