@@ -30,16 +30,10 @@ internal class ParameterAggregator : IParameterExtractor
         allParameters.AddRange(GetExtractor<RouteParameterExtractor>().Extract(operationModel, operation, settings));
 
         // Query parameters (with dynamic querystring support)
-        var queryParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Query)
-            .ToList();
-
-        allParameters.AddRange(ExtractQueryParameters(
-            operationModel,
-            settings,
-            dynamicQuerystringParameterType,
-            queryParameters,
-            out dynamicQuerystringParameters));
+        var queryExtractor = GetExtractor<QueryParameterExtractor>();
+        queryExtractor.DynamicQuerystringParameterType = dynamicQuerystringParameterType;
+        allParameters.AddRange(queryExtractor.Extract(operationModel, operation, settings));
+        dynamicQuerystringParameters = queryExtractor.DynamicQuerystringCode;
 
         // Body parameters (including binary body)
         allParameters.AddRange(GetExtractor<BodyParameterExtractor>().Extract(operationModel, operation, settings));
@@ -63,48 +57,9 @@ internal class ParameterAggregator : IParameterExtractor
         return allParameters;
     }
 
-    private IParameterTypeExtractor GetExtractor<T>() where T : IParameterTypeExtractor
+    private T GetExtractor<T>() where T : IParameterTypeExtractor
     {
         return extractors.OfType<T>().First();
-    }
-
-    private static List<string> ExtractQueryParameters(
-        CSharpOperationModel operationModel,
-        RefitGeneratorSettings settings,
-        string dynamicQuerystringParameterType,
-        List<CSharpParameterModel> queryParameters,
-        out string? dynamicQuerystringParameters)
-    {
-        List<string>? parameters = null;
-        var dynamicQuerystringParametersCodeBuilder = string.Empty;
-
-        if (settings.UseDynamicQuerystringParameters && queryParameters.Count >= 2)
-        {
-            var allNullable = queryParameters.All(p =>
-                ParameterShared.GetQueryParameterType(p, settings).EndsWith("?"));
-
-            var dynamicQuerystringCode = DynamicQuerystringParameterBuilder.Build(
-                queryParameters,
-                dynamicQuerystringParameterType,
-                settings);
-
-            if (!string.IsNullOrWhiteSpace(dynamicQuerystringCode))
-            {
-                dynamicQuerystringParametersCodeBuilder = dynamicQuerystringCode;
-            }
-
-            var dynamicQuerystringParameter = $"[Query] {dynamicQuerystringParameterType}";
-            if (allNullable)
-                dynamicQuerystringParameter += "?";
-            dynamicQuerystringParameter += " queryParams";
-            parameters = [dynamicQuerystringParameter];
-        }
-
-        dynamicQuerystringParameters = dynamicQuerystringParametersCodeBuilder;
-
-        parameters ??= QueryParameterExtractor.ExtractSimple(operationModel, settings).ToList();
-
-        return parameters;
     }
 
     private static IReadOnlyList<IParameterTypeExtractor> GetDefaultExtractors()
@@ -112,6 +67,7 @@ internal class ParameterAggregator : IParameterExtractor
         return new IParameterTypeExtractor[]
         {
             new RouteParameterExtractor(),
+            new QueryParameterExtractor(),
             new BodyParameterExtractor(),
             new HeaderParameterExtractor(),
             new FormParameterExtractor(),

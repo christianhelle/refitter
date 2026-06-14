@@ -5,9 +5,6 @@ namespace Refitter.Core;
 
 internal class HeaderParameterExtractor : IParameterTypeExtractor
 {
-    public bool CanExtract(OpenApiParameterKind kind) =>
-        kind == OpenApiParameterKind.Header;
-
     public IEnumerable<string> Extract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,

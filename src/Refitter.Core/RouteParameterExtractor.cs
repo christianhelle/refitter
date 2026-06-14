@@ -5,9 +5,6 @@ namespace Refitter.Core;
 
 internal class RouteParameterExtractor : IParameterTypeExtractor
 {
-    public bool CanExtract(OpenApiParameterKind kind) =>
-        kind == OpenApiParameterKind.Path;
-
     public IEnumerable<string> Extract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
