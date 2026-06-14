@@ -6,7 +6,6 @@
 
 **Implemented enhancements:**
 
-- Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1123](https://github.com/christianhelle/refitter/issues/1123)
 - Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1122](https://github.com/christianhelle/refitter/issues/1122)
 - Deepen RefitterGenerateTask: Replace AsyncLocal test hooks with real seams [\#1121](https://github.com/christianhelle/refitter/issues/1121)
 - Fix RefitterSourceGenerator: Remove blocking I/O and async-over-sync in source generator [\#1120](https://github.com/christianhelle/refitter/issues/1120)
@@ -16,6 +15,7 @@
 - Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
 - Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
+- Refactor InterfaceGenerator into composable method generators [\#1147](https://github.com/christianhelle/refitter/pull/1147) ([christianhelle](https://github.com/christianhelle))
 - Propagate JsonLibraryVersion and preserve ImmutableRecords for GenerateNativeRecords [\#1141](https://github.com/christianhelle/refitter/pull/1141) ([christianhelle](https://github.com/christianhelle))
 - Remove IGenerationOrchestrator ghost interface [\#1140](https://github.com/christianhelle/refitter/pull/1140) ([christianhelle](https://github.com/christianhelle))
 - Update GeneratorPipeline to use injected IContractsPostProcessor adapters [\#1139](https://github.com/christianhelle/refitter/pull/1139) ([christianhelle](https://github.com/christianhelle))
