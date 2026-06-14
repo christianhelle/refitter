@@ -1,40 +1,31 @@
 using System.Text;
-using System.Text.RegularExpressions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSwag;
 
 namespace Refitter.Core;
 
 internal sealed class GeneratorPipeline
 {
-    private static readonly Regex JsonStringEnumConverterAttributeRegex = new(
-        @"^\s*\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof\((System\.Text\.Json\.Serialization\.)?JsonStringEnumConverter(?:<[\w.]+>)?\)\)\]\s*\r?\n?",
-        RegexOptions.Compiled | RegexOptions.Multiline,
-        TimeSpan.FromSeconds(1));
+    private readonly InterfaceGenerator interfaceGenerator;
+    private readonly IReadOnlyList<IContractsPostProcessor> contractsPostProcessors;
 
-    private static readonly Regex EnumDeclarationRegex = new(
-        @"^(\s*)((?:public|internal)\s+(?:partial\s+)?enum\s+\w+\b)",
-        RegexOptions.Compiled | RegexOptions.Multiline,
-        TimeSpan.FromSeconds(1));
+    internal GeneratorPipeline(
+        XmlDocumentationGenerator docGenerator,
+        InterfaceGenerator interfaceGenerator,
+        IEnumerable<IContractsPostProcessor> contractsPostProcessors)
+    {
+        this.interfaceGenerator = interfaceGenerator;
+        this.contractsPostProcessors = contractsPostProcessors.ToArray();
+    }
 
     public GenerationResult Run(
         OpenApiDocument document,
         RefitGeneratorSettings settings,
         CustomCSharpClientGenerator generator)
     {
-        var docGenerator = new XmlDocumentationGenerator(settings);
-
-        // Create the interface generator before calling GenerateFile() so that
-        // OperationNameGenerator.CheckForDuplicateOperationIds() sees the original
-        // (pre-generation) operation IDs. GenerateFile() auto-populates operation IDs
-        // with globally unique names which would prevent the switch to the path segments
-        // generator, causing unnecessary numeric suffixes in ByTag mode.
-        var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
-
         var contracts = generator.GenerateFile();
-        contracts = SanitizeGeneratedContracts(document, settings, contracts);
+        foreach (var postProcessor in contractsPostProcessors)
+            contracts = postProcessor.Process(document, settings, contracts);
+
         var serializerContext = GenerateJsonSerializerContext(document, settings, contracts);
         var interfaces = GenerateClient(document, settings, interfaceGenerator);
         var interfaceNames = interfaces.Select(c => c.TypeName).ToArray();
@@ -58,51 +49,7 @@ internal sealed class GeneratorPipeline
         };
     }
 
-    internal static string SanitizeGeneratedContracts(OpenApiDocument document, RefitGeneratorSettings settings, string contracts)
-    {
-        contracts = NormalizeSwagger2OptionalReferencePropertyNullability(document, settings, contracts);
-
-        if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
-        {
-            contracts = JsonStringEnumConverterAttributeRegex.Replace(contracts, string.Empty);
-            var newLine = GetPreferredNewLine(contracts);
-            return EnumDeclarationRegex
-                .Replace(
-                    contracts,
-                    match =>
-                        $"{match.Groups[1].Value}[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]{newLine}{match.Groups[1].Value}{match.Groups[2].Value}")
-                .TrimEnd();
-        }
-
-        return JsonStringEnumConverterAttributeRegex
-            .Replace(contracts, string.Empty)
-            .TrimEnd();
-    }
-
-    private static string GetPreferredNewLine(string content) =>
-        content.Contains("\r\n", StringComparison.Ordinal)
-            ? "\r\n"
-            : "\n";
-
-    internal static string NormalizeSwagger2OptionalReferencePropertyNullability(
-        OpenApiDocument document,
-        RefitGeneratorSettings settings,
-        string contracts)
-    {
-        if (document.SchemaType != NJsonSchema.SchemaType.Swagger2 ||
-            settings.CodeGeneratorSettings?.GenerateNullableReferenceTypes != true ||
-            settings.CodeGeneratorSettings.GenerateOptionalPropertiesAsNullable)
-        {
-            return contracts;
-        }
-
-        var tree = CSharpSyntaxTree.ParseText(contracts);
-        var root = tree.GetCompilationUnitRoot();
-        var rewrittenRoot = new Swagger2OptionalReferencePropertyNullabilityRewriter().Visit(root);
-        return rewrittenRoot!.ToFullString();
-    }
-
-    internal static string GenerateJsonSerializerContext(
+    private static string GenerateJsonSerializerContext(
         OpenApiDocument document,
         RefitGeneratorSettings settings,
         string contracts) =>
@@ -187,32 +134,6 @@ internal sealed class GeneratorPipeline
             // </auto-generated>
 
             """);
-    }
-
-    private sealed class Swagger2OptionalReferencePropertyNullabilityRewriter : CSharpSyntaxRewriter
-    {
-        public override SyntaxNode? VisitPropertyDeclaration(PropertyDeclarationSyntax node)
-        {
-            if (node.Type is NullableTypeSyntax nullableType &&
-                IsReferenceType(nullableType.ElementType))
-            {
-                node = node.WithType(nullableType.ElementType.WithTriviaFrom(node.Type));
-            }
-
-            return base.VisitPropertyDeclaration(node);
-        }
-
-        private static bool IsReferenceType(TypeSyntax typeSyntax) =>
-            typeSyntax switch
-            {
-                PredefinedTypeSyntax predefinedType => predefinedType.Keyword.Kind() is SyntaxKind.ObjectKeyword or SyntaxKind.StringKeyword,
-                ArrayTypeSyntax => true,
-                IdentifierNameSyntax => true,
-                GenericNameSyntax => true,
-                QualifiedNameSyntax => true,
-                AliasQualifiedNameSyntax => true,
-                _ => false,
-            };
     }
 }
 

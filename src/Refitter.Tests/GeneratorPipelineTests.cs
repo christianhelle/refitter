@@ -131,6 +131,12 @@ public class GeneratorPipelineTests
     private static GenerationResult RunPipeline(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        return new GeneratorPipeline().Run(document, settings, generator);
+        var docGenerator = new XmlDocumentationGenerator(settings);
+        var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
+        var pipeline = new GeneratorPipeline(
+            docGenerator,
+            interfaceGenerator,
+            Array.Empty<IContractsPostProcessor>());
+        return pipeline.Run(document, settings, generator);
     }
 }

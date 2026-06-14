@@ -9,7 +9,6 @@ namespace Refitter.Core;
 /// </summary>
 public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
 {
-    private readonly GeneratorPipeline pipeline = new();
 
     /// <summary>
     /// OpenAPI specifications used to generate Refit clients and interfaces.
@@ -157,17 +156,26 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     {
         var factory = new CSharpClientGeneratorFactory(settings, document);
         var generator = factory.Create();
+        var docGenerator = new XmlDocumentationGenerator(settings);
+
+        // Create the interface generator before calling GenerateFile() so that
+        // OperationNameGenerator.CheckForDuplicateOperationIds() sees the original
+        // (pre-generation) operation IDs. GenerateFile() auto-populates operation IDs
+        // with globally unique names which would prevent the switch to the path segments
+        // generator, causing unnecessary numeric suffixes in ByTag mode.
+        var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
+
+        var pipeline = new GeneratorPipeline(
+            docGenerator,
+            interfaceGenerator,
+            new IContractsPostProcessor[]
+            {
+                new Swagger2OptionalReferenceNullabilityNormalizer(),
+                new EnumStringConverterInjector(),
+            });
+
         return pipeline.Run(document, settings, generator);
     }
-
-    private string SanitizeGeneratedContracts(string contracts) =>
-        GeneratorPipeline.SanitizeGeneratedContracts(document, settings, contracts);
-
-    private string NormalizeSwagger2OptionalReferencePropertyNullability(string contracts) =>
-        GeneratorPipeline.NormalizeSwagger2OptionalReferencePropertyNullability(document, settings, contracts);
-
-    private string GenerateJsonSerializerContext(string contracts) =>
-        GeneratorPipeline.GenerateJsonSerializerContext(document, settings, contracts);
 
     private string FormatSingleFile(GenerationResult result)
     {

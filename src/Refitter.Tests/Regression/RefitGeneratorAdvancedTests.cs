@@ -1,4 +1,3 @@
-using System.Reflection;
 using FluentAssertions;
 using NJsonSchema;
 using NSwag;
@@ -761,18 +760,18 @@ public class RefitGeneratorAdvancedTests
             }
             """;
 
-        var generator = new RefitGenerator(
-            new RefitGeneratorSettings
+        var normalizer = new Swagger2OptionalReferenceNullabilityNormalizer();
+        var document = new OpenApiDocument { SchemaType = SchemaType.Swagger2 };
+        var settings = new RefitGeneratorSettings
+        {
+            CodeGeneratorSettings = new CodeGeneratorSettings
             {
-                CodeGeneratorSettings = new CodeGeneratorSettings
-                {
-                    GenerateNullableReferenceTypes = true,
-                    GenerateOptionalPropertiesAsNullable = false
-                }
-            },
-            new OpenApiDocument { SchemaType = SchemaType.Swagger2 });
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = false
+            }
+        };
 
-        var normalized = NormalizeSwagger2OptionalReferencePropertyNullability(generator, contracts);
+        var normalized = normalizer.Process(document, settings, contracts);
 
         normalized.Should().Contain("public Pet[] Pets { get; set; }");
         normalized.Should().Contain("public List<Pet> Values { get; set; }");
@@ -780,6 +779,75 @@ public class RefitGeneratorAdvancedTests
         normalized.Should().Contain("public (string First, string Last)? NameParts { get; set; }");
         normalized.Should().Contain("public int? Count { get; set; }");
         BuildHelper.BuildCSharp(normalized).Should().BeTrue();
+    }
+
+    [Test]
+    public void NormalizeSwagger2OptionalReferencePropertyNullability_Incorrectly_Removes_Nullability_From_Struct_Value_Types()
+    {
+        const string contracts = """
+            using System;
+            using System.Collections.Generic;
+
+            public struct MyCustomStruct
+            {
+                public int Value { get; set; }
+            }
+
+            public struct Coordinate
+            {
+                public double X { get; set; }
+                public double Y { get; set; }
+            }
+
+            namespace Generated.Contracts
+            {
+                public partial class Response
+                {
+                    public MyCustomStruct? OptionalStruct { get; set; }
+
+                    public Coordinate? OptionalCoordinate { get; set; }
+
+                    public List<MyCustomStruct>? OptionalStructList { get; set; }
+
+                    public global::MyCustomStruct? QualifiedOptionalStruct { get; set; }
+
+                    public DateTime? BuiltInStruct { get; set; }
+
+                    public int? BuiltInValueType { get; set; }
+                }
+            }
+            """;
+
+        var normalizer = new Swagger2OptionalReferenceNullabilityNormalizer();
+        var document = new OpenApiDocument { SchemaType = SchemaType.Swagger2 };
+        var settings = new RefitGeneratorSettings
+        {
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = false
+            }
+        };
+
+        var normalized = normalizer.Process(document, settings, contracts);
+
+        // Document current behavior: The normalizer incorrectly treats custom struct types
+        // (IdentifierNameSyntax) as reference types and removes their nullability.
+        // This is because IsReferenceType() uses a heuristic that treats all IdentifierNameSyntax
+        // nodes as reference types, which is incorrect for custom struct types.
+        normalized.Should().Contain("public MyCustomStruct OptionalStruct { get; set; }");
+        normalized.Should().Contain("public Coordinate OptionalCoordinate { get; set; }");
+
+        // Generic types are also incorrectly unwrapped when they contain struct types
+        normalized.Should().Contain("public List<MyCustomStruct> OptionalStructList { get; set; }");
+
+        // Qualified names for structs are also unwrapped
+        normalized.Should().Contain("public global::MyCustomStruct QualifiedOptionalStruct { get; set; }");
+
+        // Built-in value types like DateTime and int remain nullable (correct behavior)
+        // because they use PredefinedTypeSyntax or are not matched as reference types
+        normalized.Should().Contain("public DateTime? BuiltInStruct { get; set; }");
+        normalized.Should().Contain("public int? BuiltInValueType { get; set; }");
     }
 
     [Test]
@@ -885,25 +953,20 @@ public class RefitGeneratorAdvancedTests
             }
             """;
 
-        var generator = new RefitGenerator(
-            new RefitGeneratorSettings
+        var settings = new RefitGeneratorSettings
+        {
+            GenerateJsonSerializerContext = true,
+            GenerateContracts = true,
+            Namespace = "Generated.Clients",
+            ContractsNamespace = "Generated.Contracts",
+            Naming = new NamingSettings
             {
-                GenerateJsonSerializerContext = true,
-                GenerateContracts = true,
-                Namespace = "Generated.Clients",
-                ContractsNamespace = "Generated.Contracts",
-                Naming = new NamingSettings
-                {
-                    UseOpenApiTitle = true,
-                    InterfaceName = "ITestApi"
-                }
-            },
-            new OpenApiDocument
-            {
-                Info = null!
-            });
+                UseOpenApiTitle = true,
+                InterfaceName = "ITestApi"
+            }
+        };
 
-        var serializerContext = GenerateJsonSerializerContext(generator, contracts);
+        var serializerContext = JsonSerializerContextGenerator.Generate(contracts, settings);
 
         serializerContext.Should().Contain("internal partial class TestApiSerializerContext");
     }
@@ -1032,26 +1095,6 @@ public class RefitGeneratorAdvancedTests
     }
 
     #endregion
-
-    private static string NormalizeSwagger2OptionalReferencePropertyNullability(RefitGenerator generator, string contracts)
-    {
-        var method = typeof(RefitGenerator).GetMethod(
-            "NormalizeSwagger2OptionalReferencePropertyNullability",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-
-        method.Should().NotBeNull();
-        return method!.Invoke(generator, [contracts]).Should().BeOfType<string>().Subject;
-    }
-
-    private static string GenerateJsonSerializerContext(RefitGenerator generator, string contracts)
-    {
-        var method = typeof(RefitGenerator).GetMethod(
-            "GenerateJsonSerializerContext",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-
-        method.Should().NotBeNull();
-        return method!.Invoke(generator, [contracts]).Should().BeOfType<string>().Subject;
-    }
 
     private static void CleanupSwaggerFile(string swaggerFile)
     {
