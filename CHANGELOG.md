@@ -19,6 +19,7 @@
 - Remove IGenerationOrchestrator ghost interface [\#1140](https://github.com/christianhelle/refitter/pull/1140) ([christianhelle](https://github.com/christianhelle))
 - Update GeneratorPipeline to use injected IContractsPostProcessor adapters [\#1139](https://github.com/christianhelle/refitter/pull/1139) ([christianhelle](https://github.com/christianhelle))
 - Convention based CLI Settings Mapper [\#1137](https://github.com/christianhelle/refitter/pull/1137) ([christianhelle](https://github.com/christianhelle))
+- Consolidate parameter extraction - Remove IParameterTypeExtractor [\#1136](https://github.com/christianhelle/refitter/pull/1136) ([christianhelle](https://github.com/christianhelle))
 - Ensure Refit v11 compatibility [\#1111](https://github.com/christianhelle/refitter/pull/1111) ([christianhelle](https://github.com/christianhelle))
 - Fix missing interface XML docs in multi-interface generation [\#1110](https://github.com/christianhelle/refitter/pull/1110) ([christianhelle](https://github.com/christianhelle))
 - Add JsonLibraryVersion property and CLI support for code generation [\#1106](https://github.com/christianhelle/refitter/pull/1106) ([christianhelle](https://github.com/christianhelle))
