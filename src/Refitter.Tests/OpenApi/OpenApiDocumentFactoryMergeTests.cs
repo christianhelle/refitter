@@ -10,6 +10,8 @@ namespace Refitter.Tests.OpenApi;
 
 public class OpenApiDocumentFactoryMergeTests
 {
+    private static readonly DocumentEquivalenceComparer Comparer = new();
+    private static readonly DocumentMerger Merger = new(Comparer);
     [Test]
     public async Task Merge_Preserves_Tags_From_Base_Document()
     {
@@ -1617,20 +1619,7 @@ paths:
         => OpenApiDocument.FromJsonAsync(json);
 
     private static OpenApiDocument InvokeMerge(params OpenApiDocument[] documents)
-    {
-        var mergeMethod = typeof(OpenApiDocumentFactory).GetMethod("Merge", BindingFlags.NonPublic | BindingFlags.Static);
-
-        mergeMethod.Should().NotBeNull();
-
-        try
-        {
-            return (OpenApiDocument)mergeMethod!.Invoke(null, [documents])!;
-        }
-        catch (TargetInvocationException exception) when (exception.InnerException != null)
-        {
-            throw exception.InnerException;
-        }
-    }
+        => Merger.Merge(documents);
 
     private static void InvokeMergeIfMissingOrThrowOnConflict<TValue>(
         IDictionary<string, TValue> target,
@@ -1638,13 +1627,13 @@ paths:
         TValue value,
         string itemType)
     {
-        var mergeMethod = typeof(OpenApiDocumentFactory)
-            .GetMethod("MergeIfMissingOrThrowOnConflict", BindingFlags.NonPublic | BindingFlags.Static)!
+        var mergeMethod = typeof(DocumentMerger)
+            .GetMethod("MergeIfMissingOrThrowOnConflict", BindingFlags.NonPublic | BindingFlags.Instance)!
             .MakeGenericMethod(typeof(TValue));
 
         try
         {
-            mergeMethod.Invoke(null, [target, key, value!, itemType]);
+            mergeMethod.Invoke(Merger, [target, key, value!, itemType]);
         }
         catch (TargetInvocationException exception) when (exception.InnerException != null)
         {
@@ -1653,61 +1642,25 @@ paths:
     }
 
     private static bool InvokeAreEquivalent<TValue>(TValue existingValue, TValue incomingValue)
-    {
-        var areEquivalentMethod = typeof(OpenApiDocumentFactory)
-            .GetMethod("AreEquivalent", BindingFlags.NonPublic | BindingFlags.Static)!
-            .MakeGenericMethod(typeof(TValue));
-
-        return (bool)areEquivalentMethod.Invoke(null, [existingValue!, incomingValue!])!;
-    }
+        => Comparer.AreEquivalent(existingValue, incomingValue);
 
     private static JToken InvokeCreateCanonicalSchemaToken(JsonSchema schema, ISet<JsonSchema> visited)
-    {
-        var createCanonicalSchemaTokenMethod = typeof(OpenApiDocumentFactory)
-            .GetMethod("CreateCanonicalSchemaToken", BindingFlags.NonPublic | BindingFlags.Static)!;
-
-        return (JToken)createCanonicalSchemaTokenMethod.Invoke(null, [schema, visited])!;
-    }
+        => Comparer.CreateCanonicalSchemaToken(schema, visited);
 
     private static JToken InvokeCreateCanonicalJsonToken(object value)
-    {
-        var createCanonicalJsonTokenMethod = typeof(OpenApiDocumentFactory)
-            .GetMethod("CreateCanonicalJsonToken", BindingFlags.NonPublic | BindingFlags.Static)!;
-
-        return (JToken)createCanonicalJsonTokenMethod.Invoke(null, [value])!;
-    }
+        => Comparer.CreateCanonicalJsonToken(value);
 
     private static void InvokeAddReferencedSchemas(IDictionary<string, JsonSchema> definitions, JsonSchema schema)
-    {
-        var addReferencedSchemasMethod = typeof(OpenApiDocumentFactory)
-            .GetMethod("AddReferencedSchemas", BindingFlags.NonPublic | BindingFlags.Static)!;
-
-        addReferencedSchemasMethod.Invoke(null, [definitions, schema]);
-    }
+        => Comparer.AddReferencedSchemas(definitions, schema);
 
     private static string? InvokeGetDefinitionName(JsonSchema schema)
-    {
-        var getDefinitionNameMethod = typeof(OpenApiDocumentFactory)
-            .GetMethod("GetDefinitionName", BindingFlags.NonPublic | BindingFlags.Static)!;
-
-        return (string?)getDefinitionNameMethod.Invoke(null, [schema]);
-    }
+        => Comparer.GetDefinitionName(schema);
 
     private static string InvokeCreateOpenApiJson(object value)
-    {
-        var createOpenApiJsonMethod = typeof(OpenApiDocumentFactory)
-            .GetMethod("CreateOpenApiJson", BindingFlags.NonPublic | BindingFlags.Static)!;
-
-        return (string)createOpenApiJsonMethod.Invoke(null, [value])!;
-    }
+        => Comparer.CreateOpenApiJson(value);
 
     private static JObject InvokeRemoveNullProperties(JObject json)
-    {
-        var removeNullPropertiesMethod = typeof(OpenApiDocumentFactory)
-            .GetMethod("RemoveNullProperties", BindingFlags.NonPublic | BindingFlags.Static)!;
-
-        return (JObject)removeNullPropertiesMethod.Invoke(null, [json])!;
-    }
+        => Comparer.RemoveNullProperties(json);
 
     private sealed class SelfReferencingValue
     {
