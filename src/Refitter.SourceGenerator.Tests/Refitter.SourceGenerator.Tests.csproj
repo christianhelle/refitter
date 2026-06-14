@@ -54,6 +54,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Include="AdditionalFiles\Generated\*.cs" />
       <Folder Include="AdditionalFiles\Generated\" />
     </ItemGroup>
 
