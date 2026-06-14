@@ -28,6 +28,7 @@
 **Fixed bugs:**
 
 - Build Error CS1591 Missing XML comment for publicly visible type or member [\#1109](https://github.com/christianhelle/refitter/issues/1109)
+- Fix Source Generator not emitting any files [\#1143](https://github.com/christianhelle/refitter/pull/1143) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
