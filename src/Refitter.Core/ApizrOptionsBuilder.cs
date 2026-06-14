@@ -7,7 +7,7 @@ internal class ApizrOptionsBuilder : IApizrOptionsBuilder
 {
     private readonly StringBuilder _optionsCode;
     private readonly StringBuilder _usingsCode;
-    private readonly List<ApizrPackages> _packages = new();
+    private readonly HashSet<ApizrPackages> _packages = new();
     private bool _hasOptions;
 
     public ApizrOptionsBuilder(string initialOptionsCode, string initialUsings)
@@ -69,5 +69,5 @@ internal class ApizrOptionsBuilder : IApizrOptionsBuilder
 
     public string GetUsings() => _usingsCode.ToString();
 
-    public List<ApizrPackages> GetPackages() => _packages;
+    public List<ApizrPackages> GetPackages() => _packages.ToList();
 }
