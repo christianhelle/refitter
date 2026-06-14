@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text;
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 using Refitter.Core;
@@ -52,14 +53,12 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         {
             context.ReportDiagnostic(CreateDiagnostic(diagnostic));
         }
-
-        if (result.Code is not null && result.HintName is not null)
-        {
-            context.AddSource(result.HintName, result.Code);
-            context.ReportDiagnostic(CreateDiagnostic(CreateGeneratedSuccessfullyDiagnostic(result.HintName)));
-        }
     }
 
+    [SuppressMessage(
+        "MicrosoftCodeAnalysisCorrectness",
+        "RS1035:Do not use APIs banned for analyzers",
+        Justification = "By design")]
     internal static GeneratedCode GenerateCode(
         AdditionalText file,
         CancellationToken cancellationToken = default)
@@ -101,15 +100,50 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var hintName = CreateUniqueHintName(file.Path, settings.OutputFilename);
+            var outputPath = GetOutputPath(file.Path, settings);
+            WriteGeneratedFile(outputPath, refit, diagnostics);
 
-            return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), refit, hintName);
+            return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), outputPath);
         }
         catch (Exception e)
         {
             diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to generate code: {e}"));
 
             return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+        }
+
+        static string GetOutputPath(string refitterFilePath, RefitGeneratorSettings settings)
+        {
+            var directory = GetDirectoryName(refitterFilePath);
+            var folder = Path.Combine(directory, settings.OutputFolder);
+            var filename = !string.IsNullOrWhiteSpace(settings.OutputFilename)
+                ? settings.OutputFilename
+                : GetFileNameWithoutExtension(refitterFilePath) + ".g.cs";
+            return Path.Combine(folder, filename);
+        }
+
+        static void WriteGeneratedFile(string outputPath, string content, List<GeneratedDiagnostic> diagnostics)
+        {
+            try
+            {
+                var folder = Path.GetDirectoryName(outputPath);
+                if (!string.IsNullOrEmpty(folder) && !Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
+                var existingContent = File.Exists(outputPath) ? File.ReadAllText(outputPath, Encoding.UTF8) : null;
+                if (existingContent == null || !existingContent.Equals(content, StringComparison.Ordinal))
+                {
+                    File.WriteAllText(outputPath, content, Encoding.UTF8);
+                }
+
+                diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(outputPath));
+            }
+            catch (Exception e)
+            {
+                diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to write generated code: {e}"));
+            }
         }
     }
 
@@ -180,11 +214,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             "No .refitter files found. Add a `.refitter` file to your project. Refitter.SourceGenerator automatically includes `**/*.refitter` as Roslyn AdditionalFiles via its package props.",
             DiagnosticSeverity.Warning);
 
-    internal static GeneratedDiagnostic CreateGeneratedSuccessfullyDiagnostic(string hintName) =>
+    internal static GeneratedDiagnostic CreateGeneratedSuccessfullyDiagnostic(string outputPath) =>
         new(
             "REFITTER001",
             RefitterDiagnosticTitle,
-            $"{RefitterDiagnosticTitle} generated {hintName} successfully",
+            $"{RefitterDiagnosticTitle} generated {outputPath} successfully",
             DiagnosticSeverity.Info);
 
     private static GeneratedDiagnostic CreateFoundFileDiagnostic(string path) =>
@@ -226,25 +260,25 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 diagnostic.EnabledByDefault),
             Location.None);
 
-    private static string CreateUniqueHintName(string refitterFilePath, string? outputFilename)
+    private static string GetDirectoryName(string path)
     {
-        var baseName = !string.IsNullOrWhiteSpace(outputFilename)
-            ? GetFileNameWithoutExtension(outputFilename!)
-            : GetFileNameWithoutExtension(refitterFilePath);
-
-        if (string.IsNullOrEmpty(baseName) || baseName == ".")
+        var lastSep = path.LastIndexOfAny(new[] { '/', '\\' });
+        if (lastSep < 0)
         {
-            baseName = RefitterDiagnosticTitle;
+            return string.Empty;
         }
-
-        if (!string.IsNullOrWhiteSpace(refitterFilePath))
+        else if (lastSep == 0)
         {
-            var normalizedPath = refitterFilePath.Replace('/', '\\');
-            var pathHash = GetStableHash(normalizedPath);
-            return $"{baseName}_{pathHash}.g.cs";
+            return path.Substring(0, 1);
         }
-
-        return $"{baseName}.g.cs";
+        else if (lastSep == 2 && path.Length > 1 && path[1] == ':')
+        {
+            return path.Substring(0, lastSep + 1);
+        }
+        else
+        {
+            return path.Substring(0, lastSep);
+        }
     }
 
     private static string GetFileNameWithoutExtension(string path)
@@ -255,28 +289,9 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         return lastDot >= 0 ? fileName.Substring(0, lastDot) : fileName;
     }
 
-    /// <summary>
-    /// Generates a stable hash string from the input suitable for use in filenames.
-    /// Uses a simple but deterministic algorithm.
-    /// </summary>
-    private static string GetStableHash(string input)
-    {
-        unchecked
-        {
-            int hash = 17;
-            foreach (char c in input)
-            {
-                hash = hash * 31 + c;
-            }
-            // Convert to unsigned and format as hex to ensure no negative sign
-            return ((uint)hash).ToString("X8");
-        }
-    }
-
     internal readonly record struct GeneratedCode(
         EquatableArray<GeneratedDiagnostic> Diagnostics,
-        string? Code = null,
-        string? HintName = null);
+        string? OutputPath = null);
 
     [SuppressMessage(
         "Major Code Smell",
