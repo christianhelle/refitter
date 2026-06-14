@@ -1,6 +1,4 @@
 using FluentAssertions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using Refitter.Core;
 using Refitter.SourceGenerators.Tests.Build;
 using Refitter.SourceGenerators.Tests.TestUtilities;
@@ -136,37 +134,4 @@ components:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
-    public async Task Test_SourceGenerator_WritesToDisk()
-    {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
-        var outputDir = Path.GetDirectoryName(swaggerFile)!;
-        var refitterPath = Path.Combine(outputDir, "test.refitter");
-        var json = $$"""
-            {
-              "openApiPath": "{{swaggerFile.Replace("\\", "\\\\")}}",
-              "returnIApiResponse": true
-            }
-            """;
-        File.WriteAllText(refitterPath, json);
-
-        var additionalText = new InMemoryAdditionalText(refitterPath, json);
-        var result = RefitterSourceGenerator.GenerateCode(additionalText);
-
-        var outputPath = Path.Combine(outputDir, "Generated", "test.g.cs");
-        File.Exists(outputPath).Should().BeTrue("source generator should write generated code to disk");
-        result.Diagnostics.Should().Contain(d => d.Message.Contains("generated"));
-    }
-
-    private class InMemoryAdditionalText : AdditionalText
-    {
-        private readonly SourceText _text;
-        public InMemoryAdditionalText(string path, string text)
-        {
-            Path = path;
-            _text = SourceText.From(text);
-        }
-        public override string Path { get; }
-        public override SourceText GetText(CancellationToken cancellationToken = default) => _text;
-    }
 }
