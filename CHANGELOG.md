@@ -16,6 +16,7 @@
 - Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
 - Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
+- Remove IGenerationOrchestrator ghost interface [\#1140](https://github.com/christianhelle/refitter/pull/1140) ([christianhelle](https://github.com/christianhelle))
 - Update GeneratorPipeline to use injected IContractsPostProcessor adapters [\#1139](https://github.com/christianhelle/refitter/pull/1139) ([christianhelle](https://github.com/christianhelle))
 - Ensure Refit v11 compatibility [\#1111](https://github.com/christianhelle/refitter/pull/1111) ([christianhelle](https://github.com/christianhelle))
 - Fix missing interface XML docs in multi-interface generation [\#1110](https://github.com/christianhelle/refitter/pull/1110) ([christianhelle](https://github.com/christianhelle))
