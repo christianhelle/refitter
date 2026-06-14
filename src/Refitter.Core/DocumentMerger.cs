@@ -9,13 +9,25 @@ internal sealed class DocumentMerger : IDocumentMerger
 {
     private readonly DocumentEquivalenceComparer _comparer;
 
+    /// <summary>
+    /// Initializes a new instance of the DocumentMerger class.
+    /// </summary>
+    /// <param name="comparer">The comparer used to detect equivalent document elements during merging.</param>
     public DocumentMerger(DocumentEquivalenceComparer comparer)
     {
         _comparer = comparer;
     }
 
+    /// <summary>
+    /// Merges multiple OpenAPI documents into a single document.
+    /// </summary>
+    /// <param name="documents">The array of OpenAPI documents to merge.</param>
+    /// <returns>A merged OpenAPI document containing all paths, schemas, and other elements from the input documents.</returns>
     public OpenApiDocument Merge(OpenApiDocument[] documents)
     {
+        if (documents == null || documents.Length == 0)
+            throw new ArgumentException("The documents parameter cannot be null or empty.", nameof(documents));
+
         var baseDocument = CloneDocument(documents[0]);
         var tagNames = new HashSet<string>(baseDocument.Tags.Select(t => t.Name), StringComparer.Ordinal);
 
@@ -27,11 +39,14 @@ internal sealed class DocumentMerger : IDocumentMerger
                 MergeIfMissingOrThrowOnConflict(baseDocument.Paths, path.Key, path.Value, "path");
             }
 
-            if (document.Components.Schemas.Count > 0)
+            if (document.Components?.Schemas?.Count > 0)
             {
-                foreach (var schema in document.Components.Schemas)
+                if (baseDocument.Components?.Schemas != null)
                 {
-                    MergeIfMissingOrThrowOnConflict(baseDocument.Components.Schemas, schema.Key, schema.Value, "schema");
+                    foreach (var schema in document.Components.Schemas)
+                    {
+                        MergeIfMissingOrThrowOnConflict(baseDocument.Components.Schemas, schema.Key, schema.Value, "schema");
+                    }
                 }
             }
 
