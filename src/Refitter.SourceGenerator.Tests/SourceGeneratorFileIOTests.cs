@@ -1,14 +1,12 @@
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using Refitter.Core;
 using Refitter.SourceGenerators.Tests.Build;
 using Refitter.SourceGenerators.Tests.TestUtilities;
 
 namespace Refitter.SourceGenerators.Tests;
 
-/// <summary>
-/// Test for Issue #635: Source generator should use context.AddSource() instead of File.WriteAllText()
-/// https://github.com/christianhelle/refitter/issues/635
-/// </summary>
 public class SourceGeneratorFileIOTests
 {
     private const string OpenApiSpec = @"
@@ -41,9 +39,8 @@ components:
 ";
 
     [Test]
-    public async Task Test_SourceGenerator_DoesNotWriteToFileSystem()
+    public async Task Test_CoreGenerator_DoesNotWriteToFileSystem()
     {
-        // Arrange
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
@@ -51,34 +48,26 @@ components:
             ReturnIApiResponse = true,
         };
 
-        // Get the directory where output would be written
         var outputDir = Path.GetDirectoryName(swaggerFile)!;
         var possibleOutputFiles = Directory.GetFiles(outputDir, "*.g.cs");
         var initialFileCount = possibleOutputFiles.Length;
 
-        // Act - Generate code (this simulates what the source generator does)
         var generator = await RefitGenerator.CreateAsync(settings);
         var generatedCode = generator.Generate();
 
-        // Assert - Verify no new .g.cs files were created
         var finalOutputFiles = Directory.GetFiles(outputDir, "*.g.cs");
         var finalFileCount = finalOutputFiles.Length;
 
-        // No new files should have been written to disk during generation
         finalFileCount.Should().Be(initialFileCount,
-            "source generator should use context.AddSource() not File.WriteAllText()");
+            "core generator should not write files to disk");
 
-        // But generated code should exist in memory
         generatedCode.Should().NotBeNullOrWhiteSpace();
         generatedCode.Should().Contain("partial interface ITestAPI");
     }
 
     [Test]
-    public async Task Test_SourceGenerator_WithApiDescriptionServer_NoFileConflicts()
+    public async Task Test_CoreGenerator_ConcurrentGeneration()
     {
-        // This tests that concurrent generation doesn't cause file I/O conflicts
-        // When using context.AddSource(), multiple generators can run in parallel safely
-
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
@@ -86,17 +75,14 @@ components:
             ReturnIApiResponse = true,
         };
 
-        // Act - Simulate concurrent generation
         var tasks = Enumerable.Range(0, 5).Select(async i =>
         {
             var generator = await RefitGenerator.CreateAsync(settings);
             return generator.Generate();
         });
 
-        // This should not throw IOException or file access exceptions
         var results = await Task.WhenAll(tasks);
 
-        // Assert - All generations should succeed
         foreach (var code in results)
         {
             code.Should().NotBeNullOrWhiteSpace();
@@ -105,9 +91,8 @@ components:
     }
 
     [Test]
-    public async Task Test_SourceGenerator_GeneratedCodeIsValid()
+    public async Task Test_CoreGenerator_GeneratedCodeIsValid()
     {
-        // Arrange
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
         {
@@ -115,11 +100,9 @@ components:
             ReturnIApiResponse = true,
         };
 
-        // Act
         var generator = await RefitGenerator.CreateAsync(settings);
         var generatedCode = generator.Generate();
 
-        // Assert - Generated code should compile
         generatedCode.Should().Contain("partial interface ITestAPI");
         generatedCode.Should().Contain("Task<IApiResponse<ICollection<User>>> GetUsers(");
 
@@ -130,9 +113,8 @@ components:
     }
 
     [Test]
-    public async Task Test_SourceGenerator_OutputFilename_NotCreatedOnDisk()
+    public async Task Test_CoreGenerator_OutputFilename_NotCreatedOnDisk()
     {
-        // Arrange
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var outputFilename = "CustomOutput.g.cs";
         var settings = new RefitGeneratorSettings
@@ -145,14 +127,46 @@ components:
         var outputDir = Path.GetDirectoryName(swaggerFile)!;
         var expectedFilePath = Path.Combine(outputDir, outputFilename);
 
-        // Act
         var generator = await RefitGenerator.CreateAsync(settings);
         var generatedCode = generator.Generate();
 
-        // Assert - The OutputFilename should NOT create a file on disk
         File.Exists(expectedFilePath).Should().BeFalse(
-            "OutputFilename should be used as hint name for context.AddSource(), not as a file path");
+            "core generator should not write files to disk");
 
         generatedCode.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task Test_SourceGenerator_WritesToDisk()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var outputDir = Path.GetDirectoryName(swaggerFile)!;
+        var refitterPath = Path.Combine(outputDir, "test.refitter");
+        var json = $$"""
+            {
+              "openApiPath": "{{swaggerFile.Replace("\\", "\\\\")}}",
+              "returnIApiResponse": true
+            }
+            """;
+        File.WriteAllText(refitterPath, json);
+
+        var additionalText = new InMemoryAdditionalText(refitterPath, json);
+        var result = RefitterSourceGenerator.GenerateCode(additionalText);
+
+        var outputPath = Path.Combine(outputDir, "Generated", "test.g.cs");
+        File.Exists(outputPath).Should().BeTrue("source generator should write generated code to disk");
+        result.Diagnostics.Should().Contain(d => d.Message.Contains("generated"));
+    }
+
+    private class InMemoryAdditionalText : AdditionalText
+    {
+        private readonly SourceText _text;
+        public InMemoryAdditionalText(string path, string text)
+        {
+            Path = path;
+            _text = SourceText.From(text);
+        }
+        public override string Path { get; }
+        public override SourceText GetText(CancellationToken cancellationToken = default) => _text;
     }
 }
