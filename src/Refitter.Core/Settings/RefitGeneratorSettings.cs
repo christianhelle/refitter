@@ -14,12 +14,21 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Default output folder for generated files.
     /// </summary>
-    public const string DefaultOutputFolder = "./Generated";
+    public const string DefaultOutputFolder = OutputConfig.DefaultOutputFolder;
 
     /// <summary>
     /// Default namespace for generated code.
     /// </summary>
-    public const string DefaultNamespace = "GeneratedCode";
+    public const string DefaultNamespace = OutputConfig.DefaultNamespace;
+
+    private readonly OpenApiSourceConfig _openApiSource = new();
+    private readonly CodeGenerationConfig _codeGeneration = new();
+    private readonly ParameterConfig _parameterConfig = new();
+    private readonly OutputConfig _outputConfig = new();
+    private readonly TypeConfig _typeConfig = new();
+    private readonly FilterConfig _filterConfig = new();
+    private readonly SchemaConfig _schemaConfig = new();
+    private readonly FeatureConfig _featureConfig = new();
 
     /// <summary>
     /// Gets or sets the path to the Open API.
@@ -27,7 +36,11 @@ public class RefitGeneratorSettings
     [Description("The path to the OpenAPI document.")]
     [JsonPropertyName("openApiPath")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? OpenApiPath { get; set; }
+    public string? OpenApiPath
+    {
+        get => _openApiSource.OpenApiPath;
+        set => _openApiSource.OpenApiPath = value;
+    }
 
     /// <summary>
     /// Gets or sets the paths to multiple Open API documents. When specified, the documents are merged.
@@ -35,19 +48,31 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("The paths to multiple OpenAPI documents. When specified, the documents are merged into a single client.")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string[]? OpenApiPaths { get; set; }
+    public string[]? OpenApiPaths
+    {
+        get => _openApiSource.OpenApiPaths;
+        set => _openApiSource.OpenApiPaths = value;
+    }
 
     /// <summary>
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
     /// </summary>
     [Description("The namespace for the generated code. Default is GeneratedCode.")]
-    public string Namespace { get; set; } = DefaultNamespace;
+    public string Namespace
+    {
+        get => _outputConfig.Namespace;
+        set => _outputConfig.Namespace = value;
+    }
 
     /// <summary>
     /// Gets or sets the namespace for the generated contracts. (default: GeneratedCode);
     /// </summary>
     [Description("The namespace for the generated contracts. Default is GeneratedCode.")]
-    public string? ContractsNamespace { get; set; }
+    public string? ContractsNamespace
+    {
+        get => _outputConfig.ContractsNamespace;
+        set => _outputConfig.ContractsNamespace = value;
+    }
 
     /// <summary>
     /// Gets or sets the naming settings.
@@ -60,31 +85,51 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Controls how generated contract properties are named. Default is PascalCase. Possible values: PascalCase, PreserveOriginal.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public PropertyNamingPolicy PropertyNamingPolicy { get; set; } = PropertyNamingPolicy.PascalCase;
+    public PropertyNamingPolicy PropertyNamingPolicy
+    {
+        get => _typeConfig.PropertyNamingPolicy;
+        set => _typeConfig.PropertyNamingPolicy = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether contracts should be generated.
     /// </summary>
     [Description("Generate contracts. Default is true.")]
-    public bool GenerateContracts { get; set; } = true;
+    public bool GenerateContracts
+    {
+        get => _codeGeneration.GenerateContracts;
+        set => _codeGeneration.GenerateContracts = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether clients should be generated.
     /// </summary>
     [Description("Generate clients. Default is true.")]
-    public bool GenerateClients { get; set; } = true;
+    public bool GenerateClients
+    {
+        get => _codeGeneration.GenerateClients;
+        set => _codeGeneration.GenerateClients = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether clients should implement IDisposable.
     /// </summary>
     [Description("Generate clients that implement IDisposable.")]
-    public bool GenerateDisposableClients { get; set; }
+    public bool GenerateDisposableClients
+    {
+        get => _codeGeneration.GenerateDisposableClients;
+        set => _codeGeneration.GenerateDisposableClients = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether XML doc comments should be generated.
     /// </summary>
     [Description("Generate XML doc comments. Default is true.")]
-    public bool GenerateXmlDocCodeComments { get; set; } = true;
+    public bool GenerateXmlDocCodeComments
+    {
+        get => _codeGeneration.GenerateXmlDocCodeComments;
+        set => _codeGeneration.GenerateXmlDocCodeComments = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether <c>ApiException</c> and <c>IApiResponse</c> should be documented with
@@ -96,37 +141,61 @@ public class RefitGeneratorSettings
         the relevant status codes specified in the OpenAPI document.
         """
     )]
-    public bool GenerateStatusCodeComments { get; set; } = true;
+    public bool GenerateStatusCodeComments
+    {
+        get => _codeGeneration.GenerateStatusCodeComments;
+        set => _codeGeneration.GenerateStatusCodeComments = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether to add auto-generated header.
     /// </summary>
     [Description("Add auto-generated header. Default is true.")]
-    public bool AddAutoGeneratedHeader { get; set; } = true;
+    public bool AddAutoGeneratedHeader
+    {
+        get => _codeGeneration.AddAutoGeneratedHeader;
+        set => _codeGeneration.AddAutoGeneratedHeader = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether to add accept headers [Headers("Accept: application/json")].
     /// </summary>
     [Description("Add accept headers [Headers(\"Accept: application/json\")]. Default is true.")]
-    public bool AddAcceptHeaders { get; set; } = true;
+    public bool AddAcceptHeaders
+    {
+        get => _codeGeneration.AddAcceptHeaders;
+        set => _codeGeneration.AddAcceptHeaders = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether to add content-type headers [Headers("Content-Type: application/json")].
     /// </summary>
     [Description("Add content-type headers [Headers(\"Content-Type: application/json\")]. Default is true.")]
-    public bool AddContentTypeHeaders { get; set; } = true;
+    public bool AddContentTypeHeaders
+    {
+        get => _codeGeneration.AddContentTypeHeaders;
+        set => _codeGeneration.AddContentTypeHeaders = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether to return <c>IApiResponse</c> objects.
     /// </summary>
     [Description("Return IApiResponse objects.")]
-    public bool ReturnIApiResponse { get; set; }
+    public bool ReturnIApiResponse
+    {
+        get => _codeGeneration.ReturnIApiResponse;
+        set => _codeGeneration.ReturnIApiResponse = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether to return IObservable or Task
     /// </summary>
     [Description("Return IObservable or Task.")]
-    public bool ReturnIObservable { get; set; }
+    public bool ReturnIObservable
+    {
+        get => _codeGeneration.ReturnIObservable;
+        set => _codeGeneration.ReturnIObservable = value;
+    }
 
     /// <summary>
     /// Gets or sets a dictionary of operation ids and a specific response type that they should use. The type is
@@ -138,32 +207,52 @@ public class RefitGeneratorSettings
         The type is wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).
         """
     )]
-    public Dictionary<string, string> ResponseTypeOverride { get; set; } = new();
+    public Dictionary<string, string> ResponseTypeOverride
+    {
+        get => _codeGeneration.ResponseTypeOverride;
+        set => _codeGeneration.ResponseTypeOverride = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate operation headers.
     /// </summary>
     [Description("Generate operation headers. Default is true.")]
-    public bool GenerateOperationHeaders { get; set; } = true;
+    public bool GenerateOperationHeaders
+    {
+        get => _codeGeneration.GenerateOperationHeaders;
+        set => _codeGeneration.GenerateOperationHeaders = value;
+    }
 
     /// <summary>
     /// Gets or sets a collection of headers to omit from operation signatures. (default: [])
     /// </summary>
     [Description("A collection of headers to omit from operation signatures.")]
-    public string[] IgnoredOperationHeaders { get; set; } = [];
+    public string[] IgnoredOperationHeaders
+    {
+        get => _filterConfig.IgnoredOperationHeaders;
+        set => _filterConfig.IgnoredOperationHeaders = value;
+    }
 
     /// <summary>
     /// Gets or sets the generated type accessibility. (default: Public)
     /// </summary>
     [Description("The generated type accessibility. Default is Public.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public TypeAccessibility TypeAccessibility { get; set; } = TypeAccessibility.Public;
+    public TypeAccessibility TypeAccessibility
+    {
+        get => _typeConfig.TypeAccessibility;
+        set => _typeConfig.TypeAccessibility = value;
+    }
 
     /// <summary>
     /// Enable or disable the use of cancellation tokens.
     /// </summary>
     [Description("Enable or disable the use of cancellation tokens.")]
-    public bool UseCancellationTokens { get; set; }
+    public bool UseCancellationTokens
+    {
+        get => _parameterConfig.UseCancellationTokens;
+        set => _parameterConfig.UseCancellationTokens = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to explicitly format date query string parameters
@@ -175,50 +264,78 @@ public class RefitGeneratorSettings
         in ISO 8601 standard date format using delimiters (for example: 2023-06-15)
         """
     )]
-    public bool UseIsoDateFormat { get; set; }
+    public bool UseIsoDateFormat
+    {
+        get => _parameterConfig.UseIsoDateFormat;
+        set => _parameterConfig.UseIsoDateFormat = value;
+    }
 
     /// <summary>
     /// Add additional namespace to generated types
     /// </summary>
     [Description("Add additional namespace to generated types.")]
-    public string[] AdditionalNamespaces { get; set; } = Array.Empty<string>();
+    public string[] AdditionalNamespaces
+    {
+        get => _filterConfig.AdditionalNamespaces;
+        set => _filterConfig.AdditionalNamespaces = value;
+    }
 
     /// <summary>
     /// Exclude namespaces on generated types
     /// </summary>
     [Description("Exclude namespaces on generated types.")]
-    public string[] ExcludeNamespaces { get; set; } = Array.Empty<string>();
+    public string[] ExcludeNamespaces
+    {
+        get => _filterConfig.ExcludeNamespaces;
+        set => _filterConfig.ExcludeNamespaces = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to Generate a Refit interface for each endpoint
     /// </summary>
     [Description("Generate a Refit interface for each endpoint.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public MultipleInterfaces MultipleInterfaces { get; set; }
+    public MultipleInterfaces MultipleInterfaces
+    {
+        get => _codeGeneration.MultipleInterfaces;
+        set => _codeGeneration.MultipleInterfaces = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to only include Paths that match the provided regular expression.
     /// May be set multiple times
     /// </summary>
     [Description("Only include Paths that match the provided regular expression. May be set multiple times.")]
-    public string[] IncludePathMatches { get; set; } = Array.Empty<string>();
+    public string[] IncludePathMatches
+    {
+        get => _filterConfig.IncludePathMatches;
+        set => _filterConfig.IncludePathMatches = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to only include Endpoints that contain this tag.
     /// May be set multiple times and result in OR'ed evaluation.
     /// </summary>
     [Description("Generate a Refit interface for each endpoint.")]
-    public string[] IncludeTags { get; set; } = Array.Empty<string>();
+    public string[] IncludeTags
+    {
+        get => _filterConfig.IncludeTags;
+        set => _filterConfig.IncludeTags = value;
+    }
 
     /// <summary>
-    /// Set to <c>true</c> to generate deprecated operations, otherwise <c>false</c>
+    /// Gets or sets a value indicating whether to generate deprecated operations, otherwise <c>false</c>
     /// </summary>
     [Description("Generate deprecated operations. Default is true.")]
-    public bool GenerateDeprecatedOperations { get; set; } = true;
+    public bool GenerateDeprecatedOperations
+    {
+        get => _codeGeneration.GenerateDeprecatedOperations;
+        set => _codeGeneration.GenerateDeprecatedOperations = value;
+    }
 
     /// <summary>
     /// Generate operation names using pattern.
-    /// When using <see cref="MultipleInterfaces"/> <see cref="Core.MultipleInterfaces.ByEndpoint"/>, this is name of the Execute() method in the interface.
+    /// When using <see cref="Core.MultipleInterfaces.ByEndpoint"/>, this is name of the Execute() method in the interface.
     /// </summary>
     [Description(
         """
@@ -226,25 +343,41 @@ public class RefitGeneratorSettings
         this is name of the Execute() method in the interface.
         """
     )]
-    public string? OperationNameTemplate { get; set; }
+    public string? OperationNameTemplate
+    {
+        get => _codeGeneration.OperationNameTemplate;
+        set => _codeGeneration.OperationNameTemplate = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to re-order optional parameters to the end of the parameter list
     /// </summary>
     [Description("Re-order optional parameters to the end of the parameter list.")]
-    public bool OptionalParameters { get; set; }
+    public bool OptionalParameters
+    {
+        get => _parameterConfig.OptionalParameters;
+        set => _parameterConfig.OptionalParameters = value;
+    }
 
     /// <summary>
     /// Gets or sets the relative path to a folder in which the output files are generated. (default: ./Generated)
     /// </summary>
     [Description("The relative path to a folder in which the output files are generated. Default is ./Generated.")]
-    public string OutputFolder { get; set; } = DefaultOutputFolder;
+    public string OutputFolder
+    {
+        get => _outputConfig.OutputFolder;
+        set => _outputConfig.OutputFolder = value;
+    }
 
     /// <summary>
     /// Gets or sets the relative path to a folder where to store the generated contracts. (default: ./Generated)
     /// </summary>
     [Description("The relative path to a folder where to store the generated contracts. Default is ./Generated.")]
-    public string? ContractsOutputFolder { get; set; }
+    public string? ContractsOutputFolder
+    {
+        get => _outputConfig.ContractsOutputFolder;
+        set => _outputConfig.ContractsOutputFolder = value;
+    }
 
     /// <summary>
     /// Gets or sets the filename of the generated code.
@@ -259,7 +392,11 @@ public class RefitGeneratorSettings
         and the default is [.refitter defined naming OR .refitter filename].g.cs)
         """
     )]
-    public string? OutputFilename { get; set; }
+    public string? OutputFilename
+    {
+        get => _outputConfig.OutputFilename;
+        set => _outputConfig.OutputFilename = value;
+    }
 
     /// <summary>
     /// Gets or sets the settings describing how to register generated interface to the .NET Core DI container
@@ -283,7 +420,11 @@ public class RefitGeneratorSettings
         This works in conjunction with includeTags and includePathMatches.
         """
     )]
-    public bool TrimUnusedSchema { get; set; }
+    public bool TrimUnusedSchema
+    {
+        get => _schemaConfig.TrimUnusedSchema;
+        set => _schemaConfig.TrimUnusedSchema = value;
+    }
 
     /// <summary>
     /// Array of regular expressions that determine if a schema needs to be kept.
@@ -295,7 +436,11 @@ public class RefitGeneratorSettings
         This works in conjunction with TrimUnusedSchema.
         """
     )]
-    public string[] KeepSchemaPatterns { get; set; } = Array.Empty<string>();
+    public string[] KeepSchemaPatterns
+    {
+        get => _schemaConfig.KeepSchemaPatterns;
+        set => _schemaConfig.KeepSchemaPatterns = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to keep all possible type-instances of inheritance/union types.
@@ -309,32 +454,52 @@ public class RefitGeneratorSettings
         This works in conjunction with TrimUnusedSchema.
         """
     )]
-    public bool IncludeInheritanceHierarchy { get; set; }
+    public bool IncludeInheritanceHierarchy
+    {
+        get => _schemaConfig.IncludeInheritanceHierarchy;
+        set => _schemaConfig.IncludeInheritanceHierarchy = value;
+    }
 
     /// <summary>
     /// The NSwag IOperationNameGenerator implementation to use
     /// </summary>
     [Description("The NSwag IOperationNameGenerator implementation to use.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
+    public OperationNameGeneratorTypes OperationNameGenerator
+    {
+        get => _codeGeneration.OperationNameGenerator;
+        set => _codeGeneration.OperationNameGenerator = value;
+    }
 
     /// <summary>
     /// Set to <c>false</c> to skip default additional properties. Default is <c>true</c>
     /// </summary>
     [Description("Skip default additional properties. Default is true.")]
-    public bool GenerateDefaultAdditionalProperties { get; set; } = true;
+    public bool GenerateDefaultAdditionalProperties
+    {
+        get => _codeGeneration.GenerateDefaultAdditionalProperties;
+        set => _codeGeneration.GenerateDefaultAdditionalProperties = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to generate contracts as immutable records instead of classes
     /// </summary>
     [Description("Generate contracts as immutable records instead of classes.")]
-    public bool ImmutableRecords { get; set; }
+    public bool ImmutableRecords
+    {
+        get => _typeConfig.ImmutableRecords;
+        set => _typeConfig.ImmutableRecords = value;
+    }
 
     /// <summary>
     /// Get ot set the settings describing how to configure Apizr
     /// </summary>
     [Description("The settings describing how to configure Apizr.")]
-    public ApizrSettings? ApizrSettings { get; set; }
+    public ApizrSettings? ApizrSettings
+    {
+        get => _featureConfig.ApizrSettings;
+        set => _featureConfig.ApizrSettings = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to wrap multiple query parameters into a single complex one. Default is <c>false</c> (no wrapping).
@@ -346,7 +511,11 @@ public class RefitGeneratorSettings
         See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
         """
     )]
-    public bool UseDynamicQuerystringParameters { get; set; }
+    public bool UseDynamicQuerystringParameters
+    {
+        get => _parameterConfig.UseDynamicQuerystringParameters;
+        set => _parameterConfig.UseDynamicQuerystringParameters = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
@@ -366,7 +535,11 @@ public class RefitGeneratorSettings
         When GenerateJsonSerializerContext is enabled, an additional serializer context file is emitted.
         """
     )]
-    public bool GenerateMultipleFiles { get; set; }
+    public bool GenerateMultipleFiles
+    {
+        get => _outputConfig.GenerateMultipleFiles;
+        set => _outputConfig.GenerateMultipleFiles = value;
+    }
 
     /// <summary>
     /// Set to <c>true</c> to use System.Text.Json polymorphic serialization. Default is <c>false</c>
@@ -385,20 +558,32 @@ public class RefitGeneratorSettings
         See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
         """
     )]
-    public bool UsePolymorphicSerialization { get; set; }
+    public bool UsePolymorphicSerialization
+    {
+        get => _featureConfig.UsePolymorphicSerialization;
+        set => _featureConfig.UsePolymorphicSerialization = value;
+    }
 
     /// <summary>
     /// Gets or sets the parameter name generator for customizing parameter names.
     /// </summary>
     [JsonIgnore]
-    public IParameterNameGenerator? ParameterNameGenerator { get; set; }
+    public IParameterNameGenerator? ParameterNameGenerator
+    {
+        get => _parameterConfig.ParameterNameGenerator;
+        set => _parameterConfig.ParameterNameGenerator = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate Security Schema Authentication headers.
     /// </summary>
     [Description("Generate Security Schema Authentication headers")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public AuthenticationHeaderStyle AuthenticationHeaderStyle { get; set; }
+    public AuthenticationHeaderStyle AuthenticationHeaderStyle
+    {
+        get => _featureConfig.AuthenticationHeaderStyle;
+        set => _featureConfig.AuthenticationHeaderStyle = value;
+    }
 
     /// <summary>
     /// Gets or sets the collection format to use for array query parameters.
@@ -406,32 +591,52 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("The collection format to use for array query parameters. Default is CollectionFormat.Multi.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public CollectionFormat CollectionFormat { get; set; } = CollectionFormat.Multi;
+    public CollectionFormat CollectionFormat
+    {
+        get => _parameterConfig.CollectionFormat;
+        set => _parameterConfig.CollectionFormat = value;
+    }
 
     /// <summary>
     /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
     /// templates.
     /// </summary>
     [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
-    public string? CustomTemplateDirectory { get; set; }
+    public string? CustomTemplateDirectory
+    {
+        get => _codeGeneration.CustomTemplateDirectory;
+        set => _codeGeneration.CustomTemplateDirectory = value;
+    }
 
     /// <summary>
     /// Gets or sets the security scheme name for which to generate authentication headers.
     /// When specified, only endpoints using this security scheme will have authentication headers generated.
     /// </summary>
     [Description("Security scheme for which to generate authentication headers.")]
-    public string? SecurityScheme { get; set; }
+    public string? SecurityScheme
+    {
+        get => _featureConfig.SecurityScheme;
+        set => _featureConfig.SecurityScheme = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate JsonSerializerContext for AOT compilation support.
     /// The context is emitted into the contracts namespace and only when contracts are generated.
     /// </summary>
     [Description("Generate JsonSerializerContext for AOT compilation support in the contracts namespace when contracts are generated.")]
-    public bool GenerateJsonSerializerContext { get; set; }
+    public bool GenerateJsonSerializerContext
+    {
+        get => _featureConfig.GenerateJsonSerializerContext;
+        set => _featureConfig.GenerateJsonSerializerContext = value;
+    }
 
     /// <summary>
     /// Gets or sets a suffix to append to all generated contract type names.
     /// </summary>
     [Description("Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.")]
-    public string? ContractTypeSuffix { get; set; }
+    public string? ContractTypeSuffix
+    {
+        get => _typeConfig.ContractTypeSuffix;
+        set => _typeConfig.ContractTypeSuffix = value;
+    }
 }
