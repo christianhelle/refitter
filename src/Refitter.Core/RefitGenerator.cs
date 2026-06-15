@@ -73,7 +73,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     }
 
     private static Task<OpenApiDocument> CloneDocumentAsync(OpenApiDocument document)
-        => OpenApiDocument.FromJsonAsync(document.ToJson());
+        => OpenApiDocument.FromJsonAsync(document.ToJson()).ConfigureAwait(false);
 
     /// <summary>
     /// Generates Refit clients and interfaces based on an OpenAPI specification and returns the generated code as a string.
