@@ -26,11 +26,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var openApiDocument = await GetOpenApiDocument(settings).ConfigureAwait(false);
         var processed = RefitDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
         processed = RefitDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
-        processed = CleanSchema(
+        processed = await CleanSchemaAsync(
             processed,
             settings.TrimUnusedSchema,
             settings.KeepSchemaPatterns,
-            settings.IncludeInheritanceHierarchy);
+            settings.IncludeInheritanceHierarchy).ConfigureAwait(false);
 
         return new RefitGenerator(settings, processed);
     }
@@ -50,7 +50,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath!).ConfigureAwait(false);
     }
 
-    private static OpenApiDocument CleanSchema(
+    private static async Task<OpenApiDocument> CleanSchemaAsync(
         OpenApiDocument document,
         bool removeUnusedSchema,
         string[] keepSchemaPatterns,
@@ -62,7 +62,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         if (!removeUnusedSchema)
             return document;
 
-        var result = CloneDocument(document);
+        var result = await CloneDocumentAsync(document).ConfigureAwait(false);
         var cleaner = new SchemaCleaner(result, keepSchemaPatterns)
         {
             IncludeInheritanceHierarchy = includeInheritanceHierarchy
@@ -72,8 +72,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         return result;
     }
 
-    private static OpenApiDocument CloneDocument(OpenApiDocument document)
-        => OpenApiDocument.FromJsonAsync(document.ToJson()).GetAwaiter().GetResult();
+    private static Task<OpenApiDocument> CloneDocumentAsync(OpenApiDocument document)
+        => OpenApiDocument.FromJsonAsync(document.ToJson());
 
     /// <summary>
     /// Generates Refit clients and interfaces based on an OpenAPI specification and returns the generated code as a string.
