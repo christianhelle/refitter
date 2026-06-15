@@ -51,6 +51,7 @@ Run these first if source generator tests fail with missing generated types.
 - 4-space indentation; `crlf` line endings for C# files per `.editorconfig`.
 - `var` is discouraged (`csharp_style_var_* = false:silent`).
 - `TreatWarningsAsErrors` is enabled on most production projects.
+- **Private fields must NOT be prefixed with `_`** — use camelCase without underscore prefix (e.g., `openApiPath` not `_openApiPath`).
 
 ## Key Conventions
 
