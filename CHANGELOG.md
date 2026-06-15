@@ -15,7 +15,8 @@
 - Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
 - Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
-- Rename private fields [\#1149](https://github.com/christianhelle/refitter/pull/1149) ([christianhelle](https://github.com/christianhelle))
+- Remove underscore prefix from private fields [\#1150](https://github.com/christianhelle/refitter/pull/1150) ([christianhelle](https://github.com/christianhelle))
+- Rename fields [\#1149](https://github.com/christianhelle/refitter/pull/1149) ([christianhelle](https://github.com/christianhelle))
 - Split RefitGeneratorSettings into focused config records [\#1148](https://github.com/christianhelle/refitter/pull/1148) ([christianhelle](https://github.com/christianhelle))
 - Refactor InterfaceGenerator into composable method generators [\#1147](https://github.com/christianhelle/refitter/pull/1147) ([christianhelle](https://github.com/christianhelle))
 - RefitGenerator into separate modules \(document filter, schema cleaner, code generator, pipeline\) [\#1146](https://github.com/christianhelle/refitter/pull/1146) ([christianhelle](https://github.com/christianhelle))
@@ -37,6 +38,7 @@
 
 **Merged pull requests:**
 
+- Refactor Refit Generator [\#1151](https://github.com/christianhelle/refitter/pull/1151) ([christianhelle](https://github.com/christianhelle))
 - Update test assertions for struct nullability and target framework [\#1142](https://github.com/christianhelle/refitter/pull/1142) ([christianhelle](https://github.com/christianhelle))
 - Improve code coverage [\#1132](https://github.com/christianhelle/refitter/pull/1132) ([christianhelle](https://github.com/christianhelle))
 - Refactor RefitGenerator to add synchronous factory method and fix RS1035 [\#1131](https://github.com/christianhelle/refitter/pull/1131) ([christianhelle](https://github.com/christianhelle))
