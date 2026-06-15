@@ -82,6 +82,9 @@ paths:
         var sut = await RefitGenerator.CreateAsync(settings);
 
         sut.Should().NotBeNull();
+        sut.OpenApiDocument.Paths.Should().ContainKey("/foo");
+        sut.OpenApiDocument.Paths.Should().ContainKey("/bar");
+        sut.OpenApiDocument.Paths.Should().NotContainKey("/baz");
         var generatedCode = sut.Generate();
         generatedCode.Should().NotBeNullOrWhiteSpace();
         generatedCode.Should().Contain("PipelineTest");
@@ -99,6 +102,9 @@ paths:
         };
 
         var generator = await RefitGenerator.CreateAsync(settings);
+        generator.OpenApiDocument.Paths.Should().ContainKey("/foo");
+        generator.OpenApiDocument.Paths.Should().NotContainKey("/bar");
+        generator.OpenApiDocument.Paths.Should().NotContainKey("/baz");
         var generatedCode = generator.Generate();
 
         generatedCode.Should().NotBeNullOrWhiteSpace();
@@ -106,11 +112,9 @@ paths:
     }
 
     [Test]
-    public async Task CreateAsync_DoesNotMutateOriginalDocument()
+    public async Task CreateAsync_FilterByTags_PreservesOnlyMatchingPaths()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
-        var originalCount = document.Paths.Count;
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
@@ -119,9 +123,11 @@ paths:
         };
 
         var generator = await RefitGenerator.CreateAsync(settings);
+        generator.OpenApiDocument.Paths.Should().ContainKey("/foo");
+        generator.OpenApiDocument.Paths.Should().NotContainKey("/bar");
+        generator.OpenApiDocument.Paths.Should().NotContainKey("/baz");
         var generatedCode = generator.Generate();
 
-        originalCount.Should().Be(document.Paths.Count);
         generatedCode.Should().NotBeNullOrWhiteSpace();
         generatedCode.Should().Contain("PipelineTest");
     }
@@ -176,6 +182,9 @@ paths:
         var sut = await RefitGenerator.CreateAsync(settings);
 
         sut.Should().NotBeNull();
+        sut.OpenApiDocument.Paths.Should().ContainKey("/foo");
+        sut.OpenApiDocument.Paths.Should().ContainKey("/bar");
+        sut.OpenApiDocument.Paths.Should().NotContainKey("/baz");
         var generatedCode = sut.Generate();
         generatedCode.Should().NotBeNullOrWhiteSpace();
         generatedCode.Should().Contain("PipelineTest");
