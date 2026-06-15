@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.Build.Framework;
+using Refitter.Core;
 using Refitter.MSBuild;
 
 namespace Refitter.Tests.MSBuild;
@@ -287,7 +288,7 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
-    public void Execute_Should_Generate_Files_Reported_By_Refitter()
+    public void Execute_Should_Use_CoreGeneratorRunner_When_No_Cli_Available()
     {
         var workspace = CreateWorkspace();
 
@@ -352,13 +353,15 @@ public class RefitterGenerateTaskTests
                 }
                 """);
 
+            var buildEngine = new RecordingBuildEngine();
             var task = new RefitterGenerateTask
             {
-                BuildEngine = new RecordingBuildEngine(),
+                BuildEngine = buildEngine,
                 ProjectFileDirectory = workspace,
                 IncludePatterns = "petstore.refitter",
                 DisableLogging = true,
-                SkipValidation = true
+                SkipValidation = true,
+                GeneratorRunner = new CoreGeneratorRunner()
             };
 
             var result = task.Execute();
@@ -377,7 +380,7 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
-    public void Execute_Should_Return_False_When_Runtime_Discovery_Throws()
+    public void Execute_Should_Use_Injected_GeneratorRunner()
     {
         var workspace = CreateWorkspace();
 
@@ -387,26 +390,124 @@ public class RefitterGenerateTaskTests
             var generatedFile = CreateGeneratedFile(workspace);
 
             var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.RuntimeResolver = new DelegatingRuntimeResolver { Handler = () => throw new InvalidOperationException("boom") };
-            task.FileExists = path =>
-                path.EndsWith("refitter.dll", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
-            task.ProcessRunner = new DelegatingProcessRunner
+            var task = new RefitterGenerateTask
             {
-                Handler = (startInfo, logOutput, _) =>
-                {
-                    startInfo.Arguments.Should().Contain("net8.0");
-                    logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
-                    return new ProcessExecutionResult(false, 0);
-                }
+                BuildEngine = buildEngine,
+                ProjectFileDirectory = workspace,
+                IncludePatterns = "petstore.refitter",
+                DisableLogging = true,
+                SkipValidation = true,
+                GeneratorRunner = new TestGeneratorRunner(
+                    (settings, skipValidation, noLogging, cancellationToken) =>
+                        Task.FromResult<IReadOnlyList<string>>(new[] { generatedFile }))
             };
 
             var result = task.Execute();
 
             result.Should().BeTrue();
             task.GeneratedFiles.Should().ContainSingle().Which.ItemSpec.Should().Be(generatedFile);
-            buildEngine.Messages.Should().Contain(message => message.Contains("Failed to inspect installed .NET runtimes", StringComparison.Ordinal));
-            buildEngine.Messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
+        }
+        finally
+        {
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Return_False_When_GeneratorRunner_Throws()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = new RefitterGenerateTask
+            {
+                BuildEngine = buildEngine,
+                ProjectFileDirectory = workspace,
+                IncludePatterns = "petstore.refitter",
+                DisableLogging = true,
+                SkipValidation = true,
+                GeneratorRunner = new TestGeneratorRunner(
+                    (settings, skipValidation, noLogging, cancellationToken) =>
+                        throw new InvalidOperationException("generation failed"))
+            };
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            task.GeneratedFiles.Should().BeEmpty();
+            buildEngine.Errors.Should().Contain(message => message.Contains("generation failed", StringComparison.Ordinal));
+        }
+        finally
+        {
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Return_False_When_GeneratorRunner_Times_Out()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = new RefitterGenerateTask
+            {
+                BuildEngine = buildEngine,
+                ProjectFileDirectory = workspace,
+                IncludePatterns = "petstore.refitter",
+                DisableLogging = true,
+                SkipValidation = true,
+                GeneratorRunner = new TestGeneratorRunner(
+                    (settings, skipValidation, noLogging, cancellationToken) =>
+                        throw new TimeoutException("timeout"))
+            };
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            task.GeneratedFiles.Should().BeEmpty();
+            buildEngine.Errors.Should().Contain(message => message.Contains("timed out", StringComparison.Ordinal));
+        }
+        finally
+        {
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Return_False_When_No_Generated_Files_Reported()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = new RefitterGenerateTask
+            {
+                BuildEngine = buildEngine,
+                ProjectFileDirectory = workspace,
+                IncludePatterns = "petstore.refitter",
+                DisableLogging = true,
+                SkipValidation = true,
+                GeneratorRunner = new TestGeneratorRunner(
+                    (settings, skipValidation, noLogging, cancellationToken) =>
+                        throw new InvalidOperationException("Refitter did not report any generated files for petstore.refitter"))
+            };
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            task.GeneratedFiles.Should().BeEmpty();
+            buildEngine.Errors.Should().Contain(message => message.Contains("did not report any generated files", StringComparison.Ordinal));
         }
         finally
         {
@@ -489,438 +590,6 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
-    public void GetInstalledDotnetRuntimes_Should_Throw_TimeoutException_When_Runtime_Discovery_Times_Out()
-    {
-        var processRunner = new DelegatingProcessRunner
-        {
-            Handler = (startInfo, _, _) =>
-            {
-                startInfo.FileName.Should().Be("dotnet");
-                startInfo.Arguments.Should().Be("--list-runtimes");
-                return new ProcessExecutionResult(true, -1);
-            }
-        };
-
-        var resolver = new DefaultRuntimeResolver(processRunner) { TimeoutMilliseconds = 500 };
-        var action = () => resolver.GetInstalledRuntimes();
-
-        action.Should().Throw<TimeoutException>()
-            .WithMessage("*dotnet --list-runtimes timed out after 500 ms*");
-    }
-
-    [Test]
-    public void GetInstalledDotnetRuntimes_Should_Include_Termination_Failure_When_Runtime_Discovery_Cannot_Be_Stopped()
-    {
-        var processRunner = new DelegatingProcessRunner
-        {
-            Handler = (startInfo, _, _) =>
-            {
-                startInfo.FileName.Should().Be("dotnet");
-                startInfo.Arguments.Should().Be("--list-runtimes");
-                return new ProcessExecutionResult(true, -1, new InvalidOperationException("kill failed"));
-            }
-        };
-
-        var resolver = new DefaultRuntimeResolver(processRunner) { TimeoutMilliseconds = 500 };
-        var action = () => resolver.GetInstalledRuntimes();
-
-        action.Should().Throw<TimeoutException>()
-            .WithMessage("*dotnet --list-runtimes timed out after 500 ms. Failed to terminate timed-out process: kill failed*")
-            .WithInnerException<InvalidOperationException>()
-            .WithMessage("kill failed");
-    }
-
-    [Test]
-    public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero()
-    {
-        var processRunner = new DelegatingProcessRunner
-        {
-            Handler = (startInfo, _, logError) =>
-            {
-                startInfo.FileName.Should().Be("dotnet");
-                startInfo.Arguments.Should().Be("--list-runtimes");
-                logError("runtime probe failed");
-                return new ProcessExecutionResult(false, 23);
-            }
-        };
-
-        var resolver = new DefaultRuntimeResolver(processRunner);
-        var action = () => resolver.GetInstalledRuntimes();
-
-        action.Should().Throw<InvalidOperationException>()
-            .WithMessage("*dotnet --list-runtimes exited with code 23*runtime probe failed*");
-    }
-
-    [Test]
-    public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero_Without_Error_Output()
-    {
-        var processRunner = new DelegatingProcessRunner
-        {
-            Handler = (startInfo, _, _) =>
-            {
-                startInfo.FileName.Should().Be("dotnet");
-                startInfo.Arguments.Should().Be("--list-runtimes");
-                return new ProcessExecutionResult(false, 23);
-            }
-        };
-
-        var resolver = new DefaultRuntimeResolver(processRunner);
-        var action = () => resolver.GetInstalledRuntimes();
-
-        action.Should().Throw<InvalidOperationException>()
-            .WithMessage("dotnet --list-runtimes exited with code 23");
-    }
-
-    [Test]
-    public void Execute_Should_Fall_Back_When_Runtime_Discovery_Times_Out()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-            var generatedFile = CreateGeneratedFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.ProcessTimeoutMilliseconds = 500;
-            task.FileExists = path =>
-                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
-            task.RuntimeResolver = new DelegatingRuntimeResolver
-            {
-                Handler = () => throw new TimeoutException("dotnet --list-runtimes timed out after 500 ms")
-            };
-            task.ProcessRunner = new DelegatingProcessRunner
-            {
-                Handler = (startInfo, logOutput, _) =>
-                {
-                    startInfo.Arguments.Should().Contain("net8.0");
-                    logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
-                    return new ProcessExecutionResult(false, 0);
-                }
-            };
-
-            var result = task.Execute();
-
-            result.Should().BeTrue();
-            task.GeneratedFiles.Should().ContainSingle().Which.ItemSpec.Should().Be(generatedFile);
-            buildEngine.Messages.Should().Contain(message => message.Contains("Failed to inspect installed .NET runtimes", StringComparison.Ordinal));
-            buildEngine.Messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void Execute_Should_Use_DotNet9_Runtime_When_Available()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-            var generatedFile = CreateGeneratedFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.RuntimeResolver = new DelegatingRuntimeResolver { Handler = () => ["Microsoft.NETCore.App 9.0.0"] };
-            task.FileExists = path =>
-                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
-                File.Exists(path);
-            task.ProcessRunner = new DelegatingProcessRunner
-            {
-                Handler = (startInfo, logOutput, _) =>
-                {
-                    startInfo.Arguments.Should().Contain("net9.0");
-                    logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
-                    return new ProcessExecutionResult(false, 0);
-                }
-            };
-
-            var result = task.Execute();
-
-            result.Should().BeTrue();
-            task.GeneratedFiles.Should().ContainSingle();
-            task.GeneratedFiles.Single().ItemSpec.Should().Be(generatedFile);
-            buildEngine.Messages.Should().Contain(message => message.Contains("Detected .NET 9.0 runtime", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void Execute_Should_Fall_Back_To_DotNet8_Runtime_When_Newer_Runtimes_Are_Unavailable()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-            var generatedFile = CreateGeneratedFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.RuntimeResolver = new DelegatingRuntimeResolver { Handler = () => ["Microsoft.NETCore.App 8.0.0"] };
-            task.FileExists = path =>
-                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) ||
-                File.Exists(path);
-            task.ProcessRunner = new DelegatingProcessRunner
-            {
-                Handler = (startInfo, logOutput, _) =>
-                {
-                    startInfo.Arguments.Should().Contain("net8.0");
-                    logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
-                    return new ProcessExecutionResult(false, 0);
-                }
-            };
-
-            var result = task.Execute();
-
-            result.Should().BeTrue();
-            task.GeneratedFiles.Should().ContainSingle();
-            buildEngine.Messages.Should().Contain(message => message.Contains("Detected .NET 8.0 runtime", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void Execute_Should_Return_False_When_Refitter_Cli_Cannot_Be_Located()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.FileExists = _ => false;
-
-            var result = task.Execute();
-
-            result.Should().BeFalse();
-            task.GeneratedFiles.Should().BeEmpty();
-            buildEngine.Errors.Should().Contain(message => message.Contains("Unable to locate a bundled Refitter CLI runtime for the MSBuild task.", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void Execute_Should_Log_Timeout_When_Process_Does_Not_Exit()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.ProcessRunner = new DelegatingProcessRunner
-            {
-                Handler = (_, _, _) => new ProcessExecutionResult(true, -1)
-            };
-
-            var result = task.Execute();
-
-            result.Should().BeFalse();
-            task.GeneratedFiles.Should().BeEmpty();
-            buildEngine.Errors.Should().Contain(message => message.Contains("timed out after 300 seconds", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void Execute_Should_Log_Millisecond_Timeout_Value()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.ProcessTimeoutMilliseconds = 500;
-            task.ProcessRunner = new DelegatingProcessRunner
-            {
-                Handler = (_, _, _) => new ProcessExecutionResult(true, -1)
-            };
-
-            var result = task.Execute();
-
-            result.Should().BeFalse();
-            buildEngine.Errors.Should().Contain(message => message.Contains("timed out after 500 ms", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void Execute_Should_Log_When_Timed_Out_Process_Cannot_Be_Terminated()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.ProcessRunner = new DelegatingProcessRunner
-            {
-                Handler = (_, _, _) => new ProcessExecutionResult(
-                    true,
-                    -1,
-                    new InvalidOperationException("termination failed"))
-            };
-
-            var result = task.Execute();
-
-            result.Should().BeFalse();
-            buildEngine.Errors.Should().Contain(message => message.Contains("Failed to terminate timed-out process: termination failed", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void Execute_Should_Log_Configured_Timeout_Value()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.ProcessTimeoutMilliseconds = 1500;
-            task.ProcessRunner = new DelegatingProcessRunner
-            {
-                Handler = (_, _, _) => new ProcessExecutionResult(true, -1)
-            };
-
-            var result = task.Execute();
-
-            result.Should().BeFalse();
-            buildEngine.Errors.Should().Contain(message => message.Contains($"timed out after {1500 / 1000d:0.###} seconds", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void Execute_Should_Log_ProcessRunner_Exception_And_Return_False()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.FileExists = path =>
-                path.Contains("net10.0", StringComparison.OrdinalIgnoreCase) ||
-                File.Exists(path);
-            task.ProcessRunner = new DelegatingProcessRunner
-            {
-                Handler = (_, _, _) => throw new InvalidOperationException("boom")
-            };
-
-            var result = task.Execute();
-
-            result.Should().BeFalse();
-            task.GeneratedFiles.Should().BeEmpty();
-            buildEngine.Errors.Should().Contain(message => message.Contains("boom", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void Execute_Should_Log_When_Process_Exits_With_Non_Zero_Code()
-    {
-        var workspace = CreateWorkspace();
-
-        try
-        {
-            CreateRefitterSettingsFile(workspace);
-
-            var buildEngine = new RecordingBuildEngine();
-            var task = CreateTask(workspace, buildEngine);
-            task.ProcessRunner = new DelegatingProcessRunner
-            {
-                Handler = (_, _, _) => new ProcessExecutionResult(false, 23)
-            };
-
-            var result = task.Execute();
-
-            result.Should().BeFalse();
-            buildEngine.Errors.Should().Contain(message => message.Contains("Refitter process exited with code 23", StringComparison.Ordinal));
-        }
-        finally
-        {
-            DeleteWorkspace(workspace);
-        }
-    }
-
-    [Test]
-    public void RunProcess_Should_Return_TimedOut_Result_When_Process_Exceeds_Timeout()
-    {
-        var runner = new DefaultProcessRunner { TimeoutMilliseconds = 1 };
-
-        var result = runner.Run(
-            CreateSleepProcessStartInfo(),
-            _ => { },
-            _ => { });
-
-        result.TimedOut.Should().BeTrue();
-        result.TerminationException.Should().BeNull();
-    }
-
-    [Test]
-    public void RunProcess_Should_Return_Termination_Exception_When_Kill_Fails_After_Timeout()
-    {
-        var runner = new DefaultProcessRunner
-        {
-            TimeoutMilliseconds = 1,
-            ProcessTerminator = _ => throw new InvalidOperationException("kill failed")
-        };
-
-        var result = runner.Run(
-            CreateSleepProcessStartInfo(),
-            _ => { },
-            _ => { });
-
-        result.TimedOut.Should().BeTrue();
-        result.TerminationException.Should().BeOfType<InvalidOperationException>()
-            .Which.Message.Should().Be("kill failed");
-    }
-
-    [Test]
     public void TryLogCommandLine_Should_Swallow_BuildEngine_Exceptions()
     {
         var task = new RefitterGenerateTask { BuildEngine = new RecordingBuildEngine { ThrowOnMessages = true } };
@@ -980,47 +649,11 @@ public class RefitterGenerateTaskTests
         return generatedFile;
     }
 
-    private static RefitterGenerateTask CreateTask(string workspace, IBuildEngine? buildEngine = null) =>
-        new()
-        {
-            BuildEngine = buildEngine ?? new RecordingBuildEngine(),
-            ProjectFileDirectory = workspace,
-            IncludePatterns = "petstore.refitter",
-            DisableLogging = true,
-            SkipValidation = true
-        };
-
     private static void InvokePrivateMethod(RefitterGenerateTask task, string methodName, params object[] arguments)
     {
         var method = typeof(RefitterGenerateTask).GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
         method.Should().NotBeNull();
         method!.Invoke(task, arguments);
-    }
-
-    private static ProcessStartInfo CreateSleepProcessStartInfo()
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            return new ProcessStartInfo
-            {
-                FileName = "powershell",
-                Arguments = "-NoLogo -NoProfile -Command \"Start-Sleep -Seconds 1\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-        }
-
-        return new ProcessStartInfo
-        {
-            FileName = "bash",
-            Arguments = "-lc \"sleep 1\"",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
     }
 
     private static void DeleteWorkspace(string workspace)
@@ -1029,24 +662,6 @@ public class RefitterGenerateTaskTests
         {
             Directory.Delete(workspace, recursive: true);
         }
-    }
-
-    private sealed class DelegatingProcessRunner : IProcessRunner
-    {
-        public Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult> Handler { get; set; }
-
-        public ProcessExecutionResult Run(
-            ProcessStartInfo startInfo,
-            Action<string?> standardOutput,
-            Action<string?> standardError) =>
-            Handler(startInfo, standardOutput, standardError);
-    }
-
-    private sealed class DelegatingRuntimeResolver : IRuntimeResolver
-    {
-        public Func<List<string>> Handler { get; set; }
-
-        public List<string> GetInstalledRuntimes() => Handler();
     }
 
     private sealed class RecordingBuildEngine : IBuildEngine
