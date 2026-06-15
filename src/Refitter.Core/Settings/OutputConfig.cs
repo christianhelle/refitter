@@ -52,8 +52,8 @@ public class OutputConfig
         """
         The filename of the generated code.
         For the CLI tool, the default is Output.cs
-        The the Source Generator, this is the name of the generated class
-        and the default is [.refitter defined naming OR .refitter filename].g.cs)
+        For the Source Generator, this is the name of the generated class
+        and the default is [.refitter defined naming OR .refitter filename].g.cs
         """
     )]
     public string? OutputFilename { get; set; }

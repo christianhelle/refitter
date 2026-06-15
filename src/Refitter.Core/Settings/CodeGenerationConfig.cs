@@ -82,7 +82,7 @@ public class CodeGenerationConfig
     /// </summary>
     [Description(
         """
-        AddAcceptHeaders dictionary of operation ids and a specific response type that they should use.
+        A dictionary of operation ids and a specific response type that they should use.
         The type is wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).
         """
     )]
