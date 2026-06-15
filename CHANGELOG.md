@@ -15,6 +15,7 @@
 - Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
 - Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
+- Split RefitGeneratorSettings into focused config records [\#1148](https://github.com/christianhelle/refitter/pull/1148) ([christianhelle](https://github.com/christianhelle))
 - Refactor InterfaceGenerator into composable method generators [\#1147](https://github.com/christianhelle/refitter/pull/1147) ([christianhelle](https://github.com/christianhelle))
 - RefitGenerator into separate modules \(document filter, schema cleaner, code generator, pipeline\) [\#1146](https://github.com/christianhelle/refitter/pull/1146) ([christianhelle](https://github.com/christianhelle))
 - Deepen Apizr registration generator with adapter isolation and pipeline tests [\#1145](https://github.com/christianhelle/refitter/pull/1145) ([christianhelle](https://github.com/christianhelle))
