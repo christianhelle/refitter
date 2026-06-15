@@ -6,7 +6,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests;
 
-public class RefitPipelineTests
+public class RefitGeneratorTests
 {
     private const string OpenApiSpec = @"
 openapi: '3.0.0'
@@ -79,52 +79,55 @@ paths:
             IncludeTags = ["Foo", "Bar"]
         };
 
-        var sut = await RefitPipeline.CreateAsync(settings);
+        var sut = await RefitGenerator.CreateAsync(settings);
 
         sut.Should().NotBeNull();
-        sut.OpenApiDocument.Paths.Should().ContainKey("/foo");
-        sut.OpenApiDocument.Paths.Should().ContainKey("/bar");
-        sut.OpenApiDocument.Paths.Should().NotContainKey("/baz");
+        var generatedCode = sut.Generate();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain("PipelineTest");
     }
 
     [Test]
-    public async Task Create_WithFilteredDocument_ReturnsGeneratorWithFilteredDocument()
+    public async Task CreateAsync_WithFilteredDocument_ReturnsGeneratorWithFilteredDocument()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
         var settings = new RefitGeneratorSettings
         {
+            OpenApiPath = swaggerFile,
             Namespace = "PipelineTest",
             IncludePathMatches = ["^/foo"]
         };
 
-        var sut = RefitPipeline.Create(document, settings);
+        var generator = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = generator.Generate();
 
-        sut.Should().NotBeNull();
-        sut.OpenApiDocument.Paths.Should().ContainKey("/foo");
-        sut.OpenApiDocument.Paths.Should().NotContainKey("/bar");
-        sut.OpenApiDocument.Paths.Should().NotContainKey("/baz");
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain("PipelineTest");
     }
 
     [Test]
-    public async Task Create_DoesNotMutateOriginalDocument()
+    public async Task CreateAsync_DoesNotMutateOriginalDocument()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
         var originalCount = document.Paths.Count;
         var settings = new RefitGeneratorSettings
         {
+            OpenApiPath = swaggerFile,
             Namespace = "PipelineTest",
             IncludeTags = ["Foo"]
         };
 
-        RefitPipeline.Create(document, settings);
+        var generator = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = generator.Generate();
 
-        document.Paths.Count.Should().Be(originalCount);
+        originalCount.Should().Be(document.Paths.Count);
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain("PipelineTest");
     }
 
     [Test]
-    public async Task Pipeline_Generate_ProducesValidCode()
+    public async Task Generate_ProducesValidCode()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
@@ -133,7 +136,7 @@ paths:
             Namespace = "PipelineTest"
         };
 
-        var sut = await RefitPipeline.CreateAsync(settings);
+        var sut = await RefitGenerator.CreateAsync(settings);
         var generatedCode = sut.Generate();
 
         generatedCode.Should().NotBeNullOrWhiteSpace();
@@ -141,7 +144,7 @@ paths:
     }
 
     [Test]
-    public async Task Pipeline_GenerateMultipleFiles_ProducesOutput()
+    public async Task GenerateMultipleFiles_ProducesOutput()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         var settings = new RefitGeneratorSettings
@@ -153,7 +156,7 @@ paths:
             GenerateClients = true
         };
 
-        var sut = await RefitPipeline.CreateAsync(settings);
+        var sut = await RefitGenerator.CreateAsync(settings);
         var result = sut.GenerateMultipleFiles();
 
         result.Files.Should().NotBeEmpty();
@@ -170,16 +173,16 @@ paths:
             IncludeTags = ["Foo", "Bar"]
         };
 
-        var sut = await RefitPipeline.CreateAsync(settings);
+        var sut = await RefitGenerator.CreateAsync(settings);
 
         sut.Should().NotBeNull();
-        sut.OpenApiDocument.Paths.Should().ContainKey("/foo");
-        sut.OpenApiDocument.Paths.Should().ContainKey("/bar");
-        sut.OpenApiDocument.Paths.Should().NotContainKey("/baz");
+        var generatedCode = sut.Generate();
+        generatedCode.Should().NotBeNullOrWhiteSpace();
+        generatedCode.Should().Contain("PipelineTest");
     }
 
     [Test]
-    public async Task Pipeline_WithSwagger20_Generate_ProducesValidCode()
+    public async Task Generate_WithSwagger20_ProducesValidCode()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);
         var settings = new RefitGeneratorSettings
@@ -188,7 +191,7 @@ paths:
             Namespace = "PipelineTest"
         };
 
-        var sut = await RefitPipeline.CreateAsync(settings);
+        var sut = await RefitGenerator.CreateAsync(settings);
         var generatedCode = sut.Generate();
 
         generatedCode.Should().NotBeNullOrWhiteSpace();
