@@ -7,7 +7,7 @@ namespace Refitter.Core;
 
 internal sealed class DocumentMerger : IDocumentMerger
 {
-    private readonly DocumentEquivalenceComparer _comparer;
+    private readonly DocumentEquivalenceComparer comparer;
 
     /// <summary>
     /// Initializes a new instance of the DocumentMerger class.
@@ -15,7 +15,7 @@ internal sealed class DocumentMerger : IDocumentMerger
     /// <param name="comparer">The comparer used to detect equivalent document elements during merging.</param>
     public DocumentMerger(DocumentEquivalenceComparer comparer)
     {
-        _comparer = comparer;
+        this.comparer = comparer;
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ internal sealed class DocumentMerger : IDocumentMerger
             return;
         }
 
-        if (!_comparer.AreEquivalent(existingValue, value))
+        if (!comparer.AreEquivalent(existingValue, value))
             throw CreateMergeConflictException(itemType, key);
     }
 

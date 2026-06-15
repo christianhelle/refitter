@@ -21,14 +21,14 @@ public class RefitGeneratorSettings
     /// </summary>
     public const string DefaultNamespace = OutputConfig.DefaultNamespace;
 
-    private readonly OpenApiSourceConfig _openApiSource = new();
-    private readonly CodeGenerationConfig _codeGeneration = new();
-    private readonly ParameterConfig _parameterConfig = new();
-    private readonly OutputConfig _outputConfig = new();
-    private readonly TypeConfig _typeConfig = new();
-    private readonly FilterConfig _filterConfig = new();
-    private readonly SchemaConfig _schemaConfig = new();
-    private readonly FeatureConfig _featureConfig = new();
+    private readonly OpenApiSourceConfig openApiSource = new();
+    private readonly CodeGenerationConfig codeGeneration = new();
+    private readonly ParameterConfig parameterConfig = new();
+    private readonly OutputConfig outputConfig = new();
+    private readonly TypeConfig typeConfig = new();
+    private readonly FilterConfig filterConfig = new();
+    private readonly SchemaConfig schemaConfig = new();
+    private readonly FeatureConfig featureConfig = new();
 
     /// <summary>
     /// Gets or sets the path to the Open API.
@@ -38,8 +38,8 @@ public class RefitGeneratorSettings
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? OpenApiPath
     {
-        get => _openApiSource.OpenApiPath;
-        set => _openApiSource.OpenApiPath = value;
+        get => openApiSource.OpenApiPath;
+        set => openApiSource.OpenApiPath = value;
     }
 
     /// <summary>
@@ -50,8 +50,8 @@ public class RefitGeneratorSettings
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string[]? OpenApiPaths
     {
-        get => _openApiSource.OpenApiPaths;
-        set => _openApiSource.OpenApiPaths = value;
+        get => openApiSource.OpenApiPaths;
+        set => openApiSource.OpenApiPaths = value;
     }
 
     /// <summary>
@@ -60,8 +60,8 @@ public class RefitGeneratorSettings
     [Description("The namespace for the generated code. Default is GeneratedCode.")]
     public string Namespace
     {
-        get => _outputConfig.Namespace;
-        set => _outputConfig.Namespace = value;
+        get => outputConfig.Namespace;
+        set => outputConfig.Namespace = value;
     }
 
     /// <summary>
@@ -70,8 +70,8 @@ public class RefitGeneratorSettings
     [Description("The namespace for the generated contracts. Default is GeneratedCode.")]
     public string? ContractsNamespace
     {
-        get => _outputConfig.ContractsNamespace;
-        set => _outputConfig.ContractsNamespace = value;
+        get => outputConfig.ContractsNamespace;
+        set => outputConfig.ContractsNamespace = value;
     }
 
     /// <summary>
@@ -87,8 +87,8 @@ public class RefitGeneratorSettings
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public PropertyNamingPolicy PropertyNamingPolicy
     {
-        get => _typeConfig.PropertyNamingPolicy;
-        set => _typeConfig.PropertyNamingPolicy = value;
+        get => typeConfig.PropertyNamingPolicy;
+        set => typeConfig.PropertyNamingPolicy = value;
     }
 
     /// <summary>
@@ -97,8 +97,8 @@ public class RefitGeneratorSettings
     [Description("Generate contracts. Default is true.")]
     public bool GenerateContracts
     {
-        get => _codeGeneration.GenerateContracts;
-        set => _codeGeneration.GenerateContracts = value;
+        get => codeGeneration.GenerateContracts;
+        set => codeGeneration.GenerateContracts = value;
     }
 
     /// <summary>
@@ -107,8 +107,8 @@ public class RefitGeneratorSettings
     [Description("Generate clients. Default is true.")]
     public bool GenerateClients
     {
-        get => _codeGeneration.GenerateClients;
-        set => _codeGeneration.GenerateClients = value;
+        get => codeGeneration.GenerateClients;
+        set => codeGeneration.GenerateClients = value;
     }
 
     /// <summary>
@@ -117,8 +117,8 @@ public class RefitGeneratorSettings
     [Description("Generate clients that implement IDisposable.")]
     public bool GenerateDisposableClients
     {
-        get => _codeGeneration.GenerateDisposableClients;
-        set => _codeGeneration.GenerateDisposableClients = value;
+        get => codeGeneration.GenerateDisposableClients;
+        set => codeGeneration.GenerateDisposableClients = value;
     }
 
     /// <summary>
@@ -127,8 +127,8 @@ public class RefitGeneratorSettings
     [Description("Generate XML doc comments. Default is true.")]
     public bool GenerateXmlDocCodeComments
     {
-        get => _codeGeneration.GenerateXmlDocCodeComments;
-        set => _codeGeneration.GenerateXmlDocCodeComments = value;
+        get => codeGeneration.GenerateXmlDocCodeComments;
+        set => codeGeneration.GenerateXmlDocCodeComments = value;
     }
 
     /// <summary>
@@ -143,8 +143,8 @@ public class RefitGeneratorSettings
     )]
     public bool GenerateStatusCodeComments
     {
-        get => _codeGeneration.GenerateStatusCodeComments;
-        set => _codeGeneration.GenerateStatusCodeComments = value;
+        get => codeGeneration.GenerateStatusCodeComments;
+        set => codeGeneration.GenerateStatusCodeComments = value;
     }
 
     /// <summary>
@@ -153,8 +153,8 @@ public class RefitGeneratorSettings
     [Description("Add auto-generated header. Default is true.")]
     public bool AddAutoGeneratedHeader
     {
-        get => _codeGeneration.AddAutoGeneratedHeader;
-        set => _codeGeneration.AddAutoGeneratedHeader = value;
+        get => codeGeneration.AddAutoGeneratedHeader;
+        set => codeGeneration.AddAutoGeneratedHeader = value;
     }
 
     /// <summary>
@@ -163,8 +163,8 @@ public class RefitGeneratorSettings
     [Description("Add accept headers [Headers(\"Accept: application/json\")]. Default is true.")]
     public bool AddAcceptHeaders
     {
-        get => _codeGeneration.AddAcceptHeaders;
-        set => _codeGeneration.AddAcceptHeaders = value;
+        get => codeGeneration.AddAcceptHeaders;
+        set => codeGeneration.AddAcceptHeaders = value;
     }
 
     /// <summary>
@@ -173,8 +173,8 @@ public class RefitGeneratorSettings
     [Description("Add content-type headers [Headers(\"Content-Type: application/json\")]. Default is true.")]
     public bool AddContentTypeHeaders
     {
-        get => _codeGeneration.AddContentTypeHeaders;
-        set => _codeGeneration.AddContentTypeHeaders = value;
+        get => codeGeneration.AddContentTypeHeaders;
+        set => codeGeneration.AddContentTypeHeaders = value;
     }
 
     /// <summary>
@@ -183,8 +183,8 @@ public class RefitGeneratorSettings
     [Description("Return IApiResponse objects.")]
     public bool ReturnIApiResponse
     {
-        get => _codeGeneration.ReturnIApiResponse;
-        set => _codeGeneration.ReturnIApiResponse = value;
+        get => codeGeneration.ReturnIApiResponse;
+        set => codeGeneration.ReturnIApiResponse = value;
     }
 
     /// <summary>
@@ -193,8 +193,8 @@ public class RefitGeneratorSettings
     [Description("Return IObservable or Task.")]
     public bool ReturnIObservable
     {
-        get => _codeGeneration.ReturnIObservable;
-        set => _codeGeneration.ReturnIObservable = value;
+        get => codeGeneration.ReturnIObservable;
+        set => codeGeneration.ReturnIObservable = value;
     }
 
     /// <summary>
@@ -209,8 +209,8 @@ public class RefitGeneratorSettings
     )]
     public Dictionary<string, string> ResponseTypeOverride
     {
-        get => _codeGeneration.ResponseTypeOverride;
-        set => _codeGeneration.ResponseTypeOverride = value;
+        get => codeGeneration.ResponseTypeOverride;
+        set => codeGeneration.ResponseTypeOverride = value;
     }
 
     /// <summary>
@@ -219,8 +219,8 @@ public class RefitGeneratorSettings
     [Description("Generate operation headers. Default is true.")]
     public bool GenerateOperationHeaders
     {
-        get => _codeGeneration.GenerateOperationHeaders;
-        set => _codeGeneration.GenerateOperationHeaders = value;
+        get => codeGeneration.GenerateOperationHeaders;
+        set => codeGeneration.GenerateOperationHeaders = value;
     }
 
     /// <summary>
@@ -229,8 +229,8 @@ public class RefitGeneratorSettings
     [Description("A collection of headers to omit from operation signatures.")]
     public string[] IgnoredOperationHeaders
     {
-        get => _filterConfig.IgnoredOperationHeaders;
-        set => _filterConfig.IgnoredOperationHeaders = value;
+        get => filterConfig.IgnoredOperationHeaders;
+        set => filterConfig.IgnoredOperationHeaders = value;
     }
 
     /// <summary>
@@ -240,8 +240,8 @@ public class RefitGeneratorSettings
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TypeAccessibility TypeAccessibility
     {
-        get => _typeConfig.TypeAccessibility;
-        set => _typeConfig.TypeAccessibility = value;
+        get => typeConfig.TypeAccessibility;
+        set => typeConfig.TypeAccessibility = value;
     }
 
     /// <summary>
@@ -250,8 +250,8 @@ public class RefitGeneratorSettings
     [Description("Enable or disable the use of cancellation tokens.")]
     public bool UseCancellationTokens
     {
-        get => _parameterConfig.UseCancellationTokens;
-        set => _parameterConfig.UseCancellationTokens = value;
+        get => parameterConfig.UseCancellationTokens;
+        set => parameterConfig.UseCancellationTokens = value;
     }
 
     /// <summary>
@@ -266,8 +266,8 @@ public class RefitGeneratorSettings
     )]
     public bool UseIsoDateFormat
     {
-        get => _parameterConfig.UseIsoDateFormat;
-        set => _parameterConfig.UseIsoDateFormat = value;
+        get => parameterConfig.UseIsoDateFormat;
+        set => parameterConfig.UseIsoDateFormat = value;
     }
 
     /// <summary>
@@ -276,8 +276,8 @@ public class RefitGeneratorSettings
     [Description("Add additional namespace to generated types.")]
     public string[] AdditionalNamespaces
     {
-        get => _filterConfig.AdditionalNamespaces;
-        set => _filterConfig.AdditionalNamespaces = value;
+        get => filterConfig.AdditionalNamespaces;
+        set => filterConfig.AdditionalNamespaces = value;
     }
 
     /// <summary>
@@ -286,8 +286,8 @@ public class RefitGeneratorSettings
     [Description("Exclude namespaces on generated types.")]
     public string[] ExcludeNamespaces
     {
-        get => _filterConfig.ExcludeNamespaces;
-        set => _filterConfig.ExcludeNamespaces = value;
+        get => filterConfig.ExcludeNamespaces;
+        set => filterConfig.ExcludeNamespaces = value;
     }
 
     /// <summary>
@@ -297,8 +297,8 @@ public class RefitGeneratorSettings
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public MultipleInterfaces MultipleInterfaces
     {
-        get => _codeGeneration.MultipleInterfaces;
-        set => _codeGeneration.MultipleInterfaces = value;
+        get => codeGeneration.MultipleInterfaces;
+        set => codeGeneration.MultipleInterfaces = value;
     }
 
     /// <summary>
@@ -308,8 +308,8 @@ public class RefitGeneratorSettings
     [Description("Only include Paths that match the provided regular expression. May be set multiple times.")]
     public string[] IncludePathMatches
     {
-        get => _filterConfig.IncludePathMatches;
-        set => _filterConfig.IncludePathMatches = value;
+        get => filterConfig.IncludePathMatches;
+        set => filterConfig.IncludePathMatches = value;
     }
 
     /// <summary>
@@ -319,8 +319,8 @@ public class RefitGeneratorSettings
     [Description("Generate a Refit interface for each endpoint.")]
     public string[] IncludeTags
     {
-        get => _filterConfig.IncludeTags;
-        set => _filterConfig.IncludeTags = value;
+        get => filterConfig.IncludeTags;
+        set => filterConfig.IncludeTags = value;
     }
 
     /// <summary>
@@ -329,8 +329,8 @@ public class RefitGeneratorSettings
     [Description("Generate deprecated operations. Default is true.")]
     public bool GenerateDeprecatedOperations
     {
-        get => _codeGeneration.GenerateDeprecatedOperations;
-        set => _codeGeneration.GenerateDeprecatedOperations = value;
+        get => codeGeneration.GenerateDeprecatedOperations;
+        set => codeGeneration.GenerateDeprecatedOperations = value;
     }
 
     /// <summary>
@@ -345,8 +345,8 @@ public class RefitGeneratorSettings
     )]
     public string? OperationNameTemplate
     {
-        get => _codeGeneration.OperationNameTemplate;
-        set => _codeGeneration.OperationNameTemplate = value;
+        get => codeGeneration.OperationNameTemplate;
+        set => codeGeneration.OperationNameTemplate = value;
     }
 
     /// <summary>
@@ -355,8 +355,8 @@ public class RefitGeneratorSettings
     [Description("Re-order optional parameters to the end of the parameter list.")]
     public bool OptionalParameters
     {
-        get => _parameterConfig.OptionalParameters;
-        set => _parameterConfig.OptionalParameters = value;
+        get => parameterConfig.OptionalParameters;
+        set => parameterConfig.OptionalParameters = value;
     }
 
     /// <summary>
@@ -365,8 +365,8 @@ public class RefitGeneratorSettings
     [Description("The relative path to a folder in which the output files are generated. Default is ./Generated.")]
     public string OutputFolder
     {
-        get => _outputConfig.OutputFolder;
-        set => _outputConfig.OutputFolder = value;
+        get => outputConfig.OutputFolder;
+        set => outputConfig.OutputFolder = value;
     }
 
     /// <summary>
@@ -375,8 +375,8 @@ public class RefitGeneratorSettings
     [Description("The relative path to a folder where to store the generated contracts. Default is ./Generated.")]
     public string? ContractsOutputFolder
     {
-        get => _outputConfig.ContractsOutputFolder;
-        set => _outputConfig.ContractsOutputFolder = value;
+        get => outputConfig.ContractsOutputFolder;
+        set => outputConfig.ContractsOutputFolder = value;
     }
 
     /// <summary>
@@ -394,8 +394,8 @@ public class RefitGeneratorSettings
     )]
     public string? OutputFilename
     {
-        get => _outputConfig.OutputFilename;
-        set => _outputConfig.OutputFilename = value;
+        get => outputConfig.OutputFilename;
+        set => outputConfig.OutputFilename = value;
     }
 
     /// <summary>
@@ -422,8 +422,8 @@ public class RefitGeneratorSettings
     )]
     public bool TrimUnusedSchema
     {
-        get => _schemaConfig.TrimUnusedSchema;
-        set => _schemaConfig.TrimUnusedSchema = value;
+        get => schemaConfig.TrimUnusedSchema;
+        set => schemaConfig.TrimUnusedSchema = value;
     }
 
     /// <summary>
@@ -438,8 +438,8 @@ public class RefitGeneratorSettings
     )]
     public string[] KeepSchemaPatterns
     {
-        get => _schemaConfig.KeepSchemaPatterns;
-        set => _schemaConfig.KeepSchemaPatterns = value;
+        get => schemaConfig.KeepSchemaPatterns;
+        set => schemaConfig.KeepSchemaPatterns = value;
     }
 
     /// <summary>
@@ -456,8 +456,8 @@ public class RefitGeneratorSettings
     )]
     public bool IncludeInheritanceHierarchy
     {
-        get => _schemaConfig.IncludeInheritanceHierarchy;
-        set => _schemaConfig.IncludeInheritanceHierarchy = value;
+        get => schemaConfig.IncludeInheritanceHierarchy;
+        set => schemaConfig.IncludeInheritanceHierarchy = value;
     }
 
     /// <summary>
@@ -467,8 +467,8 @@ public class RefitGeneratorSettings
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public OperationNameGeneratorTypes OperationNameGenerator
     {
-        get => _codeGeneration.OperationNameGenerator;
-        set => _codeGeneration.OperationNameGenerator = value;
+        get => codeGeneration.OperationNameGenerator;
+        set => codeGeneration.OperationNameGenerator = value;
     }
 
     /// <summary>
@@ -477,8 +477,8 @@ public class RefitGeneratorSettings
     [Description("Skip default additional properties. Default is true.")]
     public bool GenerateDefaultAdditionalProperties
     {
-        get => _codeGeneration.GenerateDefaultAdditionalProperties;
-        set => _codeGeneration.GenerateDefaultAdditionalProperties = value;
+        get => codeGeneration.GenerateDefaultAdditionalProperties;
+        set => codeGeneration.GenerateDefaultAdditionalProperties = value;
     }
 
     /// <summary>
@@ -487,8 +487,8 @@ public class RefitGeneratorSettings
     [Description("Generate contracts as immutable records instead of classes.")]
     public bool ImmutableRecords
     {
-        get => _typeConfig.ImmutableRecords;
-        set => _typeConfig.ImmutableRecords = value;
+        get => typeConfig.ImmutableRecords;
+        set => typeConfig.ImmutableRecords = value;
     }
 
     /// <summary>
@@ -497,8 +497,8 @@ public class RefitGeneratorSettings
     [Description("The settings describing how to configure Apizr.")]
     public ApizrSettings? ApizrSettings
     {
-        get => _featureConfig.ApizrSettings;
-        set => _featureConfig.ApizrSettings = value;
+        get => featureConfig.ApizrSettings;
+        set => featureConfig.ApizrSettings = value;
     }
 
     /// <summary>
@@ -513,8 +513,8 @@ public class RefitGeneratorSettings
     )]
     public bool UseDynamicQuerystringParameters
     {
-        get => _parameterConfig.UseDynamicQuerystringParameters;
-        set => _parameterConfig.UseDynamicQuerystringParameters = value;
+        get => parameterConfig.UseDynamicQuerystringParameters;
+        set => parameterConfig.UseDynamicQuerystringParameters = value;
     }
 
     /// <summary>
@@ -537,8 +537,8 @@ public class RefitGeneratorSettings
     )]
     public bool GenerateMultipleFiles
     {
-        get => _outputConfig.GenerateMultipleFiles;
-        set => _outputConfig.GenerateMultipleFiles = value;
+        get => outputConfig.GenerateMultipleFiles;
+        set => outputConfig.GenerateMultipleFiles = value;
     }
 
     /// <summary>
@@ -560,8 +560,8 @@ public class RefitGeneratorSettings
     )]
     public bool UsePolymorphicSerialization
     {
-        get => _featureConfig.UsePolymorphicSerialization;
-        set => _featureConfig.UsePolymorphicSerialization = value;
+        get => featureConfig.UsePolymorphicSerialization;
+        set => featureConfig.UsePolymorphicSerialization = value;
     }
 
     /// <summary>
@@ -570,8 +570,8 @@ public class RefitGeneratorSettings
     [JsonIgnore]
     public IParameterNameGenerator? ParameterNameGenerator
     {
-        get => _parameterConfig.ParameterNameGenerator;
-        set => _parameterConfig.ParameterNameGenerator = value;
+        get => parameterConfig.ParameterNameGenerator;
+        set => parameterConfig.ParameterNameGenerator = value;
     }
 
     /// <summary>
@@ -581,8 +581,8 @@ public class RefitGeneratorSettings
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AuthenticationHeaderStyle AuthenticationHeaderStyle
     {
-        get => _featureConfig.AuthenticationHeaderStyle;
-        set => _featureConfig.AuthenticationHeaderStyle = value;
+        get => featureConfig.AuthenticationHeaderStyle;
+        set => featureConfig.AuthenticationHeaderStyle = value;
     }
 
     /// <summary>
@@ -593,8 +593,8 @@ public class RefitGeneratorSettings
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public CollectionFormat CollectionFormat
     {
-        get => _parameterConfig.CollectionFormat;
-        set => _parameterConfig.CollectionFormat = value;
+        get => parameterConfig.CollectionFormat;
+        set => parameterConfig.CollectionFormat = value;
     }
 
     /// <summary>
@@ -604,8 +604,8 @@ public class RefitGeneratorSettings
     [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
     public string? CustomTemplateDirectory
     {
-        get => _codeGeneration.CustomTemplateDirectory;
-        set => _codeGeneration.CustomTemplateDirectory = value;
+        get => codeGeneration.CustomTemplateDirectory;
+        set => codeGeneration.CustomTemplateDirectory = value;
     }
 
     /// <summary>
@@ -615,8 +615,8 @@ public class RefitGeneratorSettings
     [Description("Security scheme for which to generate authentication headers.")]
     public string? SecurityScheme
     {
-        get => _featureConfig.SecurityScheme;
-        set => _featureConfig.SecurityScheme = value;
+        get => featureConfig.SecurityScheme;
+        set => featureConfig.SecurityScheme = value;
     }
 
     /// <summary>
@@ -626,8 +626,8 @@ public class RefitGeneratorSettings
     [Description("Generate JsonSerializerContext for AOT compilation support in the contracts namespace when contracts are generated.")]
     public bool GenerateJsonSerializerContext
     {
-        get => _featureConfig.GenerateJsonSerializerContext;
-        set => _featureConfig.GenerateJsonSerializerContext = value;
+        get => featureConfig.GenerateJsonSerializerContext;
+        set => featureConfig.GenerateJsonSerializerContext = value;
     }
 
     /// <summary>
@@ -636,7 +636,7 @@ public class RefitGeneratorSettings
     [Description("Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.")]
     public string? ContractTypeSuffix
     {
-        get => _typeConfig.ContractTypeSuffix;
-        set => _typeConfig.ContractTypeSuffix = value;
+        get => typeConfig.ContractTypeSuffix;
+        set => typeConfig.ContractTypeSuffix = value;
     }
 }
