@@ -15,7 +15,7 @@ internal sealed class DocumentMerger : IDocumentMerger
     /// <param name="comparer">The comparer used to detect equivalent document elements during merging.</param>
     public DocumentMerger(DocumentEquivalenceComparer comparer)
     {
-        comparer = comparer;
+        this.comparer = comparer;
     }
 
     /// <summary>
