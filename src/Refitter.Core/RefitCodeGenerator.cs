@@ -7,7 +7,7 @@ namespace Refitter.Core;
 /// Generates Refit client and interface code from an OpenAPI document.
 /// Handles both single-file and multi-file output modes.
 /// </summary>
-public sealed class RefitCodeGenerator : IRefitCodeGenerator
+internal sealed class RefitCodeGenerator
 {
     /// <summary>
     /// Generates all Refit code as a single string.
