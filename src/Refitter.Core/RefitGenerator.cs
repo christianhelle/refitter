@@ -7,7 +7,7 @@ namespace Refitter.Core;
 /// </summary>
 public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
 {
-    private static readonly RefitCodeGenerator _codeGenerator = new();
+    private static readonly RefitCodeGenerator CodeGenerator = new();
 
     /// <summary>
     /// OpenAPI specifications used to generate Refit clients and interfaces.
@@ -79,11 +79,11 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     /// Generates Refit clients and interfaces based on an OpenAPI specification and returns the generated code as a string.
     /// </summary>
     /// <returns>The generated code as a string.</returns>
-    public string Generate() => _codeGenerator.Generate(document, settings);
+    public string Generate() => CodeGenerator.Generate(document, settings);
 
     /// <summary>
     /// Generates multiple files containing Refit interfaces and contracts.
     /// </summary>
     /// <returns>A GeneratorOutput containing all generated code files.</returns>
-    public GeneratorOutput GenerateMultipleFiles() => _codeGenerator.GenerateMultipleFiles(document, settings);
+    public GeneratorOutput GenerateMultipleFiles() => CodeGenerator.GenerateMultipleFiles(document, settings);
 }
