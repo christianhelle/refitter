@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Build.Framework;
 using MSBuildTask = Microsoft.Build.Utilities.Task;
+using Refitter.Core;
 
 namespace Refitter.MSBuild;
 
@@ -25,11 +26,9 @@ public class RefitterGenerateTask : MSBuildTask
         "net10.0"
     ];
 
-    public IProcessRunner ProcessRunner { get; set; }
+    public IGeneratorRunner? GeneratorRunner { get; set; }
 
-    public IRuntimeResolver RuntimeResolver { get; set; }
-
-    public Func<string, bool> FileExists { get; set; }
+    public string? RefitterDllPath { get; set; }
 
     public int ProcessTimeoutMilliseconds { get; set; } = DefaultProcessTimeoutMilliseconds;
 
@@ -46,13 +45,11 @@ public class RefitterGenerateTask : MSBuildTask
 
     public RefitterGenerateTask()
     {
-        var processRunner = new DefaultProcessRunner
-        {
-            TimeoutMilliseconds = ProcessTimeoutMilliseconds
-        };
-        ProcessRunner = processRunner;
-        RuntimeResolver = new DefaultRuntimeResolver(processRunner);
-        FileExists = System.IO.File.Exists;
+    }
+
+    public RefitterGenerateTask(IGeneratorRunner generatorRunner)
+    {
+        GeneratorRunner = generatorRunner;
     }
 
     public override bool Execute()
@@ -69,13 +66,15 @@ public class RefitterGenerateTask : MSBuildTask
 
         TryLogCommandLine($"Found {files.Length} .refitter files...");
 
+        var generatorRunner = GeneratorRunner ?? CreateDefaultRunner();
+
         var generatedFiles = new List<string>();
         var hasErrors = false;
 
         foreach (var file in files)
         {
             TryLogCommandLine($"Processing {file}");
-            var generated = TryExecuteRefitter(file, out var failed);
+            var generated = TryRunGenerator(generatorRunner, file, out var failed);
             if (failed)
             {
                 hasErrors = true;
@@ -93,12 +92,80 @@ public class RefitterGenerateTask : MSBuildTask
         return !hasErrors;
     }
 
-    private List<string>? TryExecuteRefitter(string file, out bool failed)
+    private IGeneratorRunner CreateDefaultRunner()
+    {
+        var packageFolder = GetPackageFolder();
+        var refitterDll = ResolveRefitterDllForTask(packageFolder);
+
+        if (!string.IsNullOrWhiteSpace(refitterDll) && System.IO.File.Exists(refitterDll))
+        {
+            TryLogCommandLine($"Using CLI adapter with {refitterDll}");
+            return new Core.CliGeneratorRunner(refitterDll, ProcessTimeoutMilliseconds);
+        }
+
+        TryLogCommandLine("Using Core generator runner (in-process)");
+        return new Core.CoreGeneratorRunner();
+    }
+
+    private string? GetPackageFolder()
+    {
+        try
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            return Path.GetDirectoryName(assembly.Location);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private string? ResolveRefitterDllForTask(string? packageFolder)
+    {
+        if (!string.IsNullOrWhiteSpace(RefitterDllPath))
+        {
+            return RefitterDllPath;
+        }
+
+        if (string.IsNullOrWhiteSpace(packageFolder))
+        {
+            return null;
+        }
+
+        var bundledRuntimes = PreferredRuntimeOrder
+            .Select(candidate => new
+            {
+                candidate.TargetFramework,
+                candidate.RuntimePrefix,
+                Path = Path.GetFullPath(Path.Combine(packageFolder, "..", candidate.TargetFramework, "refitter.dll")),
+            })
+            .ToArray();
+
+        foreach (var runtime in bundledRuntimes)
+        {
+            if (System.IO.File.Exists(runtime.Path))
+            {
+                TryLogCommandLine($"Detected bundled .NET {runtime.TargetFramework.Substring(3)} version of Refitter.");
+                return runtime.Path;
+            }
+        }
+
+        var coLocatedCli = Path.GetFullPath(Path.Combine(packageFolder, "refitter.dll"));
+        if (System.IO.File.Exists(coLocatedCli))
+        {
+            TryLogCommandLine("Falling back to co-located Refitter CLI.");
+            return coLocatedCli;
+        }
+
+        return null;
+    }
+
+    private List<string>? TryRunGenerator(IGeneratorRunner runner, string file, out bool failed)
     {
         failed = false;
         try
         {
-            return StartProcess(file, out failed);
+            return RunGenerator(runner, file, out failed);
         }
         catch (Exception e)
         {
@@ -108,80 +175,39 @@ public class RefitterGenerateTask : MSBuildTask
         }
     }
 
-    private List<string> StartProcess(string file, out bool failed)
+    private List<string>? RunGenerator(IGeneratorRunner runner, string file, out bool failed)
     {
         failed = false;
-        var assembly = Assembly.GetExecutingAssembly();
-        var packageFolder = Path.GetDirectoryName(assembly.Location);
-        var outputLines = new List<string>();
 
-        List<string>? installedRuntimes = null;
+        var settingsDirectory = Path.GetDirectoryName(file);
+        var json = File.ReadAllText(file);
+        var settings = RefitterSettingsLoader.Load(json, settingsDirectory ?? string.Empty);
+
         try
         {
-            installedRuntimes = RuntimeResolver.GetInstalledRuntimes();
+            var generatedFiles = runner.RunAsync(settings, SkipValidation, DisableLogging, CancellationToken.None).GetAwaiter().GetResult();
+            return generatedFiles?.ToList();
         }
-        catch (Exception exception)
-        {
-            TryLogCommandLine($"Failed to inspect installed .NET runtimes: {exception.Message}. Falling back to bundled Refitter runtime selection.");
-        }
-
-        var refitterDll = ResolveRefitterDll(packageFolder, installedRuntimes, TryLogCommandLine, FileExists);
-        if (string.IsNullOrWhiteSpace(refitterDll) || !FileExists(refitterDll!))
-        {
-            failed = true;
-            TryLogError("Unable to locate a bundled Refitter CLI runtime for the MSBuild task.");
-            return new();
-        }
-
-        var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
-        if (DisableLogging)
-        {
-            args += " --no-logging";
-        }
-        if (SkipValidation)
-        {
-            args += " --skip-validation";
-        }
-
-        TryLogCommandLine($"Starting dotnet {args}");
-
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = "dotnet",
-            Arguments = args,
-            WorkingDirectory = Path.GetDirectoryName(file)!,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            RedirectStandardInput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-        };
-
-        var processResult = ProcessRunner.Run(
-            startInfo,
-            data => HandleProcessStandardOutput(data, outputLines, outputLines, TryLogCommandLine),
-            data => HandleProcessErrorOutput(data, TryLogError));
-
-        if (processResult.TimedOut)
+        catch (TimeoutException)
         {
             failed = true;
             var timeoutDescription = FormatTimeout(ProcessTimeoutMilliseconds);
             TryLogError(
-                processResult.TerminationException is null
-                    ? $"Refitter process timed out after {timeoutDescription} and was terminated"
-                    : $"Refitter process timed out after {timeoutDescription}. Failed to terminate timed-out process: {processResult.TerminationException.Message}");
-
-            return new();
-        }
-
-        if (processResult.ExitCode != 0)
-        {
-            failed = true;
-            TryLogError($"Refitter process exited with code {processResult.ExitCode}");
+                $"Refitter process timed out after {timeoutDescription} and was terminated");
             return new List<string>();
         }
-
-        return ResolveGeneratedFiles(outputLines, file, out failed, TryLogError);
+        catch (InvalidOperationException ex) when (ex.Message.Contains("exited with code"))
+        {
+            failed = true;
+            TryLogError(ex.Message);
+            return new List<string>();
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("did not report any generated files"))
+        {
+            failed = true;
+            TryLogError(ex.Message);
+            return new List<string>();
+        }
     }
 
     internal static string? ResolveRefitterDll(

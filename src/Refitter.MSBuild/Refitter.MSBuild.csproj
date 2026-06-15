@@ -19,6 +19,10 @@
                           ExcludeAssets="runtime"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
+    </ItemGroup>
+
     <ItemGroup>    
         <Content Include="$(AssemblyName).props" PackagePath="build" />
         <Content Include="$(AssemblyName).targets" PackagePath="build" />
