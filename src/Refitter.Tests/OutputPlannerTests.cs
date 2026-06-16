@@ -337,4 +337,175 @@ public class OutputPlannerTests
                 Path.GetDirectoryName(settingsFilePath)!,
                 "RefitInterfaces.cs"));
     }
+
+    [Test]
+    public void SingleFile_BareFilename_SettingsFilePath_Handles_Empty_Root()
+    {
+        var settingsFilePath = "petstore.refitter";
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "ApiClient.cs"
+        };
+
+        var expected = Path.Combine("./Generated", "ApiClient.cs");
+        OutputPlanner.GetSingleFileOutputPath(settingsFilePath, cliOutputPath: null, refitSettings)
+            .Should().Be(expected);
+    }
+
+    [Test]
+    public void SingleFile_BareFilename_SettingsFilePath_With_CliOverride_Roots_To_CliPath()
+    {
+        var settingsFilePath = "petstore.refitter";
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "ApiClient.cs"
+        };
+
+        OutputPlanner.GetSingleFileOutputPath(
+                settingsFilePath,
+                cliOutputPath: Path.Combine("CustomCli", "Override.cs"),
+                refitSettings)
+            .Should().Be(Path.Combine("CustomCli", "Override.cs"));
+    }
+
+    [Test]
+    public void MultiFile_BareFilename_SettingsFilePath_Handles_Empty_Root()
+    {
+        var settingsFilePath = "petstore.refitter";
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./ApiClient"
+        };
+
+        OutputPlanner.GetMultiFileOutputPath(
+                settingsFilePath,
+                cliOutputPath: null,
+                refitSettings,
+                new GeneratedCode("RefitInterfaces", "// code"))
+            .Should().Be(Path.Combine("./ApiClient", "RefitInterfaces.cs"));
+    }
+
+    [Test]
+    public void PlanMultipleFiles_DirectCli_No_SettingsFilePath()
+    {
+        var refitSettings = new RefitGeneratorSettings();
+        var generatorOutput = new GeneratorOutput(new List<GeneratedCode>
+        {
+            new("RefitInterfaces", "// interfaces"),
+            new(TypenameConstants.Contracts, "// contracts")
+        });
+
+        var planned = OutputPlanner.PlanMultipleFiles(
+            settingsFilePath: null,
+            cliOutputPath: OutputPlanner.DefaultOutputPath,
+            refitSettings,
+            generatorOutput);
+
+        planned.Should().HaveCount(2);
+        planned[0].Path.Should().Be(Path.Combine(".", "RefitInterfaces.cs"));
+        planned[1].Path.Should().Be(Path.Combine(".", $"{TypenameConstants.Contracts}.cs"));
+    }
+
+    [Test]
+    public void GetContractsOutputPath_With_Empty_String_SettingsFilePath()
+    {
+        var refitSettings = new RefitGeneratorSettings { ContractsOutputFolder = "./Contracts" };
+        var outputFile = new GeneratedCode(TypenameConstants.Contracts, "// code");
+
+        var contractsFolder = Path.GetFullPath("./Contracts");
+        OutputPlanner.GetContractsOutputPath(
+                settingsFilePath: string.Empty,
+                refitSettings,
+                outputFile)
+            .Should().Be(Path.Combine(contractsFolder, TypenameConstants.Contracts + ".cs"));
+    }
+
+    [Test]
+    public void SingleFile_SettingsFile_WhitespaceOutputFolder_Uses_Filename_Directly()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = " ",
+            OutputFilename = "ApiClient.cs"
+        };
+
+        var expected = Path.Combine(
+            Path.GetDirectoryName(settingsFilePath)!,
+            "ApiClient.cs");
+        OutputPlanner.GetSingleFileOutputPath(settingsFilePath, cliOutputPath: null, refitSettings)
+            .Should().Be(expected);
+    }
+
+    [Test]
+    public void SingleFile_SettingsFile_EmptyOutputFilename_Uses_Empty_String()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./CustomFolder",
+            OutputFilename = string.Empty
+        };
+
+        var expected = Path.Combine(
+            Path.GetDirectoryName(settingsFilePath)!,
+            "./CustomFolder",
+            string.Empty);
+        OutputPlanner.GetSingleFileOutputPath(settingsFilePath, cliOutputPath: null, refitSettings)
+            .Should().Be(expected);
+    }
+
+    [Test]
+    public void SingleFile_SettingsFile_RootDir_As_SettingsFilePath()
+    {
+        var rootDir = Path.GetPathRoot(Path.GetTempPath())!;
+        var settingsFilePath = Path.Combine(rootDir, "petstore.refitter");
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "ApiClient.cs"
+        };
+
+        var expected = Path.Combine(rootDir, "./Generated", "ApiClient.cs");
+        OutputPlanner.GetSingleFileOutputPath(settingsFilePath, cliOutputPath: null, refitSettings)
+            .Should().Be(expected);
+    }
+
+    [Test]
+    public void MultiFile_SettingsFile_Empty_OutputFolder_Uses_Filename_Directly()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = string.Empty
+        };
+
+        OutputPlanner.GetMultiFileOutputPath(
+                settingsFilePath,
+                cliOutputPath: null,
+                refitSettings,
+                new GeneratedCode("RefitInterfaces", "// code"))
+            .Should().Be(Path.Combine(
+                Path.GetDirectoryName(settingsFilePath)!,
+                "RefitInterfaces.cs"));
+    }
+
+    [Test]
+    public void MultiFile_BareFilename_SettingsFile_With_CliOverride_Roots_To_CliPath()
+    {
+        var settingsFilePath = "petstore.refitter";
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFolder = "./ApiClient"
+        };
+
+        OutputPlanner.GetMultiFileOutputPath(
+                settingsFilePath,
+                cliOutputPath: Path.Combine("CustomCli", "MultipleFiles"),
+                refitSettings,
+                new GeneratedCode("RefitInterfaces", "// code"))
+            .Should().Be(Path.Combine("CustomCli", "MultipleFiles", "RefitInterfaces.cs"));
+    }
 }
