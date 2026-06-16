@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.OpenApi;
 using Refitter.Core;
-using Refitter.Validation;
+using Refitter.Core.Validation;
 
 namespace Refitter;
 
@@ -91,7 +91,11 @@ public sealed class GenerationOrchestrator
         await reporter.ReportSingleFileGenerationProgressAsync();
 
         var code = generator.Generate().ReplaceLineEndings();
-        var planned = OutputPlanner.PlanSingleFile(settings, refitGeneratorSettings, code);
+        var planned = OutputPlanner.PlanSingleFile(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitGeneratorSettings,
+            code);
 
         var fileName = Path.GetFileName(planned.Path);
         var directory = Path.GetDirectoryName(planned.Path) ?? "";
@@ -117,7 +121,8 @@ public sealed class GenerationOrchestrator
             generator.GenerateMultipleFiles);
 
         var planned = OutputPlanner.PlanMultipleFiles(
-            settings,
+            settings.SettingsFilePath,
+            settings.OutputPath,
             refitGeneratorSettings,
             generatorOutput);
 
@@ -182,7 +187,7 @@ public sealed class GenerationOrchestrator
     private static async Task ValidateOpenApiSpec(string openApiPath, IGenerationReporter reporter)
     {
         var validationResult = await reporter.ValidateWithProgressAsync(
-            () => Validation.OpenApiValidator.Validate(openApiPath));
+            () => Refitter.Core.Validation.OpenApiValidator.Validate(openApiPath));
 
         if (!validationResult.IsValid)
         {
