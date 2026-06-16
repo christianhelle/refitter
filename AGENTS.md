@@ -68,6 +68,20 @@ Run these first if source generator tests fail with missing generated types.
 - **Never commit broken code.** If tests fail, fix them before committing. If the fix requires additional changes, commit those together as a "fix: ..." commit.
 - **Commit messages** follow the pattern: `type: description` where type is one of `feat`, `fix`, `refactor`, `docs`, `test`, `chore`. Keep the subject line under 50 characters when possible.
 
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked as GitHub Issues against `christianhelle/refitter`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-label vocabulary (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context repo. See `docs/agents/domain.md`.
+
 ## Documentation
 
 - API docs are generated with DocFX from `docs/docfx_project/docfx.json`. To build locally:
