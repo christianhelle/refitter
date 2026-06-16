@@ -25,7 +25,7 @@ Run these first if source generator tests fail with missing generated types.
 |---|---|---|
 | `Refitter.Core` | `netstandard2.0` | Core generation logic (NSwag-based) |
 | `Refitter` | `net8.0;net9.0;net10.0` | CLI tool (`PackAsTool`, container support) |
-| `Refitter.MSBuild` | `netstandard2.0` | MSBuild task; **requires Refitter CLI binaries** to be built first because it copies `../Refitter/bin/$(Configuration)/net{8,9,10}.0/**/*` into the package |
+| `Refitter.MSBuild` | `netstandard2.0` | MSBuild task; references `Refitter.Core` directly (in-process); no CLI binary dependency |
 | `Refitter.SourceGenerator` | `netstandard2.0` | Roslyn source generator; emits code in-memory via `AddSource()` (not to disk since v2.0.0) |
 | `Refitter.Tests` | `net10.0` | Unit tests |
 | `Refitter.SourceGenerator.Tests` | `net8.0;net10.0` | Source generator integration tests |
