@@ -85,7 +85,7 @@ public static class SettingsValidator
             return fileAndOutputResult;
         }
 
-        GenerateCommand.ApplySettingsFileDefaults(settings.SettingsFilePath!, refitGeneratorSettings);
+        RefitterSettingsLoader.ApplyDefaults(settings.SettingsFilePath!, refitGeneratorSettings);
         GenerateCommand.ResolveRelativeSpecPaths(settings.SettingsFilePath!, refitGeneratorSettings);
         refitSettings = refitGeneratorSettings;
 

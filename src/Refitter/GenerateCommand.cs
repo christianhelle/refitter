@@ -70,7 +70,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
                 refitGeneratorSettings.OpenApiPath = settings.OpenApiPath;
 
-            ApplySettingsFileDefaults(settings.SettingsFilePath, refitGeneratorSettings);
+            RefitterSettingsLoader.ApplyDefaults(settings.SettingsFilePath, refitGeneratorSettings);
         }
         else
         {
@@ -90,30 +90,20 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         SettingsMapper.Map(settings);
 
     private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings) =>
-        OutputPlanner.GetSingleFileOutputPath(settings, refitGeneratorSettings);
+        OutputPlanner.GetSingleFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitGeneratorSettings);
 
     private string GetOutputPath(
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings,
         GeneratedCode outputFile) =>
-        OutputPlanner.GetMultiFileOutputPath(settings, refitGeneratorSettings, outputFile);
-
-    internal static void ApplySettingsFileDefaults(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
-    {
-        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder))
-            refitGeneratorSettings.GenerateMultipleFiles = true;
-
-        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
-            refitGeneratorSettings.OutputFolder = RefitGeneratorSettings.DefaultOutputFolder;
-
-        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFilename))
-        {
-            var refitterFileName = Path.GetFileNameWithoutExtension(settingsFilePath);
-            if (string.IsNullOrEmpty(refitterFileName))
-                refitterFileName = "Output";
-            refitGeneratorSettings.OutputFilename = $"{refitterFileName}.cs";
-        }
-    }
+        OutputPlanner.GetMultiFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitGeneratorSettings,
+            outputFile);
 
     internal static string FormatGeneratedFileMarker(string outputPath) =>
         $"{GeneratedFileMarker}{Path.GetFullPath(outputPath)}";

@@ -2,7 +2,7 @@ using System.Reflection;
 using FluentAssertions;
 using Microsoft.OpenApi;
 using Refitter.Core;
-using Refitter.Validation;
+using Refitter.Core.Validation;
 using TUnit.Core;
 
 namespace Refitter.Tests;

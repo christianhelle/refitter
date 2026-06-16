@@ -1,6 +1,6 @@
 using Microsoft.OpenApi;
 using Refitter.Core;
-using Refitter.Validation;
+using Refitter.Core.Validation;
 using Spectre.Console;
 
 namespace Refitter;

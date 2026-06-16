@@ -115,4 +115,99 @@ public class RefitterSettingsLoaderTests
     {
         RefitterSettingsLoader.IsUrl(path).Should().Be(expected);
     }
+
+    [Test]
+    public void ApplyDefaults_Should_Enable_GenerateMultipleFiles_When_ContractsOutputFolder_Is_Set()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var refitSettings = new RefitGeneratorSettings
+        {
+            ContractsOutputFolder = "./Contracts"
+        };
+
+        RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitSettings);
+
+        refitSettings.GenerateMultipleFiles.Should().BeTrue();
+        refitSettings.OutputFolder.Should().Be(RefitGeneratorSettings.DefaultOutputFolder);
+    }
+
+    [Test]
+    public void ApplyDefaults_Should_Fallback_To_Output_When_SettingsFilePath_Has_No_Filename()
+    {
+        var refitSettings = new RefitGeneratorSettings();
+
+        RefitterSettingsLoader.ApplyDefaults(null!, refitSettings);
+        refitSettings.OutputFilename.Should().Be("Output.cs");
+
+        refitSettings.OutputFilename = null!;
+        RefitterSettingsLoader.ApplyDefaults(string.Empty, refitSettings);
+        refitSettings.OutputFilename.Should().Be("Output.cs");
+    }
+
+    [Test]
+    public void ApplyDefaults_Should_Fallback_To_Output_When_OutputFilename_Is_Whitespace()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFilename = " "
+        };
+
+        RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitSettings);
+
+        refitSettings.OutputFilename.Should().Be("petstore.cs");
+    }
+
+    [Test]
+    public void ApplyDefaults_Should_Preserve_Existing_OutputFilename()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var refitSettings = new RefitGeneratorSettings
+        {
+            OutputFilename = "CustomClient.cs"
+        };
+
+        RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitSettings);
+
+        refitSettings.OutputFilename.Should().Be("CustomClient.cs");
+    }
+
+    [Test]
+    public void ApplyDefaults_Should_Not_Set_GenerateMultipleFiles_When_No_ContractsFolder()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var refitSettings = new RefitGeneratorSettings();
+
+        RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitSettings);
+
+        refitSettings.GenerateMultipleFiles.Should().BeFalse();
+    }
+
+    [Test]
+    public void ResolveRelativeSpecPaths_Null_OpenApiPaths_Does_Not_Throw()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = null,
+            OpenApiPaths = null
+        };
+
+        RefitterSettingsLoader.ResolveRelativeSpecPaths(settings, BaseDirectory);
+
+        settings.OpenApiPath.Should().BeNull();
+        settings.OpenApiPaths.Should().BeNull();
+    }
+
+    [Test]
+    public void ResolveRelativeSpecPaths_Empty_OpenApiPath_Does_Not_Resolve()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = string.Empty
+        };
+
+        RefitterSettingsLoader.ResolveRelativeSpecPaths(settings, BaseDirectory);
+
+        settings.OpenApiPath.Should().Be(string.Empty);
+    }
 }

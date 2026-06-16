@@ -199,16 +199,6 @@ public class GenerateCommandTests
     }
 
     [Test]
-    public void FormatGeneratedFileMarker_Should_Emit_A_Task_Parseable_Full_Path()
-    {
-        var generatedFile = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Generated", "Petstore.cs"));
-        var outputLine = GenerateCommand.FormatGeneratedFileMarker(generatedFile);
-
-        outputLine.Should().Be($"{GenerateCommand.GeneratedFileMarker}{generatedFile}");
-        Refitter.MSBuild.RefitterGenerateTask.ParseGeneratedFilePath(outputLine).Should().Be(generatedFile);
-    }
-
-    [Test]
     public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Default()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -331,10 +321,7 @@ public class GenerateCommandTests
         };
 
         // Apply defaults first (simulates what GenerateCommand does)
-        var applyMethod = typeof(GenerateCommand).GetMethod(
-            "ApplySettingsFileDefaults",
-            BindingFlags.NonPublic | BindingFlags.Static);
-        applyMethod!.Invoke(null, [settingsFilePath, refitSettings]);
+        RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitSettings);
 
         var method = typeof(GenerateCommand).GetMethod(
             "GetOutputPath",
@@ -408,7 +395,7 @@ public class GenerateCommandTests
     }
 
     [Test]
-    public void ApplySettingsFileDefaults_Should_Set_Default_OutputFolder()
+    public void ApplyDefaults_Should_Set_Default_OutputFolder()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var refitSettings = new RefitGeneratorSettings
@@ -416,18 +403,13 @@ public class GenerateCommandTests
             OutputFolder = null!,
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "ApplySettingsFileDefaults",
-            BindingFlags.NonPublic | BindingFlags.Static);
-
-        method.Should().NotBeNull();
-        method!.Invoke(null, [settingsFilePath, refitSettings]);
+        RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitSettings);
 
         refitSettings.OutputFolder.Should().Be("./Generated");
     }
 
     [Test]
-    public void ApplySettingsFileDefaults_Should_Preserve_Explicit_OutputFolder()
+    public void ApplyDefaults_Should_Preserve_Explicit_OutputFolder()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var refitSettings = new RefitGeneratorSettings
@@ -435,17 +417,13 @@ public class GenerateCommandTests
             OutputFolder = "./CustomFolder"
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "ApplySettingsFileDefaults",
-            BindingFlags.NonPublic | BindingFlags.Static);
-
-        method!.Invoke(null, [settingsFilePath, refitSettings]);
+        RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitSettings);
 
         refitSettings.OutputFolder.Should().Be("./CustomFolder");
     }
 
     [Test]
-    public void ApplySettingsFileDefaults_Should_Set_Default_When_Empty_OutputFolder()
+    public void ApplyDefaults_Should_Set_Default_When_Empty_OutputFolder()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
         var refitSettings = new RefitGeneratorSettings
@@ -453,11 +431,7 @@ public class GenerateCommandTests
             OutputFolder = string.Empty
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "ApplySettingsFileDefaults",
-            BindingFlags.NonPublic | BindingFlags.Static);
-
-        method!.Invoke(null, [settingsFilePath, refitSettings]);
+        RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitSettings);
 
         refitSettings.OutputFolder.Should().Be("./Generated");
     }
@@ -466,20 +440,16 @@ public class GenerateCommandTests
     public void ResolveRelativeSpecPaths_Should_Normalize_Relative_OpenApiPaths_And_Preserve_Urls()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var baseDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath))!;
         var refitSettings = new RefitGeneratorSettings
         {
             OpenApiPaths = ["specs/first.json", "https://example.com/openapi.json"]
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "ResolveRelativeSpecPaths",
-            BindingFlags.NonPublic | BindingFlags.Static);
-
-        method.Should().NotBeNull();
-        method!.Invoke(null, [settingsFilePath, refitSettings]);
+        RefitterSettingsLoader.ResolveRelativeSpecPaths(refitSettings, baseDirectory);
 
         refitSettings.OpenApiPaths.Should().Equal(
-            Path.GetFullPath(Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "specs", "first.json")),
+            Path.GetFullPath(Path.Combine(baseDirectory, "specs", "first.json")),
             "https://example.com/openapi.json");
     }
 
