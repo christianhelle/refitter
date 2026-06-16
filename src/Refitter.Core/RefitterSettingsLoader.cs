@@ -58,6 +58,28 @@ public static class RefitterSettingsLoader
     }
 
     /// <summary>
+    /// Applies default values to settings that are not explicitly set in a settings file.
+    /// </summary>
+    /// <param name="settingsFilePath">The path to the settings file.</param>
+    /// <param name="refitGeneratorSettings">The settings to apply defaults to.</param>
+    public static void ApplyDefaults(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder))
+            refitGeneratorSettings.GenerateMultipleFiles = true;
+
+        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
+            refitGeneratorSettings.OutputFolder = RefitGeneratorSettings.DefaultOutputFolder;
+
+        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFilename))
+        {
+            var refitterFileName = Path.GetFileNameWithoutExtension(settingsFilePath);
+            if (string.IsNullOrEmpty(refitterFileName))
+                refitterFileName = "Output";
+            refitGeneratorSettings.OutputFilename = $"{refitterFileName}.cs";
+        }
+    }
+
+    /// <summary>
     /// Determines whether the specified path is an absolute HTTP or HTTPS URL.
     /// </summary>
     /// <param name="path">The path to inspect.</param>
