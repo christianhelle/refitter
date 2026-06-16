@@ -1,7 +1,7 @@
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 
-namespace Refitter.Validation;
+namespace Refitter.Core.Validation;
 
 public static class OpenApiValidator
 {

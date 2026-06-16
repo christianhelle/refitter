@@ -1,6 +1,6 @@
 using Microsoft.OpenApi;
 
-namespace Refitter.Validation;
+namespace Refitter.Core.Validation;
 
 public class OpenApiStats : OpenApiVisitorBase
 {

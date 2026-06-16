@@ -1,4 +1,4 @@
-namespace Refitter.Validation;
+namespace Refitter.Core.Validation;
 
 public class OpenApiValidationException : Exception
 {
