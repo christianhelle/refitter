@@ -278,6 +278,8 @@ test/Apizr/GeneratedCode
 test/MultipleFiles/**/*.cs
 test/HelloWorld/HelloWorld/Output.cs
 test/MSBuild/refitter.msbuild/
+test/MSBuild/nupkg-*/
+src/Refitter.MSBuild/nupkg-check/
 
 # Install scripts
 dotnet-install.sh
@@ -286,7 +288,7 @@ install.sh
 # Confidential temporary files — must not reach public repository
 tmp/
 test/Generated/GeneratedCode/*.generated.cs
-test/MSBuild/Generated/**/*.generated.cs
+test/MSBuild/Generated/**/*.cs
 test/MSBuild/GeneratedOutput/**/*.cs
 .squad/orchestration-log/
 .squad/log/
