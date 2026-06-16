@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.OpenApi.Reader;
-using Refitter.Validation;
+using Refitter.Core.Validation;
 
 namespace Refitter.Tests.OpenApi;
 

@@ -163,12 +163,7 @@ public class SettingsFileOutputPathTests
 
     private static void ApplySettingsFileDefaults(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
     {
-        var method = typeof(GenerateCommand).GetMethod(
-            "ApplySettingsFileDefaults",
-            BindingFlags.NonPublic | BindingFlags.Static);
-
-        method.Should().NotBeNull();
-        method!.Invoke(null, [settingsFilePath, refitGeneratorSettings]);
+        RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitGeneratorSettings);
     }
 
     private static string CreateTempDirectory()
