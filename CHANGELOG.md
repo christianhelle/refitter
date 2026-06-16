@@ -15,6 +15,7 @@
 - Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
 - Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
+- Decouple CLI binary dependency from MSBuild task [\#1154](https://github.com/christianhelle/refitter/pull/1154) ([christianhelle](https://github.com/christianhelle))
 - Remove underscore prefix from private fields [\#1150](https://github.com/christianhelle/refitter/pull/1150) ([christianhelle](https://github.com/christianhelle))
 - Rename fields [\#1149](https://github.com/christianhelle/refitter/pull/1149) ([christianhelle](https://github.com/christianhelle))
 - Split RefitGeneratorSettings into focused config records [\#1148](https://github.com/christianhelle/refitter/pull/1148) ([christianhelle](https://github.com/christianhelle))
