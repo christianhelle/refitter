@@ -23,7 +23,6 @@ public class RefitGeneratorSettings
 
     private readonly CodeGenerationConfig codeGeneration = new();
     private readonly OutputConfig outputConfig = new();
-    private readonly FilterConfig filterConfig = new();
     private readonly SchemaConfig schemaConfig = new();
     private readonly FeatureConfig featureConfig = new();
 
@@ -212,11 +211,7 @@ public class RefitGeneratorSettings
     /// Gets or sets a collection of headers to omit from operation signatures. (default: [])
     /// </summary>
     [Description("A collection of headers to omit from operation signatures.")]
-    public string[] IgnoredOperationHeaders
-    {
-        get => filterConfig.IgnoredOperationHeaders;
-        set => filterConfig.IgnoredOperationHeaders = value;
-    }
+    public string[] IgnoredOperationHeaders { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the generated type accessibility. (default: Public)
@@ -247,21 +242,13 @@ public class RefitGeneratorSettings
     /// Add additional namespace to generated types
     /// </summary>
     [Description("Add additional namespace to generated types.")]
-    public string[] AdditionalNamespaces
-    {
-        get => filterConfig.AdditionalNamespaces;
-        set => filterConfig.AdditionalNamespaces = value;
-    }
+    public string[] AdditionalNamespaces { get; set; } = [];
 
     /// <summary>
     /// Exclude namespaces on generated types
     /// </summary>
     [Description("Exclude namespaces on generated types.")]
-    public string[] ExcludeNamespaces
-    {
-        get => filterConfig.ExcludeNamespaces;
-        set => filterConfig.ExcludeNamespaces = value;
-    }
+    public string[] ExcludeNamespaces { get; set; } = [];
 
     /// <summary>
     /// Set to <c>true</c> to Generate a Refit interface for each endpoint
@@ -279,22 +266,14 @@ public class RefitGeneratorSettings
     /// May be set multiple times
     /// </summary>
     [Description("Only include Paths that match the provided regular expression. May be set multiple times.")]
-    public string[] IncludePathMatches
-    {
-        get => filterConfig.IncludePathMatches;
-        set => filterConfig.IncludePathMatches = value;
-    }
+    public string[] IncludePathMatches { get; set; } = [];
 
     /// <summary>
     /// Set to <c>true</c> to only include Endpoints that contain this tag.
     /// May be set multiple times and result in OR'ed evaluation.
     /// </summary>
     [Description("Generate a Refit interface for each endpoint.")]
-    public string[] IncludeTags
-    {
-        get => filterConfig.IncludeTags;
-        set => filterConfig.IncludeTags = value;
-    }
+    public string[] IncludeTags { get; set; } = [];
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate deprecated operations, otherwise <c>false</c>
