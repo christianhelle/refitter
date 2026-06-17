@@ -23,7 +23,6 @@ public class RefitGeneratorSettings
 
     private readonly CodeGenerationConfig codeGeneration = new();
     private readonly OutputConfig outputConfig = new();
-    private readonly SchemaConfig schemaConfig = new();
     private readonly FeatureConfig featureConfig = new();
 
     /// <summary>
@@ -368,11 +367,7 @@ public class RefitGeneratorSettings
         This works in conjunction with includeTags and includePathMatches.
         """
     )]
-    public bool TrimUnusedSchema
-    {
-        get => schemaConfig.TrimUnusedSchema;
-        set => schemaConfig.TrimUnusedSchema = value;
-    }
+    public bool TrimUnusedSchema { get; set; }
 
     /// <summary>
     /// Array of regular expressions that determine if a schema needs to be kept.
@@ -384,11 +379,7 @@ public class RefitGeneratorSettings
         This works in conjunction with TrimUnusedSchema.
         """
     )]
-    public string[] KeepSchemaPatterns
-    {
-        get => schemaConfig.KeepSchemaPatterns;
-        set => schemaConfig.KeepSchemaPatterns = value;
-    }
+    public string[] KeepSchemaPatterns { get; set; } = [];
 
     /// <summary>
     /// Set to <c>true</c> to keep all possible type-instances of inheritance/union types.
@@ -402,11 +393,7 @@ public class RefitGeneratorSettings
         This works in conjunction with TrimUnusedSchema.
         """
     )]
-    public bool IncludeInheritanceHierarchy
-    {
-        get => schemaConfig.IncludeInheritanceHierarchy;
-        set => schemaConfig.IncludeInheritanceHierarchy = value;
-    }
+    public bool IncludeInheritanceHierarchy { get; set; }
 
     /// <summary>
     /// The NSwag IOperationNameGenerator implementation to use
