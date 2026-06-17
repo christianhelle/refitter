@@ -23,7 +23,6 @@ public class RefitGeneratorSettings
 
     private readonly CodeGenerationConfig codeGeneration = new();
     private readonly OutputConfig outputConfig = new();
-    private readonly FeatureConfig featureConfig = new();
 
     /// <summary>
     /// Gets or sets the path to the Open API.
@@ -426,11 +425,7 @@ public class RefitGeneratorSettings
     /// Get ot set the settings describing how to configure Apizr
     /// </summary>
     [Description("The settings describing how to configure Apizr.")]
-    public ApizrSettings? ApizrSettings
-    {
-        get => featureConfig.ApizrSettings;
-        set => featureConfig.ApizrSettings = value;
-    }
+    public ApizrSettings? ApizrSettings { get; set; }
 
     /// <summary>
     /// Set to <c>true</c> to wrap multiple query parameters into a single complex one. Default is <c>false</c> (no wrapping).
@@ -485,11 +480,7 @@ public class RefitGeneratorSettings
         See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
         """
     )]
-    public bool UsePolymorphicSerialization
-    {
-        get => featureConfig.UsePolymorphicSerialization;
-        set => featureConfig.UsePolymorphicSerialization = value;
-    }
+    public bool UsePolymorphicSerialization { get; set; }
 
     /// <summary>
     /// Gets or sets the parameter name generator for customizing parameter names.
@@ -502,11 +493,7 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Generate Security Schema Authentication headers")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public AuthenticationHeaderStyle AuthenticationHeaderStyle
-    {
-        get => featureConfig.AuthenticationHeaderStyle;
-        set => featureConfig.AuthenticationHeaderStyle = value;
-    }
+    public AuthenticationHeaderStyle AuthenticationHeaderStyle { get; set; }
 
     /// <summary>
     /// Gets or sets the collection format to use for array query parameters.
@@ -532,22 +519,14 @@ public class RefitGeneratorSettings
     /// When specified, only endpoints using this security scheme will have authentication headers generated.
     /// </summary>
     [Description("Security scheme for which to generate authentication headers.")]
-    public string? SecurityScheme
-    {
-        get => featureConfig.SecurityScheme;
-        set => featureConfig.SecurityScheme = value;
-    }
+    public string? SecurityScheme { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate JsonSerializerContext for AOT compilation support.
     /// The context is emitted into the contracts namespace and only when contracts are generated.
     /// </summary>
     [Description("Generate JsonSerializerContext for AOT compilation support in the contracts namespace when contracts are generated.")]
-    public bool GenerateJsonSerializerContext
-    {
-        get => featureConfig.GenerateJsonSerializerContext;
-        set => featureConfig.GenerateJsonSerializerContext = value;
-    }
+    public bool GenerateJsonSerializerContext { get; set; }
 
     /// <summary>
     /// Gets or sets a suffix to append to all generated contract type names.
