@@ -14,15 +14,14 @@ public class RefitGeneratorSettings
     /// <summary>
     /// Default output folder for generated files.
     /// </summary>
-    public const string DefaultOutputFolder = OutputConfig.DefaultOutputFolder;
+    public const string DefaultOutputFolder = "./Generated";
 
     /// <summary>
     /// Default namespace for generated code.
     /// </summary>
-    public const string DefaultNamespace = OutputConfig.DefaultNamespace;
+    public const string DefaultNamespace = "GeneratedCode";
 
     private readonly CodeGenerationConfig codeGeneration = new();
-    private readonly OutputConfig outputConfig = new();
 
     /// <summary>
     /// Gets or sets the path to the Open API.
@@ -44,21 +43,13 @@ public class RefitGeneratorSettings
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
     /// </summary>
     [Description("The namespace for the generated code. Default is GeneratedCode.")]
-    public string Namespace
-    {
-        get => outputConfig.Namespace;
-        set => outputConfig.Namespace = value;
-    }
+    public string Namespace { get; set; } = DefaultNamespace;
 
     /// <summary>
     /// Gets or sets the namespace for the generated contracts. (default: GeneratedCode);
     /// </summary>
     [Description("The namespace for the generated contracts. Default is GeneratedCode.")]
-    public string? ContractsNamespace
-    {
-        get => outputConfig.ContractsNamespace;
-        set => outputConfig.ContractsNamespace = value;
-    }
+    public string? ContractsNamespace { get; set; }
 
     /// <summary>
     /// Gets or sets the naming settings.
@@ -309,21 +300,13 @@ public class RefitGeneratorSettings
     /// Gets or sets the relative path to a folder in which the output files are generated. (default: ./Generated)
     /// </summary>
     [Description("The relative path to a folder in which the output files are generated. Default is ./Generated.")]
-    public string OutputFolder
-    {
-        get => outputConfig.OutputFolder;
-        set => outputConfig.OutputFolder = value;
-    }
+    public string OutputFolder { get; set; } = DefaultOutputFolder;
 
     /// <summary>
     /// Gets or sets the relative path to a folder where to store the generated contracts. (default: ./Generated)
     /// </summary>
     [Description("The relative path to a folder where to store the generated contracts. Default is ./Generated.")]
-    public string? ContractsOutputFolder
-    {
-        get => outputConfig.ContractsOutputFolder;
-        set => outputConfig.ContractsOutputFolder = value;
-    }
+    public string? ContractsOutputFolder { get; set; }
 
     /// <summary>
     /// Gets or sets the filename of the generated code.
@@ -338,11 +321,7 @@ public class RefitGeneratorSettings
         and the default is [.refitter defined naming OR .refitter filename].g.cs)
         """
     )]
-    public string? OutputFilename
-    {
-        get => outputConfig.OutputFilename;
-        set => outputConfig.OutputFilename = value;
-    }
+    public string? OutputFilename { get; set; }
 
     /// <summary>
     /// Gets or sets the settings describing how to register generated interface to the .NET Core DI container
@@ -457,11 +436,7 @@ public class RefitGeneratorSettings
         When GenerateJsonSerializerContext is enabled, an additional serializer context file is emitted.
         """
     )]
-    public bool GenerateMultipleFiles
-    {
-        get => outputConfig.GenerateMultipleFiles;
-        set => outputConfig.GenerateMultipleFiles = value;
-    }
+    public bool GenerateMultipleFiles { get; set; }
 
     /// <summary>
     /// Set to <c>true</c> to use System.Text.Json polymorphic serialization. Default is <c>false</c>
