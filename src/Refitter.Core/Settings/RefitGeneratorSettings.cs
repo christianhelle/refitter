@@ -22,7 +22,6 @@ public class RefitGeneratorSettings
     public const string DefaultNamespace = OutputConfig.DefaultNamespace;
 
     private readonly CodeGenerationConfig codeGeneration = new();
-    private readonly ParameterConfig parameterConfig = new();
     private readonly OutputConfig outputConfig = new();
     private readonly TypeConfig typeConfig = new();
     private readonly FilterConfig filterConfig = new();
@@ -239,11 +238,7 @@ public class RefitGeneratorSettings
     /// Enable or disable the use of cancellation tokens.
     /// </summary>
     [Description("Enable or disable the use of cancellation tokens.")]
-    public bool UseCancellationTokens
-    {
-        get => parameterConfig.UseCancellationTokens;
-        set => parameterConfig.UseCancellationTokens = value;
-    }
+    public bool UseCancellationTokens { get; set; }
 
     /// <summary>
     /// Set to <c>true</c> to explicitly format date query string parameters
@@ -255,11 +250,7 @@ public class RefitGeneratorSettings
         in ISO 8601 standard date format using delimiters (for example: 2023-06-15)
         """
     )]
-    public bool UseIsoDateFormat
-    {
-        get => parameterConfig.UseIsoDateFormat;
-        set => parameterConfig.UseIsoDateFormat = value;
-    }
+    public bool UseIsoDateFormat { get; set; }
 
     /// <summary>
     /// Add additional namespace to generated types
@@ -344,11 +335,7 @@ public class RefitGeneratorSettings
     /// Set to <c>true</c> to re-order optional parameters to the end of the parameter list
     /// </summary>
     [Description("Re-order optional parameters to the end of the parameter list.")]
-    public bool OptionalParameters
-    {
-        get => parameterConfig.OptionalParameters;
-        set => parameterConfig.OptionalParameters = value;
-    }
+    public bool OptionalParameters { get; set; }
 
     /// <summary>
     /// Gets or sets the relative path to a folder in which the output files are generated. (default: ./Generated)
@@ -502,11 +489,7 @@ public class RefitGeneratorSettings
         See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.
         """
     )]
-    public bool UseDynamicQuerystringParameters
-    {
-        get => parameterConfig.UseDynamicQuerystringParameters;
-        set => parameterConfig.UseDynamicQuerystringParameters = value;
-    }
+    public bool UseDynamicQuerystringParameters { get; set; }
 
     /// <summary>
     /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
@@ -559,11 +542,7 @@ public class RefitGeneratorSettings
     /// Gets or sets the parameter name generator for customizing parameter names.
     /// </summary>
     [JsonIgnore]
-    public IParameterNameGenerator? ParameterNameGenerator
-    {
-        get => parameterConfig.ParameterNameGenerator;
-        set => parameterConfig.ParameterNameGenerator = value;
-    }
+    public IParameterNameGenerator? ParameterNameGenerator { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate Security Schema Authentication headers.
@@ -582,11 +561,7 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("The collection format to use for array query parameters. Default is CollectionFormat.Multi.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public CollectionFormat CollectionFormat
-    {
-        get => parameterConfig.CollectionFormat;
-        set => parameterConfig.CollectionFormat = value;
-    }
+    public CollectionFormat CollectionFormat { get; set; } = CollectionFormat.Multi;
 
     /// <summary>
     /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
