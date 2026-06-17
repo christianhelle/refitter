@@ -329,4 +329,94 @@ public class SettingsBuilderTests
         result.UseDynamicQuerystringParameters.Should().BeTrue();
         result.CollectionFormat.Should().Be(CollectionFormat.Csv);
     }
+
+    [Test]
+    public void ToLegacySettings_Should_Map_OpenApiSourceConfigSlice()
+    {
+        var bundle = new SettingsBundle(
+            new Dictionary<Type, object>
+            {
+                {
+                    typeof(OpenApiSourceConfigSlice),
+                    new OpenApiSourceConfigSlice(
+                        OpenApiPath: "https://example.com/swagger.json",
+                        OpenApiPaths: null)
+                }
+            });
+
+        var result = bundle.ToLegacySettings();
+
+        result.OpenApiPath.Should().Be("https://example.com/swagger.json");
+        result.OpenApiPaths.Should().BeNull();
+    }
+
+    [Test]
+    public void ToLegacySettings_Should_Map_SchemaConfigSlice()
+    {
+        var bundle = new SettingsBundle(
+            new Dictionary<Type, object>
+            {
+                {
+                    typeof(SchemaConfigSlice),
+                    new SchemaConfigSlice(
+                        TrimUnusedSchema: true,
+                        KeepSchemaPatterns: new[] { ".*Dto", ".*Request" },
+                        IncludeInheritanceHierarchy: true)
+                }
+            });
+
+        var result = bundle.ToLegacySettings();
+
+        result.TrimUnusedSchema.Should().BeTrue();
+        result.KeepSchemaPatterns.Should().BeEquivalentTo(".*Dto", ".*Request");
+        result.IncludeInheritanceHierarchy.Should().BeTrue();
+    }
+
+    [Test]
+    public void ToLegacySettings_Should_Map_TypeConfigSlice()
+    {
+        var bundle = new SettingsBundle(
+            new Dictionary<Type, object>
+            {
+                {
+                    typeof(TypeConfigSlice),
+                    new TypeConfigSlice(
+                        TypeAccessibility: Core.TypeAccessibility.Internal,
+                        PropertyNamingPolicy: PropertyNamingPolicy.PreserveOriginal,
+                        ImmutableRecords: true,
+                        ContractTypeSuffix: "Dto")
+                }
+            });
+
+        var result = bundle.ToLegacySettings();
+
+        result.TypeAccessibility.Should().Be(Core.TypeAccessibility.Internal);
+        result.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PreserveOriginal);
+        result.ImmutableRecords.Should().BeTrue();
+        result.ContractTypeSuffix.Should().Be("Dto");
+    }
+
+    [Test]
+    public void ToLegacySettings_Should_Map_FeatureConfigSlice()
+    {
+        var bundle = new SettingsBundle(
+            new Dictionary<Type, object>
+            {
+                {
+                    typeof(FeatureConfigSlice),
+                    new FeatureConfigSlice(
+                        UsePolymorphicSerialization: true,
+                        AuthenticationHeaderStyle: AuthenticationHeaderStyle.Method,
+                        SecurityScheme: "bearer",
+                        GenerateJsonSerializerContext: true)
+                }
+            });
+
+        var result = bundle.ToLegacySettings();
+
+        result.UsePolymorphicSerialization.Should().BeTrue();
+        result.AuthenticationHeaderStyle.Should().Be(AuthenticationHeaderStyle.Method);
+        result.SecurityScheme.Should().Be("bearer");
+        result.GenerateJsonSerializerContext.Should().BeTrue();
+    }
 }
