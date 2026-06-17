@@ -21,7 +21,6 @@ public class RefitGeneratorSettings
     /// </summary>
     public const string DefaultNamespace = OutputConfig.DefaultNamespace;
 
-    private readonly OpenApiSourceConfig openApiSource = new();
     private readonly CodeGenerationConfig codeGeneration = new();
     private readonly ParameterConfig parameterConfig = new();
     private readonly OutputConfig outputConfig = new();
@@ -36,11 +35,7 @@ public class RefitGeneratorSettings
     [Description("The path to the OpenAPI document.")]
     [JsonPropertyName("openApiPath")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? OpenApiPath
-    {
-        get => openApiSource.OpenApiPath;
-        set => openApiSource.OpenApiPath = value;
-    }
+    public string? OpenApiPath { get; set; }
 
     /// <summary>
     /// Gets or sets the paths to multiple Open API documents. When specified, the documents are merged.
@@ -48,11 +43,7 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("The paths to multiple OpenAPI documents. When specified, the documents are merged into a single client.")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string[]? OpenApiPaths
-    {
-        get => openApiSource.OpenApiPaths;
-        set => openApiSource.OpenApiPaths = value;
-    }
+    public string[]? OpenApiPaths { get; set; }
 
     /// <summary>
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
