@@ -23,7 +23,6 @@ public class RefitGeneratorSettings
 
     private readonly CodeGenerationConfig codeGeneration = new();
     private readonly OutputConfig outputConfig = new();
-    private readonly TypeConfig typeConfig = new();
     private readonly FilterConfig filterConfig = new();
     private readonly SchemaConfig schemaConfig = new();
     private readonly FeatureConfig featureConfig = new();
@@ -75,11 +74,7 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("Controls how generated contract properties are named. Default is PascalCase. Possible values: PascalCase, PreserveOriginal.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public PropertyNamingPolicy PropertyNamingPolicy
-    {
-        get => typeConfig.PropertyNamingPolicy;
-        set => typeConfig.PropertyNamingPolicy = value;
-    }
+    public PropertyNamingPolicy PropertyNamingPolicy { get; set; } = PropertyNamingPolicy.PascalCase;
 
     /// <summary>
     /// Gets or sets a value indicating whether contracts should be generated.
@@ -228,11 +223,7 @@ public class RefitGeneratorSettings
     /// </summary>
     [Description("The generated type accessibility. Default is Public.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public TypeAccessibility TypeAccessibility
-    {
-        get => typeConfig.TypeAccessibility;
-        set => typeConfig.TypeAccessibility = value;
-    }
+    public TypeAccessibility TypeAccessibility { get; set; } = TypeAccessibility.Public;
 
     /// <summary>
     /// Enable or disable the use of cancellation tokens.
@@ -463,11 +454,7 @@ public class RefitGeneratorSettings
     /// Set to <c>true</c> to generate contracts as immutable records instead of classes
     /// </summary>
     [Description("Generate contracts as immutable records instead of classes.")]
-    public bool ImmutableRecords
-    {
-        get => typeConfig.ImmutableRecords;
-        set => typeConfig.ImmutableRecords = value;
-    }
+    public bool ImmutableRecords { get; set; }
 
     /// <summary>
     /// Get ot set the settings describing how to configure Apizr
@@ -600,9 +587,5 @@ public class RefitGeneratorSettings
     /// Gets or sets a suffix to append to all generated contract type names.
     /// </summary>
     [Description("Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.")]
-    public string? ContractTypeSuffix
-    {
-        get => typeConfig.ContractTypeSuffix;
-        set => typeConfig.ContractTypeSuffix = value;
-    }
+    public string? ContractTypeSuffix { get; set; }
 }
