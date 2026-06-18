@@ -1,4 +1,3 @@
-using System.Threading;
 using NSwag;
 
 namespace Refitter.Core;
@@ -6,7 +5,9 @@ namespace Refitter.Core;
 /// <summary>
 /// Generates Refit clients and interfaces based on an OpenAPI specification.
 /// </summary>
-public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
+public class RefitGenerator(
+    RefitGeneratorSettings settings,
+    OpenApiDocument document)
 {
     private static readonly RefitCodeGenerator CodeGenerator = new();
 
@@ -30,12 +31,13 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         var processed = RefitDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
         processed = RefitDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
         processed = await CleanSchemaAsync(
-            processed,
-            settings.TrimUnusedSchema,
-            settings.KeepSchemaPatterns,
-            settings.IncludeInheritanceHierarchy).ConfigureAwait(false);
+                processed,
+                settings.TrimUnusedSchema,
+                settings.KeepSchemaPatterns,
+                settings.IncludeInheritanceHierarchy)
+            .ConfigureAwait(false);
 
-        return new RefitGenerator(settings, processed);
+        return new(settings, processed);
     }
 
     private static async Task<OpenApiDocument> GetOpenApiDocument(
@@ -43,7 +45,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         CancellationToken cancellationToken = default)
     {
         if (settings.OpenApiPaths is { Length: > 0 })
-            return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPaths, cancellationToken).ConfigureAwait(false);
+            return await OpenApiDocumentFactory
+                .CreateAsync(settings.OpenApiPaths, cancellationToken)
+                .ConfigureAwait(false);
 
         if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
         {
@@ -52,7 +56,9 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                 nameof(settings));
         }
 
-        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath!, cancellationToken).ConfigureAwait(false);
+        return await OpenApiDocumentFactory
+            .CreateAsync(settings.OpenApiPath!, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     private static async Task<OpenApiDocument> CleanSchemaAsync(
@@ -81,7 +87,8 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         => await OpenApiDocument.FromJsonAsync(document.ToJson()).ConfigureAwait(false);
 
     /// <summary>
-    /// Generates Refit clients and interfaces based on an OpenAPI specification and returns the generated code as a string.
+    /// Generates Refit clients and interfaces based on an OpenAPI specification
+    /// and returns the generated code as a string.
     /// </summary>
     /// <returns>The generated code as a string.</returns>
     public string Generate() => CodeGenerator.Generate(document, settings);
