@@ -1,4 +1,3 @@
-using NJsonSchema;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
@@ -6,30 +5,19 @@ using NSwag.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 
-internal class CSharpClientGeneratorFactory
+internal class CSharpClientGeneratorFactory(
+    RefitGeneratorSettings settings,
+    OpenApiDocument document,
+    IReadOnlyList<IOpenApiDocumentMutator>? mutators = null)
 {
-    private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
-    private readonly IReadOnlyList<IOpenApiDocumentMutator> mutators;
+    private readonly IReadOnlyList<IOpenApiDocumentMutator> mutators = mutators ?? CreateDefaultMutators(settings);
 
-    public CSharpClientGeneratorFactory(
-        RefitGeneratorSettings settings,
-        OpenApiDocument document,
-        IReadOnlyList<IOpenApiDocumentMutator>? mutators = null)
-    {
-        this.settings = settings;
-        this.document = document;
-        this.mutators = mutators ?? CreateDefaultMutators(settings);
-    }
-
-    private static IReadOnlyList<IOpenApiDocumentMutator> CreateDefaultMutators(
-        RefitGeneratorSettings settings) =>
+    private static IReadOnlyList<IOpenApiDocumentMutator> CreateDefaultMutators(RefitGeneratorSettings settings) =>
     [
         new DisableAdditionalPropertiesMutator(settings.GenerateDefaultAdditionalProperties),
         new OneOfDiscriminatorToAllOfMutator(),
         new FixMissingIntegerTypesMutator(),
-        new CustomIntegerTypeMutator(
-            settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32),
+        new CustomIntegerTypeMutator(settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32),
     ];
 
     public CustomCSharpClientGenerator Create()
@@ -81,14 +69,12 @@ internal class CSharpClientGeneratorFactory
             document,
             csharpClientGeneratorSettings);
 
-        ApplyCodeGeneratorSettings(
-            settings.CodeGeneratorSettings,
-            generator.Settings.CSharpGeneratorSettings);
+        var csharpGeneratorSettings = generator.Settings.CSharpGeneratorSettings;
+        ApplyCodeGeneratorSettings(settings.CodeGeneratorSettings, csharpGeneratorSettings);
 
-        var useNativeRecords = settings.ImmutableRecords ||
-                               generator.Settings.CSharpGeneratorSettings.GenerateNativeRecords;
-        generator.Settings.CSharpGeneratorSettings.GenerateNativeRecords = useNativeRecords;
-        generator.Settings.CSharpGeneratorSettings.ClassStyle = useNativeRecords
+        var useNativeRecords = settings.ImmutableRecords || csharpGeneratorSettings.GenerateNativeRecords;
+        csharpGeneratorSettings.GenerateNativeRecords = useNativeRecords;
+        csharpGeneratorSettings.ClassStyle = useNativeRecords
             ? CSharpClassStyle.Record
             : CSharpClassStyle.Poco;
 
@@ -112,10 +98,11 @@ internal class CSharpClientGeneratorFactory
     private SafeSchemaTypeNameGenerator CreateTypeNameGenerator()
     {
         var preferredExactTypeNameHints = GetNamedSchemaHints()
-            .Where(typeNameHint => string.Equals(
-                IdentifierUtils.NormalizeSchemaTypeNameHint(typeNameHint),
-                typeNameHint,
-                StringComparison.Ordinal))
+            .Where(
+                typeNameHint => string.Equals(
+                    IdentifierUtils.NormalizeSchemaTypeNameHint(typeNameHint),
+                    typeNameHint,
+                    StringComparison.Ordinal))
             .ToList();
 
         return new(new(preferredExactTypeNameHints, StringComparer.Ordinal));
