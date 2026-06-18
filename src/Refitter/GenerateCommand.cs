@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using Refitter.Core;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -81,7 +82,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     internal static async Task WriteRefitterSettingsFile(
         Settings settings,
-        RefitGeneratorSettings refitGeneratorSettings)
+        RefitGeneratorSettings refitGeneratorSettings,
+        CancellationToken cancellationToken = default)
     {
         var settingsFilePath = DetermineSettingsFilePath(settings);
         var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
@@ -90,7 +92,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             Directory.CreateDirectory(settingsDirectory);
 
         var json = Serializer.Serialize(refitGeneratorSettings);
-        await File.WriteAllTextAsync(settingsFilePath, json);
+        await File.WriteAllTextAsync(settingsFilePath, json, cancellationToken);
 
         CreateReporter(settings).ReportSettingsFileGenerated(settingsFilePath);
     }
