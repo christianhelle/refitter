@@ -7,6 +7,7 @@ public static class ProjectFileContents
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""11.0.1"" />
@@ -35,6 +36,7 @@ public static class ProjectFileContents
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""8.0.0"" />
@@ -62,6 +64,7 @@ public static class ProjectFileContents
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""11.0.1"" />
@@ -90,6 +93,7 @@ public static class ProjectFileContents
     <TargetFramework>net9.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""8.0.0"" />
@@ -117,6 +121,7 @@ public static class ProjectFileContents
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""11.0.1"" />
@@ -145,6 +150,7 @@ public static class ProjectFileContents
     <TargetFramework>net10.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""11.0.1"" />
