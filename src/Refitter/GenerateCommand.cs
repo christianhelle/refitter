@@ -8,7 +8,7 @@ namespace Refitter;
 [ExcludeFromCodeCoverage]
 public sealed class GenerateCommand : AsyncCommand<Settings>
 {
-    internal const string GeneratedFileMarker = "GeneratedFile: ";
+    private const string GeneratedFileMarker = "GeneratedFile: ";
 
     private RefitGeneratorSettings? cachedSettings;
 
