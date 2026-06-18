@@ -30,15 +30,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         if (refitSettings != null)
             cachedSettings = refitSettings;
 
-        if (settings.JsonLibraryVersion is { } cliValue &&
-            cliValue != 8.0m &&
-            refitSettings?.CodeGeneratorSettings?.JsonLibraryVersion is { } fileValue &&
-            fileValue != 8.0m)
-        {
-            return ValidationResult.Error(
-                "Cannot specify --json-library-version via CLI when the settings file also specifies a non-default value. Use only one source.");
-        }
-
         return validationResult;
     }
 
@@ -85,26 +76,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             cancellationToken);
     }
 
-    [Obsolete("Use SettingsMapper.Map instead")]
-    private static RefitGeneratorSettings CreateRefitGeneratorSettings(Settings settings) =>
-        SettingsMapper.Map(settings);
-
-    private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings) =>
-        OutputPlanner.GetSingleFileOutputPath(
-            settings.SettingsFilePath,
-            settings.OutputPath,
-            refitGeneratorSettings);
-
-    private string GetOutputPath(
-        Settings settings,
-        RefitGeneratorSettings refitGeneratorSettings,
-        GeneratedCode outputFile) =>
-        OutputPlanner.GetMultiFileOutputPath(
-            settings.SettingsFilePath,
-            settings.OutputPath,
-            refitGeneratorSettings,
-            outputFile);
-
     internal static string FormatGeneratedFileMarker(string outputPath) =>
         $"{GeneratedFileMarker}{Path.GetFullPath(outputPath)}";
 
@@ -138,12 +109,4 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return FileExtensionConstants.Refitter;
     }
 
-    internal static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
-    {
-        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty;
-        RefitterSettingsLoader.ResolveRelativeSpecPaths(refitGeneratorSettings, settingsFileDirectory);
-    }
-
-    internal static bool IsUrl(string path) =>
-        RefitterSettingsLoader.IsUrl(path);
 }

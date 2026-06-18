@@ -29,9 +29,10 @@ public sealed class GenerationOrchestrator
             reporter.ReportSupportKey(supportKey);
 
             if (!string.IsNullOrWhiteSpace(cliSettings.SettingsFilePath))
-                GenerateCommand.ResolveRelativeSpecPaths(
-                    cliSettings.SettingsFilePath,
-                    refitGeneratorSettings);
+            {
+                var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(cliSettings.SettingsFilePath!)) ?? string.Empty;
+                RefitterSettingsLoader.ResolveRelativeSpecPaths(refitGeneratorSettings, settingsFileDirectory);
+            }
 
             var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
 
