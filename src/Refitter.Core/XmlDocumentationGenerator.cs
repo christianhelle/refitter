@@ -32,9 +32,7 @@ public class XmlDocumentationGenerator
     public void AppendInterfaceDocumentationByTag(OpenApiDocument document, string tag, StringBuilder code)
     {
         if (!settings.GenerateXmlDocCodeComments)
-        {
             return;
-        }
 
         var controllerTag = document.Tags?.FirstOrDefault(t => t.Name.SanitizeControllerTag() == tag);
         var controllerDescription = controllerTag?.Description;
@@ -50,9 +48,7 @@ public class XmlDocumentationGenerator
     public void AppendInterfaceDocumentationByEndpoint(OpenApiOperation endpoint, StringBuilder code)
     {
         if (!settings.GenerateXmlDocCodeComments)
-        {
             return;
-        }
 
         var summary = endpoint.Summary;
         var operationId = endpoint.OperationId;
@@ -70,9 +66,7 @@ public class XmlDocumentationGenerator
     public void AppendSingleInterfaceDocumentation(OpenApiDocument document, StringBuilder code)
     {
         if (!settings.GenerateXmlDocCodeComments)
-        {
             return;
-        }
 
         var title = document.Info?.Title;
         if (!string.IsNullOrEmpty(title))
@@ -120,7 +114,7 @@ public class XmlDocumentationGenerator
                 "param",
                 description,
                 code,
-                new Dictionary<string, string>
+                new()
                 {
                     ["name"] = parameter.VariableName
                 });
@@ -132,7 +126,7 @@ public class XmlDocumentationGenerator
                 "param",
                 "The dynamic querystring parameter wrapping all others.",
                 code,
-                new Dictionary<string, string>
+                new()
                 {
                     ["name"] = "queryParams"
                 });
@@ -144,7 +138,7 @@ public class XmlDocumentationGenerator
                 "param",
                 "The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.",
                 code,
-                new Dictionary<string, string>
+                new()
                 {
                     ["name"] = "options"
                 });
@@ -156,7 +150,7 @@ public class XmlDocumentationGenerator
                 "param",
                 "The cancellation token to cancel the request.",
                 code,
-                new Dictionary<string, string>
+                new()
                 {
                     ["name"] = "cancellationToken"
                 });
@@ -172,14 +166,9 @@ public class XmlDocumentationGenerator
             {
                 // Document the result with a fallback description.
                 var description = method.ResultDescription;
-                if (string.IsNullOrWhiteSpace(description))
-                {
-                    description = "A <see cref=\"Task\"/> representing the result of the request.";
-                }
-                else
-                {
-                    description = SanitizeResponseDescription(description);
-                }
+                description = string.IsNullOrWhiteSpace(description)
+                    ? "A <see cref=\"Task\"/> representing the result of the request."
+                    : SanitizeResponseDescription(description);
 
                 this.AppendXmlCommentBlock("returns", description, code);
             }
@@ -196,7 +185,7 @@ public class XmlDocumentationGenerator
                 "exception",
                 this.BuildErrorDescription(method.Responses),
                 code,
-                new Dictionary<string, string>
+                new()
                 {
                     ["cref"] = "ApiException"
                 });
@@ -228,10 +217,7 @@ public class XmlDocumentationGenerator
         code.Append(">");
 
         var lines = content.Split(
-            new[]
-            {
-                "\r\n", "\r", "\n"
-            },
+            ["\r\n", "\r", "\n"],
             StringSplitOptions.None);
         if (lines.Length > 1)
         {
@@ -261,11 +247,11 @@ public class XmlDocumentationGenerator
     }
 
     /// <summary>
-    /// Generates a human readable error description for the given endpoint responses. This includes available
+    /// Generates a human-readable error description for the given endpoint responses. This includes available
     /// documentation for response codes below 200 or above 299 if the
     /// <see cref="RefitGeneratorSettings.GenerateStatusCodeComments"/> setting is enabled.
     /// </summary>
-    /// <param name="responses">The responses to document.</param>
+    /// <param name="responses">The responses to the document.</param>
     /// <returns>A string detailing the error codes and their description.</returns>
     private string BuildErrorDescription(IEnumerable<CSharpResponseModel> responses)
     {
@@ -275,10 +261,10 @@ public class XmlDocumentationGenerator
     }
 
     /// <summary>
-    /// Generates a human readable result description for the given endpoint responses. This includes all documented
+    /// Generates a human-readable result description for the given endpoint responses. This includes all documented
     /// response codes if the <see cref="RefitGeneratorSettings.GenerateStatusCodeComments"/> setting is enabled.
     /// </summary>
-    /// <param name="responses">The responses to document.</param>
+    /// <param name="responses">The responses to the document.</param>
     /// <returns>A string detailing the response codes and their description.</returns>
     private string BuildApiResponseDescription(IEnumerable<CSharpResponseModel> responses)
     {
@@ -291,7 +277,7 @@ public class XmlDocumentationGenerator
     /// Generates a description for the given responses.
     /// </summary>
     /// <param name="text">The text to prepend to the responses.</param>
-    /// <param name="responses">The responses to document.</param>
+    /// <param name="responses">The responses to the document.</param>
     /// <returns>A string containing the given text and response descriptions.</returns>
     private string BuildResponseDescription(string text, IEnumerable<CSharpResponseModel> responses)
     {
@@ -335,7 +321,7 @@ public class XmlDocumentationGenerator
         return description.ToString();
     }
 
-    internal static string EscapeSymbols(string input)
+    private static string EscapeSymbols(string input)
     {
         return input
             .Replace("&", "&amp;")
@@ -358,17 +344,7 @@ public class XmlDocumentationGenerator
         // Fast path: if no backslashes and no invalid control characters, return as is.
         // Invalid XML chars: < 0x20 except 0x09, 0x0A, 0x0D.
         bool needsDecoding = input.IndexOf('\\') >= 0;
-        bool needsSanitization = false;
-
-        for (int i = 0; i < input.Length; i++)
-        {
-            char c = input[i];
-            if (!IsValidXmlChar(c))
-            {
-                needsSanitization = true;
-                break;
-            }
-        }
+        bool needsSanitization = input.Any(c => !IsValidXmlChar(c));
 
         if (!needsDecoding && !needsSanitization)
         {
@@ -394,7 +370,11 @@ public class XmlDocumentationGenerator
             if (escapedCharacter == 'u' && index + 4 < input.Length)
             {
                 var hexValue = input.Substring(index + 1, 4);
-                if (int.TryParse(hexValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var unicodeCodePoint))
+                if (int.TryParse(
+                    hexValue,
+                    NumberStyles.HexNumber,
+                    CultureInfo.InvariantCulture,
+                    out var unicodeCodePoint))
                 {
                     char decodedChar = (char)unicodeCodePoint;
                     if (IsValidXmlChar(decodedChar))
