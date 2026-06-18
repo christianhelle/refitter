@@ -836,12 +836,12 @@ public class GenerationOrchestratorTests
 
         public void ReportHeader(string version) { }
         public void ReportSupportKey(string supportKey) { }
-        public Task ReportSingleFileGenerationProgressAsync() => Task.CompletedTask;
+        public Task ReportSingleFileGenerationProgressAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
         public void ReportSingleFileOutput(string fileName, string directory, string sizeFormatted, int lines) { }
-        public Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate) => Task.FromResult(generate());
+        public Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate, CancellationToken cancellationToken = default) => Task.FromResult(generate());
         public IMultiFileOutputReport BeginMultiFileOutput() => new TestMultiFileOutputReport();
         public void ReportFileWritten(string outputPath) { }
-        public async Task<OpenApiValidationResult> ValidateWithProgressAsync(Func<Task<OpenApiValidationResult>> validate) => await validate();
+        public async Task<OpenApiValidationResult> ValidateWithProgressAsync(Func<Task<OpenApiValidationResult>> validate, CancellationToken cancellationToken = default) => await validate();
         public void ReportValidationFailed() { }
         public void ReportValidationDiagnostic(OpenApiError error, bool isError) { }
         public void ReportValidationStatistics(OpenApiValidationResult validationResult) { }
@@ -890,17 +890,18 @@ public class GenerationOrchestratorTests
 
         public void ReportHeader(string version) { }
         public void ReportSupportKey(string supportKey) => SupportKey = supportKey;
-        public Task ReportSingleFileGenerationProgressAsync() => Task.CompletedTask;
+        public Task ReportSingleFileGenerationProgressAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
         public void ReportSingleFileOutput(string fileName, string directory, string sizeFormatted, int lines) { }
 
-        public Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate) =>
+        public Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate, CancellationToken cancellationToken = default) =>
             Task.FromResult(generate());
 
         public IMultiFileOutputReport BeginMultiFileOutput() => new TestMultiFileOutputReport();
         public void ReportFileWritten(string outputPath) { }
 
         public async Task<OpenApiValidationResult> ValidateWithProgressAsync(
-            Func<Task<OpenApiValidationResult>> validate) => await validate();
+            Func<Task<OpenApiValidationResult>> validate,
+            CancellationToken cancellationToken = default) => await validate();
 
         public void ReportValidationFailed() => ValidationFailedCalled = true;
 

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Threading;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 using NSwag;
@@ -25,16 +26,22 @@ internal sealed class DocumentLoader : IDocumentLoader
             $"refitter/{typeof(DocumentLoader).Assembly.GetName().Version}");
     }
 
-    public async Task<OpenApiDocument> LoadAsync(string openApiPath)
+    public async Task<OpenApiDocument> LoadAsync(
+        string openApiPath,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(openApiPath))
             throw new ArgumentException("The openApiPath parameter cannot be null, empty, or contain only whitespace.", nameof(openApiPath));
 
         try
         {
-            var readResult = await OpenApiMultiFileReader.Read(openApiPath).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            var readResult = await OpenApiMultiFileReader
+                .Read(openApiPath, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
             if (!readResult.ContainedExternalReferences)
-                return await CreateUsingNSwagAsync(openApiPath).ConfigureAwait(false);
+                return await CreateUsingNSwagAsync(openApiPath, cancellationToken).ConfigureAwait(false);
 
             var specificationVersion = readResult.OpenApiDiagnostic.SpecificationVersion;
             PopulateMissingRequiredFields(openApiPath, readResult);
@@ -50,15 +57,17 @@ internal sealed class DocumentLoader : IDocumentLoader
         }
         catch (Exception ex) when (ex is not OperationCanceledException && ex is not TaskCanceledException)
         {
-            return await CreateUsingNSwagAsync(openApiPath).ConfigureAwait(false);
+            return await CreateUsingNSwagAsync(openApiPath, cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private static async Task<OpenApiDocument> CreateUsingNSwagAsync(string openApiPath)
+    private static async Task<OpenApiDocument> CreateUsingNSwagAsync(
+        string openApiPath,
+        CancellationToken cancellationToken = default)
     {
         if (IsHttp(openApiPath))
         {
-            var content = await GetHttpContent(openApiPath).ConfigureAwait(false);
+            var content = await GetHttpContent(openApiPath, cancellationToken).ConfigureAwait(false);
             return IsYaml(openApiPath)
                 ? await OpenApiYamlDocument.FromYamlAsync(content).ConfigureAwait(false)
                 : await OpenApiDocument.FromJsonAsync(content).ConfigureAwait(false);
@@ -96,8 +105,14 @@ internal sealed class DocumentLoader : IDocumentLoader
                path.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static Task<string> GetHttpContent(string openApiPath)
-        => HttpClient.GetStringAsync(openApiPath);
+    private static async Task<string> GetHttpContent(
+        string openApiPath,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await HttpClient.GetAsync(openApiPath, cancellationToken).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+    }
 
     private static bool IsYaml(string path)
     {

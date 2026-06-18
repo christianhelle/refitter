@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using Refitter.Core;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -8,7 +9,7 @@ namespace Refitter;
 [ExcludeFromCodeCoverage]
 public sealed class GenerateCommand : AsyncCommand<Settings>
 {
-    internal const string GeneratedFileMarker = "GeneratedFile: ";
+    private const string GeneratedFileMarker = "GeneratedFile: ";
 
     private RefitGeneratorSettings? cachedSettings;
 
@@ -29,15 +30,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         var validationResult = SettingsValidator.Validate(settings, out var refitSettings);
         if (refitSettings != null)
             cachedSettings = refitSettings;
-
-        if (settings.JsonLibraryVersion is { } cliValue &&
-            cliValue != 8.0m &&
-            refitSettings?.CodeGeneratorSettings?.JsonLibraryVersion is { } fileValue &&
-            fileValue != 8.0m)
-        {
-            return ValidationResult.Error(
-                "Cannot specify --json-library-version via CLI when the settings file also specifies a non-default value. Use only one source.");
-        }
 
         return validationResult;
     }
@@ -64,7 +56,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         }
         else if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
         {
-            var json = await File.ReadAllTextAsync(settings.SettingsFilePath);
+            var json = await File.ReadAllTextAsync(settings.SettingsFilePath, cancellationToken);
             refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
 
             if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
@@ -85,30 +77,13 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             cancellationToken);
     }
 
-    [Obsolete("Use SettingsMapper.Map instead")]
-    private static RefitGeneratorSettings CreateRefitGeneratorSettings(Settings settings) =>
-        SettingsMapper.Map(settings);
-
-    private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings) =>
-        OutputPlanner.GetSingleFileOutputPath(
-            settings.SettingsFilePath,
-            settings.OutputPath,
-            refitGeneratorSettings);
-
-    private string GetOutputPath(
-        Settings settings,
-        RefitGeneratorSettings refitGeneratorSettings,
-        GeneratedCode outputFile) =>
-        OutputPlanner.GetMultiFileOutputPath(
-            settings.SettingsFilePath,
-            settings.OutputPath,
-            refitGeneratorSettings,
-            outputFile);
-
     internal static string FormatGeneratedFileMarker(string outputPath) =>
         $"{GeneratedFileMarker}{Path.GetFullPath(outputPath)}";
 
-    internal static async Task WriteRefitterSettingsFile(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    internal static async Task WriteRefitterSettingsFile(
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings,
+        CancellationToken cancellationToken = default)
     {
         var settingsFilePath = DetermineSettingsFilePath(settings);
         var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
@@ -117,33 +92,27 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             Directory.CreateDirectory(settingsDirectory);
 
         var json = Serializer.Serialize(refitGeneratorSettings);
-        await File.WriteAllTextAsync(settingsFilePath, json);
+        await File.WriteAllTextAsync(settingsFilePath, json, cancellationToken);
 
         CreateReporter(settings).ReportSettingsFileGenerated(settingsFilePath);
     }
 
     internal static string DetermineSettingsFilePath(Settings settings)
     {
-        if (!string.IsNullOrWhiteSpace(settings.OutputPath) &&
-            settings.OutputPath != Settings.DefaultOutputPath)
+        if (string.IsNullOrWhiteSpace(settings.OutputPath) ||
+            settings.OutputPath == Settings.DefaultOutputPath)
         {
-            var outputDir = settings.GenerateMultipleFiles || !string.IsNullOrWhiteSpace(settings.ContractsOutputPath)
-                ? settings.OutputPath
-                : Path.GetDirectoryName(settings.OutputPath);
-
-            if (!string.IsNullOrWhiteSpace(outputDir))
-                return Path.Combine(outputDir, FileExtensionConstants.Refitter);
+            return FileExtensionConstants.Refitter;
         }
 
-        return FileExtensionConstants.Refitter;
+        var specifyOutputPath = !string.IsNullOrWhiteSpace(settings.ContractsOutputPath);
+        var outputDir = settings.GenerateMultipleFiles || specifyOutputPath
+            ? settings.OutputPath
+            : Path.GetDirectoryName(settings.OutputPath);
+
+        return !string.IsNullOrWhiteSpace(outputDir)
+            ? Path.Combine(outputDir, FileExtensionConstants.Refitter)
+            : FileExtensionConstants.Refitter;
     }
 
-    internal static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
-    {
-        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty;
-        RefitterSettingsLoader.ResolveRelativeSpecPaths(refitGeneratorSettings, settingsFileDirectory);
-    }
-
-    internal static bool IsUrl(string path) =>
-        RefitterSettingsLoader.IsUrl(path);
 }

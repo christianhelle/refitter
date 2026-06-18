@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
@@ -41,14 +42,14 @@ internal sealed class RichGenerationReporter : IGenerationReporter
         AnsiConsole.WriteLine();
     }
 
-    public async Task ReportSingleFileGenerationProgressAsync()
+    public async Task ReportSingleFileGenerationProgressAsync(CancellationToken cancellationToken = default)
     {
         await AnsiConsole.Status()
             .Spinner(Spinner.Known.Dots)
             .SpinnerStyle(Style.Parse("green bold"))
             .StartAsync("[yellow]🔧 Generating code...[/]", async _ =>
             {
-                await Task.Delay(100); // Brief delay to show spinner
+                await Task.Delay(100, cancellationToken); // Brief delay to show spinner
             });
     }
 
@@ -68,14 +69,17 @@ internal sealed class RichGenerationReporter : IGenerationReporter
         AnsiConsole.WriteLine();
     }
 
-    public async Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate)
+    public async Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(
+        Func<GeneratorOutput> generate,
+        CancellationToken cancellationToken = default)
     {
         return await AnsiConsole.Status()
             .Spinner(Spinner.Known.Dots)
             .SpinnerStyle(Style.Parse("green bold"))
             .StartAsync("[yellow]🔧 Generating multiple files...[/]", async _ =>
             {
-                await Task.Delay(100); // Brief delay to show spinner
+                cancellationToken.ThrowIfCancellationRequested();
+                await Task.Delay(100, cancellationToken); // Brief delay to show spinner
                 return generate();
             });
     }
@@ -87,13 +91,16 @@ internal sealed class RichGenerationReporter : IGenerationReporter
         // Rich output does not emit the machine-readable marker.
     }
 
-    public async Task<OpenApiValidationResult> ValidateWithProgressAsync(Func<Task<OpenApiValidationResult>> validate)
+    public async Task<OpenApiValidationResult> ValidateWithProgressAsync(
+        Func<Task<OpenApiValidationResult>> validate,
+        CancellationToken cancellationToken = default)
     {
         return await AnsiConsole.Status()
             .Spinner(Spinner.Known.Dots)
             .SpinnerStyle(Style.Parse("cyan bold"))
             .StartAsync("[cyan]🔍 Validating OpenAPI specification...[/]", async _ =>
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 return await validate();
             });
     }

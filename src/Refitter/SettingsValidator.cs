@@ -29,7 +29,10 @@ public static class SettingsValidator
 
         if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
         {
-            return ValidateFilePath(settings, out refitSettings);
+            var fileResult = ValidateFilePath(settings, out refitSettings);
+            if (!fileResult.Successful)
+                return fileResult;
+            return ValidateJsonLibraryVersionConflict(settings, refitSettings);
         }
 
         return ValidateOperationNameAndUrl(settings);
@@ -86,7 +89,8 @@ public static class SettingsValidator
         }
 
         RefitterSettingsLoader.ApplyDefaults(settings.SettingsFilePath!, refitGeneratorSettings);
-        GenerateCommand.ResolveRelativeSpecPaths(settings.SettingsFilePath!, refitGeneratorSettings);
+        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settings.SettingsFilePath!)) ?? string.Empty;
+        RefitterSettingsLoader.ResolveRelativeSpecPaths(refitGeneratorSettings, settingsFileDirectory);
         refitSettings = refitGeneratorSettings;
 
         // Then populate settings.OpenApiPath and validate file existence
@@ -97,7 +101,7 @@ public static class SettingsValidator
             for (var i = 0; i < refitGeneratorSettings.OpenApiPaths.Length; i++)
             {
                 var path = refitGeneratorSettings.OpenApiPaths[i];
-                if (!GenerateCommand.IsUrl(path))
+                if (!IsUrl(path))
                 {
                     if (!File.Exists(path))
                     {
@@ -186,6 +190,22 @@ public static class SettingsValidator
     private static ValidationResult GetValidationErrorForOperationName()
     {
         return ValidationResult.Error("'{operationName}' placeholder must be present in operation name template");
+    }
+
+    private static ValidationResult ValidateJsonLibraryVersionConflict(
+        Settings settings,
+        RefitGeneratorSettings? refitSettings)
+    {
+        if (settings.JsonLibraryVersion is { } cliValue &&
+            cliValue != 8.0m &&
+            refitSettings?.CodeGeneratorSettings?.JsonLibraryVersion is { } fileValue &&
+            fileValue != 8.0m)
+        {
+            return ValidationResult.Error(
+                "Cannot specify --json-library-version via CLI when the settings file also specifies a non-default value. Use only one source.");
+        }
+
+        return ValidationResult.Success();
     }
 
     private static ValidationResult ValidateFileExistence(Settings settings)

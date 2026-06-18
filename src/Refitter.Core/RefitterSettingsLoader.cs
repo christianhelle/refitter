@@ -44,15 +44,15 @@ public static class RefitterSettingsLoader
             settings.OpenApiPath = Path.GetFullPath(Path.Combine(baseDirectory, settings.OpenApiPath!));
         }
 
-        if (settings.OpenApiPaths is { Length: > 0 })
+        if (settings.OpenApiPaths is not { Length: > 0 })
+            return;
+
+        for (var i = 0; i < settings.OpenApiPaths.Length; i++)
         {
-            for (var i = 0; i < settings.OpenApiPaths.Length; i++)
+            var path = settings.OpenApiPaths[i];
+            if (!IsUrl(path) && !Path.IsPathRooted(path))
             {
-                var path = settings.OpenApiPaths[i];
-                if (!IsUrl(path) && !Path.IsPathRooted(path))
-                {
-                    settings.OpenApiPaths[i] = Path.GetFullPath(Path.Combine(baseDirectory, path));
-                }
+                settings.OpenApiPaths[i] = Path.GetFullPath(Path.Combine(baseDirectory, path));
             }
         }
     }
@@ -70,13 +70,13 @@ public static class RefitterSettingsLoader
         if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder))
             refitGeneratorSettings.OutputFolder = RefitGeneratorSettings.DefaultOutputFolder;
 
-        if (string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFilename))
-        {
-            var refitterFileName = Path.GetFileNameWithoutExtension(settingsFilePath);
-            if (string.IsNullOrEmpty(refitterFileName))
-                refitterFileName = "Output";
-            refitGeneratorSettings.OutputFilename = $"{refitterFileName}.cs";
-        }
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFilename))
+            return;
+
+        var refitterFileName = Path.GetFileNameWithoutExtension(settingsFilePath);
+        if (string.IsNullOrEmpty(refitterFileName))
+            refitterFileName = "Output";
+        refitGeneratorSettings.OutputFilename = $"{refitterFileName}.cs";
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
@@ -27,7 +28,7 @@ internal sealed class SimpleGenerationReporter : IGenerationReporter
         Console.WriteLine();
     }
 
-    public Task ReportSingleFileGenerationProgressAsync()
+    public Task ReportSingleFileGenerationProgressAsync(CancellationToken cancellationToken = default)
     {
         Console.WriteLine("Generating code...");
         return Task.CompletedTask;
@@ -43,7 +44,9 @@ internal sealed class SimpleGenerationReporter : IGenerationReporter
         Console.WriteLine();
     }
 
-    public Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate)
+    public Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(
+        Func<GeneratorOutput> generate,
+        CancellationToken cancellationToken = default)
     {
         Console.WriteLine("Generating multiple files...");
         return Task.FromResult(generate());
@@ -54,7 +57,9 @@ internal sealed class SimpleGenerationReporter : IGenerationReporter
     public void ReportFileWritten(string outputPath) =>
         Console.WriteLine(GenerateCommand.FormatGeneratedFileMarker(outputPath));
 
-    public async Task<OpenApiValidationResult> ValidateWithProgressAsync(Func<Task<OpenApiValidationResult>> validate)
+    public async Task<OpenApiValidationResult> ValidateWithProgressAsync(
+        Func<Task<OpenApiValidationResult>> validate,
+        CancellationToken cancellationToken = default)
     {
         Console.WriteLine("Validating OpenAPI specification...");
         return await validate();

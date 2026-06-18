@@ -111,17 +111,7 @@ public class GenerateCommandTests
             PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "CreateRefitGeneratorSettings",
-            BindingFlags.NonPublic | BindingFlags.Static);
-
-        method.Should().NotBeNull();
-
-        var refitSettings = method!
-            .Invoke(null, [settings])
-            .Should()
-            .BeOfType<RefitGeneratorSettings>()
-            .Subject;
+        var refitSettings = SettingsMapper.Map(settings);
 
         refitSettings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PreserveOriginal);
     }
@@ -135,17 +125,7 @@ public class GenerateCommandTests
             JsonLibraryVersion = 9.0m
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "CreateRefitGeneratorSettings",
-            BindingFlags.NonPublic | BindingFlags.Static);
-
-        method.Should().NotBeNull();
-
-        var refitSettings = method!
-            .Invoke(null, [settings])
-            .Should()
-            .BeOfType<RefitGeneratorSettings>()
-            .Subject;
+        var refitSettings = SettingsMapper.Map(settings);
 
         refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(9.0m);
     }
@@ -159,17 +139,7 @@ public class GenerateCommandTests
             JsonLibraryVersion = null
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "CreateRefitGeneratorSettings",
-            BindingFlags.NonPublic | BindingFlags.Static);
-
-        method.Should().NotBeNull();
-
-        var refitSettings = method!
-            .Invoke(null, [settings])
-            .Should()
-            .BeOfType<RefitGeneratorSettings>()
-            .Subject;
+        var refitSettings = SettingsMapper.Map(settings);
 
         refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(8.0m);
     }
@@ -214,13 +184,10 @@ public class GenerateCommandTests
             OutputFilename = "Output.cs"
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            [typeof(Settings), typeof(RefitGeneratorSettings)]);
-
-        method.Should().NotBeNull();
-        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+        var result = OutputPlanner.GetSingleFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitSettings);
 
         var expectedPath = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./Generated", "Output.cs");
         result.Should().Be(expectedPath);
@@ -240,13 +207,10 @@ public class GenerateCommandTests
             OutputFilename = "Output.cs"
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            [typeof(Settings), typeof(RefitGeneratorSettings)]);
-
-        method.Should().NotBeNull();
-        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+        var result = OutputPlanner.GetSingleFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitSettings);
 
         result.Should().Be(Path.Combine("GeneratedCode", "Petstore.cs"));
     }
@@ -265,13 +229,10 @@ public class GenerateCommandTests
             OutputFilename = "Output.cs"
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            [typeof(Settings), typeof(RefitGeneratorSettings)]);
-
-        method.Should().NotBeNull();
-        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+        var result = OutputPlanner.GetSingleFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitSettings);
 
         result.Should().Be(Settings.DefaultOutputPath);
     }
@@ -292,12 +253,10 @@ public class GenerateCommandTests
             OutputFilename = "PetStore.cs"
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            [typeof(Settings), typeof(RefitGeneratorSettings)]);
-
-        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+        var result = OutputPlanner.GetSingleFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitSettings);
 
         var expectedPath = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./CustomOutput", "PetStore.cs");
         result.Should().Be(expectedPath);
@@ -323,12 +282,10 @@ public class GenerateCommandTests
         // Apply defaults first (simulates what GenerateCommand does)
         RefitterSettingsLoader.ApplyDefaults(settingsFilePath, refitSettings);
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            [typeof(Settings), typeof(RefitGeneratorSettings)]);
-
-        var result = method!.Invoke(null, [settings, refitSettings]) as string;
+        var result = OutputPlanner.GetSingleFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitSettings);
 
         // Should use settings file base name
         var expectedFilename = Path.GetFileNameWithoutExtension(settingsFilePath) + ".cs";
@@ -351,15 +308,11 @@ public class GenerateCommandTests
             OutputFolder = "./Generated"
         };
 
-        var command = new GenerateCommand();
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            BindingFlags.NonPublic | BindingFlags.Instance,
-            [typeof(Settings), typeof(RefitGeneratorSettings), typeof(GeneratedCode)]);
-
-        method.Should().NotBeNull();
-
-        var result = method!.Invoke(command, [settings, refitSettings, new GeneratedCode("RefitInterfaces", "// code")]) as string;
+        var result = OutputPlanner.GetMultiFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitSettings,
+            new GeneratedCode("RefitInterfaces", "// code"));
 
         result.Should().Be(Path.Combine("GeneratedCode", "MultipleFiles", "RefitInterfaces.cs"));
     }
@@ -381,15 +334,11 @@ public class GenerateCommandTests
             OutputFolder = "./Generated"
         };
 
-        var command = new GenerateCommand();
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            BindingFlags.NonPublic | BindingFlags.Instance,
-            [typeof(Settings), typeof(RefitGeneratorSettings), typeof(GeneratedCode)]);
-
-        method.Should().NotBeNull();
-
-        var result = method!.Invoke(command, [settings, refitSettings, new GeneratedCode("RefitInterfaces", "// code")]) as string;
+        var result = OutputPlanner.GetMultiFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitSettings,
+            new GeneratedCode("RefitInterfaces", "// code"));
 
         result.Should().Be(Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "GeneratedCode", "MultipleFiles", "RefitInterfaces.cs"));
     }

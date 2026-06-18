@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Threading;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
@@ -29,23 +30,26 @@ public sealed class GenerationOrchestrator
             reporter.ReportSupportKey(supportKey);
 
             if (!string.IsNullOrWhiteSpace(cliSettings.SettingsFilePath))
-                GenerateCommand.ResolveRelativeSpecPaths(
-                    cliSettings.SettingsFilePath,
-                    refitGeneratorSettings);
+            {
+                var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(cliSettings.SettingsFilePath!)) ?? string.Empty;
+                RefitterSettingsLoader.ResolveRelativeSpecPaths(refitGeneratorSettings, settingsFileDirectory);
+            }
 
-            var generator = await RefitGenerator.CreateAsync(refitGeneratorSettings);
+            var generator = await RefitGenerator.CreateAsync(
+                refitGeneratorSettings,
+                cancellationToken);
 
             if (!cliSettings.SkipValidation)
-                await ValidateOpenApiSpecs(refitGeneratorSettings, reporter);
+                await ValidateOpenApiSpecs(refitGeneratorSettings, reporter, cancellationToken);
 
             await (refitGeneratorSettings.GenerateMultipleFiles
-                ? WriteMultipleFiles(generator, cliSettings, refitGeneratorSettings, reporter)
-                : WriteSingleFile(generator, cliSettings, refitGeneratorSettings, reporter));
+                ? WriteMultipleFiles(generator, cliSettings, refitGeneratorSettings, reporter, cancellationToken)
+                : WriteSingleFile(generator, cliSettings, refitGeneratorSettings, reporter, cancellationToken));
 
             Analytics.LogFeatureUsage(cliSettings, refitGeneratorSettings);
 
             if (string.IsNullOrWhiteSpace(cliSettings.SettingsFilePath))
-                await GenerateCommand.WriteRefitterSettingsFile(cliSettings, refitGeneratorSettings);
+                await GenerateCommand.WriteRefitterSettingsFile(cliSettings, refitGeneratorSettings, cancellationToken);
 
             if (refitGeneratorSettings.IncludePathMatches.Length > 0 &&
                 generator.OpenApiDocument.Paths.Count == 0)
@@ -86,9 +90,11 @@ public sealed class GenerationOrchestrator
         RefitGenerator generator,
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings,
-        IGenerationReporter reporter)
+        IGenerationReporter reporter,
+        CancellationToken cancellationToken)
     {
-        await reporter.ReportSingleFileGenerationProgressAsync();
+        cancellationToken.ThrowIfCancellationRequested();
+        await reporter.ReportSingleFileGenerationProgressAsync(cancellationToken);
 
         var code = generator.Generate().ReplaceLineEndings();
         var planned = OutputPlanner.PlanSingleFile(
@@ -107,7 +113,7 @@ public sealed class GenerationOrchestrator
         var dir = Path.GetDirectoryName(planned.Path);
         if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
             Directory.CreateDirectory(dir);
-        await File.WriteAllTextAsync(planned.Path, planned.Content);
+        await File.WriteAllTextAsync(planned.Path, planned.Content, cancellationToken);
         reporter.ReportFileWritten(planned.Path);
     }
 
@@ -115,10 +121,13 @@ public sealed class GenerationOrchestrator
         RefitGenerator generator,
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings,
-        IGenerationReporter reporter)
+        IGenerationReporter reporter,
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var generatorOutput = await reporter.GenerateMultipleFilesWithProgressAsync(
-            generator.GenerateMultipleFiles);
+            generator.GenerateMultipleFiles,
+            cancellationToken);
 
         var planned = OutputPlanner.PlanMultipleFiles(
             settings.SettingsFilePath,
@@ -147,7 +156,8 @@ public sealed class GenerationOrchestrator
             var plannedDir = Path.GetDirectoryName(plannedFile.Path);
             if (!string.IsNullOrWhiteSpace(plannedDir) && !Directory.Exists(plannedDir))
                 Directory.CreateDirectory(plannedDir);
-            await File.WriteAllTextAsync(plannedFile.Path, plannedFile.Content);
+            cancellationToken.ThrowIfCancellationRequested();
+            await File.WriteAllTextAsync(plannedFile.Path, plannedFile.Content, cancellationToken);
             reporter.ReportFileWritten(plannedFile.Path);
         }
 
@@ -171,23 +181,29 @@ public sealed class GenerationOrchestrator
 
     private static async Task ValidateOpenApiSpecs(
         RefitGeneratorSettings refitGeneratorSettings,
-        IGenerationReporter reporter)
+        IGenerationReporter reporter,
+        CancellationToken cancellationToken)
     {
         if (refitGeneratorSettings.OpenApiPaths is { Length: > 0 })
         {
             foreach (var specPath in refitGeneratorSettings.OpenApiPaths)
-                await ValidateOpenApiSpec(specPath, reporter);
+                await ValidateOpenApiSpec(specPath, reporter, cancellationToken);
         }
         else if (refitGeneratorSettings.OpenApiPath is not null)
         {
-            await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath, reporter);
+            await ValidateOpenApiSpec(refitGeneratorSettings.OpenApiPath, reporter, cancellationToken);
         }
     }
 
-    private static async Task ValidateOpenApiSpec(string openApiPath, IGenerationReporter reporter)
+    private static async Task ValidateOpenApiSpec(
+        string openApiPath,
+        IGenerationReporter reporter,
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var validationResult = await reporter.ValidateWithProgressAsync(
-            () => Refitter.Core.Validation.OpenApiValidator.Validate(openApiPath));
+            () => Refitter.Core.Validation.OpenApiValidator.Validate(openApiPath, cancellationToken),
+            cancellationToken);
 
         if (!validationResult.IsValid)
         {

@@ -303,13 +303,10 @@ public class SettingsCliRegressionTests
             OutputFilename = "Output.cs"
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static,
-            new[] { typeof(Settings), typeof(RefitGeneratorSettings) });
-
-        method.Should().NotBeNull();
-        var result = method!.Invoke(null, new object[] { settings, refitSettings }) as string;
+        var result = OutputPlanner.GetSingleFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitSettings);
 
         // CLI output should override settings file
         // Normalize path separators for cross-platform compatibility
@@ -334,13 +331,10 @@ public class SettingsCliRegressionTests
             OutputFilename = "CustomApi.cs"
         };
 
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static,
-            new[] { typeof(Settings), typeof(RefitGeneratorSettings) });
-
-        method.Should().NotBeNull();
-        var result = method!.Invoke(null, new object[] { settings, refitSettings }) as string;
+        var result = OutputPlanner.GetSingleFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitSettings);
 
         // Should use settings file output
         result.Should().Contain("CustomFolder");
