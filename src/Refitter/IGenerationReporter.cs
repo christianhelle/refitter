@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
@@ -17,11 +18,11 @@ public interface IGenerationReporter
 
     void ReportSupportKey(string supportKey);
 
-    Task ReportSingleFileGenerationProgressAsync();
+    Task ReportSingleFileGenerationProgressAsync(CancellationToken cancellationToken = default);
 
     void ReportSingleFileOutput(string fileName, string directory, string sizeFormatted, int lines);
 
-    Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate);
+    Task<GeneratorOutput> GenerateMultipleFilesWithProgressAsync(Func<GeneratorOutput> generate, CancellationToken cancellationToken = default);
 
     IMultiFileOutputReport BeginMultiFileOutput();
 
@@ -31,7 +32,7 @@ public interface IGenerationReporter
     /// </summary>
     void ReportFileWritten(string outputPath);
 
-    Task<OpenApiValidationResult> ValidateWithProgressAsync(Func<Task<OpenApiValidationResult>> validate);
+    Task<OpenApiValidationResult> ValidateWithProgressAsync(Func<Task<OpenApiValidationResult>> validate, CancellationToken cancellationToken = default);
 
     void ReportValidationFailed();
 
