@@ -1,6 +1,5 @@
 using System.Text;
 using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -20,7 +19,11 @@ internal class InterfaceGenerator
         CustomCSharpClientGenerator generator,
         XmlDocumentationGenerator docGenerator,
         IParameterExtractor? parameterExtractor = null)
-        : this(settings, document, generator, docGenerator,
+        : this(
+            settings,
+            document,
+            generator,
+            docGenerator,
             new MethodGenerator(
                 new ReturnTypeGenerator(settings, generator),
                 new MethodAttributeGenerator(settings, document),
@@ -28,7 +31,7 @@ internal class InterfaceGenerator
     {
     }
 
-    internal InterfaceGenerator(
+    private InterfaceGenerator(
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
@@ -46,7 +49,10 @@ internal class InterfaceGenerator
     public IEnumerable<GeneratedCode> Generate(IInterfacePartitioning partitioning)
     {
         var operations = document.Paths
-            .SelectMany(path => path.Value, (path, op) => new OpenApiOperationInfo(path.Key, op.Key, op.Value))
+            .SelectMany(
+                path => path.Value,
+                (path, op)
+                    => new OpenApiOperationInfo(path.Key, op.Key, op.Value))
             .ToList();
 
         var groups = operations
@@ -60,7 +66,7 @@ internal class InterfaceGenerator
 
         if (partitioning.IsSingleInterface)
         {
-            var singleGroup = groups.Count > 0 ? groups[0].ToList() : new List<OpenApiOperationInfo>();
+            var singleGroup = groups.Count > 0 ? groups[0].ToList() : new();
             yield return GenerateSingleInterface(singleGroup, partitioning, title, knownInterfaceIdentifiers);
         }
         else
@@ -74,7 +80,13 @@ internal class InterfaceGenerator
                 if (nonDeprecatedOperations.Count == 0)
                     continue;
 
-                foreach (var generatedCode in GenerateMultipleInterface(nonDeprecatedOperations, partitioning, title, knownInterfaceIdentifiers))
+                var generateMultipleInterface = GenerateMultipleInterface(
+                    nonDeprecatedOperations,
+                    partitioning,
+                    title,
+                    knownInterfaceIdentifiers);
+
+                foreach (var generatedCode in generateMultipleInterface)
                 {
                     yield return generatedCode;
                 }
@@ -97,8 +109,14 @@ internal class InterfaceGenerator
         var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
         var representativeOperation = operations.Count > 0
             ? operations[0]
-            : new OpenApiOperationInfo(string.Empty, string.Empty, new OpenApiOperation());
-        partitioning.AppendInterfaceDocumentation(document, docGenerator, string.Empty, representativeOperation, code);
+            : new(string.Empty, string.Empty, new());
+        partitioning.AppendInterfaceDocumentation(
+            document,
+            docGenerator,
+            string.Empty,
+            representativeOperation,
+            code);
+
         var interfaceDeclaration = GenerateInterfaceDeclaration(interfaceName, partitioning.IsSingleInterface);
         code.AppendLine(interfaceDeclaration);
         code.AppendLine($"{Separator}{{");
@@ -107,7 +125,12 @@ internal class InterfaceGenerator
 
         foreach (var op in operations)
         {
-            var (dynamicQuerystringParams, _) = GenerateMethod(op, interfaceName, partitioning, knownMethodIdentifiers, code);
+            var (dynamicQuerystringParams, _) = GenerateMethod(
+                op,
+                interfaceName,
+                partitioning,
+                knownMethodIdentifiers,
+                code);
             if (!string.IsNullOrWhiteSpace(dynamicQuerystringParams))
             {
                 dynamicQuerystringParametersCodeBuilder.AppendLine(dynamicQuerystringParams);
@@ -117,7 +140,7 @@ internal class InterfaceGenerator
         code.AppendLine($"{Separator}}}");
         code.AppendLine(dynamicQuerystringParametersCodeBuilder.ToString());
 
-        return new GeneratedCode(interfaceName, code.ToString());
+        return new(interfaceName, code.ToString());
     }
 
     private IEnumerable<GeneratedCode> GenerateMultipleInterface(
@@ -143,7 +166,12 @@ internal class InterfaceGenerator
 
         foreach (var op in operations)
         {
-            var (dynamicQuerystringParams, dynamicQuerystringType) = GenerateMethod(op, interfaceName, partitioning, knownMethodIdentifiers, code);
+            var (dynamicQuerystringParams, dynamicQuerystringType) = GenerateMethod(
+                op,
+                interfaceName,
+                partitioning,
+                knownMethodIdentifiers,
+                code);
             if (!string.IsNullOrWhiteSpace(dynamicQuerystringParams))
             {
                 yield return new GeneratedCode(dynamicQuerystringType, dynamicQuerystringParams);
@@ -152,7 +180,7 @@ internal class InterfaceGenerator
 
         code.AppendLine($"{Separator}}}");
 
-        yield return new GeneratedCode(interfaceName, code.ToString());
+        yield return new(interfaceName, code.ToString());
     }
 
     private (string DynamicQuerystringParameters, string DynamicQuerystringParameterType) GenerateMethod(
@@ -176,7 +204,8 @@ internal class InterfaceGenerator
         var methodName = IdentifierUtils.Counted(knownMethodIdentifiers, rawMethodName);
         knownMethodIdentifiers.Add(methodName);
 
-        var dynamicQuerystringParameterType = partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
+        var dynamicQuerystringParameterType =
+            partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
         var operationModel = generator.CreateOperationModel(operation);
 
         var (parametersString, parameters, operationDynamicQuerystringParameters) =
@@ -189,7 +218,13 @@ internal class InterfaceGenerator
 
         if (settings.GenerateXmlDocCodeComments)
         {
-            docGenerator.AppendMethodDocumentation(operationModel, isApiResponseType, hasDynamicQuerystringParameter, hasApizrRequestOptionsParameter, hasCancellationToken, code);
+            docGenerator.AppendMethodDocumentation(
+                operationModel,
+                isApiResponseType,
+                hasDynamicQuerystringParameter,
+                hasApizrRequestOptionsParameter,
+                hasCancellationToken,
+                code);
         }
 
         foreach (var attribute in methodGenerator.GenerateMethodAttributes(operation, operationModel))
@@ -205,7 +240,13 @@ internal class InterfaceGenerator
         {
             if (settings.GenerateXmlDocCodeComments)
             {
-                docGenerator.AppendMethodDocumentation(operationModel, isApiResponseType, false, hasApizrRequestOptionsParameter, hasCancellationToken, code);
+                docGenerator.AppendMethodDocumentation(
+                    operationModel,
+                    isApiResponseType,
+                    false,
+                    hasApizrRequestOptionsParameter,
+                    hasCancellationToken,
+                    code);
             }
 
             foreach (var attribute in methodGenerator.GenerateMethodAttributes(operation, operationModel))
