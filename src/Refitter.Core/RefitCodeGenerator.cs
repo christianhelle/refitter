@@ -37,7 +37,6 @@ internal sealed class RefitCodeGenerator
         var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
 
         var pipeline = new GeneratorPipeline(
-            docGenerator,
             interfaceGenerator,
             [
                 new Swagger2OptionalReferenceNullabilityNormalizer(),
