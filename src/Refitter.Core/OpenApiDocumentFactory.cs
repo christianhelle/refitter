@@ -3,6 +3,10 @@ using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
 
+/// <summary>
+/// Creates instances of <see cref="NSwag.OpenApiDocument"/> from file paths or URLs.
+/// Supports loading single documents or merging multiple documents into one.
+/// </summary>
 public static class OpenApiDocumentFactory
 {
     private static readonly IDocumentLoader DocumentLoader = new DocumentLoader();

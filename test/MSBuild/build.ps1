@@ -12,9 +12,8 @@ dotnet restore ../../src/Refitter.slnx
 dotnet clean -c release ../../src/Refitter.slnx
 dotnet build -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
-dotnet add package .\Refitter.MSBuild.1.0.0.nupkg --source .
-dotnet restore
 dotnet add package Refitter.MSBuild --source .
+dotnet restore
 dotnet run -v d -filelogger -c Release
 
 # Issue #998 regression assertions

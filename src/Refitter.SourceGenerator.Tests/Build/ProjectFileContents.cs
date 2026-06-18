@@ -7,6 +7,7 @@ public static class ProjectFileContents
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""11.0.1"" />
@@ -15,7 +16,7 @@ public static class ProjectFileContents
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
     <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.8"" />
     <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.8"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.0.8"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.8"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
     <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
@@ -34,6 +35,7 @@ public static class ProjectFileContents
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""11.0.1"" />
@@ -42,7 +44,7 @@ public static class ProjectFileContents
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
     <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.8"" />
     <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.8"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.0.8"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.8"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
     <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />

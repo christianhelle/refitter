@@ -13,6 +13,7 @@
         <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
     </PropertyGroup>
 
     <ItemGroup>
@@ -39,11 +40,13 @@
     <Target Name="IncludeTransitiveDepsInPackage" BeforeTargets="GenerateNuspec">
         <ItemGroup>
             <_PackageFiles Include="bin\$(Configuration)\$(TargetFramework)\*.dll"
+                           Exclude="bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).dll"
                            PackagePath="tasks\$(TargetFramework)">
                 <Visible>false</Visible>
                 <BuildAction>None</BuildAction>
             </_PackageFiles>
             <_PackageFiles Include="bin\$(Configuration)\$(TargetFramework)\*.pdb"
+                           Exclude="bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).pdb"
                            PackagePath="tasks\$(TargetFramework)">
                 <Visible>false</Visible>
                 <BuildAction>None</BuildAction>

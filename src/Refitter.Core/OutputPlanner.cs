@@ -1,11 +1,32 @@
 namespace Refitter.Core;
 
+/// <summary>
+/// Represents a planned output file with its relative path and generated content.
+/// </summary>
+/// <param name="Path">The relative file path for the output.</param>
+/// <param name="Content">The generated code content.</param>
 public sealed record PlannedFile(string Path, string Content);
 
+/// <summary>
+/// Plans the output file paths for generated Refit code.
+/// Supports single-file and multi-file output modes, CLI and settings-file driven generation,
+/// and optional rerouting of contracts to a separate output folder.
+/// </summary>
 public static class OutputPlanner
 {
+    /// <summary>
+    /// The default output file name used when no explicit output path is specified.
+    /// </summary>
     public const string DefaultOutputPath = "Output.cs";
 
+    /// <summary>
+    /// Plans a single output file, determining its path based on the generation mode.
+    /// </summary>
+    /// <param name="settingsFilePath">The path to the settings file, or <c>null</c> for direct CLI generation.</param>
+    /// <param name="cliOutputPath">The output path specified via CLI, or <c>null</c>.</param>
+    /// <param name="refitGeneratorSettings">The Refit generator settings.</param>
+    /// <param name="code">The generated code content.</param>
+    /// <returns>A <see cref="PlannedFile"/> with the resolved output path and content.</returns>
     public static PlannedFile PlanSingleFile(
         string? settingsFilePath,
         string? cliOutputPath,
@@ -13,6 +34,15 @@ public static class OutputPlanner
         string code) =>
         new(GetSingleFileOutputPath(settingsFilePath, cliOutputPath, refitGeneratorSettings), code);
 
+    /// <summary>
+    /// Plans multiple output files, determining each file's path based on the generation mode
+    /// and whether the file should be rerouted to the contracts output folder.
+    /// </summary>
+    /// <param name="settingsFilePath">The path to the settings file, or <c>null</c> for direct CLI generation.</param>
+    /// <param name="cliOutputPath">The output path specified via CLI, or <c>null</c>.</param>
+    /// <param name="refitGeneratorSettings">The Refit generator settings.</param>
+    /// <param name="generatorOutput">The generator output containing multiple files.</param>
+    /// <returns>A read-only list of <see cref="PlannedFile"/> with resolved output paths and content.</returns>
     public static IReadOnlyList<PlannedFile> PlanMultipleFiles(
         string? settingsFilePath,
         string? cliOutputPath,
@@ -32,6 +62,14 @@ public static class OutputPlanner
         return planned;
     }
 
+    /// <summary>
+    /// Resolves the output path for single-file generation, accounting for settings file location,
+    /// CLI overrides, and configured output folder/filename in the settings.
+    /// </summary>
+    /// <param name="settingsFilePath">The path to the settings file, or <c>null</c> for direct CLI generation.</param>
+    /// <param name="cliOutputPath">The output path specified via CLI, or <c>null</c>.</param>
+    /// <param name="refitGeneratorSettings">The Refit generator settings.</param>
+    /// <returns>The resolved output file path.</returns>
     public static string GetSingleFileOutputPath(
         string? settingsFilePath,
         string? cliOutputPath,
@@ -70,6 +108,15 @@ public static class OutputPlanner
         return outputPath;
     }
 
+    /// <summary>
+    /// Resolves the output path for a single file in multi-file generation mode,
+    /// accounting for settings file location, CLI overrides, and configured output folder.
+    /// </summary>
+    /// <param name="settingsFilePath">The path to the settings file, or <c>null</c> for direct CLI generation.</param>
+    /// <param name="cliOutputPath">The output path specified via CLI, or <c>null</c>.</param>
+    /// <param name="refitGeneratorSettings">The Refit generator settings.</param>
+    /// <param name="outputFile">The generated code file to produce a path for.</param>
+    /// <returns>The resolved output file path.</returns>
     public static string GetMultiFileOutputPath(
         string? settingsFilePath,
         string? cliOutputPath,
@@ -99,6 +146,14 @@ public static class OutputPlanner
         return CombineWithSettingsRoot(root, outputFile.Filename);
     }
 
+    /// <summary>
+    /// Determines whether the specified output file should be rerouted to the contracts output folder.
+    /// Rerouting occurs when <see cref="RefitGeneratorSettings.ContractsOutputFolder"/> is set to a
+    /// non-default value and the file is the contracts file.
+    /// </summary>
+    /// <param name="refitGeneratorSettings">The Refit generator settings.</param>
+    /// <param name="outputFile">The generated code file to evaluate.</param>
+    /// <returns><c>true</c> if the file should be rerouted to the contracts folder; otherwise, <c>false</c>.</returns>
     public static bool ShouldRerouteToContractsFolder(
         RefitGeneratorSettings refitGeneratorSettings,
         GeneratedCode outputFile) =>
@@ -106,6 +161,14 @@ public static class OutputPlanner
         && refitGeneratorSettings.ContractsOutputFolder != RefitGeneratorSettings.DefaultOutputFolder
         && outputFile.Filename == $"{TypenameConstants.Contracts}.cs";
 
+    /// <summary>
+    /// Resolves the output path for a contracts file, placing it in the configured contracts output folder
+    /// relative to the settings file location.
+    /// </summary>
+    /// <param name="settingsFilePath">The path to the settings file, or <c>null</c> for direct CLI generation.</param>
+    /// <param name="refitGeneratorSettings">The Refit generator settings.</param>
+    /// <param name="outputFile">The generated contracts code file.</param>
+    /// <returns>The resolved contracts output file path.</returns>
     public static string GetContractsOutputPath(
         string? settingsFilePath,
         RefitGeneratorSettings refitGeneratorSettings,
