@@ -24,7 +24,7 @@ internal sealed class RefitCodeGenerator
     public GeneratorOutput GenerateMultipleFiles(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
-        return new GeneratorOutput(FormatMultipleFiles(result, settings, document));
+        return new(FormatMultipleFiles(result, settings, document));
     }
 
     private static GenerationResult RunPipeline(
@@ -34,17 +34,15 @@ internal sealed class RefitCodeGenerator
         var factory = new CSharpClientGeneratorFactory(settings, document);
         var generator = factory.Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
-
         var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
 
         var pipeline = new GeneratorPipeline(
             docGenerator,
             interfaceGenerator,
-            new IContractsPostProcessor[]
-            {
+            [
                 new Swagger2OptionalReferenceNullabilityNormalizer(),
                 new EnumStringConverterInjector(),
-            });
+            ]);
 
         return pipeline.Run(document, settings, generator);
     }
@@ -60,7 +58,10 @@ internal sealed class RefitCodeGenerator
             : result.Contracts;
 
         var output = new StringBuilder()
-            .AppendLine(settings.GenerateClients ? string.Join("", result.Interfaces.Select(c => c.Content)) : string.Empty)
+            .AppendLine(
+                settings.GenerateClients
+                    ? string.Join("", result.Interfaces.Select(c => c.Content))
+                    : string.Empty)
             .AppendLine()
             .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
             .AppendLine(result.SerializerContext)
@@ -80,13 +81,13 @@ internal sealed class RefitCodeGenerator
 
         if (settings.GenerateContracts)
         {
-            generatedFiles.Add(new GeneratedCode(TypenameConstants.Contracts, result.Contracts));
+            generatedFiles.Add(new(TypenameConstants.Contracts, result.Contracts));
         }
 
         if (!string.IsNullOrWhiteSpace(result.SerializerContext))
         {
             generatedFiles.Add(
-                new GeneratedCode(
+                new(
                     JsonSerializerContextGenerator.GetContextTypeName(settings, document.Info?.Title),
                     result.SerializerContext));
         }
@@ -94,7 +95,7 @@ internal sealed class RefitCodeGenerator
         if (!string.IsNullOrWhiteSpace(result.DependencyInjectionCode))
         {
             generatedFiles.Add(
-                new GeneratedCode(
+                new(
                     TypenameConstants.DependencyInjection,
                     result.DependencyInjectionCode));
         }
@@ -117,10 +118,11 @@ internal sealed class RefitCodeGenerator
         var contractTypeSuffix = settings.ContractTypeSuffix;
         return contractTypeSuffix is not null && !string.IsNullOrWhiteSpace(contractTypeSuffix)
             ? generatedFiles
-                .Select(f => f with
-                {
-                    Content = ContractTypeSuffixApplier.ApplySuffix(f.Content, contractTypeSuffix)
-                })
+                .Select(
+                    f => f with
+                    {
+                        Content = ContractTypeSuffixApplier.ApplySuffix(f.Content, contractTypeSuffix)
+                    })
                 .ToList()
             : generatedFiles;
     }
