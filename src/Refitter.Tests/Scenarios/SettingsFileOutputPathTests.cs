@@ -1,4 +1,3 @@
-using System.Reflection;
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
@@ -149,16 +148,10 @@ public class SettingsFileOutputPathTests
 
     private static string GetOutputPath(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
     {
-        var method = typeof(GenerateCommand).GetMethod(
-            "GetOutputPath",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(Settings), typeof(RefitGeneratorSettings)],
-            null);
-
-        method.Should().NotBeNull();
-
-        return (string)method!.Invoke(null, [settings, refitGeneratorSettings])!;
+        return OutputPlanner.GetSingleFileOutputPath(
+            settings.SettingsFilePath,
+            settings.OutputPath,
+            refitGeneratorSettings);
     }
 
     private static void ApplySettingsFileDefaults(string settingsFilePath, RefitGeneratorSettings refitGeneratorSettings)
