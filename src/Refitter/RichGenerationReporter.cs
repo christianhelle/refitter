@@ -1,4 +1,3 @@
-using System.Threading;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
@@ -200,7 +199,7 @@ internal sealed class RichGenerationReporter : IGenerationReporter
         AnsiConsole.WriteLine();
     }
 
-    public void ReportConfigurationWarnings(IReadOnlyList<(string Title, string Description)> warnings)
+    public void ReportConfigurationWarnings(IReadOnlyList<Warning> warnings)
     {
         var table = new Table()
             .RoundedBorder()
@@ -208,9 +207,9 @@ internal sealed class RichGenerationReporter : IGenerationReporter
             .AddColumn(new TableColumn("[bold white]Warning[/]").LeftAligned())
             .AddColumn(new TableColumn("[bold white]Description[/]").LeftAligned());
 
-        table.Title = new TableTitle("[bold yellow]⚠️ Configuration Warnings[/]");
+        table.Title = new("[bold yellow]⚠️ Configuration Warnings[/]");
 
-        foreach (var (title, description) in warnings)
+        foreach ((string title, string description) in warnings)
         {
             table.AddRow(
                 $"[bold orange3]{title}[/]",

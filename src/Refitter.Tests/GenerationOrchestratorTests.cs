@@ -3,7 +3,6 @@ using FluentAssertions;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
@@ -830,7 +829,7 @@ public class GenerationOrchestratorTests
     /// </summary>
     private sealed class TestGenerationReporter : IGenerationReporter
     {
-        public List<(string Title, string Description)> ConfigurationWarnings { get; } = [];
+        public List<Warning> ConfigurationWarnings { get; } = [];
         public bool AllPathsFilteredWarningCalled { get; private set; }
         public IReadOnlyList<string> AllPathsFilteredMatchPatterns { get; private set; } = [];
 
@@ -848,7 +847,7 @@ public class GenerationOrchestratorTests
         public void ReportSuccess(TimeSpan duration, bool multipleFiles) { }
         public void ReportDonationBanner() { }
 
-        public void ReportConfigurationWarnings(IReadOnlyList<(string Title, string Description)> warnings)
+        public void ReportConfigurationWarnings(IReadOnlyList<Warning> warnings)
         {
             ConfigurationWarnings.AddRange(warnings);
         }
@@ -886,7 +885,7 @@ public class GenerationOrchestratorTests
         public bool ValidationFailedCalled { get; private set; }
         public string? UnsupportedVersion { get; private set; }
         public bool DonationBannerCalled { get; private set; }
-        public List<(string Title, string Description)> ConfigurationWarnings { get; } = [];
+        public List<Warning> ConfigurationWarnings { get; } = [];
 
         public void ReportHeader(string version) { }
         public void ReportSupportKey(string supportKey) => SupportKey = supportKey;
@@ -912,7 +911,7 @@ public class GenerationOrchestratorTests
         public void ReportSuccess(TimeSpan duration, bool multipleFiles) { }
         public void ReportDonationBanner() => DonationBannerCalled = true;
 
-        public void ReportConfigurationWarnings(IReadOnlyList<(string Title, string Description)> warnings) =>
+        public void ReportConfigurationWarnings(IReadOnlyList<Warning> warnings) =>
             ConfigurationWarnings.AddRange(warnings);
 
         public void ReportAllPathsFilteredWarning(IReadOnlyList<string> matchPatterns) { }
