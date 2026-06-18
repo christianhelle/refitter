@@ -79,7 +79,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     internal static string FormatGeneratedFileMarker(string outputPath) =>
         $"{GeneratedFileMarker}{Path.GetFullPath(outputPath)}";
 
-    internal static async Task WriteRefitterSettingsFile(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    internal static async Task WriteRefitterSettingsFile(
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings)
     {
         var settingsFilePath = DetermineSettingsFilePath(settings);
         var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
@@ -95,18 +97,20 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     internal static string DetermineSettingsFilePath(Settings settings)
     {
-        if (!string.IsNullOrWhiteSpace(settings.OutputPath) &&
-            settings.OutputPath != Settings.DefaultOutputPath)
+        if (string.IsNullOrWhiteSpace(settings.OutputPath) ||
+            settings.OutputPath == Settings.DefaultOutputPath)
         {
-            var outputDir = settings.GenerateMultipleFiles || !string.IsNullOrWhiteSpace(settings.ContractsOutputPath)
-                ? settings.OutputPath
-                : Path.GetDirectoryName(settings.OutputPath);
-
-            if (!string.IsNullOrWhiteSpace(outputDir))
-                return Path.Combine(outputDir, FileExtensionConstants.Refitter);
+            return FileExtensionConstants.Refitter;
         }
 
-        return FileExtensionConstants.Refitter;
+        var specifyOutputPath = !string.IsNullOrWhiteSpace(settings.ContractsOutputPath);
+        var outputDir = settings.GenerateMultipleFiles || specifyOutputPath
+            ? settings.OutputPath
+            : Path.GetDirectoryName(settings.OutputPath);
+
+        return !string.IsNullOrWhiteSpace(outputDir)
+            ? Path.Combine(outputDir, FileExtensionConstants.Refitter)
+            : FileExtensionConstants.Refitter;
     }
 
 }
