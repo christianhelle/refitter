@@ -1,3 +1,4 @@
+using System.Threading;
 using NSwag;
 
 namespace Refitter.Core;
@@ -19,11 +20,13 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     /// Creates a new instance of the <see cref="RefitGenerator"/> class asynchronously
     /// by loading the document from settings, then filtering and cleaning it.
     /// </summary>
-    public static async Task<RefitGenerator> CreateAsync(RefitGeneratorSettings settings)
+    public static async Task<RefitGenerator> CreateAsync(
+        RefitGeneratorSettings settings,
+        CancellationToken cancellationToken = default)
     {
         if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-        var openApiDocument = await GetOpenApiDocument(settings).ConfigureAwait(false);
+        var openApiDocument = await GetOpenApiDocument(settings, cancellationToken).ConfigureAwait(false);
         var processed = RefitDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
         processed = RefitDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
         processed = await CleanSchemaAsync(
@@ -35,10 +38,12 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
         return new RefitGenerator(settings, processed);
     }
 
-    private static async Task<OpenApiDocument> GetOpenApiDocument(RefitGeneratorSettings settings)
+    private static async Task<OpenApiDocument> GetOpenApiDocument(
+        RefitGeneratorSettings settings,
+        CancellationToken cancellationToken = default)
     {
         if (settings.OpenApiPaths is { Length: > 0 })
-            return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPaths).ConfigureAwait(false);
+            return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPaths, cancellationToken).ConfigureAwait(false);
 
         if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
         {
@@ -47,7 +52,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
                 nameof(settings));
         }
 
-        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath!).ConfigureAwait(false);
+        return await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath!, cancellationToken).ConfigureAwait(false);
     }
 
     private static async Task<OpenApiDocument> CleanSchemaAsync(
