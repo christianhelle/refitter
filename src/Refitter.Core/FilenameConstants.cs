@@ -6,11 +6,6 @@ namespace Refitter.Core;
 public static class TypenameConstants
 {
     /// <summary>
-    /// The typename for Refit interfaces.
-    /// </summary>
-    public const string RefitInterfaces = "RefitInterfaces";
-
-    /// <summary>
     /// The typename for contracts.
     /// </summary>
     public const string Contracts = "Contracts";
