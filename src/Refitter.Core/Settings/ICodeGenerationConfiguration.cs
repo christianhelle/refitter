@@ -1,3 +1,5 @@
+using NSwag.CodeGeneration;
+
 namespace Refitter.Core;
 
 /// <summary>
@@ -49,4 +51,34 @@ public interface ICodeGenerationConfiguration
     /// Gets a value indicating whether status code comments should be generated.
     /// </summary>
     bool GenerateStatusCodeComments { get; }
+
+    /// <summary>
+    /// Gets the accessibility of generated types.
+    /// </summary>
+    TypeAccessibility TypeAccessibility { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether to generate contracts as immutable records.
+    /// </summary>
+    bool ImmutableRecords { get; }
+
+    /// <summary>
+    /// Gets the custom template directory for NSwag code generation.
+    /// </summary>
+    string? CustomTemplateDirectory { get; }
+
+    /// <summary>
+    /// Gets the parameter name generator.
+    /// </summary>
+    IParameterNameGenerator? ParameterNameGenerator { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether to use polymorphic serialization.
+    /// </summary>
+    bool UsePolymorphicSerialization { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether to use cancellation tokens.
+    /// </summary>
+    bool UseCancellationTokens { get; }
 }

@@ -9,7 +9,7 @@ namespace Refitter.Core;
 /// Provide settings for Refit generator.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration, IPartitioningConfiguration, ICodeGenerationConfiguration
+public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration, IPartitioningConfiguration, ICodeGenerationConfiguration, ISchemaConfiguration
 {
     /// <summary>
     /// Default output folder for generated files.

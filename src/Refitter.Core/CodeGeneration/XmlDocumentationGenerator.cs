@@ -17,7 +17,7 @@ public class XmlDocumentationGenerator
     /// <summary>
     /// Instantiates a new instance of the <see cref="XmlDocumentationGenerator"/> class.
     /// </summary>
-    /// <param name="settings">The code generation settings to use.</param>
+    /// <param name="codeGeneration">The code generation settings to use.</param>
     internal XmlDocumentationGenerator(ICodeGenerationConfiguration codeGeneration)
     {
         this.codeGeneration = codeGeneration;
