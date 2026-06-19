@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 
 namespace Refitter.Core.Validation;

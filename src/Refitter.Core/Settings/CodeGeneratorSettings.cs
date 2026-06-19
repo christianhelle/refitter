@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using NJsonSchema.CodeGeneration;
-using NJsonSchema.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 

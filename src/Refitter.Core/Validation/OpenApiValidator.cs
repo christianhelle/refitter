@@ -1,4 +1,3 @@
-using System.Threading;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 
