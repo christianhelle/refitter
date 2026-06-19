@@ -5,7 +5,7 @@ namespace Refitter.Core;
 
 internal static class RefitInterfaceImports
 {
-    private static readonly string[] DefaultNamespases =
+    private static readonly string[] defaultNamespases =
     [
         "Refit",
         "System.Collections.Generic",
@@ -14,7 +14,7 @@ internal static class RefitInterfaceImports
 
     public static string[] GetImportedNamespaces(RefitGeneratorSettings settings)
     {
-        var namespaces = new List<string>(DefaultNamespases);
+        var namespaces = new List<string>(defaultNamespases);
 
         if (settings.ApizrSettings?.WithRequestOptions == true)
         {
