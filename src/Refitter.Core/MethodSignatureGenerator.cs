@@ -3,18 +3,12 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class MethodSignatureGenerator : IMethodSignatureGenerator
+internal class MethodSignatureGenerator(
+    RefitGeneratorSettings settings,
+    IParameterExtractor? parameterExtractor = null)
+    : IMethodSignatureGenerator
 {
-    private readonly RefitGeneratorSettings settings;
-    private readonly IParameterExtractor parameterExtractor;
-
-    public MethodSignatureGenerator(
-        RefitGeneratorSettings settings,
-        IParameterExtractor? parameterExtractor = null)
-    {
-        this.settings = settings;
-        this.parameterExtractor = parameterExtractor ?? new ParameterAggregator();
-    }
+    private readonly IParameterExtractor parameterExtractor = parameterExtractor ?? new ParameterAggregator();
 
     public (string ParametersString, IReadOnlyList<string> Parameters, string? DynamicQuerystringParameters) Generate(
         CSharpOperationModel operationModel,
