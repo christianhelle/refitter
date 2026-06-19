@@ -3,18 +3,12 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class ParameterAggregator : IParameterExtractor
+internal class ParameterAggregator(
+    IReadOnlyList<IParameterTypeExtractor> extractors) : IParameterExtractor
 {
-    private readonly IReadOnlyList<IParameterTypeExtractor> extractors;
-
     public ParameterAggregator()
         : this(GetDefaultExtractors())
     {
-    }
-
-    public ParameterAggregator(IReadOnlyList<IParameterTypeExtractor> extractors)
-    {
-        this.extractors = extractors;
     }
 
     public IEnumerable<string> ExtractParameters(
