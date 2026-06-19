@@ -30,7 +30,9 @@ internal sealed class DocumentLoader : IDocumentLoader
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(openApiPath))
-            throw new ArgumentException("The openApiPath parameter cannot be null, empty, or contain only whitespace.", nameof(openApiPath));
+            throw new ArgumentException(
+                "The openApiPath parameter cannot be null, empty, or contain only whitespace.",
+                nameof(openApiPath));
 
         try
         {
@@ -47,16 +49,29 @@ internal sealed class DocumentLoader : IDocumentLoader
 
             if (IsYaml(openApiPath))
             {
-                var yaml = await readResult.OpenApiDocument.SerializeAsYamlAsync(specificationVersion).ConfigureAwait(false);
-                return await OpenApiYamlDocument.FromYamlAsync(yaml).ConfigureAwait(false);
+                var yaml = await readResult.OpenApiDocument
+                    .SerializeAsYamlAsync(
+                        specificationVersion,
+                        cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
+
+                return await OpenApiYamlDocument
+                    .FromYamlAsync(yaml, cancellationToken)
+                    .ConfigureAwait(false);
             }
 
-            var json = await readResult.OpenApiDocument.SerializeAsJsonAsync(specificationVersion).ConfigureAwait(false);
-            return await OpenApiDocument.FromJsonAsync(json).ConfigureAwait(false);
+            var json = await readResult.OpenApiDocument
+                .SerializeAsJsonAsync(specificationVersion, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return await OpenApiDocument
+                .FromJsonAsync(json, cancellationToken)
+                .ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException && ex is not TaskCanceledException)
         {
-            return await CreateUsingNSwagAsync(openApiPath, cancellationToken).ConfigureAwait(false);
+            return await CreateUsingNSwagAsync(openApiPath, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 
@@ -68,13 +83,13 @@ internal sealed class DocumentLoader : IDocumentLoader
         {
             var content = await GetHttpContent(openApiPath, cancellationToken).ConfigureAwait(false);
             return IsYaml(openApiPath)
-                ? await OpenApiYamlDocument.FromYamlAsync(content).ConfigureAwait(false)
-                : await OpenApiDocument.FromJsonAsync(content).ConfigureAwait(false);
+                ? await OpenApiYamlDocument.FromYamlAsync(content, cancellationToken).ConfigureAwait(false)
+                : await OpenApiDocument.FromJsonAsync(content, cancellationToken).ConfigureAwait(false);
         }
 
         return IsYaml(openApiPath)
-            ? await OpenApiYamlDocument.FromFileAsync(openApiPath).ConfigureAwait(false)
-            : await OpenApiDocument.FromFileAsync(openApiPath).ConfigureAwait(false);
+            ? await OpenApiYamlDocument.FromFileAsync(openApiPath, cancellationToken).ConfigureAwait(false)
+            : await OpenApiDocument.FromFileAsync(openApiPath, cancellationToken).ConfigureAwait(false);
     }
 
     [ExcludeFromCodeCoverage]
@@ -85,7 +100,7 @@ internal sealed class DocumentLoader : IDocumentLoader
         var document = readResult.OpenApiDocument;
         if (document.Info is null)
         {
-            document.Info = new Microsoft.OpenApi.OpenApiInfo
+            document.Info = new()
             {
                 Title = Path.GetFileNameWithoutExtension(openApiPath),
                 Version = readResult.OpenApiDiagnostic.SpecificationVersion.GetDisplayName()
