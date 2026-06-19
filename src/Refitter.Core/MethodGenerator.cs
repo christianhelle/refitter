@@ -3,21 +3,12 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class MethodGenerator : IMethodGenerator
+internal class MethodGenerator(
+    IReturnTypeGenerator returnTypeGenerator,
+    IMethodAttributeGenerator methodAttributeGenerator,
+    IMethodSignatureGenerator methodSignatureGenerator)
+    : IMethodGenerator
 {
-    private readonly IReturnTypeGenerator returnTypeGenerator;
-    private readonly IMethodAttributeGenerator methodAttributeGenerator;
-    private readonly IMethodSignatureGenerator methodSignatureGenerator;
-
-    public MethodGenerator(
-        IReturnTypeGenerator returnTypeGenerator,
-        IMethodAttributeGenerator methodAttributeGenerator,
-        IMethodSignatureGenerator methodSignatureGenerator)
-    {
-        this.returnTypeGenerator = returnTypeGenerator;
-        this.methodAttributeGenerator = methodAttributeGenerator;
-        this.methodSignatureGenerator = methodSignatureGenerator;
-    }
 
     public string GenerateReturnType(OpenApiOperation operation) =>
         returnTypeGenerator.Generate(operation);
