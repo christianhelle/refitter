@@ -39,7 +39,8 @@ internal sealed class Swagger2OptionalReferenceNullabilityNormalizer : IContract
         private static bool IsReferenceType(TypeSyntax typeSyntax) =>
             typeSyntax switch
             {
-                PredefinedTypeSyntax predefinedType => predefinedType.Keyword.Kind() is SyntaxKind.ObjectKeyword or SyntaxKind.StringKeyword,
+                PredefinedTypeSyntax predefinedType =>
+                    predefinedType.Keyword.Kind() is SyntaxKind.ObjectKeyword or SyntaxKind.StringKeyword,
                 ArrayTypeSyntax => true,
                 IdentifierNameSyntax => true,
                 GenericNameSyntax => true,
