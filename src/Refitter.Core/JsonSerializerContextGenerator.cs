@@ -38,7 +38,8 @@ internal static class JsonSerializerContextGenerator
             sb.AppendLine($"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}))]");
         }
 
-        sb.AppendLine($"    internal partial class {contextName} : global::System.Text.Json.Serialization.JsonSerializerContext");
+        sb.AppendLine(
+            $"    internal partial class {contextName} : global::System.Text.Json.Serialization.JsonSerializerContext");
         sb.AppendLine("    {");
         sb.AppendLine("    }");
         sb.AppendLine("}");
@@ -163,20 +164,37 @@ internal static class JsonSerializerContextGenerator
     {
         return typeSyntax switch
         {
-            NullableTypeSyntax nullableType => $"{FormatTypeSyntax(nullableType.ElementType, declaredTypes, contextNamespace)}?",
-            ArrayTypeSyntax arrayType => $"{FormatTypeSyntax(arrayType.ElementType, declaredTypes, contextNamespace)}{string.Concat(arrayType.RankSpecifiers)}",
+            NullableTypeSyntax nullableType =>
+                $"{FormatTypeSyntax(nullableType.ElementType, declaredTypes, contextNamespace)}?",
+            ArrayTypeSyntax arrayType =>
+                $"{FormatTypeSyntax(arrayType.ElementType, declaredTypes, contextNamespace)}{string.Concat(arrayType.RankSpecifiers)}",
             QualifiedNameSyntax qualifiedName
-                when TryResolveDeclaredType(qualifiedName, declaredTypes, GetCurrentNamespace(typeSyntax), out var declaredQualifiedType)
+                when TryResolveDeclaredType(
+                    qualifiedName,
+                    declaredTypes,
+                    GetCurrentNamespace(typeSyntax),
+                    out var declaredQualifiedType)
                 => FormatDeclaredTypeName(qualifiedName, declaredQualifiedType, declaredTypes, contextNamespace),
             GenericNameSyntax genericName
-                when TryResolveDeclaredType(genericName, declaredTypes, GetCurrentNamespace(typeSyntax), out var declaredGenericType)
+                when TryResolveDeclaredType(
+                    genericName,
+                    declaredTypes,
+                    GetCurrentNamespace(typeSyntax),
+                    out var declaredGenericType)
                 => FormatDeclaredTypeName(genericName, declaredGenericType, declaredTypes, contextNamespace),
             IdentifierNameSyntax identifierName
-                when TryResolveDeclaredType(identifierName, declaredTypes, GetCurrentNamespace(typeSyntax), out var declaredIdentifierType)
+                when TryResolveDeclaredType(
+                    identifierName,
+                    declaredTypes,
+                    GetCurrentNamespace(typeSyntax),
+                    out var declaredIdentifierType)
                 => declaredIdentifierType.GetDisplayName(contextNamespace),
-            QualifiedNameSyntax qualifiedName => $"{FormatTypeSyntax(qualifiedName.Left, declaredTypes, contextNamespace)}.{FormatTypeSyntax(qualifiedName.Right, declaredTypes, contextNamespace)}",
-            AliasQualifiedNameSyntax aliasQualifiedName => $"{aliasQualifiedName.Alias}::{FormatTypeSyntax(aliasQualifiedName.Name, declaredTypes, contextNamespace)}",
-            GenericNameSyntax genericName => $"{genericName.Identifier.Text}<{string.Join(", ", genericName.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)))}>",
+            QualifiedNameSyntax qualifiedName =>
+                $"{FormatTypeSyntax(qualifiedName.Left, declaredTypes, contextNamespace)}.{FormatTypeSyntax(qualifiedName.Right, declaredTypes, contextNamespace)}",
+            AliasQualifiedNameSyntax aliasQualifiedName =>
+                $"{aliasQualifiedName.Alias}::{FormatTypeSyntax(aliasQualifiedName.Name, declaredTypes, contextNamespace)}",
+            GenericNameSyntax genericName =>
+                $"{genericName.Identifier.Text}<{string.Join(", ", genericName.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)))}>",
             _ => typeSyntax.ToString(),
         };
     }
@@ -187,7 +205,9 @@ internal static class JsonSerializerContextGenerator
         IReadOnlyCollection<DeclaredTypeInfo> declaredTypes,
         string contextNamespace)
     {
-        var arguments = string.Join(", ", typeSyntax.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)));
+        var arguments = string.Join(
+            ", ",
+            typeSyntax.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)));
         return $"{declaredType.GetDisplayName(contextNamespace)}<{arguments}>";
     }
 
@@ -200,7 +220,9 @@ internal static class JsonSerializerContextGenerator
         if (typeSyntax.Right is not GenericNameSyntax genericName)
             return declaredType.GetDisplayName(contextNamespace);
 
-        var arguments = string.Join(", ", genericName.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)));
+        var arguments = string.Join(
+            ", ",
+            genericName.TypeArgumentList.Arguments.Select(a => FormatTypeSyntax(a, declaredTypes, contextNamespace)));
         return $"{declaredType.GetDisplayName(contextNamespace)}<{arguments}>";
     }
 
@@ -214,21 +236,26 @@ internal static class JsonSerializerContextGenerator
         var arity = typeSyntax switch
         {
             GenericNameSyntax genericName => genericName.TypeArgumentList.Arguments.Count,
-            QualifiedNameSyntax { Right: GenericNameSyntax genericName } => genericName.TypeArgumentList.Arguments.Count,
-            AliasQualifiedNameSyntax { Name: GenericNameSyntax genericName } => genericName.TypeArgumentList.Arguments.Count,
+            QualifiedNameSyntax { Right: GenericNameSyntax genericName } =>
+                genericName.TypeArgumentList.Arguments.Count,
+            AliasQualifiedNameSyntax { Name: GenericNameSyntax genericName } => genericName.TypeArgumentList.Arguments
+                .Count,
             _ => 0
         };
 
         var candidates = declaredTypes
-            .Where(t => t.Arity == arity &&
-                        (t.Name.Equals(name, StringComparison.Ordinal) ||
-                         t.RelativeName.Equals(name, StringComparison.Ordinal) ||
-                         t.FullyQualifiedName.Equals(name, StringComparison.Ordinal)))
+            .Where(
+                t => t.Arity == arity &&
+                     (t.Name.Equals(name, StringComparison.Ordinal) ||
+                      t.RelativeName.Equals(name, StringComparison.Ordinal) ||
+                      t.FullyQualifiedName.Equals(name, StringComparison.Ordinal)))
             .ToArray();
 
-        declaredType = candidates
-            .FirstOrDefault(t => t.Namespace.Equals(currentNamespace, StringComparison.Ordinal))
-            ?? candidates.FirstOrDefault();
+        declaredType = candidates.FirstOrDefault(
+                           t => t.Namespace.Equals(
+                               currentNamespace,
+                               StringComparison.Ordinal))
+                    ?? candidates.FirstOrDefault();
 
         return declaredType is not null;
     }
@@ -247,12 +274,18 @@ internal static class JsonSerializerContextGenerator
             NullableTypeSyntax nullableType => GetTypeNameKey(nullableType.ElementType),
             IdentifierNameSyntax identifierName => identifierName.Identifier.Text,
             GenericNameSyntax genericName => genericName.Identifier.Text,
-            QualifiedNameSyntax qualifiedName => $"{GetTypeNameKey(qualifiedName.Left)}.{GetTypeNameKey(qualifiedName.Right)}",
-            AliasQualifiedNameSyntax aliasQualifiedName => $"{aliasQualifiedName.Alias.Identifier.Text}::{GetTypeNameKey(aliasQualifiedName.Name)}",
+            QualifiedNameSyntax qualifiedName =>
+                $"{GetTypeNameKey(qualifiedName.Left)}.{GetTypeNameKey(qualifiedName.Right)}",
+            AliasQualifiedNameSyntax aliasQualifiedName =>
+                $"{aliasQualifiedName.Alias.Identifier.Text}::{GetTypeNameKey(aliasQualifiedName.Name)}",
             _ => typeSyntax.ToString(),
         };
 
-    private sealed record DeclaredTypeInfo(string Namespace, IReadOnlyList<string> Containers, string Name, int Arity)
+    private sealed record DeclaredTypeInfo(
+        string Namespace,
+        IReadOnlyList<string> Containers,
+        string Name,
+        int Arity)
     {
         public string RelativeName => string.Join(".", Containers.Append(Name));
 
