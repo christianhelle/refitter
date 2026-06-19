@@ -1,7 +1,6 @@
 using System.ComponentModel;
 
-namespace Refitter.Core.Settings
-{
+namespace Refitter.Core;
     /// <summary>
     /// Enumeration of available Apizr packages.
     /// </summary>
@@ -79,4 +78,3 @@ namespace Refitter.Core.Settings
         [Description("dotnet add package Apizr.Integrations.FileTransfer.MediatR, then register MediatR")]
         Apizr_Integrations_FileTransfer_MediatR = 2048 | Apizr_Integrations_MediatR | Apizr_Extensions_Microsoft_FileTransfer
     }
-}

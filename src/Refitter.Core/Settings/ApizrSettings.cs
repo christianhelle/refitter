@@ -1,8 +1,7 @@
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
-namespace Refitter.Core
-{
+namespace Refitter.Core;
     /// <summary>
     /// Describing how Apizr should be configured.
     /// Here are only the common configurations.
@@ -94,4 +93,3 @@ namespace Refitter.Core
         [Description("Set it to true to manage file transfers (default: false)")]
         public bool WithFileTransfer { get; set; } = false;
     }
-}

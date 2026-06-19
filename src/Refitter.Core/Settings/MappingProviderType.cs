@@ -1,5 +1,4 @@
-namespace Refitter.Core
-{
+namespace Refitter.Core;
     /// <summary>
     /// Enumeration of mapping provider types.
     /// </summary>
@@ -20,4 +19,3 @@ namespace Refitter.Core
         /// </summary>
         Mapster
     }
-}
