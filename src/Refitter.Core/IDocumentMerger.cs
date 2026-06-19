@@ -1,4 +1,3 @@
-using NSwag;
 using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
