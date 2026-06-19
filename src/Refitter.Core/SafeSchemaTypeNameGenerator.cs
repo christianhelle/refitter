@@ -1,5 +1,4 @@
 using NJsonSchema;
-using NJsonSchema.CodeGeneration;
 
 namespace Refitter.Core;
 
