@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Reorganize Refitter.Core into logical subfolders and cleanup [\#1161](https://github.com/christianhelle/refitter/pull/1161) ([christianhelle](https://github.com/christianhelle))
 - chore\(deps\): bump actions/checkout from 6 to 7 [\#1160](https://github.com/christianhelle/refitter/pull/1160) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [2.1.0-preview.110](https://github.com/christianhelle/refitter/tree/2.1.0-preview.110) (2026-06-18)
