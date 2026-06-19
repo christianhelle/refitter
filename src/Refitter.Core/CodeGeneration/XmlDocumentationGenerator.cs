@@ -10,7 +10,7 @@ namespace Refitter.Core;
 /// </summary>
 public class XmlDocumentationGenerator
 {
-    private readonly RefitGeneratorSettings settings;
+    private readonly ICodeGenerationConfiguration codeGeneration;
     private const string Separator = "    ";
     private const string SummaryTag = "summary";
 
@@ -18,9 +18,9 @@ public class XmlDocumentationGenerator
     /// Instantiates a new instance of the <see cref="XmlDocumentationGenerator"/> class.
     /// </summary>
     /// <param name="settings">The code generation settings to use.</param>
-    internal XmlDocumentationGenerator(RefitGeneratorSettings settings)
+    internal XmlDocumentationGenerator(ICodeGenerationConfiguration codeGeneration)
     {
-        this.settings = settings;
+        this.codeGeneration = codeGeneration;
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendInterfaceDocumentationByTag(OpenApiDocument document, string tag, StringBuilder code)
     {
-        if (!settings.GenerateXmlDocCodeComments)
+        if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
 
         var controllerTag = document.Tags?.FirstOrDefault(t => t.Name.SanitizeControllerTag() == tag);
@@ -47,7 +47,7 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendInterfaceDocumentationByEndpoint(OpenApiOperation endpoint, StringBuilder code)
     {
-        if (!settings.GenerateXmlDocCodeComments)
+        if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
 
         var summary = endpoint.Summary;
@@ -65,7 +65,7 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendSingleInterfaceDocumentation(OpenApiDocument document, StringBuilder code)
     {
-        if (!settings.GenerateXmlDocCodeComments)
+        if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
 
         var title = document.Info?.Title;
@@ -92,7 +92,7 @@ public class XmlDocumentationGenerator
         bool hasCancellationToken,
         StringBuilder code)
     {
-        if (!settings.GenerateXmlDocCodeComments)
+        if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
 
         if (!string.IsNullOrWhiteSpace(method.Summary))
@@ -284,7 +284,7 @@ public class XmlDocumentationGenerator
         var description = new StringBuilder(text);
         var responseList = responses.ToList();
 
-        if (!this.settings.GenerateStatusCodeComments || !responseList.Any())
+        if (!this.codeGeneration.GenerateStatusCodeComments || !responseList.Any())
             return description.Append(".").ToString();
 
         description.AppendLine(":")

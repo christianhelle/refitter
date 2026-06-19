@@ -39,4 +39,14 @@ public interface ICodeGenerationConfiguration
     /// Gets a value indicating whether to generate JsonSerializerContext for AOT compilation.
     /// </summary>
     bool GenerateJsonSerializerContext { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether XML doc comments should be generated.
+    /// </summary>
+    bool GenerateXmlDocCodeComments { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether status code comments should be generated.
+    /// </summary>
+    bool GenerateStatusCodeComments { get; }
 }
