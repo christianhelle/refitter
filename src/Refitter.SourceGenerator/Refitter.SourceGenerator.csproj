@@ -39,6 +39,7 @@
     <Compile Include="../Refitter.Core/Schema/*.cs" />
     <Compile Include="../Refitter.Core/Settings/*.cs" />
     <Compile Include="../Refitter.Core/Utilities/*.cs" />
+    <Compile Include="../Refitter.Core/Validation/*.cs" />
   </ItemGroup>
 
 </Project>
