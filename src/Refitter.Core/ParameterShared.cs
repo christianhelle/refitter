@@ -1,8 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using NJsonSchema;
-using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using NSwag.CodeGeneration.Models;
 
