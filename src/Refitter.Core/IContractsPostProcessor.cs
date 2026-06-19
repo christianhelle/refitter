@@ -1,5 +1,4 @@
 using NSwag;
-using Refitter.Core;
 
 namespace Refitter.Core;
 
