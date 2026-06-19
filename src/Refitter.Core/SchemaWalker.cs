@@ -34,7 +34,7 @@ internal static class SchemaWalker
         }
     }
 
-    public static IEnumerable<JsonSchema?> EnumerateDocumentSchemaRoots(
+    private static IEnumerable<JsonSchema?> EnumerateDocumentSchemaRoots(
         OpenApiDocument document)
     {
         if (document.Components?.Schemas != null)
@@ -106,7 +106,7 @@ internal static class SchemaWalker
         }
     }
 
-    public static IEnumerable<JsonSchema?> EnumerateTraversableSchemas(JsonSchema schema)
+    private static IEnumerable<JsonSchema?> EnumerateTraversableSchemas(JsonSchema schema)
     {
         yield return schema.AdditionalItemsSchema;
         yield return schema.AdditionalPropertiesSchema;
