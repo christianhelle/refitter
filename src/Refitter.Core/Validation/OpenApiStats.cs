@@ -69,11 +69,11 @@ public class OpenApiStats : OpenApiVisitorBase
     }
 
     /// <summary>
-    /// Increments <see cref="HeaderCount"/>.
+    /// Adds the number of headers to <see cref="HeaderCount"/>.
     /// </summary>
     public override void Visit(IDictionary<string, IOpenApiHeader> headers)
     {
-        HeaderCount++;
+        HeaderCount += headers.Count;
     }
 
     /// <summary>
@@ -93,11 +93,11 @@ public class OpenApiStats : OpenApiVisitorBase
     }
 
     /// <summary>
-    /// Increments <see cref="ResponseCount"/>.
+    /// Adds the number of responses to <see cref="ResponseCount"/>.
     /// </summary>
     public override void Visit(OpenApiResponses response)
     {
-        ResponseCount++;
+        ResponseCount += response.Count;
     }
 
     /// <summary>
