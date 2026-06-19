@@ -9,9 +9,9 @@ internal class OperationNameGenerator : IOperationNameGenerator
 {
     private readonly IOperationNameGenerator defaultGenerator;
 
-    public OperationNameGenerator(OpenApiDocument document, RefitGeneratorSettings settings)
+    public OperationNameGenerator(OpenApiDocument document, IPartitioningConfiguration partitioning)
     {
-        switch (settings.OperationNameGenerator)
+        switch (partitioning.OperationNameGenerator)
         {
             case GeneratorType.MultipleClientsFromOperationId:
                 defaultGenerator = new MultipleClientsFromOperationIdOperationNameGenerator();

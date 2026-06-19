@@ -29,4 +29,9 @@ public interface IPartitioningConfiguration
     /// Gets a value indicating whether to generate deprecated operations.
     /// </summary>
     bool GenerateDeprecatedOperations { get; }
+
+    /// <summary>
+    /// Gets the NSwag IOperationNameGenerator implementation to use.
+    /// </summary>
+    OperationNameGeneratorTypes OperationNameGenerator { get; }
 }
