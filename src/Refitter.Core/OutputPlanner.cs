@@ -56,7 +56,7 @@ public static class OutputPlanner
                 ? GetContractsOutputPath(settingsFilePath, refitGeneratorSettings, outputFile)
                 : GetMultiFileOutputPath(settingsFilePath, cliOutputPath, refitGeneratorSettings, outputFile);
 
-            planned.Add(new PlannedFile(path, outputFile.Content));
+            planned.Add(new(path, outputFile.Content));
         }
 
         return planned;
@@ -77,10 +77,9 @@ public static class OutputPlanner
     {
         if (IsDirectCliGeneration(settingsFilePath))
         {
-            if (HasExplicitCliOutputOverride(cliOutputPath))
-                return cliOutputPath!;
-
-            return DefaultOutputPath;
+            return HasExplicitCliOutputOverride(cliOutputPath)
+                ? cliOutputPath!
+                : DefaultOutputPath;
         }
 
         var root = string.IsNullOrWhiteSpace(settingsFilePath)
@@ -140,16 +139,15 @@ public static class OutputPlanner
             ? cliOutputPath
             : refitGeneratorSettings.OutputFolder;
 
-        if (!string.IsNullOrWhiteSpace(outputFolder))
-            return CombineWithSettingsRoot(root, outputFolder!, outputFile.Filename);
-
-        return CombineWithSettingsRoot(root, outputFile.Filename);
+        return !string.IsNullOrWhiteSpace(outputFolder)
+            ? CombineWithSettingsRoot(root, outputFolder!, outputFile.Filename)
+            : CombineWithSettingsRoot(root, outputFile.Filename);
     }
 
     /// <summary>
     /// Determines whether the specified output file should be rerouted to the contracts output folder.
     /// Rerouting occurs when <see cref="RefitGeneratorSettings.ContractsOutputFolder"/> is set to a
-    /// non-default value and the file is the contracts file.
+    /// non-default value and the file is the contract's file.
     /// </summary>
     /// <param name="refitGeneratorSettings">The Refit generator settings.</param>
     /// <param name="outputFile">The generated code file to evaluate.</param>
@@ -158,17 +156,17 @@ public static class OutputPlanner
         RefitGeneratorSettings refitGeneratorSettings,
         GeneratedCode outputFile) =>
         !string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder)
-        && refitGeneratorSettings.ContractsOutputFolder != RefitGeneratorSettings.DefaultOutputFolder
-        && outputFile.Filename == $"{TypenameConstants.Contracts}.cs";
+     && refitGeneratorSettings.ContractsOutputFolder != RefitGeneratorSettings.DefaultOutputFolder
+     && outputFile.Filename == $"{TypenameConstants.Contracts}.cs";
 
     /// <summary>
-    /// Resolves the output path for a contracts file, placing it in the configured contracts output folder
+    /// Resolves the output path for a contract's file, placing it in the configured contracts output folder
     /// relative to the settings file location.
     /// </summary>
     /// <param name="settingsFilePath">The path to the settings file, or <c>null</c> for direct CLI generation.</param>
     /// <param name="refitGeneratorSettings">The Refit generator settings.</param>
     /// <param name="outputFile">The generated contracts code file.</param>
-    /// <returns>The resolved contracts output file path.</returns>
+    /// <returns>The resolved contracts output filepath.</returns>
     public static string GetContractsOutputPath(
         string? settingsFilePath,
         RefitGeneratorSettings refitGeneratorSettings,
@@ -178,8 +176,9 @@ public static class OutputPlanner
             ? string.Empty
             : Path.GetDirectoryName(settingsFilePath) ?? string.Empty;
 
-        var contractsFolder = Path.GetFullPath(Path.Combine(root, refitGeneratorSettings.ContractsOutputFolder!));
-        return Path.Combine(contractsFolder, outputFile.Filename);
+        return Path.Combine(
+            Path.GetFullPath(Path.Combine(root, refitGeneratorSettings.ContractsOutputFolder!)),
+            outputFile.Filename);
     }
 
     private static bool IsDirectCliGeneration(string? settingsFilePath) =>
