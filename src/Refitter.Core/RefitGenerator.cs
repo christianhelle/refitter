@@ -19,7 +19,7 @@ public class RefitGenerator(
 
     /// <summary>
     /// Creates a new instance of the <see cref="RefitGenerator"/> class asynchronously
-    /// by loading the document from settings, then filtering and cleaning it.
+    /// by loading the document from settings, then filtering, and cleaning it.
     /// </summary>
     public static async Task<RefitGenerator> CreateAsync(
         RefitGeneratorSettings settings,
