@@ -76,16 +76,7 @@ public static class RefitDocumentFilter
             .Select(x => new Regex(x, RegexOptions.Compiled, TimeSpan.FromSeconds(1)))
             .ToArray();
         var paths = result.Paths.Keys
-            .Where(pathKey =>
-            {
-                for (var i = 0; i < regexes.Length; i++)
-                {
-                    if (regexes[i].IsMatch(pathKey))
-                        return false;
-                }
-
-                return true;
-            })
+            .Where(pathKey => regexes.All(t => !t.IsMatch(pathKey)))
             .ToArray();
 
         foreach (string pathKey in paths)
