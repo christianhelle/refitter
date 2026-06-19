@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.1-preview.109...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0-preview.110...HEAD)
+
+**Merged pull requests:**
+
+- chore\(deps\): bump actions/checkout from 6 to 7 [\#1160](https://github.com/christianhelle/refitter/pull/1160) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [2.1.0-preview.110](https://github.com/christianhelle/refitter/tree/2.1.0-preview.110) (2026-06-18)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.1-preview.109...2.1.0-preview.110)
 
 **Implemented enhancements:**
 
