@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using NJsonSchema;
 using NSwag;
@@ -6,7 +5,7 @@ using NSwag;
 namespace Refitter.Core;
 
 /// <summary>
-/// Cleans up OpenAPI schema by removing unreferenced schemas and handling inheritance hierarchies.
+/// Cleans up the OpenAPI schema by removing unreferenced schemas and handling inheritance hierarchies.
 /// </summary>
 
 public class SchemaCleaner
@@ -17,7 +16,7 @@ public class SchemaCleaner
     /// <summary>
     /// Gets or sets a value indicating whether to include inheritance hierarchy in the schema cleaning process.
     /// </summary>
-    public bool IncludeInheritanceHierarchy { get; set; }
+    public bool IncludeInheritanceHierarchy { get; init; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SchemaCleaner"/> class.
@@ -191,72 +190,65 @@ public class SchemaCleaner
             .Where(x => x != null)
             .Select(x => x!);
 
-        IEnumerable<JsonSchema?> EnumerateInternal(JsonSchema schema)
+        IEnumerable<JsonSchema?> EnumerateInternal(JsonSchema schemaElement)
         {
-            schema = schema.ActualSchema;
+            schemaElement = schemaElement.ActualSchema;
 
-            yield return schema.AdditionalItemsSchema;
-            yield return schema.AdditionalPropertiesSchema;
-            if (schema.AllInheritedSchemas != null)
+            yield return schemaElement.AdditionalItemsSchema;
+            yield return schemaElement.AdditionalPropertiesSchema;
+            foreach (JsonSchema s in schemaElement.AllInheritedSchemas)
             {
-                foreach (JsonSchema s in schema.AllInheritedSchemas)
-                {
-                    yield return s;
-                }
+                yield return s;
             }
 
-            if (schema.DictionaryKey != null)
+            if (schemaElement.DictionaryKey != null)
             {
-                yield return schema.DictionaryKey;
+                yield return schemaElement.DictionaryKey;
             }
 
-            if (schema.Item != null)
+            if (schemaElement.Item != null)
             {
-                yield return schema.Item;
+                yield return schemaElement.Item;
             }
 
-            if (schema.Items != null)
+            foreach (JsonSchema s in schemaElement.Items)
             {
-                foreach (JsonSchema s in schema.Items)
-                {
-                    yield return s;
-                }
+                yield return s;
             }
 
-            yield return schema.Not;
+            yield return schemaElement.Not;
 
-
-            foreach (var subSchema in schema.AllOf)
+            foreach (var subSchema in schemaElement.AllOf)
             {
                 yield return subSchema;
             }
 
-            if (schema.DiscriminatorObject != null && IncludeInheritanceHierarchy)
+            if (schemaElement.DiscriminatorObject != null && IncludeInheritanceHierarchy)
             {
                 // abstract type
                 // if we let these out, we get a bunch of "AnonymousN"-classes
-                foreach (var subSchema in schema.DiscriminatorObject.Mapping)
+                foreach (var subSchema in schemaElement.DiscriminatorObject.Mapping)
                 {
                     yield return subSchema.Value;
                 }
             }
 
-            foreach (var subSchema in schema.AnyOf)
+            foreach (var subSchema in schemaElement.AnyOf)
             {
                 yield return subSchema;
             }
 
-            foreach (var subSchema in schema.OneOf)
+            foreach (var subSchema in schemaElement.OneOf)
             {
                 yield return subSchema;
             }
 
-            foreach (var subSchema in schema.ActualProperties.Select(kvp => kvp.Value))
+            foreach (var subSchema in schemaElement.ActualProperties.Select(kvp => kvp.Value))
             {
                 yield return subSchema;
             }
 
-            foreach (var subSchema in schema.Definitions.Select(kvp => kvp.Value))
+            foreach (var subSchema in schemaElement.Definitions.Select(kvp => kvp.Value))
             {
                 yield return subSchema;
             }
