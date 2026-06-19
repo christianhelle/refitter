@@ -65,7 +65,7 @@ public interface IGenerationReporter
 }
 
 /// <summary>
-/// A user-facing warning message, emitted during configuration validation. The title
+/// A user-facing warning message, emitted during configuration validation
 /// </summary>
 /// <param name="Title">Title of the warning</param>
 /// <param name="Description">Extended description</param>
