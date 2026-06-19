@@ -16,11 +16,7 @@ public sealed class GenerationOrchestrator
         try
         {
             var stopwatch = Stopwatch.StartNew();
-            var version = GetType().Assembly.GetName().Version!.ToString();
-            if (version == "1.0.0.0")
-                version += " (local build)";
-
-            reporter.ReportHeader(version);
+            reporter.ReportHeader(VersionHelper.GetVersion());
 
             var supportKey = cliSettings.NoLogging
                 ? "Unavailable when logging is disabled"
