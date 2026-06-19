@@ -1,4 +1,3 @@
-using System.Threading;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
@@ -44,7 +43,7 @@ public interface IGenerationReporter
 
     void ReportDonationBanner();
 
-    void ReportConfigurationWarnings(IReadOnlyList<(string Title, string Description)> warnings);
+    void ReportConfigurationWarnings(IReadOnlyList<Warning> warnings);
 
     /// <summary>
     /// Emitted when every API path was filtered out by <c>--match-path</c> patterns.
@@ -64,6 +63,15 @@ public interface IGenerationReporter
 
     void ReportSupportHelp();
 }
+
+/// <summary>
+/// A user-facing warning message, emitted during configuration validation
+/// </summary>
+/// <param name="Title">Title of the warning</param>
+/// <param name="Description">Extended description</param>
+public record Warning(
+    string Title,
+    string Description);
 
 /// <summary>
 /// Stateful sub-report for the multi-file output listing. The simple reporter

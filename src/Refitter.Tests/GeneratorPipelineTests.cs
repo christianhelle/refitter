@@ -134,7 +134,6 @@ public class GeneratorPipelineTests
         var docGenerator = new XmlDocumentationGenerator(settings);
         var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
         var pipeline = new GeneratorPipeline(
-            docGenerator,
             interfaceGenerator,
             Array.Empty<IContractsPostProcessor>());
         return pipeline.Run(document, settings, generator);

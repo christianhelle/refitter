@@ -46,11 +46,15 @@ public class OpenApiStatsTests
     public void Visit_Headers_Should_Increment_HeaderCount()
     {
         var stats = new OpenApiStats();
-        var headers = new Dictionary<string, IOpenApiHeader>();
+        var headers = new Dictionary<string, IOpenApiHeader>
+        {
+            { "X-Custom", new OpenApiHeader() },
+            { "Authorization", new OpenApiHeader() },
+        };
 
         stats.Visit(headers);
 
-        stats.HeaderCount.Should().Be(1);
+        stats.HeaderCount.Should().Be(2);
     }
 
     [Test]
@@ -77,11 +81,16 @@ public class OpenApiStatsTests
     public void Visit_Response_Should_Increment_ResponseCount()
     {
         var stats = new OpenApiStats();
-        var response = new OpenApiResponses();
+        var response = new OpenApiResponses
+        {
+            { "200", new OpenApiResponse() },
+            { "404", new OpenApiResponse() },
+            { "500", new OpenApiResponse() },
+        };
 
         stats.Visit(response);
 
-        stats.ResponseCount.Should().Be(1);
+        stats.ResponseCount.Should().Be(3);
     }
 
     [Test]

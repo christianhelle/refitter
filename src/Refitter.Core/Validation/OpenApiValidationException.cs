@@ -1,13 +1,15 @@
 namespace Refitter.Core.Validation;
 
-public class OpenApiValidationException : Exception
+/// <summary>
+/// Exception thrown when OpenAPI validation fails.
+/// </summary>
+/// <param name="validationResult">The validation result that caused the failure.</param>
+public class OpenApiValidationException(
+    OpenApiValidationResult validationResult)
+    : Exception("OpenAPI validation failed")
 {
-    public OpenApiValidationResult ValidationResult { get; }
-
-    public OpenApiValidationException(
-        OpenApiValidationResult validationResult)
-        : base("OpenAPI validation failed")
-    {
-        ValidationResult = validationResult;
-    }
+    /// <summary>
+    /// Gets the validation result that caused this exception.
+    /// </summary>
+    public OpenApiValidationResult ValidationResult { get; } = validationResult;
 }

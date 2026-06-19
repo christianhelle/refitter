@@ -1,5 +1,4 @@
-namespace Refitter.Core
-{
+namespace Refitter.Core;
     /// <summary>
     /// Enumeration of cache provider types.
     /// </summary>
@@ -35,4 +34,3 @@ namespace Refitter.Core
         /// </summary>
         DistributedAsByteArray,
     }
-}

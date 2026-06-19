@@ -30,7 +30,7 @@ public static class Analytics
         var configuration = TelemetryConfiguration.CreateDefault();
         configuration.ConnectionString = ApplicationInsightsConnectionString;
 
-        telemetryClient = new TelemetryClient(configuration);
+        telemetryClient = new(configuration);
         telemetryClient.Context.User.Id = SupportInformation.GetSupportKey();
         telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
         telemetryClient.Context.Operation.Id = Guid.NewGuid().ToString();

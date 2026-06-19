@@ -2,7 +2,6 @@ using FluentAssertions;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
@@ -157,10 +156,10 @@ public class RichGenerationReporterTests
     [Test]
     public void ReportConfigurationWarnings_Does_Not_Throw()
     {
-        var warnings = new List<(string Title, string Description)>
+        var warnings = new List<Warning>
         {
-            ("Title1", "Desc1"),
-            ("Title2", "Desc2")
+            new("Title1", "Desc1"),
+            new("Title2", "Desc2")
         };
 
         var act = () => new RichGenerationReporter().ReportConfigurationWarnings(warnings);

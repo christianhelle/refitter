@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Threading;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
@@ -9,7 +8,7 @@ namespace Refitter;
 public sealed class GenerationOrchestrator
 {
     public async Task<int> RunAsync(
-        RefitGeneratorSettings refitGeneratorSettings,
+        RefitGeneratorSettings generatorSettings,
         Settings cliSettings,
         IGenerationReporter reporter,
         CancellationToken cancellationToken)
@@ -17,11 +16,7 @@ public sealed class GenerationOrchestrator
         try
         {
             var stopwatch = Stopwatch.StartNew();
-            var version = GetType().Assembly.GetName().Version!.ToString();
-            if (version == "1.0.0.0")
-                version += " (local build)";
-
-            reporter.ReportHeader(version);
+            reporter.ReportHeader(VersionHelper.GetVersion());
 
             var supportKey = cliSettings.NoLogging
                 ? "Unavailable when logging is disabled"
@@ -31,39 +26,43 @@ public sealed class GenerationOrchestrator
 
             if (!string.IsNullOrWhiteSpace(cliSettings.SettingsFilePath))
             {
-                var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(cliSettings.SettingsFilePath!)) ?? string.Empty;
-                RefitterSettingsLoader.ResolveRelativeSpecPaths(refitGeneratorSettings, settingsFileDirectory);
+                RefitterSettingsLoader.ResolveRelativeSpecPaths(
+                    generatorSettings,
+                    Path.GetDirectoryName(Path.GetFullPath(cliSettings.SettingsFilePath!)) ?? string.Empty);
             }
 
             var generator = await RefitGenerator.CreateAsync(
-                refitGeneratorSettings,
+                generatorSettings,
                 cancellationToken);
 
             if (!cliSettings.SkipValidation)
-                await ValidateOpenApiSpecs(refitGeneratorSettings, reporter, cancellationToken);
+                await ValidateOpenApiSpecs(generatorSettings, reporter, cancellationToken);
 
-            await (refitGeneratorSettings.GenerateMultipleFiles
-                ? WriteMultipleFiles(generator, cliSettings, refitGeneratorSettings, reporter, cancellationToken)
-                : WriteSingleFile(generator, cliSettings, refitGeneratorSettings, reporter, cancellationToken));
+            await (generatorSettings.GenerateMultipleFiles
+                ? WriteMultipleFiles(generator, cliSettings, generatorSettings, reporter, cancellationToken)
+                : WriteSingleFile(generator, cliSettings, generatorSettings, reporter, cancellationToken));
 
-            Analytics.LogFeatureUsage(cliSettings, refitGeneratorSettings);
+            Analytics.LogFeatureUsage(cliSettings, generatorSettings);
 
             if (string.IsNullOrWhiteSpace(cliSettings.SettingsFilePath))
-                await GenerateCommand.WriteRefitterSettingsFile(cliSettings, refitGeneratorSettings, cancellationToken);
+                await GenerateCommand.WriteRefitterSettingsFile(
+                    cliSettings,
+                    generatorSettings,
+                    cancellationToken);
 
-            if (refitGeneratorSettings.IncludePathMatches.Length > 0 &&
+            if (generatorSettings.IncludePathMatches.Length > 0 &&
                 generator.OpenApiDocument.Paths.Count == 0)
             {
-                reporter.ReportAllPathsFilteredWarning(refitGeneratorSettings.IncludePathMatches);
+                reporter.ReportAllPathsFilteredWarning(generatorSettings.IncludePathMatches);
             }
 
             stopwatch.Stop();
-            reporter.ReportSuccess(stopwatch.Elapsed, refitGeneratorSettings.GenerateMultipleFiles);
+            reporter.ReportSuccess(stopwatch.Elapsed, generatorSettings.GenerateMultipleFiles);
 
             if (!cliSettings.NoBanner)
                 reporter.ReportDonationBanner();
 
-            ShowWarnings(refitGeneratorSettings, cliSettings, reporter);
+            ShowWarnings(generatorSettings, reporter);
             return 0;
         }
         catch (Exception exception)
@@ -104,7 +103,7 @@ public sealed class GenerationOrchestrator
             code);
 
         var fileName = Path.GetFileName(planned.Path);
-        var directory = Path.GetDirectoryName(planned.Path) ?? "";
+        var directory = Path.GetDirectoryName(planned.Path) ?? string.Empty;
         var sizeFormatted = FormatFileSize(code.Length);
         var lines = code.Split('\n').Length;
 
@@ -166,7 +165,10 @@ public sealed class GenerationOrchestrator
 
     private static string FormatFileSize(long bytes)
     {
-        var suffixes = new[] { "B", "KB", "MB", "GB" };
+        var suffixes = new[]
+        {
+            "B", "KB", "MB", "GB"
+        };
         var size = (double)bytes;
         var suffixIndex = 0;
 
@@ -202,7 +204,7 @@ public sealed class GenerationOrchestrator
     {
         cancellationToken.ThrowIfCancellationRequested();
         var validationResult = await reporter.ValidateWithProgressAsync(
-            () => Refitter.Core.Validation.OpenApiValidator.Validate(openApiPath, cancellationToken),
+            () => Core.Validation.OpenApiValidator.Validate(openApiPath, cancellationToken),
             cancellationToken);
 
         if (!validationResult.IsValid)
@@ -223,26 +225,28 @@ public sealed class GenerationOrchestrator
 
     private static void ShowWarnings(
         RefitGeneratorSettings refitGeneratorSettings,
-        Settings settings,
         IGenerationReporter reporter)
     {
-        var warnings = new List<(string title, string description)>();
+        var warnings = new List<Warning>();
 
-        if (refitGeneratorSettings.UseIsoDateFormat &&
-            refitGeneratorSettings.CodeGeneratorSettings?.DateFormat is not null)
+        if (refitGeneratorSettings is { UseIsoDateFormat: true, CodeGeneratorSettings.DateFormat: not null })
         {
-            warnings.Add((
-                "Date Format Override",
-                "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true"));
+            warnings.Add(
+                new (
+                    "Date Format Override",
+                    "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true"
+                ));
         }
 
 #pragma warning disable CS0618
         if (refitGeneratorSettings.DependencyInjectionSettings?.UsePolly is true)
 #pragma warning restore CS0618
         {
-            warnings.Add((
-                "Deprecated Setting",
-                "The 'usePolly' property is deprecated. Use 'transientErrorHandler: Polly' instead"));
+            warnings.Add(
+                new (
+                    "Deprecated Setting",
+                    "The 'usePolly' property is deprecated. Use 'transientErrorHandler: Polly' instead"
+                ));
         }
 
         if (warnings.Count > 0)

@@ -1,4 +1,3 @@
-using System.Threading;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
@@ -110,10 +109,10 @@ internal sealed class SimpleGenerationReporter : IGenerationReporter
         Console.WriteLine();
     }
 
-    public void ReportConfigurationWarnings(IReadOnlyList<(string Title, string Description)> warnings)
+    public void ReportConfigurationWarnings(IReadOnlyList<Warning> warnings)
     {
         Console.WriteLine("Configuration Warnings");
-        foreach (var (title, description) in warnings)
+        foreach ((string title, string description) in warnings)
         {
             Console.WriteLine($"Warning: {title}");
             Console.WriteLine($"Description: {description}");
