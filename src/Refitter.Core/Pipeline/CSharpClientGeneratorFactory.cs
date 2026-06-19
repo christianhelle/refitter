@@ -5,19 +5,44 @@ using NSwag.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 
-internal class CSharpClientGeneratorFactory(
-    RefitGeneratorSettings settings,
-    OpenApiDocument document,
-    IReadOnlyList<IOpenApiDocumentMutator>? mutators = null)
+internal class CSharpClientGeneratorFactory
 {
-    private readonly IReadOnlyList<IOpenApiDocumentMutator> mutators = mutators ?? CreateDefaultMutators(settings);
+    private readonly ICodeGenerationConfiguration codeGeneration;
+    private readonly INamingConfiguration naming;
+    private readonly ISchemaConfiguration schema;
+    private readonly OpenApiDocument document;
+    private readonly IReadOnlyList<IOpenApiDocumentMutator> mutators;
 
-    private static IReadOnlyList<IOpenApiDocumentMutator> CreateDefaultMutators(RefitGeneratorSettings settings) =>
+    public CSharpClientGeneratorFactory(
+        ICodeGenerationConfiguration codeGeneration,
+        INamingConfiguration naming,
+        ISchemaConfiguration schema,
+        OpenApiDocument document,
+        IReadOnlyList<IOpenApiDocumentMutator>? mutators = null)
+    {
+        this.codeGeneration = codeGeneration;
+        this.naming = naming;
+        this.schema = schema;
+        this.document = document;
+        this.mutators = mutators ?? CreateDefaultMutators(schema, codeGeneration);
+    }
+
+    public CSharpClientGeneratorFactory(
+        RefitGeneratorSettings settings,
+        OpenApiDocument document,
+        IReadOnlyList<IOpenApiDocumentMutator>? mutators = null)
+        : this(settings, settings, settings, document, mutators)
+    {
+    }
+
+    private static IReadOnlyList<IOpenApiDocumentMutator> CreateDefaultMutators(
+        ISchemaConfiguration schema,
+        ICodeGenerationConfiguration codeGeneration) =>
     [
-        new DisableAdditionalPropertiesMutator(settings.GenerateDefaultAdditionalProperties),
+        new DisableAdditionalPropertiesMutator(schema.GenerateDefaultAdditionalProperties),
         new OneOfDiscriminatorToAllOfMutator(),
         new FixMissingIntegerTypesMutator(),
-        new CustomIntegerTypeMutator(settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32),
+        new CustomIntegerTypeMutator(codeGeneration.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32),
     ];
 
     public CustomCSharpClientGenerator Create()
@@ -38,28 +63,28 @@ internal class CSharpClientGeneratorFactory(
             },
             CSharpGeneratorSettings =
             {
-                Namespace = settings.ContractsNamespace ?? settings.Namespace,
+                Namespace = naming.ContractsNamespace ?? naming.Namespace,
                 JsonLibrary = CSharpJsonLibrary.SystemTextJson,
                 JsonPolymorphicSerializationStyle =
-                    settings.UsePolymorphicSerialization
+                    codeGeneration.UsePolymorphicSerialization
                         ? CSharpJsonPolymorphicSerializationStyle.SystemTextJson
                         : CSharpJsonPolymorphicSerializationStyle.NJsonSchema,
-                TypeAccessModifier = settings.TypeAccessibility.ToString().ToLowerInvariant(),
+                TypeAccessModifier = codeGeneration.TypeAccessibility.ToString().ToLowerInvariant(),
                 ClassStyle =
-                    settings.ImmutableRecords ||
-                    settings.CodeGeneratorSettings?.GenerateNativeRecords is true
+                    codeGeneration.ImmutableRecords ||
+                    codeGeneration.CodeGeneratorSettings?.GenerateNativeRecords is true
                         ? CSharpClassStyle.Record
                         : CSharpClassStyle.Poco,
                 GenerateNativeRecords =
-                    settings.ImmutableRecords ||
-                    settings.CodeGeneratorSettings?.GenerateNativeRecords is true,
-                TemplateDirectory = settings.CustomTemplateDirectory,
+                    codeGeneration.ImmutableRecords ||
+                    codeGeneration.CodeGeneratorSettings?.GenerateNativeRecords is true,
+                TemplateDirectory = codeGeneration.CustomTemplateDirectory,
             },
         };
 
-        if (settings.ParameterNameGenerator != null)
+        if (codeGeneration.ParameterNameGenerator != null)
         {
-            csharpClientGeneratorSettings.ParameterNameGenerator = settings.ParameterNameGenerator;
+            csharpClientGeneratorSettings.ParameterNameGenerator = codeGeneration.ParameterNameGenerator;
         }
 
         csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory
@@ -70,9 +95,9 @@ internal class CSharpClientGeneratorFactory(
             csharpClientGeneratorSettings);
 
         var csharpGeneratorSettings = generator.Settings.CSharpGeneratorSettings;
-        ApplyCodeGeneratorSettings(settings.CodeGeneratorSettings, csharpGeneratorSettings);
+        ApplyCodeGeneratorSettings(codeGeneration.CodeGeneratorSettings, csharpGeneratorSettings);
 
-        var useNativeRecords = settings.ImmutableRecords || csharpGeneratorSettings.GenerateNativeRecords;
+        var useNativeRecords = codeGeneration.ImmutableRecords || csharpGeneratorSettings.GenerateNativeRecords;
         csharpGeneratorSettings.GenerateNativeRecords = useNativeRecords;
         csharpGeneratorSettings.ClassStyle = useNativeRecords
             ? CSharpClassStyle.Record
@@ -83,12 +108,12 @@ internal class CSharpClientGeneratorFactory(
 
     private IPropertyNameGenerator CreatePropertyNameGenerator()
     {
-        if (settings.CodeGeneratorSettings?.PropertyNameGenerator is { } propertyNameGenerator)
+        if (codeGeneration.CodeGeneratorSettings?.PropertyNameGenerator is { } propertyNameGenerator)
         {
             return propertyNameGenerator;
         }
 
-        return settings.PropertyNamingPolicy switch
+        return naming.PropertyNamingPolicy switch
         {
             PropertyNamingPolicy.PreserveOriginal => new PreserveOriginalPropertyNameGenerator(),
             _ => new CustomCSharpPropertyNameGenerator(),
