@@ -11,7 +11,9 @@ internal class InterfaceGenerator
     private readonly OpenApiDocument document;
     private readonly CustomCSharpClientGenerator generator;
     private readonly XmlDocumentationGenerator docGenerator;
-    private readonly IMethodGenerator methodGenerator;
+    private readonly IReturnTypeGenerator returnTypeGenerator;
+    private readonly IMethodAttributeGenerator methodAttributeGenerator;
+    private readonly IMethodSignatureGenerator methodSignatureGenerator;
 
     internal InterfaceGenerator(
         RefitGeneratorSettings settings,
@@ -24,10 +26,9 @@ internal class InterfaceGenerator
             document,
             generator,
             docGenerator,
-            new MethodGenerator(
-                new ReturnTypeGenerator(settings, generator),
-                new MethodAttributeGenerator(settings, document),
-                new MethodSignatureGenerator(settings, parameterExtractor ?? new ParameterAggregator())))
+            new ReturnTypeGenerator(settings, generator),
+            new MethodAttributeGenerator(settings, document),
+            new MethodSignatureGenerator(settings, parameterExtractor ?? new ParameterAggregator()))
     {
     }
 
@@ -36,13 +37,17 @@ internal class InterfaceGenerator
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
         XmlDocumentationGenerator docGenerator,
-        IMethodGenerator methodGenerator)
+        IReturnTypeGenerator returnTypeGenerator,
+        IMethodAttributeGenerator methodAttributeGenerator,
+        IMethodSignatureGenerator methodSignatureGenerator)
     {
         this.settings = settings;
         this.document = document;
         this.generator = generator;
         this.docGenerator = docGenerator;
-        this.methodGenerator = methodGenerator;
+        this.returnTypeGenerator = returnTypeGenerator;
+        this.methodAttributeGenerator = methodAttributeGenerator;
+        this.methodSignatureGenerator = methodSignatureGenerator;
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
@@ -197,7 +202,7 @@ internal class InterfaceGenerator
             return (string.Empty, string.Empty);
         }
 
-        var returnType = methodGenerator.GenerateReturnType(operation);
+        var returnType = returnTypeGenerator.Generate(operation);
         var verb = op.Verb.CapitalizeFirstCharacter();
         var baseOperationName = GetBaseOperationName(op);
         var rawMethodName = partitioning.GetMethodName(op, interfaceName, baseOperationName);
@@ -209,12 +214,12 @@ internal class InterfaceGenerator
         var operationModel = generator.CreateOperationModel(operation);
 
         var (parametersString, parameters, operationDynamicQuerystringParameters) =
-            methodGenerator.GenerateMethodSignature(operationModel, operation, dynamicQuerystringParameterType);
+            methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
 
         var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
         var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
         var hasCancellationToken = settings.UseCancellationTokens && !hasApizrRequestOptionsParameter;
-        var isApiResponseType = methodGenerator.IsApiResponseType(returnType);
+        var isApiResponseType = returnTypeGenerator.IsApiResponseType(returnType);
 
         if (settings.GenerateXmlDocCodeComments)
         {
@@ -227,7 +232,7 @@ internal class InterfaceGenerator
                 code);
         }
 
-        foreach (var attribute in methodGenerator.GenerateMethodAttributes(operation, operationModel))
+        foreach (var attribute in methodAttributeGenerator.Generate(operation, operationModel))
         {
             code.AppendLine($"{Separator}{Separator}{attribute}");
         }
@@ -249,7 +254,7 @@ internal class InterfaceGenerator
                     code);
             }
 
-            foreach (var attribute in methodGenerator.GenerateMethodAttributes(operation, operationModel))
+            foreach (var attribute in methodAttributeGenerator.Generate(operation, operationModel))
             {
                 code.AppendLine($"{Separator}{Separator}{attribute}");
             }
