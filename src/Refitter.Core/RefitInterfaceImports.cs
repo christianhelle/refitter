@@ -5,15 +5,16 @@ namespace Refitter.Core;
 
 internal static class RefitInterfaceImports
 {
-    private static readonly string[] defaultNamespases = new[]
-    {
+    private static readonly string[] DefaultNamespases =
+    [
         "Refit",
         "System.Collections.Generic",
         "System.Text.Json.Serialization",
-    };
+    ];
+
     public static string[] GetImportedNamespaces(RefitGeneratorSettings settings)
     {
-        var namespaces = new List<string>(defaultNamespases);
+        var namespaces = new List<string>(DefaultNamespases);
 
         if (settings.ApizrSettings?.WithRequestOptions == true)
         {
@@ -24,14 +25,10 @@ internal static class RefitInterfaceImports
             namespaces.Add("System.Threading");
         }
 
-        if (settings.ReturnIObservable)
-        {
-            namespaces.Add("System.Reactive");
-        }
-        else
-        {
-            namespaces.Add("System.Threading.Tasks");
-        }
+        namespaces.Add(
+            settings.ReturnIObservable
+                ? "System.Reactive"
+                : "System.Threading.Tasks");
 
         if (settings.ExcludeNamespaces.Length != 0)
         {
@@ -59,9 +56,10 @@ internal static class RefitInterfaceImports
     public static string GenerateNamespaceImports(RefitGeneratorSettings settings)
     {
         var namespaces = GetImportedNamespaces(settings);
-        if (namespaces.Length == 0)
-            return string.Empty;
-
-        return string.Join(Environment.NewLine, namespaces.Select(ns => $"using {ns};"));
+        return namespaces.Length == 0
+            ? string.Empty
+            : string.Join(
+                Environment.NewLine,
+                namespaces.Select(ns => $"using {ns};"));
     }
 }
