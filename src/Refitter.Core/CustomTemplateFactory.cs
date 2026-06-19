@@ -1,23 +1,25 @@
-using NJsonSchema;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
-using NSwag;
 using NSwag.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 
 /// <summary>
-/// Custom template factory solely for the purpose of tweaking the JsonPolymorphic attribute
+/// Custom template factory solely for tweaking the JsonPolymorphic attribute
 /// with UnknownDerivedTypeHandling = FallBackToBaseType and IgnoreUnrecognizedTypeDiscriminators = true.
 /// This class should be removed if NSwag eventually supports setting UnknownDerivedTypeHandling
 /// and IgnoreUnrecognizedTypeDiscriminators.
 /// </summary>
-internal class CustomTemplateFactory : NSwag.CodeGeneration.DefaultTemplateFactory
+internal class CustomTemplateFactory(
+    CodeGeneratorSettingsBase settings)
+    : NSwag.CodeGeneration.DefaultTemplateFactory(
+        settings,
+        [
+            typeof(CSharpGenerator).Assembly,
+            typeof(CSharpGeneratorBaseSettings).Assembly,
+            typeof(CSharpGeneratorSettings).Assembly
+        ])
 {
-    public CustomTemplateFactory(CodeGeneratorSettingsBase settings)
-        : base(settings, [typeof(CSharpGenerator).Assembly, typeof(CSharpGeneratorBaseSettings).Assembly, typeof(NJsonSchema.CodeGeneration.CSharp.CSharpGeneratorSettings).Assembly])
-    {
-    }
 
     protected override string GetEmbeddedLiquidTemplate(string language, string template)
     {
