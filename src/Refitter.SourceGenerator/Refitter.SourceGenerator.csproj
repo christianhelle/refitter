@@ -26,7 +26,19 @@
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(AssemblyName).props" Pack="true" PackagePath="build" />
-    <Compile Include="../Refitter.Core/**/*.cs" />
+    <Compile Include="../Refitter.Core/*.cs" />
+    <Compile Include="../Refitter.Core/Apizr/*.cs" />
+    <Compile Include="../Refitter.Core/CodeGeneration/*.cs" />
+    <Compile Include="../Refitter.Core/Contracts/*.cs" />
+    <Compile Include="../Refitter.Core/Document/*.cs" />
+    <Compile Include="../Refitter.Core/Generation/*.cs" />
+    <Compile Include="../Refitter.Core/Mutators/*.cs" />
+    <Compile Include="../Refitter.Core/ParameterExtraction/*.cs" />
+    <Compile Include="../Refitter.Core/Partitioning/*.cs" />
+    <Compile Include="../Refitter.Core/Pipeline/*.cs" />
+    <Compile Include="../Refitter.Core/Schema/*.cs" />
+    <Compile Include="../Refitter.Core/Settings/*.cs" />
+    <Compile Include="../Refitter.Core/Utilities/*.cs" />
   </ItemGroup>
 
 </Project>
