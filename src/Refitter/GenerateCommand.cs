@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 using Refitter.Core;
 using Spectre.Console;
 using Spectre.Console.Cli;

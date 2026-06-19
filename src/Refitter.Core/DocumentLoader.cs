@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Threading;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 using NSwag;
