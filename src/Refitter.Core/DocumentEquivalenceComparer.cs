@@ -218,9 +218,9 @@ internal sealed class DocumentEquivalenceComparer
 
     private void AddSchemaArray(JObject json, string propertyName, IEnumerable<JsonSchema> schemas, ISet<JsonSchema> visited)
     {
-        var items = schemas
+        object[] items = schemas
             .Select(schema => CreateCanonicalSchemaToken(schema, new HashSet<JsonSchema>(visited, JsonSchemaReferenceComparer.Instance)))
-            .ToArray();
+            .ToArray<object>();
 
         if (items.Length > 0)
             json[propertyName] = new JArray(items);
@@ -254,8 +254,8 @@ internal sealed class DocumentEquivalenceComparer
             Info =
             {
                 Title = "Refitter equivalence comparison",
-                Version = "1.0"
-            }
+                Version = "1.0",
+            },
         };
 
     private static IEnumerable<JsonSchema?> EnumerateTraversableSchemas(JsonSchema schema)
@@ -265,12 +265,9 @@ internal sealed class DocumentEquivalenceComparer
         yield return schema.DictionaryKey;
         yield return schema.Item;
 
-        if (schema.Items != null)
+        foreach (var item in schema.Items)
         {
-            foreach (var item in schema.Items)
-            {
-                yield return item;
-            }
+            yield return item;
         }
 
         yield return schema.Not;
