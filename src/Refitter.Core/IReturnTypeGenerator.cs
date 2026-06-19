@@ -7,6 +7,4 @@ internal interface IReturnTypeGenerator
     string Generate(OpenApiOperation operation);
 
     bool IsApiResponseType(string typeName);
-
-    bool IsFileStreamResponse(OpenApiOperation operation);
 }

@@ -3,7 +3,10 @@ using NSwag;
 
 namespace Refitter.Core;
 
-internal class ReturnTypeGenerator : IReturnTypeGenerator
+internal class ReturnTypeGenerator(
+    RefitGeneratorSettings settings,
+    CustomCSharpClientGenerator generator)
+    : IReturnTypeGenerator
 {
     private static readonly Regex HttpResponseMessageTypeRegex = new(
         "(Task|IObservable)<HttpResponseMessage>",
@@ -14,17 +17,6 @@ internal class ReturnTypeGenerator : IReturnTypeGenerator
         "(Task|IObservable)<(I)?ApiResponse(<[\\w<>]+>)?>",
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(1));
-
-    private readonly RefitGeneratorSettings settings;
-    private readonly CustomCSharpClientGenerator generator;
-
-    public ReturnTypeGenerator(
-        RefitGeneratorSettings settings,
-        CustomCSharpClientGenerator generator)
-    {
-        this.settings = settings;
-        this.generator = generator;
-    }
 
     public string Generate(OpenApiOperation operation)
     {
