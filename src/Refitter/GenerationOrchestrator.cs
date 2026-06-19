@@ -103,7 +103,7 @@ public sealed class GenerationOrchestrator
             code);
 
         var fileName = Path.GetFileName(planned.Path);
-        var directory = Path.GetDirectoryName(planned.Path) ?? "";
+        var directory = Path.GetDirectoryName(planned.Path) ?? string.Empty;
         var sizeFormatted = FormatFileSize(code.Length);
         var lines = code.Split('\n').Length;
 

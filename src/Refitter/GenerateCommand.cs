@@ -113,5 +113,4 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             ? Path.Combine(outputDir, FileExtensionConstants.Refitter)
             : FileExtensionConstants.Refitter;
     }
-
 }
