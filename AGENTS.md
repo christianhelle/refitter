@@ -5,7 +5,7 @@ OpenAPI-to-Refit code generator. Multi-package solution: CLI tool, MSBuild task,
 ## Build & Test
 
 - Solution: `src/Refitter.slnx`
-- SDK: `10.0.300` with `rollForward: latestFeature` (see `global.json`)
+- SDK: `10.0.100` with `rollForward: latestFeature` (see `global.json`)
 - Build: `dotnet build -c Release src/Refitter.slnx`
 - Test: `dotnet test --solution src/Refitter.slnx -c Release`
 
