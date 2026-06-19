@@ -3,18 +3,11 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class MethodAttributeGenerator : IMethodAttributeGenerator
+internal class MethodAttributeGenerator(
+    RefitGeneratorSettings settings,
+    OpenApiDocument document)
+    : IMethodAttributeGenerator
 {
-    private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
-
-    public MethodAttributeGenerator(
-        RefitGeneratorSettings settings,
-        OpenApiDocument document)
-    {
-        this.settings = settings;
-        this.document = document;
-    }
 
     public string[] Generate(OpenApiOperation operation, CSharpOperationModel operationModel)
     {
