@@ -1,22 +1,14 @@
 using NJsonSchema;
-using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 
 namespace Refitter.Core;
 
-internal class CustomCSharpTypeResolver : CSharpTypeResolver
+internal class CustomCSharpTypeResolver(
+    CSharpGeneratorSettings settings,
+    Dictionary<string, string>? formatMappings)
+    : CSharpTypeResolver(settings)
 {
-    private readonly Dictionary<string, string>? formatMappings;
-    private readonly CSharpGeneratorSettings settings;
-
-    public CustomCSharpTypeResolver(
-        CSharpGeneratorSettings settings,
-        Dictionary<string, string>? formatMappings)
-        : base(settings)
-    {
-        this.formatMappings = formatMappings;
-        this.settings = settings;
-    }
+    private readonly CSharpGeneratorSettings settings = settings;
 
     public override string Resolve(
         JsonSchema schema,
