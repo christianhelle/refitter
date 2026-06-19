@@ -15,7 +15,7 @@ internal sealed class RefitCodeGenerator
     public string Generate(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
-        return FormatSingleFile(result, settings);
+        return FormatSingleFile(result, settings, settings, settings);
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ internal sealed class RefitCodeGenerator
     public GeneratorOutput GenerateMultipleFiles(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
-        return new(FormatMultipleFiles(result, settings, document));
+        return new(FormatMultipleFiles(result, settings, settings, settings, document));
     }
 
     private static GenerationResult RunPipeline(
@@ -46,9 +46,13 @@ internal sealed class RefitCodeGenerator
         return pipeline.Run(document, settings, generator);
     }
 
-    private static string FormatSingleFile(GenerationResult result, RefitGeneratorSettings settings)
+    private static string FormatSingleFile(
+        GenerationResult result,
+        RefitGeneratorSettings settings,
+        ICodeGenerationConfiguration codeGeneration,
+        INamingConfiguration naming)
     {
-        var contracts = settings.GenerateClients
+        var contracts = codeGeneration.GenerateClients
             ? RefitInterfaceImports
                 .GetImportedNamespaces(settings)
                 .Aggregate(
@@ -58,27 +62,29 @@ internal sealed class RefitCodeGenerator
 
         var output = new StringBuilder()
             .AppendLine(
-                settings.GenerateClients
+                codeGeneration.GenerateClients
                     ? string.Join("", result.Interfaces.Select(c => c.Content))
                     : string.Empty)
             .AppendLine()
-            .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
+            .AppendLine(codeGeneration.GenerateContracts ? contracts : string.Empty)
             .AppendLine(result.SerializerContext)
             .AppendLine(result.DependencyInjectionCode)
             .ToString()
             .TrimEnd();
 
-        return ApplyContractTypeSuffix(output, settings);
+        return ApplyContractTypeSuffix(output, naming);
     }
 
     private static IReadOnlyList<GeneratedCode> FormatMultipleFiles(
         GenerationResult result,
         RefitGeneratorSettings settings,
+        ICodeGenerationConfiguration codeGeneration,
+        INamingConfiguration naming,
         OpenApiDocument document)
     {
         var generatedFiles = new List<GeneratedCode>(result.Interfaces);
 
-        if (settings.GenerateContracts)
+        if (codeGeneration.GenerateContracts)
         {
             generatedFiles.Add(new(TypenameConstants.Contracts, result.Contracts));
         }
@@ -87,7 +93,7 @@ internal sealed class RefitCodeGenerator
         {
             generatedFiles.Add(
                 new(
-                    JsonSerializerContextGenerator.GetContextTypeName(settings, document.Info?.Title),
+                    JsonSerializerContextGenerator.GetContextTypeName(naming, document.Info?.Title),
                     result.SerializerContext));
         }
 
@@ -99,12 +105,12 @@ internal sealed class RefitCodeGenerator
                     result.DependencyInjectionCode));
         }
 
-        return ApplyContractTypeSuffix(generatedFiles, settings);
+        return ApplyContractTypeSuffix(generatedFiles, naming);
     }
 
-    private static string ApplyContractTypeSuffix(string content, RefitGeneratorSettings settings)
+    private static string ApplyContractTypeSuffix(string content, INamingConfiguration naming)
     {
-        var contractTypeSuffix = settings.ContractTypeSuffix;
+        var contractTypeSuffix = naming.ContractTypeSuffix;
         return contractTypeSuffix is not null && !string.IsNullOrWhiteSpace(contractTypeSuffix)
             ? ContractTypeSuffixApplier.ApplySuffix(content, contractTypeSuffix)
             : content;
@@ -112,9 +118,9 @@ internal sealed class RefitCodeGenerator
 
     private static IReadOnlyList<GeneratedCode> ApplyContractTypeSuffix(
         IReadOnlyList<GeneratedCode> generatedFiles,
-        RefitGeneratorSettings settings)
+        INamingConfiguration naming)
     {
-        var contractTypeSuffix = settings.ContractTypeSuffix;
+        var contractTypeSuffix = naming.ContractTypeSuffix;
         return contractTypeSuffix is not null && !string.IsNullOrWhiteSpace(contractTypeSuffix)
             ? generatedFiles
                 .Select(
