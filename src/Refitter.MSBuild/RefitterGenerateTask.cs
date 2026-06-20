@@ -71,65 +71,28 @@ public class RefitterGenerateTask : MSBuildTask
         var settings = RefitterSettingsLoader.Load(json, baseDirectory);
         RefitterSettingsLoader.ApplyDefaults(filePath, settings);
 
-        var generator = RefitGenerator.CreateAsync(settings)
+        var writer = new MsBuildFileWriter();
+        IValidator? validator = SkipValidation
+            ? null
+            : new OpenApiValidatorAdapter();
+
+        var runner = new RefitterRunner();
+        var result = runner.RunAsync(
+                settings,
+                writer,
+                validator,
+                settingsFilePath: filePath,
+                outputPath: null,
+                CancellationToken.None)
             .GetAwaiter().GetResult();
 
-        var planner = new OutputPlannerAdapter();
-        var writer = new MsBuildFileWriter();
+        if (result.ExitCode != 0)
+            throw result.Exception ?? new InvalidOperationException(
+                result.Diagnostics.FirstOrDefault()?.Message ?? "Unknown error");
 
-        var generatedFiles = new List<string>();
-
-        if (settings.GenerateMultipleFiles)
-        {
-            var output = generator.GenerateMultipleFiles();
-            var plannedFiles = planner.Plan(
-                output,
-                settings,
-                filePath,
-                cliOutputPath: null);
-
-            foreach (var plannedFile in plannedFiles)
-            {
-                writer.WriteAsync(plannedFile).GetAwaiter().GetResult();
-                generatedFiles.Add(Path.GetFullPath(plannedFile.Path));
-            }
-        }
-        else
-        {
-            var code = generator.Generate().Replace("\r\n", "\n");
-            var output = new GeneratorOutput(
-                new List<GeneratedCode> { new(string.Empty, code) });
-
-            var plannedFiles = planner.Plan(
-                output,
-                settings,
-                filePath,
-                cliOutputPath: null);
-
-            writer.WriteAsync(plannedFiles[0]).GetAwaiter().GetResult();
-            generatedFiles.Add(Path.GetFullPath(plannedFiles[0].Path));
-        }
-
-        if (!SkipValidation)
-        {
-            var openApiPaths = settings.OpenApiPaths is { Length: > 0 }
-                ? settings.OpenApiPaths
-                : settings.OpenApiPath is not null
-                    ? [settings.OpenApiPath]
-                    : [];
-
-            foreach (var specPath in openApiPaths)
-            {
-                if (!string.IsNullOrWhiteSpace(specPath))
-                {
-                    var validationResult = OpenApiValidator.Validate(specPath)
-                        .GetAwaiter().GetResult();
-                    validationResult.ThrowIfInvalid();
-                }
-            }
-        }
-
-        return generatedFiles;
+        return result.GeneratedFiles
+            .Select(f => Path.GetFullPath(f.Path))
+            .ToList();
     }
 
     internal static string[] FilterFiles(string[] files, string includePatterns, string projectFileDirectory)
