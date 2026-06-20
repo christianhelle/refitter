@@ -13,6 +13,9 @@ internal sealed class DocumentLoader : IDocumentLoader
 
     public DocumentLoader(IEnumerable<IDocumentLoadingStrategy> strategies)
     {
+        if (strategies == null)
+            throw new ArgumentNullException(nameof(strategies), "strategies cannot be null");
+
         this.strategies = strategies.ToList();
     }
 
@@ -44,6 +47,9 @@ internal sealed class DocumentLoader : IDocumentLoader
             }
             catch (Exception ex)
             {
+                if (ex is OperationCanceledException or TaskCanceledException)
+                    throw;
+
                 errors.Add($"{strategy.GetType().Name}: {ex.Message}");
             }
         }

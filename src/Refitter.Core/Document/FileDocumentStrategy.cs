@@ -20,8 +20,11 @@ internal sealed class FileDocumentStrategy : IDocumentLoadingStrategy
                 ? await OpenApiYamlDocument.FromFileAsync(path, cancellationToken).ConfigureAwait(false)
                 : await OpenApiDocument.FromFileAsync(path, cancellationToken).ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex)
         {
+            if (ex is OperationCanceledException or TaskCanceledException)
+                throw;
+
             return null;
         }
     }

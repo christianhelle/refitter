@@ -21,7 +21,7 @@ internal static class PathUtilities
 
         var basePath = endIndex < path.Length ? path.Substring(0, endIndex) : path;
 
-        return basePath.EndsWith("yaml", StringComparison.OrdinalIgnoreCase) ||
-               basePath.EndsWith("yml", StringComparison.OrdinalIgnoreCase);
+        return basePath.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase) ||
+               basePath.EndsWith(".yml", StringComparison.OrdinalIgnoreCase);
     }
 }

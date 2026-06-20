@@ -100,7 +100,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
 
             var outputPath = GetOutputPath(file.Path, settings);
             var planned = new PlannedFile(outputPath, refit);
-            WriteGeneratedFile(planned, diagnostics);
+            WriteGeneratedFile(planned, diagnostics, cancellationToken);
 
             return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), outputPath);
         }
@@ -121,12 +121,12 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             return Path.Combine(folder, filename);
         }
 
-        static void WriteGeneratedFile(PlannedFile planned, List<GeneratedDiagnostic> diagnostics)
+        static void WriteGeneratedFile(PlannedFile planned, List<GeneratedDiagnostic> diagnostics, CancellationToken cancellationToken)
         {
             try
             {
                 var writer = new SourceGeneratorFileWriter();
-                writer.WriteAsync(planned).GetAwaiter().GetResult();
+                writer.WriteAsync(planned, cancellationToken).GetAwaiter().GetResult();
                 diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(planned.Path));
             }
             catch (Exception e)

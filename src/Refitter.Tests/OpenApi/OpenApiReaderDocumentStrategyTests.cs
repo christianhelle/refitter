@@ -75,6 +75,8 @@ public class OpenApiReaderDocumentStrategyTests
 
         result.Should().NotBeNull();
         result!.Info.Title.Should().Be("External Ref Test");
+
+        Directory.Delete(folder, true);
     }
 
     [Test]
@@ -118,6 +120,8 @@ paths:
 
         result.Should().NotBeNull();
         result!.Info.Title.Should().Be("YAML External Ref Test");
+
+        Directory.Delete(folder, true);
     }
 
     [Test]

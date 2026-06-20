@@ -29,7 +29,7 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var response = await httpClient
+            using var response = await httpClient
                 .GetAsync(path, cancellationToken)
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
@@ -43,8 +43,11 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
                 : await OpenApiDocument.FromJsonAsync(content, cancellationToken)
                     .ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex)
         {
+            if (ex is OperationCanceledException or TaskCanceledException)
+                throw;
+
             return null;
         }
     }
