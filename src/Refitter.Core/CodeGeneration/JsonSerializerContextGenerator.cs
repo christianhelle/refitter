@@ -14,20 +14,20 @@ internal static class JsonSerializerContextGenerator
     /// Generates a JsonSerializerContext class with all DTO types registered for source generation
     /// </summary>
     /// <param name="contracts">The generated contracts code containing the DTO types</param>
-    /// <param name="settings">The generator settings</param>
+    /// <param name="namingConfiguration">The naming configuration</param>
     /// <param name="documentTitle">The OpenAPI document title used to derive the context class name when UseOpenApiTitle is enabled</param>
     /// <returns>The generated JsonSerializerContext code</returns>
-    public static string Generate(string contracts, RefitGeneratorSettings settings, string? documentTitle = null)
+    public static string Generate(string contracts, INamingConfiguration namingConfiguration, string? documentTitle = null)
     {
         if (string.IsNullOrWhiteSpace(contracts))
             return string.Empty;
 
-        var contextNamespace = settings.ContractsNamespace ?? settings.Namespace;
+        var contextNamespace = namingConfiguration.ContractsNamespace ?? namingConfiguration.Namespace;
         var typeNames = ExtractTypeNames(contracts, contextNamespace);
         if (typeNames.Count == 0)
             return string.Empty;
 
-        var contextName = GetContextTypeName(settings, documentTitle);
+        var contextName = GetContextTypeName(namingConfiguration, documentTitle);
         var sb = new StringBuilder();
 
         sb.AppendLine($"namespace {contextNamespace}");
@@ -51,20 +51,20 @@ internal static class JsonSerializerContextGenerator
     /// <summary>
     /// Gets the generated JsonSerializerContext type name.
     /// </summary>
-    /// <param name="settings">The generator settings</param>
+    /// <param name="namingConfiguration">The naming configuration</param>
     /// <param name="documentTitle">The OpenAPI document title used when UseOpenApiTitle is enabled</param>
-    public static string GetContextTypeName(RefitGeneratorSettings settings, string? documentTitle = null)
+    public static string GetContextTypeName(INamingConfiguration namingConfiguration, string? documentTitle = null)
     {
         string interfaceName;
 
-        if (settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(documentTitle))
+        if (namingConfiguration.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(documentTitle))
         {
             // Derive from the OpenAPI title, matching how the Refit interface name is derived
             interfaceName = documentTitle!.Sanitize().CapitalizeFirstCharacter();
         }
         else
         {
-            interfaceName = settings.Naming.InterfaceName;
+            interfaceName = namingConfiguration.Naming.InterfaceName;
             if (string.IsNullOrWhiteSpace(interfaceName))
             {
                 interfaceName = NamingSettings.DefaultInterfaceName;

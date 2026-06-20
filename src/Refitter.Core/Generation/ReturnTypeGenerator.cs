@@ -4,7 +4,7 @@ using NSwag;
 namespace Refitter.Core;
 
 internal class ReturnTypeGenerator(
-    RefitGeneratorSettings settings,
+    ICodeGenerationConfiguration codeGeneration,
     CustomCSharpClientGenerator generator)
     : IReturnTypeGenerator
 {
@@ -20,7 +20,7 @@ internal class ReturnTypeGenerator(
 
     public string Generate(OpenApiOperation operation)
     {
-        if (settings.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
+        if (codeGeneration.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
         {
             return type is null or "void"
                 ? GetAsyncOperationType(true)
@@ -105,12 +105,12 @@ internal class ReturnTypeGenerator(
         var schema = operation.Responses[code].ActualResponse.Schema;
         var typeName = generator.GetTypeName(schema, false, null);
 
-        if (!string.IsNullOrWhiteSpace(settings.CodeGeneratorSettings?.ArrayType) &&
+        if (!string.IsNullOrWhiteSpace(codeGeneration.CodeGeneratorSettings?.ArrayType) &&
             schema?.Type == NJsonSchema.JsonObjectType.Array)
         {
             typeName = typeName
-                .Replace("ICollection", settings.CodeGeneratorSettings!.ArrayType)
-                .Replace("IEnumerable", settings.CodeGeneratorSettings!.ArrayType);
+                .Replace("ICollection", codeGeneration.CodeGeneratorSettings!.ArrayType)
+                .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings!.ArrayType);
         }
 
         return typeName;
@@ -126,7 +126,7 @@ internal class ReturnTypeGenerator(
     private string GetDefaultReturnType()
     {
         var asyncType = GetAsyncOperationType(true);
-        return settings.ReturnIApiResponse
+        return codeGeneration.ReturnIApiResponse
             ? $"{asyncType}<IApiResponse>"
             : asyncType;
     }
@@ -134,7 +134,7 @@ internal class ReturnTypeGenerator(
     private string GetConfiguredReturnType(string returnTypeParameter)
     {
         var asyncType = GetAsyncOperationType(false);
-        return settings.ReturnIApiResponse
+        return codeGeneration.ReturnIApiResponse
             ? $"{asyncType}<IApiResponse<{TrimImportedNamespaces(returnTypeParameter)}>>"
             : $"{asyncType}<{TrimImportedNamespaces(returnTypeParameter)}>";
     }
@@ -142,7 +142,7 @@ internal class ReturnTypeGenerator(
     private string GetAsyncOperationType(bool withVoidReturnType)
     {
         var type = withVoidReturnType ? "<Unit>" : string.Empty;
-        return settings.ReturnIObservable
+        return codeGeneration.ReturnIObservable
             ? "IObservable" + type
             : "Task";
     }
