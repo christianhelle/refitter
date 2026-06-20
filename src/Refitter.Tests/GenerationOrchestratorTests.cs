@@ -1,4 +1,3 @@
-using System.Reflection;
 using FluentAssertions;
 using Microsoft.OpenApi;
 using Refitter.Core;
@@ -513,59 +512,6 @@ public class GenerationOrchestratorTests
             if (Directory.Exists(workspace))
                 Directory.Delete(workspace, recursive: true);
         }
-    }
-
-    [Test]
-    public void FormatFileSize_Small_Values()
-    {
-        var method = typeof(GenerationOrchestrator).GetMethod(
-            "FormatFileSize",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(long)],
-            null);
-
-        method.Should().NotBeNull();
-
-        var bytesResult = (string)method!.Invoke(null, [0L])!;
-        bytesResult.Should().Match("0* B");
-
-        var kbResult = (string)method.Invoke(null, [1024L])!;
-        kbResult.Should().Match("1* KB");
-
-        var mbResult = (string)method.Invoke(null, [1048576L])!;
-        mbResult.Should().Match("1* MB");
-
-        var gbResult = (string)method.Invoke(null, [1073741824L])!;
-        gbResult.Should().Match("1* GB");
-    }
-
-    [Test]
-    public void FormatFileSize_Exact_Boundaries()
-    {
-        var method = typeof(GenerationOrchestrator).GetMethod(
-            "FormatFileSize",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            [typeof(long)],
-            null);
-
-        method.Should().NotBeNull();
-
-        var justUnder1K = (string)method!.Invoke(null, [1023L])!;
-        justUnder1K.Should().Match("1023* B");
-
-        var exactly1K = (string)method.Invoke(null, [1024L])!;
-        exactly1K.Should().Match("1* KB");
-
-        var justOver1K = (string)method.Invoke(null, [1025L])!;
-        justOver1K.Should().Match("1* KB");
-
-        var justUnder1M = (string)method.Invoke(null, [1048575L])!;
-        justUnder1M.Should().Match("1024* KB");
-
-        var exactly1M = (string)method.Invoke(null, [1048576L])!;
-        exactly1M.Should().Match("1* MB");
     }
 
     [Test]

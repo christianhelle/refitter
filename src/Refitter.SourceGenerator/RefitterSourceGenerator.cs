@@ -86,21 +86,50 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             cancellationToken.ThrowIfCancellationRequested();
             ResolveRelativeSpecPaths(file.Path, settings);
 
-            if (settings.UseIsoDateFormat &&
-                settings.CodeGeneratorSettings?.DateFormat is not null)
+            if (string.IsNullOrWhiteSpace(settings.OutputFilename))
             {
-                diagnostics.Add(CreateIsoDateFormatOverrideDiagnostic());
+                settings.OutputFilename = GetFileNameWithoutExtension(file.Path) + ".g.cs";
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            var generator = RefitGenerator.CreateAsync(settings).GetAwaiter().GetResult();
-            var refit = generator.Generate();
 
-            cancellationToken.ThrowIfCancellationRequested();
+            var runner = new RefitterRunner();
+            var result = runner.RunAsync(
+                    settings,
+                    writer: new SourceGeneratorFileWriter(),
+                    validator: null,
+                    settingsFilePath: file.Path,
+                    cancellationToken: cancellationToken)
+                .GetAwaiter()
+                .GetResult();
 
-            var outputPath = GetOutputPath(file.Path, settings);
-            var planned = new PlannedFile(outputPath, refit);
-            WriteGeneratedFile(planned, diagnostics, cancellationToken);
+            foreach (var warning in result.Warnings)
+            {
+                if (warning.Title == "Date Format Override")
+                {
+                    diagnostics.Add(CreateIsoDateFormatOverrideDiagnostic());
+                }
+            }
+
+            foreach (var diagnostic in result.Diagnostics)
+            {
+                if (diagnostic.IsError)
+                {
+                    diagnostics.Add(CreateErrorDiagnostic(diagnostic.Message));
+                }
+            }
+
+            if (result.Exception is null)
+            {
+                foreach (var plannedFile in result.GeneratedFiles)
+                {
+                    diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(plannedFile.Path));
+                }
+            }
+
+            var outputPath = result.GeneratedFiles.Count > 0
+                ? result.GeneratedFiles[0].Path
+                : null;
 
             return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), outputPath);
         }
@@ -109,30 +138,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to generate code: {e}"));
 
             return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
-        }
-
-        static string GetOutputPath(string refitterFilePath, RefitGeneratorSettings settings)
-        {
-            var directory = GetDirectoryName(refitterFilePath);
-            var folder = Path.Combine(directory, settings.OutputFolder);
-            var filename = !string.IsNullOrWhiteSpace(settings.OutputFilename)
-                ? settings.OutputFilename
-                : GetFileNameWithoutExtension(refitterFilePath) + ".g.cs";
-            return Path.Combine(folder, filename);
-        }
-
-        static void WriteGeneratedFile(PlannedFile planned, List<GeneratedDiagnostic> diagnostics, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var writer = new SourceGeneratorFileWriter();
-                writer.WriteAsync(planned, cancellationToken).GetAwaiter().GetResult();
-                diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(planned.Path));
-            }
-            catch (Exception e)
-            {
-                diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to write generated code: {e}"));
-            }
         }
     }
 
@@ -248,27 +253,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 diagnostic.Severity,
                 diagnostic.EnabledByDefault),
             Location.None);
-
-    private static string GetDirectoryName(string path)
-    {
-        var lastSep = path.LastIndexOfAny(new[] { '/', '\\' });
-        if (lastSep < 0)
-        {
-            return string.Empty;
-        }
-        else if (lastSep == 0)
-        {
-            return path.Substring(0, 1);
-        }
-        else if (lastSep == 2 && path.Length > 1 && path[1] == ':')
-        {
-            return path.Substring(0, lastSep + 1);
-        }
-        else
-        {
-            return path.Substring(0, lastSep);
-        }
-    }
 
     private static string GetFileNameWithoutExtension(string path)
     {
