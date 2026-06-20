@@ -146,8 +146,8 @@ public static class OutputPlanner
 
     /// <summary>
     /// Determines whether the specified output file should be rerouted to the contracts output folder.
-    /// Rerouting occurs when <see cref="RefitGeneratorSettings.ContractsOutputFolder"/> is set to a
-    /// non-default value and the file is the contract's file.
+    /// Rerouting occurs when <see cref="IOutputConfiguration.ContractsOutputFolder"/> differs from
+    /// the primary <see cref="IOutputConfiguration.OutputFolder"/> and the file is the contract's file.
     /// </summary>
     /// <param name="outputConfiguration">The output configuration.</param>
     /// <param name="outputFile">The generated code file to evaluate.</param>
@@ -156,7 +156,7 @@ public static class OutputPlanner
         IOutputConfiguration outputConfiguration,
         GeneratedCode outputFile) =>
         !string.IsNullOrWhiteSpace(outputConfiguration.ContractsOutputFolder)
-     && outputConfiguration.ContractsOutputFolder != RefitGeneratorSettings.DefaultOutputFolder
+     && outputConfiguration.ContractsOutputFolder != outputConfiguration.OutputFolder
      && outputFile.Filename == $"{TypenameConstants.Contracts}.cs";
 
     /// <summary>
