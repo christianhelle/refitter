@@ -7,6 +7,26 @@ namespace Refitter;
 
 public sealed class GenerationOrchestrator
 {
+    private readonly IOutputPlanner _planner;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GenerationOrchestrator"/> class
+    /// with the default <see cref="OutputPlannerAdapter"/>.
+    /// </summary>
+    public GenerationOrchestrator()
+        : this(new OutputPlannerAdapter())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GenerationOrchestrator"/> class.
+    /// </summary>
+    /// <param name="planner">The output planner to use for resolving file paths.</param>
+    public GenerationOrchestrator(IOutputPlanner planner)
+    {
+        _planner = planner ?? throw new ArgumentNullException(nameof(planner));
+    }
+
     public async Task<int> RunAsync(
         RefitGeneratorSettings generatorSettings,
         Settings cliSettings,
@@ -38,9 +58,11 @@ public sealed class GenerationOrchestrator
             if (!cliSettings.SkipValidation)
                 await ValidateOpenApiSpecs(generatorSettings, reporter, cancellationToken);
 
+            var writer = new CliFileWriter(reporter);
+
             await (generatorSettings.GenerateMultipleFiles
-                ? WriteMultipleFiles(generator, cliSettings, generatorSettings, reporter, cancellationToken)
-                : WriteSingleFile(generator, cliSettings, generatorSettings, reporter, cancellationToken));
+                ? WriteMultipleFiles(generator, cliSettings, generatorSettings, reporter, writer, cancellationToken)
+                : WriteSingleFile(generator, cliSettings, generatorSettings, reporter, writer, cancellationToken));
 
             Analytics.LogFeatureUsage(cliSettings, generatorSettings);
 
@@ -85,42 +107,44 @@ public sealed class GenerationOrchestrator
         }
     }
 
-    private static async Task WriteSingleFile(
+    private async Task WriteSingleFile(
         RefitGenerator generator,
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings,
         IGenerationReporter reporter,
+        IFileWriter writer,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         await reporter.ReportSingleFileGenerationProgressAsync(cancellationToken);
 
         var code = generator.Generate().ReplaceLineEndings();
-        var planned = OutputPlanner.PlanSingleFile(
-            settings.SettingsFilePath,
-            settings.OutputPath,
-            refitGeneratorSettings,
-            code);
+        var output = new GeneratorOutput(
+            new List<GeneratedCode> { new(string.Empty, code) });
 
-        var fileName = Path.GetFileName(planned.Path);
-        var directory = Path.GetDirectoryName(planned.Path) ?? string.Empty;
+        var planned = _planner.Plan(
+            output,
+            refitGeneratorSettings,
+            settings.SettingsFilePath,
+            settings.OutputPath);
+
+        var plannedFile = planned[0];
+        var fileName = Path.GetFileName(plannedFile.Path);
+        var directory = Path.GetDirectoryName(plannedFile.Path) ?? string.Empty;
         var sizeFormatted = FormatFileSize(code.Length);
         var lines = code.Split('\n').Length;
 
         reporter.ReportSingleFileOutput(fileName, directory, sizeFormatted, lines);
 
-        var dir = Path.GetDirectoryName(planned.Path);
-        if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-        await File.WriteAllTextAsync(planned.Path, planned.Content, cancellationToken);
-        reporter.ReportFileWritten(planned.Path);
+        await writer.WriteAsync(plannedFile, cancellationToken);
     }
 
-    private static async Task WriteMultipleFiles(
+    private async Task WriteMultipleFiles(
         RefitGenerator generator,
         Settings settings,
         RefitGeneratorSettings refitGeneratorSettings,
         IGenerationReporter reporter,
+        IFileWriter writer,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -128,11 +152,11 @@ public sealed class GenerationOrchestrator
             generator.GenerateMultipleFiles,
             cancellationToken);
 
-        var planned = OutputPlanner.PlanMultipleFiles(
-            settings.SettingsFilePath,
-            settings.OutputPath,
+        var planned = _planner.Plan(
+            generatorOutput,
             refitGeneratorSettings,
-            generatorOutput);
+            settings.SettingsFilePath,
+            settings.OutputPath);
 
         var totalSize = 0L;
         var totalLines = 0;
@@ -152,12 +176,8 @@ public sealed class GenerationOrchestrator
             totalSize += size;
             totalLines += lines;
 
-            var plannedDir = Path.GetDirectoryName(plannedFile.Path);
-            if (!string.IsNullOrWhiteSpace(plannedDir) && !Directory.Exists(plannedDir))
-                Directory.CreateDirectory(plannedDir);
             cancellationToken.ThrowIfCancellationRequested();
-            await File.WriteAllTextAsync(plannedFile.Path, plannedFile.Content, cancellationToken);
-            reporter.ReportFileWritten(plannedFile.Path);
+            await writer.WriteAsync(plannedFile, cancellationToken);
         }
 
         report.Complete(generatorOutput.Files.Count, FormatFileSize(totalSize), totalLines);
