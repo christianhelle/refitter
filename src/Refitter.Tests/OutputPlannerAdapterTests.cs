@@ -6,7 +6,7 @@ namespace Refitter.Tests;
 
 public class OutputPlannerAdapterTests
 {
-    private static readonly IOutputPlanner Planner = new OutputPlannerAdapter();
+    private static readonly IOutputPlanner planner = new OutputPlannerAdapter();
 
     [Test]
     public void Plan_SingleFile_DirectCli_Explicit_Output_Is_Used()
@@ -23,7 +23,7 @@ public class OutputPlannerAdapterTests
             new("GeneratedType", "// code")
         });
 
-        var planned = Planner.Plan(
+        var planned = planner.Plan(
             output,
             config,
             settingsFilePath: null,
@@ -49,7 +49,7 @@ public class OutputPlannerAdapterTests
             new("GeneratedType", "// code")
         });
 
-        var planned = Planner.Plan(
+        var planned = planner.Plan(
             output,
             config,
             settingsFilePath: null,
@@ -76,7 +76,7 @@ public class OutputPlannerAdapterTests
             new("GeneratedType", "// code")
         });
 
-        var planned = Planner.Plan(
+        var planned = planner.Plan(
             output,
             config,
             settingsFilePath,
@@ -102,7 +102,7 @@ public class OutputPlannerAdapterTests
             new("RefitInterfaces", "// interfaces"),
         });
 
-        var planned = Planner.Plan(
+        var planned = planner.Plan(
             output,
             config,
             settingsFilePath: null,
@@ -128,7 +128,7 @@ public class OutputPlannerAdapterTests
             new("RefitInterfaces", "// interfaces"),
         });
 
-        var planned = Planner.Plan(
+        var planned = planner.Plan(
             output,
             config,
             settingsFilePath,
@@ -157,7 +157,7 @@ public class OutputPlannerAdapterTests
             new(TypenameConstants.Contracts, "// contracts"),
         });
 
-        var planned = Planner.Plan(
+        var planned = planner.Plan(
             output,
             config,
             settingsFilePath,
@@ -185,7 +185,7 @@ public class OutputPlannerAdapterTests
             new("Interface2", "// content 2"),
         });
 
-        var planned = Planner.Plan(
+        var planned = planner.Plan(
             output,
             config,
             settingsFilePath: null,
