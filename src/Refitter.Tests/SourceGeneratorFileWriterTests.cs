@@ -47,11 +47,18 @@ public class SourceGeneratorFileWriterTests
             var filePath = Path.Combine(workspace, "Output.g.cs");
             await File.WriteAllTextAsync(filePath, "// original content");
 
+            // Capture the timestamp after initial write
+            var originalTimestamp = File.GetLastWriteTimeUtc(filePath);
+
             var writer = new SourceGeneratorFileWriter();
             var planned = new PlannedFile(filePath, "// original content");
 
             // This should NOT write because content is the same
             await writer.WriteAsync(planned, default);
+
+            // Verify timestamp hasn't changed (proving no write occurred)
+            var currentTimestamp = File.GetLastWriteTimeUtc(filePath);
+            currentTimestamp.Should().Be(originalTimestamp);
 
             // File should still exist with original content
             File.Exists(filePath).Should().BeTrue();
