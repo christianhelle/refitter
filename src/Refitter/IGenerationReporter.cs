@@ -65,15 +65,6 @@ public interface IGenerationReporter
 }
 
 /// <summary>
-/// A user-facing warning message, emitted during configuration validation
-/// </summary>
-/// <param name="Title">Title of the warning</param>
-/// <param name="Description">Extended description</param>
-public record Warning(
-    string Title,
-    string Description);
-
-/// <summary>
 /// Stateful sub-report for the multi-file output listing. The simple reporter
 /// prints each row as it is added (interleaved with file writes); the rich
 /// reporter buffers rows into a table rendered on <see cref="Complete"/>.

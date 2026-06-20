@@ -7,8 +7,22 @@ using Refitter.Core.Validation;
 
 namespace Refitter.Core;
 
+/// <summary>
+/// Encapsulates the shared generation workflow across all distribution forms (CLI, MSBuild, Source Generator).
+/// Handles generator creation, code generation, output planning, validation, warning detection, and file writing.
+/// </summary>
 public class RefitterRunner
 {
+    /// <summary>
+    /// Runs the complete generation workflow.
+    /// </summary>
+    /// <param name="settings">The generator settings.</param>
+    /// <param name="writer">Optional file writer for writing output files. When null, files are not written.</param>
+    /// <param name="validator">Optional validator for OpenAPI spec validation. When null, validation is skipped.</param>
+    /// <param name="settingsFilePath">Optional path to the .refitter settings file, used for resolving relative output paths.</param>
+    /// <param name="outputPath">Optional CLI output path override.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>A <see cref="RunResult"/> containing generated files, warnings, diagnostics, and the exit code.</returns>
     public async Task<RunResult> RunAsync(
         RefitGeneratorSettings settings,
         IFileWriter? writer = null,
@@ -127,6 +141,9 @@ public class RefitterRunner
         return Array.Empty<string>();
     }
 
+    /// <summary>
+    /// Detects configuration warnings in the settings and adds them to the provided list.
+    /// </summary>
     internal static void DetectWarnings(
         RefitGeneratorSettings settings,
         List<Warning> warnings)
