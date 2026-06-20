@@ -1,7 +1,5 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Text;
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 using Refitter.Core;
@@ -101,7 +99,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             cancellationToken.ThrowIfCancellationRequested();
 
             var outputPath = GetOutputPath(file.Path, settings);
-            WriteGeneratedFile(outputPath, refit, diagnostics);
+            var planned = new PlannedFile(outputPath, refit);
+            WriteGeneratedFile(planned, diagnostics, cancellationToken);
 
             return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), outputPath);
         }
@@ -122,23 +121,13 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             return Path.Combine(folder, filename);
         }
 
-        static void WriteGeneratedFile(string outputPath, string content, List<GeneratedDiagnostic> diagnostics)
+        static void WriteGeneratedFile(PlannedFile planned, List<GeneratedDiagnostic> diagnostics, CancellationToken cancellationToken)
         {
             try
             {
-                var folder = Path.GetDirectoryName(outputPath);
-                if (!string.IsNullOrEmpty(folder) && !Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-
-                var existingContent = File.Exists(outputPath) ? File.ReadAllText(outputPath, Encoding.UTF8) : null;
-                if (existingContent == null || !existingContent.Equals(content, StringComparison.Ordinal))
-                {
-                    File.WriteAllText(outputPath, content, Encoding.UTF8);
-                }
-
-                diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(outputPath));
+                var writer = new SourceGeneratorFileWriter();
+                writer.WriteAsync(planned, cancellationToken).GetAwaiter().GetResult();
+                diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(planned.Path));
             }
             catch (Exception e)
             {

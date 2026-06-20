@@ -74,41 +74,40 @@ public class RefitterGenerateTask : MSBuildTask
         var generator = RefitGenerator.CreateAsync(settings)
             .GetAwaiter().GetResult();
 
+        var planner = new OutputPlannerAdapter();
+        var writer = new MsBuildFileWriter();
+
         var generatedFiles = new List<string>();
 
         if (settings.GenerateMultipleFiles)
         {
             var output = generator.GenerateMultipleFiles();
-            foreach (var outputFile in output.Files)
+            var plannedFiles = planner.Plan(
+                output,
+                settings,
+                filePath,
+                cliOutputPath: null);
+
+            foreach (var plannedFile in plannedFiles)
             {
-                var outputPath = OutputPlanner.GetMultiFileOutputPath(
-                    filePath,
-                    cliOutputPath: null,
-                    settings,
-                    outputFile);
-
-                var dir = Path.GetDirectoryName(outputPath);
-                if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
-
-                File.WriteAllText(outputPath, outputFile.Content);
-                generatedFiles.Add(Path.GetFullPath(outputPath));
+                writer.WriteAsync(plannedFile).GetAwaiter().GetResult();
+                generatedFiles.Add(Path.GetFullPath(plannedFile.Path));
             }
         }
         else
         {
             var code = generator.Generate().Replace("\r\n", "\n");
-            var outputPath = OutputPlanner.GetSingleFileOutputPath(
+            var output = new GeneratorOutput(
+                new List<GeneratedCode> { new(string.Empty, code) });
+
+            var plannedFiles = planner.Plan(
+                output,
+                settings,
                 filePath,
-                cliOutputPath: null,
-                settings);
+                cliOutputPath: null);
 
-            var dir = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            File.WriteAllText(outputPath, code);
-            generatedFiles.Add(Path.GetFullPath(outputPath));
+            writer.WriteAsync(plannedFiles[0]).GetAwaiter().GetResult();
+            generatedFiles.Add(Path.GetFullPath(plannedFiles[0].Path));
         }
 
         if (!SkipValidation)
