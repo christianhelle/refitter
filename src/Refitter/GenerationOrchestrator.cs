@@ -128,11 +128,14 @@ public sealed class GenerationOrchestrator
             settings.SettingsFilePath,
             settings.OutputPath);
 
+        if (planned == null || planned.Count == 0)
+            throw new InvalidOperationException("Output planner did not return any planned files.");
+
         var plannedFile = planned[0];
         var fileName = Path.GetFileName(plannedFile.Path);
         var directory = Path.GetDirectoryName(plannedFile.Path) ?? string.Empty;
-        var sizeFormatted = FormatFileSize(code.Length);
-        var lines = code.Split('\n').Length;
+        var sizeFormatted = FormatFileSize(plannedFile.Content.Length);
+        var lines = plannedFile.Content.Split('\n').Length;
 
         reporter.ReportSingleFileOutput(fileName, directory, sizeFormatted, lines);
 
@@ -157,6 +160,9 @@ public sealed class GenerationOrchestrator
             refitGeneratorSettings,
             settings.SettingsFilePath,
             settings.OutputPath);
+
+        if (planned == null || planned.Count != generatorOutput.Files.Count)
+            throw new InvalidOperationException($"Output planner returned {planned?.Count ?? 0} planned files but expected {generatorOutput.Files.Count}.");
 
         var totalSize = 0L;
         var totalLines = 0;
