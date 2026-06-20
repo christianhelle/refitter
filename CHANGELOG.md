@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Extract RefitterRunner as shared generation workflow [\#1166](https://github.com/christianhelle/refitter/pull/1166) ([christianhelle](https://github.com/christianhelle))
 - Strategy pattern for document loading [\#1165](https://github.com/christianhelle/refitter/pull/1165) ([christianhelle](https://github.com/christianhelle))
 - Separate output planning from writing [\#1164](https://github.com/christianhelle/refitter/pull/1164) ([christianhelle](https://github.com/christianhelle))
 - Introduce configuration interfaces and refactor generator dependencies [\#1163](https://github.com/christianhelle/refitter/pull/1163) ([christianhelle](https://github.com/christianhelle))
