@@ -41,19 +41,7 @@ public class RefitterRunner
                 settings,
                 cancellationToken);
 
-            GeneratorOutput output;
-            if (settings.GenerateMultipleFiles)
-            {
-                output = generator.GenerateMultipleFiles();
-            }
-            else
-            {
-                var code = generator.Generate()
-                    .Replace("\r\n", "\n")
-                    .Replace("\r", "\n");
-                output = new GeneratorOutput(
-                    new List<GeneratedCode> { new(string.Empty, code) });
-            }
+            var output = GenerateCode(generator, settings);
 
             var planner = new OutputPlannerAdapter();
             var plannedFiles = planner.Plan(
@@ -64,43 +52,21 @@ public class RefitterRunner
 
             if (validator != null)
             {
-                var openApiPaths = GetOpenApiPaths(settings);
-                foreach (var specPath in openApiPaths)
-                {
-                    if (!string.IsNullOrWhiteSpace(specPath))
-                    {
-                        var validationResult = await validator.ValidateAsync(
-                            specPath,
-                            cancellationToken);
-
-                        foreach (var error in validationResult.Diagnostics.Errors)
-                            diagnostics.Add(new RunnerDiagnostic(error.Message, IsError: true));
-
-                        foreach (var warning in validationResult.Diagnostics.Warnings)
-                            diagnostics.Add(new RunnerDiagnostic(warning.Message, IsError: false));
-
-                        validationResult.ThrowIfInvalid();
-                    }
-                }
+                await ValidateOpenApiSpecsAsync(
+                    settings,
+                    validator,
+                    diagnostics,
+                    cancellationToken);
             }
 
             if (writer != null)
             {
-                foreach (var file in plannedFiles)
-                {
-                    await writer.WriteAsync(file, cancellationToken);
-                }
+                await WriteFilesAsync(plannedFiles, writer, cancellationToken);
             }
 
             DetectWarnings(settings, warnings);
 
-            if (settings.IncludePathMatches.Length > 0 &&
-                generator.OpenApiDocument.Paths.Count == 0)
-            {
-                diagnostics.Add(new RunnerDiagnostic(
-                    $"All paths were filtered out by include path patterns: [{string.Join(", ", settings.IncludePathMatches)}]",
-                    IsError: false));
-            }
+            DetectPathFilteringDiagnostics(settings, generator, diagnostics);
 
             stopwatch.Stop();
 
@@ -127,6 +93,73 @@ public class RefitterRunner
                 stopwatch.Elapsed,
                 ex.HResult,
                 ex);
+        }
+    }
+
+    private static GeneratorOutput GenerateCode(RefitGenerator generator, RefitGeneratorSettings settings)
+    {
+        if (settings.GenerateMultipleFiles)
+        {
+            return generator.GenerateMultipleFiles();
+        }
+        else
+        {
+            var code = generator.Generate()
+                .Replace("\r\n", "\n")
+                .Replace("\n", "\r\n");
+            return new GeneratorOutput(
+                new List<GeneratedCode> { new(string.Empty, code) });
+        }
+    }
+
+    private static async Task ValidateOpenApiSpecsAsync(
+        RefitGeneratorSettings settings,
+        IValidator validator,
+        List<RunnerDiagnostic> diagnostics,
+        CancellationToken cancellationToken)
+    {
+        var openApiPaths = GetOpenApiPaths(settings);
+        foreach (var specPath in openApiPaths)
+        {
+            if (!string.IsNullOrWhiteSpace(specPath))
+            {
+                var validationResult = await validator.ValidateAsync(
+                    specPath,
+                    cancellationToken);
+
+                foreach (var error in validationResult.Diagnostics.Errors)
+                    diagnostics.Add(new RunnerDiagnostic(error.Message, IsError: true));
+
+                foreach (var warning in validationResult.Diagnostics.Warnings)
+                    diagnostics.Add(new RunnerDiagnostic(warning.Message, IsError: false));
+
+                validationResult.ThrowIfInvalid();
+            }
+        }
+    }
+
+    private static async Task WriteFilesAsync(
+        IReadOnlyList<PlannedFile> plannedFiles,
+        IFileWriter writer,
+        CancellationToken cancellationToken)
+    {
+        foreach (var file in plannedFiles)
+        {
+            await writer.WriteAsync(file, cancellationToken);
+        }
+    }
+
+    private static void DetectPathFilteringDiagnostics(
+        RefitGeneratorSettings settings,
+        RefitGenerator generator,
+        List<RunnerDiagnostic> diagnostics)
+    {
+        if (settings.IncludePathMatches.Length > 0 &&
+            generator.OpenApiDocument.Paths.Count == 0)
+        {
+            diagnostics.Add(new RunnerDiagnostic(
+                $"All paths were filtered out by include path patterns: [{string.Join(", ", settings.IncludePathMatches)}]",
+                IsError: false));
         }
     }
 

@@ -363,7 +363,7 @@ public class RefitterRunnerTests
     {
         var settings = new RefitGeneratorSettings
         {
-            OpenApiPath = "C:\\nonexistent\\spec.json",
+            OpenApiPath = Path.Combine(Path.GetTempPath(), "nonexistent", "spec.json"),
             Namespace = "TestNamespace",
             GenerateContracts = false,
             GenerateClients = true,
