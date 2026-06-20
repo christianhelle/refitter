@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Refitter.Core.Validation;
@@ -112,7 +111,8 @@ public class RefitterRunner
                 warnings.AsReadOnly(),
                 errorDiagnostics.AsReadOnly(),
                 stopwatch.Elapsed,
-                ex.HResult);
+                ex.HResult,
+                ex);
         }
     }
 

@@ -8,4 +8,5 @@ public record RunResult(
     IReadOnlyList<Warning> Warnings,
     IReadOnlyList<RunnerDiagnostic> Diagnostics,
     TimeSpan Elapsed,
-    int ExitCode);
+    int ExitCode,
+    Exception? Exception = null);
