@@ -696,6 +696,64 @@ public class IdentifierCorrectnessTests
 
     #endregion
 
+    #region Optional Parameter Identifier Reordering (Swagger 2.0)
+
+    private const string SpecWithUnsanitizedParameterName_Swagger2 = """
+        {
+          "swagger": "2.0",
+          "info": {
+            "title": "Test API",
+            "version": "1.0.0"
+          },
+          "host": "localhost",
+          "basePath": "/",
+          "paths": {
+            "/test": {
+              "get": {
+                "operationId": "TestMethod",
+                "parameters": [
+                  {
+                    "name": "filter#tag",
+                    "in": "query",
+                    "required": false,
+                    "type": "string",
+                    "default": "abc"
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Success"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Optional_Parameter_With_Unsanitized_Name_Falls_Back_To_Sanitized_Variable_Name_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            SpecWithUnsanitizedParameterName_Swagger2,
+            optionalParameters: true);
+
+        generatedCode.Should().Contain("filter_tag");
+        generatedCode.Should().Contain("\"abc\"");
+    }
+
+    [Test]
+    public async Task Generated_Code_With_Unsanitized_Parameter_Name_Compiles_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            SpecWithUnsanitizedParameterName_Swagger2,
+            optionalParameters: true);
+
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    #endregion
+
     #region Issue #1037 - Empty Namespace List Crash
 
     [Test]
