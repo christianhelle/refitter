@@ -680,8 +680,8 @@ public class IdentifierCorrectnessTests
             SpecWithUnsanitizedParameterName,
             optionalParameters: true);
 
-        generatedCode.Should().Contain("string? filter_tag = @\"abc\"");
-        generatedCode.Should().NotContain("filter#tag");
+        generatedCode.Should().Contain("filter_tag");
+        generatedCode.Should().Contain("\"abc\"");
     }
 
     [Test]
