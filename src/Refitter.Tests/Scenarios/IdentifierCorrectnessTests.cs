@@ -1,9 +1,4 @@
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using FluentAssertions;
-using NJsonSchema;
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
@@ -645,42 +640,116 @@ public class IdentifierCorrectnessTests
 
     #region Optional Parameter Identifier Reordering
 
-    [Test]
-    public void GetDefaultValueForParameter_Uses_Sanitized_Variable_Name_Fallback()
-    {
-        var openApiParameter = new OpenApiParameter
+    private const string SpecWithUnsanitizedParameterName = """
         {
-            Name = "class",
-            Kind = OpenApiParameterKind.Query,
-            IsRequired = false,
-            Schema = new JsonSchema
-            {
-                Type = JsonObjectType.String,
-                Default = "abc"
+          "openapi": "3.0.1",
+          "info": {
+            "title": "Test API",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/test": {
+              "get": {
+                "operationId": "TestMethod",
+                "parameters": [
+                  {
+                    "name": "filter#tag",
+                    "in": "query",
+                    "required": false,
+                    "schema": {
+                      "type": "string",
+                      "default": "abc"
+                    }
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Success"
+                  }
+                }
+              }
             }
-        };
+          }
+        }
+        """;
 
-        var parameterModel = (CSharpParameterModel)RuntimeHelpers.GetUninitializedObject(typeof(CSharpParameterModel));
-        var baseType = typeof(CSharpParameterModel).BaseType!;
+    [Test]
+    public async Task Optional_Parameter_With_Unsanitized_Name_Falls_Back_To_Sanitized_Variable_Name()
+    {
+        var generatedCode = await GenerateCode(
+            SpecWithUnsanitizedParameterName,
+            optionalParameters: true);
 
-        baseType
-            .GetField("<Type>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .SetValue(parameterModel, "string");
-        baseType
-            .GetField("<Name>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .SetValue(parameterModel, "class");
-        baseType
-            .GetField("<VariableName>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .SetValue(parameterModel, "class");
-        baseType
-            .GetField("_parameter", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .SetValue(parameterModel, openApiParameter);
+        generatedCode.Should().Contain("filter_tag");
+        generatedCode.Should().Contain("\"abc\"");
+    }
 
-        var result = ParameterShared.GetDefaultValueForParameter(
-            "string? @class",
-            new List<CSharpParameterModel> { parameterModel });
+    [Test]
+    public async Task Generated_Code_With_Unsanitized_Parameter_Name_Compiles()
+    {
+        var generatedCode = await GenerateCode(
+            SpecWithUnsanitizedParameterName,
+            optionalParameters: true);
 
-        result.Should().Be("\"abc\"");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    #endregion
+
+    #region Optional Parameter Identifier Reordering (Swagger 2.0)
+
+    private const string SpecWithUnsanitizedParameterName_Swagger2 = """
+        {
+          "swagger": "2.0",
+          "info": {
+            "title": "Test API",
+            "version": "1.0.0"
+          },
+          "host": "localhost",
+          "basePath": "/",
+          "paths": {
+            "/test": {
+              "get": {
+                "operationId": "TestMethod",
+                "parameters": [
+                  {
+                    "name": "filter#tag",
+                    "in": "query",
+                    "required": false,
+                    "type": "string",
+                    "default": "abc"
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Success"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Optional_Parameter_With_Unsanitized_Name_Falls_Back_To_Sanitized_Variable_Name_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            SpecWithUnsanitizedParameterName_Swagger2,
+            optionalParameters: true);
+
+        generatedCode.Should().Contain("filter_tag");
+        generatedCode.Should().Contain("\"abc\"");
+    }
+
+    [Test]
+    public async Task Generated_Code_With_Unsanitized_Parameter_Name_Compiles_Swagger2()
+    {
+        var generatedCode = await GenerateCode(
+            SpecWithUnsanitizedParameterName_Swagger2,
+            optionalParameters: true);
+
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
     #endregion

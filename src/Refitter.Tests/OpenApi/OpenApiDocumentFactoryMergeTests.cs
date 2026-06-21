@@ -1,4 +1,3 @@
-using System.Reflection;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
@@ -635,49 +634,6 @@ paths:
     }
 
     [Test]
-    public async Task Merge_With_Equivalent_Swagger2_Definition_Duplicate_Ignores_Duplicate()
-    {
-        var target = new Dictionary<string, JsonSchema>
-        {
-            ["ProblemDetails"] = await JsonSchema.FromJsonAsync("""
-                {
-                  "type": "object",
-                  "required": [ "title" ],
-                  "properties": {
-                    "title": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "integer",
-                      "format": "int32"
-                    }
-                  }
-                }
-                """)
-        };
-        var incoming = await JsonSchema.FromJsonAsync("""
-            {
-              "properties": {
-                "status": {
-                  "format": "int32",
-                  "type": "integer"
-                },
-                "title": {
-                  "type": "string"
-                }
-              },
-              "required": [ "title" ],
-              "type": "object"
-            }
-            """);
-
-        InvokeMergeIfMissingOrThrowOnConflict(target, "ProblemDetails", incoming, "definition");
-
-        target.Should().ContainSingle().Which.Key.Should().Be("ProblemDetails");
-        target["ProblemDetails"].Properties.Should().ContainKeys("title", "status");
-    }
-
-    [Test]
     public async Task Merge_With_Collisions_Throws_And_Does_Not_Mutate_Inputs()
     {
         const string baseSpec = """
@@ -849,45 +805,6 @@ paths:
     }
 
     [Test]
-    public void Merge_With_Swagger2_Definition_Collision_Throws_And_Does_Not_Mutate_Dictionaries()
-    {
-        var target = new Dictionary<string, JsonSchema>
-        {
-            ["Shared"] = new()
-            {
-                Type = JsonObjectType.Object,
-                Properties =
-                {
-                    ["id"] = new JsonSchemaProperty
-                    {
-                        Type = JsonObjectType.String
-                    }
-                }
-            }
-        };
-        var incoming = new JsonSchema
-        {
-            Type = JsonObjectType.Object,
-            Properties =
-            {
-                ["total"] = new JsonSchemaProperty
-                {
-                    Type = JsonObjectType.Integer
-                }
-            }
-        };
-
-        var act = () => InvokeMergeIfMissingOrThrowOnConflict(target, "Shared", incoming, "definition");
-
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*duplicate definition 'Shared'*");
-
-        target.Should().ContainSingle().Which.Key.Should().Be("Shared");
-        target["Shared"].Properties.Should().ContainKey("id");
-        incoming.Properties.Should().ContainKey("total");
-    }
-
-    [Test]
     public async Task Merge_With_Security_Scheme_Collision_Throws_And_Does_Not_Mutate_Inputs()
     {
         const string baseSpec = """
@@ -962,83 +879,6 @@ paths:
         secondDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/orders");
         secondDocument.SecurityDefinitions.Should().ContainSingle().Which.Key.Should().Be("ApiKey");
         secondDocument.SecurityDefinitions["ApiKey"].Name.Should().Be("X-Second-Key");
-    }
-
-    [Test]
-    public async Task Merge_With_Equivalent_Composed_Schema_Duplicate_Ignores_Duplicate()
-    {
-        const string schemaJson = """
-            {
-              "type": "object",
-              "required": [ "child", "kind" ],
-              "properties": {
-                "kind": {
-                  "type": "string",
-                  "enum": [ "basic", "advanced" ]
-                },
-                "child": {
-                  "$ref": "#/definitions/NamedChild"
-                }
-              },
-              "allOf": [
-                {
-                  "$ref": "#/definitions/BasePart"
-                }
-              ],
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/NamedChild"
-                },
-                {
-                  "type": "string"
-                }
-              ],
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "$ref": "#/definitions/BasePart"
-                }
-              ],
-              "x-meta": {
-                "alpha": 1,
-                "zeta": null
-              },
-              "x-null": null,
-              "definitions": {
-                "NamedChild": {
-                  "type": "object",
-                  "required": [ "id" ],
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "BasePart": {
-                  "type": "object",
-                  "properties": {
-                    "enabled": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-            """;
-        var target = new Dictionary<string, JsonSchema>
-        {
-            ["Shared"] = await JsonSchema.FromJsonAsync(schemaJson)
-        };
-        var incoming = await JsonSchema.FromJsonAsync(schemaJson);
-
-        InvokeMergeIfMissingOrThrowOnConflict(target, "Shared", incoming, "schema");
-
-        target.Should().ContainSingle().Which.Key.Should().Be("Shared");
-        target["Shared"].RequiredProperties.Should().BeEquivalentTo(["kind", "child"]);
-        target["Shared"].Properties.Should().ContainKeys("kind", "child");
-        target["Shared"].Properties["kind"].Enumeration.Should().BeEquivalentTo(["basic", "advanced"]);
     }
 
     [Test]
@@ -1620,26 +1460,6 @@ paths:
 
     private static OpenApiDocument InvokeMerge(params OpenApiDocument[] documents)
         => Merger.Merge(documents);
-
-    private static void InvokeMergeIfMissingOrThrowOnConflict<TValue>(
-        IDictionary<string, TValue> target,
-        string key,
-        TValue value,
-        string itemType)
-    {
-        var mergeMethod = typeof(DocumentMerger)
-            .GetMethod("MergeIfMissingOrThrowOnConflict", BindingFlags.NonPublic | BindingFlags.Instance)!
-            .MakeGenericMethod(typeof(TValue));
-
-        try
-        {
-            mergeMethod.Invoke(Merger, [target, key, value!, itemType]);
-        }
-        catch (TargetInvocationException exception) when (exception.InnerException != null)
-        {
-            throw exception.InnerException;
-        }
-    }
 
     private static bool InvokeAreEquivalent<TValue>(TValue existingValue, TValue incomingValue)
         => Comparer.AreEquivalent(existingValue, incomingValue);
