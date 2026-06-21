@@ -49,6 +49,7 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertToVariableName_Handles_Empty_String_Property()
     {
@@ -57,6 +58,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"\")] string unnamed");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertToVariableName_Handles_Dashes()
     {
@@ -66,6 +68,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"field-with-dashes\")] string field_with_dashes");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertToVariableName_Handles_Dots()
     {
@@ -75,6 +78,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"field.with.dots\")] string field_with_dots");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertToVariableName_Handles_Special_Characters()
     {
@@ -83,6 +87,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"field@special#chars\")] string fieldspecial_chars");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertToVariableName_Generated_Code_Builds()
     {
@@ -150,6 +155,7 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task Multipart_FormData_Includes_Text_Fields()
     {
@@ -160,6 +166,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("string category");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Multipart_FormData_Includes_Array_Text_Fields()
     {
@@ -167,6 +174,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("IEnumerable<string> tags");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Multipart_FormData_Includes_Binary_Fields()
     {
@@ -175,6 +183,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("StreamPart documentFile");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Multipart_FormData_Text_Fields_Have_Correct_Attributes()
     {
@@ -185,6 +194,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("IEnumerable<string> tags");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Multipart_FormData_Mixed_Fields_Builds()
     {
@@ -252,6 +262,7 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task ApizrRequestOptions_Included_When_Enabled()
     {
@@ -259,6 +270,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[RequestOptions] IApizrRequestOptions options");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ApizrRequestOptions_Not_Included_When_Disabled()
     {
@@ -274,6 +286,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().NotContain("IApizrRequestOptions options");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ApizrRequestOptions_Included_In_All_Methods()
     {
@@ -285,6 +298,7 @@ public class ParameterExtractorEdgeCaseTests
         occurrences.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ApizrRequestOptions_Code_Builds()
     {
@@ -349,6 +363,7 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task CancellationToken_Included_When_Enabled()
     {
@@ -356,6 +371,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("CancellationToken cancellationToken = default");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task CancellationToken_Not_Included_When_Disabled()
     {
@@ -371,6 +387,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().NotContain("CancellationToken cancellationToken");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task CancellationToken_Included_In_All_Methods()
     {
@@ -382,6 +399,7 @@ public class ParameterExtractorEdgeCaseTests
         occurrences.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task CancellationToken_Code_Builds()
     {
@@ -389,6 +407,7 @@ public class ParameterExtractorEdgeCaseTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task CancellationToken_Not_Included_When_ApizrRequestOptions_Used()
     {
@@ -471,6 +490,7 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task Complex_Multipart_With_Special_Characters_And_Mixed_Types()
     {
@@ -492,6 +512,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"profile.pic\")]");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Complex_Multipart_Code_Builds()
     {

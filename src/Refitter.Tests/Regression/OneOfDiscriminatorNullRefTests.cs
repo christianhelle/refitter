@@ -116,6 +116,7 @@ public class OneOfDiscriminatorNullRefTests
 }
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task Should_Not_Throw_NRE_On_Swagger_20_Document()
     {
@@ -130,6 +131,7 @@ public class OneOfDiscriminatorNullRefTests
             "Swagger 2.0 documents have null Components, code should handle this gracefully");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Should_Not_Throw_NRE_On_OpenAPI_Without_Components()
     {
@@ -143,6 +145,7 @@ public class OneOfDiscriminatorNullRefTests
             "OpenAPI documents without components section should be handled gracefully");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Should_Not_Throw_NRE_On_OpenAPI_Without_Schemas()
     {
@@ -156,6 +159,7 @@ public class OneOfDiscriminatorNullRefTests
             "OpenAPI documents with components but no schemas should be handled gracefully");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_From_Swagger_20()
     {
@@ -165,6 +169,7 @@ public class OneOfDiscriminatorNullRefTests
         generatedCode.Should().Contain("GetPets");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_From_OpenAPI_Without_Components()
     {
@@ -174,6 +179,7 @@ public class OneOfDiscriminatorNullRefTests
         generatedCode.Should().Contain("HealthCheck");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_From_OpenAPI_Without_Schemas()
     {
@@ -183,6 +189,7 @@ public class OneOfDiscriminatorNullRefTests
         generatedCode.Should().Contain("GetData");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_From_All_Variants()
     {

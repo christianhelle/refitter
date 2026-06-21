@@ -101,6 +101,7 @@ public class SchemaTypeNameSanitizationTests
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1083_Sanitizes_Trailing_Dot_Schema_Name_In_Contract_And_Method_Signature()
     {
@@ -113,6 +114,7 @@ public class SchemaTypeNameSanitizationTests
         generatedCode.Should().Contain($"Task<{SanitizedDtoName}> LookUpErn(");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1083_Dotted_Schema_Name_Generated_Code_Can_Build()
     {
@@ -121,6 +123,7 @@ public class SchemaTypeNameSanitizationTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1083_Preserves_Normal_Schema_Name_When_Malformed_Name_Normalizes_To_Same_Type()
     {

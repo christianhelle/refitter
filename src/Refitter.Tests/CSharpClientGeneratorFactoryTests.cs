@@ -351,6 +351,7 @@ public class CSharpClientGeneratorFactoryTests
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForIntegerWithoutFormat()
     {
@@ -358,6 +359,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("long IntegerNoFormat");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForNestedInteger()
     {
@@ -365,6 +367,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("long NestedInt");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForArrayItems()
     {
@@ -372,6 +375,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("ICollection<long> ArrayOfIntegers");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForAdditionalProperties()
     {
@@ -379,6 +383,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("IDictionary<string, long>");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForAllOfSchemas()
     {
@@ -386,6 +391,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("long AllOfProp");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForOneOfSchemas()
     {
@@ -393,6 +399,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("long OneOfProp");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForAnyOfSchemas()
     {
@@ -402,6 +409,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("AnyOfInt");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForParameterWithoutFormat()
     {
@@ -410,6 +418,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("intParam");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_CanBuildGeneratedCode()
     {
@@ -420,6 +429,7 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ProcessSchemaWalkers_WithRecursivePropertyItemAndAdditionalPropertiesSchemas_CanBuildGeneratedCode()
     {
@@ -432,6 +442,7 @@ public class CSharpClientGeneratorFactoryTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ProcessSchemaWalkers_WithRecursiveAllOfSchemas_CanBuildGeneratedCode()
     {
@@ -442,6 +453,7 @@ public class CSharpClientGeneratorFactoryTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ProcessSchemaWalkers_WithRecursivePropertyItemAndAdditionalPropertiesSchemas_V2_CanBuildGeneratedCode()
     {
@@ -454,6 +466,7 @@ public class CSharpClientGeneratorFactoryTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ProcessSchemaWalkers_WithRecursiveAllOfSchemas_V2_CanBuildGeneratedCode()
     {
@@ -552,6 +565,7 @@ public class CSharpClientGeneratorFactoryTests
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesFalse_DoesNotGenerateAdditionalProperties()
     {
@@ -562,6 +576,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().NotContain("Dictionary<string, object> AdditionalProperties");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesTrue_GeneratesAdditionalProperties()
     {
@@ -570,6 +585,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("IDictionary<string, object>");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesFalse_AppliesToAllSchemas()
     {
@@ -584,6 +600,7 @@ public class CSharpClientGeneratorFactoryTests
         additionalPropsLines.Should().BeEmpty();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesFalse_CanBuildGeneratedCode()
     {
@@ -594,6 +611,7 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesTrue_CanBuildGeneratedCode()
     {
@@ -781,6 +799,7 @@ public class CSharpClientGeneratorFactoryTests
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_GeneratesBaseClass()
     {
@@ -788,6 +807,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("class Vehicle");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_DoesNotGenerateAnonymousTypes()
     {
@@ -796,6 +816,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().NotContain("Anonymous");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_GeneratesInheritanceHierarchy()
     {
@@ -804,6 +825,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("Truck : Vehicle");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_GeneratesAllSubtypes()
     {
@@ -812,6 +834,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("class Truck");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_CanBuildGeneratedCode()
     {
@@ -822,6 +845,7 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_GeneratesBaseClass()
     {
@@ -829,6 +853,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("class Payment");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_DoesNotGenerateAnonymousTypes()
     {
@@ -837,6 +862,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().NotContain("Anonymous");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_GeneratesInheritanceHierarchy()
     {
@@ -845,6 +871,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("BankTransfer : Payment");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_GeneratesAllSubtypes()
     {
@@ -853,6 +880,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("class BankTransfer");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_CanBuildGeneratedCode()
     {
@@ -863,6 +891,7 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_WithPolymorphicSerialization_GeneratesJsonAttributes()
     {
@@ -872,6 +901,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("[JsonDerivedType(typeof(Truck)");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_WithPolymorphicSerialization_CanBuildGeneratedCode()
     {

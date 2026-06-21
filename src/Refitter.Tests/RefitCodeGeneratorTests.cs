@@ -55,6 +55,7 @@ paths:
           description: success
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task Generate_Produces_Valid_Code()
     {
@@ -73,6 +74,7 @@ paths:
         result.Should().Contain("TestNamespace");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generate_WithFilteredDocument_ProducesValidCode()
     {
@@ -92,6 +94,7 @@ paths:
         result.Should().NotContain("\"/foo\"");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generate_Compiles_Successfully()
     {
@@ -111,6 +114,7 @@ paths:
         BuildHelper.BuildCSharp(result).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_Produces_Output()
     {
@@ -132,6 +136,7 @@ paths:
         result.Files.Should().Contain(f => f.TypeName == "Contracts");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generate_WithSwagger20_Produces_Valid_Code()
     {
@@ -150,6 +155,7 @@ paths:
         result.Should().Contain("TestNamespace");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_WithSwagger20_Produces_Output()
     {

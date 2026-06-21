@@ -55,6 +55,7 @@ components:
           type: number
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -62,6 +63,7 @@ components:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_IObservable()
     {
@@ -69,6 +71,7 @@ components:
         generatedCode.Should().Contain("IObservable<");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Does_Not_Contain_IObservable_When_Disabled()
     {
@@ -77,6 +80,7 @@ components:
         generatedCode.Should().Contain("Task<");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_Without_IObservable()
     {
@@ -84,6 +88,7 @@ components:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_Using_System_Reactive()
     {
@@ -91,6 +96,7 @@ components:
         generatedCode.Should().Contain("using System.Reactive;");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_IObservable_Code_Contains_Multiple_Methods()
     {
@@ -101,6 +107,7 @@ components:
         observableCount.Should().BeGreaterThanOrEqualTo(2);
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Task_Code_Contains_Multiple_Methods()
     {

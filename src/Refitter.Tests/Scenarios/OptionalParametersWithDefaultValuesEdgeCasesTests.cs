@@ -8,6 +8,7 @@ namespace Refitter.Tests.Scenarios;
 
 public class OptionalParametersWithDefaultValuesEdgeCasesTests
 {
+    [Category("Unit")]
     [Test]
     public async Task String_Default_Values_Should_Be_Escaped()
     {
@@ -71,6 +72,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("string? newlineString = \"line1\\nline2\"");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task String_Default_Values_With_All_Escape_Characters_Should_Be_Escaped()
     {
@@ -134,6 +136,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("string? allSpecialChars = \"test\\n\\r\\t\\\\\\\"\"");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Float_Default_Values_Should_Have_Type_Suffix()
     {
@@ -178,6 +181,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("float? floatValue = 1.5f");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Decimal_Default_Values_Should_Have_Type_Suffix()
     {
@@ -222,6 +226,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("decimal? decimalValue = 99.99m");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Escaped_Strings_Should_Build()
     {
@@ -263,6 +268,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Float_Decimal_Should_Build()
     {
@@ -315,6 +321,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Integer_Default_Values_Should_Not_Have_Suffix()
     {
@@ -370,6 +377,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("long? longValue = 9999");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Double_Default_Values_Should_Have_Decimal_Point()
     {
@@ -426,6 +434,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("double? doubleIntValue = 10.0");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Boolean_Default_Values_Should_Be_Lowercase()
     {
@@ -479,6 +488,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("bool? isDisabled = false");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Empty_String_Default_Value_Should_Be_Handled()
     {
@@ -522,6 +532,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("string? emptyString = \"\"");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Mixed_Escape_Sequences_Should_Be_Handled()
     {
@@ -565,6 +576,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("string? complexString = \"path\\\\to\\\\file with \\\"quotes\\\" and\\nnewlines\\tand tabs\"");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Long_And_ULong_Default_Values_Should_Have_Suffixes()
     {

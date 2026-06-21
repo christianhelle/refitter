@@ -187,6 +187,7 @@ public class TrimUnusedSchemaAliasRegressionTests
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_When_TrimUnusedSchema_Uses_Aliased_Component_Schemas()
     {
@@ -194,6 +195,7 @@ public class TrimUnusedSchemaAliasRegressionTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task TrimUnusedSchema_With_Aliased_Component_Schemas_Can_Build()
     {
@@ -202,6 +204,7 @@ public class TrimUnusedSchemaAliasRegressionTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Combined_Alias_Trim_And_Digit_Prefixed_Property_Regression_Can_Build()
     {
@@ -212,6 +215,7 @@ public class TrimUnusedSchemaAliasRegressionTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Combined_Regression_Can_Generate_From_Settings_File_Content()
     {

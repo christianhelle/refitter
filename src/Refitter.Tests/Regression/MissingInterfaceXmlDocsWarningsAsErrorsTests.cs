@@ -50,6 +50,7 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
                   description: 'ok'
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task ByTag_Generates_Interface_Fallback_Summary_When_Tag_Description_Is_Missing()
     {
@@ -59,6 +60,7 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
         generatedCode.Should().Contain("/// <summary>Operations for Orders.</summary>");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ByTag_Generated_Code_Builds_With_Warnings_As_Errors()
     {
@@ -67,6 +69,7 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
         BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task ByEndpoint_Generates_Interface_Fallback_Summary_When_Endpoint_Summary_Is_Missing()
     {
@@ -77,6 +80,7 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
         generatedCode.Should().Contain("/// <summary>Operations for");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ByEndpoint_Generated_Code_Builds_With_Warnings_As_Errors()
     {

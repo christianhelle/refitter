@@ -133,6 +133,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task EscapeString_Handles_Tab_Character()
     {
@@ -141,6 +142,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain(@"= ""before\tafter""");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task EscapeString_Handles_Carriage_Return()
     {
@@ -149,6 +151,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain(@"= ""line1\rline2""");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task EscapeString_Handles_Form_Feed()
     {
@@ -157,6 +160,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain(@"= ""page1\fpage2""");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task EscapeString_Handles_Backspace()
     {
@@ -438,6 +442,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
+    [Category("Unit")]
     [Test]
     public async Task FormatNumericValue_Float_Has_F_Suffix()
     {
@@ -446,6 +451,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("float? floatValue = 3.14f");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task FormatNumericValue_Decimal_Has_M_Suffix()
     {
@@ -454,6 +460,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("decimal? decimalValue = 99.99m");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task FormatNumericValue_Double_Has_Implicit_Suffix()
     {
@@ -462,6 +469,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().NotContain("2.718d");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task FormatNumericValue_Long_Has_L_Suffix()
     {
@@ -470,6 +478,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("long? longValue = 9223372036854775807L");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task FormatNumericValue_Ulong_Has_UL_Suffix()
     {
@@ -478,6 +487,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("ulong? ulongValue = 18446744073709551615UL");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task FormatNumericValue_Uint_Has_U_Suffix()
     {
@@ -487,6 +497,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("int? uintValue = 4294967295");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task FormatNumericValue_All_Types_Together()
     {
@@ -500,6 +511,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("uintValue = 300");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task FormatNumericValue_Generated_Code_Builds()
     {
@@ -684,6 +696,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
+    [Category("Unit")]
     [Test]
     public async Task GetCSharpType_String_Type()
     {
@@ -691,6 +704,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("string? stringParam");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetCSharpType_Integer_Type()
     {
@@ -698,6 +712,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("int? intParam");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetCSharpType_Number_Type()
     {
@@ -705,6 +720,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("double? numberParam");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetCSharpType_Boolean_Type()
     {
@@ -712,6 +728,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("bool? boolParam");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetCSharpType_Array_Type()
     {
@@ -721,6 +738,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("arrayParam");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetCSharpType_Object_Type()
     {
@@ -729,6 +747,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("string objectParam");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetCSharpType_Nullable_With_OptionalParameters()
     {
@@ -776,6 +795,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
+    [Category("Unit")]
     [Test]
     public async Task NullablePattern_Matches_Escaped_CSharp_Identifier()
     {
@@ -794,6 +814,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("@class = default");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetCSharpType_Array_Of_Integers()
     {
@@ -803,6 +824,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("intArray");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetCSharpType_Array_Of_Booleans()
     {
@@ -812,6 +834,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("boolArray");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task GetCSharpType_All_Types_Build()
     {
@@ -915,6 +938,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
+    [Category("Unit")]
     [Test]
     public async Task GetIntegerTypeName_Int32_Format_Returns_Int()
     {
@@ -922,6 +946,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("int? int32Value");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetIntegerTypeName_Int64_Format_Returns_Long()
     {
@@ -929,6 +954,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("long? int64Value");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetIntegerTypeName_No_Format_Defaults_To_Int()
     {
@@ -936,6 +962,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("int? integerValue");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetIntegerTypeName_With_Int64_Setting()
     {
@@ -955,6 +982,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("long? integerValue");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task GetIntegerTypeName_Format_Overrides_Setting()
     {
@@ -974,6 +1002,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("int? int32Value");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task GetIntegerTypeName_Generated_Code_Builds()
     {
@@ -1015,6 +1044,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
+    [Category("Unit")]
     [Test]
     public async Task GetArrayType_Null_Item_Returns_Object_Array()
     {
@@ -1024,6 +1054,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("arrayWithoutItems");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task GetArrayType_Null_Item_Generated_Code_Builds()
     {
@@ -1099,6 +1130,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
+    [Category("Unit")]
     [Test]
     public async Task FormatDoubleLiteral_Integer_Value_Adds_Point_Zero()
     {
@@ -1107,6 +1139,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("double? doubleValue = 42.0");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task FormatDoubleLiteral_With_Exponent_No_Point_Zero()
     {

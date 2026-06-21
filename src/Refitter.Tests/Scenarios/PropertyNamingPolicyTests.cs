@@ -209,6 +209,7 @@ public class PropertyNamingPolicyTests
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Default_PascalCase_Property_Naming()
     {
@@ -216,6 +217,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Default_PascalCase_Property_Naming_Remains_Unchanged()
     {
@@ -224,6 +226,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("""[JsonPropertyName("node_id")]""");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Default_PascalCase_Minimally_Sanitizes_Invalid_Identifiers()
     {
@@ -231,6 +234,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("public string _1stNode { get; set; }");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Default_PascalCase_Minimally_Sanitizes_Invalid_Identifiers_OpenApi2()
     {
@@ -239,6 +243,7 @@ public class PropertyNamingPolicyTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task PreserveOriginal_Emits_Raw_Valid_Identifiers()
     {
@@ -246,6 +251,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("public int node_id { get; set; }");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task PreserveOriginal_Escapes_Reserved_Keywords()
     {
@@ -253,6 +259,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("public string @class { get; set; }");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task PreserveOriginal_Minimally_Sanitizes_Invalid_Identifiers()
     {
@@ -260,6 +267,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("_1st_node { get; set; }");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task PreserveOriginal_Generated_Code_With_Recursive_Schemas_Can_Build()
     {
@@ -267,6 +275,7 @@ public class PropertyNamingPolicyTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Default_PascalCase_Property_Naming_Prefixes_Digit_Prefixed_Properties()
     {
@@ -275,6 +284,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("_42QuestionField { get; set; }");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Default_PascalCase_Digit_Prefixed_Properties_Can_Build()
     {

@@ -159,6 +159,7 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
                 type: number
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -166,6 +167,7 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {
@@ -173,6 +175,7 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_OpenApi2()
     {
@@ -180,6 +183,7 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_OpenApi2()
     {
@@ -187,6 +191,7 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Generated_Identifier_Is_Valid_And_Compilable()
     {

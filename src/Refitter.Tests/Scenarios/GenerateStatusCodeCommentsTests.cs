@@ -94,6 +94,7 @@ paths:
 ";
 
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -101,6 +102,7 @@ paths:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {
@@ -108,6 +110,7 @@ paths:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_Status_Code_Comments_When_Enabled()
     {
@@ -117,6 +120,7 @@ paths:
         generatedCode.Should().Contain("500");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Does_Not_Contain_Status_Code_Comments_When_Disabled()
     {
@@ -133,6 +137,7 @@ paths:
         countWithout.Should().BeLessThan(countWith);
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_Response_Descriptions_When_Comments_Enabled()
     {
@@ -141,6 +146,7 @@ paths:
         generatedCode.Should().Contain("Bad request");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments()
     {
@@ -151,6 +157,7 @@ paths:
             .And.NotContain(@"\u041e\u0448");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments_Swagger20()
     {
@@ -161,6 +168,7 @@ paths:
             .And.NotContain(@"\u041e\u0448");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Unicode_Status_Code_Comments_Can_Build()
     {

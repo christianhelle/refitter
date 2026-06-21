@@ -90,6 +90,7 @@ public class OptionalParametersWithDefaultValuesTests
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -97,6 +98,7 @@ public class OptionalParametersWithDefaultValuesTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Should_Have_Optional_Parameters_With_Default_Values()
     {
@@ -106,6 +108,7 @@ public class OptionalParametersWithDefaultValuesTests
         generatedCode.Should().Contain("string? filter = \"active\"");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Should_Have_Required_Parameters_Without_Defaults()
     {
@@ -116,6 +119,7 @@ public class OptionalParametersWithDefaultValuesTests
         generatedCode.Should().NotContain("System.DateTimeOffset end =");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {

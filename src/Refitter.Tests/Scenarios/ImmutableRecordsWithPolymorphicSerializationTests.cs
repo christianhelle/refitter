@@ -67,6 +67,7 @@ components:
               type: string
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -74,6 +75,7 @@ components:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {
@@ -81,6 +83,7 @@ components:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_Record_Keyword()
     {
@@ -88,6 +91,7 @@ components:
         generatedCode.Should().Contain("record ");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_JsonPolymorphic_Attribute()
     {

@@ -8,6 +8,7 @@ namespace Refitter.Tests.Scenarios;
 
 public class DynamicQueryStringParametersEdgeCasesTests
 {
+    [Category("Unit")]
     [Test]
     public async Task Dynamic_QueryString_With_Escaped_String_Defaults()
     {
@@ -69,6 +70,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("string? BackslashString { get; set; } = \"path\\\\to\\\\file\"");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Dynamic_QueryString_With_All_Escape_Characters()
     {
@@ -140,6 +142,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("string? TabString { get; set; } = \"col1\\tcol2\"");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Dynamic_QueryString_With_Float_And_Decimal_Defaults()
     {
@@ -203,6 +206,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("decimal? DecimalValue { get; set; } = 99.99m");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Dynamic_QueryString_With_Boolean_Defaults()
     {
@@ -264,6 +268,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("bool? IsDisabled { get; set; } = false");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Dynamic_QueryString_With_Integer_Defaults()
     {
@@ -327,6 +332,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("long? LongValue { get; set; } = 9999");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Dynamic_QueryString_Generated_Code_Should_Build()
     {
@@ -396,6 +402,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Dynamic_QueryString_With_Mixed_Escape_Characters()
     {
@@ -447,6 +454,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("string? ComplexString { get; set; } = \"path\\\\to\\\\file with \\\"quotes\\\"\\nand newlines\"");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Dynamic_QueryString_With_Long_And_ULong_Defaults()
     {
@@ -510,6 +518,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("ulong? UlongValue { get; set; } = 5000000000UL");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Dynamic_QueryString_With_Double_Integer_Value()
     {

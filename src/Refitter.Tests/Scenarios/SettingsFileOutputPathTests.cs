@@ -37,6 +37,7 @@ public class SettingsFileOutputPathTests
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public void SettingsFile_WithoutOutputFilename_UsesRefitterFilenameFallback()
     {
@@ -72,6 +73,7 @@ public class SettingsFileOutputPathTests
         }
     }
 
+    [Category("Unit")]
     [Test]
     public void SettingsFile_WithExplicitDefaultOutputFolder_RootsToSettingsFileDirectory()
     {
@@ -106,6 +108,7 @@ public class SettingsFileOutputPathTests
         }
     }
 
+    [Category("Integration")]
     [Test]
     public async Task SettingsFile_PreservesNamingInterfaceName()
     {

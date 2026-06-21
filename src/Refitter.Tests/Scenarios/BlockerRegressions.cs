@@ -77,6 +77,7 @@ public class BlockerRegressions
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1013_Prevents_Suffix_Collision_When_Target_Type_Already_Exists()
     {
@@ -91,6 +92,7 @@ public class BlockerRegressions
         result.Should().Contain("public partial class PetDto");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1013_Does_Not_Corrupt_Type_References_When_Collision_Exists()
     {
@@ -103,6 +105,7 @@ public class BlockerRegressions
         result.Should().NotContain("Task<PetDtoDto>");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1013_Generated_Code_With_Suffix_Collision_Compiles()
     {
@@ -160,6 +163,7 @@ public class BlockerRegressions
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1018_Deduplicates_Multipart_Parameters_By_Sanitized_Identifier()
     {
@@ -174,6 +178,7 @@ public class BlockerRegressions
         matches.Count.Should().BeLessThanOrEqualTo(1, "deduplication should prevent duplicate sanitized identifiers");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1018_First_Multipart_Parameter_Wins_After_Sanitization()
     {
@@ -184,6 +189,7 @@ public class BlockerRegressions
         generatedCode.Should().Contain("[AliasAs(\"a-b\")]", "first parameter with sanitized name should be emitted");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1018_Generated_Code_With_Duplicate_Sanitized_Names_Compiles()
     {
@@ -257,6 +263,7 @@ public class BlockerRegressions
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1053_Keywords_Are_Escaped_Not_Double_Prefixed()
     {
@@ -274,6 +281,7 @@ public class BlockerRegressions
         generatedCode.Should().NotContain("_@event");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1053_Sanitize_Routes_Through_EscapeReservedKeyword()
     {
@@ -285,6 +293,7 @@ public class BlockerRegressions
         sanitizedEvent.Should().Be("@event", "Sanitize must escape reserved keywords");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1053_Title_With_Special_Chars_Does_Not_Produce_Invalid_Identifiers()
     {
@@ -297,6 +306,7 @@ public class BlockerRegressions
         generatedCode.Should().NotContain("class @");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1053_Parameter_Name_With_Leading_At_Sign_Is_Stripped()
     {
@@ -308,6 +318,7 @@ public class BlockerRegressions
         generatedCode.Should().NotContain("@@while");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1053_Schema_Names_As_Keywords_Are_Properly_Escaped()
     {
@@ -326,6 +337,7 @@ public class BlockerRegressions
         generatedCode.Should().Contain("@while");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1053_Generated_Code_With_Keywords_Compiles()
     {
@@ -372,6 +384,7 @@ public class BlockerRegressions
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1102_TagNamedPublic_DoesNotProduceIAtPublicApi()
     {
@@ -393,6 +406,7 @@ public class BlockerRegressions
         generatedCode.Should().Contain("interface IPublicApi");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1102_TagNamedPublic_GeneratedCode_Compiles()
     {
@@ -410,6 +424,7 @@ public class BlockerRegressions
             "generated code must compile (I@publicApi is invalid and would not compile)");
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Issue1102_TagNamedPublic_AllReservedKeywordsHandled()
     {

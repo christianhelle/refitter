@@ -8,6 +8,7 @@ namespace Refitter.Tests.Scenarios;
 
 public class RefitMultipleInterfaceByTagGeneratorTests
 {
+    [Category("Unit")]
     [Test]
     public async Task RefitMultipleInterfaceByTagGenerator_Creates_Ungrouped_Interface_When_Operation_Has_No_Tags()
     {
@@ -49,6 +50,7 @@ paths:
         Regex.IsMatch(generatedCode, @"interface I\w+Api.*GetUntaggedResource", RegexOptions.Singleline).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task RefitMultipleInterfaceByTagGenerator_Groups_All_Tagged_Operations()
     {
@@ -92,6 +94,7 @@ paths:
         generatedCode.Should().Contain("GetBar");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task RefitMultipleInterfaceByTagGenerator_Generated_Code_Compiles()
     {

@@ -37,6 +37,7 @@ public class ByEndpointQueryParamsInternalITests
                   description: 'ok'
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task ByEndpoint_Dynamic_Query_Params_Keep_Internal_I_Characters()
     {
@@ -48,6 +49,7 @@ public class ByEndpointQueryParamsInternalITests
         generatedCode.Should().NotContain("GetnvoicenfoQueryParams");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ByEndpoint_Dynamic_Query_Params_With_Internal_I_Characters_Build()
     {

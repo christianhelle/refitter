@@ -50,6 +50,7 @@ public class AnyTypeBodySerializationTests
 }
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_BodySerializationMethod_For_Object_Parameter()
     {
@@ -57,6 +58,7 @@ public class AnyTypeBodySerializationTests
         generatedCode.Should().Contain("[Body(BodySerializationMethod.Serialized)] object body");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {

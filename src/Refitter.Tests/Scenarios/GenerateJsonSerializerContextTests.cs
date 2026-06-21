@@ -55,6 +55,7 @@ public class GenerateJsonSerializerContextTests
         }
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -62,6 +63,7 @@ public class GenerateJsonSerializerContextTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_JsonSerializerContext()
     {
@@ -71,6 +73,7 @@ public class GenerateJsonSerializerContextTests
         generatedCode.Should().Contain("internal partial class UsersApiSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_JsonSerializerContext_Can_Build()
     {
@@ -79,6 +82,7 @@ public class GenerateJsonSerializerContextTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Separate_Contracts_Namespace_Can_Build()
     {
@@ -92,6 +96,7 @@ public class GenerateJsonSerializerContextTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Does_Not_Contain_JsonSerializerContext_When_Disabled()
     {

@@ -75,6 +75,7 @@ components:
           type: string
 ";
 
+    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -82,6 +83,7 @@ components:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {
@@ -89,6 +91,7 @@ components:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_Multiple_Interfaces()
     {
@@ -97,6 +100,7 @@ components:
         interfaceCount.Should().BeGreaterThan(1);
     }
 
+    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_DI_Registration()
     {

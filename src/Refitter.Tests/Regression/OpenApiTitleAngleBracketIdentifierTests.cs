@@ -34,6 +34,7 @@ public class OpenApiTitleAngleBracketIdentifierTests
                   type: string
         """;
 
+    [Category("Unit")]
     [Test]
     public async Task OpenApi_Title_With_Angle_Brackets_Does_Not_Leak_Invalid_Interface_Or_Context_Names()
     {
@@ -45,6 +46,7 @@ public class OpenApiTitleAngleBracketIdentifierTests
         generatedCode.Should().NotContain("Invoice<Client>APISerializerContext");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task OpenApi_Title_With_Angle_Brackets_Generated_Code_Builds()
     {
