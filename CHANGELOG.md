@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Remove reflection-based non-public method testing [\#1167](https://github.com/christianhelle/refitter/pull/1167) ([christianhelle](https://github.com/christianhelle))
 - Extract RefitterRunner as shared generation workflow [\#1166](https://github.com/christianhelle/refitter/pull/1166) ([christianhelle](https://github.com/christianhelle))
 - Strategy pattern for document loading [\#1165](https://github.com/christianhelle/refitter/pull/1165) ([christianhelle](https://github.com/christianhelle))
 - Separate output planning from writing [\#1164](https://github.com/christianhelle/refitter/pull/1164) ([christianhelle](https://github.com/christianhelle))
