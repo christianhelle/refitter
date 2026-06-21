@@ -5,6 +5,8 @@ using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
 
+
+[Category("Unit")]
 public class MultipleInterfaceByTagGeneratorTests
 {
     private const string ExpectedNamespace = "Refitter.Tests.AdditionalFiles.ByTag";
