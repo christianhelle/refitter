@@ -2,9 +2,11 @@ using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
+using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios
 {
+    [Category("Unit")]
     public class NumericFormatWithPatternTests
     {
         private const string OpenApiSpec = @"

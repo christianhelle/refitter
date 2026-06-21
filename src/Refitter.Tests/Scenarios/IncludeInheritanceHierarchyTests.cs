@@ -6,6 +6,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios
 {
+    [Category("Unit")]
     public class IncludeInheritanceHierarchyTests
     {
         private const string OpenApiSpec = @"
