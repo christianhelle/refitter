@@ -18,7 +18,7 @@ TUnit uses `--treenode-filter` instead of the VSTest `--filter` syntax.
 dotnet test --treenode-filter "/*/*/*/*[Category=Unit]" --solution src/Refitter.slnx -c Release --no-build
 
 # Integration tests only (compilation verification — ~17s, 88 tests)
-dotnet test --treenode-filter "/*/*/*/*[Category=Integration]" --solution src/Refitter.slnx -c Release --no-build
+dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-build --treenode-filter "/*/*/*/*[Category=Integration]"
 
 # Full suite before commit
 dotnet test --solution src/Refitter.slnx -c Release
