@@ -8,6 +8,8 @@ namespace Refitter.Tests.Regression;
 /// Regression tests for #1057 settings and CLI workstream issues.
 /// Tests issues: #1021, #1030, #1031, #1044, #1045, #1046, #1048, #1050, #1054
 /// </summary>
+
+[Category("Unit")]
 public class SettingsCliRegressionTests
 {
     [Test]

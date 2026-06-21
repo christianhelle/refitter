@@ -4,6 +4,8 @@ using Refitter.Core;
 
 namespace Refitter.Tests.SettingsFile;
 
+
+[Category("Unit")]
 public class SettingsValidatorTests
 {
     [Test]

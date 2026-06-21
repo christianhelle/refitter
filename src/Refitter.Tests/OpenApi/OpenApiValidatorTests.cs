@@ -4,6 +4,8 @@ using Refitter.Core.Validation;
 
 namespace Refitter.Tests.OpenApi;
 
+
+[Category("Unit")]
 public class OpenApiValidatorTests
 {
     [Test]

@@ -7,6 +7,8 @@ namespace Refitter.Tests.Regression;
 /// Regression tests for Issue #1039: dynamic querystring extraction mutates the shared NSwag model.
 /// Validates that XML documentation still sees the original query parameters after wrapper generation.
 /// </summary>
+
+[Category("Unit")]
 public class DynamicQuerystringMutationTests
 {
     private const string OpenApiSpec = """

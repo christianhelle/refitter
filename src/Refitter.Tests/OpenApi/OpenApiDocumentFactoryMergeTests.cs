@@ -7,6 +7,8 @@ using Refitter.Tests.Resources;
 
 namespace Refitter.Tests.OpenApi;
 
+
+[Category("Unit")]
 public class OpenApiDocumentFactoryMergeTests
 {
     private static readonly DocumentEquivalenceComparer Comparer = new();

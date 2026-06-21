@@ -4,6 +4,8 @@ using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;
 
+
+[Category("Unit")]
 public class DocumentLoaderCompositorTests
 {
     [Test]

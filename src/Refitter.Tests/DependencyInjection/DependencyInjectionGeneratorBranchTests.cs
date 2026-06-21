@@ -3,6 +3,8 @@ using Refitter.Core;
 
 namespace Refitter.Tests.DependencyInjection;
 
+
+[Category("Unit")]
 public class DependencyInjectionGeneratorBranchTests
 {
     [Test]

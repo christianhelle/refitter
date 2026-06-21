@@ -5,6 +5,8 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Apizr;
 
+
+[Category("Unit")]
 public class ApizrTests
 {
     private const string OpenApiSpec = @"

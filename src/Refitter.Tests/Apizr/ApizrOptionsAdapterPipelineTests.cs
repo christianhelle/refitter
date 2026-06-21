@@ -3,6 +3,8 @@ using Refitter.Core;
 
 namespace Refitter.Tests.Apizr;
 
+
+[Category("Unit")]
 public class ApizrOptionsAdapterPipelineTests
 {
     [Test]

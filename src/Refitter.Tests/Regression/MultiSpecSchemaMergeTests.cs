@@ -8,6 +8,8 @@ namespace Refitter.Tests.Regression;
 /// Regression tests for Issue #1016: Multi-spec merge drops schemas
 /// Validates that schemas from all OpenAPI specs are preserved during merge
 /// </summary>
+
+[Category("Unit")]
 public class MultiSpecSchemaMergeTests
 {
     // First spec: has paths but NO components section
