@@ -6,6 +6,8 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+
+[Category("Unit")]
 public class KeepSchemaPatternsTests
 {
     private const string OpenApiSpec = @"

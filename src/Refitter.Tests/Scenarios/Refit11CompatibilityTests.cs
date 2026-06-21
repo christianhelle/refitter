@@ -7,6 +7,8 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+
+[Category("Unit")]
 public class Refit11CompatibilityTests
 {
     private const string Refit11TargetFramework = "net10.0";

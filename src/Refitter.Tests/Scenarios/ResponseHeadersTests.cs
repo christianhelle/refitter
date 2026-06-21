@@ -7,6 +7,8 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+
+[Category("Unit")]
 public class ResponseHeadersTests
 {
     private const string OpenApiSpec = @"

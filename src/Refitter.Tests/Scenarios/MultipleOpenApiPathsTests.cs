@@ -5,6 +5,8 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+
+[Category("Unit")]
 public class MultipleOpenApiPathsTests
 {
     private const string PetstoreV1Spec = @"openapi: '3.0.0'

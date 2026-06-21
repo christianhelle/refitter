@@ -6,6 +6,8 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+
+[Category("Unit")]
 public class MutuallyExclusiveSettingsTests
 {
     private const string OpenApiSpec = @"

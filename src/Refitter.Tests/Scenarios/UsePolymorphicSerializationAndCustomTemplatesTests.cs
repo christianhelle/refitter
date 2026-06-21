@@ -5,6 +5,8 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Scenarios;
 
+
+[Category("Unit")]
 public class UsePolymorphicSerializationAndCustomTemplatesTests
 {
     private const string OpenApiSpec = @"
