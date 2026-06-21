@@ -43,8 +43,11 @@ jobs:
         dotnet msbuild src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
     - name: 🛠️ Build
       run: dotnet build -c Release src/Refitter.slnx -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
-    - name: 🧪 Test
-      run: dotnet test --solution src/Refitter.slnx -c Release
+    - name: 🧪 Unit tests (fast gate)
+      run: dotnet test --solution src/Refitter.slnx -c Release --no-build --treenode-filter "/*/*/*/*[Category=Unit]"
+    - name: 🧪 Full test suite
+      if: ${{ success() }}
+      run: dotnet test --solution src/Refitter.slnx -c Release --no-build
     - name: 🗳️ Upload
       uses: actions/upload-artifact@v7
       with:
