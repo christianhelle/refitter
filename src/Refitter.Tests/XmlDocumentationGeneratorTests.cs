@@ -7,6 +7,8 @@ using Refitter.Core;
 
 namespace Refitter.Tests;
 
+
+[Category("Unit")]
 public class XmlDocumentationGeneratorTests
 {
     private readonly XmlDocumentationGenerator generator = new(new RefitGeneratorSettings { GenerateXmlDocCodeComments = true });

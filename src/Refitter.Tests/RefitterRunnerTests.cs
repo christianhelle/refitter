@@ -5,6 +5,8 @@ using Refitter.Core.Validation;
 
 namespace Refitter.Tests;
 
+
+[Category("Unit")]
 public class RefitterRunnerTests
 {
     private static string CreateTempDirectory() =>

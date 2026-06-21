@@ -11,6 +11,8 @@ namespace Refitter.Tests;
 /// AnsiConsole/Spectre.Console which cannot be captured in unit tests.
 /// A clean run (no exception) is the success criterion.
 /// </summary>
+
+[Category("Unit")]
 public class RichGenerationReporterTests
 {
     [Test]
