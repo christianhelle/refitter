@@ -392,6 +392,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&gt;");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_With_Escaped_Parameter_Descriptions()
     {
@@ -402,6 +403,7 @@ public class XmlDocEscapingTests
             "Generated code with escaped parameter descriptions should compile");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_With_Escaped_Response_Descriptions()
     {
@@ -411,6 +413,7 @@ public class XmlDocEscapingTests
             "Generated code with escaped response descriptions should compile");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_With_Escaped_Dynamic_Querystring_Descriptions()
     {
@@ -495,6 +498,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&gt;");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_With_Escaped_Parameter_Descriptions_Swagger2()
     {
@@ -504,6 +508,7 @@ public class XmlDocEscapingTests
             "Generated code with escaped parameter descriptions should compile");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_With_Escaped_Response_Descriptions_Swagger2()
     {
@@ -513,6 +518,7 @@ public class XmlDocEscapingTests
             "Generated code with escaped response descriptions should compile");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_With_Escaped_Dynamic_Querystring_Descriptions_Swagger2()
     {

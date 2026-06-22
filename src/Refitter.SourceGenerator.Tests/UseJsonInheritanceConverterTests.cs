@@ -4,6 +4,7 @@ using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
 
+
 public class UseJsonInheritanceConverterTests
 {
     [Test]

@@ -6,6 +6,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+
 public class IntegerFormatTests
 {
     private const string OpenApiSpec =

@@ -9,6 +9,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+
 public class InlineJsonConvertersTests
 {
     private const string OpenApiSpec = @"

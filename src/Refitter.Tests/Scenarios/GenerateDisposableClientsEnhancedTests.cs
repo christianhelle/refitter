@@ -60,6 +60,7 @@ components:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {
@@ -82,6 +83,7 @@ components:
         generatedCode.Should().NotContain(": IDisposable");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_Without_Disposable()
     {

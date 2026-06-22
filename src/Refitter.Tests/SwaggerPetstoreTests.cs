@@ -8,6 +8,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests;
 
+
 public class SwaggerPetstoreTests
 {
     [Test]

@@ -103,6 +103,7 @@ public class BlockerRegressions
         result.Should().NotContain("Task<PetDtoDto>");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1013_Generated_Code_With_Suffix_Collision_Compiles()
     {
@@ -184,6 +185,7 @@ public class BlockerRegressions
         generatedCode.Should().Contain("[AliasAs(\"a-b\")]", "first parameter with sanitized name should be emitted");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1018_Generated_Code_With_Duplicate_Sanitized_Names_Compiles()
     {
@@ -326,6 +328,7 @@ public class BlockerRegressions
         generatedCode.Should().Contain("@while");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1053_Generated_Code_With_Keywords_Compiles()
     {
@@ -393,6 +396,7 @@ public class BlockerRegressions
         generatedCode.Should().Contain("interface IPublicApi");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Issue1102_TagNamedPublic_GeneratedCode_Compiles()
     {

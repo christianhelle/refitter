@@ -3,6 +3,7 @@ using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;
 
+
 public class PathUtilitiesTests
 {
     [Test]

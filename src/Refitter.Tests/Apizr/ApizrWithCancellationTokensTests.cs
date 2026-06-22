@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Apizr;
 
+
 public class ApizrWithCancellationTokensTests
 {
     private const string OpenApiSpec = @"

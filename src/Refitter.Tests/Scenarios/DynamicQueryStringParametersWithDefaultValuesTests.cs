@@ -116,6 +116,7 @@ public class DynamicQueryStringParametersWithDefaultValuesTests
         generatedCode.Should().NotContain("System.DateTimeOffset  End { get; set; } =");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {

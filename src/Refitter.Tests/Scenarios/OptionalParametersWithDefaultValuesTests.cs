@@ -116,6 +116,7 @@ public class OptionalParametersWithDefaultValuesTests
         generatedCode.Should().NotContain("System.DateTimeOffset end =");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {

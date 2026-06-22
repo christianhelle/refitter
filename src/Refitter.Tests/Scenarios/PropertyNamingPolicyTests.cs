@@ -231,6 +231,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("public string _1stNode { get; set; }");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Default_PascalCase_Minimally_Sanitizes_Invalid_Identifiers_OpenApi2()
     {
@@ -260,6 +261,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("_1st_node { get; set; }");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task PreserveOriginal_Generated_Code_With_Recursive_Schemas_Can_Build()
     {
@@ -275,6 +277,7 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("_42QuestionField { get; set; }");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Default_PascalCase_Digit_Prefixed_Properties_Can_Build()
     {

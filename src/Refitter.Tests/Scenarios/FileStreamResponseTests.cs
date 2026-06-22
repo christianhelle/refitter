@@ -6,6 +6,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+
 public class FileStreamResponseTests
 {
     private const string OpenApiSpec = @"

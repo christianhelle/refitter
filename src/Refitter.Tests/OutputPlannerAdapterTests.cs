@@ -4,6 +4,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests;
 
+
 public class OutputPlannerAdapterTests
 {
     private static readonly IOutputPlanner planner = new OutputPlannerAdapter();

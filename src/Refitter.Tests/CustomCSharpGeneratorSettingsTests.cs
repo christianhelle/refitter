@@ -289,6 +289,7 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().NotContain("class User");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Generate_With_ExcludedTypeNames_On_Recursive_Schema_And_PreserveOriginal_Property_Names()
     {
@@ -320,6 +321,7 @@ public class CustomCSharpGeneratorSettingsTests
         BuildHelper.BuildCSharp(generatedCode, RecursiveExternalNodeStub).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Generate_With_ExcludedTypeNames_On_Recursive_Schema_And_PreserveOriginal_Property_Names_V2()
     {

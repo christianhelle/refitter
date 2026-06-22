@@ -106,6 +106,7 @@ public class SettingsFileOutputPathTests
         }
     }
 
+    [Category("Integration")]
     [Test]
     public async Task SettingsFile_PreservesNamingInterfaceName()
     {

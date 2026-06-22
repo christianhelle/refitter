@@ -101,6 +101,7 @@ paths:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {
@@ -161,6 +162,7 @@ paths:
             .And.NotContain(@"\u041e\u0448");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Unicode_Status_Code_Comments_Can_Build()
     {

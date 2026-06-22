@@ -13,6 +13,7 @@ namespace Refitter.Tests.Scenarios;
 /// (requires NSwag/NJsonSchema version that supports this in their Enum.liquid template).
 /// When JsonLibraryVersion is 8.0 or below (default), enums use [EnumMember] attributes.
 /// </summary>
+
 public class JsonLibraryVersionTests
 {
     private const string OpenApiSpec = @"

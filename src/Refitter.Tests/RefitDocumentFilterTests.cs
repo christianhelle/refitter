@@ -5,6 +5,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests;
 
+
 public class RefitDocumentFilterTests
 {
     private const string OpenApiSpec = @"

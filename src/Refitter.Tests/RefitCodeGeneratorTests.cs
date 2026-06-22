@@ -92,6 +92,7 @@ paths:
         result.Should().NotContain("\"/foo\"");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generate_Compiles_Successfully()
     {

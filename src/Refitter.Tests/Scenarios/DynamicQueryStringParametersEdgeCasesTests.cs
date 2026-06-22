@@ -327,6 +327,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("long? LongValue { get; set; } = 9999");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Dynamic_QueryString_Generated_Code_Should_Build()
     {

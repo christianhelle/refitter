@@ -136,6 +136,7 @@ public class JsonSerializerContextGeneratorTests
         result.Split("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]").Length.Should().Be(2);
     }
 
+    [Category("Integration")]
     [Test]
     public void Generate_Registers_Nested_Types_With_Qualified_Name()
     {
@@ -158,6 +159,7 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public void Generate_Registers_Closed_Generic_Usages_And_Skips_Open_Generic_Declarations()
     {
@@ -187,6 +189,7 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public void Generate_Skips_Generic_Usages_That_Still_Reference_Open_Type_Parameters()
     {
@@ -222,6 +225,7 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public void Generate_Global_Qualifies_Types_Outside_The_Context_Namespace()
     {
@@ -248,6 +252,7 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public void Generate_Formats_Nullable_Array_And_Qualified_Generic_Usages()
     {
@@ -281,6 +286,7 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public void Generate_Formats_Alias_Qualified_Generic_Usages()
     {
@@ -314,6 +320,7 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public void Generate_Formats_Alias_Qualified_Declared_Types_Using_Namespace_Alias()
     {
@@ -347,6 +354,7 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public void Generate_Formats_NonDeclared_Generic_Type_Arguments()
     {
@@ -377,6 +385,7 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public void Generate_Handles_Declared_Types_In_Global_Namespace()
     {

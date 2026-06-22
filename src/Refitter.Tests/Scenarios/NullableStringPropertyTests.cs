@@ -10,6 +10,7 @@ namespace Refitter.Tests.Scenarios;
 /// Test for Issue #580: Nullable string properties should generate with string? (not string)
 /// https://github.com/christianhelle/refitter/issues/580
 /// </summary>
+
 public class NullableStringPropertyTests
 {
     private const string OpenApiSpecWithNullableProperties = @"

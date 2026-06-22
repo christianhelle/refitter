@@ -7,6 +7,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+
 public class SymbolsInDescriptionTests
 {
     private const string OpenApiSpec = @"

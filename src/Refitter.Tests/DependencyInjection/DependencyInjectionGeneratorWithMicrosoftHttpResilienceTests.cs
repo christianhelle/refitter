@@ -3,6 +3,7 @@ using Refitter.Core;
 
 namespace Refitter.Tests.DependencyInjection;
 
+
 public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
 {
     private readonly RefitGeneratorSettings settings = new()

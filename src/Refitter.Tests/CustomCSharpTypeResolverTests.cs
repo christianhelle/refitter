@@ -5,6 +5,7 @@ using Refitter.Core;
 
 namespace Refitter.Tests;
 
+
 public class CustomCSharpTypeResolverTests
 {
     [Test]

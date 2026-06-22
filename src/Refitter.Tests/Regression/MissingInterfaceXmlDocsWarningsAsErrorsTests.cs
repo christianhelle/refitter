@@ -59,6 +59,7 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
         generatedCode.Should().Contain("/// <summary>Operations for Orders.</summary>");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ByTag_Generated_Code_Builds_With_Warnings_As_Errors()
     {
@@ -77,6 +78,7 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
         generatedCode.Should().Contain("/// <summary>Operations for");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ByEndpoint_Generated_Code_Builds_With_Warnings_As_Errors()
     {

@@ -71,6 +71,7 @@ public class GenerateJsonSerializerContextTests
         generatedCode.Should().Contain("internal partial class UsersApiSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_JsonSerializerContext_Can_Build()
     {
@@ -79,6 +80,7 @@ public class GenerateJsonSerializerContextTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Separate_Contracts_Namespace_Can_Build()
     {

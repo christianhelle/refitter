@@ -5,6 +5,7 @@ using Refitter.Tests.Resources;
 
 namespace Refitter.Tests;
 
+
 public class SwaggerPetstoreMultipleFileTests
 {
     [Test]

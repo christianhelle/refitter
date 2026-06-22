@@ -3,6 +3,7 @@ using Refitter.Core;
 
 namespace Refitter.Tests.SettingsFile;
 
+
 public class WriteRefitterSettingsFileTests
 {
     [Test]

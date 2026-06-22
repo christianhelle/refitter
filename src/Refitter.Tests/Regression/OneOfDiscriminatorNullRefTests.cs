@@ -183,6 +183,7 @@ public class OneOfDiscriminatorNullRefTests
         generatedCode.Should().Contain("GetData");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_From_All_Variants()
     {

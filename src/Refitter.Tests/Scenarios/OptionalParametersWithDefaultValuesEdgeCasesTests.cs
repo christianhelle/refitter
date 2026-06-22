@@ -222,6 +222,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         generatedCode.Should().Contain("decimal? decimalValue = 99.99m");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Escaped_Strings_Should_Build()
     {
@@ -263,6 +264,7 @@ public class OptionalParametersWithDefaultValuesEdgeCasesTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Float_Decimal_Should_Build()
     {

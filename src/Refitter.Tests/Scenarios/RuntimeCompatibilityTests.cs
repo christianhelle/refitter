@@ -323,6 +323,7 @@ public class RuntimeCompatibilityTests
     /// Swagger 2.0 optional reference properties should keep pre-#1026 shapes for arrays, custom types and generic collections.
     /// Value types should still retain nullable fallthrough where appropriate.
     /// </summary>
+    [Category("Integration")]
     [Test]
     public async Task Does_Not_Auto_Enable_Optional_Properties_As_Nullable_For_Swagger2_Reference_Shapes()
     {
@@ -816,6 +817,7 @@ public class RuntimeCompatibilityTests
     /// Test for issue #1049: Verify generated code with async operations.
     /// Note: ConfigureAwait(false) is used internally in library code, not in generated output.
     /// </summary>
+    [Category("Integration")]
     [Test]
     public async Task Can_Generate_Code_With_Async_Operations()
     {
@@ -867,6 +869,7 @@ public class RuntimeCompatibilityTests
     /// <summary>
     /// Swagger 2.0 equivalent of Can_Generate_Code_With_Async_Operations.
     /// </summary>
+    [Category("Integration")]
     [Test]
     public async Task Can_Generate_Code_With_Async_Operations_Swagger2()
     {

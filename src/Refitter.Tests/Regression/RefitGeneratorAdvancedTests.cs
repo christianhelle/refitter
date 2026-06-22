@@ -308,6 +308,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
+    [Category("Integration")]
     [Test]
     public async Task GenerateMultipleFiles_With_AdditionalNamespaces_Code_Builds()
     {
@@ -444,6 +445,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
+    [Category("Integration")]
     [Test]
     public async Task CreateAsync_With_OpenApiPaths_Array_Builds_Successfully()
     {
@@ -671,6 +673,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
+    [Category("Integration")]
     [Test]
     public async Task GenerateMultipleFiles_With_JsonSerializerContext_Adds_Context_File()
     {
@@ -733,6 +736,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
+    [Category("Integration")]
     [Test]
     public void NormalizeSwagger2OptionalReferencePropertyNullability_Removes_Nullability_From_Reference_Type_Shapes()
     {

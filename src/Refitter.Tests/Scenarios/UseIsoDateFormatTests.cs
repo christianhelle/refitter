@@ -138,6 +138,7 @@ paths:
         generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {

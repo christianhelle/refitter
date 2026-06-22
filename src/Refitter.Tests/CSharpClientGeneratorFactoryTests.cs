@@ -420,6 +420,7 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ProcessSchemaWalkers_WithRecursivePropertyItemAndAdditionalPropertiesSchemas_CanBuildGeneratedCode()
     {
@@ -432,6 +433,7 @@ public class CSharpClientGeneratorFactoryTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ProcessSchemaWalkers_WithRecursiveAllOfSchemas_CanBuildGeneratedCode()
     {
@@ -442,6 +444,7 @@ public class CSharpClientGeneratorFactoryTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ProcessSchemaWalkers_WithRecursivePropertyItemAndAdditionalPropertiesSchemas_V2_CanBuildGeneratedCode()
     {
@@ -454,6 +457,7 @@ public class CSharpClientGeneratorFactoryTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ProcessSchemaWalkers_WithRecursiveAllOfSchemas_V2_CanBuildGeneratedCode()
     {

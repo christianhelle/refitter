@@ -86,6 +86,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string !special");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Invalid_Multipart_Identifiers_Compiles()
     {
@@ -169,6 +170,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("@class");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Invalid_Security_Identifiers_Compiles()
     {
@@ -242,6 +244,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("this._foo = _foo;");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Compiles()
     {
@@ -315,6 +318,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("IDictionary<string, string?> filters = default");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Generic_Parameters_Compiles()
     {
@@ -404,6 +408,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string !special");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Invalid_Multipart_Identifiers_Compiles_Swagger2()
     {
@@ -487,6 +492,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("@class");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Invalid_Security_Identifiers_Compiles_Swagger2()
     {
@@ -558,6 +564,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("this._foo = _foo;");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Compiles_Swagger2()
     {
@@ -629,6 +636,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("IDictionary<string, string?> filters = default");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Generic_Parameters_Compiles_Swagger2()
     {
@@ -684,6 +692,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("\"abc\"");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Unsanitized_Parameter_Name_Compiles()
     {
@@ -742,6 +751,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("\"abc\"");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Generated_Code_With_Unsanitized_Parameter_Name_Compiles_Swagger2()
     {

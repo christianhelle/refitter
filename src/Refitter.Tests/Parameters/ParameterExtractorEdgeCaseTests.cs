@@ -285,6 +285,7 @@ public class ParameterExtractorEdgeCaseTests
         occurrences.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ApizrRequestOptions_Code_Builds()
     {
@@ -382,6 +383,7 @@ public class ParameterExtractorEdgeCaseTests
         occurrences.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task CancellationToken_Code_Builds()
     {

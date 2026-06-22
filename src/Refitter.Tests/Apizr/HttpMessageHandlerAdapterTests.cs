@@ -3,6 +3,7 @@ using Refitter.Core;
 
 namespace Refitter.Tests.Apizr;
 
+
 public class HttpMessageHandlerAdapterTests
 {
     [Test]

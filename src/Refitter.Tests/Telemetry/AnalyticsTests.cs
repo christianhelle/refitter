@@ -3,6 +3,7 @@ using Refitter.Core;
 
 namespace Refitter.Tests.Telemetry;
 
+
 public class AnalyticsTests
 {
     [Test]

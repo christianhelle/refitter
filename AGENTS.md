@@ -9,6 +9,23 @@ OpenAPI-to-Refit code generator. Multi-package solution: CLI tool, MSBuild task,
 - Build: `dotnet build -c Release src/Refitter.slnx`
 - Test: `dotnet test --solution src/Refitter.slnx -c Release`
 
+### Fast Feedback (TUnit category filters)
+
+TUnit uses `--treenode-filter` instead of the VSTest `--filter` syntax.
+
+```bash
+# Fast unit tests only (no subprocess compilation — ~41s, 2152 tests)
+dotnet test --treenode-filter "/*/*/*/*[Category!=Integration]" --solution src/Refitter.slnx -c Release --no-build
+
+# Integration tests only (compilation verification — ~17s, 88 tests)
+dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-build --treenode-filter "/*/*/*/*[Category=Integration]"
+
+# Full suite before commit
+dotnet test --solution src/Refitter.slnx -c Release
+```
+
+**Convention:** Only `[Category("Integration")]` is explicitly declared — tests that call `BuildHelper.BuildCSharp()` which spawns `dotnet build`. All other tests are unmarked and treated as unit tests by default.
+
 **Source Generator tests require a pre-build step.** Before running `dotnet test` on `Refitter.SourceGenerator.Tests`, the CI does:
 
 ```bash

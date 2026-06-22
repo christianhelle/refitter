@@ -500,6 +500,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("uintValue = 300");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task FormatNumericValue_Generated_Code_Builds()
     {
@@ -812,6 +813,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("boolArray");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task GetCSharpType_All_Types_Build()
     {
@@ -974,6 +976,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("int? int32Value");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task GetIntegerTypeName_Generated_Code_Builds()
     {
@@ -1024,6 +1027,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("arrayWithoutItems");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task GetArrayType_Null_Item_Generated_Code_Builds()
     {

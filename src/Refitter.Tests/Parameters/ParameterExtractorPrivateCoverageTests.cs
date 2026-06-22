@@ -6,6 +6,7 @@ using Refitter.Core;
 
 namespace Refitter.Tests.Parameters;
 
+
 public class ParameterExtractorPrivateCoverageTests
 {
     [Test]

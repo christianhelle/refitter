@@ -92,6 +92,7 @@ paths:
         generatedCode.Should().Contain("GetBar");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task RefitMultipleInterfaceByTagGenerator_Generated_Code_Compiles()
     {

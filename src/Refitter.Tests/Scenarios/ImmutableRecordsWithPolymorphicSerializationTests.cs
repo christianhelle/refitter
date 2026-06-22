@@ -74,6 +74,7 @@ components:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code()
     {

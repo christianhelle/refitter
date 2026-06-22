@@ -2,6 +2,7 @@ using FluentAssertions;
 
 namespace Refitter.Tests.Telemetry;
 
+
 public class SupportInformationTests
 {
     [Test]

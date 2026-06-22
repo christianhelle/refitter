@@ -77,6 +77,7 @@ components:
         generatedCode.Should().Contain("Task<");
     }
 
+    [Category("Integration")]
     [Test]
     public async Task Can_Build_Generated_Code_Without_IObservable()
     {

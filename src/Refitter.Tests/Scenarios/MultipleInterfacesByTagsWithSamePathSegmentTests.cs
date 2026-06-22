@@ -11,6 +11,7 @@ namespace Refitter.Tests.Scenarios;
 /// When using ByTag, method names should not have numeric suffixes added for
 /// cross-interface uniqueness - deduplication should be per-interface.
 /// </summary>
+
 public class MultipleInterfacesByTagsWithSamePathSegmentTests
 {
     private const string OpenApiSpec = @"

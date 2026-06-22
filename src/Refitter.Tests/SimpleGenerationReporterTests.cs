@@ -11,6 +11,7 @@ namespace Refitter.Tests;
 /// redirecting Console.Out (TUnit0055). The methods only write to Console so they
 /// don't throw — a clean run is the success criterion.
 /// </summary>
+
 public class SimpleGenerationReporterTests
 {
     [Test]

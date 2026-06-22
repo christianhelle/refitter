@@ -10,6 +10,7 @@ namespace Refitter.Tests.Scenarios;
 /// Test for Issue #672: Method naming increments globally instead of per-interface
 /// https://github.com/christianhelle/refitter/issues/672
 /// </summary>
+
 public class MultipleInterfacesByTagMethodNamingTests
 {
     private const string OpenApiSpec = @"
