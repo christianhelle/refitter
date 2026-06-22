@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Split up Unit and Integration tests using \[Category\] [\#1168](https://github.com/christianhelle/refitter/pull/1168) ([christianhelle](https://github.com/christianhelle))
 - Remove reflection-based non-public method testing [\#1167](https://github.com/christianhelle/refitter/pull/1167) ([christianhelle](https://github.com/christianhelle))
 - Extract RefitterRunner as shared generation workflow [\#1166](https://github.com/christianhelle/refitter/pull/1166) ([christianhelle](https://github.com/christianhelle))
 - Strategy pattern for document loading [\#1165](https://github.com/christianhelle/refitter/pull/1165) ([christianhelle](https://github.com/christianhelle))
