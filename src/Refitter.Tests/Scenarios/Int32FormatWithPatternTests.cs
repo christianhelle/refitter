@@ -7,7 +7,6 @@ using TUnit.Core;
 namespace Refitter.Tests.Scenarios;
 
 
-[Category("Unit")]
 public class Int32FormatWithPatternTests
 {
     private const string OpenApiSpec = @"

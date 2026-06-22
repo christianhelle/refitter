@@ -6,7 +6,6 @@ using Refitter.Tests.TestUtilities;
 namespace Refitter.Tests.Apizr;
 
 
-[Category("Unit")]
 public class ApizrWithCancellationTokensTests
 {
     private const string OpenApiSpec = @"

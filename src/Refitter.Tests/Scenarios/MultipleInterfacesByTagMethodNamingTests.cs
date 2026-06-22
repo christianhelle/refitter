@@ -11,7 +11,6 @@ namespace Refitter.Tests.Scenarios;
 /// https://github.com/christianhelle/refitter/issues/672
 /// </summary>
 
-[Category("Unit")]
 public class MultipleInterfacesByTagMethodNamingTests
 {
     private const string OpenApiSpec = @"

@@ -11,7 +11,6 @@ namespace Refitter.Tests.Scenarios;
 /// https://github.com/christianhelle/refitter/issues/580
 /// </summary>
 
-[Category("Unit")]
 public class NullableStringPropertyTests
 {
     private const string OpenApiSpecWithNullableProperties = @"

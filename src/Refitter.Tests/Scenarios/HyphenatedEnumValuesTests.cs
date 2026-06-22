@@ -17,7 +17,6 @@ namespace Refitter.Tests.Scenarios;
 /// respects [EnumMember] (e.g. JsonStringEnumMemberConverter).
 /// </summary>
 
-[Category("Unit")]
 public class HyphenatedEnumValuesTests
 {
     private const string OpenApiSpec = @"

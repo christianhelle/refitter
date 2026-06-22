@@ -10,7 +10,6 @@ namespace Refitter.Tests.Regression;
 /// Validates that suffix replacement doesn't corrupt XML comments, string literals, or partial name matches
 /// </summary>
 
-[Category("Unit")]
 public class ContractSuffixCorruptionTests
 {
     private const string OpenApiSpec = @"

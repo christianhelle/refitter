@@ -14,7 +14,6 @@ namespace Refitter.Tests.Scenarios;
 /// When JsonLibraryVersion is 8.0 or below (default), enums use [EnumMember] attributes.
 /// </summary>
 
-[Category("Unit")]
 public class JsonLibraryVersionTests
 {
     private const string OpenApiSpec = @"

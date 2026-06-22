@@ -9,7 +9,6 @@ using TUnit.Core;
 namespace Refitter.Tests;
 
 
-[Category("Unit")]
 public class SwaggerPetstoreTests
 {
     [Test]

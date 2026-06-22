@@ -6,7 +6,6 @@ using TUnit.Core;
 namespace Refitter.SourceGenerators.Tests;
 
 
-[Category("Unit")]
 public class MultipleInterfaceGeneratorTests
 {
     private const string ExpectedNamespace = "Refitter.Tests.AdditionalFiles.ByEndpoint";

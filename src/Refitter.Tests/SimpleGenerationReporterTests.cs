@@ -12,7 +12,6 @@ namespace Refitter.Tests;
 /// don't throw — a clean run is the success criterion.
 /// </summary>
 
-[Category("Unit")]
 public class SimpleGenerationReporterTests
 {
     [Test]

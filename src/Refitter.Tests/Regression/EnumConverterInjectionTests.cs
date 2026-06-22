@@ -10,7 +10,6 @@ namespace Refitter.Tests.Regression;
 /// Validates that both internal and public enums receive JsonConverter attributes
 /// </summary>
 
-[Category("Unit")]
 public class EnumConverterInjectionTests
 {
     private const string OpenApiSpec = @"

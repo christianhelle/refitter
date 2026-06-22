@@ -4,7 +4,6 @@ using Refitter.Core;
 namespace Refitter.Tests.Telemetry;
 
 
-[Category("Unit")]
 public class AnalyticsTests
 {
     [Test]

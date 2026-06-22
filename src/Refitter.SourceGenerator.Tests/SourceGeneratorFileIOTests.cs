@@ -6,7 +6,6 @@ using Refitter.SourceGenerators.Tests.TestUtilities;
 namespace Refitter.SourceGenerators.Tests;
 
 
-[Category("Unit")]
 public class SourceGeneratorFileIOTests
 {
     private const string OpenApiSpec = @"

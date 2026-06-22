@@ -8,7 +8,6 @@ namespace Refitter.Tests.Regression;
 /// Validates that malformed Unicode escape sequences (e.g., \uZZZZ) are handled correctly without consuming extra characters
 /// </summary>
 
-[Category("Unit")]
 public class MalformedUnicodeEscapeTests
 {
     [Test]

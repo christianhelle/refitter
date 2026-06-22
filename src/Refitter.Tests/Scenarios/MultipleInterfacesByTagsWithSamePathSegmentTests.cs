@@ -12,7 +12,6 @@ namespace Refitter.Tests.Scenarios;
 /// cross-interface uniqueness - deduplication should be per-interface.
 /// </summary>
 
-[Category("Unit")]
 public class MultipleInterfacesByTagsWithSamePathSegmentTests
 {
     private const string OpenApiSpec = @"

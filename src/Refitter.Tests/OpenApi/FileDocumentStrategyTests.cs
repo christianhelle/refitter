@@ -5,7 +5,6 @@ using Refitter.Tests.Resources;
 namespace Refitter.Tests.OpenApi;
 
 
-[Category("Unit")]
 public class FileDocumentStrategyTests
 {
     [Test]

@@ -4,7 +4,6 @@ using Refitter.Core;
 namespace Refitter.Tests;
 
 
-[Category("Unit")]
 public class ContractTypeSuffixApplierTests
 {
     [Test]

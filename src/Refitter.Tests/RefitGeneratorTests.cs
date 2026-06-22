@@ -7,7 +7,6 @@ using TUnit.Core;
 namespace Refitter.Tests;
 
 
-[Category("Unit")]
 public class RefitGeneratorTests
 {
     private const string OpenApiSpec = @"

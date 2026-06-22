@@ -6,7 +6,6 @@ using Refitter.Tests.Resources;
 namespace Refitter.Tests.Apizr;
 
 
-[Category("Unit")]
 public class SwaggerPetstoreApizrTests
 {
     private class ApizrGeneratorSettings : RefitGeneratorSettings

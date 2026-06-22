@@ -12,7 +12,6 @@ namespace Refitter.Tests;
 /// A clean run (no exception) is the success criterion.
 /// </summary>
 
-[Category("Unit")]
 public class RichGenerationReporterTests
 {
     [Test]

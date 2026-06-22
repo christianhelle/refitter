@@ -9,7 +9,6 @@ namespace Refitter.Tests.Regression;
 /// Validates that schemas from all OpenAPI specs are preserved during merge
 /// </summary>
 
-[Category("Unit")]
 public class MultiSpecSchemaMergeTests
 {
     // First spec: has paths but NO components section

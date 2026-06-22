@@ -6,7 +6,6 @@ using Refitter.MSBuild;
 namespace Refitter.Tests.MSBuild;
 
 
-[Category("Unit")]
 public class RefitterGenerateTaskTests
 {
     [Test]

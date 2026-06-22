@@ -4,7 +4,6 @@ using Refitter.Core;
 namespace Refitter.Tests.SettingsFile;
 
 
-[Category("Unit")]
 public class SerializerTests
 {
     private static RefitGeneratorSettings CreateTestSettings() => new()

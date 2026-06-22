@@ -4,7 +4,6 @@ using Refitter.Core;
 namespace Refitter.Tests.SettingsFile;
 
 
-[Category("Unit")]
 public class RefitterSettingsLoaderTests
 {
     private static readonly string BaseDirectory = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "refitter-loader-tests"));

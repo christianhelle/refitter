@@ -4,7 +4,6 @@ using Refitter.Core;
 namespace Refitter.Tests.DependencyInjection;
 
 
-[Category("Unit")]
 public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
 {
     private readonly RefitGeneratorSettings settings = new()

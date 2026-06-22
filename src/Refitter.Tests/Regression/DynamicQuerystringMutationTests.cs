@@ -8,7 +8,6 @@ namespace Refitter.Tests.Regression;
 /// Validates that XML documentation still sees the original query parameters after wrapper generation.
 /// </summary>
 
-[Category("Unit")]
 public class DynamicQuerystringMutationTests
 {
     private const string OpenApiSpec = """

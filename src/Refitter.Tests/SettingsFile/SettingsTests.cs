@@ -6,7 +6,6 @@ using Spectre.Console.Cli;
 namespace Refitter.Tests.SettingsFile;
 
 
-[Category("Unit")]
 public class SettingsTests
 {
     [Test]

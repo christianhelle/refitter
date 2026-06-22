@@ -3,7 +3,6 @@ using FluentAssertions;
 namespace Refitter.Tests.Telemetry;
 
 
-[Category("Unit")]
 public class SupportInformationTests
 {
     [Test]

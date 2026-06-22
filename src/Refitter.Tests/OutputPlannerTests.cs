@@ -5,7 +5,6 @@ using TUnit.Core;
 namespace Refitter.Tests;
 
 
-[Category("Unit")]
 public class OutputPlannerTests
 {
     private static readonly string ContractsFileName = $"{TypenameConstants.Contracts}.cs";
