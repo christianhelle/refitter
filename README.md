@@ -553,8 +553,6 @@ This approach requires that Refitter is installed as a local tool using a manife
 
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) and generate some registration helpers too.
 
-Starting with v2.0.0, the source generator emits code in-memory through Roslyn `AddSource()` instead of writing `.g.cs` files to disk. Use your IDE's generated-files view to inspect the output. If your workflow requires physical generated files for review, commits, or build scripts, use the [MSBuild](#msbuild) package or the CLI instead.
-
 ### Installation
 
 The source generator is distributed as a NuGet package and should be installed to the project that will contain the generated code
