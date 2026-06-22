@@ -50,7 +50,6 @@ public class AnyTypeBodySerializationTests
 }
 ";
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_BodySerializationMethod_For_Object_Parameter()
     {

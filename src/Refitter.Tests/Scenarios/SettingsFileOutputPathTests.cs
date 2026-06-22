@@ -37,7 +37,6 @@ public class SettingsFileOutputPathTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public void SettingsFile_WithoutOutputFilename_UsesRefitterFilenameFallback()
     {
@@ -73,7 +72,6 @@ public class SettingsFileOutputPathTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public void SettingsFile_WithExplicitDefaultOutputFolder_RootsToSettingsFileDirectory()
     {

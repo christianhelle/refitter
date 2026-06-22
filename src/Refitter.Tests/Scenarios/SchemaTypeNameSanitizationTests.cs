@@ -101,7 +101,6 @@ public class SchemaTypeNameSanitizationTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Issue1083_Sanitizes_Trailing_Dot_Schema_Name_In_Contract_And_Method_Signature()
     {

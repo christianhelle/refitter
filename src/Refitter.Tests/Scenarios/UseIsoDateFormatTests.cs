@@ -46,7 +46,6 @@ paths:
           description: No response was specified
 ";
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -54,7 +53,6 @@ paths:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GeneratedCode_Contains_Date_Format_String()
     {
@@ -63,7 +61,6 @@ paths:
         generatedCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_to");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GeneratedCode_NotContains_DateTime_Format_String()
     {
@@ -72,7 +69,6 @@ paths:
         generatedCode.Should().NotContain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset time_datetime");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter()
     {
@@ -80,7 +76,6 @@ paths:
         generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GeneratedCode_Contains_Date_Format_String_With_Empty_Settings()
     {
@@ -89,7 +84,6 @@ paths:
         generatedCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_to");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GeneratedCode_NotContains_DateTime_Format_String_With_Empty_Settings()
     {
@@ -98,7 +92,6 @@ paths:
         generatedCode.Should().NotContain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset time_datetime");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter_With_Empty_Settings()
     {
@@ -106,7 +99,6 @@ paths:
         generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments("dd/MM/yyyy", "yyyy-MM-ddTHH:mm:ss")]
     [Arguments("MM-dd-yyyy", "HH:mm:ss")]
@@ -127,7 +119,6 @@ paths:
         generatedCode.Should().Contain(@$"[Query] System.TimeSpan test_time");
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments("dd/MM/yyyy")]
     [Arguments("MM-dd-yyyy")]
@@ -138,7 +129,6 @@ paths:
         generatedCode.Should().NotContain(@$"[Query(Format = ""{format}"")] System.DateTimeOffset time_datetime");
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments("dd/MM/yyyy")]
     [Arguments("MM-dd-yyyy")]

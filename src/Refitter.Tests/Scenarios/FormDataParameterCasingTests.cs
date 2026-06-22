@@ -60,7 +60,6 @@ public class FormDataParameterCasingTests
 }
 ";
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -76,7 +75,6 @@ public class FormDataParameterCasingTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_Multipart_Attribute()
     {
@@ -84,7 +82,6 @@ public class FormDataParameterCasingTests
         generatedCode.Should().Contain("[Multipart]");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task FormData_Parameters_Should_Have_AliasAs_Attribute()
     {

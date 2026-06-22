@@ -37,7 +37,6 @@ components:
           type: string
 ";
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -53,7 +52,6 @@ components:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Uses_OpenApi_Title_As_Interface_Name()
     {
@@ -61,7 +59,6 @@ components:
         generatedCode.Should().Contain("interface IPetStore");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Uses_Custom_Interface_Name()
     {
@@ -69,7 +66,6 @@ components:
         generatedCode.Should().Contain("interface IMyCustomApi");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Uses_Default_Interface_Name_When_Not_Configured()
     {
@@ -77,7 +73,6 @@ components:
         generatedCode.Should().Contain("interface IApiClient");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Custom_Interface_Name_Takes_Precedence_Over_OpenApi_Title()
     {

@@ -14,7 +14,6 @@ public class RuntimeCompatibilityTests
     /// Test for issue #1027: RefitInterfaceGenerator NRE when an OpenAPI response has no content.
     /// Ensures that responses with null Content (e.g., 204 No Content) are handled gracefully.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Can_Handle_Response_With_No_Content()
     {
@@ -69,7 +68,6 @@ public class RuntimeCompatibilityTests
     /// <summary>
     /// Test for issue #1027: Verify Accept headers are generated for responses with content.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Accept_Headers_For_Valid_Responses()
     {
@@ -125,7 +123,6 @@ public class RuntimeCompatibilityTests
     /// <summary>
     /// Swagger 2.0 equivalent of Can_Generate_Accept_Headers_For_Valid_Responses.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Accept_Headers_For_Valid_Responses_Swagger2()
     {
@@ -180,7 +177,6 @@ public class RuntimeCompatibilityTests
     /// <summary>
     /// Test for issue #1026: nullable reference types alone must not silently change contract shapes.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled()
     {
@@ -253,7 +249,6 @@ public class RuntimeCompatibilityTests
     /// <summary>
     /// Swagger 2.0 equivalent of Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Does_Not_Auto_Enable_Optional_Properties_As_Nullable_When_NRT_Enabled_Swagger2()
     {
@@ -430,7 +425,6 @@ public class RuntimeCompatibilityTests
     /// <summary>
     /// Explicit opt-in should still generate nullable optional properties when desired.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Honors_Explicit_GenerateOptionalPropertiesAsNullable_When_NRT_Enabled()
     {
@@ -502,7 +496,6 @@ public class RuntimeCompatibilityTests
     /// <summary>
     /// Swagger 2.0 should still honor explicit opt-in for nullable optional properties.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Honors_Explicit_GenerateOptionalPropertiesAsNullable_When_NRT_Enabled_Swagger2()
     {
@@ -576,7 +569,6 @@ public class RuntimeCompatibilityTests
     /// Test for issue #1052: Verify duplicate operation ID detection is efficient.
     /// This test ensures the duplicate detection short-circuits on first duplicate found.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Duplicate_Operation_Id_Detection_Is_Efficient()
     {
@@ -628,7 +620,6 @@ public class RuntimeCompatibilityTests
     /// <summary>
     /// Swagger 2.0 equivalent of Duplicate_Operation_Id_Detection_Is_Efficient.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Duplicate_Operation_Id_Detection_Is_Efficient_Swagger2()
     {
@@ -683,7 +674,6 @@ public class RuntimeCompatibilityTests
     /// Test for issue #1055: Verify interface generator is created before GenerateFile().
     /// This ensures operation ID detection works correctly.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Interface_Generator_Created_Before_Generate_File()
     {
@@ -755,7 +745,6 @@ public class RuntimeCompatibilityTests
     /// <summary>
     /// Swagger 2.0 equivalent of Interface_Generator_Created_Before_Generate_File.
     /// </summary>
-    [Category("Unit")]
     [Test]
     public async Task Interface_Generator_Created_Before_Generate_File_Swagger2()
     {

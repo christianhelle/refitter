@@ -6,7 +6,6 @@ namespace Refitter.Tests;
 
 public class JsonSerializerContextGeneratorTests
 {
-    [Category("Unit")]
     [Test]
     public void Generate_Returns_Empty_When_Contracts_Are_Whitespace()
     {
@@ -15,7 +14,6 @@ public class JsonSerializerContextGeneratorTests
             .BeEmpty();
     }
 
-    [Category("Unit")]
     [Test]
     public void Generate_Returns_Empty_When_No_Types()
     {
@@ -26,7 +24,6 @@ public class JsonSerializerContextGeneratorTests
             .BeEmpty();
     }
 
-    [Category("Unit")]
     [Test]
     public void Generate_Uses_OpenApi_Title_For_Context_Name_When_Enabled()
     {
@@ -48,7 +45,6 @@ public class JsonSerializerContextGeneratorTests
         result.Should().NotContain("IgnoredApiSerializerContext");
     }
 
-    [Category("Unit")]
     [Test]
     public void Generate_Sanitizes_Angle_Brackets_In_OpenApi_Title_For_Context_Name()
     {
@@ -70,7 +66,6 @@ public class JsonSerializerContextGeneratorTests
         result.Should().NotContain("Pet<Service>SerializerContext");
     }
 
-    [Category("Unit")]
     [Test]
     public void Generate_Uses_Contracts_Namespace_And_Strips_Interface_Prefix()
     {
@@ -91,7 +86,6 @@ public class JsonSerializerContextGeneratorTests
         result.Should().NotContain("IMyApiSerializerContext");
     }
 
-    [Category("Unit")]
     [Test]
     public void Generate_Falls_Back_To_Default_Context_Name_When_Interface_Name_Is_Missing()
     {
@@ -110,7 +104,6 @@ public class JsonSerializerContextGeneratorTests
         result.Should().Contain("internal partial class ApiClientSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
     }
 
-    [Category("Unit")]
     [Test]
     public void Generate_Registers_Types_Once()
     {

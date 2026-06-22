@@ -55,7 +55,6 @@ public class GenerateJsonSerializerContextTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -63,7 +62,6 @@ public class GenerateJsonSerializerContextTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_JsonSerializerContext()
     {
@@ -96,7 +94,6 @@ public class GenerateJsonSerializerContextTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Does_Not_Contain_JsonSerializerContext_When_Disabled()
     {

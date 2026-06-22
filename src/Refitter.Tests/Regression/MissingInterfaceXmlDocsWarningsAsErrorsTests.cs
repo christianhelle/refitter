@@ -50,7 +50,6 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
                   description: 'ok'
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task ByTag_Generates_Interface_Fallback_Summary_When_Tag_Description_Is_Missing()
     {
@@ -69,7 +68,6 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
         BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task ByEndpoint_Generates_Interface_Fallback_Summary_When_Endpoint_Summary_Is_Missing()
     {

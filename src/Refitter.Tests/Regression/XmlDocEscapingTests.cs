@@ -319,7 +319,6 @@ public class XmlDocEscapingTests
 }
 ";
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Ampersand_In_Parameter_Description()
     {
@@ -330,7 +329,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().NotContain("/// <summary>\n                /// Search filter: use & for");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Less_Than_In_Parameter_Description()
     {
@@ -340,7 +338,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Greater_Than_In_Parameter_Description()
     {
@@ -350,7 +347,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&gt;");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Multiple_Unsafe_Chars_In_Parameter_Description()
     {
@@ -360,7 +356,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;100 &amp; offset&gt;0");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Unsafe_Chars_In_Response_Description()
     {
@@ -370,7 +365,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("Success: returns data where x&lt;100 &amp; y&gt;0");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Unsafe_Chars_In_Exception_Description()
     {
@@ -380,7 +374,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;10 &amp;");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Unsafe_Chars_In_Dynamic_Querystring_Parameter_Descriptions()
     {
@@ -439,7 +432,6 @@ public class XmlDocEscapingTests
 
     // ── Swagger 2.0 companion tests ─────────────────────────────────────────
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Ampersand_In_Parameter_Description_Swagger2()
     {
@@ -449,7 +441,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().NotContain("/// <summary>\n                /// Search filter: use & for");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Less_Than_In_Parameter_Description_Swagger2()
     {
@@ -458,7 +449,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Greater_Than_In_Parameter_Description_Swagger2()
     {
@@ -467,7 +457,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&gt;");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Multiple_Unsafe_Chars_In_Parameter_Description_Swagger2()
     {
@@ -476,7 +465,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;100 &amp; offset&gt;0");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Unsafe_Chars_In_Response_Description_Swagger2()
     {
@@ -485,7 +473,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("Success: returns data where x&lt;100 &amp; y&gt;0");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Unsafe_Chars_In_Exception_Description_Swagger2()
     {
@@ -494,7 +481,6 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;10 &amp;");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Should_Escape_Unsafe_Chars_In_Dynamic_Querystring_Parameter_Descriptions_Swagger2()
     {

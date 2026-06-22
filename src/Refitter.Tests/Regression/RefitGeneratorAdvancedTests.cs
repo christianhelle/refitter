@@ -92,7 +92,6 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 1: ContractTypeSuffix in GenerateMultipleFiles (Lines 249-256)
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_Applies_ContractTypeSuffix_To_All_Files()
     {
@@ -128,7 +127,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_ContractTypeSuffix_Can_Build()
     {
@@ -159,7 +157,6 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 2: GenerateContracts = false in GenerateMultipleFiles (Lines 221-227)
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_With_GenerateContracts_False_Excludes_Contracts_File()
     {
@@ -184,7 +181,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_With_GenerateContracts_False_Still_Has_Interface_Files()
     {
@@ -213,7 +209,6 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 3: Empty DI config should not add config file (Lines 229-247)
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_Empty_DI_Config_Does_Not_Add_DependencyInjection_File()
     {
@@ -244,7 +239,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_With_Valid_DI_Config_Includes_DependencyInjection_File()
     {
@@ -281,7 +275,6 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 4: AdditionalNamespaces in GenerateClient (Lines 297-305)
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_With_AdditionalNamespaces_Includes_Using_Statements()
     {
@@ -340,7 +333,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_AdditionalNamespaces_With_MultipleInterfaces_ByEndpoint()
     {
@@ -377,7 +369,6 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 5: OpenApiPaths array (Line 45-46)
 
-    [Category("Unit")]
     [Test]
     public async Task CreateAsync_With_OpenApiPaths_Array_Loads_Multiple_Documents()
     {
@@ -559,7 +550,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public async Task CreateAsync_With_OpenApiPaths_Array_In_MultipleFiles_Mode()
     {
@@ -642,7 +632,6 @@ public class RefitGeneratorAdvancedTests
 
     #region Combined Scenarios
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_With_ContractTypeSuffix_And_AdditionalNamespaces()
     {
@@ -716,7 +705,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_With_GenerateContracts_False_And_ContractTypeSuffix()
     {
@@ -797,7 +785,6 @@ public class RefitGeneratorAdvancedTests
         BuildHelper.BuildCSharp(normalized).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     public void NormalizeSwagger2OptionalReferencePropertyNullability_Incorrectly_Removes_Nullability_From_Struct_Value_Types()
     {
@@ -867,7 +854,6 @@ public class RefitGeneratorAdvancedTests
         normalized.Should().Contain("public int? BuiltInValueType { get; set; }");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generate_Does_Not_Emit_JsonSerializerContext_When_Contracts_Are_Disabled()
     {
@@ -898,7 +884,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_Does_Not_Add_JsonSerializerContext_File_When_Contracts_Are_Disabled()
     {
@@ -929,7 +914,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_Handles_Missing_Document_Info_For_JsonSerializerContext_File_Name()
     {
@@ -961,7 +945,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public void GenerateJsonSerializerContext_Handles_Missing_Document_Info()
     {
@@ -992,7 +975,6 @@ public class RefitGeneratorAdvancedTests
         serializerContext.Should().Contain("internal partial class TestApiSerializerContext");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_Does_Not_Add_JsonSerializerContext_File_When_No_Contract_Types_Are_Generated()
     {
@@ -1044,7 +1026,6 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Unit")]
     [Test]
     public async Task GenerateMultipleFiles_With_Whitespace_OpenApi_Title_Uses_InterfaceName_For_Apizr_Title_Fallback()
     {

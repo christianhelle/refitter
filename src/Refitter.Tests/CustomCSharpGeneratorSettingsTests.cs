@@ -170,7 +170,6 @@ public class CustomCSharpGeneratorSettingsTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -187,7 +186,6 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain(settings.CodeGeneratorSettings!.DateType);
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -204,7 +202,6 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain(settings.CodeGeneratorSettings!.DateTimeType);
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -221,7 +218,6 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("ICollection<");
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -239,7 +235,6 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("DateTime");
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -257,7 +252,6 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("DateTime");
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -275,7 +269,6 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("System.Collection.Generic.IList<");
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -360,7 +353,6 @@ public class CustomCSharpGeneratorSettingsTests
         BuildHelper.BuildCSharp(generatedCode, RecursiveExternalNodeStub).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
@@ -377,7 +369,6 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("[JsonConstructor]");
     }
 
-    [Category("Unit")]
     [Test]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
     [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]

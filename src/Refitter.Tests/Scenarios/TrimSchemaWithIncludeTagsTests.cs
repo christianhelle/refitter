@@ -103,7 +103,6 @@ components:
           type: string
 ";
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -119,7 +118,6 @@ components:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_Included_Tag_Endpoints()
     {
@@ -128,7 +126,6 @@ components:
         generatedCode.Should().Contain("GetPetById");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Does_Not_Contain_Excluded_Tag_Endpoints()
     {
@@ -137,7 +134,6 @@ components:
         generatedCode.Should().NotContain("GetOwnerById");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Does_Not_Contain_Unused_Schemas()
     {

@@ -187,7 +187,6 @@ public class TrimUnusedSchemaAliasRegressionTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_When_TrimUnusedSchema_Uses_Aliased_Component_Schemas()
     {

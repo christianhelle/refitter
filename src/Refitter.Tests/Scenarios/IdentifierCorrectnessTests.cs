@@ -55,7 +55,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Invalid_Multipart_Identifiers()
     {
@@ -63,7 +62,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Multipart_LeadingDigit_Identifiers_Are_Prefixed()
     {
@@ -72,7 +70,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string 123File");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Multipart_ReservedKeyword_Identifiers_Are_Escaped()
     {
@@ -81,7 +78,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("@event");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Multipart_SpecialChar_Identifiers_Are_Sanitized()
     {
@@ -146,7 +142,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Invalid_Security_Identifiers()
     {
@@ -156,7 +151,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task SecurityScheme_LeadingDigit_Identifiers_Are_Prefixed()
     {
@@ -167,7 +161,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string 1Token");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task SecurityScheme_ReservedKeyword_Identifiers_Are_Escaped()
     {
@@ -231,7 +224,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Querystring_Leading_NonLetter()
     {
@@ -241,7 +233,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Uses_This_Qualifier()
     {
@@ -310,7 +301,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Generic_Parameters()
     {
@@ -318,7 +308,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generic_Dictionary_Parameter_Not_Misclassified_As_Nullable()
     {
@@ -388,7 +377,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Invalid_Multipart_Identifiers_Swagger2()
     {
@@ -396,7 +384,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Multipart_LeadingDigit_Identifiers_Are_Prefixed_Swagger2()
     {
@@ -405,7 +392,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string 123File");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Multipart_ReservedKeyword_Identifiers_Are_Escaped_Swagger2()
     {
@@ -414,7 +400,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("@event");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Multipart_SpecialChar_Identifiers_Are_Sanitized_Swagger2()
     {
@@ -479,7 +464,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Invalid_Security_Identifiers_Swagger2()
     {
@@ -489,7 +473,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task SecurityScheme_LeadingDigit_Identifiers_Are_Prefixed_Swagger2()
     {
@@ -500,7 +483,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string 1Token");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task SecurityScheme_ReservedKeyword_Identifiers_Are_Escaped_Swagger2()
     {
@@ -562,7 +544,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Querystring_Leading_NonLetter_Swagger2()
     {
@@ -572,7 +553,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Uses_This_Qualifier_Swagger2()
     {
@@ -639,7 +619,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Generic_Parameters_Swagger2()
     {
@@ -647,7 +626,6 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generic_Dictionary_Parameter_Not_Misclassified_As_Nullable_Swagger2()
     {
@@ -703,7 +681,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Optional_Parameter_With_Unsanitized_Name_Falls_Back_To_Sanitized_Variable_Name()
     {
@@ -763,7 +740,6 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Optional_Parameter_With_Unsanitized_Name_Falls_Back_To_Sanitized_Variable_Name_Swagger2()
     {
@@ -790,7 +766,6 @@ public class IdentifierCorrectnessTests
 
     #region Issue #1037 - Empty Namespace List Crash
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_With_Empty_Namespace_List()
     {
@@ -825,7 +800,6 @@ public class IdentifierCorrectnessTests
 
     #region Issue #1053 - Reserved Keyword Escaping
 
-    [Category("Unit")]
     [Test]
     public void Sanitize_Escapes_Underscore_Keywords()
     {
@@ -835,7 +809,6 @@ public class IdentifierCorrectnessTests
         "__refvalue".Sanitize().Should().Be("@__refvalue");
     }
 
-    [Category("Unit")]
     [Test]
     public void Sanitize_Escapes_Common_Keywords()
     {

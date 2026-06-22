@@ -44,7 +44,7 @@ jobs:
     - name: 🛠️ Build
       run: dotnet build -c Release src/Refitter.slnx -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
     - name: 🧪 Unit tests (fast gate)
-      run: dotnet test --solution src/Refitter.slnx -c Release --no-build --treenode-filter "/*/*/*/*[Category=Unit]"
+      run: dotnet test --solution src/Refitter.slnx -c Release --no-build --treenode-filter "/*/*/*/*[Category!=Integration]"
     - name: 🧪 Full test suite
       if: ${{ success() }}
       run: dotnet test --solution src/Refitter.slnx -c Release --no-build

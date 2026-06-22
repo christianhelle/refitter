@@ -53,7 +53,6 @@ components:
           type: string
 ";
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -69,7 +68,6 @@ components:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Contains_IDisposable()
     {
@@ -78,7 +76,6 @@ components:
         generatedCode.Should().Contain("interface ITestAPI : IDisposable");
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Code_Does_Not_Contain_IDisposable_When_Disabled()
     {
@@ -94,7 +91,6 @@ components:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Generated_Disposable_Code_Contains_Using_System()
     {

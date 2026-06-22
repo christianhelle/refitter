@@ -159,7 +159,6 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
                 type: number
         """;
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -175,7 +174,6 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Unit")]
     [Test]
     public async Task Can_Generate_Code_OpenApi2()
     {
