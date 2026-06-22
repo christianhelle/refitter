@@ -362,7 +362,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `naming.useOpenApiTitle` - a boolean indicating whether the OpenApi title should be used. Default is `true`
 - `naming.interfaceName` - the name of the generated interface. The generated code will automatically prefix this with `I` so if this set to `MyApiClient` then the generated interface is called `IMyApiClient`. Default is `ApiClient`
 - `generateContracts` - a boolean indicating whether contracts should be generated. A use case for this is several API clients use the same contracts. Default is `true`
-- `generateClients`:  - a boolean indicating whether clients should be generated. A use case for this is to seperate clients and contracts in two generation
+- `generateClients` - a boolean indicating whether clients should be generated. A use case for this is to separate clients and contracts into two separate generation runs. Default is `true`
 - `generateDisposableClients` - a boolean indicating whether to generate clients that implement `IDisposable`. Default is `false`
 - `generateXmlDocCodeComments` - a boolean indicating whether XML doc comments should be generated. Default is `true`
 - `generateJsonSerializerContext` - a boolean indicating whether to generate a `JsonSerializerContext` for AOT compilation support. Default is `false`. The context is emitted in the contracts namespace and, in multi-file mode, is written to its own `*SerializerContext.cs` file
