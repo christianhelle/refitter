@@ -1,21 +1,22 @@
 namespace Refitter.Core;
+
+/// <summary>
+/// Enumeration of mapping provider types.
+/// </summary>
+public enum MappingProviderType
+{
     /// <summary>
-    /// Enumeration of mapping provider types.
+    /// No mapping provider.
     /// </summary>
-    public enum MappingProviderType
-    {
-        /// <summary>
-        /// No mapping provider.
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// AutoMapper mapping provider.
-        /// </summary>
-        AutoMapper,
+    /// <summary>
+    /// AutoMapper mapping provider.
+    /// </summary>
+    AutoMapper,
 
-        /// <summary>
-        /// Mapster mapping provider.
-        /// </summary>
-        Mapster
-    }
+    /// <summary>
+    /// Mapster mapping provider.
+    /// </summary>
+    Mapster
+}

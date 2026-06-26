@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Refitter.Tests.Resources;
 using Refitter.Core.Validation;
+using Refitter.Tests.Resources;
 
 namespace Refitter.Tests.OpenApi;
 

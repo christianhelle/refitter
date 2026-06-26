@@ -1,4 +1,4 @@
-﻿namespace Refitter.Core
+namespace Refitter.Core
 {
     /// <summary>
     /// Helper class to retrieve the version of the Refitter library.
