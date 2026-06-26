@@ -35,12 +35,12 @@ public sealed class Settings : CommandSettings
     [DefaultValue(Core.PropertyNamingPolicy.PascalCase)]
     public Core.PropertyNamingPolicy PropertyNamingPolicy { get; set; } = Core.PropertyNamingPolicy.PascalCase;
 
-    [Description("Path to Output file or folder (if multiple files are generated)")]
+    [Description("Path to the generated file in single-file mode, or the output directory in multiple-file mode")]
     [CommandOption("-o|--output")]
     [DefaultValue(DefaultOutputPath)]
     public string? OutputPath { get; set; } = DefaultOutputPath;
 
-    [Description("Output path for generated contracts. Enabling this automatically enables generating multiple files")]
+    [Description("Output directory for generated contracts. Enabling this automatically enables generating multiple files")]
     [CommandOption("--contracts-output")]
     [DefaultValue(null)]
     public string? ContractsOutputPath { get; set; }
@@ -128,6 +128,7 @@ public sealed class Settings : CommandSettings
 
     [Description("""
                  Generate multiple files instead of a single large file.
+                 In this mode, --output and --contracts-output must be directory paths.
                  The output files can be the following:
                  - RefitInterfaces.cs
                  - DependencyInjection.cs
