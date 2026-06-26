@@ -7,6 +7,7 @@ using Refit;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 #nullable enable annotations
 
@@ -467,6 +468,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterface
         {
             var clientBuilderISwaggerPetstoreInterface = services
                 .AddRefitClient<ISwaggerPetstoreInterface>(settings)
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"))
                 .AddHttpMessageHandler<EmptyMessageHandler>()
                 .AddHttpMessageHandler<AnotherEmptyMessageHandler>();

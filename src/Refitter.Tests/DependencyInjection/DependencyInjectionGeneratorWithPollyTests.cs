@@ -69,6 +69,30 @@ public class DependencyInjectionGeneratorWithPollyTests
     }
 
     [Test]
+    public void Can_Generate_With_Windows_Authentication_And_Polly()
+    {
+        settings.DependencyInjectionSettings!.UseWindowsAuthentication = true;
+
+        string code = DependencyInjectionGenerator.Generate(
+            settings,
+            new[]
+            {
+                "IPetApi",
+                "IStoreApi"
+            });
+
+        code.Should().Contain("using System.Net.Http");
+        code.Should().Contain(".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })");
+        code.Should().Contain(".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"https://petstore3.swagger.io/api/v3\"))");
+        code.IndexOf(".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })")
+            .Should().BeLessThan(code.IndexOf(".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"https://petstore3.swagger.io/api/v3\"))"));
+        code.IndexOf(".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })")
+            .Should().BeLessThan(code.IndexOf(".AddHttpMessageHandler<AuthorizationMessageHandler>()"));
+        code.IndexOf(".AddHttpMessageHandler<DiagnosticMessageHandler>()")
+            .Should().BeLessThan(code.IndexOf(".AddPolicyHandler("));
+    }
+
+    [Test]
     public void Can_Generate_Without_Polly()
     {
         settings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;

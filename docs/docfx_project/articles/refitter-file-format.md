@@ -75,6 +75,7 @@ The following is an example `.refitter` file
         "TelemetryMessageHandler"
     ],
     "usePolly": true, // DEPRECATED - Use "transientErrorHandler": "None|Polly|HttpResilience" instead
+    "useWindowsAuthentication": true, // Optional. Default=false
     "transientErrorHandler": "HttpResilience", // Optional. Set this to configure transient error handling with a retry policy that uses a jittered backoff. May be one of None, Polly, HttpResilience
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
@@ -189,7 +190,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
 - `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization.
 - `generateMultipleFiles`: Set to `true` to generate multiple files. This is automatically set to `true` when `ContractsOutputFolder` is specified. Refit interface(s) are written to a file called `RefitInterfaces.cs`, Contracts are written to a file called `Contracts.cs`, and Dependency Injection is written to a file called `DependencyInjection.cs`
-- `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
+- `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients, including optional Windows Authentication support
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
   - `usePolly` - Set this to `true` to configure the HttpClient to use Polly using a retry policy with a jittered backoff.  This is **DEPRECATED**, use `transientErrorHandler` instead

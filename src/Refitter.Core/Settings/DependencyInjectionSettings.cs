@@ -34,6 +34,12 @@ public class DependencyInjectionSettings
     public string[] HttpMessageHandlers { get; set; } = Array.Empty<string>();
 
     /// <summary>
+    /// Set this to true to use the current Windows user's credentials for HTTP authentication.
+    /// </summary>
+    [Description("Set this to true to use the current Windows user's credentials for HTTP authentication.")]
+    public bool UseWindowsAuthentication { get; set; }
+
+    /// <summary>
     /// Set this to true to use Polly for transient fault handling.
     /// This is deprecated. Use TransientErrorHandler instead.
     /// </summary>

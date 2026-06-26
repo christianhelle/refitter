@@ -211,6 +211,10 @@
             "type": "string"
           }
         },
+        "useWindowsAuthentication": {
+          "description": "Set this to true to use the current Windows user's credentials for HTTP authentication.",
+          "type": "boolean"
+        },
         "usePolly": {
           "description": "Set this to true to use Polly for transient fault handling.\nThis is deprecated. Use TransientErrorHandler instead.",
           "type": "boolean"
