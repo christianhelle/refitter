@@ -122,6 +122,7 @@ This is enabled through the `.refitter` settings file like this:
   "dependencyInjectionSettings": {
     "baseUrl": "https://petstore3.swagger.io/api/v3",
     "httpMessageHandlers": [ "TelemetryDelegatingHandler" ],
+    "useWindowsAuthentication": true,
     "transientErrorHandler": "Polly",
     "maxRetryCount": 3,
     "firstBackoffRetryInSeconds": 0.5

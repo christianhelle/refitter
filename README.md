@@ -286,6 +286,7 @@ The following is an example `.refitter` file using a single OpenAPI specificatio
         "TelemetryMessageHandler"
     ],
     "usePolly": true, // DEPRECATED - Use "transientErrorHandler": "None|Polly|HttpResilience" instead
+    "useWindowsAuthentication": true, // Optional. Default=false
     "transientErrorHandler": "HttpResilience", // Optional. Set this to configure transient error handling with a retry policy that uses a jittered backoff. May be one of None, Polly, HttpResilience
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
@@ -397,7 +398,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `usePolymorphicSerialization`: Set to `true` to use System.Text.Json polymorphic serialization. Replaces NSwag `JsonInheritanceConverter` attributes with `System.Text.Json` `JsonPolymorphicAttributes`. Default is `false`. See <https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism>
 - `collectionFormat` - The collection format for array query parameters. Possible values: `Multi`, `Csv`, `Ssv`, `Tsv`, `Pipes`. Default is `Multi`
 - `contractTypeSuffix` - An optional suffix to append to all generated contract type names. For example, setting this to `Dto` would rename `Pet` to `PetDto`. Default is `null` (no suffix)
-- `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
+- `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients, including optional Windows Authentication support
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
   - `usePolly` - Set this to `true` to configure the HttpClient to use Polly using a retry policy with a jittered backoff.  This is **DEPRECATED**, use `transientErrorHandler` instead

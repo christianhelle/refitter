@@ -197,6 +197,7 @@ The following is an example `.refitter` file
         "AuthorizationMessageHandler",
         "TelemetryMessageHandler"
     ],
+    "useWindowsAuthentication": true, // Optional. Default=false
     "transientErrorHandler": "Polly", // Optional. Value=None|Polly|HttpResilience
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5 // Optional. Default=1.0
@@ -303,7 +304,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
 - `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization.
-- `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients
+- `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients, including optional Windows Authentication support
   - `baseUrl` - Used as the HttpClient base address. Leave this blank to manually set the base URL
   - `httpMessageHandlers` - A collection of `HttpMessageHandler` that is added to the HttpClient pipeline
   - `transientErrorHandler` - This is the transient error handler to use. Possible values are `None`, `Polly`, and `HttpResilience`. Default is `None`
