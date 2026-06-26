@@ -61,9 +61,9 @@ internal static class DependencyInjectionGenerator
             _
                 => """
                     using System;
-                        using System.Net.Http;
-                        using Microsoft.Extensions.DependencyInjection;
-                        using Refit;
+                    using System.Net.Http;
+                    using Microsoft.Extensions.DependencyInjection;
+                    using Refit;
                     """
         };
 
@@ -93,7 +93,7 @@ internal static class DependencyInjectionGenerator
                 $$"""
                               var {{clientBuilderName}} = services
                                   .AddRefitClient<{{interfaceName}}>(settings)
-                  {{(iocSettings.UseWindowsAuthentication ? ".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })" : "")}}
+                                  {{(iocSettings.UseWindowsAuthentication ? ".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })" : "")}}
                                   {{configureRefitClient}}
                   """);
 
