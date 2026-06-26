@@ -264,4 +264,26 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().NotContain("ConfigurePrimaryHttpMessageHandler");
         code.Should().NotContain("HttpClientHandler { UseDefaultCredentials = true }");
     }
+
+    [Test]
+    public void Can_Generate_Windows_Authentication_For_TransientErrorHandler_None()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://petstore3.swagger.io/api/v3",
+                HttpMessageHandlers = Array.Empty<string>(),
+                TransientErrorHandler = TransientErrorHandler.None,
+                UseWindowsAuthentication = true
+            }
+        };
+
+        string code = DependencyInjectionGenerator.Generate(
+            settings,
+            new[] { "IPetApi" });
+
+        code.Should().Contain("using System.Net.Http");
+        code.Should().Contain(".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })");
+    }
 }
