@@ -4,6 +4,11 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0-preview.110...HEAD)
 
+**Implemented enhancements:**
+
+- Add option for Windows Authentication support to generated ConfigureRefitClients\(\) [\#1170](https://github.com/christianhelle/refitter/issues/1170)
+- Add Windows Authentication option for DI clients [\#1171](https://github.com/christianhelle/refitter/pull/1171) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - Split up Unit and Integration tests using \[Category\] [\#1168](https://github.com/christianhelle/refitter/pull/1168) ([christianhelle](https://github.com/christianhelle))
@@ -443,7 +448,7 @@
 
 **Fixed bugs:**
 
-- Explicitely setting multipleInterfaces = "ByEndpoint" causes Refitter to render names literally "{operationName}Async" [\#757](https://github.com/christianhelle/refitter/issues/757)
+- Explicitly setting multipleInterfaces = "ByEndpoint" causes Refitter to render names literally "{operationName}Async" [\#757](https://github.com/christianhelle/refitter/issues/757)
 
 **Merged pull requests:**
 
@@ -947,7 +952,7 @@
 
 **Implemented enhancements:**
 
-- Added GenerateClients options for seperate generation [\#436](https://github.com/christianhelle/refitter/pull/436) ([berkslv](https://github.com/berkslv))
+- Added GenerateClients options for separate generation [\#436](https://github.com/christianhelle/refitter/pull/436) ([berkslv](https://github.com/berkslv))
 - \[Query\] Dynamic Querystring Parameters implemented [\#435](https://github.com/christianhelle/refitter/pull/435) ([JeremyBP](https://github.com/JeremyBP))
 - \[Apizr\] Docs updated about Apizr integration [\#432](https://github.com/christianhelle/refitter/pull/432) ([JeremyBP](https://github.com/JeremyBP))
 - \[Apizr\] Including an xml doc param for ApizrRequestOptions parameter [\#431](https://github.com/christianhelle/refitter/pull/431) ([JeremyBP](https://github.com/JeremyBP))
@@ -1346,7 +1351,7 @@
 
 - Manually run refit generator so the source can be directly added to the compilation rather than writing to a file [\#196](https://github.com/christianhelle/refitter/issues/196)
 - Single output [\#184](https://github.com/christianhelle/refitter/issues/184)
-- Fix extra close paranthesis in IServiceCollectionExtensions [\#207](https://github.com/christianhelle/refitter/pull/207) ([christianhelle](https://github.com/christianhelle))
+- Fix extra close parenthesis in IServiceCollectionExtensions [\#207](https://github.com/christianhelle/refitter/pull/207) ([christianhelle](https://github.com/christianhelle))
 - 🤖 Apply quick-fixes by Qodana [\#203](https://github.com/christianhelle/refitter/pull/203) ([github-actions[bot]](https://github.com/apps/github-actions))
 - Enable JetBrains Qodana auto-fixes [\#202](https://github.com/christianhelle/refitter/pull/202) ([christianhelle](https://github.com/christianhelle))
 - Add JetBrains Qodana GitHub workflow [\#201](https://github.com/christianhelle/refitter/pull/201) ([christianhelle](https://github.com/christianhelle))
@@ -1581,7 +1586,7 @@
 
 **Implemented enhancements:**
 
-- Additonal Namespaces for generated Types [\#80](https://github.com/christianhelle/refitter/pull/80) ([angelofb](https://github.com/angelofb))
+- Additional Namespaces for generated Types [\#80](https://github.com/christianhelle/refitter/pull/80) ([angelofb](https://github.com/angelofb))
 
 **Fixed bugs:**
 
