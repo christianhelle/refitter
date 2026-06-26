@@ -243,4 +243,25 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().Contain("using Microsoft.Extensions.Http.Resilience");
         code.Should().Contain("AddStandardResilienceHandler");
     }
+
+    [Test]
+    public void Does_Not_Generate_Windows_Authentication_By_Default()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://petstore3.swagger.io/api/v3",
+                HttpMessageHandlers = Array.Empty<string>(),
+                TransientErrorHandler = TransientErrorHandler.None
+            }
+        };
+
+        string code = DependencyInjectionGenerator.Generate(
+            settings,
+            new[] { "IPetApi" });
+
+        code.Should().NotContain("ConfigurePrimaryHttpMessageHandler");
+        code.Should().NotContain("HttpClientHandler { UseDefaultCredentials = true }");
+    }
 }

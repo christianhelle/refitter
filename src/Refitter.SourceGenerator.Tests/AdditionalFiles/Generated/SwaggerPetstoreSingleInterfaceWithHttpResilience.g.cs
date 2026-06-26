@@ -7,6 +7,7 @@ using Refit;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 #nullable enable annotations
 

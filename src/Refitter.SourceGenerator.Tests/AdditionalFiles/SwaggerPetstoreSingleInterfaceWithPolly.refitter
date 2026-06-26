@@ -12,6 +12,7 @@
     "transientErrorHandler": "Polly",
     "maxRetryCount": 3,
     "firstBackoffRetryInSeconds": 0.5,
+    "useWindowsAuthentication": true,
     "httpMessageHandlers": [
       "EmptyMessageHandler",
       "AnotherEmptyMessageHandler"
