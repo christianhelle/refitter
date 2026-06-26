@@ -26,7 +26,12 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             context.Arguments.Any(a => a.Equals("-v", StringComparison.OrdinalIgnoreCase)))
             return ValidationResult.Success();
 
-        var validationResult = SettingsValidator.Validate(settings, out var refitSettings);
+        var validationResult = SettingsValidator.Validate(
+            settings,
+            out var refitSettings,
+            outputPathSpecified: context.Arguments.Any(a =>
+                a.Equals("--output", StringComparison.OrdinalIgnoreCase) ||
+                a.Equals("-o", StringComparison.OrdinalIgnoreCase)));
         if (refitSettings != null)
             cachedSettings = refitSettings;
 
