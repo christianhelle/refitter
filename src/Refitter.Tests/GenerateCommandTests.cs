@@ -43,6 +43,89 @@ public class GenerateCommandTests
     }
 
     [Test]
+    public void Validate_Should_Fail_When_MultipleFiles_Uses_FileLike_Output()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            OutputPath = "./Output.cs",
+            GenerateMultipleFiles = true,
+            NoLogging = true
+        };
+
+        var result = SettingsValidator.Validate(settings);
+
+        result.Successful.Should().BeFalse();
+        result.Message.Should().Contain("Invalid --output value './Output.cs'");
+        result.Message.Should().Contain("--multiple-files --output ./Generated");
+    }
+
+    [Test]
+    public void Validate_Should_Fail_When_MultipleFiles_Uses_Explicit_Default_Output_File()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            OutputPath = Settings.DefaultOutputPath,
+            GenerateMultipleFiles = true,
+            NoLogging = true
+        };
+
+        var result = SettingsValidator.Validate(settings, outputPathSpecified: true);
+
+        result.Successful.Should().BeFalse();
+        result.Message.Should().Contain("Invalid --output value 'Output.cs'");
+    }
+
+    [Test]
+    public void Validate_Should_Fail_When_ContractsOutput_Uses_FileLike_Output()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            ContractsOutputPath = "./Contracts.cs",
+            NoLogging = true
+        };
+
+        var result = SettingsValidator.Validate(settings);
+
+        result.Successful.Should().BeFalse();
+        result.Message.Should().Contain("Invalid --contracts-output value './Contracts.cs'");
+        result.Message.Should().Contain("--contracts-output ./Generated/Contracts");
+    }
+
+    [Test]
+    public void Validate_Should_Succeed_When_MultipleFiles_Uses_Directory_Output()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            OutputPath = "./Generated",
+            GenerateMultipleFiles = true,
+            NoLogging = true
+        };
+
+        var result = SettingsValidator.Validate(settings);
+
+        result.Successful.Should().BeTrue();
+    }
+
+    [Test]
+    public void Validate_Should_Succeed_When_SingleFile_Uses_FileLike_Output()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            OutputPath = "./Client.cs",
+            NoLogging = true
+        };
+
+        var result = SettingsValidator.Validate(settings);
+
+        result.Successful.Should().BeTrue();
+    }
+
+    [Test]
     public void Validate_Should_Fail_When_Both_OpenApiPath_And_SettingsFilePath_Are_Empty()
     {
         var settings = new Settings
