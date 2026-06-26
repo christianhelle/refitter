@@ -43,6 +43,7 @@ internal static class DependencyInjectionGenerator
             TransientErrorHandler.Polly
                 => """
                     using System;
+                        using System.Net.Http;
                         using Microsoft.Extensions.DependencyInjection;
                         using Polly;
                         using Polly.Contrib.WaitAndRetry;
@@ -52,6 +53,7 @@ internal static class DependencyInjectionGenerator
             TransientErrorHandler.HttpResilience
                 => """
                     using System;
+                        using System.Net.Http;
                         using Microsoft.Extensions.DependencyInjection;
                         using Microsoft.Extensions.Http.Resilience;
                         using Refit;
@@ -59,6 +61,7 @@ internal static class DependencyInjectionGenerator
             _
                 => """
                     using System;
+                        using System.Net.Http;
                         using Microsoft.Extensions.DependencyInjection;
                         using Refit;
                     """
@@ -90,6 +93,7 @@ internal static class DependencyInjectionGenerator
                 $$"""
                               var {{clientBuilderName}} = services
                                   .AddRefitClient<{{interfaceName}}>(settings)
+                  {{(iocSettings.UseWindowsAuthentication ? ".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })" : "")}}
                                   {{configureRefitClient}}
                   """);
 
