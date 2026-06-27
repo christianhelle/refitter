@@ -31,7 +31,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             out var refitSettings,
             outputPathSpecified: context.Arguments.Any(a =>
                 a.Equals("--output", StringComparison.OrdinalIgnoreCase) ||
-                a.Equals("-o", StringComparison.OrdinalIgnoreCase)));
+                a.Equals("-o", StringComparison.OrdinalIgnoreCase) ||
+                a.StartsWith("--output=", StringComparison.OrdinalIgnoreCase) ||
+                a.StartsWith("-o=", StringComparison.OrdinalIgnoreCase)));
         if (refitSettings != null)
             cachedSettings = refitSettings;
 

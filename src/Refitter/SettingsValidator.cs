@@ -365,7 +365,25 @@ public static class SettingsValidator
         if (string.IsNullOrWhiteSpace(lastSegment))
             return false;
 
-        return !string.IsNullOrWhiteSpace(Path.GetExtension(lastSegment));
+        var extension = Path.GetExtension(lastSegment);
+        if (string.IsNullOrWhiteSpace(extension))
+            return false;
+
+        // Known file extensions used by Refitter for source files, config files, and outputs
+        var knownFileExtensions = new[]
+        {
+            ".cs",      // C# source files
+            ".json",    // Settings files
+            ".yaml",    // Settings files
+            ".yml",     // Settings files
+            ".toml",    // Settings files
+            ".txt",     // Text files
+            ".md",      // Documentation
+            ".csproj",  // Project files
+            ".sln"      // Solution files
+        };
+
+        return knownFileExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase);
     }
 
     private static string ExtractEnumNameFromException(JsonException ex)
