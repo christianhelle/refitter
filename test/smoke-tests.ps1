@@ -591,6 +591,7 @@ function RunTests
             Name = "ContractOnlyMultipleFiles"
             Args = "--contract-only --multiple-files"
             Spec = "./OpenAPI/v3.0/petstore.json"
+            Output = "./GeneratedCode/Combo_ContractOnlyMultipleFiles/"
         },
         @{
             Name = "TrimSchemaKeepPattern"
@@ -608,6 +609,10 @@ function RunTests
     {
         $ns = "Combo_$($combo.Name)"
         $output = "./GeneratedCode/Combo_$($combo.Name).generated.cs"
+        if ($combo.ContainsKey("Output"))
+        {
+            $output = $combo.Output
+        }
         $fullArgs = "$($combo.Spec) --namespace $ns --output $output --no-logging $($combo.Args)"
         $p = StartRefitter -arguments $fullArgs -processPath $processPath -useDocker $UseDocker
         $p | Wait-Process

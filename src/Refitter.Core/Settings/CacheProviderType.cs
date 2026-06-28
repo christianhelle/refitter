@@ -1,36 +1,37 @@
 namespace Refitter.Core;
+
+/// <summary>
+/// Enumeration of cache provider types.
+/// </summary>
+public enum CacheProviderType
+{
     /// <summary>
-    /// Enumeration of cache provider types.
+    /// No cache provider.
     /// </summary>
-    public enum CacheProviderType
-    {
-        /// <summary>
-        /// No cache provider.
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// Akavache cache provider.
-        /// </summary>
-        Akavache,
+    /// <summary>
+    /// Akavache cache provider.
+    /// </summary>
+    Akavache,
 
-        /// <summary>
-        /// MonkeyCache cache provider.
-        /// </summary>
-        MonkeyCache,
+    /// <summary>
+    /// MonkeyCache cache provider.
+    /// </summary>
+    MonkeyCache,
 
-        /// <summary>
-        /// In-memory cache provider.
-        /// </summary>
-        InMemory,
+    /// <summary>
+    /// In-memory cache provider.
+    /// </summary>
+    InMemory,
 
-        /// <summary>
-        /// Distributed cache as string provider.
-        /// </summary>
-        DistributedAsString,
+    /// <summary>
+    /// Distributed cache as string provider.
+    /// </summary>
+    DistributedAsString,
 
-        /// <summary>
-        /// Distributed cache as byte array provider.
-        /// </summary>
-        DistributedAsByteArray,
-    }
+    /// <summary>
+    /// Distributed cache as byte array provider.
+    /// </summary>
+    DistributedAsByteArray,
+}

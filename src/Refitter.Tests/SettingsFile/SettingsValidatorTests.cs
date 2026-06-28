@@ -175,6 +175,132 @@ public class SettingsValidatorTests
     }
 
     [Test]
+    public void Validate_Should_Fail_When_Settings_File_MultiFile_OutputFolder_Is_FileLike()
+    {
+        var tempSettingsFile = Path.GetTempFileName();
+        try
+        {
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPath = "https://example.com/openapi.json",
+                GenerateMultipleFiles = true,
+                OutputFolder = "./Generated.cs"
+            };
+            File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Refitter.Settings
+            {
+                SettingsFilePath = tempSettingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings);
+
+            result.Successful.Should().BeFalse();
+            result.Message.Should().Contain("outputFolder");
+            result.Message.Should().Contain("\"outputFolder\": \"./Generated\"");
+        }
+        finally
+        {
+            if (File.Exists(tempSettingsFile))
+                File.Delete(tempSettingsFile);
+        }
+    }
+
+    [Test]
+    public void Validate_Should_Fail_When_Settings_File_MultiFile_ContractsOutputFolder_Is_FileLike()
+    {
+        var tempSettingsFile = Path.GetTempFileName();
+        try
+        {
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPath = "https://example.com/openapi.json",
+                ContractsOutputFolder = "./Contracts.cs"
+            };
+            File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Refitter.Settings
+            {
+                SettingsFilePath = tempSettingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings);
+
+            result.Successful.Should().BeFalse();
+            result.Message.Should().Contain("contractsOutputFolder");
+            result.Message.Should().Contain("\"contractsOutputFolder\": \"./Generated/Contracts\"");
+        }
+        finally
+        {
+            if (File.Exists(tempSettingsFile))
+                File.Delete(tempSettingsFile);
+        }
+    }
+
+    [Test]
+    public void Validate_Should_Fail_When_Settings_File_MultiFile_Cli_Output_Override_Is_FileLike()
+    {
+        var tempSettingsFile = Path.GetTempFileName();
+        try
+        {
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPath = "https://example.com/openapi.json",
+                GenerateMultipleFiles = true,
+                OutputFolder = "./Generated"
+            };
+            File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Refitter.Settings
+            {
+                SettingsFilePath = tempSettingsFile,
+                OutputPath = "./Output.cs"
+            };
+
+            var result = SettingsValidator.Validate(settings);
+
+            result.Successful.Should().BeFalse();
+            result.Message.Should().Contain("Invalid --output value './Output.cs'");
+        }
+        finally
+        {
+            if (File.Exists(tempSettingsFile))
+                File.Delete(tempSettingsFile);
+        }
+    }
+
+    [Test]
+    public void Validate_Should_Succeed_When_Settings_File_MultiFile_Uses_Directory_Paths()
+    {
+        var tempSettingsFile = Path.GetTempFileName();
+        try
+        {
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPath = "https://example.com/openapi.json",
+                GenerateMultipleFiles = true,
+                OutputFolder = "./Generated",
+                ContractsOutputFolder = "./Contracts"
+            };
+            File.WriteAllText(tempSettingsFile, JsonSerializer.Serialize(refitSettings));
+
+            var settings = new Refitter.Settings
+            {
+                SettingsFilePath = tempSettingsFile
+            };
+
+            var result = SettingsValidator.Validate(settings);
+
+            result.Successful.Should().BeTrue();
+        }
+        finally
+        {
+            if (File.Exists(tempSettingsFile))
+                File.Delete(tempSettingsFile);
+        }
+    }
+
+    [Test]
     public void Validate_Should_Fail_When_Settings_File_Has_Empty_OpenApiPath()
     {
         var tempSettingsFile = Path.GetTempFileName();

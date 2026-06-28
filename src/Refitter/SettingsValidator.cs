@@ -8,12 +8,15 @@ namespace Refitter;
 [ExcludeFromCodeCoverage(Justification = "CLI validation logic with many edge-case branches dependent on file system and user input")]
 public static class SettingsValidator
 {
-    public static ValidationResult Validate(Settings settings)
+    public static ValidationResult Validate(Settings settings, bool outputPathSpecified = false)
     {
-        return Validate(settings, out _);
+        return Validate(settings, out _, outputPathSpecified);
     }
 
-    public static ValidationResult Validate(Settings settings, out RefitGeneratorSettings? refitSettings)
+    public static ValidationResult Validate(
+        Settings settings,
+        out RefitGeneratorSettings? refitSettings,
+        bool outputPathSpecified = false)
     {
         refitSettings = null;
 
@@ -29,11 +32,15 @@ public static class SettingsValidator
 
         if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
         {
-            var fileResult = ValidateFilePath(settings, out refitSettings);
+            var fileResult = ValidateFilePath(settings, out refitSettings, outputPathSpecified);
             if (!fileResult.Successful)
                 return fileResult;
             return ValidateJsonLibraryVersionConflict(settings, refitSettings);
         }
+
+        var multiFileOutputResult = ValidateCliMultiFileOutputSettings(settings, outputPathSpecified);
+        if (!multiFileOutputResult.Successful)
+            return multiFileOutputResult;
 
         return ValidateOperationNameAndUrl(settings);
     }
@@ -58,7 +65,10 @@ public static class SettingsValidator
             "not both");
     }
 
-    private static ValidationResult ValidateFilePath(Settings settings, out RefitGeneratorSettings? refitSettings)
+    private static ValidationResult ValidateFilePath(
+        Settings settings,
+        out RefitGeneratorSettings? refitSettings,
+        bool outputPathSpecified)
     {
         var json = File.ReadAllText(settings.SettingsFilePath!);
 
@@ -81,7 +91,10 @@ public static class SettingsValidator
         }
 
         // First validate the file/output settings (includes check for both OpenApiPath and OpenApiPaths)
-        var fileAndOutputResult = ValidateFileAndOutputSettings(settings, refitGeneratorSettings);
+        var fileAndOutputResult = ValidateFileAndOutputSettings(
+            settings,
+            refitGeneratorSettings,
+            outputPathSpecified);
         if (!fileAndOutputResult.Successful)
         {
             refitSettings = null;
@@ -121,7 +134,8 @@ public static class SettingsValidator
 
     private static ValidationResult ValidateFileAndOutputSettings(
         Settings settings,
-        RefitGeneratorSettings refitGeneratorSettings)
+        RefitGeneratorSettings refitGeneratorSettings,
+        bool outputPathSpecified)
     {
         // Check if both OpenApiPath and OpenApiPaths are explicitly set in settings file
         var hasOpenApiPath = !string.IsNullOrWhiteSpace(refitGeneratorSettings.OpenApiPath);
@@ -148,6 +162,13 @@ public static class SettingsValidator
         {
             return GetValidationErrorForOutputPath();
         }
+
+        var multiFileOutputResult = ValidateSettingsFileMultiFileOutputSettings(
+            settings,
+            refitGeneratorSettings,
+            outputPathSpecified);
+        if (!multiFileOutputResult.Successful)
+            return multiFileOutputResult;
 
         return ValidateOperationNameAndUrl(settings);
     }
@@ -187,9 +208,110 @@ public static class SettingsValidator
         return ValidationResult.Success();
     }
 
+    private static ValidationResult ValidateCliMultiFileOutputSettings(
+        Settings settings,
+        bool outputPathSpecified)
+    {
+        if (!IsCliMultiFileGenerationEnabled(settings))
+            return ValidationResult.Success();
+
+        if (HasExplicitCliOutputOverride(settings.OutputPath, outputPathSpecified) &&
+            IsFileLikePath(settings.OutputPath!))
+        {
+            return GetCliMultiFilePathValidationError(
+                "--output",
+                settings.OutputPath!,
+                "--multiple-files --output ./Generated",
+                "Use '--output ./Client.cs' for single-file generation.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(settings.ContractsOutputPath) &&
+            IsFileLikePath(settings.ContractsOutputPath))
+        {
+            return GetCliMultiFilePathValidationError(
+                "--contracts-output",
+                settings.ContractsOutputPath,
+                "--contracts-output ./Generated/Contracts");
+        }
+
+        return ValidationResult.Success();
+    }
+
+    private static ValidationResult ValidateSettingsFileMultiFileOutputSettings(
+        Settings settings,
+        RefitGeneratorSettings refitGeneratorSettings,
+        bool outputPathSpecified)
+    {
+        if (!IsSettingsFileMultiFileGenerationEnabled(refitGeneratorSettings))
+            return ValidationResult.Success();
+
+        if (HasExplicitCliOutputOverride(settings.OutputPath, outputPathSpecified) &&
+            IsFileLikePath(settings.OutputPath!))
+        {
+            return GetCliMultiFilePathValidationError(
+                "--output",
+                settings.OutputPath!,
+                "--multiple-files --output ./Generated",
+                "Use '--output ./Client.cs' for single-file generation.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.OutputFolder) &&
+            IsFileLikePath(refitGeneratorSettings.OutputFolder))
+        {
+            return GetSettingsFileMultiFilePathValidationError(
+                "outputFolder",
+                refitGeneratorSettings.OutputFolder,
+                "\"outputFolder\": \"./Generated\"",
+                "Use \"outputFilename\": \"Client.cs\" to control the single-file filename.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder) &&
+            IsFileLikePath(refitGeneratorSettings.ContractsOutputFolder))
+        {
+            return GetSettingsFileMultiFilePathValidationError(
+                "contractsOutputFolder",
+                refitGeneratorSettings.ContractsOutputFolder,
+                "\"contractsOutputFolder\": \"./Generated/Contracts\"");
+        }
+
+        return ValidationResult.Success();
+    }
+
     private static ValidationResult GetValidationErrorForOperationName()
     {
         return ValidationResult.Error("'{operationName}' placeholder must be present in operation name template");
+    }
+
+    private static ValidationResult GetCliMultiFilePathValidationError(
+        string optionName,
+        string path,
+        string directoryExample,
+        string? additionalGuidance = null)
+    {
+        var message =
+            $"Invalid {optionName} value '{path}' for multi-file generation. " +
+            $"{optionName} must be a directory path, for example: {directoryExample}.";
+
+        if (!string.IsNullOrWhiteSpace(additionalGuidance))
+            message = $"{message} {additionalGuidance}";
+
+        return ValidationResult.Error(message);
+    }
+
+    private static ValidationResult GetSettingsFileMultiFilePathValidationError(
+        string propertyName,
+        string path,
+        string directoryExample,
+        string? additionalGuidance = null)
+    {
+        var message =
+            $"Invalid settings file value for '{propertyName}': '{path}'. " +
+            $"In multi-file generation, {propertyName} must be a directory path, for example: {directoryExample}.";
+
+        if (!string.IsNullOrWhiteSpace(additionalGuidance))
+            message = $"{message} {additionalGuidance}";
+
+        return ValidationResult.Error(message);
     }
 
     private static ValidationResult ValidateJsonLibraryVersionConflict(
@@ -219,6 +341,49 @@ public static class SettingsValidator
     {
         return Uri.TryCreate(openApiPath, UriKind.Absolute, out var uriResult) &&
                (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+    }
+
+    private static bool IsCliMultiFileGenerationEnabled(Settings settings) =>
+        settings.GenerateMultipleFiles ||
+        !string.IsNullOrWhiteSpace(settings.ContractsOutputPath);
+
+    private static bool IsSettingsFileMultiFileGenerationEnabled(RefitGeneratorSettings refitGeneratorSettings) =>
+        refitGeneratorSettings.GenerateMultipleFiles ||
+        !string.IsNullOrWhiteSpace(refitGeneratorSettings.ContractsOutputFolder);
+
+    private static bool HasExplicitCliOutputOverride(string? outputPath, bool outputPathSpecified) =>
+        !string.IsNullOrWhiteSpace(outputPath) &&
+        (outputPathSpecified || outputPath != Settings.DefaultOutputPath);
+
+    private static bool IsFileLikePath(string path)
+    {
+        var normalizedPath = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (string.IsNullOrWhiteSpace(normalizedPath))
+            return false;
+
+        var lastSegment = Path.GetFileName(normalizedPath);
+        if (string.IsNullOrWhiteSpace(lastSegment))
+            return false;
+
+        var extension = Path.GetExtension(lastSegment);
+        if (string.IsNullOrWhiteSpace(extension))
+            return false;
+
+        // Known file extensions used by Refitter for source files, config files, and outputs
+        var knownFileExtensions = new[]
+        {
+            ".cs",      // C# source files
+            ".json",    // Settings files
+            ".yaml",    // Settings files
+            ".yml",     // Settings files
+            ".toml",    // Settings files
+            ".txt",     // Text files
+            ".md",      // Documentation
+            ".csproj",  // Project files
+            ".sln"      // Solution files
+        };
+
+        return knownFileExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase);
     }
 
     private static string ExtractEnumNameFromException(JsonException ex)

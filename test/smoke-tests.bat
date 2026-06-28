@@ -543,7 +543,7 @@ call :clean_generated_code
 
 call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_MultipleInterfacesByTagFiltered" ".\GeneratedCode\Combo_MultipleInterfacesByTagFiltered.generated.cs" "--multiple-interfaces ByTag --tag pet --tag store" "%process_path%" "%use_docker_param%"
 call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_ImmutableRecordsPolymorphic" ".\GeneratedCode\Combo_ImmutableRecordsPolymorphic.generated.cs" "--immutable-records --use-polymorphic-serialization" "%process_path%" "%use_docker_param%"
-call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_ContractOnlyMultipleFiles" ".\GeneratedCode\Combo_ContractOnlyMultipleFiles.generated.cs" "--contract-only --multiple-files" "%process_path%" "%use_docker_param%"
+call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_ContractOnlyMultipleFiles" ".\GeneratedCode\Combo_ContractOnlyMultipleFiles\" "--contract-only --multiple-files" "%process_path%" "%use_docker_param%"
 call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_TrimSchemaKeepPattern" ".\GeneratedCode\Combo_TrimSchemaKeepPattern.generated.cs" "--trim-unused-schema --tag pet --keep-schema ^^Pet.*" "%process_path%" "%use_docker_param%"
 call :generate ".\OpenAPI\v3.0\petstore.json" "Combo_DisposableCancellation" ".\GeneratedCode\Combo_DisposableCancellation.generated.cs" "--disposable --cancellation-tokens" "%process_path%" "%use_docker_param%"
 
