@@ -7,7 +7,12 @@
 **Implemented enhancements:**
 
 - Add option for Windows Authentication support to generated ConfigureRefitClients\(\) [\#1170](https://github.com/christianhelle/refitter/issues/1170)
+- Fix multi-file output directory validation [\#1172](https://github.com/christianhelle/refitter/pull/1172) ([christianhelle](https://github.com/christianhelle))
 - Add Windows Authentication option for DI clients [\#1171](https://github.com/christianhelle/refitter/pull/1171) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Using the --multiple-files argument generates Contracts.cs under a folder called Output.cs [\#1169](https://github.com/christianhelle/refitter/issues/1169)
 
 **Merged pull requests:**
 
