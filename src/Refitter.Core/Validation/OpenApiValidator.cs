@@ -18,6 +18,9 @@ public static class OpenApiValidator
         string openApiFile,
         CancellationToken cancellationToken = default)
     {
+        await ReferenceGuard.ValidateAsync(openApiFile, allowRemoteReferences: false, cancellationToken)
+            .ConfigureAwait(false);
+
         var result = await OpenApiMultiFileReader.Read(
             openApiFile,
             cancellationToken: cancellationToken);
