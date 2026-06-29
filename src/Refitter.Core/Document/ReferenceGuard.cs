@@ -56,6 +56,9 @@ internal static class ReferenceGuard
 
         foreach (var reference in ExtractReferences(content))
         {
+            if (reference.StartsWith("#", StringComparison.Ordinal))
+                continue;
+
             if (PathUtilities.IsHttp(reference))
             {
                 if (!allowRemoteReferences)
@@ -63,9 +66,8 @@ internal static class ReferenceGuard
             }
             else
             {
-                throw new ReferenceResolutionException(
-                    $"Local '$ref' \"{reference}\" in remote document \"{url}\" was rejected. " +
-                    "Refitter does not resolve local files referenced from a remote document.");
+                if (!allowRemoteReferences)
+                    throw RemoteBlocked(reference, url);
             }
         }
     }
