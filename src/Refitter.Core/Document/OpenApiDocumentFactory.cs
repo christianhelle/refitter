@@ -48,7 +48,10 @@ public static class OpenApiDocumentFactory
                 try
                 {
                     using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-                    content = await client.GetStringAsync(paths[i], cancellationToken).ConfigureAwait(false);
+                    using var httpResponse = await client.SendAsync(
+                        new HttpRequestMessage(HttpMethod.Get, paths[i]),
+                        cancellationToken).ConfigureAwait(false);
+                    content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -101,7 +104,10 @@ public static class OpenApiDocumentFactory
             try
             {
                 using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-                content = await client.GetStringAsync(openApiPath, cancellationToken).ConfigureAwait(false);
+                using var httpResponse = await client.SendAsync(
+                    new HttpRequestMessage(HttpMethod.Get, openApiPath),
+                    cancellationToken).ConfigureAwait(false);
+                content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {

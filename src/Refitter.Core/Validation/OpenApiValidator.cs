@@ -27,7 +27,10 @@ public static class OpenApiValidator
             try
             {
                 using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-                content = await client.GetStringAsync(openApiFile, cancellationToken).ConfigureAwait(false);
+                using var httpResponse = await client.SendAsync(
+                    new HttpRequestMessage(HttpMethod.Get, openApiFile),
+                    cancellationToken).ConfigureAwait(false);
+                content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -37,17 +40,18 @@ public static class OpenApiValidator
             await ReferenceGuard.ValidateAsync(openApiFile, content, allowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
 
-            // Parse the already-fetched content
-            var document = PathUtilities.IsYaml(openApiFile)
-                ? await NSwag.OpenApiYamlDocument.FromYamlAsync(content, cancellationToken).ConfigureAwait(false)
-                : await NSwag.OpenApiDocument.FromJsonAsync(content, cancellationToken).ConfigureAwait(false);
+            // Parse the already-fetched content using Microsoft.OpenApi
+            var readerSettings = new OpenApiReaderSettings();
+            readerSettings.AddYamlReader();
+            using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content));
+            var loadResult = await OpenApiDocument.LoadAsync(stream, settings: readerSettings, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var msDocument = loadResult.Document;
+            var diagnostic = loadResult.Diagnostic ?? new OpenApiDiagnostic();
 
             var statsVisitor = new OpenApiStats();
             var walker = new OpenApiWalker(statsVisitor);
-            walker.Walk(document);
+            walker.Walk(msDocument);
 
-            // Create a basic diagnostic since we're not using OpenApiMultiFileReader for remote URLs
-            var diagnostic = new Microsoft.OpenApi.Readers.OpenApiDiagnostic();
             return new(diagnostic, statsVisitor);
         }
 

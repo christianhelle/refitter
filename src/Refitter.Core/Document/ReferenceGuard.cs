@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace Refitter.Core;
@@ -61,7 +62,10 @@ internal static class ReferenceGuard
             try
             {
                 using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-                content = await client.GetStringAsync(url, cancellationToken).ConfigureAwait(false);
+                using var httpResponse = await client.SendAsync(
+                    new HttpRequestMessage(HttpMethod.Get, url),
+                    cancellationToken).ConfigureAwait(false);
+                content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -186,7 +190,7 @@ internal static class ReferenceGuard
         var path = Path.GetFullPath(candidate);
 
         // Use filesystem-aware comparison: case-sensitive on Linux/macOS, case-insensitive on Windows
-        var comparison = OperatingSystem.IsWindows()
+        var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
             ? StringComparison.OrdinalIgnoreCase
             : StringComparison.Ordinal;
 
