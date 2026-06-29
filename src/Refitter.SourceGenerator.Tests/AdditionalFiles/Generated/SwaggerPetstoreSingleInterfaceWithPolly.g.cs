@@ -7,7 +7,6 @@ using Refit;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Net.Http;
 
 #nullable enable annotations
 
@@ -453,6 +452,7 @@ public PetStatus Status { get; set; }
 namespace Refitter.Tests.AdditionalFiles.SingeInterface
 {
     using System;
+    using System.Net.Http;
     using Microsoft.Extensions.DependencyInjection;
     using Polly;
     using Polly.Contrib.WaitAndRetry;
