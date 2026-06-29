@@ -1,5 +1,5 @@
 using System.Linq;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 
 namespace Refitter.Core.Validation;
