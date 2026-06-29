@@ -1,5 +1,4 @@
 using System.Linq;
-using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Reader;
 

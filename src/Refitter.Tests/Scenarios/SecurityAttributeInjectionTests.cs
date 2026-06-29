@@ -221,6 +221,21 @@ securityDefinitions:
     }
 
     [Test]
+    public async Task Validation_Rejects_Header_With_Breakout_Characters()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(HeaderInjectionSpec);
+        try
+        {
+            var result = await OpenApiValidator.Validate(swaggerFile);
+            result.IsValid.Should().BeFalse();
+        }
+        finally
+        {
+            CleanUp(swaggerFile);
+        }
+    }
+
+    [Test]
     public async Task Validation_Rejects_Header_With_Breakout_Characters_V2()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(HeaderInjectionSpecV2);
