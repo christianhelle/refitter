@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Refitter.Core;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.OpenApi;
 
@@ -176,5 +177,131 @@ components:
         var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
+    }
+
+    [Test]
+    public async Task Ignores_Whitespace_OpenApiPath()
+    {
+        var act = () => ReferenceGuard.ValidateAsync("   ", allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Ignores_Missing_Local_File()
+    {
+        var path = Path.Combine(NewRoot(), "does-not-exist.json");
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Remote_Validation_Blocks_Dot_Relative_Reference_By_Default()
+    {
+        var content = MainTemplate.Replace("__REF__", "./schema.json#/components/schemas/Pet");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
+    }
+
+    [Test]
+    public async Task Remote_Validation_Allows_Dot_Relative_Reference_When_Enabled()
+    {
+        var content = MainTemplate.Replace("__REF__", "./schema.json#/components/schemas/Pet");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Remote_Validation_Blocks_Non_Http_Scheme()
+    {
+        var content = MainTemplate.Replace("__REF__", "file:///etc/passwd");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
+    }
+
+    [Test]
+    public async Task Remote_Validation_Blocks_Bare_Relative_Reference_By_Default()
+    {
+        var content = MainTemplate.Replace("__REF__", "schema.json#/components/schemas/Pet");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
+    }
+
+    [Test]
+    public async Task Remote_Validation_Allows_Bare_Relative_Reference_When_Enabled()
+    {
+        var content = MainTemplate.Replace("__REF__", "schema.json#/components/schemas/Pet");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Throws_When_Remote_Entry_Cannot_Be_Downloaded()
+    {
+        var act = () => ReferenceGuard.ValidateAsync("http://127.0.0.1:1/openapi.json", allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*Failed to read OpenAPI document*");
+    }
+
+    [Test]
+    public async Task Downloads_Remote_Entry_And_Validates_When_Reachable()
+    {
+        var remoteSpec = MainTemplate.Replace("__REF__", "#/components/schemas/InlineSchema")
+            .Replace("\"components\": { \"schemas\": {} }", "\"components\": { \"schemas\": { \"InlineSchema\": { \"type\": \"object\" } } }");
+        await using var server = new LocalHttpServer(remoteSpec);
+
+        var act = () => ReferenceGuard.ValidateAsync(server.Url, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Handles_Circular_Local_References_Without_Recursion_Error()
+    {
+        var root = NewRoot();
+        Write(root, "a.json", MainTemplate.Replace("__REF__", "./b.json"));
+        Write(root, "b.json", MainTemplate.Replace("__REF__", "./a.json"));
+
+        var act = () => ReferenceGuard.ValidateAsync(Path.Combine(root, "a.json"), allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Allows_Missing_Local_Referenced_File()
+    {
+        var root = NewRoot();
+        var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "./missing.json"));
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Throws_OperationCanceled_When_Cancellation_Requested()
+    {
+        var root = NewRoot();
+        var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "./leaf.json"));
+        Write(root, "leaf.json", Leaf);
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false, cts.Token);
+
+        await act.Should().ThrowAsync<OperationCanceledException>();
     }
 }
