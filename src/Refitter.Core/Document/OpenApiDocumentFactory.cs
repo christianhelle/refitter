@@ -1,3 +1,5 @@
+using System.Net;
+
 using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
@@ -47,7 +49,8 @@ public static class OpenApiDocumentFactory
                 string content;
                 try
                 {
-                    using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+                    using var handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
+                    using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
                     using var httpResponse = await client.SendAsync(
                         new HttpRequestMessage(HttpMethod.Get, paths[i]),
                         cancellationToken).ConfigureAwait(false);
@@ -103,7 +106,8 @@ public static class OpenApiDocumentFactory
             string content;
             try
             {
-                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+                using var handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
+                using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
                 using var httpResponse = await client.SendAsync(
                     new HttpRequestMessage(HttpMethod.Get, openApiPath),
                     cancellationToken).ConfigureAwait(false);
