@@ -253,8 +253,10 @@ securityDefinitions:
     [Test]
     public async Task SecurityScheme_Header_Injection_Does_Not_Break_Out_Of_Attribute()
     {
-        string generatedCode = await GenerateCode(SecuritySchemeHeaderInjectionSpec);
-        generatedCode.Should().Contain("\\\"");
+        string generatedCode = await GenerateCode(
+            SecuritySchemeHeaderInjectionSpec,
+            AuthenticationHeaderStyle.Parameter);
+        generatedCode.Should().Contain("[Get(\"/api\")]");
         generatedCode.Should().NotContain("[Header(\"Y\")]");
     }
 
@@ -262,7 +264,9 @@ securityDefinitions:
     [Test]
     public async Task Generated_Code_With_SecurityScheme_Header_Injection_Is_Inert_And_Compiles()
     {
-        string generatedCode = await GenerateCode(SecuritySchemeHeaderInjectionSpec);
+        string generatedCode = await GenerateCode(
+            SecuritySchemeHeaderInjectionSpec,
+            AuthenticationHeaderStyle.Parameter);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
@@ -284,8 +288,10 @@ securityDefinitions:
     [Test]
     public async Task SecurityScheme_Header_Injection_Does_Not_Break_Out_Of_Attribute_V2()
     {
-        string generatedCode = await GenerateCode(SecuritySchemeHeaderInjectionSpecV2);
-        generatedCode.Should().Contain("\\\"");
+        string generatedCode = await GenerateCode(
+            SecuritySchemeHeaderInjectionSpecV2,
+            AuthenticationHeaderStyle.Parameter);
+        generatedCode.Should().Contain("[Get(\"/api\")]");
         generatedCode.Should().NotContain("[Header(\"Y\")]");
     }
 
@@ -293,7 +299,9 @@ securityDefinitions:
     [Test]
     public async Task Generated_Code_With_SecurityScheme_Header_Injection_Is_Inert_And_Compiles_V2()
     {
-        string generatedCode = await GenerateCode(SecuritySchemeHeaderInjectionSpecV2);
+        string generatedCode = await GenerateCode(
+            SecuritySchemeHeaderInjectionSpecV2,
+            AuthenticationHeaderStyle.Parameter);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
@@ -312,12 +320,18 @@ securityDefinitions:
         }
     }
 
-    private static async Task<string> GenerateCode(string spec)
+    private static async Task<string> GenerateCode(
+        string spec,
+        AuthenticationHeaderStyle authenticationHeaderStyle = AuthenticationHeaderStyle.None)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
         try
         {
-            var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                AuthenticationHeaderStyle = authenticationHeaderStyle
+            };
             var generator = await RefitGenerator.CreateAsync(settings);
             return generator.Generate();
         }
