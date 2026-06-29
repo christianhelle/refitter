@@ -112,6 +112,13 @@ public class RefitterRunner
         }
     }
 
+    /// <summary>
+    /// Validates the configured OpenAPI specifications and records any diagnostics.
+    /// </summary>
+    /// <param name="settings">The generator settings that provide the OpenAPI paths to validate.</param>
+    /// <param name="validator">The OpenAPI validator used to validate each specification.</param>
+    /// <param name="diagnostics">The list that receives validation errors and warnings.</param>
+    /// <param name="cancellationToken">The token used to cancel validation.</param>
     private static async Task ValidateOpenApiSpecsAsync(
         RefitGeneratorSettings settings,
         IValidator validator,

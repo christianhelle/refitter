@@ -40,6 +40,13 @@ public class RefitGenerator(
         return new(settings, processed);
     }
 
+    /// <summary>
+    /// Loads an OpenAPI document from the configured specification path or paths.
+    /// </summary>
+    /// <param name="settings">The generator settings that specify the OpenAPI source and reference handling.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <returns>The loaded OpenAPI document.</returns>
+    /// <exception cref="ArgumentException">Thrown when neither <see cref="RefitGeneratorSettings.OpenApiPath"/> nor <see cref="RefitGeneratorSettings.OpenApiPaths"/> provides a valid specification path.</exception>
     private static async Task<OpenApiDocument> GetOpenApiDocument(
         RefitGeneratorSettings settings,
         CancellationToken cancellationToken = default)

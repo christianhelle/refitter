@@ -22,6 +22,14 @@ public static class OpenApiDocumentFactory
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A merged <see cref="NSwag.OpenApiDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="openApiPaths"/> is null.</exception>
+    /// <summary>
+    /// Loads one or more OpenAPI documents and merges them into a single document.
+    /// </summary>
+    /// <param name="openApiPaths">The file paths or URLs of the OpenAPI documents to load.</param>
+    /// <param name="allowRemoteReferences">Whether remote references are allowed when validating documents.</param>
+    /// <param name="cancellationToken">The token to observe while loading and merging documents.</param>
+    /// <returns>The merged OpenAPI document.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="openApiPaths"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="openApiPaths"/> is empty.</exception>
     public static async Task<OpenApiDocument> CreateAsync(
         IEnumerable<string> openApiPaths,
@@ -82,7 +90,12 @@ public static class OpenApiDocumentFactory
     /// </summary>
     /// <param name="openApiPath">The path or URL to the OpenAPI specification.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A new instance of the <see cref="NSwag.OpenApiDocument"/> class.</returns>
+    /// <summary>
+        /// Loads a single OpenAPI document with remote references disabled.
+        /// </summary>
+        /// <param name="openApiPath">The file path or URL of the OpenAPI document.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <returns>The loaded <see cref="NSwag.OpenApiDocument"/> instance.</returns>
     public static Task<OpenApiDocument> CreateAsync(
         string openApiPath,
         CancellationToken cancellationToken) =>
@@ -94,7 +107,13 @@ public static class OpenApiDocumentFactory
     /// <param name="openApiPath">The path or URL to the OpenAPI specification.</param>
     /// <param name="allowRemoteReferences">When false, remote and out-of-tree <c>$ref</c> references are rejected.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A new instance of the <see cref="NSwag.OpenApiDocument"/> class.</returns>
+    /// <summary>
+    /// Loads an OpenAPI document from a file path or URL.
+    /// </summary>
+    /// <param name="openApiPath">The local path or HTTP URL of the OpenAPI document.</param>
+    /// <param name="allowRemoteReferences">Whether remote references are permitted during validation.</param>
+    /// <returns>The loaded <see cref="NSwag.OpenApiDocument"/> instance.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when an HTTP document cannot be downloaded.</exception>
     public static async Task<OpenApiDocument> CreateAsync(
         string openApiPath,
         bool allowRemoteReferences = false,

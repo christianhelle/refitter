@@ -14,7 +14,12 @@ public static class OpenApiValidator
     /// <param name="openApiFile">The path to the OpenAPI specification file.</param>
     /// <param name="allowRemoteReferences">When false, remote and out-of-tree <c>$ref</c> references are rejected.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    /// <returns>A <see cref="OpenApiValidationResult"/> containing diagnostics and element counts.</returns>
+    /// <summary>
+    /// Validates an OpenAPI document and collects document statistics.
+    /// </summary>
+    /// <param name="openApiFile">The path or HTTP URL of the OpenAPI document.</param>
+    /// <param name="allowRemoteReferences">Whether remote $ref targets are permitted.</param>
+    /// <returns>A <see cref="OpenApiValidationResult"/> with parsing diagnostics and element counts.</returns>
     public static async Task<OpenApiValidationResult> Validate(
         string openApiFile,
         bool allowRemoteReferences = false,

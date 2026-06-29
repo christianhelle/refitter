@@ -14,6 +14,13 @@ internal sealed class LocalHttpServer : IAsyncDisposable
     private readonly string statusText;
     private readonly Task acceptTask;
 
+    /// <summary>
+    /// Starts a loopback HTTP server with a fixed response.
+    /// </summary>
+    /// <param name="responseBody">The response body to return for the accepted request.</param>
+    /// <param name="contentType">The value used for the response <c>Content-Type</c> header.</param>
+    /// <param name="statusCode">The HTTP status code to return.</param>
+    /// <param name="statusText">The HTTP status text to return.</param>
     public LocalHttpServer(
         string responseBody,
         string contentType = "application/json",
@@ -32,6 +39,9 @@ internal sealed class LocalHttpServer : IAsyncDisposable
 
     public string Url => $"http://127.0.0.1:{((IPEndPoint)listener.LocalEndpoint).Port}/openapi";
 
+    /// <summary>
+    /// Stops the server and waits for the accept loop to finish.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         cancellationTokenSource.Cancel();
@@ -50,6 +60,9 @@ internal sealed class LocalHttpServer : IAsyncDisposable
         cancellationTokenSource.Dispose();
     }
 
+    /// <summary>
+    /// Accepts a request and writes the configured HTTP response.
+    /// </summary>
     private async Task AcceptAsync()
     {
         using var client = await listener.AcceptTcpClientAsync(cancellationTokenSource.Token).ConfigureAwait(false);

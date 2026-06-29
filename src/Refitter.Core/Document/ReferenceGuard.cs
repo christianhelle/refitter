@@ -14,12 +14,24 @@ internal static class ReferenceGuard
         "[\"']?\\$ref[\"']?\\s*:\\s*(?:[\"']([^\"']+)[\"']|([^\\s#][^\\s]*))",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    public static Task ValidateAsync(
+    /// <summary>
+        /// Validates the OpenAPI document at the specified path.
+        /// </summary>
+        /// <param name="openApiPath">The path or URL of the OpenAPI document to validate.</param>
+        /// <param name="allowRemoteReferences">Whether remote $ref values are allowed.</param>
+        public static Task ValidateAsync(
         string openApiPath,
         bool allowRemoteReferences,
         CancellationToken cancellationToken = default) =>
         ValidateAsync(openApiPath, null, allowRemoteReferences, cancellationToken);
 
+    /// <summary>
+    /// Validates the $ref values in an OpenAPI document at the specified path.
+    /// </summary>
+    /// <param name="openApiPath">The local file path or HTTP(S) URL of the OpenAPI document.</param>
+    /// <param name="content">Optional preloaded document content used when validating a remote document.</param>
+    /// <param name="allowRemoteReferences">Whether remote $ref values are permitted.</param>
+    /// <param name="cancellationToken">A token used to cancel validation.</param>
     public static async Task ValidateAsync(
         string openApiPath,
         string? content,
@@ -46,6 +58,13 @@ internal static class ReferenceGuard
             .ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Validates $ref values in a remote OpenAPI document.
+    /// </summary>
+    /// <param name="url">The document URL.</param>
+    /// <param name="preloadedContent">The document content to validate, or null to load it from <paramref name="url"/>.</param>
+    /// <param name="allowRemoteReferences">Whether HTTP and HTTPS references are allowed.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     private static async Task ValidateRemoteEntryAsync(
         string url,
         string? preloadedContent,
@@ -116,6 +135,14 @@ internal static class ReferenceGuard
         }
     }
 
+    /// <summary>
+    /// Validates local OpenAPI reference files within the input directory tree.
+    /// </summary>
+    /// <param name="filePath">The path to the OpenAPI document to inspect.</param>
+    /// <param name="rootDirectory">The directory that bounds local reference traversal.</param>
+    /// <param name="allowRemoteReferences">Whether HTTP and HTTPS references are permitted.</param>
+    /// <param name="visited">The set of file paths already processed during traversal.</param>
+    /// <param name="cancellationToken">The token used to cancel validation.</param>
     private static async Task ValidateLocalFileAsync(
         string filePath,
         string rootDirectory,
@@ -170,6 +197,11 @@ internal static class ReferenceGuard
         }
     }
 
+    /// <summary>
+    /// Extracts <c>$ref</c> values from text content.
+    /// </summary>
+    /// <param name="content">The text to scan.</param>
+    /// <returns>The extracted <c>$ref</c> values.</returns>
     private static IEnumerable<string> ExtractReferences(string content)
     {
         foreach (Match match in RefPattern.Matches(content))
@@ -183,6 +215,12 @@ internal static class ReferenceGuard
         }
     }
 
+    /// <summary>
+    /// Determines whether a path is inside a root directory.
+    /// </summary>
+    /// <param name="rootDirectory">The root directory to compare against.</param>
+    /// <param name="candidate">The path to test.</param>
+    /// <returns><c>true</c> if the path equals the root directory or is located beneath it; otherwise, <c>false</c>.</returns>
     private static bool IsWithin(string rootDirectory, string candidate)
     {
         var root = Path.GetFullPath(rootDirectory)
@@ -199,11 +237,23 @@ internal static class ReferenceGuard
                path.StartsWith(root + Path.AltDirectorySeparatorChar, comparison);
     }
 
-    private static ReferenceResolutionException RemoteBlocked(string reference, string source) =>
+    /// <summary>
+            /// Creates an exception for a blocked remote reference.
+            /// </summary>
+            /// <param name="reference">The blocked $ref value.</param>
+            /// <param name="source">The document that contains the reference.</param>
+            /// <returns>An exception that reports the remote reference was blocked.</returns>
+            private static ReferenceResolutionException RemoteBlocked(string reference, string source) =>
         new($"Remote '$ref' \"{reference}\" in \"{source}\" was blocked. " +
             "Remote reference resolution is disabled by default; pass --allow-remote-refs " +
             "(or set allowRemoteReferences: true) to enable it.");
 
+    /// <summary>
+    /// Reads the entire text content of a file.
+    /// </summary>
+    /// <param name="path">The file path to read.</param>
+    /// <param name="cancellationToken">A token used to cancel the read operation.</param>
+    /// <returns>The file contents.</returns>
     private static async Task<string> ReadAllTextAsync(string path, CancellationToken cancellationToken)
     {
         using var reader = new StreamReader(path);

@@ -10,6 +10,9 @@ public sealed class ReferenceResolutionException : Exception
     /// <summary>
     /// Initializes a new instance of the <see cref="ReferenceResolutionException"/> class.
     /// </summary>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferenceResolutionException"/> class with a specified error message.
+    /// </summary>
     /// <param name="message">The error message.</param>
     public ReferenceResolutionException(string message)
         : base(message)
@@ -20,7 +23,11 @@ public sealed class ReferenceResolutionException : Exception
     /// Initializes a new instance of the <see cref="ReferenceResolutionException"/> class.
     /// </summary>
     /// <param name="message">The error message.</param>
-    /// <param name="innerException">The inner exception.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferenceResolutionException"/> class with a specified message and inner exception.
+    /// </summary>
+    /// <param name="message">The error message.</param>
+    /// <param name="innerException">The exception that caused this exception.</param>
     public ReferenceResolutionException(string message, Exception innerException)
         : base(message, innerException)
     {

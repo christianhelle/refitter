@@ -4,6 +4,11 @@ namespace Refitter;
 
 internal static class SettingsMapper
 {
+    /// <summary>
+    /// Maps application settings to Refit generator settings.
+    /// </summary>
+    /// <param name="settings">The source settings to map.</param>
+    /// <returns>The mapped Refit generator settings.</returns>
     public static RefitGeneratorSettings Map(Settings settings)
     {
         settings.TryGetAuthenticationHeaderStyle(out var authenticationHeaderStyle, out _);
