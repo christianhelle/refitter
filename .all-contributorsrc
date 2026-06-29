@@ -905,6 +905,16 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "Gal3m",
+      "name": "Ali Sadeghi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/91008976?v=4",
+      "profile": "https://github.com/Gal3m",
+      "contributions": [
+        "bug",
+        "security"
+      ]
     }
   ],
   "contributorsPerLine": 7,
