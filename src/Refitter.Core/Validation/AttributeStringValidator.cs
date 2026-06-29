@@ -1,5 +1,6 @@
 using System.Linq;
 using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Reader;
 
 namespace Refitter.Core.Validation;
@@ -17,7 +18,26 @@ internal static class AttributeStringValidator
 
     internal static void Validate(OpenApiDocument? document, OpenApiDiagnostic diagnostic)
     {
-        if (document?.Paths == null)
+        if (document == null)
+            return;
+
+        // Validate security scheme names for API-key schemes with header location
+        if (document.Components?.SecuritySchemes != null)
+        {
+            foreach (var securityScheme in document.Components.SecuritySchemes)
+            {
+                if (securityScheme.Value?.Type == SecuritySchemeType.ApiKey
+                    && securityScheme.Value.In == ParameterLocation.Header
+                    && ContainsUnsafeCharacters(securityScheme.Value.Name))
+                {
+                    diagnostic.Errors.Add(new OpenApiError(
+                        securityScheme.Key,
+                        $"Security scheme '{securityScheme.Key}' has header name '{securityScheme.Value.Name}' containing illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
+                }
+            }
+        }
+
+        if (document.Paths == null)
             return;
 
         foreach (var path in document.Paths)

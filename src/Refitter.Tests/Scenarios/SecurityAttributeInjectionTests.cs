@@ -15,8 +15,25 @@ public class SecurityAttributeInjectionTests
     private const string MaliciousPath =
         @"/p"")] Task<string> Dummy(); } } file class Evil { [System.Runtime.CompilerServices.ModuleInitializer] internal static void Init(){ } } namespace N2 { public partial interface I2 { [Get(""/q";
 
+    private const string MaliciousHeaderName =
+        @"X"")] string a); } file class H {} public partial interface J { [Header(""Y";
+
     private const string PathInjectionSpec = @"
 openapi: 3.0.0
+info:
+  title: Injection
+  version: 1.0.0
+paths:
+  '" + MaliciousPath + @"':
+    get:
+      operationId: GetU
+      responses:
+        '200':
+          description: ok
+";
+
+    private const string PathInjectionSpecV2 = @"
+swagger: '2.0'
 info:
   title: Injection
   version: 1.0.0
@@ -39,13 +56,74 @@ paths:
     get:
       operationId: GetU
       parameters:
-        - name: 'X"")] string a); } file class H {} public partial interface J { [Header(""Y'
+        - name: '" + MaliciousHeaderName + @"'
           in: header
           schema:
             type: string
       responses:
         '200':
           description: ok
+";
+
+    private const string HeaderInjectionSpecV2 = @"
+swagger: '2.0'
+info:
+  title: Injection
+  version: 1.0.0
+paths:
+  /api:
+    get:
+      operationId: GetU
+      parameters:
+        - name: '" + MaliciousHeaderName + @"'
+          in: header
+          type: string
+      responses:
+        '200':
+          description: ok
+";
+
+    private const string SecuritySchemeHeaderInjectionSpec = @"
+openapi: 3.0.0
+info:
+  title: Injection
+  version: 1.0.0
+paths:
+  /api:
+    get:
+      operationId: GetU
+      security:
+        - apiKey: []
+      responses:
+        '200':
+          description: ok
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: '" + MaliciousHeaderName + @"'
+";
+
+    private const string SecuritySchemeHeaderInjectionSpecV2 = @"
+swagger: '2.0'
+info:
+  title: Injection
+  version: 1.0.0
+paths:
+  /api:
+    get:
+      operationId: GetU
+      security:
+        - apiKey: []
+      responses:
+        '200':
+          description: ok
+securityDefinitions:
+  apiKey:
+    type: apiKey
+    in: header
+    name: '" + MaliciousHeaderName + @"'
 ";
 
     [Test]
@@ -84,6 +162,130 @@ paths:
     public async Task Validation_Rejects_Path_With_Breakout_Characters()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(PathInjectionSpec);
+        try
+        {
+            var result = await OpenApiValidator.Validate(swaggerFile);
+            result.IsValid.Should().BeFalse();
+        }
+        finally
+        {
+            CleanUp(swaggerFile);
+        }
+    }
+
+    [Test]
+    public async Task Path_Injection_Does_Not_Break_Out_Of_Attribute_V2()
+    {
+        string generatedCode = await GenerateCode(PathInjectionSpecV2);
+        generatedCode.Should().Contain("\\\"");
+        generatedCode.Should().NotContain("[Get(\"/q\")]");
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task Generated_Code_With_Path_Injection_Is_Inert_And_Compiles_V2()
+    {
+        string generatedCode = await GenerateCode(PathInjectionSpecV2);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Header_Injection_Does_Not_Break_Out_Of_Attribute_V2()
+    {
+        string generatedCode = await GenerateCode(HeaderInjectionSpecV2);
+        generatedCode.Should().Contain("\\\"");
+        generatedCode.Should().NotContain("[Header(\"Y\")]");
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task Generated_Code_With_Header_Injection_Is_Inert_And_Compiles_V2()
+    {
+        string generatedCode = await GenerateCode(HeaderInjectionSpecV2);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Validation_Rejects_Path_With_Breakout_Characters_V2()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(PathInjectionSpecV2);
+        try
+        {
+            var result = await OpenApiValidator.Validate(swaggerFile);
+            result.IsValid.Should().BeFalse();
+        }
+        finally
+        {
+            CleanUp(swaggerFile);
+        }
+    }
+
+    [Test]
+    public async Task Validation_Rejects_Header_With_Breakout_Characters_V2()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(HeaderInjectionSpecV2);
+        try
+        {
+            var result = await OpenApiValidator.Validate(swaggerFile);
+            result.IsValid.Should().BeFalse();
+        }
+        finally
+        {
+            CleanUp(swaggerFile);
+        }
+    }
+
+    [Test]
+    public async Task SecurityScheme_Header_Injection_Does_Not_Break_Out_Of_Attribute()
+    {
+        string generatedCode = await GenerateCode(SecuritySchemeHeaderInjectionSpec);
+        generatedCode.Should().Contain("\\\"");
+        generatedCode.Should().NotContain("[Header(\"Y\")]");
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task Generated_Code_With_SecurityScheme_Header_Injection_Is_Inert_And_Compiles()
+    {
+        string generatedCode = await GenerateCode(SecuritySchemeHeaderInjectionSpec);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Validation_Rejects_SecurityScheme_Header_With_Breakout_Characters()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SecuritySchemeHeaderInjectionSpec);
+        try
+        {
+            var result = await OpenApiValidator.Validate(swaggerFile);
+            result.IsValid.Should().BeFalse();
+        }
+        finally
+        {
+            CleanUp(swaggerFile);
+        }
+    }
+
+    [Test]
+    public async Task SecurityScheme_Header_Injection_Does_Not_Break_Out_Of_Attribute_V2()
+    {
+        string generatedCode = await GenerateCode(SecuritySchemeHeaderInjectionSpecV2);
+        generatedCode.Should().Contain("\\\"");
+        generatedCode.Should().NotContain("[Header(\"Y\")]");
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task Generated_Code_With_SecurityScheme_Header_Injection_Is_Inert_And_Compiles_V2()
+    {
+        string generatedCode = await GenerateCode(SecuritySchemeHeaderInjectionSpecV2);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Validation_Rejects_SecurityScheme_Header_With_Breakout_Characters_V2()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SecuritySchemeHeaderInjectionSpecV2);
         try
         {
             var result = await OpenApiValidator.Validate(swaggerFile);
