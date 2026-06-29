@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-98-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-99-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1486,6 +1486,9 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="http://umair.me"><img src="https://avatars.githubusercontent.com/u/834935?v=4?s=100" width="100px;" alt="Muhammad Umair Irshad"/><br /><sub><b>Muhammad Umair Irshad</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Aumair-me" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://z-bo.tumblr.com"><img src="https://avatars.githubusercontent.com/u/447485?v=4?s=100" width="100px;" alt="John Zabroski"/><br /><sub><b>John Zabroski</b></sub></a><br /><a href="#ideas-jzabroski" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Gal3m"><img src="https://avatars.githubusercontent.com/u/91008976?v=4?s=100" width="100px;" alt="Ali Sadeghi"/><br /><sub><b>Ali Sadeghi</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AGal3m" title="Bug reports">🐛</a> <a href="#security-Gal3m" title="Security">🛡️</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://mrostamipoor.github.io/"><img src="https://avatars.githubusercontent.com/u/78902717?v=4?s=100" width="100px;" alt="Maryam Rostamipoor"/><br /><sub><b>Maryam Rostamipoor</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amrostamipoor" title="Bug reports">🐛</a> <a href="#security-mrostamipoor" title="Security">🛡️</a></td>
     </tr>
   </tbody>
 </table>
