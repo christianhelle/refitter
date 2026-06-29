@@ -26,6 +26,8 @@ public static class OpenApiValidator
         var walker = new OpenApiWalker(statsVisitor);
         walker.Walk(result.OpenApiDocument);
 
+        AttributeStringValidator.Validate(result.OpenApiDocument, result.OpenApiDiagnostic);
+
         return new(
             result.OpenApiDiagnostic,
             statsVisitor);
