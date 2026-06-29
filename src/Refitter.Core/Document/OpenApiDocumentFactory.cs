@@ -16,12 +16,14 @@ public static class OpenApiDocumentFactory
     /// The first document serves as the base; paths and schemas from subsequent documents are merged in.
     /// </summary>
     /// <param name="openApiPaths">The paths or URLs to the OpenAPI specifications.</param>
+    /// <param name="allowRemoteReferences">When false, remote and out-of-tree <c>$ref</c> references are rejected.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A merged <see cref="NSwag.OpenApiDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="openApiPaths"/> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="openApiPaths"/> is empty.</exception>
     public static async Task<OpenApiDocument> CreateAsync(
         IEnumerable<string> openApiPaths,
+        bool allowRemoteReferences = false,
         CancellationToken cancellationToken = default)
     {
         if (openApiPaths == null)
@@ -32,12 +34,13 @@ public static class OpenApiDocumentFactory
             throw new ArgumentException("At least one OpenAPI path must be specified.", nameof(openApiPaths));
 
         if (paths.Length == 1)
-            return await CreateAsync(paths[0], cancellationToken).ConfigureAwait(false);
+            return await CreateAsync(paths[0], allowRemoteReferences, cancellationToken).ConfigureAwait(false);
 
         var documents = new OpenApiDocument[paths.Length];
         for (var i = 0; i < paths.Length; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            await ReferenceGuard.ValidateAsync(paths[i], allowRemoteReferences, cancellationToken).ConfigureAwait(false);
             documents[i] = await DocumentLoader.LoadAsync(paths[i], cancellationToken).ConfigureAwait(false);
         }
 
@@ -48,12 +51,15 @@ public static class OpenApiDocumentFactory
     /// Creates a new instance of the <see cref="NSwag.OpenApiDocument"/> class asynchronously.
     /// </summary>
     /// <param name="openApiPath">The path or URL to the OpenAPI specification.</param>
+    /// <param name="allowRemoteReferences">When false, remote and out-of-tree <c>$ref</c> references are rejected.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A new instance of the <see cref="NSwag.OpenApiDocument"/> class.</returns>
     public static async Task<OpenApiDocument> CreateAsync(
         string openApiPath,
+        bool allowRemoteReferences = false,
         CancellationToken cancellationToken = default)
     {
+        await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
         return await DocumentLoader.LoadAsync(openApiPath, cancellationToken).ConfigureAwait(false);
     }
 }
