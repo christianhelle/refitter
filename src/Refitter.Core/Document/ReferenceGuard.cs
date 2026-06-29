@@ -10,11 +10,18 @@ namespace Refitter.Core;
 internal static class ReferenceGuard
 {
     private static readonly Regex RefPattern = new(
-        "[\"']?\\$ref[\"']?\\s*:\\s*[\"']([^\"']+)[\"']",
+        "[\"']?\\$ref[\"']?\\s*:\\s*(?:[\"']([^\"']+)[\"']|([^\\s#][^\\s]*))",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    public static Task ValidateAsync(
+        string openApiPath,
+        bool allowRemoteReferences,
+        CancellationToken cancellationToken = default) =>
+        ValidateAsync(openApiPath, null, allowRemoteReferences, cancellationToken);
 
     public static async Task ValidateAsync(
         string openApiPath,
+        string? content,
         bool allowRemoteReferences,
         CancellationToken cancellationToken = default)
     {
@@ -23,7 +30,7 @@ internal static class ReferenceGuard
 
         if (PathUtilities.IsHttp(openApiPath))
         {
-            await ValidateRemoteEntryAsync(openApiPath, allowRemoteReferences, cancellationToken)
+            await ValidateRemoteEntryAsync(openApiPath, content, allowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
             return;
         }
@@ -40,18 +47,27 @@ internal static class ReferenceGuard
 
     private static async Task ValidateRemoteEntryAsync(
         string url,
+        string? preloadedContent,
         bool allowRemoteReferences,
         CancellationToken cancellationToken)
     {
         string content;
-        try
+        if (preloadedContent != null)
         {
-            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-            content = await client.GetStringAsync(url).ConfigureAwait(false);
+            content = preloadedContent;
         }
-        catch
+        else
         {
-            return;
+            try
+            {
+                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+                content = await client.GetStringAsync(url, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new ReferenceResolutionException(
+                    $"Failed to read OpenAPI document from '{url}' during reference validation: {ex.Message}", ex);
+            }
         }
 
         foreach (var reference in ExtractReferences(content))
@@ -59,13 +75,37 @@ internal static class ReferenceGuard
             if (reference.StartsWith("#", StringComparison.Ordinal))
                 continue;
 
-            if (PathUtilities.IsHttp(reference))
+            Uri? resolvedUri = null;
+            if (Uri.TryCreate(reference, UriKind.Absolute, out var absoluteUri))
             {
-                if (!allowRemoteReferences)
-                    throw RemoteBlocked(reference, url);
+                resolvedUri = absoluteUri;
             }
-            else
+            else if (Uri.TryCreate(new Uri(url), reference.Split('#')[0], out var relativeUri))
             {
+                resolvedUri = relativeUri;
+            }
+
+            if (resolvedUri != null && !string.IsNullOrEmpty(resolvedUri.Scheme))
+            {
+                var isHttpScheme = resolvedUri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
+                                   resolvedUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
+
+                if (isHttpScheme)
+                {
+                    if (!allowRemoteReferences)
+                        throw RemoteBlocked(reference, url);
+                }
+                else
+                {
+                    // Non-HTTP schemes (file:, data:, etc.) are always blocked
+                    throw RemoteBlocked(reference, url);
+                }
+            }
+            else if (!reference.StartsWith("/", StringComparison.Ordinal) &&
+                     !reference.StartsWith("./", StringComparison.Ordinal) &&
+                     !reference.StartsWith("../", StringComparison.Ordinal))
+            {
+                // Relative references from remote documents treated as remote
                 if (!allowRemoteReferences)
                     throw RemoteBlocked(reference, url);
             }
@@ -89,9 +129,10 @@ internal static class ReferenceGuard
         {
             content = await ReadAllTextAsync(filePath, cancellationToken).ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex)
         {
-            return;
+            throw new ReferenceResolutionException(
+                $"Failed to read OpenAPI document from '{filePath}' during reference validation: {ex.Message}", ex);
         }
 
         var currentDirectory = Path.GetDirectoryName(filePath) ?? rootDirectory;
@@ -129,7 +170,10 @@ internal static class ReferenceGuard
     {
         foreach (Match match in RefPattern.Matches(content))
         {
-            var value = match.Groups[1].Value.Trim();
+            // Group 1 = quoted value, Group 2 = unquoted YAML scalar
+            var value = !string.IsNullOrEmpty(match.Groups[1].Value)
+                ? match.Groups[1].Value.Trim()
+                : match.Groups[2].Value.Trim();
             if (value.Length > 0)
                 yield return value;
         }
@@ -140,9 +184,15 @@ internal static class ReferenceGuard
         var root = Path.GetFullPath(rootDirectory)
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         var path = Path.GetFullPath(candidate);
-        return path.Equals(root, StringComparison.OrdinalIgnoreCase) ||
-               path.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) ||
-               path.StartsWith(root + Path.AltDirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+
+        // Use filesystem-aware comparison: case-sensitive on Linux/macOS, case-insensitive on Windows
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return path.Equals(root, comparison) ||
+               path.StartsWith(root + Path.DirectorySeparatorChar, comparison) ||
+               path.StartsWith(root + Path.AltDirectorySeparatorChar, comparison);
     }
 
     private static ReferenceResolutionException RemoteBlocked(string reference, string source) =>

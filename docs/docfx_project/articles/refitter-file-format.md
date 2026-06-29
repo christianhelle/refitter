@@ -413,6 +413,10 @@ When using `openApiPaths`, the documents are merged into a single generated clie
             "type": "boolean",
             "description": "Indicates whether to generate default additional properties."
         },
+        "allowRemoteReferences": {
+            "type": "boolean",
+            "description": "When true, remote (http/https) $ref references inside the document are resolved. Disabled by default to prevent generation-time SSRF and remote file inclusion. Local $ref references are always confined to the input document's directory tree."
+        },
         "operationNameGenerator": {
             "type": "string",
             "description": "The generator used to generate operation names."

@@ -13,6 +13,33 @@ public class ReferenceGuardTests
   ""components"": { ""schemas"": {} }
 }";
 
+    private const string Swagger2Template = @"{
+  ""swagger"": ""2.0"",
+  ""info"": { ""title"": ""t"", ""version"": ""1"" },
+  ""paths"": { ""/p"": { ""get"": { ""operationId"": ""g"", ""responses"": { ""200"": {
+    ""description"": ""ok"", ""schema"": { ""$ref"": ""__REF__"" } } } } } },
+  ""definitions"": {}
+}";
+
+    private const string YamlMainTemplate = @"openapi: 3.0.0
+info:
+  title: t
+  version: '1'
+paths:
+  /p:
+    get:
+      operationId: g
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: __REF__
+components:
+  schemas: {}
+";
+
     private const string Leaf = @"{ ""type"": ""object"", ""properties"": { ""ok"": { ""type"": ""string"" } } }";
 
     private static string Write(string dir, string name, string contents)
@@ -92,5 +119,62 @@ public class ReferenceGuardTests
         var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Blocks_Remote_Reference_In_Swagger2_Spec()
+    {
+        var root = NewRoot();
+        var path = Write(root, "swagger.json", Swagger2Template.Replace("__REF__", "http://evil.com/schema.json"));
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
+    }
+
+    [Test]
+    public async Task Allows_In_Tree_Reference_In_Swagger2_Spec()
+    {
+        var root = NewRoot();
+        Write(root, "leaf.json", Leaf);
+        var path = Write(root, "swagger.json", Swagger2Template.Replace("__REF__", "./leaf.json"));
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Blocks_Remote_Reference_In_YAML_Unquoted()
+    {
+        var root = NewRoot();
+        var path = Write(root, "spec.yaml", YamlMainTemplate.Replace("__REF__", "http://evil.com/schema.yaml"));
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
+    }
+
+    [Test]
+    public async Task Allows_In_Tree_Reference_In_YAML_Unquoted()
+    {
+        var root = NewRoot();
+        Write(root, "leaf.json", Leaf);
+        var path = Write(root, "spec.yaml", YamlMainTemplate.Replace("__REF__", "./leaf.json"));
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Blocks_Parent_Traversal_In_YAML_Unquoted()
+    {
+        var root = NewRoot();
+        var path = Write(root, "spec.yaml", YamlMainTemplate.Replace("__REF__", "../secret.yaml#/Pet"));
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 }
