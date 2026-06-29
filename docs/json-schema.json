@@ -474,6 +474,10 @@
       "description": "Skip default additional properties. Default is true.",
       "type": "boolean"
     },
+    "allowRemoteReferences": {
+      "description": "Resolve remote (http/https) $ref references inside the OpenAPI document. Disabled by default to prevent generation-time SSRF. Top-level remote document URLs are always allowed.",
+      "type": "boolean"
+    },
     "immutableRecords": {
       "description": "Generate contracts as immutable records instead of classes.",
       "type": "boolean"

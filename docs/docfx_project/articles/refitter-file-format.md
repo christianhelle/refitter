@@ -62,6 +62,7 @@ The following is an example `.refitter` file
     "^Person.+"
   ],
   "generateDefaultAdditionalProperties": true, // Optional. default=true
+  "allowRemoteReferences": false, // Optional. Default=false. When true, remote http/https $ref references inside the document are resolved
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": false, // Optional. Default=false
@@ -185,6 +186,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
 - `includeInheritanceHierarchy`: Set to true to keep all possible type-instances of inheritance/union types. If this is false only directly referenced types will be kept. This works in conjunction with `trimUnusedSchema`
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
+- `allowRemoteReferences`: When `true`, remote (`http`/`https`) `$ref` references inside the document are resolved. Disabled by default to prevent generation-time SSRF and remote file inclusion. Local `$ref` references are always confined to the input document's directory tree. Default is `false`
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
