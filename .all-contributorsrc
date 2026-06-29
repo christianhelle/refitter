@@ -915,6 +915,16 @@
         "bug",
         "security"
       ]
+    },
+    {
+      "login": "mrostamipoor",
+      "name": "Maryam Rostamipoor",
+      "avatar_url": "https://avatars.githubusercontent.com/u/78902717?v=4",
+      "profile": "https://mrostamipoor.github.io/",
+      "contributions": [
+        "bug",
+        "security"
+      ]
     }
   ],
   "contributorsPerLine": 7,
