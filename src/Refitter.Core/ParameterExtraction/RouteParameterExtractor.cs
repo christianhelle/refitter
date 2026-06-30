@@ -3,7 +3,7 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class RouteParameterExtractor : IParameterTypeExtractor
+internal sealed class RouteParameterExtractor
 {
     public IEnumerable<string> Extract(
         CSharpOperationModel operationModel,

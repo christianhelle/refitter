@@ -3,55 +3,52 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class QueryParameterExtractor : IParameterTypeExtractor
+internal sealed class QueryParameterExtractor
 {
-    public string? DynamicQuerystringParameterType { get; set; }
-    public string? DynamicQuerystringCode { get; private set; }
-
-    public IEnumerable<string> Extract(
+    public (IReadOnlyList<string> Parameters, string? DynamicQuerystringCode) Extract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
-        RefitGeneratorSettings settings)
+        RefitGeneratorSettings settings,
+        string dynamicQuerystringParameterType)
     {
         var queryParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.Query)
             .ToList();
 
-        if (settings.UseDynamicQuerystringParameters && queryParameters.Count >= 2)
-            return ExtractDynamic(queryParameters, settings);
-
-        return ExtractSimple(queryParameters, settings);
+        return settings.UseDynamicQuerystringParameters && queryParameters.Count >= 2
+            ? ExtractDynamic(queryParameters, settings, dynamicQuerystringParameterType)
+            : (ExtractSimple(queryParameters, settings), null);
     }
 
-    private List<string> ExtractDynamic(
+    private static (IReadOnlyList<string> Parameters, string? DynamicQuerystringCode) ExtractDynamic(
         List<CSharpParameterModel> queryParameters,
-        RefitGeneratorSettings settings)
+        RefitGeneratorSettings settings,
+        string dynamicQuerystringParameterType)
     {
         var dynamicQuerystringCode = DynamicQuerystringParameterBuilder.Build(
             queryParameters,
-            DynamicQuerystringParameterType!,
+            dynamicQuerystringParameterType,
             settings);
 
-        DynamicQuerystringCode = !string.IsNullOrWhiteSpace(dynamicQuerystringCode)
+        var code = !string.IsNullOrWhiteSpace(dynamicQuerystringCode)
             ? dynamicQuerystringCode
             : null;
 
         var allNullable = queryParameters.All(p =>
             ParameterShared.GetQueryParameterType(p, settings).EndsWith("?"));
 
-        var dynamicQuerystringParameter = $"[Query] {DynamicQuerystringParameterType}";
+        var dynamicQuerystringParameter = $"[Query] {dynamicQuerystringParameterType}";
         if (allNullable)
             dynamicQuerystringParameter += "?";
         dynamicQuerystringParameter += " queryParams";
-        return [dynamicQuerystringParameter];
+
+        return (new[] { dynamicQuerystringParameter }, code);
     }
 
-    private List<string> ExtractSimple(
+    private static List<string> ExtractSimple(
         List<CSharpParameterModel> queryParameters,
         RefitGeneratorSettings settings)
     {
-        DynamicQuerystringCode = string.Empty;
-
         return queryParameters
             .Select(p =>
             {

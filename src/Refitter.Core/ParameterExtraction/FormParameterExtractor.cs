@@ -4,7 +4,7 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class FormParameterExtractor : IParameterTypeExtractor
+internal sealed class FormParameterExtractor
 {
     public IEnumerable<string> Extract(
         CSharpOperationModel operationModel,
