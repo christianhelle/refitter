@@ -382,15 +382,15 @@ paths:
         string spec,
         AuthenticationHeaderStyle authenticationHeaderStyle = AuthenticationHeaderStyle.None)
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
+        string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
         try
         {
-            var settings = new RefitGeneratorSettings
+            RefitGeneratorSettings settings = new RefitGeneratorSettings
             {
                 OpenApiPath = swaggerFile,
                 AuthenticationHeaderStyle = authenticationHeaderStyle
             };
-            var generator = await RefitGenerator.CreateAsync(settings);
+            RefitGenerator generator = await RefitGenerator.CreateAsync(settings);
             return generator.Generate();
         }
         finally
@@ -403,7 +403,7 @@ paths:
     {
         if (File.Exists(swaggerFile))
             File.Delete(swaggerFile);
-        var directory = Path.GetDirectoryName(swaggerFile);
+        string? directory = Path.GetDirectoryName(swaggerFile);
         if (directory != null && Directory.Exists(directory))
             Directory.Delete(directory, true);
     }
