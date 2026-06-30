@@ -5,10 +5,10 @@ using Microsoft.OpenApi.Reader;
 namespace Refitter.Core.Validation;
 
 /// <summary>
-/// Rejects OpenAPI paths and header names containing characters that could break out of the
-/// generated Refit attribute string literals (e.g. quotes, backslashes, newlines). Generated
-/// code escapes these characters, but rejecting them gives a clear error unless validation is
-/// skipped. See GHSA-3fhm-p725-h3g3.
+/// Rejects OpenAPI paths, header names, and content-type keys containing characters that could break
+/// out of the generated Refit attribute string literals (e.g. quotes, backslashes, newlines). Generated
+/// code escapes these characters, but rejecting them gives a clear error unless validation is skipped.
+/// See GHSA-3fhm-p725-h3g3 (path), GHSA-58x9-vjvp-6mx8 (header name), GHSA-p32v-8v8j-j534 (content-type).
 /// </summary>
 internal static class AttributeStringValidator
 {
