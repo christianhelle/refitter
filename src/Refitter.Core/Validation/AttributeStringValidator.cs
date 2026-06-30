@@ -39,6 +39,10 @@ internal static class AttributeStringValidator
         if (document.Paths == null)
             return;
 
+        // Accept/Content-Type headers are only emitted from content map keys for OpenAPI 3.0+,
+        // so only reject unsafe content-type keys for those documents to avoid Swagger 2.0 false positives.
+        var validateContentTypes = diagnostic.SpecificationVersion != OpenApiSpecVersion.OpenApi2_0;
+
         foreach (var path in document.Paths)
         {
             if (ContainsUnsafeCharacters(path.Key))
@@ -53,19 +57,62 @@ internal static class AttributeStringValidator
 
             foreach (var operation in path.Value.Operations.Values)
             {
-                if (operation?.Parameters == null)
+                if (operation == null)
                     continue;
 
-                foreach (var parameter in operation.Parameters)
+                if (operation.Parameters != null)
                 {
-                    if (parameter.In == ParameterLocation.Header && ContainsUnsafeCharacters(parameter.Name))
+                    foreach (var parameter in operation.Parameters)
                     {
-                        diagnostic.Errors.Add(new OpenApiError(
-                            parameter.Name ?? string.Empty,
-                            $"Header parameter name '{parameter.Name}' contains illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
+                        if (parameter.In == ParameterLocation.Header && ContainsUnsafeCharacters(parameter.Name))
+                        {
+                            diagnostic.Errors.Add(new OpenApiError(
+                                parameter.Name ?? string.Empty,
+                                $"Header parameter name '{parameter.Name}' contains illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
+                        }
                     }
                 }
+
+                if (validateContentTypes)
+                {
+                    ValidateContentTypeKeys(operation, diagnostic);
+                }
             }
+        }
+    }
+
+    private static void ValidateContentTypeKeys(OpenApiOperation operation, OpenApiDiagnostic diagnostic)
+    {
+        if (operation.RequestBody?.Content != null)
+        {
+            foreach (var contentType in operation.RequestBody.Content.Keys)
+            {
+                AddContentTypeErrorIfUnsafe(contentType, diagnostic);
+            }
+        }
+
+        if (operation.Responses == null)
+            return;
+
+        foreach (var response in operation.Responses.Values)
+        {
+            if (response?.Content == null)
+                continue;
+
+            foreach (var contentType in response.Content.Keys)
+            {
+                AddContentTypeErrorIfUnsafe(contentType, diagnostic);
+            }
+        }
+    }
+
+    private static void AddContentTypeErrorIfUnsafe(string contentType, OpenApiDiagnostic diagnostic)
+    {
+        if (ContainsUnsafeCharacters(contentType))
+        {
+            diagnostic.Errors.Add(new OpenApiError(
+                contentType,
+                $"Content type '{contentType}' contains illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
         }
     }
 }
