@@ -7,9 +7,10 @@ using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
-// Regression tests for GHSA-3fhm-p725-h3g3: an OpenAPI path / header name that closes the
-// Refit attribute string and injects a [ModuleInitializer] file class must not break out of
-// the generated code, and must be rejected by validation.
+// Regression tests for the Refit attribute-injection advisories. An OpenAPI path, header name, or
+// content-type key that closes the Refit attribute string and injects a [ModuleInitializer] file
+// class must not break out of the generated code, and must be rejected by validation.
+// Covers GHSA-3fhm-p725-h3g3 (path), GHSA-58x9-vjvp-6mx8 (header name), GHSA-p32v-8v8j-j534 (content-type).
 public class SecurityAttributeInjectionTests
 {
     private const string MaliciousPath =
@@ -17,6 +18,9 @@ public class SecurityAttributeInjectionTests
 
     private const string MaliciousHeaderName =
         @"X"")] string a); } file class H {} public partial interface J { [Header(""Y";
+
+    private const string MaliciousContentType =
+        @"application/json"")] Task<string> Dummy(); } } file class CtEvil { [System.Runtime.CompilerServices.ModuleInitializer] internal static void Init(){ } } namespace N3 { public partial interface I3 { [Get(""/ctq";
 
     private const string PathInjectionSpec = @"
 openapi: 3.0.0
@@ -124,6 +128,29 @@ securityDefinitions:
     type: apiKey
     in: header
     name: '" + MaliciousHeaderName + @"'
+";
+
+    private const string ContentTypeInjectionSpec = @"
+openapi: 3.0.0
+info:
+  title: Injection
+  version: 1.0.0
+paths:
+  /api:
+    post:
+      operationId: PostU
+      requestBody:
+        content:
+          '" + MaliciousContentType + @"':
+            schema:
+              type: string
+      responses:
+        '200':
+          description: ok
+          content:
+            '" + MaliciousContentType + @"':
+              schema:
+                type: string
 ";
 
     [Test]
@@ -309,6 +336,37 @@ securityDefinitions:
     public async Task Validation_Rejects_SecurityScheme_Header_With_Breakout_Characters_V2()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SecuritySchemeHeaderInjectionSpecV2);
+        try
+        {
+            var result = await OpenApiValidator.Validate(swaggerFile);
+            result.IsValid.Should().BeFalse();
+        }
+        finally
+        {
+            CleanUp(swaggerFile);
+        }
+    }
+
+    [Test]
+    public async Task ContentType_Injection_Does_Not_Break_Out_Of_Attribute()
+    {
+        string generatedCode = await GenerateCode(ContentTypeInjectionSpec);
+        generatedCode.Should().Contain("\\\"");
+        generatedCode.Should().NotContain("application/json\")]");
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task Generated_Code_With_ContentType_Injection_Is_Inert_And_Compiles()
+    {
+        string generatedCode = await GenerateCode(ContentTypeInjectionSpec);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Validation_Rejects_ContentType_With_Breakout_Characters()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(ContentTypeInjectionSpec);
         try
         {
             var result = await OpenApiValidator.Validate(swaggerFile);
