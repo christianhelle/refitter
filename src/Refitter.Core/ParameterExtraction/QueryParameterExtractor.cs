@@ -35,7 +35,7 @@ internal sealed class QueryParameterExtractor
             : null;
 
         var allNullable = queryParameters.All(p =>
-            ParameterShared.GetQueryParameterType(p, settings).EndsWith("?"));
+            ParameterTypeResolver.GetQueryParameterType(p, settings).EndsWith("?"));
 
         var dynamicQuerystringParameter = $"[Query] {dynamicQuerystringParameterType}";
         if (allNullable)
@@ -52,8 +52,8 @@ internal sealed class QueryParameterExtractor
         return queryParameters
             .Select(p =>
             {
-                var variableName = ParameterShared.GetVariableName(p);
-                return $"{ParameterShared.JoinAttributes(ParameterShared.GetQueryAttribute(p, settings), ParameterShared.GetAliasAsAttribute(p.Name, variableName))}{ParameterShared.GetQueryParameterType(p, settings)} {variableName}";
+                var variableName = ParameterNaming.GetVariableName(p);
+                return $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetQueryAttribute(p, settings), ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{ParameterTypeResolver.GetQueryParameterType(p, settings)} {variableName}";
             })
             .ToList();
     }

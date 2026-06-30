@@ -12,7 +12,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void GetDefaultValueForParameter_Returns_Default_For_Empty_Parameter_String()
     {
-        var result = ParameterShared.GetDefaultValueForParameter(
+        var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
             string.Empty,
             new List<CSharpParameterModel>());
 
@@ -22,8 +22,8 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void FormatDefaultValue_Returns_Default_For_Null_And_Unsupported_Types()
     {
-        var nullResult = ParameterShared.FormatDefaultValue(null!, "string");
-        var unsupportedTypeResult = ParameterShared.FormatDefaultValue(42, "CustomType");
+        var nullResult = ParameterDefaultValueFormatter.FormatDefaultValue(null!, "string");
+        var unsupportedTypeResult = ParameterDefaultValueFormatter.FormatDefaultValue(42, "CustomType");
 
         nullResult.Should().Be("default");
         unsupportedTypeResult.Should().Be("default");
@@ -32,7 +32,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void EscapeString_Handles_Vertical_Tab_And_Null_Characters()
     {
-        var result = ParameterShared.EscapeString("before\vbetween\0after");
+        var result = ParameterNaming.EscapeString("before\vbetween\0after");
 
         result.Should().Be("before\\vbetween\\0after");
     }
@@ -42,7 +42,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Arguments("UInt32")]
     public void FormatNumericValue_Appends_U_Suffix_For_UInt_Types(string numericType)
     {
-        var result = ParameterShared.FormatNumericValue(42, numericType);
+        var result = ParameterDefaultValueFormatter.FormatNumericValue(42, numericType);
 
         result.Should().Be("42U");
     }
@@ -72,7 +72,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Arguments("UInt16")]
     public void IsNumericType_Returns_True_For_Supported_Numeric_Types(string numericType)
     {
-        var result = ParameterShared.IsNumericType(numericType);
+        var result = ParameterDefaultValueFormatter.IsNumericType(numericType);
 
         result.Should().BeTrue();
     }
@@ -84,7 +84,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Arguments("numbers")]
     public void IsNumericType_Returns_False_For_Non_Numeric_Types(string numericType)
     {
-        var result = ParameterShared.IsNumericType(numericType);
+        var result = ParameterDefaultValueFormatter.IsNumericType(numericType);
 
         result.Should().BeFalse();
     }
@@ -92,9 +92,9 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void GetAliasAsAttribute_StringOverload_Escapes_Special_Characters()
     {
-        var unchanged = ParameterShared.GetAliasAsAttribute("same", "same");
-        var withQuote = ParameterShared.GetAliasAsAttribute("user\"id", "userId");
-        var withBackslash = ParameterShared.GetAliasAsAttribute("user\\id", "userId");
+        var unchanged = ParameterAttributeFormatter.GetAliasAsAttribute("same", "same");
+        var withQuote = ParameterAttributeFormatter.GetAliasAsAttribute("user\"id", "userId");
+        var withBackslash = ParameterAttributeFormatter.GetAliasAsAttribute("user\\id", "userId");
 
         unchanged.Should().BeEmpty();
         withQuote.Should().Be("AliasAs(\"user\\\"id\")");
@@ -106,19 +106,19 @@ public class ParameterExtractorPrivateCoverageTests
     {
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
 
-        var numberType = ParameterShared.GetCSharpType(
+        var numberType = ParameterTypeResolver.GetCSharpType(
             new JsonSchema { Type = JsonObjectType.Number },
             settings);
 
-        var objectType = ParameterShared.GetCSharpType(
+        var objectType = ParameterTypeResolver.GetCSharpType(
             new JsonSchema { Type = JsonObjectType.Object },
             settings);
 
-        var unknownType = ParameterShared.GetCSharpType(
+        var unknownType = ParameterTypeResolver.GetCSharpType(
             new JsonSchema { Type = JsonObjectType.None },
             settings);
 
-        var nullableStringType = ParameterShared.GetCSharpType(
+        var nullableStringType = ParameterTypeResolver.GetCSharpType(
             new JsonSchema { Type = JsonObjectType.String, IsNullableRaw = true },
             settings);
 
@@ -133,11 +133,11 @@ public class ParameterExtractorPrivateCoverageTests
     {
         var settings = new RefitGeneratorSettings();
 
-        var int64Type = ParameterShared.GetIntegerTypeName(
+        var int64Type = ParameterTypeResolver.GetIntegerTypeName(
             new JsonSchema { Format = "int64" },
             settings);
 
-        var int32Type = ParameterShared.GetIntegerTypeName(
+        var int32Type = ParameterTypeResolver.GetIntegerTypeName(
             new JsonSchema { Format = "int32" },
             settings);
 
@@ -148,7 +148,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void GetArrayType_Returns_Object_Array_When_Item_Is_Missing()
     {
-        var result = ParameterShared.GetArrayType(
+        var result = ParameterTypeResolver.GetArrayType(
             new JsonSchema { Type = JsonObjectType.Array },
             new RefitGeneratorSettings());
 
@@ -156,9 +156,9 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [Test]
-    public void ReplaceUnsafeCharacters_Delegates_To_ParameterShared()
+    public void ReplaceUnsafeCharacters_Delegates_To_ParameterNaming()
     {
-        var result = ParameterShared.ReplaceUnsafeCharacters("unsafe-name!");
+        var result = ParameterNaming.ReplaceUnsafeCharacters("unsafe-name!");
         result.Should().NotBeNullOrWhiteSpace();
     }
 
@@ -177,49 +177,49 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void FormatDefaultValue_Adds_PointZero_For_Double_Integer_Values()
     {
-        var result = ParameterShared.FormatDefaultValue(42, "double");
+        var result = ParameterDefaultValueFormatter.FormatDefaultValue(42, "double");
         result.Should().Be("42.0");
     }
 
     [Test]
     public void JoinAttributes_Returns_Empty_For_Empty_Input()
     {
-        var result = ParameterShared.JoinAttributes();
+        var result = ParameterAttributeFormatter.JoinAttributes();
         result.Should().Be(string.Empty);
     }
 
     [Test]
     public void JoinAttributes_Returns_Combined_Attributes()
     {
-        var result = ParameterShared.JoinAttributes("AliasAs(\"name\")", "Query()");
+        var result = ParameterAttributeFormatter.JoinAttributes("AliasAs(\"name\")", "Query()");
         result.Should().Be("[AliasAs(\"name\"), Query()] ");
     }
 
     [Test]
     public void JoinAttributes_Returns_Single_Attribute()
     {
-        var result = ParameterShared.JoinAttributes("AliasAs(\"name\")");
+        var result = ParameterAttributeFormatter.JoinAttributes("AliasAs(\"name\")");
         result.Should().Be("[AliasAs(\"name\")] ");
     }
 
     [Test]
     public void FindSupportedType_Passes_Through_Type_Name()
     {
-        var result = ParameterShared.FindSupportedType("string");
+        var result = ParameterTypeResolver.FindSupportedType("string");
         result.Should().Be("string");
     }
 
     [Test]
     public void ConvertToVariableName_Replaces_Unsafe_Characters()
     {
-        var result = ParameterShared.ConvertToVariableName("field-name");
+        var result = ParameterNaming.ConvertToVariableName("field-name");
         result.Should().Be("field_name");
     }
 
     [Test]
     public void ConvertToVariableName_Returns_Value_For_Empty_String()
     {
-        var result = ParameterShared.ConvertToVariableName(string.Empty);
+        var result = ParameterNaming.ConvertToVariableName(string.Empty);
         result.Should().Be("value");
     }
 
@@ -227,7 +227,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void AppendXmlDocComment_Extends_CodeBuilder()
     {
         var codeBuilder = new StringBuilder();
-        ParameterShared.AppendXmlDocComment("Some description", codeBuilder);
+        DynamicQuerystringParameterBuilder.AppendXmlDocComment("Some description", codeBuilder);
         codeBuilder.ToString().Should().Contain("Some description");
     }
 }

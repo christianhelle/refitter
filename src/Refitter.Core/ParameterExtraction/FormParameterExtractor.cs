@@ -16,10 +16,10 @@ internal sealed class FormParameterExtractor
 
         foreach (var p in operationModel.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter))
         {
-            var variableName = ParameterShared.ConvertToVariableName(p.VariableName);
+            var variableName = ParameterNaming.ConvertToVariableName(p.VariableName);
             if (seenFormParameterNames.Add(variableName))
             {
-                formParameters.Add($"{ParameterShared.JoinAttributes(ParameterShared.GetAliasAsAttribute(p.Name, variableName))}{ParameterShared.GetParameterType(p, settings)} {variableName}");
+                formParameters.Add($"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}");
             }
         }
 
@@ -40,13 +40,13 @@ internal sealed class FormParameterExtractor
 
                     if (!isBinary)
                     {
-                        var propertyType = ParameterShared.GetCSharpType(propertySchema, settings);
-                        var variableName = ParameterShared.ConvertToVariableName(property.Key);
+                        var propertyType = ParameterTypeResolver.GetCSharpType(propertySchema, settings);
+                        var variableName = ParameterNaming.ConvertToVariableName(property.Key);
 
                         if (seenFormParameterNames.Add(variableName))
                         {
-                            var aliasAttribute = ParameterShared.GetAliasAsAttribute(property.Key, variableName);
-                            var parameter = $"{ParameterShared.JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
+                            var aliasAttribute = ParameterAttributeFormatter.GetAliasAsAttribute(property.Key, variableName);
+                            var parameter = $"{ParameterAttributeFormatter.JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
                             formParameters.Add(parameter);
                         }
                     }

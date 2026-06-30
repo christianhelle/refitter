@@ -23,7 +23,7 @@ internal static class OptionalParameterReorderer
             if (NullablePattern.IsMatch(parameters[index]))
             {
                 var parameterString = parameters[index];
-                var defaultValue = ParameterShared.GetDefaultValueForParameter(parameterString, parameterModels);
+                var defaultValue = ParameterDefaultValueFormatter.GetDefaultValueForParameter(parameterString, parameterModels);
                 parameters[index] = parameterString + " = " + defaultValue;
             }
         }

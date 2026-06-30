@@ -14,8 +14,8 @@ internal sealed class RouteParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Path)
             .Select(p =>
             {
-                var variableName = ParameterShared.GetVariableName(p);
-                return $"{ParameterShared.JoinAttributes(ParameterShared.GetAliasAsAttribute(p.Name, variableName))}{p.Type} {variableName}";
+                var variableName = ParameterNaming.GetVariableName(p);
+                return $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{p.Type} {variableName}";
             })
             .ToList();
     }
