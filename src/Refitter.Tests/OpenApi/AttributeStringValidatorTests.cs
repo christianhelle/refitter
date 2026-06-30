@@ -127,4 +127,63 @@ public class AttributeStringValidatorTests
         diagnostic.Errors.Should().HaveCount(2);
         diagnostic.Errors.Select(x => x.Pointer).Should().Contain(new[] { "unsafe\"path", "X\"Bad" });
     }
+
+    [Test]
+    public void Validate_Should_Report_ContentType_Errors_For_OpenApi3()
+    {
+        OpenApiDiagnostic diagnostic = new() { SpecificationVersion = OpenApiSpecVersion.OpenApi3_0 };
+        OpenApiDocument document = BuildContentTypeDocument();
+
+        AttributeStringValidator.Validate(document, diagnostic);
+
+        diagnostic.Errors.Should().HaveCount(2);
+        diagnostic.Errors.Select(x => x.Message).Should().OnlyContain(m => m.Contains("Content type"));
+        diagnostic.Errors.Select(x => x.Pointer).Should().Contain(new[] { "application/json\")] x", "text/plain\"" });
+    }
+
+    [Test]
+    public void Validate_Should_Not_Report_ContentType_Errors_For_OpenApi2()
+    {
+        OpenApiDiagnostic diagnostic = new() { SpecificationVersion = OpenApiSpecVersion.OpenApi2_0 };
+        OpenApiDocument document = BuildContentTypeDocument();
+
+        AttributeStringValidator.Validate(document, diagnostic);
+
+        diagnostic.Errors.Should().BeEmpty();
+    }
+
+    private static OpenApiDocument BuildContentTypeDocument() => new()
+    {
+        Paths = new OpenApiPaths
+        {
+            ["/api"] = new OpenApiPathItem
+            {
+                Operations = new Dictionary<HttpMethod, OpenApiOperation>
+                {
+                    [HttpMethod.Post] = new OpenApiOperation
+                    {
+                        RequestBody = new OpenApiRequestBody
+                        {
+                            Content = new Dictionary<string, IOpenApiMediaType>
+                            {
+                                ["application/json"] = new OpenApiMediaType(),
+                                ["application/json\")] x"] = new OpenApiMediaType()
+                            }
+                        },
+                        Responses = new OpenApiResponses
+                        {
+                            ["200"] = new OpenApiResponse
+                            {
+                                Content = new Dictionary<string, IOpenApiMediaType>
+                                {
+                                    ["text/plain\""] = new OpenApiMediaType()
+                                }
+                            },
+                            ["204"] = null!
+                        }
+                    }
+                }
+            }
+        }
+    };
 }
