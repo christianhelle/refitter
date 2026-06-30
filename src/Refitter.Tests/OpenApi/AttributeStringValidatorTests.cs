@@ -1,8 +1,8 @@
+using System.Net.Http;
 using FluentAssertions;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 using Refitter.Core.Validation;
-using System.Net.Http;
 
 namespace Refitter.Tests.OpenApi;
 
