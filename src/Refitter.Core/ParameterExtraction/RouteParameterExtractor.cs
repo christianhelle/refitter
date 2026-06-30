@@ -3,7 +3,7 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class RouteParameterExtractor : IParameterTypeExtractor
+internal sealed class RouteParameterExtractor
 {
     public IEnumerable<string> Extract(
         CSharpOperationModel operationModel,
@@ -14,8 +14,8 @@ internal class RouteParameterExtractor : IParameterTypeExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Path)
             .Select(p =>
             {
-                var variableName = ParameterShared.GetVariableName(p);
-                return $"{ParameterShared.JoinAttributes(ParameterShared.GetAliasAsAttribute(p.Name, variableName))}{p.Type} {variableName}";
+                var variableName = ParameterNaming.GetVariableName(p);
+                return $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{p.Type} {variableName}";
             })
             .ToList();
     }

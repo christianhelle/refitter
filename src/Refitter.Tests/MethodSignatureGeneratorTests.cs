@@ -171,7 +171,7 @@ public class MethodSignatureGeneratorTests
             """;
 
         var document = await OpenApiYamlDocument.FromYamlAsync(spec);
-        var settings = new RefitGeneratorSettings();
+        var settings = new RefitGeneratorSettings { UseDynamicQuerystringParameters = true };
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
         var sut = new MethodSignatureGenerator(settings);
 

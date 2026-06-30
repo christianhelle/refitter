@@ -3,7 +3,7 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class BodyParameterExtractor : IParameterTypeExtractor
+internal sealed class BodyParameterExtractor
 {
     public IEnumerable<string> Extract(
         CSharpOperationModel operationModel,
@@ -14,8 +14,8 @@ internal class BodyParameterExtractor : IParameterTypeExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
             .Select(p =>
             {
-                var variableName = ParameterShared.GetVariableName(p);
-                return $"{ParameterShared.JoinAttributes(ParameterShared.GetBodyAttribute(p, settings), ParameterShared.GetAliasAsAttribute(p.Name, variableName))}{ParameterShared.GetParameterType(p, settings)} {variableName}";
+                var variableName = ParameterNaming.GetVariableName(p);
+                return $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetBodyAttribute(p, settings), ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}";
             })
             .ToList();
 
@@ -23,8 +23,8 @@ internal class BodyParameterExtractor : IParameterTypeExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
             .Select(p =>
             {
-                var variableName = ParameterShared.GetVariableName(p);
-                var aliasAsAttribute = ParameterShared.GetAliasAsAttribute(p.Name, variableName);
+                var variableName = ParameterNaming.GetVariableName(p);
+                var aliasAsAttribute = ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName);
                 var generatedAliasAsAttribute = string.IsNullOrWhiteSpace(aliasAsAttribute)
                     ? string.Empty
                     : $"[{aliasAsAttribute}]";
