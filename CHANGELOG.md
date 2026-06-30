@@ -7,15 +7,19 @@
 **Implemented enhancements:**
 
 - Add option for Windows Authentication support to generated ConfigureRefitClients\(\) [\#1170](https://github.com/christianhelle/refitter/issues/1170)
+- Flatten single-primitive allOf to avoid deriving from sealed types [\#1179](https://github.com/christianhelle/refitter/pull/1179) ([christianhelle](https://github.com/christianhelle))
 - Fix multi-file output directory validation [\#1172](https://github.com/christianhelle/refitter/pull/1172) ([christianhelle](https://github.com/christianhelle))
 - Add Windows Authentication option for DI clients [\#1171](https://github.com/christianhelle/refitter/pull/1171) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
 - Using the --multiple-files argument generates Contracts.cs under a folder called Output.cs [\#1169](https://github.com/christianhelle/refitter/issues/1169)
+- Asana API "cannot derive from sealed type" [\#359](https://github.com/christianhelle/refitter/issues/359)
 
 **Merged pull requests:**
 
+- docs: add mrostamipoor as a contributor for bug, and security [\#1177](https://github.com/christianhelle/refitter/pull/1177) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add Gal3m as a contributor for bug, and security [\#1174](https://github.com/christianhelle/refitter/pull/1174) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Split up Unit and Integration tests using \[Category\] [\#1168](https://github.com/christianhelle/refitter/pull/1168) ([christianhelle](https://github.com/christianhelle))
 - Remove reflection-based non-public method testing [\#1167](https://github.com/christianhelle/refitter/pull/1167) ([christianhelle](https://github.com/christianhelle))
 - Extract RefitterRunner as shared generation workflow [\#1166](https://github.com/christianhelle/refitter/pull/1166) ([christianhelle](https://github.com/christianhelle))
@@ -1071,7 +1075,6 @@
 **Fixed bugs:**
 
 - Refit Fails on Jira OpenAPI specs [\#371](https://github.com/christianhelle/refitter/issues/371)
-- Asana API "cannot derive from sealed type" [\#359](https://github.com/christianhelle/refitter/issues/359)
 - `remove-unused-schema` not working for collection-type responses [\#352](https://github.com/christianhelle/refitter/issues/352)
 - Non string/boolean CodeGeneratorSettings are not honored [\#334](https://github.com/christianhelle/refitter/issues/334)
 
