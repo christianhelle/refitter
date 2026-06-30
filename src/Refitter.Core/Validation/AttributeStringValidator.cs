@@ -20,21 +20,7 @@ internal static class AttributeStringValidator
         if (document == null)
             return;
 
-        // Validate security scheme names for API-key schemes with header location
-        if (document.Components?.SecuritySchemes != null)
-        {
-            foreach (var securityScheme in document.Components.SecuritySchemes)
-            {
-                if (securityScheme.Value?.Type == SecuritySchemeType.ApiKey
-                    && securityScheme.Value.In == ParameterLocation.Header
-                    && ContainsUnsafeCharacters(securityScheme.Value.Name))
-                {
-                    diagnostic.Errors.Add(new OpenApiError(
-                        securityScheme.Key,
-                        $"Security scheme '{securityScheme.Key}' has header name '{securityScheme.Value.Name}' containing illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
-                }
-            }
-        }
+        ValidateSecuritySchemes(document, diagnostic);
 
         if (document.Paths == null)
             return;
@@ -45,12 +31,7 @@ internal static class AttributeStringValidator
 
         foreach (var path in document.Paths)
         {
-            if (ContainsUnsafeCharacters(path.Key))
-            {
-                diagnostic.Errors.Add(new OpenApiError(
-                    path.Key,
-                    $"Path '{path.Key}' contains illegal characters (quotes, backslashes, or control characters) and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
-            }
+            ValidatePath(path.Key, diagnostic);
 
             if (path.Value?.Operations == null)
                 continue;
@@ -60,23 +41,55 @@ internal static class AttributeStringValidator
                 if (operation == null)
                     continue;
 
-                if (operation.Parameters != null)
-                {
-                    foreach (var parameter in operation.Parameters)
-                    {
-                        if (parameter.In == ParameterLocation.Header && ContainsUnsafeCharacters(parameter.Name))
-                        {
-                            diagnostic.Errors.Add(new OpenApiError(
-                                parameter.Name ?? string.Empty,
-                                $"Header parameter name '{parameter.Name}' contains illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
-                        }
-                    }
-                }
+                ValidateHeaderParameters(operation, diagnostic);
 
                 if (validateContentTypes)
-                {
                     ValidateContentTypeKeys(operation, diagnostic);
-                }
+            }
+        }
+    }
+
+    private static void ValidateSecuritySchemes(OpenApiDocument document, OpenApiDiagnostic diagnostic)
+    {
+        if (document.Components?.SecuritySchemes == null)
+            return;
+
+        // Validate security scheme names for API-key schemes with header location
+        foreach (var securityScheme in document.Components.SecuritySchemes)
+        {
+            if (securityScheme.Value?.Type == SecuritySchemeType.ApiKey
+                && securityScheme.Value.In == ParameterLocation.Header
+                && ContainsUnsafeCharacters(securityScheme.Value.Name))
+            {
+                diagnostic.Errors.Add(new OpenApiError(
+                    securityScheme.Key,
+                    $"Security scheme '{securityScheme.Key}' has header name '{securityScheme.Value.Name}' containing illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
+            }
+        }
+    }
+
+    private static void ValidatePath(string path, OpenApiDiagnostic diagnostic)
+    {
+        if (ContainsUnsafeCharacters(path))
+        {
+            diagnostic.Errors.Add(new OpenApiError(
+                path,
+                $"Path '{path}' contains illegal characters (quotes, backslashes, or control characters) and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
+        }
+    }
+
+    private static void ValidateHeaderParameters(OpenApiOperation operation, OpenApiDiagnostic diagnostic)
+    {
+        if (operation.Parameters == null)
+            return;
+
+        foreach (var parameter in operation.Parameters)
+        {
+            if (parameter.In == ParameterLocation.Header && ContainsUnsafeCharacters(parameter.Name))
+            {
+                diagnostic.Errors.Add(new OpenApiError(
+                    parameter.Name ?? string.Empty,
+                    $"Header parameter name '{parameter.Name}' contains illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
             }
         }
     }
