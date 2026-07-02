@@ -131,7 +131,7 @@ If your CI/CD pipeline references generated files:
 ## Silent Behavioral Change: OpenAPI Parser Upgrade
 
 ### Summary
-Refitter v2.0.0 upgrades the OpenAPI parser from **Microsoft.OpenApi.Readers 1.x to 3.x** (`OasReader 3.5.0.19`). This is a **major version upgrade** with materially different schema interpretation.
+Refitter v2.0.0 upgrades the OpenAPI parser from **Microsoft.OpenApi.Readers 1.x to 3.x** (`OasReader 3.7.0.20`). This is a **major version upgrade** with materially different schema interpretation.
 
 ### Impact
 Users upgrading from v1.7.3 may see **different generated C# code** even without changing their OpenAPI specifications. This is not a breaking change in the Refitter API, but a **behavioral change in code generation** caused by the parser upgrade. The branch proves the parser changed and documents how to migrate; it does **not** prove full 1.7.3-vs-v2.0 behavioral equivalence across a broad real-world corpus.
