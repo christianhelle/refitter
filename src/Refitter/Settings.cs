@@ -187,6 +187,11 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool NoBanner { get; set; }
 
+    [Description("Resolve remote (http/https) $ref references inside the OpenAPI document. Disabled by default to prevent generation-time SSRF. Top-level remote document URLs are always allowed.")]
+    [CommandOption("--allow-remote-refs")]
+    [DefaultValue(false)]
+    public bool AllowRemoteReferences { get; set; }
+
     [Description("Set to true to skip default additional properties")]
     [CommandOption("--skip-default-additional-properties")]
     [DefaultValue(false)]

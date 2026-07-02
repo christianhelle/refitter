@@ -9,8 +9,8 @@ namespace Refitter.Core.Validation;
 public sealed class OpenApiValidatorAdapter : IValidator
 {
     /// <inheritdoc />
-    public async Task<OpenApiValidationResult> ValidateAsync(string openApiPath, CancellationToken cancellationToken = default)
+    public async Task<OpenApiValidationResult> ValidateAsync(string openApiPath, bool allowRemoteReferences = false, CancellationToken cancellationToken = default)
     {
-        return await OpenApiValidator.Validate(openApiPath, cancellationToken);
+        return await OpenApiValidator.Validate(openApiPath, allowRemoteReferences, cancellationToken);
     }
 }

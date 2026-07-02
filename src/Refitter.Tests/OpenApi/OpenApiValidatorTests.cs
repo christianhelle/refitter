@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Refitter.Core.Validation;
 using Refitter.Tests.Resources;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.OpenApi;
 
@@ -92,5 +93,26 @@ public class OpenApiValidatorTests
             if (File.Exists(tempFile))
                 File.Delete(tempFile);
         }
+    }
+
+    [Test]
+    public async Task Validate_Should_Parse_Remote_OpenApi_Document()
+    {
+        var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
+        await using var server = new LocalHttpServer(openApiSpec);
+
+        var result = await OpenApiValidator.Validate(server.Url);
+
+        result.IsValid.Should().BeTrue();
+        result.Diagnostics.Errors.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task Validate_Should_Throw_InvalidOperationException_When_Remote_Download_Fails()
+    {
+        var act = () => OpenApiValidator.Validate("http://127.0.0.1:1/openapi.json");
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Failed to download OpenAPI document*");
     }
 }

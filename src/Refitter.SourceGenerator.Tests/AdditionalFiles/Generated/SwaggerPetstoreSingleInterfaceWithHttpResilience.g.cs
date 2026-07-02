@@ -7,7 +7,6 @@ using Refit;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Net.Http;
 
 #nullable enable annotations
 
@@ -743,6 +742,7 @@ public PetStatus Status { get; set; }
 namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
 {
     using System;
+    using System.Net.Http;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Http.Resilience;
     using Refit;
@@ -766,6 +766,7 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
         {
             var clientBuilderISwaggerPetstoreInterfaceWithHttpResilience = services
                 .AddRefitClient<ISwaggerPetstoreInterfaceWithHttpResilience>(settings)
+                
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://petstore3.swagger.io/api/v3"));
 
             clientBuilderISwaggerPetstoreInterfaceWithHttpResilience
