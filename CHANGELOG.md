@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - Add option for Windows Authentication support to generated ConfigureRefitClients\(\) [\#1170](https://github.com/christianhelle/refitter/issues/1170)
+- Upgrade oasreader to v3.7.0.20 [\#1182](https://github.com/christianhelle/refitter/pull/1182) ([christianhelle](https://github.com/christianhelle))
 - Flatten single-primitive allOf to avoid deriving from sealed types [\#1179](https://github.com/christianhelle/refitter/pull/1179) ([christianhelle](https://github.com/christianhelle))
 - Fix multi-file output directory validation [\#1172](https://github.com/christianhelle/refitter/pull/1172) ([christianhelle](https://github.com/christianhelle))
 - Add Windows Authentication option for DI clients [\#1171](https://github.com/christianhelle/refitter/pull/1171) ([christianhelle](https://github.com/christianhelle))
