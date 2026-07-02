@@ -10,7 +10,7 @@ public static class ProjectFileContents
     <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include=""Refit.HttpClientFactory"" Version=""11.0.1"" />
+    <PackageReference Include=""Refit.HttpClientFactory"" Version=""13.0.0"" />
     <PackageReference Include=""System.Text.Json"" Version=""8.0.5"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""4.5.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
@@ -38,7 +38,7 @@ public static class ProjectFileContents
     <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include=""Refit.HttpClientFactory"" Version=""11.0.1"" />
+    <PackageReference Include=""Refit.HttpClientFactory"" Version=""13.0.0"" />
     <PackageReference Include=""System.Text.Json"" Version=""8.0.5"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""4.5.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />

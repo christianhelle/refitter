@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Refit" Version="11.0.1" />
+    <PackageReference Include="Refit" Version="13.0.0" />
     <PackageReference Include="System.Text.Json" Version="10.0.8" />
   </ItemGroup>
 
