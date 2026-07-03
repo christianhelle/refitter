@@ -13,9 +13,9 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <PackageReference Include="Refit" Version="11.0.1" />
+        <PackageReference Include="Refit" Version="13.1.0" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
-        <PackageReference Include="System.Text.Json" Version="10.0.8" />
+        <PackageReference Include="System.Text.Json" Version="10.0.9" />
     </ItemGroup>
 </Project>
