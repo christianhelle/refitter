@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Exceptionless" Version="6.1.0" />
+    <PackageReference Include="Exceptionless" Version="6.2.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsServer" Version="2.23.0" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.55.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300" PrivateAssets="all" />
