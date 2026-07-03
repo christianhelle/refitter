@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - Add option for Windows Authentication support to generated ConfigureRefitClients\(\) [\#1170](https://github.com/christianhelle/refitter/issues/1170)
+- Update multiple dependencies to latest versions [\#1183](https://github.com/christianhelle/refitter/pull/1183) ([christianhelle](https://github.com/christianhelle))
 - Upgrade oasreader to v3.7.0.20 [\#1182](https://github.com/christianhelle/refitter/pull/1182) ([christianhelle](https://github.com/christianhelle))
 - Verify compatibility with Refit v13.1.0 [\#1181](https://github.com/christianhelle/refitter/pull/1181) ([christianhelle](https://github.com/christianhelle))
 - Flatten single-primitive allOf to avoid deriving from sealed types [\#1179](https://github.com/christianhelle/refitter/pull/1179) ([christianhelle](https://github.com/christianhelle))
