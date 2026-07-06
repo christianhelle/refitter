@@ -41,7 +41,7 @@ internal class MethodAttributeGenerator(
 
             if (uniqueContentTypes.Any())
             {
-                headers.Add($"\"Accept: {string.Join(", ", uniqueContentTypes)}\"");
+                headers.Add($"\"Accept: {string.Join(", ", uniqueContentTypes.Select(ParameterShared.EscapeString))}\"");
             }
         }
 
@@ -54,7 +54,7 @@ internal class MethodAttributeGenerator(
 
             if (!string.IsNullOrWhiteSpace(contentType) && !operationModel.Consumes.Contains("multipart/form-data"))
             {
-                headers.Add($"\"Content-Type: {contentType}\"");
+                headers.Add($"\"Content-Type: {ParameterShared.EscapeString(contentType)}\"");
             }
         }
 
