@@ -478,6 +478,7 @@ public class RefitterRunnerTests
 
         public Task<OpenApiValidationResult> ValidateAsync(
             string openApiPath,
+            bool allowRemoteReferences = false,
             CancellationToken cancellationToken = default)
         {
             CallCount++;

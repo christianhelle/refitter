@@ -38,6 +38,15 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public string[]? OpenApiPaths { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether remote <c>$ref</c> references (http/https) inside the
+    /// OpenAPI document are resolved. Disabled by default to prevent generation-time SSRF and remote
+    /// file inclusion. Local <c>$ref</c> references are always confined to the input document's directory.
+    /// </summary>
+    [Description("Resolve remote (http/https) $ref references inside the OpenAPI document. Disabled by default to prevent generation-time SSRF. Top-level remote document URLs are always allowed.")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool AllowRemoteReferences { get; set; }
+
+    /// <summary>
     /// Gets or sets the namespace for the generated code. (default: GeneratedCode)
     /// </summary>
     [Description("The namespace for the generated code. Default is GeneratedCode.")]

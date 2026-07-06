@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Refitter.Core;
 using Refitter.Tests.Resources;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.OpenApi;
 
@@ -16,6 +17,132 @@ public class OpenApiDocumentFactoryTests
         (await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath))
             .Should()
             .NotBeNull();
+    }
+
+    [Test]
+    public async Task Create_From_Remote_Json_Uses_Remote_Branch()
+    {
+        var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
+        await using var server = new LocalHttpServer(openApiSpec);
+
+        var document = await OpenApiDocumentFactory.CreateAsync(server.Url);
+
+        document.Should().NotBeNull();
+        document.Info.Should().NotBeNull();
+        document.Info.Title.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Test]
+    public async Task Create_From_Remote_Json_Throws_When_Download_Fails()
+    {
+        var act = () => OpenApiDocumentFactory.CreateAsync("http://127.0.0.1:1/openapi.json");
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Failed to download OpenAPI document*");
+    }
+
+    [Test]
+    public async Task Create_From_Multiple_Paths_With_Remote_Entry_Merges_Successfully()
+    {
+        var remoteSpec = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": {
+    ""title"": ""Remote API"",
+    ""version"": ""1.0.0""
+  },
+  ""paths"": {
+    ""/remote"": {
+      ""get"": {
+        ""operationId"": ""GetRemote"",
+        ""responses"": {
+          ""200"": {
+            ""description"": ""ok""
+          }
+        }
+      }
+    }
+  }
+}";
+        await using var server = new LocalHttpServer(remoteSpec);
+
+        var localSpec = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": {
+    ""title"": ""Local API"",
+    ""version"": ""1.0.0""
+  },
+  ""paths"": {
+    ""/local"": {
+      ""get"": {
+        ""operationId"": ""GetLocal"",
+        ""responses"": {
+          ""200"": {
+            ""description"": ""ok""
+          }
+        }
+      }
+    }
+  }
+}";
+        var localPath = await TestFile.CreateSwaggerFile(localSpec, "local.json");
+
+        var document = await OpenApiDocumentFactory.CreateAsync(new[] { localPath, server.Url });
+
+        document.Should().NotBeNull();
+        document.Paths.Should().ContainKey("/local");
+        document.Paths.Should().ContainKey("/remote");
+    }
+
+    [Test]
+    public async Task Create_From_Multiple_Paths_Throws_When_Remote_Download_Fails()
+    {
+        var localSpec = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": {
+    ""title"": ""Local API"",
+    ""version"": ""1.0.0""
+  },
+  ""paths"": {
+    ""/local"": {
+      ""get"": {
+        ""operationId"": ""GetLocal"",
+        ""responses"": {
+          ""200"": {
+            ""description"": ""ok""
+          }
+        }
+      }
+    }
+  }
+}";
+        var localPath = await TestFile.CreateSwaggerFile(localSpec, "local.json");
+
+        var act = () => OpenApiDocumentFactory.CreateAsync(new[] { localPath, "http://127.0.0.1:1/openapi.json" });
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Failed to download OpenAPI document*");
+    }
+
+    [Test]
+    public async Task Create_With_CancellationToken_Overload_Delegates_To_Main_Overload()
+    {
+        var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
+        var swaggerFile = await TestFile.CreateSwaggerFile(openApiSpec, "petstore.json");
+
+        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile, CancellationToken.None);
+
+        document.Should().NotBeNull();
+    }
+
+    [Test]
+    public async Task Create_From_Single_Item_Path_Collection_Delegates_To_Single_Path()
+    {
+        var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
+        var swaggerFile = await TestFile.CreateSwaggerFile(openApiSpec, "petstore.json");
+
+        var document = await OpenApiDocumentFactory.CreateAsync(new[] { swaggerFile });
+
+        document.Should().NotBeNull();
     }
 
     [Test]
