@@ -172,8 +172,8 @@ paths:
     public async Task Generates_Dynamic_Querystring_Parameters_ByTag()
     {
         string generatedCode = await GenerateCode(true, MultipleInterfaces.ByTag);
-        generatedCode.Should().Contain("string id, [Query] GetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
-        generatedCode.Should().Contain("public record GetFooDetailsQueryParams");
+        generatedCode.Should().Contain("string id, [Query] FooGetFooDetailsQueryParams? queryParams, [RequestOptions] IApizrRequestOptions options);");
+        generatedCode.Should().Contain("public record FooGetFooDetailsQueryParams");
     }
 
     [Test]
