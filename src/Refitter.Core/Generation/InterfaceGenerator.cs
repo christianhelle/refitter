@@ -212,6 +212,7 @@ internal class InterfaceGenerator
         var dynamicQuerystringParameterType =
             partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
         var operationModel = generator.CreateOperationModel(operation);
+        operationModel.Path = op.Path;
 
         var (parametersString, parameters, operationDynamicQuerystringParameters) =
             methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
