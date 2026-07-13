@@ -38,6 +38,7 @@ public class MethodSignatureGeneratorTests
 
         var operation = document.Paths["/test/{id}"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
+        operationModel.Path = "/test/{id}";
         var (parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
 
         parametersString.Should().Contain("int id");
