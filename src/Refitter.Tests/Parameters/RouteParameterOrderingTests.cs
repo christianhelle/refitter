@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Parameters;
 
+[Category("Integration")]
 public class RouteParameterOrderingTests
 {
     /// <summary>
@@ -61,10 +62,52 @@ public class RouteParameterOrderingTests
 }
 ";
 
+    /// <summary>
+    /// Swagger 2.0 equivalent of <see cref="OpenApiSpecWithReversedPathParameters"/>.
+    /// Same path /items/{paramA}/{paramB}/details with reversed parameter definition order.
+    /// Uses "swagger": "2.0" and direct "type": "string" on parameters instead of "schema".
+    /// </summary>
+    private const string OpenApiV2SpecWithReversedPathParameters = @"
+{
+  ""swagger"": ""2.0"",
+  ""info"": {
+    ""title"": ""Test"",
+    ""version"": ""1.0""
+  },
+  ""paths"": {
+    ""/items/{paramA}/{paramB}/details"": {
+      ""get"": {
+        ""parameters"": [
+          {
+            ""name"": ""paramB"",
+            ""in"": ""path"",
+            ""required"": true,
+            ""type"": ""string""
+          },
+          {
+            ""name"": ""paramA"",
+            ""in"": ""path"",
+            ""required"": true,
+            ""type"": ""string""
+          }
+        ],
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success""
+          }
+        }
+      }
+    }
+  }
+}
+";
+
     [Test]
-    public async Task Parameters_Are_In_Url_Order_Not_Spec_Definition_Order()
+    [Arguments(OpenApiSpecWithReversedPathParameters)]
+    [Arguments(OpenApiV2SpecWithReversedPathParameters)]
+    public async Task Parameters_Are_In_Url_Order_Not_Spec_Definition_Order(string openApiSpec)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(openApiSpec);
 
         // RouteParameterExtractor now sorts parameters by their position
         // in the URL template. The fix ensures URL appearance order,
@@ -120,9 +163,11 @@ public class RouteParameterOrderingTests
     /// URL order:   paramA (first), paramB (second)
     /// </summary>
     [Test]
-    public async Task Generated_Code_Compiles_Successfully_Against_Refit()
+    [Arguments(OpenApiSpecWithReversedPathParameters)]
+    [Arguments(OpenApiV2SpecWithReversedPathParameters)]
+    public async Task Generated_Code_Compiles_Successfully_Against_Refit(string openApiSpec)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(openApiSpec);
 
         // Verify the generated code compiles against Refit.
         // A successful build means Refit's source generator can process the
@@ -138,10 +183,9 @@ public class RouteParameterOrderingTests
                 "that the parameter ordering is valid for the source generator");
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(string openApiSpec)
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(
-            OpenApiSpecWithReversedPathParameters);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(openApiSpec);
 
         var settings = new RefitGeneratorSettings
         {
