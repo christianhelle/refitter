@@ -2,43 +2,21 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0-preview.110...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0...HEAD)
+
+**Merged pull requests:**
+
+- Fix the sorting of parameters to generate correct interfaces, even if the openapi spec is not sorted [\#1192](https://github.com/christianhelle/refitter/pull/1192) ([paule96](https://github.com/paule96))
+- Update dependency Polly to 8.7.0 [\#1187](https://github.com/christianhelle/refitter/pull/1187) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency AutoMapper to 16.2.0 [\#1186](https://github.com/christianhelle/refitter/pull/1186) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [2.1.0](https://github.com/christianhelle/refitter/tree/2.1.0) (2026-07-05)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...2.1.0)
 
 **Implemented enhancements:**
 
 - Add option for Windows Authentication support to generated ConfigureRefitClients\(\) [\#1170](https://github.com/christianhelle/refitter/issues/1170)
-- Update multiple dependencies to latest versions [\#1183](https://github.com/christianhelle/refitter/pull/1183) ([christianhelle](https://github.com/christianhelle))
-- Upgrade oasreader to v3.7.0.20 [\#1182](https://github.com/christianhelle/refitter/pull/1182) ([christianhelle](https://github.com/christianhelle))
-- Verify compatibility with Refit v13.1.0 [\#1181](https://github.com/christianhelle/refitter/pull/1181) ([christianhelle](https://github.com/christianhelle))
-- Flatten single-primitive allOf to avoid deriving from sealed types [\#1179](https://github.com/christianhelle/refitter/pull/1179) ([christianhelle](https://github.com/christianhelle))
-- Fix multi-file output directory validation [\#1172](https://github.com/christianhelle/refitter/pull/1172) ([christianhelle](https://github.com/christianhelle))
-- Add Windows Authentication option for DI clients [\#1171](https://github.com/christianhelle/refitter/pull/1171) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- Using the --multiple-files argument generates Contracts.cs under a folder called Output.cs [\#1169](https://github.com/christianhelle/refitter/issues/1169)
-- Asana API "cannot derive from sealed type" [\#359](https://github.com/christianhelle/refitter/issues/359)
-
-**Merged pull requests:**
-
-- docs: add mrostamipoor as a contributor for bug, and security [\#1177](https://github.com/christianhelle/refitter/pull/1177) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- docs: add Gal3m as a contributor for bug, and security [\#1174](https://github.com/christianhelle/refitter/pull/1174) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Split up Unit and Integration tests using \[Category\] [\#1168](https://github.com/christianhelle/refitter/pull/1168) ([christianhelle](https://github.com/christianhelle))
-- Remove reflection-based non-public method testing [\#1167](https://github.com/christianhelle/refitter/pull/1167) ([christianhelle](https://github.com/christianhelle))
-- Extract RefitterRunner as shared generation workflow [\#1166](https://github.com/christianhelle/refitter/pull/1166) ([christianhelle](https://github.com/christianhelle))
-- Strategy pattern for document loading [\#1165](https://github.com/christianhelle/refitter/pull/1165) ([christianhelle](https://github.com/christianhelle))
-- Separate output planning from writing [\#1164](https://github.com/christianhelle/refitter/pull/1164) ([christianhelle](https://github.com/christianhelle))
-- Introduce configuration interfaces and refactor generator dependencies [\#1163](https://github.com/christianhelle/refitter/pull/1163) ([christianhelle](https://github.com/christianhelle))
-- Remove method generator [\#1162](https://github.com/christianhelle/refitter/pull/1162) ([christianhelle](https://github.com/christianhelle))
-- Reorganize Refitter.Core into logical subfolders and cleanup [\#1161](https://github.com/christianhelle/refitter/pull/1161) ([christianhelle](https://github.com/christianhelle))
-- chore\(deps\): bump actions/checkout from 6 to 7 [\#1160](https://github.com/christianhelle/refitter/pull/1160) ([dependabot[bot]](https://github.com/apps/dependabot))
-
-## [2.1.0-preview.110](https://github.com/christianhelle/refitter/tree/2.1.0-preview.110) (2026-06-18)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.1-preview.109...2.1.0-preview.110)
-
-**Implemented enhancements:**
-
 - Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1122](https://github.com/christianhelle/refitter/issues/1122)
 - Deepen RefitterGenerateTask: Replace AsyncLocal test hooks with real seams [\#1121](https://github.com/christianhelle/refitter/issues/1121)
 - Fix RefitterSourceGenerator: Remove blocking I/O and async-over-sync in source generator [\#1120](https://github.com/christianhelle/refitter/issues/1120)
@@ -48,6 +26,13 @@
 - Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
 - Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
 - Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
+- Refitter.MSBuild RefitterAutoScan false property [\#1094](https://github.com/christianhelle/refitter/issues/1094)
+- Update multiple dependencies to latest versions [\#1183](https://github.com/christianhelle/refitter/pull/1183) ([christianhelle](https://github.com/christianhelle))
+- Upgrade oasreader to v3.7.0.20 [\#1182](https://github.com/christianhelle/refitter/pull/1182) ([christianhelle](https://github.com/christianhelle))
+- Verify compatibility with Refit v13.1.0 [\#1181](https://github.com/christianhelle/refitter/pull/1181) ([christianhelle](https://github.com/christianhelle))
+- Flatten single-primitive allOf to avoid deriving from sealed types [\#1179](https://github.com/christianhelle/refitter/pull/1179) ([christianhelle](https://github.com/christianhelle))
+- Fix multi-file output directory validation [\#1172](https://github.com/christianhelle/refitter/pull/1172) ([christianhelle](https://github.com/christianhelle))
+- Add Windows Authentication option for DI clients [\#1171](https://github.com/christianhelle/refitter/pull/1171) ([christianhelle](https://github.com/christianhelle))
 - Propagate CancellationToken through all upstream dependencies [\#1159](https://github.com/christianhelle/refitter/pull/1159) ([christianhelle](https://github.com/christianhelle))
 - Enable strict build rules - treat warnings as errors [\#1158](https://github.com/christianhelle/refitter/pull/1158) ([christianhelle](https://github.com/christianhelle))
 - Revert extracting inline focused config records from RefitGeneratorSettings [\#1157](https://github.com/christianhelle/refitter/pull/1157) ([christianhelle](https://github.com/christianhelle))
@@ -67,14 +52,33 @@
 - Ensure Refit v11 compatibility [\#1111](https://github.com/christianhelle/refitter/pull/1111) ([christianhelle](https://github.com/christianhelle))
 - Fix missing interface XML docs in multi-interface generation [\#1110](https://github.com/christianhelle/refitter/pull/1110) ([christianhelle](https://github.com/christianhelle))
 - Add JsonLibraryVersion property and CLI support for code generation [\#1106](https://github.com/christianhelle/refitter/pull/1106) ([christianhelle](https://github.com/christianhelle))
+- Fix sanitized reserved keywords in type names [\#1103](https://github.com/christianhelle/refitter/pull/1103) ([christianhelle](https://github.com/christianhelle))
+- Introduce RefitterAutoScan option in MSBuild package [\#1098](https://github.com/christianhelle/refitter/pull/1098) ([christianhelle](https://github.com/christianhelle))
+- Refactor GenerateCommand into focused modules and stabilize package-reference builds [\#1095](https://github.com/christianhelle/refitter/pull/1095) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
 
+- Using the --multiple-files argument generates Contracts.cs under a folder called Output.cs [\#1169](https://github.com/christianhelle/refitter/issues/1169)
 - Build Error CS1591 Missing XML comment for publicly visible type or member [\#1109](https://github.com/christianhelle/refitter/issues/1109)
+- Broken generation for an api named "Public" [\#1102](https://github.com/christianhelle/refitter/issues/1102)
+- Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
+- Asana API "cannot derive from sealed type" [\#359](https://github.com/christianhelle/refitter/issues/359)
 - Fix Source Generator not emitting any files [\#1143](https://github.com/christianhelle/refitter/pull/1143) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
 
+- Update dependency Swashbuckle.AspNetCore to 10.2.3 [\#1184](https://github.com/christianhelle/refitter/pull/1184) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add mrostamipoor as a contributor for bug, and security [\#1177](https://github.com/christianhelle/refitter/pull/1177) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add Gal3m as a contributor for bug, and security [\#1174](https://github.com/christianhelle/refitter/pull/1174) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Split up Unit and Integration tests using \[Category\] [\#1168](https://github.com/christianhelle/refitter/pull/1168) ([christianhelle](https://github.com/christianhelle))
+- Remove reflection-based non-public method testing [\#1167](https://github.com/christianhelle/refitter/pull/1167) ([christianhelle](https://github.com/christianhelle))
+- Extract RefitterRunner as shared generation workflow [\#1166](https://github.com/christianhelle/refitter/pull/1166) ([christianhelle](https://github.com/christianhelle))
+- Strategy pattern for document loading [\#1165](https://github.com/christianhelle/refitter/pull/1165) ([christianhelle](https://github.com/christianhelle))
+- Separate output planning from writing [\#1164](https://github.com/christianhelle/refitter/pull/1164) ([christianhelle](https://github.com/christianhelle))
+- Introduce configuration interfaces and refactor generator dependencies [\#1163](https://github.com/christianhelle/refitter/pull/1163) ([christianhelle](https://github.com/christianhelle))
+- Remove method generator [\#1162](https://github.com/christianhelle/refitter/pull/1162) ([christianhelle](https://github.com/christianhelle))
+- Reorganize Refitter.Core into logical subfolders and cleanup [\#1161](https://github.com/christianhelle/refitter/pull/1161) ([christianhelle](https://github.com/christianhelle))
+- chore\(deps\): bump actions/checkout from 6 to 7 [\#1160](https://github.com/christianhelle/refitter/pull/1160) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Refactor Refit Generator [\#1151](https://github.com/christianhelle/refitter/pull/1151) ([christianhelle](https://github.com/christianhelle))
 - Update test assertions for struct nullability and target framework [\#1142](https://github.com/christianhelle/refitter/pull/1142) ([christianhelle](https://github.com/christianhelle))
 - Improve code coverage [\#1132](https://github.com/christianhelle/refitter/pull/1132) ([christianhelle](https://github.com/christianhelle))
@@ -90,29 +94,10 @@
 - Upgrade Refit to v10.2.0 due to critical bugs found in 10.1.6 [\#1108](https://github.com/christianhelle/refitter/pull/1108) ([christianhelle](https://github.com/christianhelle))
 - docs: add Jappinen as a contributor for ideas [\#1107](https://github.com/christianhelle/refitter/pull/1107) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add dammitjanet as a contributor for bug [\#1104](https://github.com/christianhelle/refitter/pull/1104) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- chore\(deps\): update dependency tunit to 1.47.0 [\#1093](https://github.com/christianhelle/refitter/pull/1093) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update dotnet monorepo and resolve merge conflicts [\#1092](https://github.com/christianhelle/refitter/pull/1092) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [2.0.1-preview.109](https://github.com/christianhelle/refitter/tree/2.0.1-preview.109) (2026-06-02)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...2.0.1-preview.109)
-
-**Implemented enhancements:**
-
-- Refitter.MSBuild RefitterAutoScan false property [\#1094](https://github.com/christianhelle/refitter/issues/1094)
-- Fix sanitized reserved keywords in type names [\#1103](https://github.com/christianhelle/refitter/pull/1103) ([christianhelle](https://github.com/christianhelle))
-- Introduce RefitterAutoScan option in MSBuild package [\#1098](https://github.com/christianhelle/refitter/pull/1098) ([christianhelle](https://github.com/christianhelle))
-- Refactor GenerateCommand into focused modules and stabilize package-reference builds [\#1095](https://github.com/christianhelle/refitter/pull/1095) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
-- Broken generation for an api named "Public" [\#1102](https://github.com/christianhelle/refitter/issues/1102)
-- Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
-
-**Merged pull requests:**
-
 - docs: add jzabroski as a contributor for ideas [\#1101](https://github.com/christianhelle/refitter/pull/1101) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency swashbuckle.aspnetcore to 10.2.0 [\#1099](https://github.com/christianhelle/refitter/pull/1099) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency tunit to 1.47.0 [\#1093](https://github.com/christianhelle/refitter/pull/1093) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dotnet monorepo and resolve merge conflicts [\#1092](https://github.com/christianhelle/refitter/pull/1092) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency coverlet.collector to 10.0.1 [\#1091](https://github.com/christianhelle/refitter/pull/1091) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency ruby to v4.0.5 [\#1089](https://github.com/christianhelle/refitter/pull/1089) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refitter.SourceGenerator to v2 [\#1087](https://github.com/christianhelle/refitter/pull/1087) ([renovate[bot]](https://github.com/apps/renovate))
