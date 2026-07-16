@@ -4,8 +4,13 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0...HEAD)
 
+**Implemented enhancements:**
+
+- Refactor parameter extraction into a ParameterListBuilder module [\#1180](https://github.com/christianhelle/refitter/pull/1180) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
+- docs: add paule96 as a contributor for code [\#1193](https://github.com/christianhelle/refitter/pull/1193) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Fix the sorting of parameters to generate correct interfaces, even if the openapi spec is not sorted [\#1192](https://github.com/christianhelle/refitter/pull/1192) ([paule96](https://github.com/paule96))
 - Update dependency Polly to 8.7.0 [\#1187](https://github.com/christianhelle/refitter/pull/1187) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency AutoMapper to 16.2.0 [\#1186](https://github.com/christianhelle/refitter/pull/1186) ([renovate[bot]](https://github.com/apps/renovate))
