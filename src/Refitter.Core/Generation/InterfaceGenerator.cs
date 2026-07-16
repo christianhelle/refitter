@@ -19,8 +19,7 @@ internal class InterfaceGenerator
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
-        XmlDocumentationGenerator docGenerator,
-        IParameterExtractor? parameterExtractor = null)
+        XmlDocumentationGenerator docGenerator)
         : this(
             settings,
             document,
@@ -28,7 +27,7 @@ internal class InterfaceGenerator
             docGenerator,
             new ReturnTypeGenerator(settings, generator),
             new MethodAttributeGenerator(settings, document),
-            new MethodSignatureGenerator(settings, parameterExtractor ?? new ParameterAggregator()))
+            new MethodSignatureGenerator(settings))
     {
     }
 

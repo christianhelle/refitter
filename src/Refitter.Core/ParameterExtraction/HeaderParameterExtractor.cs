@@ -3,7 +3,7 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class HeaderParameterExtractor : IParameterTypeExtractor
+internal sealed class HeaderParameterExtractor
 {
     public IEnumerable<string> Extract(
         CSharpOperationModel operationModel,
@@ -26,8 +26,8 @@ internal class HeaderParameterExtractor : IParameterTypeExtractor
                 .Where(p => !anyIgnoredHeaders || !ignoredHeaders.Contains(p.Name, StringComparer.OrdinalIgnoreCase))
                 .Select(p =>
                 {
-                    var variableName = ParameterShared.GetVariableName(p);
-                    return $"{ParameterShared.JoinAttributes($"Header(\"{p.Name}\")")}{ParameterShared.GetParameterType(p, settings)} {variableName}";
+                    var variableName = ParameterNaming.GetVariableName(p);
+                    return $"{ParameterAttributeFormatter.JoinAttributes($"Header(\"{p.Name}\")")}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}";
                 })
                 .ToList();
         }
@@ -47,7 +47,7 @@ internal class HeaderParameterExtractor : IParameterTypeExtractor
                     && securityScheme.In == OpenApiSecurityApiKeyLocation.Header
                     && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
                 {
-                    headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {ParameterShared.ReplaceUnsafeCharacters(securityScheme.Name)}");
+                    headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {ParameterNaming.ReplaceUnsafeCharacters(securityScheme.Name)}");
                 }
                 else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http }
                     && string.Equals(securityScheme.Scheme, "bearer", StringComparison.OrdinalIgnoreCase))
