@@ -13,6 +13,7 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <NoWarn>NU1701;RF002</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
