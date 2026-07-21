@@ -13,6 +13,7 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <NoWarn>NU1701;RF002</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +21,7 @@
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.7.1" PrivateAssets="all" />
     <PackageReference Include="NSwag.Core.Yaml" Version="14.7.1" PrivateAssets="all" />
     <PackageReference Include="OasReader" Version="3.7.0.20" PrivateAssets="all" />
-    <PackageReference Include="Refit" Version="10.2.0" PrivateAssets="all" />
+    <PackageReference Include="Refit" Version="13.1.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
