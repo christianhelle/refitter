@@ -6,6 +6,8 @@
 
 **Implemented enhancements:**
 
+- Dynamic QueryParams type is incorrectly shared by GET endpoints with the same method name across different controllers [\#1190](https://github.com/christianhelle/refitter/issues/1190)
+- Disambiguate dynamic QueryParams type names in ByTag mode [\#1198](https://github.com/christianhelle/refitter/pull/1198) ([christianhelle](https://github.com/christianhelle))
 - Refactor parameter extraction into a ParameterListBuilder module [\#1180](https://github.com/christianhelle/refitter/pull/1180) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
