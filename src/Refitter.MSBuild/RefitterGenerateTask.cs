@@ -1,13 +1,76 @@
 using System.Diagnostics;
+using System.Reflection;
 using Microsoft.Build.Framework;
-using Refitter.Core;
-using Refitter.Core.Validation;
 using MSBuildTask = Microsoft.Build.Utilities.Task;
 
 namespace Refitter.MSBuild;
 
 public class RefitterGenerateTask : MSBuildTask
 {
+    internal const string GeneratedFileMarker = "GeneratedFile: ";
+    private static readonly AsyncLocal<Func<List<string>>?> InstalledDotnetRuntimesProviderOverride = new();
+    private static readonly AsyncLocal<Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult>?> ProcessRunnerOverride = new();
+    private static readonly AsyncLocal<int?> ProcessTimeoutMillisecondsOverride = new();
+    private static readonly AsyncLocal<Action<Process>?> ProcessTerminatorOverride = new();
+    private static readonly AsyncLocal<Func<string, bool>?> FileExistsOverride = new();
+
+    private static readonly (string TargetFramework, string RuntimePrefix)[] PreferredRuntimeOrder =
+    [
+        ("net10.0", "Microsoft.NETCore.App 10."),
+        ("net9.0", "Microsoft.NETCore.App 9."),
+        ("net8.0", "Microsoft.NETCore.App 8.")
+    ];
+
+    private static readonly string[] CompatibilityFallbackOrder =
+    [
+        "net8.0",
+        "net9.0",
+        "net10.0"
+    ];
+
+    internal sealed class ProcessExecutionResult(
+        bool timedOut,
+        int exitCode,
+        Exception? terminationException = null)
+    {
+
+        public bool TimedOut { get; } = timedOut;
+
+        public int ExitCode { get; } = exitCode;
+
+        public Exception? TerminationException { get; } = terminationException;
+    }
+
+    internal static Func<List<string>> InstalledDotnetRuntimesProvider
+    {
+        get => InstalledDotnetRuntimesProviderOverride.Value ?? GetInstalledDotnetRuntimes;
+        set => InstalledDotnetRuntimesProviderOverride.Value = value;
+    }
+
+    internal static Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult> ProcessRunner
+    {
+        get => ProcessRunnerOverride.Value ?? RunProcess;
+        set => ProcessRunnerOverride.Value = value;
+    }
+
+    internal static int ProcessTimeoutMilliseconds
+    {
+        get => ProcessTimeoutMillisecondsOverride.Value ?? 300000;
+        set => ProcessTimeoutMillisecondsOverride.Value = value;
+    }
+
+    internal static Action<Process> ProcessTerminator
+    {
+        get => ProcessTerminatorOverride.Value ?? DefaultTerminateProcess;
+        set => ProcessTerminatorOverride.Value = value;
+    }
+
+    internal static Func<string, bool> FileExists
+    {
+        get => FileExistsOverride.Value ?? File.Exists;
+        set => FileExistsOverride.Value = value;
+    }
+
     public string ProjectFileDirectory { get; set; }
 
     public bool DisableLogging { get; set; }
@@ -18,6 +81,15 @@ public class RefitterGenerateTask : MSBuildTask
 
     [Output]
     public ITaskItem[] GeneratedFiles { get; set; }
+
+    internal static void ResetTestHooks()
+    {
+        InstalledDotnetRuntimesProviderOverride.Value = null;
+        ProcessRunnerOverride.Value = null;
+        ProcessTimeoutMillisecondsOverride.Value = null;
+        ProcessTerminatorOverride.Value = null;
+        FileExistsOverride.Value = null;
+    }
 
     public override bool Execute()
     {
@@ -39,85 +111,264 @@ public class RefitterGenerateTask : MSBuildTask
         foreach (var file in files)
         {
             TryLogCommandLine($"Processing {file}");
-            try
-            {
-                var generated = ProcessRefitterFile(file);
-                if (generated.Count > 0)
-                {
-                    generatedFiles.AddRange(generated);
-                }
-            }
-            catch (Exception e)
+            var generated = TryExecuteRefitter(file, out var failed);
+            if (failed)
             {
                 hasErrors = true;
                 TryLogError($"Failed to generate code from {file}");
-                TryLogErrorFromException(e);
+            }
+            else if (generated != null)
+            {
+                generatedFiles.AddRange(generated);
             }
         }
 
-        GeneratedFiles = generatedFiles
-            .Select(f => new Microsoft.Build.Utilities.TaskItem(f))
-            .ToArray<ITaskItem>();
-
+        GeneratedFiles = generatedFiles.Select(f => new Microsoft.Build.Utilities.TaskItem(f)).ToArray<ITaskItem>();
         TryLogCommandLine($"Generated {GeneratedFiles.Length} files");
 
         return !hasErrors;
     }
 
-    private List<string> ProcessRefitterFile(string filePath)
+    private List<string>? TryExecuteRefitter(string file, out bool failed)
     {
-        var baseDirectory = Path.GetDirectoryName(Path.GetFullPath(filePath))!;
-        var json = File.ReadAllText(filePath);
-        var settings = RefitterSettingsLoader.Load(json, baseDirectory);
-        RefitterSettingsLoader.ApplyDefaults(filePath, settings);
-
-        var writer = new MsBuildFileWriter();
-        IValidator? validator = SkipValidation
-            ? null
-            : new OpenApiValidatorAdapter();
-
-        var runner = new RefitterRunner();
-        var result = runner.RunAsync(
-                settings,
-                writer,
-                validator,
-                settingsFilePath: filePath,
-                outputPath: null,
-                CancellationToken.None)
-            .GetAwaiter().GetResult();
-
-        if (result.ExitCode != 0)
-            throw result.Exception ?? new InvalidOperationException(
-                result.Diagnostics.FirstOrDefault()?.Message ?? "Unknown error");
-
-        return result.GeneratedFiles
-            .Select(f => Path.GetFullPath(f.Path))
-            .ToList();
-    }
-
-    internal static string[] FilterFiles(string[] files, string includePatterns, string projectFileDirectory)
-    {
-        if (string.IsNullOrWhiteSpace(includePatterns))
-            return files;
-
-        var patterns = includePatterns.Split([';'], StringSplitOptions.RemoveEmptyEntries)
-            .Select(NormalizeIncludePattern)
-            .ToList();
-
-        return files.Where(file =>
+        failed = false;
+        try
         {
-            var fileName = NormalizeIncludePattern(Path.GetFileName(file));
-            var relativePath = string.IsNullOrWhiteSpace(projectFileDirectory)
-                ? fileName
-                : NormalizeIncludePattern(GetRelativePath(projectFileDirectory, file));
-            var fullPath = NormalizeIncludePattern(Path.GetFullPath(file));
-
-            return patterns.Any(pattern =>
-                fileName.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
-                relativePath.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
-                fullPath.Equals(pattern, StringComparison.OrdinalIgnoreCase));
-        }).ToArray();
+            return StartProcess(file, out failed);
+        }
+        catch (Exception e)
+        {
+            failed = true;
+            TryLogErrorFromException(e);
+            return null;
+        }
     }
+
+    private List<string> StartProcess(string file, out bool failed)
+    {
+        failed = false;
+        var assembly = Assembly.GetExecutingAssembly();
+        var packageFolder = Path.GetDirectoryName(assembly.Location);
+        var outputLines = new List<string>();
+
+        List<string>? installedRuntimes = null;
+        try
+        {
+            installedRuntimes = InstalledDotnetRuntimesProvider();
+        }
+        catch (Exception exception)
+        {
+            TryLogCommandLine($"Failed to inspect installed .NET runtimes: {exception.Message}. Falling back to bundled Refitter runtime selection.");
+        }
+
+        var refitterDll = ResolveRefitterDll(packageFolder, installedRuntimes, TryLogCommandLine);
+        if (string.IsNullOrWhiteSpace(refitterDll) || !FileExists(refitterDll!))
+        {
+            failed = true;
+            TryLogError("Unable to locate a bundled Refitter CLI runtime for the MSBuild task.");
+            return new();
+        }
+
+        var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
+        if (DisableLogging)
+        {
+            args += " --no-logging";
+        }
+        if (SkipValidation)
+        {
+            args += " --skip-validation";
+        }
+
+        TryLogCommandLine($"Starting dotnet {args}");
+
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "dotnet",
+            Arguments = args,
+            WorkingDirectory = Path.GetDirectoryName(file)!,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            RedirectStandardInput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+
+        var processResult = ProcessRunner(
+            startInfo,
+            data => HandleProcessStandardOutput(data, outputLines, outputLines, TryLogCommandLine),
+            data => HandleProcessErrorOutput(data, TryLogError));
+
+        if (processResult.TimedOut)
+        {
+            failed = true;
+            var timeoutDescription = FormatTimeout(ProcessTimeoutMilliseconds);
+            TryLogError(
+                processResult.TerminationException is null
+                    ? $"Refitter process timed out after {timeoutDescription} and was terminated"
+                    : $"Refitter process timed out after {timeoutDescription}. Failed to terminate timed-out process: {processResult.TerminationException.Message}");
+
+            return new();
+        }
+
+        if (processResult.ExitCode != 0)
+        {
+            failed = true;
+            TryLogError($"Refitter process exited with code {processResult.ExitCode}");
+            return new List<string>();
+        }
+
+        return ResolveGeneratedFiles(outputLines, file, out failed, TryLogError);
+    }
+
+    private static ProcessExecutionResult RunProcess(
+        ProcessStartInfo startInfo,
+        Action<string?> handleStandardOutput,
+        Action<string?> handleErrorOutput)
+    {
+        using var process = new Process();
+        process.StartInfo = startInfo;
+
+        process.ErrorDataReceived += (_, args) => handleErrorOutput(args.Data);
+        process.OutputDataReceived += (_, args) => handleStandardOutput(args.Data);
+        process.Start();
+        process.BeginErrorReadLine();
+        process.BeginOutputReadLine();
+
+        var timeoutMilliseconds = ProcessTimeoutMilliseconds;
+        if (!process.WaitForExit(timeoutMilliseconds))
+        {
+            try
+            {
+                ProcessTerminator(process);
+                return new ProcessExecutionResult(true, -1);
+            }
+            catch (Exception ex)
+            {
+                return new ProcessExecutionResult(true, -1, ex);
+            }
+        }
+
+        process.WaitForExit();
+        return new ProcessExecutionResult(false, process.ExitCode);
+    }
+
+    private static void DefaultTerminateProcess(Process process) => process.Kill();
+
+    private static List<string> GetInstalledDotnetRuntimes()
+    {
+        var installedRuntimes = new List<string>();
+        var errorLines = new List<string>();
+        var processResult = ProcessRunner(
+            new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = "--list-runtimes",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            },
+            data => AddProcessOutputLine(data, installedRuntimes),
+            data => AddProcessOutputLine(data, errorLines));
+
+        if (processResult.TimedOut)
+        {
+            var timeoutDescription = FormatTimeout(ProcessTimeoutMilliseconds);
+            if (processResult.TerminationException is null)
+            {
+                throw new TimeoutException($"dotnet --list-runtimes timed out after {timeoutDescription}");
+            }
+
+            throw new TimeoutException(
+                $"dotnet --list-runtimes timed out after {timeoutDescription}. Failed to terminate timed-out process: {processResult.TerminationException.Message}",
+                processResult.TerminationException);
+        }
+
+        if (processResult.ExitCode != 0)
+        {
+            var errorDetails = errorLines.Count > 0
+                ? $"{Environment.NewLine}{string.Join(Environment.NewLine, errorLines)}"
+                : string.Empty;
+            throw new InvalidOperationException($"dotnet --list-runtimes exited with code {processResult.ExitCode}{errorDetails}");
+        }
+
+        return installedRuntimes;
+    }
+
+    internal static string? ResolveRefitterDll(string? packageFolder, IReadOnlyList<string>? installedRuntimes, Action<string> logCommandLine)
+    {
+        if (string.IsNullOrWhiteSpace(packageFolder))
+        {
+            return null;
+        }
+
+        var bundledRuntimes = PreferredRuntimeOrder
+            .Select(candidate => new
+            {
+                candidate.TargetFramework,
+                candidate.RuntimePrefix,
+                Path = Path.GetFullPath(Path.Combine(packageFolder, "..", candidate.TargetFramework, "refitter.dll")),
+            })
+            .ToArray();
+
+        if (installedRuntimes is not null)
+        {
+            var detectedRuntimes = installedRuntimes
+                .Where(installed => !string.IsNullOrWhiteSpace(installed))
+                .ToArray();
+
+            foreach (var runtime in bundledRuntimes.Where(runtime => FileExists(runtime.Path)))
+            {
+                if (detectedRuntimes.Any(installed =>
+                        installed.StartsWith(runtime.RuntimePrefix, StringComparison.Ordinal)))
+                {
+                    logCommandLine($"Detected {GetDisplayFramework(runtime.TargetFramework)} runtime. Using {GetDisplayFramework(runtime.TargetFramework)} version of Refitter.");
+                    return runtime.Path;
+                }
+            }
+        }
+
+        foreach (var targetFramework in CompatibilityFallbackOrder)
+        {
+            var fallbackPath = bundledRuntimes
+                .First(runtime => runtime.TargetFramework == targetFramework)
+                .Path;
+
+            if (FileExists(fallbackPath))
+            {
+                logCommandLine($"Falling back to bundled {GetDisplayFramework(targetFramework)} version of Refitter.");
+                return fallbackPath;
+            }
+        }
+
+        var coLocatedCli = Path.GetFullPath(Path.Combine(packageFolder, "refitter.dll"));
+        if (FileExists(coLocatedCli))
+        {
+            logCommandLine("Falling back to co-located Refitter CLI.");
+            return coLocatedCli;
+        }
+
+        return bundledRuntimes
+            .Select(runtime => runtime.Path)
+            .FirstOrDefault();
+    }
+
+    private static string FormatTimeout(int timeoutMilliseconds)
+    {
+        if (timeoutMilliseconds < 1000)
+        {
+            return $"{timeoutMilliseconds} ms";
+        }
+
+        if (timeoutMilliseconds % 1000 == 0)
+        {
+            return $"{timeoutMilliseconds / 1000} seconds";
+        }
+
+        return $"{timeoutMilliseconds / 1000d:0.###} seconds";
+    }
+
+    private static string GetDisplayFramework(string targetFramework) => targetFramework.Replace("net", ".NET ");
 
     private void TryLogErrorFromException(Exception e)
     {
@@ -152,6 +403,110 @@ public class RefitterGenerateTask : MSBuildTask
         catch (Exception ex)
         {
             Debug.WriteLine($"Failed to log error: {ex}");
+        }
+    }
+
+    internal static string[] FilterFiles(string[] files, string includePatterns, string projectFileDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(includePatterns))
+        {
+            return files;
+        }
+
+        var patterns = includePatterns.Split([';'], StringSplitOptions.RemoveEmptyEntries)
+            .Select(NormalizeIncludePattern)
+            .ToList();
+
+        return files.Where(file =>
+        {
+            var fileName = NormalizeIncludePattern(Path.GetFileName(file));
+            var relativePath = string.IsNullOrWhiteSpace(projectFileDirectory)
+                ? fileName
+                : NormalizeIncludePattern(GetRelativePath(projectFileDirectory, file));
+            var fullPath = NormalizeIncludePattern(Path.GetFullPath(file));
+
+            return patterns.Any(pattern =>
+                fileName.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
+                relativePath.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
+                fullPath.Equals(pattern, StringComparison.OrdinalIgnoreCase));
+        }).ToArray();
+    }
+
+    internal static string? ParseGeneratedFilePath(string? outputLine)
+    {
+        var markerLine = outputLine ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(markerLine))
+        {
+            return null;
+        }
+
+        if (!markerLine.StartsWith(GeneratedFileMarker, StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var generatedFilePath = markerLine.Substring(GeneratedFileMarker.Length).Trim();
+        return string.IsNullOrWhiteSpace(generatedFilePath) ? null : generatedFilePath;
+    }
+
+    internal static void HandleProcessErrorOutput(string? outputLine, Action<string> logError)
+    {
+        if (string.IsNullOrWhiteSpace(outputLine))
+        {
+            return;
+        }
+
+        logError(outputLine!);
+    }
+
+    internal static void HandleProcessStandardOutput(string? outputLine, ICollection<string> outputLines, object outputLinesLock, Action<string> logCommandLine)
+    {
+        if (string.IsNullOrWhiteSpace(outputLine))
+        {
+            return;
+        }
+
+        lock (outputLinesLock)
+        {
+            outputLines.Add(outputLine!);
+        }
+
+        logCommandLine(outputLine!);
+    }
+
+    internal static List<string> ResolveGeneratedFiles(IEnumerable<string?> outputLines, string settingsFilePath, out bool failed, Action<string> logError)
+    {
+        var existingGeneratedFiles = ResolveGeneratedFiles(outputLines, settingsFilePath, out var errorMessage);
+        failed = errorMessage is not null;
+        if (failed)
+        {
+            logError(errorMessage!);
+        }
+
+        return existingGeneratedFiles;
+    }
+
+    internal static List<string> ResolveGeneratedFiles(IEnumerable<string?> outputLines, string settingsFilePath, out string? errorMessage)
+    {
+        var existingGeneratedFiles = outputLines
+            .Select(ParseGeneratedFilePath)
+            .Where(path => !string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            .Select(path => path!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        errorMessage = existingGeneratedFiles.Count == 0
+            ? $"Refitter did not report any generated files for {settingsFilePath}"
+            : null;
+
+        return existingGeneratedFiles;
+    }
+
+    private static void AddProcessOutputLine(string? outputLine, ICollection<string> outputLines)
+    {
+        if (!string.IsNullOrWhiteSpace(outputLine))
+        {
+            outputLines.Add(outputLine!);
         }
     }
 
