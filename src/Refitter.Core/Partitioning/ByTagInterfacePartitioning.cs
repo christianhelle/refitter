@@ -41,8 +41,22 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
         return methodName;
     }
 
-    public string GetDynamicQuerystringParameterType(string interfaceName, string methodName) =>
-        methodName + "QueryParams";
+    public string GetDynamicQuerystringParameterType(string interfaceName, string methodName)
+    {
+        var prefix = interfaceName;
+        if (prefix.StartsWith("I"))
+        {
+            prefix = prefix.Substring(1);
+        }
+
+        var suffix = GetInterfaceNameSuffix();
+        if (prefix.EndsWith(suffix) && prefix.Length > suffix.Length)
+        {
+            prefix = prefix.Substring(0, prefix.Length - suffix.Length);
+        }
+
+        return prefix + methodName + "QueryParams";
+    }
 
     public bool IsSingleInterface => false;
 

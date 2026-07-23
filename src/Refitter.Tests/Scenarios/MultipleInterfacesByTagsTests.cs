@@ -141,9 +141,9 @@ paths:
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
         string generatedCode = await GenerateCode(true);
-        generatedCode.Should().Contain("GetFooDetailsQueryParams");
-        generatedCode.Should().Contain("GetAllFoosQueryParams");
-        generatedCode.Should().Contain("GetBarDetailsQueryParams");
+        generatedCode.Should().Contain("FooGetFooDetailsQueryParams");
+        generatedCode.Should().Contain("FooGetAllFoosQueryParams");
+        generatedCode.Should().Contain("BarGetBarDetailsQueryParams");
     }
 
     [Test]
