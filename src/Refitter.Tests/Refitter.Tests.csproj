@@ -24,7 +24,7 @@
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="8.10.0" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.7.1" PrivateAssets="all" />
-        <PackageReference Include="TUnit" Version="1.58.0" />
+        <PackageReference Include="TUnit" Version="1.61.38" />
         <PackageReference Include="coverlet.collector" Version="10.0.1">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
