@@ -1,10 +1,11 @@
+using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using FluentAssertions;
 using Microsoft.Build.Framework;
 using Refitter.MSBuild;
 
 namespace Refitter.Tests.MSBuild;
-
 
 public class RefitterGenerateTaskTests
 {
@@ -140,88 +141,113 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
-    public void Execute_Should_Generate_Files_Reported_By_Refitter()
+    public void ParseGeneratedFilePath_Should_Return_File_Path_From_Marker()
+    {
+        var generatedFile = Path.Combine("C:", "repo", "Generated", "Petstore.cs");
+
+        var result = RefitterGenerateTask.ParseGeneratedFilePath($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+
+        result.Should().Be(generatedFile);
+    }
+
+    [Test]
+    public void ParseGeneratedFilePath_Should_Return_Null_For_Empty_Marker_Path()
+    {
+        var result = RefitterGenerateTask.ParseGeneratedFilePath(RefitterGenerateTask.GeneratedFileMarker);
+
+        result.Should().BeNull();
+    }
+
+    [Test]
+    public void ParseGeneratedFilePath_Should_Return_Null_For_Whitespace_Output()
+    {
+        var result = RefitterGenerateTask.ParseGeneratedFilePath("   ");
+
+        result.Should().BeNull();
+    }
+
+    [Test]
+    public void ParseGeneratedFilePath_Should_Return_Null_For_Null_Output()
+    {
+        var result = RefitterGenerateTask.ParseGeneratedFilePath(null);
+
+        result.Should().BeNull();
+    }
+
+    [Test]
+    public void ParseGeneratedFilePath_Should_Ignore_Non_Marker_Output()
+    {
+        var result = RefitterGenerateTask.ParseGeneratedFilePath("Generated Output");
+
+        result.Should().BeNull();
+    }
+
+    [Test]
+    public void HandleProcessErrorOutput_Should_Ignore_Whitespace()
+    {
+        var messages = new List<string>();
+
+        RefitterGenerateTask.HandleProcessErrorOutput("  ", messages.Add);
+
+        messages.Should().BeEmpty();
+    }
+
+    [Test]
+    public void HandleProcessErrorOutput_Should_Log_Non_Whitespace()
+    {
+        var messages = new List<string>();
+
+        RefitterGenerateTask.HandleProcessErrorOutput("stderr output", messages.Add);
+
+        messages.Should().ContainSingle().Which.Should().Be("stderr output");
+    }
+
+    [Test]
+    public void HandleProcessStandardOutput_Should_Ignore_Whitespace()
+    {
+        var outputLines = new List<string>();
+        var logged = new List<string>();
+
+        RefitterGenerateTask.HandleProcessStandardOutput(" ", outputLines, new object(), logged.Add);
+
+        outputLines.Should().BeEmpty();
+        logged.Should().BeEmpty();
+    }
+
+    [Test]
+    public void HandleProcessStandardOutput_Should_Record_And_Log_Output()
+    {
+        var outputLines = new List<string>();
+        var logged = new List<string>();
+
+        RefitterGenerateTask.HandleProcessStandardOutput("Generated output", outputLines, new object(), logged.Add);
+
+        outputLines.Should().ContainSingle().Which.Should().Be("Generated output");
+        logged.Should().ContainSingle().Which.Should().Be("Generated output");
+    }
+
+    [Test]
+    public void ResolveGeneratedFiles_Should_Deduplicate_Duplicate_Markers()
     {
         var workspace = CreateWorkspace();
 
         try
         {
-            var openApiPath = Path.Combine(workspace, "petstore.json");
-            File.WriteAllText(
-                openApiPath,
-                """
-                {
-                  "openapi": "3.0.0",
-                  "info": {
-                    "title": "Petstore",
-                    "version": "1.0.0"
-                  },
-                  "paths": {
-                    "/pets": {
-                      "get": {
-                        "operationId": "GetPets",
-                        "responses": {
-                          "200": {
-                            "description": "Success",
-                            "content": {
-                              "application/json": {
-                                "schema": {
-                                  "type": "array",
-                                  "items": {
-                                    "$ref": "#/components/schemas/Pet"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "components": {
-                    "schemas": {
-                      "Pet": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer",
-                            "format": "int32"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-                """);
+            var generatedFile = Path.Combine(workspace, "Generated", "Petstore.cs");
+            Directory.CreateDirectory(Path.GetDirectoryName(generatedFile)!);
+            File.WriteAllText(generatedFile, "// generated");
 
-            var settingsPath = Path.Combine(workspace, "petstore.refitter");
-            File.WriteAllText(
-                settingsPath,
-                """
-                {
-                  "openApiPath": "petstore.json",
-                  "namespace": "Generated.Clients",
-                  "outputFolder": "./Generated"
-                }
-                """);
-
-            var task = new RefitterGenerateTask
+            var outputLines = new[]
             {
-                BuildEngine = new RecordingBuildEngine(),
-                ProjectFileDirectory = workspace,
-                IncludePatterns = "petstore.refitter",
-                DisableLogging = true,
-                SkipValidation = true
+                "Generated Output",
+                $"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}",
+                $"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile.ToUpperInvariant()}"
             };
 
-            var result = task.Execute();
+            var result = RefitterGenerateTask.ResolveGeneratedFiles(outputLines, "petstore.refitter", out var errorMessage);
 
-            result.Should().BeTrue();
-            task.GeneratedFiles.Should().ContainSingle();
-
-            var generatedFile = task.GeneratedFiles.Single().ItemSpec;
-            File.Exists(generatedFile).Should().BeTrue();
-            File.ReadAllText(generatedFile).Should().Contain("interface IPetstore");
+            result.Should().ContainSingle().Which.Should().Be(generatedFile);
+            errorMessage.Should().BeNull();
         }
         finally
         {
@@ -230,206 +256,618 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
-    public void Execute_Should_Skip_Validation_When_SkipValidation_Is_True()
+    public void ResolveGeneratedFiles_Should_Fail_When_No_Markers_Are_Reported()
+    {
+        var outputLines = new[]
+        {
+            "Generating code...",
+            "Generation completed successfully!"
+        };
+
+        var result = RefitterGenerateTask.ResolveGeneratedFiles(outputLines, "petstore.refitter", out var errorMessage);
+
+        result.Should().BeEmpty();
+        errorMessage.Should().Be("Refitter did not report any generated files for petstore.refitter");
+    }
+
+    [Test]
+    public void ResolveGeneratedFiles_Should_Log_Error_And_Set_Failed_When_No_Markers_Are_Reported()
+    {
+        var outputLines = new[]
+        {
+            "Generating code...",
+            "Generation completed successfully!"
+        };
+        var errors = new List<string>();
+
+        var result = RefitterGenerateTask.ResolveGeneratedFiles(outputLines, "petstore.refitter", out var failed, errors.Add);
+
+        result.Should().BeEmpty();
+        failed.Should().BeTrue();
+        errors.Should().ContainSingle().Which.Should().Be("Refitter did not report any generated files for petstore.refitter");
+    }
+
+    [Test]
+    public void Execute_Should_Return_False_When_Runtime_Discovery_Throws()
     {
         var workspace = CreateWorkspace();
 
         try
         {
-            var openApiPath = Path.Combine(workspace, "petstore.json");
-            File.WriteAllText(openApiPath, "not-valid-json");
-
-            var settingsPath = Path.Combine(workspace, "petstore.refitter");
-            File.WriteAllText(
-                settingsPath,
-                """{"openApiPath": "petstore.json", "namespace": "Test"}""");
-
-            var task = new RefitterGenerateTask
+            CreateRefitterSettingsFile(workspace);
+            var generatedFile = CreateGeneratedFile(workspace);
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => throw new InvalidOperationException("boom");
+            RefitterGenerateTask.FileExists = path =>
+                path.EndsWith("refitter.dll", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
             {
-                BuildEngine = new RecordingBuildEngine(),
-                ProjectFileDirectory = workspace,
-                IncludePatterns = "petstore.refitter",
-                SkipValidation = true
+                startInfo.Arguments.Should().Contain("net8.0");
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
             };
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeTrue();
+            task.GeneratedFiles.Should().ContainSingle().Which.ItemSpec.Should().Be(generatedFile);
+            buildEngine.Messages.Should().Contain(message => message.Contains("Failed to inspect installed .NET runtimes", StringComparison.Ordinal));
+            buildEngine.Messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Fall_Back_When_Preferred_Runtime_Binary_Is_Missing()
+    {
+        try
+        {
+            var packageFolder = Path.Combine("C:", "repo", "tasks");
+            var messages = new List<string>();
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase);
+
+            var result = RefitterGenerateTask.ResolveRefitterDll(
+                packageFolder,
+                ["Microsoft.NETCore.App 10.0.1", "Microsoft.NETCore.App 9.0.5"],
+                messages.Add);
+
+            result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net9.0", "refitter.dll")));
+            messages.Should().Contain(message => message.Contains("Detected .NET 9.0 runtime", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Return_Null_When_PackageFolder_Is_Blank()
+    {
+        var messages = new List<string>();
+
+        var result = RefitterGenerateTask.ResolveRefitterDll(" ", ["Microsoft.NETCore.App 10.0.0"], messages.Add);
+
+        result.Should().BeNull();
+        messages.Should().BeEmpty();
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Ignore_Whitespace_Runtime_Entries_When_Falling_Back()
+    {
+        try
+        {
+            var packageFolder = Path.Combine("C:", "repo", "tasks");
+            var messages = new List<string>();
+            var net8Path = Path.GetFullPath(Path.Combine(packageFolder, "..", "net8.0", "refitter.dll"));
+            RefitterGenerateTask.FileExists = path => string.Equals(path, net8Path, StringComparison.OrdinalIgnoreCase);
+
+            var result = RefitterGenerateTask.ResolveRefitterDll(
+                packageFolder,
+                [" ", "Microsoft.NETCore.App 7.0.0"],
+                messages.Add);
+
+            result.Should().Be(net8Path);
+            messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Fall_Back_To_CoLocated_Cli()
+    {
+        try
+        {
+            var packageFolder = Path.Combine("C:", "repo", "tasks");
+            var messages = new List<string>();
+            var coLocatedCli = Path.GetFullPath(Path.Combine(packageFolder, "refitter.dll"));
+            RefitterGenerateTask.FileExists = path => string.Equals(path, coLocatedCli, StringComparison.OrdinalIgnoreCase);
+
+            var result = RefitterGenerateTask.ResolveRefitterDll(
+                packageFolder,
+                ["Microsoft.NETCore.App 7.0.0"],
+                messages.Add);
+
+            result.Should().Be(coLocatedCli);
+            messages.Should().ContainSingle(message => message.Contains("Falling back to co-located Refitter CLI.", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void ResolveRefitterDll_Should_Return_First_Bundled_Path_When_No_Binaries_Exist()
+    {
+        try
+        {
+            var packageFolder = Path.Combine("C:", "repo", "tasks");
+            var messages = new List<string>();
+            RefitterGenerateTask.FileExists = _ => false;
+
+            var result = RefitterGenerateTask.ResolveRefitterDll(packageFolder, null, messages.Add);
+
+            result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net10.0", "refitter.dll")));
+            messages.Should().BeEmpty();
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void GetInstalledDotnetRuntimes_Should_Throw_TimeoutException_When_Runtime_Discovery_Times_Out()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                return new RefitterGenerateTask.ProcessExecutionResult(true, -1);
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<TimeoutException>()
+                .WithMessage("*dotnet --list-runtimes timed out after 500 ms*");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void GetInstalledDotnetRuntimes_Should_Include_Termination_Failure_When_Runtime_Discovery_Cannot_Be_Stopped()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                return new RefitterGenerateTask.ProcessExecutionResult(true, -1, new InvalidOperationException("kill failed"));
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<TimeoutException>()
+                .WithMessage("*dotnet --list-runtimes timed out after 500 ms. Failed to terminate timed-out process: kill failed*")
+                .WithInnerException<InvalidOperationException>()
+                .WithMessage("kill failed");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, logError) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                logError("runtime probe failed");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 23);
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<InvalidOperationException>()
+                .WithMessage("*dotnet --list-runtimes exited with code 23*runtime probe failed*");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero_Without_Error_Output()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessRunner = (startInfo, _, _) =>
+            {
+                startInfo.FileName.Should().Be("dotnet");
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 23);
+            };
+
+            var action = () => InvokeGetInstalledDotnetRuntimes();
+
+            action.Should().Throw<InvalidOperationException>()
+                .WithMessage("dotnet --list-runtimes exited with code 23");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Fall_Back_When_Runtime_Discovery_Times_Out()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            var generatedFile = CreateGeneratedFile(workspace);
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) || File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                if (startInfo.Arguments == "--list-runtimes")
+                {
+                    return new RefitterGenerateTask.ProcessExecutionResult(true, -1);
+                }
+
+                startInfo.Arguments.Should().Contain("net8.0");
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeTrue();
+            task.GeneratedFiles.Should().ContainSingle().Which.ItemSpec.Should().Be(generatedFile);
+            buildEngine.Messages.Should().Contain(message => message.Contains("Failed to inspect installed .NET runtimes: dotnet --list-runtimes timed out after 500 ms", StringComparison.Ordinal));
+            buildEngine.Messages.Should().Contain(message => message.Contains("Falling back to bundled .NET 8.0 version of Refitter.", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Use_DotNet9_Runtime_When_Available()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            var generatedFile = CreateGeneratedFile(workspace);
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                startInfo.Arguments.Should().Contain("net9.0");
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeTrue();
+            task.GeneratedFiles.Should().ContainSingle();
+            task.GeneratedFiles.Single().ItemSpec.Should().Be(generatedFile);
+            buildEngine.Messages.Should().Contain(message => message.Contains("Detected .NET 9.0 runtime", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Fall_Back_To_DotNet8_Runtime_When_Newer_Runtimes_Are_Unavailable()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            var generatedFile = CreateGeneratedFile(workspace);
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 8.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                startInfo.Arguments.Should().Contain("net8.0");
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeTrue();
+            task.GeneratedFiles.Should().ContainSingle();
+            buildEngine.Messages.Should().Contain(message => message.Contains("Detected .NET 8.0 runtime", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Return_False_When_Refitter_Cli_Cannot_Be_Located()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => null!;
+            RefitterGenerateTask.FileExists = _ => false;
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
 
             var result = task.Execute();
 
             result.Should().BeFalse();
+            task.GeneratedFiles.Should().BeEmpty();
+            buildEngine.Errors.Should().Contain(message => message.Contains("Unable to locate a bundled Refitter CLI runtime for the MSBuild task.", StringComparison.Ordinal));
         }
         finally
         {
+            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
 
     [Test]
-    public void Execute_Should_Generate_Multiple_Files()
+    public void Execute_Should_Log_Timeout_When_Process_Does_Not_Exit()
     {
         var workspace = CreateWorkspace();
 
         try
         {
-            var openApiPath = Path.Combine(workspace, "petstore.json");
-            File.WriteAllText(
-                openApiPath,
-                """
-                {
-                  "openapi": "3.0.0",
-                  "info": { "title": "Petstore", "version": "1.0.0" },
-                  "paths": {
-                    "/pets": {
-                      "get": {
-                        "operationId": "GetPets",
-                        "tags": ["pets"],
-                        "responses": { "200": { "description": "ok" } }
-                      }
-                    }
-                  }
-                }
-                """);
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
+            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(true, -1);
 
-            var settingsPath = Path.Combine(workspace, "petstore.refitter");
-            File.WriteAllText(
-                settingsPath,
-                """
-                {
-                  "openApiPath": "petstore.json",
-                  "namespace": "Test",
-                  "generateMultipleFiles": true,
-                  "outputFolder": "./Generated"
-                }
-                """);
-
-            var task = new RefitterGenerateTask
-            {
-                BuildEngine = new RecordingBuildEngine(),
-                ProjectFileDirectory = workspace,
-                IncludePatterns = "petstore.refitter",
-                SkipValidation = true
-            };
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
 
             var result = task.Execute();
 
-            result.Should().BeTrue();
-            task.GeneratedFiles.Should().NotBeEmpty();
-            task.GeneratedFiles.Length.Should().BeGreaterThan(1);
+            result.Should().BeFalse();
+            task.GeneratedFiles.Should().BeEmpty();
+            buildEngine.Errors.Should().Contain(message => message.Contains("timed out after 300 seconds", StringComparison.Ordinal));
         }
         finally
         {
+            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
 
     [Test]
-    public void Execute_Should_Apply_SettingsFileDefaults()
+    public void Execute_Should_Log_Millisecond_Timeout_Value()
     {
         var workspace = CreateWorkspace();
 
         try
         {
-            var openApiPath = Path.Combine(workspace, "petstore.json");
-            File.WriteAllText(
-                openApiPath,
-                """
-                {
-                  "openapi": "3.0.0",
-                  "info": { "title": "Petstore", "version": "1.0.0" },
-                  "paths": {
-                    "/pets": {
-                      "get": {
-                        "operationId": "GetPets",
-                        "responses": { "200": { "description": "ok" } }
-                      }
-                    }
-                  }
-                }
-                """);
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 500;
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
+            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(true, -1);
 
-            var settingsPath = Path.Combine(workspace, "petstore.refitter");
-            File.WriteAllText(
-                settingsPath,
-                """{"openApiPath": "petstore.json", "namespace": "Test"}""");
-
-            var task = new RefitterGenerateTask
-            {
-                BuildEngine = new RecordingBuildEngine(),
-                ProjectFileDirectory = workspace,
-                IncludePatterns = "petstore.refitter",
-                SkipValidation = true
-            };
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
 
             var result = task.Execute();
 
-            result.Should().BeTrue();
-            task.GeneratedFiles.Should().ContainSingle();
-
-            // Default outputFolder should be ./Generated and filename from settings file name
-            var generatedPath = task.GeneratedFiles.Single().ItemSpec;
-            generatedPath.Should().Contain("Generated");
-            File.Exists(generatedPath).Should().BeTrue();
+            result.Should().BeFalse();
+            buildEngine.Errors.Should().Contain(message => message.Contains("timed out after 500 ms", StringComparison.Ordinal));
         }
         finally
         {
+            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
         }
     }
 
     [Test]
-    public void Execute_Should_Respect_ContractsOutputFolder()
+    public void Execute_Should_Log_When_Timed_Out_Process_Cannot_Be_Terminated()
     {
         var workspace = CreateWorkspace();
 
         try
         {
-            var openApiPath = Path.Combine(workspace, "petstore.json");
-            File.WriteAllText(
-                openApiPath,
-                """
-                {
-                  "openapi": "3.0.0",
-                  "info": { "title": "Petstore", "version": "1.0.0" },
-                  "paths": {
-                    "/pets": {
-                      "get": {
-                        "operationId": "GetPets",
-                        "tags": ["pets"],
-                        "responses": { "200": { "description": "ok" } }
-                      }
-                    }
-                  }
-                }
-                """);
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
+            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(
+                true,
+                -1,
+                new InvalidOperationException("termination failed"));
 
-            var settingsPath = Path.Combine(workspace, "petstore.refitter");
-            File.WriteAllText(
-                settingsPath,
-                """
-                {
-                  "openApiPath": "petstore.json",
-                  "namespace": "Test",
-                  "generateMultipleFiles": true,
-                  "outputFolder": "./Generated",
-                  "contractsOutputFolder": "./Contracts"
-                }
-                """);
-
-            var task = new RefitterGenerateTask
-            {
-                BuildEngine = new RecordingBuildEngine(),
-                ProjectFileDirectory = workspace,
-                IncludePatterns = "petstore.refitter",
-                SkipValidation = true
-            };
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
 
             var result = task.Execute();
 
-            result.Should().BeTrue();
-            var allGenerated = task.GeneratedFiles.Select(f => f.ItemSpec).ToArray();
-            allGenerated.Should().Contain(f => f.Contains("Contracts"));
+            result.Should().BeFalse();
+            buildEngine.Errors.Should().Contain(message => message.Contains("Failed to terminate timed-out process: termination failed", StringComparison.Ordinal));
         }
         finally
         {
+            RefitterGenerateTask.ResetTestHooks();
             DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Log_Configured_Timeout_Value()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 1500;
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
+            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(true, -1);
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            buildEngine.Errors.Should().Contain(message => message.Contains($"timed out after {1500 / 1000d:0.###} seconds", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Log_ProcessRunner_Exception_And_Return_False()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net10.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (_, _, _) => throw new InvalidOperationException("boom");
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            task.GeneratedFiles.Should().BeEmpty();
+            buildEngine.Errors.Should().Contain(message => message.Contains("boom", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Log_When_Process_Exits_With_Non_Zero_Code()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 10.0.0"];
+            RefitterGenerateTask.ProcessRunner = (_, _, _) => new RefitterGenerateTask.ProcessExecutionResult(false, 23);
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeFalse();
+            buildEngine.Errors.Should().Contain(message => message.Contains("Refitter process exited with code 23", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void RunProcess_Should_Return_TimedOut_Result_When_Process_Exceeds_Timeout()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 1;
+
+            var result = InvokeRunProcess(CreateSleepProcessStartInfo());
+
+            result.TimedOut.Should().BeTrue();
+            result.TerminationException.Should().BeNull();
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    public void RunProcess_Should_Return_Termination_Exception_When_Kill_Fails_After_Timeout()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessTimeoutMilliseconds = 1;
+            RefitterGenerateTask.ProcessTerminator = _ => throw new InvalidOperationException("kill failed");
+
+            var result = InvokeRunProcess(CreateSleepProcessStartInfo());
+
+            result.TimedOut.Should().BeTrue();
+            result.TerminationException.Should().BeOfType<InvalidOperationException>()
+                .Which.Message.Should().Be("kill failed");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
         }
     }
 
@@ -478,11 +916,91 @@ public class RefitterGenerateTaskTests
         return workspace;
     }
 
+    private static string CreateRefitterSettingsFile(string workspace)
+    {
+        var settingsPath = Path.Combine(workspace, "petstore.refitter");
+        File.WriteAllText(settingsPath, "{}");
+        return settingsPath;
+    }
+
+    private static string CreateGeneratedFile(string workspace)
+    {
+        var generatedFile = Path.Combine(workspace, "Generated", "Petstore.cs");
+        Directory.CreateDirectory(Path.GetDirectoryName(generatedFile)!);
+        File.WriteAllText(generatedFile, "// generated");
+        return generatedFile;
+    }
+
+    private static RefitterGenerateTask CreateTask(string workspace, IBuildEngine? buildEngine = null) =>
+        new()
+        {
+            BuildEngine = buildEngine ?? new RecordingBuildEngine(),
+            ProjectFileDirectory = workspace,
+            IncludePatterns = "petstore.refitter",
+            DisableLogging = true,
+            SkipValidation = true
+        };
+
     private static void InvokePrivateMethod(RefitterGenerateTask task, string methodName, params object[] arguments)
     {
         var method = typeof(RefitterGenerateTask).GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
         method.Should().NotBeNull();
         method!.Invoke(task, arguments);
+    }
+
+    private static RefitterGenerateTask.ProcessExecutionResult InvokeRunProcess(ProcessStartInfo startInfo)
+    {
+        var method = typeof(RefitterGenerateTask).GetMethod("RunProcess", BindingFlags.Static | BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+        return method!.Invoke(null, [startInfo, (Action<string?>)(_ => { }), (Action<string?>)(_ => { })])
+            .Should()
+            .BeOfType<RefitterGenerateTask.ProcessExecutionResult>()
+            .Subject;
+    }
+
+    private static List<string> InvokeGetInstalledDotnetRuntimes()
+    {
+        var method = typeof(RefitterGenerateTask).GetMethod("GetInstalledDotnetRuntimes", BindingFlags.Static | BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+
+        try
+        {
+            return method!.Invoke(null, [])!
+                .Should()
+                .BeOfType<List<string>>()
+                .Subject;
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is not null)
+        {
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            throw;
+        }
+    }
+
+    private static ProcessStartInfo CreateSleepProcessStartInfo()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return new ProcessStartInfo
+            {
+                FileName = "powershell",
+                Arguments = "-NoLogo -NoProfile -Command \"Start-Sleep -Seconds 1\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+        }
+
+        return new ProcessStartInfo
+        {
+            FileName = "bash",
+            Arguments = "-lc \"sleep 1\"",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
     }
 
     private static void DeleteWorkspace(string workspace)
