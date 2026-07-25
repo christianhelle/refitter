@@ -1490,7 +1490,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://mrostamipoor.github.io/"><img src="https://avatars.githubusercontent.com/u/78902717?v=4?s=100" width="100px;" alt="Maryam Rostamipoor"/><br /><sub><b>Maryam Rostamipoor</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amrostamipoor" title="Bug reports">🐛</a> <a href="#security-mrostamipoor" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://codez.one/"><img src="https://avatars.githubusercontent.com/u/11291885?v=4?s=100" width="100px;" alt="paule96"/><br /><sub><b>paule96</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=paule96" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rcdailey"><img src="https://avatars.githubusercontent.com/u/1768054?v=4?s=100" width="100px;" alt="Robert Dailey"/><br /><sub><b>Robert Dailey</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Arcdailey" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rcdailey"><img src="https://avatars.githubusercontent.com/u/1768054?v=4?s=100" width="100px;" alt="Robert Dailey"/><br /><sub><b>Robert Dailey</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Arcdailey" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=rcdailey" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
