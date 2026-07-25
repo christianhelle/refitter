@@ -32,7 +32,7 @@ internal class ReturnTypeGenerator(
             return $"{GetAsyncOperationType(false)}<HttpResponseMessage>";
         }
 
-        var successCodes = new[] { "200", "201", "203", "206" };
+        var successCodes = new[] { "200", "201", "202", "203", "206" };
         var returnTypeParameter = successCodes
             .Where(operation.Responses.ContainsKey)
             .Select(code => GetTypeName(code, operation))
@@ -59,7 +59,7 @@ internal class ReturnTypeGenerator(
 
     public bool IsFileStreamResponse(OpenApiOperation operation)
     {
-        var successCodes = new[] { "200", "201", "203", "206", "2XX" };
+        var successCodes = new[] { "200", "201", "202", "203", "206", "2XX" };
 
         foreach (var code in successCodes)
         {
