@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using NJsonSchema;
 using NSwag;
 
 namespace Refitter.Core;
@@ -125,7 +128,7 @@ internal class InterfaceGenerator
         code.AppendLine(interfaceDeclaration);
         code.AppendLine($"{Separator}{{");
 
-        var knownMethodIdentifiers = new HashSet<string>();
+        var knownMethodIdentifiers = new Dictionary<string, HashSet<string>>();
 
         foreach (var op in operations)
         {
@@ -166,7 +169,7 @@ internal class InterfaceGenerator
         code.AppendLine(interfaceDeclaration);
         code.AppendLine($"{Separator}{{");
 
-        var knownMethodIdentifiers = new HashSet<string>();
+        var knownMethodIdentifiers = new Dictionary<string, HashSet<string>>();
 
         foreach (var op in operations)
         {
@@ -191,7 +194,7 @@ internal class InterfaceGenerator
         OpenApiOperationInfo op,
         string interfaceName,
         IInterfacePartitioning partitioning,
-        HashSet<string> knownMethodIdentifiers,
+        Dictionary<string, HashSet<string>> knownMethodIdentifiers,
         StringBuilder code)
     {
         var operation = op.Operation;
@@ -205,8 +208,8 @@ internal class InterfaceGenerator
         var verb = op.Verb.CapitalizeFirstCharacter();
         var baseOperationName = GetBaseOperationName(op);
         var rawMethodName = partitioning.GetMethodName(op, interfaceName, baseOperationName);
-        var methodName = IdentifierUtils.Counted(knownMethodIdentifiers, rawMethodName);
-        knownMethodIdentifiers.Add(methodName);
+        var signature = GetParameterSignature(operation);
+        var methodName = IdentifierUtils.Counted(knownMethodIdentifiers, rawMethodName, signature);
 
         var dynamicQuerystringParameterType =
             partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
@@ -269,6 +272,34 @@ internal class InterfaceGenerator
         }
 
         return (operationDynamicQuerystringParameters ?? string.Empty, dynamicQuerystringParameterType);
+    }
+
+    private static string GetParameterSignature(OpenApiOperation operation)
+    {
+        var parts = new List<string>();
+
+        if (operation.Parameters is { Count: > 0 })
+        {
+            foreach (var p in operation.Parameters)
+            {
+                var typeStr = p.Schema?.Type is JsonObjectType t
+                    ? t.ToString()
+                    : "any";
+                parts.Add($"{p.Name}:{typeStr}");
+            }
+        }
+
+        if (operation.RequestBody is { Content.Count: > 0 })
+        {
+            var contentType = operation.RequestBody.Content.Keys.First();
+            var bodySchemaType = operation.RequestBody.Content.Values.First().Schema?.Type;
+            var bodyTypeStr = bodySchemaType is JsonObjectType bt
+                ? bt.ToString()
+                : "object";
+            parts.Add($"body:{contentType}:{bodyTypeStr}");
+        }
+
+        return string.Join("|", parts);
     }
 
     private string GetBaseOperationName(OpenApiOperationInfo op)
