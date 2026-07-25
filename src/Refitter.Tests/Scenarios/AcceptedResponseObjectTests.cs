@@ -69,6 +69,21 @@ paths:
       responses:
         '202':
           description: 'Batch accepted for processing'
+  /exports:
+    post:
+      tags:
+        - 'Jobs'
+      summary: 'Start an export'
+      description: 'Accepts the request and streams back the export payload'
+      operationId: 'createExport'
+      responses:
+        '202':
+          description: 'Export accepted for processing'
+          content:
+            application/octet-stream:
+              schema:
+                type: 'string'
+                format: 'binary'
 components:
   schemas:
     Job:
@@ -113,6 +128,13 @@ components:
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task CreateBatch();");
+    }
+
+    [Test]
+    public async Task Should_Generate_HttpResponseMessage_When_Accepted_Returns_Binary_Content()
+    {
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("Task<HttpResponseMessage> CreateExport();");
     }
 
     [Test]
