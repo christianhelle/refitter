@@ -27,7 +27,7 @@ jobs:
         uses: dotnet/nbgv@master
         with:
           setAllVars: true
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: |
             8.0.x
