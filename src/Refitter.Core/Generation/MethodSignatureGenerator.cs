@@ -3,27 +3,22 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal class MethodSignatureGenerator(
-    RefitGeneratorSettings settings,
-    IParameterExtractor? parameterExtractor = null)
+internal class MethodSignatureGenerator(RefitGeneratorSettings settings)
     : IMethodSignatureGenerator
 {
-    private readonly IParameterExtractor parameterExtractor = parameterExtractor ?? new ParameterAggregator();
+    private readonly ParameterListBuilder parameterListBuilder = new(settings);
 
     public (string ParametersString, IReadOnlyList<string> Parameters, string? DynamicQuerystringParameters) Generate(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         string dynamicQuerystringParameterType)
     {
-        var parameters = parameterExtractor.ExtractParameters(
-                operationModel,
-                operation,
-                settings,
-                dynamicQuerystringParameterType,
-                out var operationDynamicQuerystringParameters)
-            .ToList();
+        var parameterList = parameterListBuilder.Build(
+            operationModel,
+            operation,
+            dynamicQuerystringParameterType);
 
-        var parametersString = string.Join(", ", parameters);
-        return (parametersString, parameters, operationDynamicQuerystringParameters);
+        var parametersString = string.Join(", ", parameterList.Parameters);
+        return (parametersString, parameterList.Parameters, parameterList.DynamicQuerystringCode);
     }
 }

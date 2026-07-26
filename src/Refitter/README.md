@@ -90,6 +90,7 @@ OPTIONS:
         --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used
         --no-banner                                              Don't show donation banner
         --skip-default-additional-properties                     Set to true to skip default additional properties
+        --allow-remote-refs                                      Resolve remote (http/https) $ref references inside the document. Disabled by default to prevent generation-time SSRF
         --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
                                                                  May be one of:
                                                                  - Default

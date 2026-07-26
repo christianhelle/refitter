@@ -619,6 +619,23 @@ function RunTests
         if ($p.ExitCode -ne 0) { throw "Combination test '$($combo.Name)' generation failed" }
     }
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore -smokeTest
+
+    # ==========================================
+    # Phase 11: Asana API regression test (issue #359)
+    # Large real-world spec that previously failed to compile with
+    # "cannot derive from sealed type 'string'" (CS0509) because of
+    # single-primitive allOf wrappers. The spec is committed under
+    # OpenAPI/v3.0/asana.yaml to avoid transient HTTP errors. Generate
+    # with default settings and build once to guard against regressions.
+    # ==========================================
+    Write-Host "`r`n=== Asana API regression test (issue #359) ===`r`n"
+
+    CleanGeneratedCode
+    $asanaArgs = "./OpenAPI/v3.0/asana.yaml --namespace Asana --output ./GeneratedCode/Asana.generated.cs --no-logging"
+    $p = StartRefitter -arguments $asanaArgs -processPath $processPath -useDocker $UseDocker
+    $p | Wait-Process
+    if ($p.ExitCode -ne 0) { throw "Asana API generation failed (issue #359 regression)" }
+    BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore -smokeTest
 }
 
 if ($UseProduction)

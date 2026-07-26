@@ -27,9 +27,9 @@ internal static class DynamicQuerystringParameterBuilder
 
         foreach (var operationParameter in queryParameters)
         {
-            var propertyType = ParameterShared.GetQueryParameterType(operationParameter, settings);
-            var variableName = ParameterShared.GetVariableName(operationParameter);
-            var attributes = $"{ParameterShared.JoinAttributes(ParameterShared.GetQueryAttribute(operationParameter, settings), ParameterShared.GetAliasAsAttribute(operationParameter.Name, variableName))}";
+            var propertyType = ParameterTypeResolver.GetQueryParameterType(operationParameter, settings);
+            var variableName = ParameterNaming.GetVariableName(operationParameter);
+            var attributes = $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetQueryAttribute(operationParameter, settings), ParameterAttributeFormatter.GetAliasAsAttribute(operationParameter.Name, variableName))}";
             var propertyName = variableName.CapitalizeFirstCharacter();
             if (operationParameter.IsRequired)
             {
@@ -48,7 +48,7 @@ internal static class DynamicQuerystringParameterBuilder
             if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
             {
                 var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(operationParameter.Description);
-                ParameterShared.AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
+                AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
             }
 
             propertiesCodeBuilder.Append(
@@ -59,7 +59,7 @@ internal static class DynamicQuerystringParameterBuilder
             var defaultValue = operationParameter.Schema.Default;
             if (defaultValue != null)
             {
-                var formattedDefaultValue = ParameterShared.FormatDefaultValue(defaultValue, propertyType);
+                var formattedDefaultValue = ParameterDefaultValueFormatter.FormatDefaultValue(defaultValue, propertyType);
                 propertiesCodeBuilder.Append($" = {formattedDefaultValue};");
             }
 
@@ -90,5 +90,33 @@ internal static class DynamicQuerystringParameterBuilder
         """);
 
         return codeBuilder.ToString();
+    }
+
+    internal static void AppendXmlDocComment(string description, StringBuilder codeBuilder)
+    {
+        codeBuilder.Append(
+"""
+                /// <summary>
+""");
+
+        var lines = description.Split(
+            ["\r\n", "\r", "\n"],
+            StringSplitOptions.None);
+
+        foreach (var line in lines)
+        {
+            codeBuilder.AppendLine();
+            codeBuilder.Append(
+$$"""
+                /// {{line.Trim()}}
+""");
+        }
+
+        codeBuilder.AppendLine();
+        codeBuilder.Append(
+"""
+                /// </summary>
+""");
+        codeBuilder.AppendLine();
     }
 }

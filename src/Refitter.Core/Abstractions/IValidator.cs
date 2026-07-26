@@ -14,7 +14,8 @@ public interface IValidator
     /// Validates the specified OpenAPI specification file.
     /// </summary>
     /// <param name="openApiPath">The path to the OpenAPI specification file.</param>
+    /// <param name="allowRemoteReferences">When false, remote and out-of-tree <c>$ref</c> references are rejected.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>An <see cref="OpenApiValidationResult"/> containing diagnostics and element counts.</returns>
-    Task<OpenApiValidationResult> ValidateAsync(string openApiPath, CancellationToken cancellationToken = default);
+    Task<OpenApiValidationResult> ValidateAsync(string openApiPath, bool allowRemoteReferences = false, CancellationToken cancellationToken = default);
 }

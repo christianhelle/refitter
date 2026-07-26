@@ -19,8 +19,7 @@ internal class InterfaceGenerator
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
-        XmlDocumentationGenerator docGenerator,
-        IParameterExtractor? parameterExtractor = null)
+        XmlDocumentationGenerator docGenerator)
         : this(
             settings,
             document,
@@ -28,7 +27,7 @@ internal class InterfaceGenerator
             docGenerator,
             new ReturnTypeGenerator(settings, generator),
             new MethodAttributeGenerator(settings, document),
-            new MethodSignatureGenerator(settings, parameterExtractor ?? new ParameterAggregator()))
+            new MethodSignatureGenerator(settings))
     {
     }
 
@@ -212,6 +211,7 @@ internal class InterfaceGenerator
         var dynamicQuerystringParameterType =
             partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
         var operationModel = generator.CreateOperationModel(operation);
+        operationModel.Path = op.Path;
 
         var (parametersString, parameters, operationDynamicQuerystringParameters) =
             methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
@@ -237,7 +237,7 @@ internal class InterfaceGenerator
             code.AppendLine($"{Separator}{Separator}{attribute}");
         }
 
-        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterShared.EscapeString(op.Path)}\")]")
+        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(op.Path)}\")]")
             .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
             .AppendLine();
 
@@ -263,7 +263,7 @@ internal class InterfaceGenerator
                 ", ",
                 parameters.Where(parameter => !parameter.Contains("?")));
 
-            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterShared.EscapeString(op.Path)}\")]")
+            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(op.Path)}\")]")
                 .AppendLine($"{Separator}{Separator}{returnType} {methodName}({nonOptionalParametersString});")
                 .AppendLine();
         }

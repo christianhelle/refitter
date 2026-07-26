@@ -905,6 +905,45 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "Gal3m",
+      "name": "Ali Sadeghi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/91008976?v=4",
+      "profile": "https://github.com/Gal3m",
+      "contributions": [
+        "bug",
+        "security"
+      ]
+    },
+    {
+      "login": "mrostamipoor",
+      "name": "Maryam Rostamipoor",
+      "avatar_url": "https://avatars.githubusercontent.com/u/78902717?v=4",
+      "profile": "https://mrostamipoor.github.io/",
+      "contributions": [
+        "bug",
+        "security"
+      ]
+    },
+    {
+      "login": "paule96",
+      "name": "paule96",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11291885?v=4",
+      "profile": "https://codez.one/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rcdailey",
+      "name": "Robert Dailey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1768054?v=4",
+      "profile": "https://github.com/rcdailey",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -125,6 +125,7 @@ public class RefitterRunner
             {
                 var validationResult = await validator.ValidateAsync(
                     specPath,
+                    settings.AllowRemoteReferences,
                     cancellationToken);
 
                 foreach (var error in validationResult.Diagnostics.Errors)

@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-97-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-101-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -131,6 +131,7 @@ OPTIONS:
         --no-banner                                              Don't show donation banner
         --simple-output                                          Generate simple, plain-text console output without ASCII art, tables, emojis, or color formatting (suitable for IDE output windows)
         --skip-default-additional-properties                     Set to true to skip default additional properties
+        --allow-remote-refs                                      Resolve remote (http/https) $ref references inside the document. Disabled by default to prevent generation-time SSRF
         --collection-format                      Multi           Determines the format of collection parameters. May be one of Multi, Csv, Ssv, Tsv, Pipes
         --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
                                                                  May be one of:
@@ -274,6 +275,7 @@ The following is an example `.refitter` file using a single OpenAPI specificatio
   ],
   "includeInheritanceHierarchy": false, // Optional. Default=false. Set to true to keep all possible type-instances of inheritance/union types. This works in conjunction with trimUnusedSchema.
   "generateDefaultAdditionalProperties": true, // Optional. default=true
+  "allowRemoteReferences": false, // Optional. Default=false. When true, remote http/https $ref references inside the document are resolved
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": true, // Optional. Default=false
@@ -395,6 +397,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `trimUnusedSchema` - Removes unreferenced components schema to keep the generated output to a minimum
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
 - `includeInheritanceHierarchy`: Set to true to keep all possible type-instances of inheritance/union types. If this is false only directly referenced types will be kept. This works in conjunction with `trimUnusedSchema`
+- `allowRemoteReferences` - a boolean controlling whether remote (`http`/`https`) `$ref` references inside the OpenAPI document are resolved. Disabled by default to prevent generation-time SSRF and remote file inclusion. Local `$ref` references are always confined to the input document's directory tree. Top-level remote document URLs remain allowed. Default is `false`
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
@@ -1485,6 +1488,12 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/AntonTeyken"><img src="https://avatars.githubusercontent.com/u/162133784?v=4?s=100" width="100px;" alt="Anton"/><br /><sub><b>Anton</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AAntonTeyken" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://umair.me"><img src="https://avatars.githubusercontent.com/u/834935?v=4?s=100" width="100px;" alt="Muhammad Umair Irshad"/><br /><sub><b>Muhammad Umair Irshad</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Aumair-me" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://z-bo.tumblr.com"><img src="https://avatars.githubusercontent.com/u/447485?v=4?s=100" width="100px;" alt="John Zabroski"/><br /><sub><b>John Zabroski</b></sub></a><br /><a href="#ideas-jzabroski" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Gal3m"><img src="https://avatars.githubusercontent.com/u/91008976?v=4?s=100" width="100px;" alt="Ali Sadeghi"/><br /><sub><b>Ali Sadeghi</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AGal3m" title="Bug reports">🐛</a> <a href="#security-Gal3m" title="Security">🛡️</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://mrostamipoor.github.io/"><img src="https://avatars.githubusercontent.com/u/78902717?v=4?s=100" width="100px;" alt="Maryam Rostamipoor"/><br /><sub><b>Maryam Rostamipoor</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amrostamipoor" title="Bug reports">🐛</a> <a href="#security-mrostamipoor" title="Security">🛡️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://codez.one/"><img src="https://avatars.githubusercontent.com/u/11291885?v=4?s=100" width="100px;" alt="paule96"/><br /><sub><b>paule96</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=paule96" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rcdailey"><img src="https://avatars.githubusercontent.com/u/1768054?v=4?s=100" width="100px;" alt="Robert Dailey"/><br /><sub><b>Robert Dailey</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Arcdailey" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=rcdailey" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

@@ -87,6 +87,7 @@ OPTIONS:
         --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used
         --no-banner                                              Don't show donation banner
         --skip-default-additional-properties                     Set to true to skip default additional properties
+        --allow-remote-refs                                      Resolve remote (http/https) $ref references inside the document. Disabled by default to prevent generation-time SSRF
         --simple-output                                          Generate output with no color, no formatting, no emojis, and no banners suitable for terminal or IDE output
         --collection-format                      Multi           Determines the format of collection parameters. May be one of:
                                                                  - Multi (separate parameter instances for each array item)
