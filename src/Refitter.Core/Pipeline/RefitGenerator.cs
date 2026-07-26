@@ -46,7 +46,7 @@ public class RefitGenerator(
     {
         if (settings.OpenApiPaths is { Length: > 0 })
             return await OpenApiDocumentFactory
-                .CreateAsync(settings.OpenApiPaths, cancellationToken)
+                .CreateAsync(settings.OpenApiPaths, settings.AllowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
 
         if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
@@ -57,7 +57,7 @@ public class RefitGenerator(
         }
 
         return await OpenApiDocumentFactory
-            .CreateAsync(settings.OpenApiPath!, cancellationToken)
+            .CreateAsync(settings.OpenApiPath!, settings.AllowRemoteReferences, cancellationToken)
             .ConfigureAwait(false);
     }
 

@@ -131,6 +131,7 @@ OPTIONS:
         --no-banner                                              Don't show donation banner
         --simple-output                                          Generate simple, plain-text console output without ASCII art, tables, emojis, or color formatting (suitable for IDE output windows)
         --skip-default-additional-properties                     Set to true to skip default additional properties
+        --allow-remote-refs                                      Resolve remote (http/https) $ref references inside the document. Disabled by default to prevent generation-time SSRF
         --collection-format                      Multi           Determines the format of collection parameters. May be one of Multi, Csv, Ssv, Tsv, Pipes
         --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
                                                                  May be one of:
@@ -274,6 +275,7 @@ The following is an example `.refitter` file using a single OpenAPI specificatio
   ],
   "includeInheritanceHierarchy": false, // Optional. Default=false. Set to true to keep all possible type-instances of inheritance/union types. This works in conjunction with trimUnusedSchema.
   "generateDefaultAdditionalProperties": true, // Optional. default=true
+  "allowRemoteReferences": false, // Optional. Default=false. When true, remote http/https $ref references inside the document are resolved
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": true, // Optional. Default=false
@@ -395,6 +397,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `trimUnusedSchema` - Removes unreferenced components schema to keep the generated output to a minimum
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
 - `includeInheritanceHierarchy`: Set to true to keep all possible type-instances of inheritance/union types. If this is false only directly referenced types will be kept. This works in conjunction with `trimUnusedSchema`
+- `allowRemoteReferences` - a boolean controlling whether remote (`http`/`https`) `$ref` references inside the OpenAPI document are resolved. Disabled by default to prevent generation-time SSRF and remote file inclusion. Local `$ref` references are always confined to the input document's directory tree. Top-level remote document URLs remain allowed. Default is `false`
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
