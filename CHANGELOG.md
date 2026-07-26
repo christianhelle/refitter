@@ -2,7 +2,24 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.1-preview.111...HEAD)
+
+**Implemented enhancements:**
+
+- Fix generate response type for 202 Accepted responses [\#1202](https://github.com/christianhelle/refitter/pull/1202) ([rcdailey](https://github.com/rcdailey))
+- Fix GHSA-x6w4-f264-3vvr: restrict unrestricted $ref resolution [\#1173](https://github.com/christianhelle/refitter/pull/1173) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- 202 Accepted responses generate no response type [\#1201](https://github.com/christianhelle/refitter/issues/1201)
+
+**Merged pull requests:**
+
+- docs: add rcdailey as a contributor for code [\#1203](https://github.com/christianhelle/refitter/pull/1203) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+
+## [2.1.1-preview.111](https://github.com/christianhelle/refitter/tree/2.1.1-preview.111) (2026-07-23)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0...2.1.1-preview.111)
 
 **Implemented enhancements:**
 
@@ -12,6 +29,7 @@
 
 **Merged pull requests:**
 
+- docs: add rcdailey as a contributor for bug [\#1200](https://github.com/christianhelle/refitter/pull/1200) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - docs: add paule96 as a contributor for code [\#1193](https://github.com/christianhelle/refitter/pull/1193) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Fix the sorting of parameters to generate correct interfaces, even if the openapi spec is not sorted [\#1192](https://github.com/christianhelle/refitter/pull/1192) ([paule96](https://github.com/paule96))
 - Update dependency Polly to 8.7.0 [\#1187](https://github.com/christianhelle/refitter/pull/1187) ([renovate[bot]](https://github.com/apps/renovate))
