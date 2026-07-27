@@ -54,6 +54,8 @@ public static class OpenApiValidator
             var walker = new OpenApiWalker(statsVisitor);
             walker.Walk(msDocument);
 
+            AttributeStringValidator.Validate(msDocument, diagnostic);
+
             return new(diagnostic, statsVisitor);
         }
 
