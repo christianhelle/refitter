@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Add signature-aware counted overload and related tests [\#1204](https://github.com/christianhelle/refitter/pull/1204) ([christianhelle](https://github.com/christianhelle))
 - Fix generate response type for 202 Accepted responses [\#1202](https://github.com/christianhelle/refitter/pull/1202) ([rcdailey](https://github.com/rcdailey))
 - Fix GHSA-x6w4-f264-3vvr: restrict unrestricted $ref resolution [\#1173](https://github.com/christianhelle/refitter/pull/1173) ([christianhelle](https://github.com/christianhelle))
 
@@ -16,6 +17,11 @@
 **Merged pull requests:**
 
 - docs: add rcdailey as a contributor for code [\#1203](https://github.com/christianhelle/refitter/pull/1203) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- chore\(deps\): update dependency system.reactive to v7 [\#1197](https://github.com/christianhelle/refitter/pull/1197) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): bump actions/setup-dotnet from 5 to 6 [\#1196](https://github.com/christianhelle/refitter/pull/1196) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): update dependency ruby to v4.0.6 [\#1194](https://github.com/christianhelle/refitter/pull/1194) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update dependency system.text.json to v10 [\#1189](https://github.com/christianhelle/refitter/pull/1189) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Refit to v13 [\#1188](https://github.com/christianhelle/refitter/pull/1188) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.1.1-preview.111](https://github.com/christianhelle/refitter/tree/2.1.1-preview.111) (2026-07-23)
 
