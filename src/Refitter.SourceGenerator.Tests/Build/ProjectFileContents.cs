@@ -15,7 +15,7 @@ public static class ProjectFileContents
     <PackageReference Include=""System.Text.Json"" Version=""8.0.5"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""4.5.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
-    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.9"" />
+    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.10"" />
     <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.9"" />
     <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.9"" />
@@ -44,7 +44,7 @@ public static class ProjectFileContents
     <PackageReference Include=""System.Text.Json"" Version=""8.0.5"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""4.5.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
-    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.9"" />
+    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.10"" />
     <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.9"" />
     <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.9"" />
