@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 
@@ -52,6 +54,8 @@ public static class OpenApiValidator
             var walker = new OpenApiWalker(statsVisitor);
             walker.Walk(msDocument);
 
+            AttributeStringValidator.Validate(msDocument, diagnostic);
+
             return new(diagnostic, statsVisitor);
         }
 
@@ -66,6 +70,8 @@ public static class OpenApiValidator
         var stats = new OpenApiStats();
         var openApiWalker = new OpenApiWalker(stats);
         openApiWalker.Walk(result.OpenApiDocument);
+
+        AttributeStringValidator.Validate(result.OpenApiDocument, result.OpenApiDiagnostic);
 
         return new(
             result.OpenApiDiagnostic,

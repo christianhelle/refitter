@@ -27,7 +27,7 @@ internal sealed class HeaderParameterExtractor
                 .Select(p =>
                 {
                     var variableName = ParameterNaming.GetVariableName(p);
-                    return $"{ParameterAttributeFormatter.JoinAttributes($"Header(\"{p.Name}\")")}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}";
+                    return $"{ParameterAttributeFormatter.JoinAttributes($"Header(\"{ParameterNaming.EscapeString(p.Name)}\")")}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}";
                 })
                 .ToList();
         }
@@ -47,7 +47,7 @@ internal sealed class HeaderParameterExtractor
                     && securityScheme.In == OpenApiSecurityApiKeyLocation.Header
                     && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
                 {
-                    headerParameters.Add($"[Header(\"{securityScheme.Name}\")] string {ParameterNaming.ReplaceUnsafeCharacters(securityScheme.Name)}");
+                    headerParameters.Add($"[Header(\"{ParameterNaming.EscapeString(securityScheme.Name)}\")] string {ParameterNaming.ReplaceUnsafeCharacters(securityScheme.Name)}");
                 }
                 else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http }
                     && string.Equals(securityScheme.Scheme, "bearer", StringComparison.OrdinalIgnoreCase))

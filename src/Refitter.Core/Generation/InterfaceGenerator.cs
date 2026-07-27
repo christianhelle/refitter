@@ -242,7 +242,7 @@ internal class InterfaceGenerator
             code.AppendLine($"{Separator}{Separator}{attribute}");
         }
 
-        code.AppendLine($"{Separator}{Separator}[{verb}(\"{op.Path}\")]")
+        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(op.Path)}\")]")
             .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
             .AppendLine();
 
@@ -268,7 +268,7 @@ internal class InterfaceGenerator
                 ", ",
                 parameters.Where(parameter => !parameter.Contains("?")));
 
-            code.AppendLine($"{Separator}{Separator}[{verb}(\"{op.Path}\")]")
+            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(op.Path)}\")]")
                 .AppendLine($"{Separator}{Separator}{returnType} {methodName}({nonOptionalParametersString});")
                 .AppendLine();
         }

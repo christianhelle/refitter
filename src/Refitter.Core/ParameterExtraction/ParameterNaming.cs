@@ -48,7 +48,10 @@ internal static class ParameterNaming
                     sb.Append("\\0");
                     break;
                 default:
-                    sb.Append(c);
+                    if (char.IsControl(c))
+                        sb.Append($"\\u{(int)c:X4}");
+                    else
+                        sb.Append(c);
                     break;
             }
         }
