@@ -39,26 +39,59 @@ public class MethodOverloadTests
 }
 ";
 
+    private const string Swagger2Spec = @"
+{
+  ""swagger"": ""2.0"",
+  ""info"": {
+    ""title"": ""Overload Test API"",
+    ""version"": ""1.0.0""
+  },
+  ""paths"": {
+    ""/customformat"": {
+      ""get"": {
+        ""tags"": [""CustomFormat""],
+        ""responses"": { ""200"": { ""description"": ""Success"" } }
+      }
+    },
+    ""/customformat/{id}"": {
+      ""get"": {
+        ""tags"": [""CustomFormat""],
+        ""parameters"": [
+          { ""in"": ""path"", ""name"": ""id"", ""required"": true, ""type"": ""integer"" }
+        ],
+        ""responses"": { ""200"": { ""description"": ""Success"" } }
+      }
+    }
+  }
+}
+";
+
     [Test]
-    public async Task Can_Generate_Code()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Can_Generate_Code(string spec)
     {
-        var generatedCode = await GenerateCode();
+        var generatedCode = await GenerateCode(spec);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Test]
-    public async Task Same_Name_Different_Params_Should_Use_Overloads_Not_Counter()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Same_Name_Different_Params_Should_Use_Overloads_Not_Counter(string spec)
     {
-        var generatedCode = await GenerateCode();
+        var generatedCode = await GenerateCode(spec);
 
         // The second method should use the same name (overload), not have a counter suffix
         generatedCode.Should().NotContain("CustomformatGet2(");
     }
 
     [Test]
-    public async Task Overloads_Should_Have_Different_Parameter_Lists()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Overloads_Should_Have_Different_Parameter_Lists(string spec)
     {
-        var generatedCode = await GenerateCode();
+        var generatedCode = await GenerateCode(spec);
 
         // First overload: no parameters (path /customformat)
         generatedCode.Should().Contain("CustomformatGet()");
@@ -68,18 +101,20 @@ public class MethodOverloadTests
     }
 
     [Test]
-    public async Task Can_Build_Generated_Code()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Can_Build_Generated_Code(string spec)
     {
-        var generatedCode = await GenerateCode();
+        var generatedCode = await GenerateCode(spec);
         BuildHelper
             .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(string spec)
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);
         try
         {
             var settings = new RefitGeneratorSettings
