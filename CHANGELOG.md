@@ -2,12 +2,28 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.1-preview.111...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.1...HEAD)
 
 **Implemented enhancements:**
 
+- Fix RCE attribute injection in generated Refit clients \(GHSA-3fhm-p725-h3g3, GHSA-58x9-vjvp-6mx8, GHSA-p32v-8v8j-j534\) [\#1178](https://github.com/christianhelle/refitter/pull/1178) ([christianhelle](https://github.com/christianhelle))
+
+**Closed issues:**
+
+- Refitter.MSBuild 2.1.0 fails on .NET 10 SDK: MissingMethodException for ValueStringBuilder.AsSpan\(\) [\#1199](https://github.com/christianhelle/refitter/issues/1199)
+
+## [2.1.1](https://github.com/christianhelle/refitter/tree/2.1.1) (2026-07-27)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0...2.1.1)
+
+**Implemented enhancements:**
+
+- Dynamic QueryParams type is incorrectly shared by GET endpoints with the same method name across different controllers [\#1190](https://github.com/christianhelle/refitter/issues/1190)
 - Add signature-aware counted overload and related tests [\#1204](https://github.com/christianhelle/refitter/pull/1204) ([christianhelle](https://github.com/christianhelle))
 - Fix generate response type for 202 Accepted responses [\#1202](https://github.com/christianhelle/refitter/pull/1202) ([rcdailey](https://github.com/rcdailey))
+- Disambiguate dynamic QueryParams type names in ByTag mode [\#1198](https://github.com/christianhelle/refitter/pull/1198) ([christianhelle](https://github.com/christianhelle))
+- Fix the sorting of parameters to generate correct interfaces, even if the openapi spec is not sorted [\#1192](https://github.com/christianhelle/refitter/pull/1192) ([paule96](https://github.com/paule96))
+- Refactor parameter extraction into a ParameterListBuilder module [\#1180](https://github.com/christianhelle/refitter/pull/1180) ([christianhelle](https://github.com/christianhelle))
 - Fix GHSA-x6w4-f264-3vvr: restrict unrestricted $ref resolution [\#1173](https://github.com/christianhelle/refitter/pull/1173) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
@@ -17,27 +33,13 @@
 **Merged pull requests:**
 
 - docs: add rcdailey as a contributor for code [\#1203](https://github.com/christianhelle/refitter/pull/1203) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- docs: add rcdailey as a contributor for bug [\#1200](https://github.com/christianhelle/refitter/pull/1200) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency system.reactive to v7 [\#1197](https://github.com/christianhelle/refitter/pull/1197) ([renovate[bot]](https://github.com/apps/renovate))
 - chore\(deps\): bump actions/setup-dotnet from 5 to 6 [\#1196](https://github.com/christianhelle/refitter/pull/1196) ([dependabot[bot]](https://github.com/apps/dependabot))
 - chore\(deps\): update dependency ruby to v4.0.6 [\#1194](https://github.com/christianhelle/refitter/pull/1194) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: add paule96 as a contributor for code [\#1193](https://github.com/christianhelle/refitter/pull/1193) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - chore\(deps\): update dependency system.text.json to v10 [\#1189](https://github.com/christianhelle/refitter/pull/1189) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Refit to v13 [\#1188](https://github.com/christianhelle/refitter/pull/1188) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [2.1.1-preview.111](https://github.com/christianhelle/refitter/tree/2.1.1-preview.111) (2026-07-23)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0...2.1.1-preview.111)
-
-**Implemented enhancements:**
-
-- Dynamic QueryParams type is incorrectly shared by GET endpoints with the same method name across different controllers [\#1190](https://github.com/christianhelle/refitter/issues/1190)
-- Disambiguate dynamic QueryParams type names in ByTag mode [\#1198](https://github.com/christianhelle/refitter/pull/1198) ([christianhelle](https://github.com/christianhelle))
-- Refactor parameter extraction into a ParameterListBuilder module [\#1180](https://github.com/christianhelle/refitter/pull/1180) ([christianhelle](https://github.com/christianhelle))
-
-**Merged pull requests:**
-
-- docs: add rcdailey as a contributor for bug [\#1200](https://github.com/christianhelle/refitter/pull/1200) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- docs: add paule96 as a contributor for code [\#1193](https://github.com/christianhelle/refitter/pull/1193) ([allcontributors[bot]](https://github.com/apps/allcontributors))
-- Fix the sorting of parameters to generate correct interfaces, even if the openapi spec is not sorted [\#1192](https://github.com/christianhelle/refitter/pull/1192) ([paule96](https://github.com/paule96))
 - Update dependency Polly to 8.7.0 [\#1187](https://github.com/christianhelle/refitter/pull/1187) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency AutoMapper to 16.2.0 [\#1186](https://github.com/christianhelle/refitter/pull/1186) ([renovate[bot]](https://github.com/apps/renovate))
 
