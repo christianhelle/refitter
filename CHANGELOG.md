@@ -13,6 +13,10 @@
 
 - Refitter.MSBuild 2.1.0 fails on .NET 10 SDK: MissingMethodException for ValueStringBuilder.AsSpan\(\) [\#1199](https://github.com/christianhelle/refitter/issues/1199)
 
+**Merged pull requests:**
+
+- Update dependency TUnit to 1.61.38 [\#1191](https://github.com/christianhelle/refitter/pull/1191) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [2.1.1](https://github.com/christianhelle/refitter/tree/2.1.1) (2026-07-27)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.0...2.1.1)
