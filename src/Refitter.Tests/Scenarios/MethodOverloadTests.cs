@@ -101,6 +101,7 @@ public class MethodOverloadTests
     }
 
     [Test]
+    [Category("Integration")]
     [Arguments(OpenApiSpec)]
     [Arguments(Swagger2Spec)]
     public async Task Can_Build_Generated_Code(string spec)
