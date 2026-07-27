@@ -72,6 +72,61 @@ public class IdentifierUtilsTests
     }
 
     [Test]
+    public void Counted_With_Signature_Returns_Name_When_Not_In_Set()
+    {
+        var knownIdentifiers = new Dictionary<string, HashSet<string>>();
+        var result = IdentifierUtils.Counted(knownIdentifiers, "GetItems", "");
+        result.Should().Be("GetItems");
+    }
+
+    [Test]
+    public void Counted_With_Signature_Allows_Overload_When_Signature_Differs()
+    {
+        var knownIdentifiers = new Dictionary<string, HashSet<string>>
+        {
+            { "GetItems", new HashSet<string> { "" } }
+        };
+        var result = IdentifierUtils.Counted(knownIdentifiers, "GetItems", "id:integer");
+        result.Should().Be("GetItems");
+    }
+
+    [Test]
+    public void Counted_With_Signature_Appends_Counter_When_Signature_Collides()
+    {
+        var knownIdentifiers = new Dictionary<string, HashSet<string>>
+        {
+            { "GetItems", new HashSet<string> { "" } }
+        };
+        var result = IdentifierUtils.Counted(knownIdentifiers, "GetItems", "");
+        result.Should().Be("GetItems2");
+    }
+
+    [Test]
+    public void Counted_With_Signature_Increments_Counter_On_Multiple_Collisions()
+    {
+        var knownIdentifiers = new Dictionary<string, HashSet<string>>
+        {
+            { "GetItems", new HashSet<string> { "" } },
+            { "GetItems2", new HashSet<string> { "" } }
+        };
+        var result = IdentifierUtils.Counted(knownIdentifiers, "GetItems", "");
+        result.Should().Be("GetItems3");
+    }
+
+    [Test]
+    public void Counted_With_Signature_Counts_Per_Signature()
+    {
+        var knownIdentifiers = new Dictionary<string, HashSet<string>>
+        {
+            { "GetItems", new HashSet<string> { "" } }
+        };
+        var overload = IdentifierUtils.Counted(knownIdentifiers, "GetItems", "id:integer");
+        var duplicate = IdentifierUtils.Counted(knownIdentifiers, "GetItems", "");
+        overload.Should().Be("GetItems");
+        duplicate.Should().Be("GetItems2");
+    }
+
+    [Test]
     public void ToCompilableIdentifier_Prefixes_Digit_Prefixed_PascalCase_Names()
     {
         var result = IdentifierUtils.ToCompilableIdentifier("42QuestionField");

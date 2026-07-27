@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
@@ -89,6 +90,46 @@ internal static class IdentifierUtils
         "__reftype",
         "__refvalue"
     };
+
+    /// <summary>
+    /// Returns <paramref name="name"/> if the (<paramref name="name"/>, <paramref name="signature"/>) pair
+    /// is not yet tracked; otherwise appends a counter until a unique pair is found.
+    /// </summary>
+    public static string Counted(
+        IDictionary<string, HashSet<string>> knownIdentifiers,
+        string name,
+        string signature)
+    {
+        if (knownIdentifiers.TryGetValue(name, out var signatures))
+        {
+            if (!signatures.Contains(signature))
+            {
+                signatures.Add(signature);
+                return name;
+            }
+
+            var counter = 2;
+            while (knownIdentifiers.TryGetValue(
+                       $"{name}{counter}",
+                       out var nextSignatures)
+                   && nextSignatures.Contains(signature))
+            {
+                counter++;
+            }
+
+            var uniqueName = $"{name}{counter}";
+            if (!knownIdentifiers.ContainsKey(uniqueName))
+            {
+                knownIdentifiers[uniqueName] = new HashSet<string>();
+            }
+
+            knownIdentifiers[uniqueName].Add(signature);
+            return uniqueName;
+        }
+
+        knownIdentifiers[name] = new HashSet<string> { signature };
+        return name;
+    }
 
     /// <summary>
     /// Returns <c>{value}{counter}{suffix}</c> if <c>{value}{name}</c> exists in <paramref name="knownIdentifiers"/>

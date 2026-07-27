@@ -1,5 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using NSwag;
+using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -125,7 +128,7 @@ internal class InterfaceGenerator
         code.AppendLine(interfaceDeclaration);
         code.AppendLine($"{Separator}{{");
 
-        var knownMethodIdentifiers = new HashSet<string>();
+        var knownMethodIdentifiers = new Dictionary<string, HashSet<string>>();
 
         foreach (var op in operations)
         {
@@ -166,7 +169,7 @@ internal class InterfaceGenerator
         code.AppendLine(interfaceDeclaration);
         code.AppendLine($"{Separator}{{");
 
-        var knownMethodIdentifiers = new HashSet<string>();
+        var knownMethodIdentifiers = new Dictionary<string, HashSet<string>>();
 
         foreach (var op in operations)
         {
@@ -191,7 +194,7 @@ internal class InterfaceGenerator
         OpenApiOperationInfo op,
         string interfaceName,
         IInterfacePartitioning partitioning,
-        HashSet<string> knownMethodIdentifiers,
+        Dictionary<string, HashSet<string>> knownMethodIdentifiers,
         StringBuilder code)
     {
         var operation = op.Operation;
@@ -205,13 +208,15 @@ internal class InterfaceGenerator
         var verb = op.Verb.CapitalizeFirstCharacter();
         var baseOperationName = GetBaseOperationName(op);
         var rawMethodName = partitioning.GetMethodName(op, interfaceName, baseOperationName);
-        var methodName = IdentifierUtils.Counted(knownMethodIdentifiers, rawMethodName);
-        knownMethodIdentifiers.Add(methodName);
+
+        var operationModel = generator.CreateOperationModel(operation);
+        operationModel.Path = op.Path;
+
+        var signature = GetParameterSignature(operation, operationModel);
+        var methodName = IdentifierUtils.Counted(knownMethodIdentifiers, rawMethodName, signature);
 
         var dynamicQuerystringParameterType =
             partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
-        var operationModel = generator.CreateOperationModel(operation);
-        operationModel.Path = op.Path;
 
         var (parametersString, parameters, operationDynamicQuerystringParameters) =
             methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
@@ -269,6 +274,36 @@ internal class InterfaceGenerator
         }
 
         return (operationDynamicQuerystringParameters ?? string.Empty, dynamicQuerystringParameterType);
+    }
+
+    private static string GetParameterSignature(
+        OpenApiOperation operation,
+        CSharpOperationModel operationModel)
+    {
+        var parts = new List<string>();
+
+        foreach (var p in operationModel.Parameters
+            .Where(p => !p.IsBinaryBodyParameter)
+            .OrderBy(p => p.Kind switch
+            {
+                OpenApiParameterKind.Path => 0,
+                OpenApiParameterKind.Query => 1,
+                OpenApiParameterKind.Body => 2,
+                OpenApiParameterKind.Header => 3,
+                OpenApiParameterKind.FormData => 4,
+                _ => 99,
+            }))
+        {
+            parts.Add(p.Type);
+        }
+
+        if (operation.RequestBody is { Content.Count: > 0 })
+        {
+            var contentType = operation.RequestBody.Content.Keys.First();
+            parts.Add($"body:{contentType}");
+        }
+
+        return string.Join("|", parts);
     }
 
     private string GetBaseOperationName(OpenApiOperationInfo op)
