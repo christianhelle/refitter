@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NJsonSchema;
 using NSwag;
+using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -208,13 +208,15 @@ internal class InterfaceGenerator
         var verb = op.Verb.CapitalizeFirstCharacter();
         var baseOperationName = GetBaseOperationName(op);
         var rawMethodName = partitioning.GetMethodName(op, interfaceName, baseOperationName);
-        var signature = GetParameterSignature(operation);
+
+        var operationModel = generator.CreateOperationModel(operation);
+        operationModel.Path = op.Path;
+
+        var signature = GetParameterSignature(operation, operationModel);
         var methodName = IdentifierUtils.Counted(knownMethodIdentifiers, rawMethodName, signature);
 
         var dynamicQuerystringParameterType =
             partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
-        var operationModel = generator.CreateOperationModel(operation);
-        operationModel.Path = op.Path;
 
         var (parametersString, parameters, operationDynamicQuerystringParameters) =
             methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
@@ -274,29 +276,31 @@ internal class InterfaceGenerator
         return (operationDynamicQuerystringParameters ?? string.Empty, dynamicQuerystringParameterType);
     }
 
-    private static string GetParameterSignature(OpenApiOperation operation)
+    private static string GetParameterSignature(
+        OpenApiOperation operation,
+        CSharpOperationModel operationModel)
     {
         var parts = new List<string>();
 
-        if (operation.Parameters is { Count: > 0 })
-        {
-            foreach (var p in operation.Parameters)
+        foreach (var p in operationModel.Parameters
+            .Where(p => !p.IsBinaryBodyParameter)
+            .OrderBy(p => p.Kind switch
             {
-                var typeStr = p.Schema?.Type is JsonObjectType t
-                    ? t.ToString()
-                    : "any";
-                parts.Add($"{p.Name}:{typeStr}");
-            }
+                OpenApiParameterKind.Path => 0,
+                OpenApiParameterKind.Query => 1,
+                OpenApiParameterKind.Body => 2,
+                OpenApiParameterKind.Header => 3,
+                OpenApiParameterKind.FormData => 4,
+                _ => 99,
+            }))
+        {
+            parts.Add(p.Type);
         }
 
         if (operation.RequestBody is { Content.Count: > 0 })
         {
             var contentType = operation.RequestBody.Content.Keys.First();
-            var bodySchemaType = operation.RequestBody.Content.Values.First().Schema?.Type;
-            var bodyTypeStr = bodySchemaType is JsonObjectType bt
-                ? bt.ToString()
-                : "object";
-            parts.Add($"body:{contentType}:{bodyTypeStr}");
+            parts.Add($"body:{contentType}");
         }
 
         return string.Join("|", parts);
