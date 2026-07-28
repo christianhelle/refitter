@@ -12,7 +12,9 @@ internal static class AsyncHelper
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+#pragma warning disable S8949
         string result = await content.ReadAsStringAsync().ConfigureAwait(false);
+#pragma warning restore S8949
         cancellationToken.ThrowIfCancellationRequested();
         return result;
     }
@@ -22,7 +24,9 @@ internal static class AsyncHelper
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+#pragma warning disable S8949
         string result = await reader.ReadToEndAsync().ConfigureAwait(false);
+#pragma warning restore S8949
         cancellationToken.ThrowIfCancellationRequested();
         return result;
     }
