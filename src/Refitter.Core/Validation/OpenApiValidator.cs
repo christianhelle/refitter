@@ -36,6 +36,10 @@ public static class OpenApiValidator
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiFile}'.", ex);
