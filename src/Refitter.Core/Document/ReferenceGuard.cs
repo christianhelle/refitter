@@ -65,7 +65,9 @@ internal static class ReferenceGuard
                 using var httpResponse = await client.SendAsync(
                     new HttpRequestMessage(HttpMethod.Get, url),
                     cancellationToken).ConfigureAwait(false);
-                content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                content = await httpResponse.Content
+                    .ReadAsStringWithCancellationAsync(cancellationToken)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -207,6 +209,8 @@ internal static class ReferenceGuard
     private static async Task<string> ReadAllTextAsync(string path, CancellationToken cancellationToken)
     {
         using var reader = new StreamReader(path);
-        return await reader.ReadToEndAsync().ConfigureAwait(false);
+        return await reader
+            .ReadToEndWithCancellationAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 }
