@@ -490,7 +490,7 @@ public class RefitterGenerateTask : MSBuildTask
     {
         var existingGeneratedFiles = outputLines
             .Select(ParseGeneratedFilePath)
-            .Where(path => !string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            .Where(path => !string.IsNullOrWhiteSpace(path) && FileExists(path!))
             .Select(path => path!)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
