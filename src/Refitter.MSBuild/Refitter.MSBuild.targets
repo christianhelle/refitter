@@ -4,10 +4,6 @@
         <RefitterAutoScan Condition="'$(RefitterAutoScan)' == ''">true</RefitterAutoScan>
     </PropertyGroup>
 
-    <UsingTask TaskName="RefitterGenerateTask"
-               AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll"
-               Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
-
     <Target Name="RefitterGenerate">
         <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                               DisableLogging="$(RefitterNoLogging)"

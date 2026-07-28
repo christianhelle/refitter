@@ -1,8 +1,8 @@
 <Project TreatAsLocalProperty="TaskFolder;TaskAssembly">
 
     <PropertyGroup>
-        <TaskFolder>$(MSBuildThisFileDirectory)..\tasks</TaskFolder>
-        <TaskAssembly>$(TaskFolder)\netstandard2.0\Refitter.MSBuild.dll</TaskAssembly>
+        <TaskFolder>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)../tasks'))</TaskFolder>
+        <TaskAssembly>$([MSBuild]::NormalizePath('$(TaskFolder)/netstandard2.0/Refitter.MSBuild.dll'))</TaskAssembly>
         <RefitterVersion>$(Version)</RefitterVersion>
     </PropertyGroup>
 
