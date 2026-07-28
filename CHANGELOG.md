@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.2...HEAD)
+
+**Implemented enhancements:**
+
+- Pass CancellationToken to async calls to resolve SonarCloud S8949 issues [\#1209](https://github.com/christianhelle/refitter/pull/1209) ([christianhelle](https://github.com/christianhelle))
+
 ## [2.1.2](https://github.com/christianhelle/refitter/tree/2.1.2) (2026-07-28)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.1...2.1.2)
