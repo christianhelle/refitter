@@ -34,7 +34,7 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
             var content = await response.Content
-                .ReadAsStringAsync()
+                .ReadAsStringWithCancellationAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             return PathUtilities.IsYaml(path)
