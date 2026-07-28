@@ -73,8 +73,10 @@ jobs:
     - name: 🚀 Publish to GitHub Packages
       if: github.event_name == 'push'
       shell: pwsh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         dotnet nuget push **/*.nupkg `
           --source https://nuget.pkg.github.com/christianhelle/index.json `
-          --api-key ${{ secrets.GITHUB_TOKEN }} `
+          --api-key $env:GITHUB_TOKEN `
           --skip-duplicate
