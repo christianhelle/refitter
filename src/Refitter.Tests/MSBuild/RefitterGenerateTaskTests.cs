@@ -248,6 +248,22 @@ public class RefitterGenerateTaskTests
 
             result.Should().ContainSingle().Which.Should().Be(generatedFile);
             errorMessage.Should().BeNull();
+
+            // On Windows, case-insensitive File.Exists also matches UPPERCASE paths
+            if (OperatingSystem.IsWindows())
+            {
+                var upperLines = new[]
+                {
+                    "Generated Output",
+                    $"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}",
+                    $"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile.ToUpperInvariant()}"
+                };
+
+                var upperResult = RefitterGenerateTask.ResolveGeneratedFiles(upperLines, "petstore.refitter", out var upperError);
+
+                upperResult.Should().ContainSingle().Which.Should().Be(generatedFile);
+                upperError.Should().BeNull();
+            }
         }
         finally
         {
@@ -288,7 +304,7 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
-    public void Execute_Should_Return_False_When_Runtime_Discovery_Throws()
+    public void Execute_Should_Fall_Back_When_Runtime_Discovery_Throws()
     {
         var workspace = CreateWorkspace();
 
