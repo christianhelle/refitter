@@ -22,6 +22,10 @@ on:
 env:
   VERSION: 2.1.2.${{ github.run_number }}
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     name: 👌 Verify build
