@@ -22,6 +22,10 @@ on:
 env:
   VERSION: 2.1.2.${{ github.run_number }}
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     name: 👌 Verify build
@@ -43,6 +47,13 @@ jobs:
         dotnet msbuild src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
     - name: 🛠️ Build
       run: dotnet build -c Release src/Refitter.slnx -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
+    - name: 📦 Pack MSBuild task
+      run: |
+        dotnet pack --no-build -c Release src/Refitter.MSBuild/Refitter.MSBuild.csproj `
+          -p:UseSourceLink=true `
+          -p:PackageVersion="${{ env.VERSION }}" `
+          -p:Version="${{ env.VERSION }}"
+      shell: pwsh
     - name: 🧪 Unit tests (fast gate)
       run: dotnet test --solution src/Refitter.slnx -c Release --no-build --treenode-filter "/*/*/*/*[Category!=Integration]"
     - name: 🧪 Full test suite
@@ -59,3 +70,13 @@ jobs:
       run: |
         dotnet tool update -g docfx
         docfx docs/docfx_project/docfx.json
+    - name: 🚀 Publish to GitHub Packages
+      if: github.event_name == 'push'
+      shell: pwsh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        dotnet nuget push **/*.nupkg `
+          --source https://nuget.pkg.github.com/christianhelle/index.json `
+          --api-key $env:GITHUB_TOKEN `
+          --skip-duplicate
