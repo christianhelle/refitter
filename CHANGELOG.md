@@ -1,8 +1,8 @@
 # Changelog
 
-## [2.1.2-preview.113](https://github.com/christianhelle/refitter/tree/2.1.2-preview.113) (2026-07-28)
+## [2.1.2](https://github.com/christianhelle/refitter/tree/2.1.2) (2026-07-28)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.1...2.1.2-preview.113)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.1...2.1.2)
 
 **Implemented enhancements:**
 
@@ -16,6 +16,7 @@
 
 **Merged pull requests:**
 
+- Publish NuGet packages to GitHub Packages [\#1208](https://github.com/christianhelle/refitter/pull/1208) ([christianhelle](https://github.com/christianhelle))
 - Update dependency TUnit to 1.61.38 [\#1191](https://github.com/christianhelle/refitter/pull/1191) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.1.1](https://github.com/christianhelle/refitter/tree/2.1.1) (2026-07-27)
