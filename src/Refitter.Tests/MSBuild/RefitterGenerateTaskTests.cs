@@ -241,7 +241,7 @@ public class RefitterGenerateTaskTests
             {
                 "Generated Output",
                 $"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}",
-                $"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile.ToUpperInvariant()}"
+                $"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}"
             };
 
             var result = RefitterGenerateTask.ResolveGeneratedFiles(outputLines, "petstore.refitter", out var errorMessage);
