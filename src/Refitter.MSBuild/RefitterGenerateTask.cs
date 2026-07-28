@@ -189,7 +189,6 @@ public class RefitterGenerateTask : MSBuildTask
             WorkingDirectory = Path.GetDirectoryName(file)!,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
-            RedirectStandardInput = true,
             UseShellExecute = false,
             CreateNoWindow = true,
         };
