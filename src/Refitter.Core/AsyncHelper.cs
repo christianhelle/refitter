@@ -12,7 +12,7 @@ internal static class AsyncHelper
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var result = await content.ReadAsStringAsync().ConfigureAwait(false);
+        string result = await content.ReadAsStringAsync().ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
         return result;
     }
@@ -22,7 +22,7 @@ internal static class AsyncHelper
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var result = await reader.ReadToEndAsync().ConfigureAwait(false);
+        string result = await reader.ReadToEndAsync().ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
         return result;
     }
