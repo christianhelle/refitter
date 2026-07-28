@@ -150,6 +150,7 @@ public class RefitterGenerateTask : MSBuildTask
         var assembly = Assembly.GetExecutingAssembly();
         var packageFolder = Path.GetDirectoryName(assembly.Location);
         var outputLines = new List<string>();
+        var outputLinesLock = new object();
 
         List<string>? installedRuntimes = null;
         try
