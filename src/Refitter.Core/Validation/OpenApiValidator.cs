@@ -32,7 +32,9 @@ public static class OpenApiValidator
                 using var httpResponse = await client.SendAsync(
                     new HttpRequestMessage(HttpMethod.Get, openApiFile),
                     cancellationToken).ConfigureAwait(false);
-                content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                content = await httpResponse.Content
+                    .ReadAsStringWithCancellationAsync(cancellationToken)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
