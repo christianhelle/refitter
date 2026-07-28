@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Revert MSBuild refactoring and restore CLI bundling implementation [\#1207](https://github.com/christianhelle/refitter/pull/1207) ([christianhelle](https://github.com/christianhelle))
 - Update Refit packages to v14.0.1 [\#1206](https://github.com/christianhelle/refitter/pull/1206) ([christianhelle](https://github.com/christianhelle))
 - Fix RCE attribute injection in generated Refit clients \(GHSA-3fhm-p725-h3g3, GHSA-58x9-vjvp-6mx8, GHSA-p32v-8v8j-j534\) [\#1178](https://github.com/christianhelle/refitter/pull/1178) ([christianhelle](https://github.com/christianhelle))
 
