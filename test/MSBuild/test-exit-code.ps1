@@ -9,6 +9,11 @@ Remove-Item obj -Force -Recurse -ErrorAction SilentlyContinue
 Remove-Item Generated -Force -Recurse -ErrorAction SilentlyContinue
 dotnet build-server shutdown
 
+# Clear stale NuGet cache (version 1.0.0 never changes, cache may hold stale layout)
+Remove-Item "$env:NUGET_PACKAGES\refitter.msbuild" -Force -Recurse -ErrorAction SilentlyContinue
+Remove-Item "$env:USERPROFILE\.nuget\packages\refitter.msbuild" -Force -Recurse -ErrorAction SilentlyContinue
+Remove-Item "~\.nuget\packages\refitter.msbuild" -Force -Recurse -ErrorAction SilentlyContinue
+
 # Build the Refitter.MSBuild package
 Write-Host "Building Refitter.MSBuild package..." -ForegroundColor Yellow
 dotnet clean -c Release ..\..\src\Refitter.MSBuild\Refitter.MSBuild.csproj
