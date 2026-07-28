@@ -8,8 +8,14 @@ Remove-Item Petstore.cs -ErrorAction SilentlyContinue
 Remove-Item PetstorePreserveOriginal.cs -ErrorAction SilentlyContinue
 Remove-Item Output.cs -ErrorAction SilentlyContinue # Issue #998: Should not exist
 
+# Clear stale NuGet cache (version 1.0.0 never changes, cache may hold stale layout)
+Remove-Item "$env:NUGET_PACKAGES\refitter.msbuild" -Force -Recurse -ErrorAction SilentlyContinue
+Remove-Item "$env:USERPROFILE\.nuget\packages\refitter.msbuild" -Force -Recurse -ErrorAction SilentlyContinue
+Remove-Item "~\.nuget\packages\refitter.msbuild" -Force -Recurse -ErrorAction SilentlyContinue
+
 dotnet restore ../../src/Refitter.slnx
 dotnet clean -c release ../../src/Refitter.slnx
+dotnet build -c release ../../src/Refitter/Refitter.csproj
 dotnet build -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
 dotnet add package Refitter.MSBuild --source .
