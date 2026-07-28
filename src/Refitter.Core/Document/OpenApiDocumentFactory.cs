@@ -42,42 +42,8 @@ public static class OpenApiDocumentFactory
         for (var i = 0; i < paths.Length; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            // For remote URLs, fetch once and reuse content for both validation and parsing
-            if (PathUtilities.IsHttp(paths[i]))
-            {
-                string content;
-                try
-                {
-                    using var handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
-                    using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
-                    using var httpResponse = await client.SendAsync(
-                        new HttpRequestMessage(HttpMethod.Get, paths[i]),
-                        cancellationToken).ConfigureAwait(false);
-                    content = await httpResponse.Content
-                        .ReadAsStringWithCancellationAsync(cancellationToken)
-                        .ConfigureAwait(false);
-                }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException($"Failed to download OpenAPI document from '{paths[i]}'.", ex);
-                }
-
-                await ReferenceGuard.ValidateAsync(paths[i], content, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
-
-                documents[i] = PathUtilities.IsYaml(paths[i])
-                    ? await NSwag.OpenApiYamlDocument.FromYamlAsync(content, cancellationToken).ConfigureAwait(false)
-                    : await OpenApiDocument.FromJsonAsync(content, cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
-                await ReferenceGuard.ValidateAsync(paths[i], allowRemoteReferences, cancellationToken).ConfigureAwait(false);
-                documents[i] = await DocumentLoader.LoadAsync(paths[i], cancellationToken).ConfigureAwait(false);
-            }
+            documents[i] = await CreateAsync(paths[i], allowRemoteReferences, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         return DocumentMerger.Merge(documents);
