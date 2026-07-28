@@ -69,6 +69,10 @@ internal static class ReferenceGuard
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new ReferenceResolutionException(
@@ -134,6 +138,10 @@ internal static class ReferenceGuard
         try
         {
             content = await ReadAllTextAsync(filePath, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
