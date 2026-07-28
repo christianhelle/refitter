@@ -54,7 +54,9 @@ public static class OpenApiDocumentFactory
                     using var httpResponse = await client.SendAsync(
                         new HttpRequestMessage(HttpMethod.Get, paths[i]),
                         cancellationToken).ConfigureAwait(false);
-                    content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    content = await httpResponse.Content
+                        .ReadAsStringWithCancellationAsync(cancellationToken)
+                        .ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -111,7 +113,9 @@ public static class OpenApiDocumentFactory
                 using var httpResponse = await client.SendAsync(
                     new HttpRequestMessage(HttpMethod.Get, openApiPath),
                     cancellationToken).ConfigureAwait(false);
-                content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                content = await httpResponse.Content
+                    .ReadAsStringWithCancellationAsync(cancellationToken)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
