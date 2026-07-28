@@ -38,7 +38,7 @@ jobs:
         dotnet build -c release ../../src/Refitter/Refitter.csproj
         dotnet build -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
         dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
-        nuget add .\Refitter.MSBuild.1.0.0.nupkg -source .
+        nuget add ./Refitter.MSBuild.1.0.0.nupkg -source .
         dotnet add package Refitter.MSBuild -s .
     - name: 🛠️ Build (auto-scan enabled)
       working-directory: test/MSBuild
@@ -49,7 +49,7 @@ jobs:
         if ($LASTEXITCODE -ne 0) {
           throw "dotnet build failed (auto-scan enabled, exit code $LASTEXITCODE)"
         }
-        if (!(Test-Path "Generated\Petstore.cs")) {
+        if (!(Test-Path "Generated/Petstore.cs")) {
           throw "Expected Generated\Petstore.cs when RefitterAutoScan is enabled."
         }
     - name: 🧪 Build Output (auto-scan enabled)
@@ -65,7 +65,7 @@ jobs:
         if ($LASTEXITCODE -ne 0) {
           throw "dotnet build failed (-t:RefitterGenerate, exit code $LASTEXITCODE)"
         }
-        if (!(Test-Path "Generated\Petstore.cs")) {
+        if (!(Test-Path "Generated/Petstore.cs")) {
           throw "Expected Generated\Petstore.cs after dotnet build -t:RefitterGenerate."
         }
         if (!(Select-String -Path msbuild-explicit.log -Pattern "Starting RefitterGenerateTask" -Quiet)) {
@@ -83,7 +83,7 @@ jobs:
         if ($LASTEXITCODE -ne 0) {
           throw "dotnet build failed (auto-scan disabled, exit code $LASTEXITCODE)"
         }
-        if (!(Test-Path "Generated\Petstore.cs")) {
+        if (!(Test-Path "Generated/Petstore.cs")) {
           throw "Expected previously generated code to remain available when RefitterAutoScan=false."
         }
         if (Select-String -Path msbuild-disabled.log -Pattern "Starting RefitterGenerateTask" -Quiet) {
