@@ -58,6 +58,10 @@ public static class OpenApiDocumentFactory
                         .ReadAsStringWithCancellationAsync(cancellationToken)
                         .ConfigureAwait(false);
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     throw new InvalidOperationException($"Failed to download OpenAPI document from '{paths[i]}'.", ex);
@@ -116,6 +120,10 @@ public static class OpenApiDocumentFactory
                 content = await httpResponse.Content
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
