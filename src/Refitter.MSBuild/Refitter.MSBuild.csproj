@@ -21,6 +21,14 @@
                           ExcludeAssets="runtime"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="../Refitter/Refitter.csproj"
+                          ReferenceOutputAssembly="false"
+                          SkipGetTargetFrameworkProperties="true"
+                          ExcludeAssets="all"
+                          PrivateAssets="all" />
+    </ItemGroup>
+
     <ItemGroup>    
         <Content Include="$(AssemblyName).props" PackagePath="build" />
         <Content Include="$(AssemblyName).targets" PackagePath="build" />
