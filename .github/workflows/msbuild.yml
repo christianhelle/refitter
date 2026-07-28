@@ -2,15 +2,6 @@ name: MSBuild Tasks
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/msbuild.yml'
-      - 'src/**/*.csproj'
-      - 'src/**/*.cs'
-      - 'src/**/*.targets'
-      - 'src/Refitter.MSBuild/README.md'
-      - 'docs/docfx_project/articles/msbuild.md'
-      - 'test/MSBuild/**'
   pull_request:
     paths:
       - '.github/workflows/msbuild.yml'
