@@ -195,7 +195,7 @@ public class RefitterGenerateTask : MSBuildTask
 
         var processResult = ProcessRunner(
             startInfo,
-            data => HandleProcessStandardOutput(data, outputLines, outputLines, TryLogCommandLine),
+            data => HandleProcessStandardOutput(data, outputLines, outputLinesLock, TryLogCommandLine),
             data => HandleProcessErrorOutput(data, TryLogError));
 
         if (processResult.TimedOut)
