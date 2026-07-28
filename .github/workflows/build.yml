@@ -70,3 +70,11 @@ jobs:
       run: |
         dotnet tool update -g docfx
         docfx docs/docfx_project/docfx.json
+    - name: 🚀 Publish to GitHub Packages
+      if: github.event_name == 'push'
+      shell: pwsh
+      run: |
+        dotnet nuget push **/*.nupkg `
+          --source https://nuget.pkg.github.com/christianhelle/index.json `
+          --api-key ${{ secrets.GITHUB_TOKEN }} `
+          --skip-duplicate
