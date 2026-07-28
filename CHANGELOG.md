@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [2.1.2-preview.113](https://github.com/christianhelle/refitter/tree/2.1.2-preview.113) (2026-07-28)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.1...2.1.2-preview.113)
 
 **Implemented enhancements:**
 
