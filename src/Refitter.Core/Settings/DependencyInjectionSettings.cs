@@ -49,6 +49,7 @@ public class DependencyInjectionSettings
             This is deprecated. Use TransientErrorHandler instead.
             """
     )]
+#pragma warning disable S1133
     [Obsolete("Use TransientErrorHandler instead")]
     [ExcludeFromCodeCoverage]
     public bool UsePolly
@@ -93,6 +94,7 @@ public class DependencyInjectionSettings
         get => MaxRetryCount;
         set => MaxRetryCount = value;
     }
+#pragma warning restore S1133
 
     /// <summary>
     /// Default max retry count for transient error handling. Default is 6.
