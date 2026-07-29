@@ -27,13 +27,13 @@ Write-Host ""
 Write-Host "=== Issue #998 Regression Checks ===" -ForegroundColor Cyan
 
 # Check that expected files exist under Generated (default output folder)
-if (!(Test-Path "Generated\Petstore.cs")) {
+if (-not (Test-Path "Generated\Petstore.cs")) {
     Write-Host "ERROR: Expected Generated\Petstore.cs not found (from petstore.refitter with output filename)" -ForegroundColor Red
     exit 1
 }
 Write-Host "PASS: Generated\Petstore.cs exists (respects output filename + default outputFolder)" -ForegroundColor Green
 
-if (!(Test-Path "Generated\PetstorePreserveOriginal.cs")) {
+if (-not (Test-Path "Generated\PetstorePreserveOriginal.cs")) {
     Write-Host "ERROR: Expected Generated\PetstorePreserveOriginal.cs not found (from petstore-preserve-original.refitter)" -ForegroundColor Red
     exit 1
 }
@@ -69,7 +69,7 @@ if ($petstoreContent -notmatch "interface ISwaggerPetstore") {
 }
 
 # Check outputFolder when explicitly specified
-if (!(Test-Path "GeneratedOutput\PetstoreWithFolder.cs")) {
+if (-not (Test-Path "GeneratedOutput\PetstoreWithFolder.cs")) {
     Write-Host "ERROR: Expected GeneratedOutput\PetstoreWithFolder.cs not found (from petstore-with-outputfolder.refitter)" -ForegroundColor Red
     exit 1
 }
