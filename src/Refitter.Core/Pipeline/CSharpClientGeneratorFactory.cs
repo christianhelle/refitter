@@ -138,9 +138,9 @@ internal class CSharpClientGeneratorFactory
     {
         if (document.Components?.Schemas != null)
         {
-            foreach (var schema in document.Components.Schemas.Keys)
+            foreach (var schemaName in document.Components.Schemas.Keys)
             {
-                yield return schema;
+                yield return schemaName;
             }
         }
 
