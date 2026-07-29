@@ -116,9 +116,8 @@ public static class SettingsValidator
                 var path = refitGeneratorSettings.OpenApiPaths[i];
                 if (!IsUrl(path) && !File.Exists(path))
                 {
-                        return ValidationResult.Error(
-                            $"OpenAPI specification file not found in openApiPaths[{i}]: {path}");
-                    }
+                    return ValidationResult.Error(
+                        $"OpenAPI specification file not found in openApiPaths[{i}]: {path}");
                 }
             }
         }
