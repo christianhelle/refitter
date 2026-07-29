@@ -36,14 +36,11 @@ internal sealed class DocumentMerger : IDocumentMerger
                 MergeIfMissingOrThrowOnConflict(baseDocument.Paths, path.Key, path.Value, "path");
             }
 
-            if (document.Components?.Schemas?.Count > 0)
+            if (document.Components?.Schemas?.Count > 0 && baseDocument.Components?.Schemas != null)
             {
-                if (baseDocument.Components?.Schemas != null)
+                foreach (var schema in document.Components.Schemas)
                 {
-                    foreach (var schema in document.Components.Schemas)
-                    {
-                        MergeIfMissingOrThrowOnConflict(baseDocument.Components.Schemas, schema.Key, schema.Value, "schema");
-                    }
+                    MergeIfMissingOrThrowOnConflict(baseDocument.Components.Schemas, schema.Key, schema.Value, "schema");
                 }
             }
 
