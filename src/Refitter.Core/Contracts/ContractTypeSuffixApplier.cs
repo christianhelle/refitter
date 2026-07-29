@@ -75,7 +75,7 @@ internal static class ContractTypeSuffixApplier
     /// <summary>
     /// Syntax rewriter that renames type declarations and all references to them
     /// </summary>
-    private sealed class TypeSuffixRewriter : CSharpSyntaxRewriter
+    private class TypeSuffixRewriter : CSharpSyntaxRewriter
     {
         private readonly Dictionary<string, string> typeRenameMap;
 
