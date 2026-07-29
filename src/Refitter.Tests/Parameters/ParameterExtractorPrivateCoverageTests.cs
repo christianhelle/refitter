@@ -182,6 +182,25 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [Test]
+    public void FormatNumericValue_FallsBack_To_DefaultKeyword_For_NonFormattable_Type()
+    {
+        var result = ParameterDefaultValueFormatter.FormatNumericValue(new object(), "int");
+        result.Should().Be("System.Object");
+    }
+
+
+
+    [Test]
+    public void GetDefaultValueForParameter_Returns_Default_When_No_Matching_Parameter_Found()
+    {
+        var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
+            "int paramName",
+            new List<CSharpParameterModel>());
+
+        result.Should().Be("default");
+    }
+
+    [Test]
     public void JoinAttributes_Returns_Empty_For_Empty_Input()
     {
         var result = ParameterAttributeFormatter.JoinAttributes();

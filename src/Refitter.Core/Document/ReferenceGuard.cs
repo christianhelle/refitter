@@ -113,11 +113,11 @@ internal static class ReferenceGuard
             }
             else if (!reference.StartsWith("/", StringComparison.Ordinal) &&
                      !reference.StartsWith("./", StringComparison.Ordinal) &&
-                     !reference.StartsWith("../", StringComparison.Ordinal) &&
-                     !allowRemoteReferences)
+                     !reference.StartsWith("../", StringComparison.Ordinal))
             {
                 // Relative references from remote documents treated as remote
-                throw RemoteBlocked(reference, url);
+                if (!allowRemoteReferences)
+                    throw RemoteBlocked(reference, url);
             }
         }
     }

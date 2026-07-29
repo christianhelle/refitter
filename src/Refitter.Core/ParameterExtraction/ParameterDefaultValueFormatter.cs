@@ -53,7 +53,7 @@ internal static class ParameterDefaultValueFormatter
 
         return type switch
         {
-            "bool" => defaultValue.ToString()?.ToLowerInvariant() ?? DefaultKeyword,
+            "bool" => defaultValue.ToString()!.ToLowerInvariant(),
             "string" => $"\"{ParameterNaming.EscapeString(defaultValue.ToString() ?? string.Empty)}\"",
             _ when IsNumericType(type) => FormatNumericValue(defaultValue, type),
             _ => DefaultKeyword
