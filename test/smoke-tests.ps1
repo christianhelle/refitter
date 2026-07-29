@@ -101,14 +101,12 @@ function BuildSolution
 
 function CleanGeneratedCode
 {
-    try {
-        if (Test-Path './GeneratedCode') {
-            Get-ChildItem './GeneratedCode' -Recurse -Include '*.cs' -ErrorAction SilentlyContinue |
-                ForEach-Object { Remove-Item -Path $_.FullName -Force }
-            Get-ChildItem './GeneratedCode' -Directory -ErrorAction SilentlyContinue |
-                ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force }
-        }
-    } catch { }
+    if (Test-Path './GeneratedCode') {
+        Get-ChildItem './GeneratedCode' -Recurse -Include '*.cs' -ErrorAction SilentlyContinue |
+            ForEach-Object { Remove-Item -Path $_.FullName -Force -ErrorAction SilentlyContinue }
+        Get-ChildItem './GeneratedCode' -Directory -ErrorAction SilentlyContinue |
+            ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+    }
 }
 
 function RunGenerationTasks
@@ -509,10 +507,8 @@ function RunTests
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.generated.cs"
 
-        try {
-            Get-ChildItem './GeneratedCode/*.cs' -Recurse -ErrorAction SilentlyContinue |
-                ForEach-Object { Remove-Item -Path $_.FullName -Force }
-        } catch { }
+        Get-ChildItem './GeneratedCode/*.cs' -Recurse -ErrorAction SilentlyContinue |
+            ForEach-Object { Remove-Item -Path $_.FullName -Force -ErrorAction SilentlyContinue }
 
         $p = StartRefitter `
             -arguments """$url"" --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging" `
