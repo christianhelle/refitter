@@ -6,7 +6,13 @@
 
 **Implemented enhancements:**
 
+- Resolve SonarCloud maintainability issues \(Critical, Major, Minor, Info\) [\#1212](https://github.com/christianhelle/refitter/pull/1212) ([christianhelle](https://github.com/christianhelle))
+- Fix conditional tests and improve PowerShell script error handling [\#1211](https://github.com/christianhelle/refitter/pull/1211) ([christianhelle](https://github.com/christianhelle))
 - Pass CancellationToken to async calls to resolve SonarCloud S8949 issues [\#1209](https://github.com/christianhelle/refitter/pull/1209) ([christianhelle](https://github.com/christianhelle))
+
+**Merged pull requests:**
+
+- CodeRabbit auto-fixes for PR \#1211 [\#1213](https://github.com/christianhelle/refitter/pull/1213) ([coderabbitai[bot]](https://github.com/apps/coderabbitai))
 
 ## [2.1.2](https://github.com/christianhelle/refitter/tree/2.1.2) (2026-07-28)
 
