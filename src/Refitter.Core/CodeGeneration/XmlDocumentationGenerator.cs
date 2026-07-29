@@ -13,6 +13,7 @@ public class XmlDocumentationGenerator
     private readonly ICodeGenerationConfiguration codeGeneration;
     private const string Separator = "    ";
     private const string SummaryTag = "summary";
+    private const string ParamKeyword = "param";
 
     /// <summary>
     /// Instantiates a new instance of the <see cref="XmlDocumentationGenerator"/> class.
@@ -111,7 +112,7 @@ public class XmlDocumentationGenerator
                 : $"{parameter.VariableName} parameter";
 
             this.AppendXmlCommentBlock(
-                "param",
+                ParamKeyword,
                 description,
                 code,
                 new()
@@ -123,7 +124,7 @@ public class XmlDocumentationGenerator
         if (hasDynamicQuerystringParameter)
         {
             this.AppendXmlCommentBlock(
-                "param",
+                ParamKeyword,
                 "The dynamic querystring parameter wrapping all others.",
                 code,
                 new()
@@ -135,7 +136,7 @@ public class XmlDocumentationGenerator
         if (hasApizrRequestOptionsParameter)
         {
             this.AppendXmlCommentBlock(
-                "param",
+                ParamKeyword,
                 "The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.",
                 code,
                 new()
@@ -147,7 +148,7 @@ public class XmlDocumentationGenerator
         if (hasCancellationToken)
         {
             this.AppendXmlCommentBlock(
-                "param",
+                ParamKeyword,
                 "The cancellation token to cancel the request.",
                 code,
                 new()

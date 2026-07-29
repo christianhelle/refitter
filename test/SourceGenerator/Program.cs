@@ -6,6 +6,8 @@ namespace MyNamespace;
 
 internal static class Program
 {
+    private const string FoundPrefix = "Found ";
+
     private static async Task Main(string[] args)
     {
         await TestPetstoreUsingDirectTypes();
@@ -23,10 +25,10 @@ internal static class Program
         Console.WriteLine($"Status: {response.Content.Status}");
 
         var pets = await responseClient.FindPetsByStatus(Petstore.UsingApiResponse.Status.Available);
-        Console.WriteLine("Found " + pets.Content.Count + " available pet(s)");
+        Console.WriteLine(FoundPrefix + pets.Content.Count + " available pet(s)");
 
         var taggedPets = await responseClient.FindPetsByTags(new[] { "tag1Updated", "new" });
-        Console.WriteLine("Found " + taggedPets.Content.Count + " tagged pet(s)");
+        Console.WriteLine(FoundPrefix + taggedPets.Content.Count + " tagged pet(s)");
     }
 
     private static async Task TestPetstoreUsingDirectTypes()
@@ -38,10 +40,10 @@ internal static class Program
         Console.WriteLine($"Status: {pet.Status}");
 
         var pets = await client.FindPetsByStatus(Petstore.Status.Available);
-        Console.WriteLine("Found " + pets.Count + " available pet(s)");
+        Console.WriteLine(FoundPrefix + pets.Count + " available pet(s)");
 
         var taggedPets = await client.FindPetsByTags(new[] { "tag1Updated", "new" });
-        Console.WriteLine("Found " + taggedPets.Count + " tagged pet(s)");
+        Console.WriteLine(FoundPrefix + taggedPets.Count + " tagged pet(s)");
 
         Console.WriteLine();
     }
