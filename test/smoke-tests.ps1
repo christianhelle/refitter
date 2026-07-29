@@ -101,14 +101,12 @@ function BuildSolution
 
 function CleanGeneratedCode
 {
-    try {
-        if (Test-Path './GeneratedCode') {
-            Get-ChildItem './GeneratedCode' -Recurse -Include '*.cs' -ErrorAction SilentlyContinue |
-                ForEach-Object { Remove-Item -Path $_.FullName -Force }
-            Get-ChildItem './GeneratedCode' -Directory -ErrorAction SilentlyContinue |
-                ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force }
-        }
-    } catch { }
+    if (Test-Path './GeneratedCode') {
+        Get-ChildItem './GeneratedCode' -Recurse -Include '*.cs' -ErrorAction SilentlyContinue |
+            ForEach-Object { Remove-Item -Path $_.FullName -Force -ErrorAction SilentlyContinue }
+        Get-ChildItem './GeneratedCode' -Directory -ErrorAction SilentlyContinue |
+            ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+    }
 }
 
 function RunGenerationTasks
@@ -285,17 +283,17 @@ function RunTests
 
                 foreach ($v in $standardVariants)
                 {
-                    $args = $v.Args
+                    $taskArgs = $v.Args
                     # InterfaceOnly variant needs contracts-namespace so generated interfaces
                     # can reference contract types from the SeparateContracts variant
                     if ($v.Suffix -eq "InterfaceOnly") {
-                        $args += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
+                        $taskArgs += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
                     }
                     $standardTasks += @{
                         SpecPath = $specPath
                         Namespace = "$ns.$($v.Suffix)"
                         OutputPath = "./GeneratedCode/$($v.Prefix)${fileTag}.generated.cs"
-                        Args = $args
+                        Args = $taskArgs
                     }
                 }
 
@@ -358,17 +356,17 @@ function RunTests
             foreach ($v in $standardVariants)
             {
                 if ($v.Args -like "*--multiple-interfaces*") { continue }
-                $args = $v.Args
+                $taskArgs = $v.Args
                 # InterfaceOnly variant needs contracts-namespace so generated interfaces
                 # can reference contract types from the SeparateContracts variant
                 if ($v.Suffix -eq "InterfaceOnly") {
-                    $args += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
+                    $taskArgs += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
                 }
                 $standardTasks += @{
                     SpecPath = $specPath
                     Namespace = "$ns.$($v.Suffix)"
                     OutputPath = "./GeneratedCode/$($v.Prefix)${fileTag}.generated.cs"
-                    Args = $args
+                    Args = $taskArgs
                 }
             }
 
@@ -414,15 +412,15 @@ function RunTests
             foreach ($v in $standardVariants)
             {
                 if ($v.Args -like "*--multiple-interfaces*") { continue }
-                $args = $v.Args
+                $taskArgs = $v.Args
                 if ($v.Suffix -eq "InterfaceOnly") {
-                    $args += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
+                    $taskArgs += " --contracts-namespace $ns.SeparateContractsFile.Contracts"
                 }
                 $standardTasks += @{
                     SpecPath = $specPath
                     Namespace = "$ns.$($v.Suffix)"
                     OutputPath = "./GeneratedCode/$($v.Prefix)${fileTag}.generated.cs"
-                    Args = $args
+                    Args = $taskArgs
                 }
             }
 
@@ -509,10 +507,8 @@ function RunTests
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.generated.cs"
 
-        try {
-            Get-ChildItem './GeneratedCode/*.cs' -Recurse -ErrorAction SilentlyContinue |
-                ForEach-Object { Remove-Item -Path $_.FullName -Force }
-        } catch { }
+        Get-ChildItem './GeneratedCode/*.cs' -Recurse -ErrorAction SilentlyContinue |
+            ForEach-Object { Remove-Item -Path $_.FullName -Force -ErrorAction SilentlyContinue }
 
         $p = StartRefitter `
             -arguments """$url"" --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging" `
@@ -543,8 +539,8 @@ function RunTests
     CleanGeneratedCode
     foreach ($gen in $opNameGenerators)
     {
-        $args = "./OpenAPI/v3.0/petstore.json --namespace OpNameGen_$gen --output ./GeneratedCode/OpNameGen_$gen.generated.cs --no-logging --operation-name-generator $gen"
-        $p = StartRefitter -arguments $args -processPath $processPath -useDocker $UseDocker
+        $genArgs = "./OpenAPI/v3.0/petstore.json --namespace OpNameGen_$gen --output ./GeneratedCode/OpNameGen_$gen.generated.cs --no-logging --operation-name-generator $gen"
+        $p = StartRefitter -arguments $genArgs -processPath $processPath -useDocker $UseDocker
         $p | Wait-Process
         if ($p.ExitCode -ne 0) { Write-Warning "Operation name generator '$gen' failed (may be expected for some generators)" }
     }
@@ -563,8 +559,8 @@ function RunTests
     CleanGeneratedCode
     foreach ($fmt in $collectionFormats)
     {
-        $args = "./OpenAPI/v3.0/petstore.json --namespace CollFmt_$fmt --output ./GeneratedCode/CollFmt_$fmt.generated.cs --no-logging --collection-format $fmt"
-        $p = StartRefitter -arguments $args -processPath $processPath -useDocker $UseDocker
+        $fmtArgs = "./OpenAPI/v3.0/petstore.json --namespace CollFmt_$fmt --output ./GeneratedCode/CollFmt_$fmt.generated.cs --no-logging --collection-format $fmt"
+        $p = StartRefitter -arguments $fmtArgs -processPath $processPath -useDocker $UseDocker
         $p | Wait-Process
         if ($p.ExitCode -ne 0) { throw "Collection format '$fmt' generation failed" }
     }

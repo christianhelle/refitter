@@ -35,9 +35,9 @@ else
 fi
 
 # Pass arguments to PowerShell
-if [ "$USE_DOCKER" = true ]; then
+if [[ "$USE_DOCKER" = true ]]; then
     $PWSH_CMD smoke-tests.ps1 -UseDocker
-elif [ "$USE_PRODUCTION" = true ]; then
+elif [[ "$USE_PRODUCTION" = true ]]; then
     $PWSH_CMD smoke-tests.ps1 -UseProduction
 else
     $PWSH_CMD smoke-tests.ps1
