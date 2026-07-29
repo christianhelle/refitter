@@ -20,13 +20,13 @@ internal sealed class DocumentLoader : IDocumentLoader
     }
 
     public async Task<OpenApiDocument> LoadAsync(
-        string openApiPath,
+        string path,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(openApiPath))
+        if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException(
-                "The openApiPath parameter cannot be null, empty, or contain only whitespace.",
-                nameof(openApiPath));
+                "The path parameter cannot be null, empty, or contain only whitespace.",
+                nameof(path));
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -39,7 +39,7 @@ internal sealed class DocumentLoader : IDocumentLoader
             try
             {
                 var result = await strategy
-                    .TryLoadAsync(openApiPath, cancellationToken)
+                    .TryLoadAsync(path, cancellationToken)
                     .ConfigureAwait(false);
 
                 if (result != null)
@@ -55,7 +55,7 @@ internal sealed class DocumentLoader : IDocumentLoader
         }
 
         throw new InvalidOperationException(
-            $"Failed to load OpenAPI document from '{openApiPath}'. " +
+            $"Failed to load OpenAPI document from '{path}'. " +
             $"All {strategies.Count} strategies failed." +
             (errors.Count > 0
                 ? $" Errors: {string.Join("; ", errors)}"

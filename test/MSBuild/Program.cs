@@ -1,9 +1,13 @@
 ﻿using Refit;
 using Refitter.MSBuild.Tests.Petstore;
 
+#pragma warning disable S1075 // Hardcoded URI — this test intentionally targets the public Petstore API
+const string PetstoreBaseUrl = "https://petstore3.swagger.io/api/v3";
+#pragma warning restore S1075
+
 try
 {
-    var client = RestService.For<ISwaggerPetstore>("https://petstore3.swagger.io/api/v3");
+    var client = RestService.For<ISwaggerPetstore>(PetstoreBaseUrl);
     var pet = await client.GetPetById(1);
 
     Console.WriteLine($"Name: {pet.Name}");

@@ -6,6 +6,9 @@ namespace Refitter;
 [ExcludeFromCodeCoverage]
 internal static class Program
 {
+    private const string OutputArg = "--output";
+    private const string DefaultOpenApiPath = "./openapi.json";
+
     private static int Main(string[] args)
     {
         if (args.Length == 0)
@@ -27,76 +30,76 @@ internal static class Program
                     .SetApplicationVersion(typeof(GenerateCommand).Assembly.GetName().Version!.ToString());
 
                 configuration
-                    .AddExample("./openapi.json");
+                    .AddExample(DefaultOpenApiPath);
 
                 configuration
                     .AddExample("https://petstore3.swagger.io/api/v3/openapi.yaml");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--settings-file",
                         "./openapi.refitter",
-                        "--output",
+                        OutputArg,
                         "./GeneratedCode.cs");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--namespace",
                         "\"Your.Namespace.Of.Choice.GeneratedCode\"",
-                        "--output",
+                        OutputArg,
                         "./GeneratedCode.cs");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--namespace",
                         "\"Your.Namespace.Of.Choice.GeneratedCode\"",
                         "--internal");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
-                        "--output",
+                        DefaultOpenApiPath,
+                        OutputArg,
                         "./IGeneratedCode.cs",
                         "--interface-only");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
-                        "--output",
+                        DefaultOpenApiPath,
+                        OutputArg,
                         "./GeneratedContracts.cs",
                         "--contract-only");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--use-api-response");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--cancellation-tokens");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--no-operation-headers");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--no-accept-headers");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--use-iso-date-format");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--additional-namespace",
                         "\"Your.Additional.Namespace\"",
                         "--additional-namespace",
@@ -104,13 +107,13 @@ internal static class Program
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--multiple-interfaces",
                         "ByEndpoint");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--tag",
                         "Pet",
                         "--tag",
@@ -120,18 +123,18 @@ internal static class Program
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--match-path",
                         "'^/pet/.*'");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--trim-unused-schema");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--trim-unused-schema",
                         " --keep-schema",
                         "'^Model$'",
@@ -140,27 +143,27 @@ internal static class Program
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--no-deprecated-operations");
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--operation-name-template",
                         "'{operationName}Async'");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--optional-nullable-parameters");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--use-polymorphic-serialization");
 
                 configuration
                     .AddExample(
-                        "./openapi.json",
+                        DefaultOpenApiPath,
                         "--collection-format",
                         "Csv");
             });

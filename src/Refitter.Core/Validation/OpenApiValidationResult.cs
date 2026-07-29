@@ -9,7 +9,9 @@ namespace Refitter.Core.Validation;
 /// <param name="Diagnostics">The diagnostics collected during validation.</param>
 /// <param name="Statistics">The element counts collected during validation.</param>
 [ExcludeFromCodeCoverage]
+#pragma warning disable S1186 // Positional record constructor is compiler-generated
 public record OpenApiValidationResult(
+#pragma warning restore S1186
     OpenApiDiagnostic Diagnostics,
     OpenApiStats Statistics)
 {

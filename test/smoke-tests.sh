@@ -30,7 +30,7 @@ if command -v pwsh &>/dev/null; then
 elif command -v powershell &>/dev/null; then
     PWSH_CMD="powershell"
 else
-    echo "Error: PowerShell not found. Please install PowerShell Core (pwsh) or use Windows PowerShell."
+    echo "Error: PowerShell not found. Please install PowerShell Core (pwsh) or use Windows PowerShell." >&2
     exit 1
 fi
 

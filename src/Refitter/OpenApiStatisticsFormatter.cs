@@ -13,7 +13,7 @@ internal static class OpenApiStatisticsFormatter
         var lines = statistics.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         foreach (var line in lines)
         {
-            if (!line.Trim().StartsWith("-"))
+            if (!line.Trim().StartsWith('-'))
                 continue;
 
             var parts = line.Trim().TrimStart('-').Trim().Split(':', 2);

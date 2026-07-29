@@ -56,12 +56,12 @@ function StartRefitter
         $dockerPrefix = BuildDockerPrefix
         $fullArgs = "$dockerPrefix $arguments"
         Write-Host "docker $fullArgs"
-        return Start-Process "docker" -Args $fullArgs -NoNewWindow -PassThru
+        Start-Process "docker" -Args $fullArgs -NoNewWindow -PassThru
     }
     else
     {
         Write-Host "$processPath $arguments"
-        return Start-Process $processPath -Args $arguments -NoNewWindow -PassThru
+        Start-Process $processPath -Args $arguments -NoNewWindow -PassThru
     }
 }
 
@@ -669,7 +669,7 @@ if ($UseDocker)
 
 Measure-Command {
     RunTests `
-        -BuildFromSource (!$UseProduction -and !$UseDocker) `
+        -BuildFromSource (-not $UseProduction -and -not $UseDocker) `
         -UseDocker $UseDocker
 }
 Write-Host "`r`n"

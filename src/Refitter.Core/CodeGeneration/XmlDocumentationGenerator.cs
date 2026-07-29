@@ -13,6 +13,7 @@ public class XmlDocumentationGenerator
     private readonly ICodeGenerationConfiguration codeGeneration;
     private const string Separator = "    ";
     private const string SummaryTag = "summary";
+    private const string ParamKeyword = "param";
 
     /// <summary>
     /// Instantiates a new instance of the <see cref="XmlDocumentationGenerator"/> class.
@@ -111,7 +112,7 @@ public class XmlDocumentationGenerator
                 : $"{parameter.VariableName} parameter";
 
             this.AppendXmlCommentBlock(
-                "param",
+                ParamKeyword,
                 description,
                 code,
                 new()
@@ -123,7 +124,7 @@ public class XmlDocumentationGenerator
         if (hasDynamicQuerystringParameter)
         {
             this.AppendXmlCommentBlock(
-                "param",
+                ParamKeyword,
                 "The dynamic querystring parameter wrapping all others.",
                 code,
                 new()
@@ -135,7 +136,7 @@ public class XmlDocumentationGenerator
         if (hasApizrRequestOptionsParameter)
         {
             this.AppendXmlCommentBlock(
-                "param",
+                ParamKeyword,
                 "The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.",
                 code,
                 new()
@@ -147,7 +148,7 @@ public class XmlDocumentationGenerator
         if (hasCancellationToken)
         {
             this.AppendXmlCommentBlock(
-                "param",
+                ParamKeyword,
                 "The cancellation token to cancel the request.",
                 code,
                 new()
@@ -353,7 +354,8 @@ public class XmlDocumentationGenerator
 
         var result = new StringBuilder(input.Length);
 
-        for (var index = 0; index < input.Length; index++)
+        var index = 0;
+        while (index < input.Length)
         {
             var current = input[index];
             if (current != '\\' || index == input.Length - 1)
@@ -362,14 +364,16 @@ public class XmlDocumentationGenerator
                 {
                     result.Append(current);
                 }
+                index++;
                 continue;
             }
 
-            var escapedCharacter = input[++index];
+            var escapedCharacter = input[index + 1];
+            index += 2;
 
-            if (escapedCharacter == 'u' && index + 4 < input.Length)
+            if (escapedCharacter == 'u' && index + 4 <= input.Length)
             {
-                var hexValue = input.Substring(index + 1, 4);
+                var hexValue = input.Substring(index, 4);
                 if (int.TryParse(
                     hexValue,
                     NumberStyles.HexNumber,

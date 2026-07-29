@@ -8,6 +8,8 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ParameterDefaultValueFormatter
 {
+    private const string DefaultKeyword = "default";
+
     public static bool IsNumericType(string type)
     {
         return type is "int" or "Int32" or "long" or "Int64" or "short" or "Int16"
@@ -28,7 +30,7 @@ internal static class ParameterDefaultValueFormatter
     {
         var numericString = defaultValue is IFormattable formattable
             ? formattable.ToString(null, CultureInfo.InvariantCulture)
-            : (defaultValue.ToString() ?? "default");
+            : (defaultValue.ToString() ?? DefaultKeyword);
 
         return type switch
         {
@@ -45,16 +47,16 @@ internal static class ParameterDefaultValueFormatter
     public static string FormatDefaultValue(object? defaultValue, string parameterType)
     {
         if (defaultValue == null)
-            return "default";
+            return DefaultKeyword;
 
         var type = parameterType.TrimEnd('?').Trim();
 
         return type switch
         {
-            "bool" => defaultValue.ToString()?.ToLowerInvariant() ?? "default",
+            "bool" => defaultValue.ToString()?.ToLowerInvariant() ?? DefaultKeyword,
             "string" => $"\"{ParameterNaming.EscapeString(defaultValue.ToString() ?? string.Empty)}\"",
             _ when IsNumericType(type) => FormatNumericValue(defaultValue, type),
-            _ => "default"
+            _ => DefaultKeyword
         };
     }
 
@@ -64,7 +66,7 @@ internal static class ParameterDefaultValueFormatter
     {
         var parts = parameterString.Split([' '], StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length == 0)
-            return "default";
+            return DefaultKeyword;
 
         var variableName = parts[parts.Length - 1].TrimEnd(';', ',');
 
@@ -75,6 +77,6 @@ internal static class ParameterDefaultValueFormatter
             return FormatDefaultValue(parameterModel.Schema.Default, parameterModel.Type);
         }
 
-        return "default";
+        return DefaultKeyword;
     }
 }
