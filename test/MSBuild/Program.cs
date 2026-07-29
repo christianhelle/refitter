@@ -1,7 +1,9 @@
 ﻿using Refit;
 using Refitter.MSBuild.Tests.Petstore;
 
+#pragma warning disable S1075 // Hardcoded URI — this test intentionally targets the public Petstore API
 const string PetstoreBaseUrl = "https://petstore3.swagger.io/api/v3";
+#pragma warning restore S1075
 
 try
 {
