@@ -102,10 +102,20 @@ function BuildSolution
 function CleanGeneratedCode
 {
     if (Test-Path './GeneratedCode') {
-        Get-ChildItem './GeneratedCode' -Recurse -Include '*.cs' -ErrorAction SilentlyContinue |
-            ForEach-Object { Remove-Item -Path $_.FullName -Force -ErrorAction SilentlyContinue }
-        Get-ChildItem './GeneratedCode' -Directory -ErrorAction SilentlyContinue |
-            ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+        try {
+            Get-ChildItem './GeneratedCode' -Recurse -Include '*.cs' -ErrorAction Stop |
+                ForEach-Object { Remove-Item -Path $_.FullName -Force -ErrorAction Stop }
+        }
+        catch [System.Management.Automation.ItemNotFoundException] {
+            # Ignore not-found errors (path/file disappeared between enumeration and deletion)
+        }
+        try {
+            Get-ChildItem './GeneratedCode' -Directory -ErrorAction Stop |
+                ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Stop }
+        }
+        catch [System.Management.Automation.ItemNotFoundException] {
+            # Ignore not-found errors (directory disappeared between enumeration and deletion)
+        }
     }
 }
 
@@ -507,8 +517,13 @@ function RunTests
         $namespace = "PetstoreFromUri"
         $outputPath = "PetstoreFromUri.generated.cs"
 
-        Get-ChildItem './GeneratedCode/*.cs' -Recurse -ErrorAction SilentlyContinue |
-            ForEach-Object { Remove-Item -Path $_.FullName -Force -ErrorAction SilentlyContinue }
+        try {
+            Get-ChildItem './GeneratedCode/*.cs' -Recurse -ErrorAction Stop |
+                ForEach-Object { Remove-Item -Path $_.FullName -Force -ErrorAction Stop }
+        }
+        catch [System.Management.Automation.ItemNotFoundException] {
+            # Ignore not-found errors (path/file doesn't exist yet)
+        }
 
         $p = StartRefitter `
             -arguments """$url"" --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging" `
