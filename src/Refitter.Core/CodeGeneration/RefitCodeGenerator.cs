@@ -24,7 +24,7 @@ internal sealed class RefitCodeGenerator
     public GeneratorOutput GenerateMultipleFiles(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
-        return new(FormatMultipleFiles(result, settings, settings, settings, document));
+        return new(FormatMultipleFiles(result, settings, settings, document));
     }
 
     private static GenerationResult RunPipeline(
@@ -77,7 +77,6 @@ internal sealed class RefitCodeGenerator
 
     private static IReadOnlyList<GeneratedCode> FormatMultipleFiles(
         GenerationResult result,
-        RefitGeneratorSettings settings,
         ICodeGenerationConfiguration codeGeneration,
         INamingConfiguration naming,
         OpenApiDocument document)
