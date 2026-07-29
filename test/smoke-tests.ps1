@@ -55,13 +55,13 @@ function StartRefitter
     {
         $dockerPrefix = BuildDockerPrefix
         $fullArgs = "$dockerPrefix $arguments"
-        Write-Output "docker $fullArgs"
-        return Start-Process "docker" -Args $fullArgs -NoNewWindow -PassThru
+        Write-Host "docker $fullArgs"
+        Start-Process "docker" -Args $fullArgs -NoNewWindow -PassThru
     }
     else
     {
-        Write-Output "$processPath $arguments"
-        return Start-Process $processPath -Args $arguments -NoNewWindow -PassThru
+        Write-Host "$processPath $arguments"
+        Start-Process $processPath -Args $arguments -NoNewWindow -PassThru
     }
 }
 
@@ -93,7 +93,7 @@ function BuildSolution
     if ($noRestore) { $buildArgs += " --no-restore" }
     if ($smokeTest) { $buildArgs += " --property:SmokeTest=true" }
 
-    Write-Output "`r`nBuilding $solution`r`n"
+    Write-Host "`r`nBuilding $solution`r`n"
     $p = Start-Process "dotnet" -Args $buildArgs -NoNewWindow -PassThru
     $p | Wait-Process
     if ($p.ExitCode -ne 0) { throw "Build Failed: $solution" }
@@ -211,10 +211,10 @@ function RunTests
     # ==========================================
     if ($BuildFromSource -and -not $UseDocker)
     {
-        Write-Output "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0"
+        Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0"
         Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0" -NoNewWindow -PassThru | Wait-Process
 
-        Write-Output "refitter --version"
+        Write-Host "refitter --version"
         $p = Start-Process "./bin/refitter" -Args "--version" -NoNewWindow -PassThru
         $p | Wait-Process
         if ($p.ExitCode -ne 0) { throw "Show version failed!" }
@@ -223,7 +223,7 @@ function RunTests
     # ==========================================
     # Phase 1: Pre-restore packages
     # ==========================================
-    Write-Output "`r`n=== Pre-restoring packages ===`r`n"
+    Write-Host "`r`n=== Pre-restoring packages ===`r`n"
     Start-Process "dotnet" -Args "restore ./ConsoleApp/ConsoleApp.slnx --nologo -v q" -NoNewWindow -PassThru | Wait-Process
     Start-Process "dotnet" -Args "restore ./ConsoleApp/ConsoleApp.Core.slnx --nologo -v q" -NoNewWindow -PassThru | Wait-Process
     Start-Process "dotnet" -Args "restore ./Apizr/Sample.csproj --nologo -v q" -NoNewWindow -PassThru | Wait-Process
@@ -231,7 +231,7 @@ function RunTests
     # ==========================================
     # Phase 2: Settings-file tests (individual generate + build)
     # ==========================================
-    Write-Output "`r`n=== Settings-file tests ===`r`n"
+    Write-Host "`r`n=== Settings-file tests ===`r`n"
 
     CleanGeneratedCode
     GenerateFromSettingsFile -settingsFile "./petstore.refitter" -processPath $processPath -useDocker $UseDocker
@@ -251,7 +251,7 @@ function RunTests
     # ==========================================
     # Phase 3: Generate all STANDARD variants (no build until all are generated)
     # ==========================================
-    Write-Output "`r`n=== Generating standard variants ===`r`n"
+    Write-Host "`r`n=== Generating standard variants ===`r`n"
     CleanGeneratedCode
 
     $standardTasks = @()
@@ -450,8 +450,8 @@ function RunTests
         }
     }
 
-    Write-Output "Standard generation tasks: $($standardTasks.Count)"
-    Write-Output "NetCore generation tasks: $($netCoreTasks.Count)"
+    Write-Host "Standard generation tasks: $($standardTasks.Count)"
+    Write-Host "NetCore generation tasks: $($netCoreTasks.Count)"
 
     # Execute standard generation in parallel batches
     RunGenerationTasks -tasks $standardTasks -processPath $processPath -useDocker $UseDocker
@@ -459,7 +459,7 @@ function RunTests
     # ==========================================
     # Phase 4: Build standard variants (one build validates all)
     # ==========================================
-    Write-Output "`r`n=== Building standard variants ===`r`n"
+    Write-Host "`r`n=== Building standard variants ===`r`n"
     BuildSolution -solution "./ConsoleApp/ConsoleApp.slnx" -noRestore -smokeTest
 
     # ==========================================
@@ -467,7 +467,7 @@ function RunTests
     # This variant uses --multiple-interfaces ByEndpoint --operation-name-template which
     # generates duplicate types per-endpoint (known limitation). We verify generation succeeds.
     # ==========================================
-    Write-Output "`r`n=== Generate-only: MultipleInterfacesWithCustomName (petstore) ===`r`n"
+    Write-Host "`r`n=== Generate-only: MultipleInterfacesWithCustomName (petstore) ===`r`n"
     $customNameSpec = "./OpenAPI/v3.0/petstore.json"
     $customNameArgs = "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync"
     $customNameOutput = "./GeneratedCode/MultipleInterfacesWithCustomName_generateonly.cs"
@@ -480,25 +480,25 @@ function RunTests
     if ($p.ExitCode -ne 0) { throw "Generate-only test failed: MultipleInterfacesWithCustomName; exit code $($p.ExitCode)" }
     if (-not (Test-Path $customNameOutput)) { throw "Generate-only test failed: MultipleInterfacesWithCustomName" }
     Remove-Item $customNameOutput -Force
-    Write-Output "Generate-only test passed: MultipleInterfacesWithCustomName"
+    Write-Host "Generate-only test passed: MultipleInterfacesWithCustomName"
 
     # ==========================================
     # Phase 5: Generate netCore variants (accumulate on top of standard code)
     # Net8/Net9/Net10 can compile both standard and netCore code
     # ==========================================
-    Write-Output "`r`n=== Generating netCore variants ===`r`n"
+    Write-Host "`r`n=== Generating netCore variants ===`r`n"
     RunGenerationTasks -tasks $netCoreTasks -processPath $processPath -useDocker $UseDocker
 
     # ==========================================
     # Phase 6: Build netCore variants
     # ==========================================
-    Write-Output "`r`n=== Building netCore variants ===`r`n"
+    Write-Host "`r`n=== Building netCore variants ===`r`n"
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore -smokeTest
 
     # ==========================================
     # Phase 7: URL-based tests (network-dependent)
     # ==========================================
-    Write-Output "`r`n=== URL-based tests ===`r`n"
+    Write-Host "`r`n=== URL-based tests ===`r`n"
     CleanGeneratedCode
 
     @("https://petstore3.swagger.io/api/v3/openapi.json", "https://petstore3.swagger.io/api/v3/openapi.yaml") | ForEach-Object {
@@ -523,7 +523,7 @@ function RunTests
     # ==========================================
     # Phase 8: Operation Name Generator Tests
     # ==========================================
-    Write-Output "`r`n=== Operation Name Generator Tests ===`r`n"
+    Write-Host "`r`n=== Operation Name Generator Tests ===`r`n"
 
     $opNameGenerators = @(
         "Default",
@@ -552,7 +552,7 @@ function RunTests
     # ==========================================
     # Phase 9: Collection Format Variant Tests
     # ==========================================
-    Write-Output "`r`n=== Collection Format Variant Tests ===`r`n"
+    Write-Host "`r`n=== Collection Format Variant Tests ===`r`n"
 
     $collectionFormats = @("Multi", "Ssv", "Tsv", "Pipes")
 
@@ -569,7 +569,7 @@ function RunTests
     # ==========================================
     # Phase 10: Combination Tests
     # ==========================================
-    Write-Output "`r`n=== Combination Tests ===`r`n"
+    Write-Host "`r`n=== Combination Tests ===`r`n"
 
     CleanGeneratedCode
     $combinationTasks = @(
@@ -624,7 +624,7 @@ function RunTests
     # OpenAPI/v3.0/asana.yaml to avoid transient HTTP errors. Generate
     # with default settings and build once to guard against regressions.
     # ==========================================
-    Write-Output "`r`n=== Asana API regression test (issue #359) ===`r`n"
+    Write-Host "`r`n=== Asana API regression test (issue #359) ===`r`n"
 
     CleanGeneratedCode
     $asanaArgs = "./OpenAPI/v3.0/asana.yaml --namespace Asana --output ./GeneratedCode/Asana.generated.cs --no-logging"
@@ -636,20 +636,20 @@ function RunTests
 
 if ($UseProduction)
 {
-    Write-Output "Running smoke tests in production mode"
-    Write-Output "dotnet tool update -g refitter --prerelease"
+    Write-Host "Running smoke tests in production mode"
+    Write-Host "dotnet tool update -g refitter --prerelease"
     Start-Process "dotnet" -Args "tool update -g refitter --prerelease" -NoNewWindow -PassThru | Wait-Process
     ThrowOnNativeFailure
-    Write-Output "`r`n"
+    Write-Host "`r`n"
 }
 
 if ($UseDocker)
 {
-    Write-Output "Running smoke tests in Docker mode"
-    Write-Output "docker pull christianhelle/refitter:latest"
+    Write-Host "Running smoke tests in Docker mode"
+    Write-Host "docker pull christianhelle/refitter:latest"
     Start-Process "docker" -Args "pull christianhelle/refitter:latest" -NoNewWindow -PassThru | Wait-Process
     ThrowOnNativeFailure
-    Write-Output "`r`n"
+    Write-Host "`r`n"
 }
 
 Measure-Command {
@@ -657,5 +657,5 @@ Measure-Command {
         -BuildFromSource (-not $UseProduction -and -not $UseDocker) `
         -UseDocker $UseDocker
 }
-Write-Output "`r`n"
-Write-Output "`r`n"
+Write-Host "`r`n"
+Write-Host "`r`n"
