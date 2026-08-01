@@ -105,14 +105,23 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool NoLogging { get; set; }
 
+    /// <summary>
+    /// The telemetry source of this invocation, e.g. <c>msbuild</c>. Used internally by the MSBuild integration.
+    /// </summary>
     [Description("Report the telemetry source of this invocation. Used internally by the MSBuild integration.")]
     [CommandOption("--telemetry-source")]
     public string? TelemetrySource { get; set; }
 
+    /// <summary>
+    /// The total number of settings files in the current workload. Used internally by the MSBuild integration.
+    /// </summary>
     [Description("Report the total number of settings files in the current workload. Used internally by the MSBuild integration.")]
     [CommandOption("--telemetry-file-count")]
     public int? TelemetryFileCount { get; set; }
 
+    /// <summary>
+    /// The bundled runtime selected for this invocation, e.g. <c>net9.0</c>. Used internally by the MSBuild integration.
+    /// </summary>
     [Description("Report the bundled runtime selected for this invocation. Used internally by the MSBuild integration.")]
     [CommandOption("--telemetry-runtime")]
     public string? TelemetryRuntime { get; set; }
