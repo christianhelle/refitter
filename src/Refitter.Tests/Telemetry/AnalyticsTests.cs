@@ -82,49 +82,91 @@ public class AnalyticsTests
     [NotInParallel("Telemetry")]
     public void LogFeatureUsage_Should_Track_Msbuild_Invocation_With_Telemetry_Settings()
     {
+        var previousClient = Analytics.GetTelemetryClient();
+        var previousTelemetrySource = GetTelemetrySource();
         var captured = new List<ITelemetry>();
         var client = CreateTelemetryClient(captured);
         Analytics.SetTelemetryClient(client);
 
-        var settings = new Settings
+        try
         {
-            TelemetrySource = "msbuild",
-            TelemetryFileCount = 3,
-            TelemetryRuntime = "net9.0"
-        };
-        var refitSettings = new RefitGeneratorSettings();
+            var settings = new Settings
+            {
+                TelemetrySource = "msbuild",
+                TelemetryFileCount = 3,
+                TelemetryRuntime = "net9.0"
+            };
+            var refitSettings = new RefitGeneratorSettings();
 
-        Analytics.LogFeatureUsage(settings, refitSettings);
+            Analytics.LogFeatureUsage(settings, refitSettings);
 
-        var msbuildEvent = captured
-            .OfType<EventTelemetry>()
-            .Single(e => e.Name == "msbuild-invocation");
-        msbuildEvent.Properties["file-count"].Should().Be("3");
-        msbuildEvent.Properties["runtime"].Should().Be("net9.0");
-        client.Context.GlobalProperties["telemetry-source"].Should().Be("msbuild");
+            var msbuildEvent = captured
+                .OfType<EventTelemetry>()
+                .Single(e => e.Name == "msbuild-invocation");
+            msbuildEvent.Properties["file-count"].Should().Be("3");
+            msbuildEvent.Properties["runtime"].Should().Be("net9.0");
+            client.Context.GlobalProperties["telemetry-source"].Should().Be("msbuild");
+        }
+        finally
+        {
+            Analytics.SetTelemetryClient(previousClient);
+            RestoreTelemetrySource(previousTelemetrySource);
+        }
     }
 
     [Test]
     [NotInParallel("Telemetry")]
     public async Task LogError_Should_Apply_Msbuild_Telemetry_Source()
     {
-        ExceptionlessClient.Default.Configuration.Enabled = false;
+        var previousClient = Analytics.GetTelemetryClient();
+        var previousTelemetrySource = GetTelemetrySource();
+        bool previousExceptionlessEnabled = ExceptionlessClient.Default.Configuration.Enabled;
         var captured = new List<ITelemetry>();
         var client = CreateTelemetryClient(captured);
         Analytics.SetTelemetryClient(client);
 
-        var settings = new Settings
+        try
         {
-            TelemetrySource = "msbuild",
-            TelemetryFileCount = 3,
-            TelemetryRuntime = "net9.0"
-        };
-        var exception = new Exception("Test exception");
+            ExceptionlessClient.Default.Configuration.Enabled = false;
+            var settings = new Settings
+            {
+                TelemetrySource = "msbuild",
+                TelemetryFileCount = 3,
+                TelemetryRuntime = "net9.0"
+            };
+            var exception = new Exception("Test exception");
 
-        await Analytics.LogError(exception, settings);
+            await Analytics.LogError(exception, settings);
 
-        captured.OfType<ExceptionTelemetry>().Should().NotBeEmpty();
-        client.Context.GlobalProperties["telemetry-source"].Should().Be("msbuild");
+            captured.OfType<ExceptionTelemetry>().Should().NotBeEmpty();
+            client.Context.GlobalProperties["telemetry-source"].Should().Be("msbuild");
+        }
+        finally
+        {
+            ExceptionlessClient.Default.Configuration.Enabled = previousExceptionlessEnabled;
+            Analytics.SetTelemetryClient(previousClient);
+            RestoreTelemetrySource(previousTelemetrySource);
+        }
+    }
+
+    private static string? GetTelemetrySource()
+    {
+        ExceptionlessClient.Default.Configuration.DefaultData.TryGetValue(
+            "telemetry-source",
+            out object? source);
+        return source as string;
+    }
+
+    private static void RestoreTelemetrySource(string? previousSource)
+    {
+        if (previousSource is null)
+        {
+            ExceptionlessClient.Default.Configuration.DefaultData.Remove("telemetry-source");
+        }
+        else
+        {
+            ExceptionlessClient.Default.Configuration.DefaultData["telemetry-source"] = previousSource;
+        }
     }
 
     private static TelemetryClient CreateTelemetryClient(List<ITelemetry> captured)

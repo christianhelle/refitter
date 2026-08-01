@@ -18,8 +18,11 @@ public static class Analytics
     private const string ApplicationInsightsConnectionString = "InstrumentationKey=470c204f-b460-493a-9e31-d9b2f5e25abb;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=0836c3ac-e8ac-4e0c-ade8-3e0fadb9b40c";
     private static TelemetryClient telemetryClient = null!;
 
-    internal static void SetTelemetryClient(TelemetryClient client) =>
-        telemetryClient = client;
+    internal static void SetTelemetryClient(TelemetryClient? client) =>
+        telemetryClient = client!;
+
+    internal static TelemetryClient? GetTelemetryClient() =>
+        telemetryClient;
 
     public static void Configure()
     {
