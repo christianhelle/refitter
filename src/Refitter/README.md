@@ -119,6 +119,9 @@ OPTIONS:
         --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
         --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+        --telemetry-source                                       Report the telemetry source of this invocation. Used internally by the MSBuild integration.
+        --telemetry-file-count                                   Report the total number of settings files in the current workload. Used internally by the MSBuild integration.
+        --telemetry-runtime                                      Report the bundled runtime selected for this invocation. Used internally by the MSBuild integration.
 ```
 
 ## CLI Tool Output Example
@@ -136,6 +139,8 @@ The following options are advanced/internal and are used by the MSBuild integrat
 - `--telemetry-source <value>` — reports the source of the invocation, e.g. `msbuild`. When set to `msbuild` (case-insensitive) a dedicated `msbuild-invocation` event is emitted.
 - `--telemetry-file-count <n>` — reports the total number of settings files in the current workload.
 - `--telemetry-runtime <tfm>` — reports the bundled runtime selected for this invocation, e.g. `net9.0`.
+
+These values are self-reported and advisory because they are user-controlled CLI options: `--telemetry-source=msbuild` indicates the caller claims an MSBuild origin, not that one is proven. A caller that requires reliable attribution should hand off provenance through a protected, non-user-controlled channel instead of relying on these flags.
 
 ### .Refitter File format
 
