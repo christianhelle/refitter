@@ -172,7 +172,7 @@ public class RefitterGenerateTask : MSBuildTask
 
         var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
         args += $" --telemetry-source msbuild --telemetry-file-count {totalFileCount}";
-        var runtimeTfm = GetRuntimeTfm(refitterDll!);
+        string? runtimeTfm = GetRuntimeTfm(refitterDll!);
         if (runtimeTfm is not null)
         {
             args += $" --telemetry-runtime {runtimeTfm}";
@@ -236,7 +236,8 @@ public class RefitterGenerateTask : MSBuildTask
         }
 
         var version = folderName.Substring(3);
-        return version.Length > 0 && version.All(c => char.IsDigit(c) || c == '.')
+        var components = version.Split('.');
+        return components.All(component => component.Length > 0 && component.All(char.IsDigit))
             ? folderName
             : null;
     }
