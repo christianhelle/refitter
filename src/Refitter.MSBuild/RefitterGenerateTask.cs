@@ -111,7 +111,7 @@ public class RefitterGenerateTask : MSBuildTask
         foreach (var file in files)
         {
             TryLogCommandLine($"Processing {file}");
-            var generated = TryExecuteRefitter(file, out var failed);
+            var generated = TryExecuteRefitter(file, files.Length, out var failed);
             if (failed)
             {
                 hasErrors = true;
@@ -129,12 +129,12 @@ public class RefitterGenerateTask : MSBuildTask
         return !hasErrors;
     }
 
-    private List<string>? TryExecuteRefitter(string file, out bool failed)
+    private List<string>? TryExecuteRefitter(string file, int totalFileCount, out bool failed)
     {
         failed = false;
         try
         {
-            return StartProcess(file, out failed);
+            return StartProcess(file, totalFileCount, out failed);
         }
         catch (Exception e)
         {
@@ -144,7 +144,7 @@ public class RefitterGenerateTask : MSBuildTask
         }
     }
 
-    private List<string> StartProcess(string file, out bool failed)
+    private List<string> StartProcess(string file, int totalFileCount, out bool failed)
     {
         failed = false;
         var assembly = Assembly.GetExecutingAssembly();
@@ -171,6 +171,12 @@ public class RefitterGenerateTask : MSBuildTask
         }
 
         var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
+        args += $" --telemetry-source msbuild --telemetry-file-count {totalFileCount}";
+        var runtimeTfm = GetRuntimeTfm(refitterDll!);
+        if (runtimeTfm is not null)
+        {
+            args += $" --telemetry-runtime {runtimeTfm}";
+        }
         if (DisableLogging)
         {
             args += " --no-logging";
@@ -218,6 +224,21 @@ public class RefitterGenerateTask : MSBuildTask
         }
 
         return ResolveGeneratedFiles(outputLines, file, out failed, TryLogError);
+    }
+
+    private static string? GetRuntimeTfm(string refitterDll)
+    {
+        var folderName = Path.GetFileName(Path.GetDirectoryName(refitterDll));
+        if (string.IsNullOrEmpty(folderName) ||
+            !folderName.StartsWith("net", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var version = folderName.Substring(3);
+        return version.Length > 0 && version.All(c => char.IsDigit(c) || c == '.')
+            ? folderName
+            : null;
     }
 
     private static ProcessExecutionResult RunProcess(

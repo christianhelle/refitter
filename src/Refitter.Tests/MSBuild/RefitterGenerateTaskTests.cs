@@ -620,6 +620,44 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void Execute_Should_Pass_Telemetry_Source_Args_To_Refitter()
+    {
+        var workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            var generatedFile = CreateGeneratedFile(workspace);
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                startInfo.Arguments.Should().Contain("--telemetry-source msbuild");
+                startInfo.Arguments.Should().Contain("--telemetry-file-count 1");
+                startInfo.Arguments.Should().Contain("--telemetry-runtime net9.0");
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            var buildEngine = new RecordingBuildEngine();
+            var task = CreateTask(workspace, buildEngine);
+
+            var result = task.Execute();
+
+            result.Should().BeTrue();
+            task.GeneratedFiles.Should().ContainSingle();
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
     public void Execute_Should_Fall_Back_To_DotNet8_Runtime_When_Newer_Runtimes_Are_Unavailable()
     {
         var workspace = CreateWorkspace();
