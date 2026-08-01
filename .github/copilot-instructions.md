@@ -113,7 +113,7 @@ images/                 # Project images and assets
 
 All new code must include unit tests following the pattern used in `Refitter.Tests.Scenarios` namespace.
 
-The project uses **TUnit v1.47.0** as its testing framework (not xUnit). TUnit provides significantly faster test execution (3x faster than xUnit), which improves both local development and CI/CD pipeline performance.
+The project uses **TUnit v1.61.38** as its testing framework (not xUnit). TUnit provides significantly faster test execution (3x faster than xUnit), which improves both local development and CI/CD pipeline performance.
 
 Use TUnit's `[Test]` attribute for test methods:
 
