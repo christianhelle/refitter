@@ -112,7 +112,7 @@ public static class Analytics
             return;
         }
 
-        var properties = new Dictionary<string, string>();
+        Dictionary<string, string> properties = new();
         if (settings.TelemetryFileCount is not null)
         {
             properties["file-count"] = settings.TelemetryFileCount.Value.ToString();
