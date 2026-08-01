@@ -46,6 +46,8 @@ public static class Analytics
         if (settings.NoLogging)
             return;
 
+        ApplyTelemetrySource(settings);
+
         foreach (var property in typeof(Settings).GetProperties())
         {
             if (!CanLogFeature(settings, property))
@@ -59,7 +61,10 @@ public static class Analytics
                     attribute =>
                         !attribute.LongNames.Contains("namespace") &&
                         !attribute.LongNames.Contains("output") &&
-                        !attribute.LongNames.Contains("no-logging"))
+                        !attribute.LongNames.Contains("no-logging") &&
+                        !attribute.LongNames.Contains("telemetry-source") &&
+                        !attribute.LongNames.Contains("telemetry-file-count") &&
+                        !attribute.LongNames.Contains("telemetry-runtime"))
                 .ToList()
                 .ForEach(attribute => LogFeatureUsage(attribute, property));
         }
@@ -74,6 +79,8 @@ public static class Analytics
                 });
             telemetryClient.Flush();
         }
+
+        LogMsbuildInvocation(settings);
     }
 
     private static void LogFeatureUsage(CommandOptionAttribute attribute, PropertyInfo property)
@@ -81,6 +88,42 @@ public static class Analytics
         var featureName = attribute.LongNames.FirstOrDefault() ?? property.Name;
 
         telemetryClient.TrackEvent(featureName);
+        telemetryClient.Flush();
+    }
+
+    internal static bool IsMsbuildInvocation(string? telemetrySource) =>
+        string.Equals(telemetrySource, "msbuild", StringComparison.OrdinalIgnoreCase);
+
+    private static void ApplyTelemetrySource(Settings settings)
+    {
+        if (string.IsNullOrWhiteSpace(settings.TelemetrySource))
+        {
+            return;
+        }
+
+        telemetryClient.Context.GlobalProperties["telemetry-source"] = settings.TelemetrySource;
+        ExceptionlessClient.Default.Configuration.DefaultData["telemetry-source"] = settings.TelemetrySource;
+    }
+
+    private static void LogMsbuildInvocation(Settings settings)
+    {
+        if (!IsMsbuildInvocation(settings.TelemetrySource))
+        {
+            return;
+        }
+
+        var properties = new Dictionary<string, string>();
+        if (settings.TelemetryFileCount is not null)
+        {
+            properties["file-count"] = settings.TelemetryFileCount.Value.ToString();
+        }
+
+        if (!string.IsNullOrWhiteSpace(settings.TelemetryRuntime))
+        {
+            properties["runtime"] = settings.TelemetryRuntime;
+        }
+
+        telemetryClient.TrackEvent("msbuild-invocation", properties);
         telemetryClient.Flush();
     }
 
@@ -108,6 +151,8 @@ public static class Analytics
     {
         if (settings.NoLogging)
             return;
+
+        ApplyTelemetrySource(settings);
 
         string json = Serializer.Serialize(settings);
         var properties = Serializer.Deserialize<Dictionary<string, object>>(json)!;

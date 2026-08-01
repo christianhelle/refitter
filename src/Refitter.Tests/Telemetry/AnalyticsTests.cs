@@ -61,4 +61,49 @@ public class AnalyticsTests
 
         action.Should().NotThrow();
     }
+
+    [Test]
+    public void IsMsbuildInvocation_Should_Be_True_Only_For_Msbuild_Source()
+    {
+        Analytics.IsMsbuildInvocation("msbuild").Should().BeTrue();
+        Analytics.IsMsbuildInvocation("MSBUILD").Should().BeTrue();
+        Analytics.IsMsbuildInvocation("cli").Should().BeFalse();
+        Analytics.IsMsbuildInvocation("").Should().BeFalse();
+        Analytics.IsMsbuildInvocation(null).Should().BeFalse();
+    }
+
+    [Test]
+    public void LogFeatureUsage_Should_Not_Throw_With_Msbuild_Telemetry_Settings()
+    {
+        var settings = new Settings
+        {
+            NoLogging = true,
+            TelemetrySource = "msbuild",
+            TelemetryFileCount = 3,
+            TelemetryRuntime = "net9.0",
+            SettingsFilePath = "petstore.refitter"
+        };
+        var refitSettings = new RefitGeneratorSettings();
+
+        var action = () => Analytics.LogFeatureUsage(settings, refitSettings);
+
+        action.Should().NotThrow();
+    }
+
+    [Test]
+    public async Task LogError_Should_Not_Throw_With_Msbuild_Telemetry_Settings()
+    {
+        var settings = new Settings
+        {
+            NoLogging = true,
+            TelemetrySource = "msbuild",
+            TelemetryFileCount = 3,
+            TelemetryRuntime = "net9.0"
+        };
+        var exception = new Exception("Test exception");
+
+        var action = async () => await Analytics.LogError(exception, settings);
+
+        await action.Should().NotThrowAsync();
+    }
 }
