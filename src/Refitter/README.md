@@ -127,6 +127,16 @@ Here's what the console output looks like when running the Refitter CLI tool:
 
 ![Console Output](https://raw.githubusercontent.com/christianhelle/refitter/refs/heads/main/images/console-output.png)
 
+## Telemetry
+
+Refitter collects anonymous usage telemetry and error reports to improve the tool. Telemetry can be disabled with `--no-logging`.
+
+The following options are advanced/internal and are used by the MSBuild integration to tag telemetry with provenance:
+
+- `--telemetry-source <value>` — reports the source of the invocation, e.g. `msbuild`. When set to `msbuild` (case-insensitive) a dedicated `msbuild-invocation` event is emitted.
+- `--telemetry-file-count <n>` — reports the total number of settings files in the current workload.
+- `--telemetry-runtime <tfm>` — reports the bundled runtime selected for this invocation, e.g. `net9.0`.
+
 ### .Refitter File format
 
 The following is an example `.refitter` file
