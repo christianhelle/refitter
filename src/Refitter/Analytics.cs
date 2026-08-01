@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Reflection;
 using Exceptionless;
 using Exceptionless.Plugins;
@@ -115,7 +116,7 @@ public static class Analytics
         Dictionary<string, string> properties = new();
         if (settings.TelemetryFileCount is not null)
         {
-            properties["file-count"] = settings.TelemetryFileCount.Value.ToString();
+            properties["file-count"] = settings.TelemetryFileCount.Value.ToString(CultureInfo.InvariantCulture);
         }
 
         if (!string.IsNullOrWhiteSpace(settings.TelemetryRuntime))
