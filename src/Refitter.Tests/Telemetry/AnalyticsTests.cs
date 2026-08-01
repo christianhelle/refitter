@@ -1,4 +1,9 @@
+using Exceptionless;
 using FluentAssertions;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Channel;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
 using Refitter.Core;
 
 namespace Refitter.Tests.Telemetry;
@@ -7,6 +12,7 @@ namespace Refitter.Tests.Telemetry;
 public class AnalyticsTests
 {
     [Test]
+    [NotInParallel("Telemetry")]
     public void Configure_Should_Not_Throw()
     {
         var action = () => Analytics.Configure();
@@ -73,37 +79,83 @@ public class AnalyticsTests
     }
 
     [Test]
-    public void LogFeatureUsage_Should_Not_Throw_With_Msbuild_Telemetry_Settings()
+    [NotInParallel("Telemetry")]
+    public void LogFeatureUsage_Should_Track_Msbuild_Invocation_With_Telemetry_Settings()
     {
+        var captured = new List<ITelemetry>();
+        var client = CreateTelemetryClient(captured);
+        Analytics.SetTelemetryClient(client);
+
         var settings = new Settings
         {
-            NoLogging = true,
             TelemetrySource = "msbuild",
             TelemetryFileCount = 3,
-            TelemetryRuntime = "net9.0",
-            SettingsFilePath = "petstore.refitter"
+            TelemetryRuntime = "net9.0"
         };
         var refitSettings = new RefitGeneratorSettings();
 
-        var action = () => Analytics.LogFeatureUsage(settings, refitSettings);
+        Analytics.LogFeatureUsage(settings, refitSettings);
 
-        action.Should().NotThrow();
+        var msbuildEvent = captured
+            .OfType<EventTelemetry>()
+            .Single(e => e.Name == "msbuild-invocation");
+        msbuildEvent.Properties["file-count"].Should().Be("3");
+        msbuildEvent.Properties["runtime"].Should().Be("net9.0");
+        client.Context.GlobalProperties["telemetry-source"].Should().Be("msbuild");
     }
 
     [Test]
-    public async Task LogError_Should_Not_Throw_With_Msbuild_Telemetry_Settings()
+    [NotInParallel("Telemetry")]
+    public async Task LogError_Should_Apply_Msbuild_Telemetry_Source()
     {
+        ExceptionlessClient.Default.Configuration.Enabled = false;
+        var captured = new List<ITelemetry>();
+        var client = CreateTelemetryClient(captured);
+        Analytics.SetTelemetryClient(client);
+
         var settings = new Settings
         {
-            NoLogging = true,
             TelemetrySource = "msbuild",
             TelemetryFileCount = 3,
             TelemetryRuntime = "net9.0"
         };
         var exception = new Exception("Test exception");
 
-        var action = async () => await Analytics.LogError(exception, settings);
+        await Analytics.LogError(exception, settings);
 
-        await action.Should().NotThrowAsync();
+        captured.OfType<ExceptionTelemetry>().Should().NotBeEmpty();
+        client.Context.GlobalProperties["telemetry-source"].Should().Be("msbuild");
+    }
+
+    private static TelemetryClient CreateTelemetryClient(List<ITelemetry> captured)
+    {
+        var configuration = new TelemetryConfiguration
+        {
+            ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000",
+            TelemetryChannel = new CapturingTelemetryChannel(captured)
+        };
+        return new TelemetryClient(configuration);
+    }
+
+    private sealed class CapturingTelemetryChannel : ITelemetryChannel
+    {
+        private readonly List<ITelemetry> captured;
+
+        public CapturingTelemetryChannel(List<ITelemetry> captured) =>
+            this.captured = captured;
+
+        public bool? DeveloperMode { get; set; }
+
+        public string EndpointAddress { get; set; } = string.Empty;
+
+        public void Send(ITelemetry item) => captured.Add(item);
+
+        public void Flush()
+        {
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }
