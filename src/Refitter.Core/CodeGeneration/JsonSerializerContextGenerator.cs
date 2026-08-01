@@ -281,9 +281,9 @@ internal static class JsonSerializerContextGenerator
             _ => typeSyntax.ToString(),
         };
 
-    #pragma warning disable S1186 // Positional record constructor is compiler-generated
+#pragma warning disable S1186 // Positional record constructor is compiler-generated
     private sealed record DeclaredTypeInfo(
-    #pragma warning restore S1186
+#pragma warning restore S1186
         string Namespace,
         IReadOnlyList<string> Containers,
         string Name,

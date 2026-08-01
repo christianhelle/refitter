@@ -38,6 +38,8 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
 
 The `RefitterGenerateTask` task scans the project folder for `.refitter` files and executes them all. `RefitterAutoScan` defaults to `true`, so normal builds keep generating code automatically. Set `<RefitterAutoScan>false</RefitterAutoScan>` to skip that automatic build hook while keeping `dotnet build -t:RefitterGenerate` available for explicit generation.
 
+Refitter CLI invocations spawned by the task are tagged in telemetry as coming from MSBuild. Set `<RefitterNoLogging>true</RefitterNoLogging>` to disable telemetry for MSBuild-driven generations.
+
 ## Configuration
 
 By default, telemetry collection is enabled. To opt-out, add the following to your `.csproj` file:

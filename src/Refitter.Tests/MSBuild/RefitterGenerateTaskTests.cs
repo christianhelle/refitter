@@ -620,6 +620,52 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void Execute_Should_Pass_Telemetry_Source_Args_To_Refitter()
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            string generatedFile = CreateGeneratedFile(workspace);
+            CreateRefitterSettingsFile(workspace, "petstore2.refitter");
+            string secondGeneratedFile = CreateGeneratedFile(workspace, "Petstore2.cs");
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+
+            int invocation = 0;
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                invocation++;
+                startInfo.Arguments.Should().Contain("--telemetry-source msbuild");
+                startInfo.Arguments.Should().Contain("--telemetry-file-count 2");
+                startInfo.Arguments.Should().Contain("--telemetry-runtime net9.0");
+                string marker = invocation == 1 ? generatedFile : secondGeneratedFile;
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{marker}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            RecordingBuildEngine buildEngine = new();
+            RefitterGenerateTask task = CreateTask(workspace, buildEngine);
+            task.IncludePatterns = "petstore.refitter;petstore2.refitter";
+
+            bool result = task.Execute();
+
+            result.Should().BeTrue();
+            invocation.Should().Be(2);
+            task.GeneratedFiles.Should().HaveCount(2);
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
     public void Execute_Should_Fall_Back_To_DotNet8_Runtime_When_Newer_Runtimes_Are_Unavailable()
     {
         var workspace = CreateWorkspace();
@@ -932,16 +978,16 @@ public class RefitterGenerateTaskTests
         return workspace;
     }
 
-    private static string CreateRefitterSettingsFile(string workspace)
+    private static string CreateRefitterSettingsFile(string workspace, string fileName = "petstore.refitter")
     {
-        var settingsPath = Path.Combine(workspace, "petstore.refitter");
+        string settingsPath = Path.Combine(workspace, fileName);
         File.WriteAllText(settingsPath, "{}");
         return settingsPath;
     }
 
-    private static string CreateGeneratedFile(string workspace)
+    private static string CreateGeneratedFile(string workspace, string fileName = "Petstore.cs")
     {
-        var generatedFile = Path.Combine(workspace, "Generated", "Petstore.cs");
+        string generatedFile = Path.Combine(workspace, "Generated", fileName);
         Directory.CreateDirectory(Path.GetDirectoryName(generatedFile)!);
         File.WriteAllText(generatedFile, "// generated");
         return generatedFile;
