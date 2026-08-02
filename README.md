@@ -163,6 +163,9 @@ OPTIONS:
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
         --json-library-version                                     JSON library version for System.Text.Json (default: 8.0). When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names. Cannot be used with a settings file that also specifies a non-default value
         --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+        --telemetry-source                                       Report the telemetry source of this invocation. Used internally by the MSBuild integration.
+        --telemetry-file-count                                   Report the total number of settings files in the current workload. Used internally by the MSBuild integration.
+        --telemetry-runtime                                      Report the bundled runtime selected for this invocation. Used internally by the MSBuild integration.
         --generate-authentication-header [STYLE]                  Controls generation of Authorization header support.
                                                                    Options: None (no authentication code is generated),
                                                                    Parameter (adds method parameters for authentication),
@@ -213,6 +216,17 @@ Generated contract properties default to `PascalCase`. To preserve valid OpenAPI
 
 Refitter still emits `[JsonPropertyName]` attributes for serialization, escapes reserved C# keywords with `@`, and minimally sanitizes invalid identifiers into compilable names (for example `class` → `@class`, `123-value` → `_123_value`).
 
+## Telemetry
+
+Refitter collects anonymous usage telemetry and error reports to improve the tool. Telemetry can be disabled with `--no-logging`.
+
+The following options are advanced/internal and are used by the MSBuild integration to tag telemetry with provenance:
+
+- `--telemetry-source <value>` — reports the source of the invocation, e.g. `msbuild`. When set to `msbuild` (case-insensitive) a dedicated `msbuild-invocation` event is emitted.
+- `--telemetry-file-count <n>` — reports the total number of settings files in the current workload.
+- `--telemetry-runtime <tfm>` — reports the bundled runtime selected for this invocation, e.g. `net9.0`.
+
+These values are self-reported and advisory because they are user-controlled CLI options: `--telemetry-source=msbuild` indicates the caller claims an MSBuild origin, not that one is proven. A caller that requires reliable attribution should hand off provenance through a protected, non-user-controlled channel instead of relying on these flags.
 
 ## .Refitter File format
 
