@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Refit.HttpClientFactory" Version="14.0.1" />
+        <PackageReference Include="Refit.HttpClientFactory" Version="15.0.0" />
     </ItemGroup>
 
 </Project>
