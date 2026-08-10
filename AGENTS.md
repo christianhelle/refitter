@@ -80,10 +80,17 @@ Run these first if source generator tests fail with missing generated types.
 
 ## Commit Discipline
 
-- **Commit as often as possible** in small, logical groups. Each commit should represent one coherent change (e.g., one file created, one bug fix, one adapter added).
+Nano-commit discipline: commit often, one logical change per commit, in the smallest independently-testable groups. This adapts the nano-commits workflow so it applies without the skill installed.
+
+- **Slice every goal** into the smallest independently-testable logical groups:
+  - One commit per semantic step: add a method, then commit; add its call site, then commit; add tests, then commit.
+  - Dependencies stay together: adding a parameter plus updating all call sites is one commit.
+  - Genuinely independent additions are always separate commits.
+- **Exceptions — skip nano-slicing and commit as one block when:** the work is generated/boilerplate content (scaffolding, migrations, project setup), it is a merge commit or conflict resolution, it is machine-applied auto-formatting across a whole file, or the user explicitly says "one commit".
+- **Workflow per commit:** inspect `git status`/`git diff`, stage exactly one logical slice with `git add <path>`, then commit with `git commit -m "<one-liner>"`. Never push (the user controls push) and never amend — always fresh commits.
+- **Message format:** one line, plain English imperative (e.g., "extract battery level calculation into helper method"), under 72 characters when possible, no trailing period, no Conventional Commits prefixes (`feat:`, `fix:`, etc.), and no co-author trailers or AI attribution.
 - **Build and run tests before every commit.** The minimum check is `dotnet build -c Release src/Refitter.slnx` followed by `dotnet test --solution src/Refitter.slnx -c Release --no-build`.
-- **Never commit broken code.** If tests fail, fix them before committing. If the fix requires additional changes, commit those together as a "fix: ..." commit.
-- **Commit messages** follow the pattern: `type: description` where type is one of `feat`, `fix`, `refactor`, `docs`, `test`, `chore`. Keep the subject line under 50 characters when possible.
+- **Never commit broken code.** If tests fail, fix them before committing. If the fix requires additional changes, commit those together as a fix commit.
 
 ## Agent skills
 

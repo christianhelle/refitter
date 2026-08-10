@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.2...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.3...HEAD)
+
+**Merged pull requests:**
+
+- Update dependency TUnit to 1.64.6 [\#1216](https://github.com/christianhelle/refitter/pull/1216) ([renovate[bot]](https://github.com/apps/renovate))
+- Update refit monorepo to v15 [\#1215](https://github.com/christianhelle/refitter/pull/1215) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [2.1.3](https://github.com/christianhelle/refitter/tree/2.1.3) (2026-08-02)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.2...2.1.3)
 
 **Implemented enhancements:**
 
