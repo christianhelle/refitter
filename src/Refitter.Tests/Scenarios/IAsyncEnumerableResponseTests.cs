@@ -53,6 +53,25 @@ paths:
                       format: int64
                     name:
                       type: string
+  '/events/sse':
+    get:
+      operationId: getEventsSse
+      summary: Stream events using text/event-stream
+      responses:
+        '200':
+          description: A stream of events
+          content:
+            text/event-stream:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                    name:
+                      type: string
 ";
 
     [Test]
@@ -81,6 +100,13 @@ paths:
     {
         string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous2> GetEventsJsonl(");
+    }
+
+    [Test]
+    public async Task Generates_IAsyncEnumerable_For_EventStream_Method()
+    {
+        string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
+        generatedCode.Should().Contain("IAsyncEnumerable<Anonymous3> GetEventsSse(");
     }
 
     [Test]
