@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
-using NSwag;
 using NJsonSchema;
+using NSwag;
 
 namespace Refitter.Core;
 
