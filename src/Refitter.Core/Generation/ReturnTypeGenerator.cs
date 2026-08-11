@@ -154,10 +154,10 @@ internal class ReturnTypeGenerator(
 
     private string GetStreamingReturnType(JsonSchema? schema)
     {
-        var itemSchema = schema?.Type == NJsonSchema.JsonObjectType.Array
+        JsonSchema? itemSchema = schema?.Type == NJsonSchema.JsonObjectType.Array
             ? schema.Item
             : schema;
-        var itemTypeName = itemSchema is null
+        string itemTypeName = itemSchema is null
             ? "object"
             : generator.GetTypeName(itemSchema, false, null);
 

@@ -144,15 +144,15 @@ paths:
 
     private static async Task<string> GenerateCode(bool returnIAsyncEnumerable)
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings
+        string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        RefitGeneratorSettings settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
             ReturnIAsyncEnumerable = returnIAsyncEnumerable
         };
 
-        var sut = await RefitGenerator.CreateAsync(settings);
-        var generatedCode = sut.Generate();
+        RefitGenerator sut = await RefitGenerator.CreateAsync(settings);
+        string generatedCode = sut.Generate();
         return generatedCode;
     }
 }
