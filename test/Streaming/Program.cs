@@ -13,19 +13,18 @@ var streamResponse = api.Chat(
     new ChatRequest
     {
         Model = modelsResponse.Models.First().Key,
-        Input = """{ "raw": [{type": "text", "content": "Hello! What can you do?"}] }""",
+        Input = "Hello! What can you do?",
         Stream = true,
         Reasoning = ChatRequestReasoning.On,
     }
 );
 
-Console.WriteLine(Environment.NewLine);
-Console.WriteLine("Streaming response:");
-Console.WriteLine();
+Console.WriteLine("\n\nStreaming response:\n");
 
 await foreach (var chunk in streamResponse)
 {
-    var type = chunk.AdditionalProperties.TryGetValue("type", out var typeValue) ? typeValue.ToString() : "unknown";
+    var type = chunk.AdditionalProperties.TryGetValue("type", out var typeValue)
+        ? typeValue.ToString() : "unknown";
     var content = chunk.AdditionalProperties.TryGetValue("content", out var contentValue)
         ? contentValue.ToString()
         : "unknown";
@@ -46,5 +45,4 @@ await foreach (var chunk in streamResponse)
     }
 }
 
-Console.WriteLine();
-Console.WriteLine();
+Console.WriteLine("\n\nStreaming finished.\n");

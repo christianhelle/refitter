@@ -286,7 +286,7 @@
                     },
                     "top_k": {
                         "type": "integer",
-                        "description": "Limits next token selection to top-k most probable tokens",
+                        "description": "Limits next token selection to top-k most probable tokens"
                     },
                     "min_p": {
                         "type": "number",
