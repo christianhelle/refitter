@@ -72,6 +72,15 @@ paths:
                       format: int64
                     name:
                       type: string
+  '/events/untyped':
+    get:
+      operationId: getEventsUntyped
+      summary: Stream events without a schema
+      responses:
+        '200':
+          description: A stream of untyped events
+          content:
+            text/event-stream: {}
 ";
 
     [Test]
@@ -107,6 +116,13 @@ paths:
     {
         string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous3> GetEventsSse(");
+    }
+
+    [Test]
+    public async Task Generates_IAsyncEnumerable_Of_Object_For_Untyped_Streaming_Response()
+    {
+        string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
+        generatedCode.Should().Contain("IAsyncEnumerable<object> GetEventsUntyped(");
     }
 
     [Test]
