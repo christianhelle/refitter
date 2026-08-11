@@ -6,6 +6,11 @@ on:
     branches:
       - "release"
 
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+
 jobs:
   publish:
     uses: ./.github/workflows/release-template.yml
