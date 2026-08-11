@@ -166,7 +166,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
 - `addAcceptHeaders` -  a boolean indicating whether to add accept headers [Headers("Accept: application/json")]. Default is `true`
 - `addContentTypeHeaders` - a boolean indicating whether to add content-type headers. Default is `true`
 - `returnIApiResponse` - a boolean indicating whether to return `IApiResponse<T>` objects. Default is `false`
-- `returnIAsyncEnumerable` - a boolean indicating whether to return `IAsyncEnumerable<T>` for streaming responses (content types `application/x-ndjson`, `application/jsonl`, `application/x-jsonlines`). Default is `false`
+- `returnIAsyncEnumerable` - a boolean indicating whether to return `IAsyncEnumerable<T>` for streaming responses (content types `application/x-ndjson`, `application/jsonl`, `application/x-jsonlines`, `text/event-stream`). Default is `false`
 - `responseTypeOverride` - a dictionary with operation ids (as specified in the OpenAPI document) and a particular return type to use. The types are wrapped in a task, but otherwise unmodified (so make sure to specify or import their namespaces). Default is `{}`
 - `generateOperationHeaders` - a boolean indicating whether to use operation headers in the generated methods. Default is `true`
 - `ignoredOperationHeaders` - A collection of headers to omit from operation signatures. Default is `[]`
