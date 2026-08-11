@@ -340,6 +340,267 @@ public class ReturnTypeGeneratorTests
     }
 
     [Test]
+    [Arguments("application/x-ndjson")]
+    [Arguments("application/jsonl")]
+    [Arguments("application/x-jsonlines")]
+    public async Task Generate_Returns_IAsyncEnumerable_For_Streaming_Array_Response(
+        string contentType)
+    {
+        var spec = $$"""
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "{{contentType}}": {
+                            "schema": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings { ReturnIAsyncEnumerable = true };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("IAsyncEnumerable<string>");
+    }
+
+    [Test]
+    public async Task Generate_Returns_Task_Of_Collection_For_Streaming_Response_When_Disabled()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/x-ndjson": {
+                            "schema": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<ICollection<string>>");
+    }
+
+    [Test]
+    public async Task Generate_Returns_IAsyncEnumerable_For_Non_Array_Schema_Streaming_Response()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/x-ndjson": {
+                            "schema": {
+                              "type": "object",
+                              "properties": {
+                                "id": { "type": "string" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings { ReturnIAsyncEnumerable = true };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("IAsyncEnumerable<Anonymous>");
+    }
+
+    [Test]
+    public async Task Generate_Returns_IAsyncEnumerable_For_Streaming_Response_When_ApiResponse_Enabled()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/x-ndjson": {
+                            "schema": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings
+        {
+            ReturnIAsyncEnumerable = true,
+            ReturnIApiResponse = true
+        };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("IAsyncEnumerable<string>");
+    }
+
+    [Test]
+    public async Task Generate_With_ResponseTypeOverride_Still_Overrides_Streaming()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "customOp",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/x-ndjson": {
+                            "schema": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings { ReturnIAsyncEnumerable = true };
+        settings.ResponseTypeOverride["customOp"] = "MyCustomType";
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<MyCustomType>");
+    }
+
+    [Test]
+    public async Task Generate_Returns_IAsyncEnumerable_For_Streaming_Response_When_Observable_Enabled()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/x-ndjson": {
+                            "schema": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings
+        {
+            ReturnIAsyncEnumerable = true,
+            ReturnIObservable = true
+        };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("IAsyncEnumerable<string>");
+    }
+
+    [Test]
     public async Task Generate_With_ResponseTypeOverride_Void_Returns_Task()
     {
         var spec = """
