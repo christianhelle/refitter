@@ -1,0 +1,13 @@
+{
+  "openApiPath": "../OpenAPI/v3.1/lmstudio.json",
+  "namespace": "Test",
+  "naming": {
+    "useOpenApiTitle": true,
+    "interfaceName": "ApiClient"
+  },
+  "returnIAsyncEnumerable": true,
+  "codeGeneratorSettings": {
+    "integerType": "Int64",
+    "generateOptionalPropertiesAsNullable": true
+  }
+}
