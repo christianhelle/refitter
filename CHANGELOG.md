@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.3...HEAD)
 
+**Implemented enhancements:**
+
+- Fix code scanning workflow permissions alerts [\#1218](https://github.com/christianhelle/refitter/pull/1218) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - Update dependency TUnit to 1.64.6 [\#1216](https://github.com/christianhelle/refitter/pull/1216) ([renovate[bot]](https://github.com/apps/renovate))
