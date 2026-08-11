@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using NSwag;
+using NJsonSchema;
 
 namespace Refitter.Core;
 
@@ -30,6 +31,11 @@ internal class ReturnTypeGenerator(
         if (IsFileStreamResponse(operation))
         {
             return $"{GetAsyncOperationType(false)}<HttpResponseMessage>";
+        }
+
+        if (codeGeneration.ReturnIAsyncEnumerable && IsStreamingResponse(operation))
+        {
+            return GetStreamingReturnType(operation);
         }
 
         var successCodes = new[] { "200", "201", "202", "203", "206" };
@@ -98,6 +104,68 @@ internal class ReturnTypeGenerator(
             contentType.StartsWith("application/gzip", StringComparison.OrdinalIgnoreCase) ||
             (contentType.StartsWith("application/x-", StringComparison.OrdinalIgnoreCase) &&
              !contentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static readonly string[] StreamingContentTypes =
+    [
+        "application/x-ndjson",
+        "application/jsonl",
+        "application/x-jsonlines",
+    ];
+
+    public bool IsStreamingResponse(OpenApiOperation operation)
+    {
+        var successCodes = new[] { "200", "201", "202", "203", "206", "2XX", "default" };
+
+        foreach (var code in successCodes)
+        {
+            if (!operation.Responses.TryGetValue(code, out var apiResponse))
+                continue;
+
+            var response = apiResponse.ActualResponse;
+
+            if (response.Content?.Any() != true)
+                continue;
+
+            foreach (var contentEntry in response.Content)
+            {
+                if (IsStreamingContentType(contentEntry.Key))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsStreamingContentType(string contentType)
+    {
+        return StreamingContentTypes.Contains(contentType, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private string GetStreamingReturnType(OpenApiOperation operation)
+    {
+        var schema = GetSuccessResponseSchema(operation);
+        var itemSchema = schema?.Type == NJsonSchema.JsonObjectType.Array
+            ? schema.Item
+            : schema;
+        var itemTypeName = generator.GetTypeName(itemSchema!, false, null);
+
+        return $"IAsyncEnumerable<{TrimImportedNamespaces(itemTypeName)}>";
+    }
+
+    private static JsonSchema? GetSuccessResponseSchema(OpenApiOperation operation)
+    {
+        var successCodes = new[] { "200", "201", "202", "203", "206", "2XX", "default" };
+
+        foreach (var code in successCodes)
+        {
+            if (!operation.Responses.TryGetValue(code, out var apiResponse))
+                continue;
+
+            return apiResponse.ActualResponse.Schema;
+        }
+
+        return null;
     }
 
     private string GetTypeName(string code, OpenApiOperation operation)
