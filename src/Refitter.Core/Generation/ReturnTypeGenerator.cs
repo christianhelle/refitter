@@ -111,6 +111,7 @@ internal class ReturnTypeGenerator(
         "application/x-ndjson",
         "application/jsonl",
         "application/x-jsonlines",
+        "text/event-stream",
     ];
 
     public bool IsStreamingResponse(OpenApiOperation operation)

@@ -343,6 +343,7 @@ public class ReturnTypeGeneratorTests
     [Arguments("application/x-ndjson")]
     [Arguments("application/jsonl")]
     [Arguments("application/x-jsonlines")]
+    [Arguments("text/event-stream")]
     public async Task Generate_Returns_IAsyncEnumerable_For_Streaming_Array_Response(
         string contentType)
     {
