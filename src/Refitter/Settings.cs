@@ -80,6 +80,11 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool ReturnIObservable { get; set; }
 
+    [Description("Return IAsyncEnumerable<T> for streaming responses")]
+    [CommandOption("--use-iasync-enumerable")]
+    [DefaultValue(false)]
+    public bool ReturnIAsyncEnumerable { get; set; }
+
     [Description("Set the accessibility of the generated types to 'internal'")]
     [CommandOption("--internal")]
     [DefaultValue(false)]
