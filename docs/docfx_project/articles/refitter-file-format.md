@@ -22,6 +22,7 @@ The following is an example `.refitter` file
   "addAcceptHeaders": true, // Optional. Default=true
   "addContentTypeHeaders": true, // Optional. Default=true
   "returnIApiResponse": false, // Optional. Default=false
+  "returnIAsyncEnumerable": false, // Optional. Default=false
   "responseTypeOverride": { // Optional. Default={}
     "File_Upload": "IApiResponse",
     "File_Download": "System.Net.Http.HttpContent"
@@ -165,6 +166,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
 - `addAcceptHeaders` -  a boolean indicating whether to add accept headers [Headers("Accept: application/json")]. Default is `true`
 - `addContentTypeHeaders` - a boolean indicating whether to add content-type headers. Default is `true`
 - `returnIApiResponse` - a boolean indicating whether to return `IApiResponse<T>` objects. Default is `false`
+- `returnIAsyncEnumerable` - a boolean indicating whether to return `IAsyncEnumerable<T>` for streaming responses (content types `application/x-ndjson`, `application/jsonl`, `application/x-jsonlines`). Default is `false`
 - `responseTypeOverride` - a dictionary with operation ids (as specified in the OpenAPI document) and a particular return type to use. The types are wrapped in a task, but otherwise unmodified (so make sure to specify or import their namespaces). Default is `{}`
 - `generateOperationHeaders` - a boolean indicating whether to use operation headers in the generated methods. Default is `true`
 - `ignoredOperationHeaders` - A collection of headers to omit from operation signatures. Default is `[]`
@@ -310,6 +312,10 @@ When using `openApiPaths`, the documents are merged into a single generated clie
         "returnIApiResponse": {
             "type": "boolean",
             "description": "Indicates whether to return IApiResponse."
+        },
+        "returnIAsyncEnumerable": {
+            "type": "boolean",
+            "description": "Indicates whether to return IAsyncEnumerable for streaming responses."
         },
         "responseTypeOverride": {
             "type": "object",
