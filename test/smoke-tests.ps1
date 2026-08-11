@@ -163,7 +163,8 @@ function RunTests
     )
 
     $v31Filenames = @(
-        "webhook-example"
+        "webhook-example",
+        "lmstudio"
     )
 
     $v34WebhookFilenames = @(
