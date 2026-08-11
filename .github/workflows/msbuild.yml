@@ -12,6 +12,9 @@ on:
       - 'docs/docfx_project/articles/msbuild.md'
       - 'test/MSBuild/**'
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: 👌 Verify build (${{ matrix.os }})
