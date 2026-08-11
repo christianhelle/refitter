@@ -211,6 +211,7 @@ function RunTests
     $netCoreVariants = @(
         @{ Suffix="Disposable"; Prefix="Disposable"; Args="--disposable" },
         @{ Suffix="ImmutableRecords"; Prefix="ImmutableRecords"; Args="--immutable-records" },
+        @{ Suffix="AsyncEnumerable"; Prefix="AsyncEnumerable"; Args="--use-iasync-enumerable" },
         @{ Suffix="PolymorphicSerialization"; Prefix="PolymorphicSerialization"; Args="--use-polymorphic-serialization" },
         @{ Suffix="CollectionFormatCsv"; Prefix="CollectionFormatCsv"; Args="--collection-format csv" },
         @{ Suffix="JsonSerializerContext"; Prefix="JsonSerializerCtx"; Args="--json-serializer-context" },
@@ -258,6 +259,10 @@ function RunTests
     CleanGeneratedCode
     GenerateFromSettingsFile -settingsFile "./multiple-sources.refitter" -processPath $processPath -useDocker $UseDocker
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore
+
+    CleanGeneratedCode
+    GenerateFromSettingsFile -settingsFile "./Streaming/.refitter" -processPath $processPath -useDocker $UseDocker
+    BuildSolution -solution "./Streaming/Streaming.csproj"
 
     # ==========================================
     # Phase 3: Generate all STANDARD variants (no build until all are generated)
