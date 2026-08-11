@@ -23,6 +23,9 @@ env:
   VERSION: 2.1.3.${{ github.run_number }}
   CODECOV_TOKEN: cbd141f8-4d0d-4bc1-84a7-970f9f9b87ac
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: 👌 Verify build

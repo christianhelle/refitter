@@ -3,6 +3,11 @@ name: Release (Preview)
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+
 jobs:
   publish:
     uses: ./.github/workflows/release-template.yml

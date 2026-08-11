@@ -12,6 +12,9 @@ on:
       branches:
         - 'main' 
 
+permissions:
+  contents: read
+
 jobs:
     publish-docs:
       if: github.ref == 'refs/heads/main' && github.repository == 'christianhelle/refitter'
