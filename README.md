@@ -896,7 +896,9 @@ Status: Sold
 
 ## Streaming responses
 
-Endpoints whose success response uses a streaming content type (`application/x-ndjson`, `application/jsonl`, `application/x-jsonlines`, or `text/event-stream`) always generate an `IAsyncEnumerable<T>` return type so you can consume the response as a stream.
+Endpoints whose success response uses a streaming content type (`application/x-ndjson`, `application/jsonl`, `application/x-jsonlines`, or `text/event-stream`) generate an `IAsyncEnumerable<T>` return type by default so you can consume the response as a stream.
+
+If you set a `responseTypeOverride` for a streaming operation, it takes precedence and may produce a different return type.
 
 ```cs
 var stream = client.GetEvents();
