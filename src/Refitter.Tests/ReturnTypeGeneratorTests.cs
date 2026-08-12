@@ -683,6 +683,82 @@ public class ReturnTypeGeneratorTests
     }
 
     [Test]
+    public async Task Generate_Returns_IAsyncEnumerable_Of_Object_For_Streaming_Response_With_Null_Media_Type()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "text/event-stream": {
+                            "schema": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        document.Paths["/test"]["get"].Responses["200"].ActualResponse.Content["text/event-stream"] = null;
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("IAsyncEnumerable<object>");
+    }
+
+    [Test]
+    public async Task Generate_Does_Not_Return_IAsyncEnumerable_For_Non_Streaming_Swagger2_Produces()
+    {
+        var spec = """
+            swagger: '2.0'
+            info:
+              title: Test
+              version: 1.0.0
+            paths:
+              '/test':
+                get:
+                  operationId: getTest
+                  produces:
+                    - application/json
+                  responses:
+                    '200':
+                      description: Success
+                      schema:
+                        type: array
+                        items:
+                          type: string
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<ICollection<string>>");
+    }
+
+    [Test]
     public async Task Generate_With_ResponseTypeOverride_Void_Returns_Task()
     {
         var spec = """
