@@ -125,15 +125,21 @@ internal class ReturnTypeGenerator(
 
             var response = apiResponse.ActualResponse;
 
-            if (response.Content?.Any() != true)
-                continue;
-
-            foreach (var contentEntry in response.Content)
+            if (response.Content?.Any() == true)
             {
-                if (!IsStreamingContentType(contentEntry.Key))
-                    continue;
+                foreach (var contentEntry in response.Content)
+                {
+                    if (!IsStreamingContentType(contentEntry.Key))
+                        continue;
 
-                schema = contentEntry.Value?.Schema;
+                    schema = contentEntry.Value?.Schema;
+                    return true;
+                }
+            }
+
+            if (operation.ActualProduces?.Any(IsStreamingContentType) == true)
+            {
+                schema = response.Schema;
                 return true;
             }
         }
