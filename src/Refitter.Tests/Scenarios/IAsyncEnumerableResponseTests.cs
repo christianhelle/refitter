@@ -83,61 +83,150 @@ paths:
             text/event-stream: {}
 ";
 
+    private const string Swagger2Spec = @"
+swagger: '2.0'
+info:
+  title: Streaming API
+  version: 1.0.0
+paths:
+  '/events':
+    get:
+      operationId: getEvents
+      summary: Stream a list of events as JSON lines
+      produces:
+        - application/x-ndjson
+      responses:
+        '200':
+          description: A stream of events
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                name:
+                  type: string
+  '/events/jsonl':
+    get:
+      operationId: getEventsJsonl
+      summary: Stream events using application/jsonl
+      produces:
+        - application/jsonl
+      responses:
+        '200':
+          description: A stream of events
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                name:
+                  type: string
+  '/events/sse':
+    get:
+      operationId: getEventsSse
+      summary: Stream events using text/event-stream
+      produces:
+        - text/event-stream
+      responses:
+        '200':
+          description: A stream of events
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                name:
+                  type: string
+  '/events/untyped':
+    get:
+      operationId: getEventsUntyped
+      summary: Stream events without a schema
+      produces:
+        - text/event-stream
+      responses:
+        '200':
+          description: A stream of untyped events
+";
+
     [Test]
-    public async Task Can_Generate_Code()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Can_Generate_Code(string spec)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(spec);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Test]
-    public async Task Generates_IAsyncEnumerable_For_NDJson()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Generates_IAsyncEnumerable_For_NDJson(string spec)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<");
     }
 
     [Test]
-    public async Task Generates_IAsyncEnumerable_For_NDJson_Method()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Generates_IAsyncEnumerable_For_NDJson_Method(string spec)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> GetEvents(");
     }
 
     [Test]
-    public async Task Generates_IAsyncEnumerable_For_Jsonl_Method()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Generates_IAsyncEnumerable_For_Jsonl_Method(string spec)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous2> GetEventsJsonl(");
     }
 
     [Test]
-    public async Task Generates_IAsyncEnumerable_For_EventStream_Method()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Generates_IAsyncEnumerable_For_EventStream_Method(string spec)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous3> GetEventsSse(");
     }
 
     [Test]
-    public async Task Generates_IAsyncEnumerable_Of_Object_For_Untyped_Streaming_Response()
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Generates_IAsyncEnumerable_Of_Object_For_Untyped_Streaming_Response(string spec)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<object> GetEventsUntyped(");
     }
 
     [Test]
-    public async Task Can_Build_Generated_Code()
+    [Category("Integration")]
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Can_Build_Generated_Code(string spec)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(spec);
         BuildHelper
             .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(string spec)
     {
-        string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
         RefitGeneratorSettings settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile
