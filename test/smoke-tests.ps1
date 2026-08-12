@@ -163,7 +163,8 @@ function RunTests
     )
 
     $v31Filenames = @(
-        "webhook-example"
+        "webhook-example",
+        "lmstudio"
     )
 
     $v34WebhookFilenames = @(
@@ -257,6 +258,10 @@ function RunTests
     CleanGeneratedCode
     GenerateFromSettingsFile -settingsFile "./multiple-sources.refitter" -processPath $processPath -useDocker $UseDocker
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore
+
+    CleanGeneratedCode
+    GenerateFromSettingsFile -settingsFile "./Streaming/.refitter" -processPath $processPath -useDocker $UseDocker
+    BuildSolution -solution "./Streaming/Streaming.csproj"
 
     # ==========================================
     # Phase 3: Generate all STANDARD variants (no build until all are generated)

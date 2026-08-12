@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using NJsonSchema;
 using NSwag;
 
 namespace Refitter.Core;
@@ -30,6 +31,11 @@ internal class ReturnTypeGenerator(
         if (IsFileStreamResponse(operation))
         {
             return $"{GetAsyncOperationType(false)}<HttpResponseMessage>";
+        }
+
+        if (TryGetStreamingResponseSchema(operation, out var streamingSchema))
+        {
+            return GetStreamingReturnType(streamingSchema);
         }
 
         var successCodes = new[] { "200", "201", "202", "203", "206" };
@@ -98,6 +104,70 @@ internal class ReturnTypeGenerator(
             contentType.StartsWith("application/gzip", StringComparison.OrdinalIgnoreCase) ||
             (contentType.StartsWith("application/x-", StringComparison.OrdinalIgnoreCase) &&
              !contentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static readonly string[] StreamingContentTypes =
+    [
+        "application/x-ndjson",
+        "application/jsonl",
+        "application/x-jsonlines",
+        "text/event-stream",
+    ];
+
+    private static bool TryGetStreamingResponseSchema(OpenApiOperation operation, out JsonSchema? schema)
+    {
+        var successCodes = new[] { "200", "201", "202", "203", "206", "2XX", "default" };
+
+        foreach (var code in successCodes)
+        {
+            if (!operation.Responses.TryGetValue(code, out var apiResponse))
+                continue;
+
+            var response = apiResponse.ActualResponse;
+
+            if (response.Content.Any())
+            {
+                foreach (var contentEntry in response.Content)
+                {
+                    if (!IsStreamingContentType(contentEntry.Key))
+                        continue;
+
+                    schema = contentEntry.Value?.Schema;
+                    return true;
+                }
+            }
+
+            if (operation.ActualProduces.Any(IsStreamingContentType))
+            {
+                schema = response.Schema;
+                return true;
+            }
+        }
+
+        schema = null;
+        return false;
+    }
+
+    private static bool IsStreamingContentType(string contentType)
+    {
+        int separatorIndex = contentType.IndexOf(';');
+        string mediaType = separatorIndex >= 0
+            ? contentType.Substring(0, separatorIndex)
+            : contentType;
+
+        return StreamingContentTypes.Contains(mediaType.Trim(), StringComparer.OrdinalIgnoreCase);
+    }
+
+    private string GetStreamingReturnType(JsonSchema? schema)
+    {
+        JsonSchema? itemSchema = schema?.Type == NJsonSchema.JsonObjectType.Array
+            ? schema.Item
+            : schema;
+        string itemTypeName = itemSchema is null
+            ? "object"
+            : generator.GetTypeName(itemSchema, false, null);
+
+        return $"IAsyncEnumerable<{TrimImportedNamespaces(itemTypeName)}>";
     }
 
     private string GetTypeName(string code, OpenApiOperation operation)

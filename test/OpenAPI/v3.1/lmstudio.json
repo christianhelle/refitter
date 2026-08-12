@@ -1,0 +1,1174 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "LM Studio v1 REST API",
+        "description": "LM Studio offers a powerful REST API with first-class support for local inference and model management.",
+        "version": "1.0.0",
+        "x-logo": {
+            "url": "https://lmstudio.ai/assets/marketing/lmstudio-app-logo.webp"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:1234",
+            "description": "Local LM Studio server"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
+    "paths": {
+        "/api/v1/chat": {
+            "post": {
+                "operationId": "chat",
+                "summary": "Chat with a model",
+                "description": "Send a message to a model and receive a response. Supports MCP integration.",
+                "tags": [
+                    "Chat"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChatRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful chat response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatResponse"
+                                }
+                            },
+                            "text/event-stream": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/models": {
+            "get": {
+                "operationId": "listModels",
+                "summary": "List your models",
+                "description": "Get a list of available models on your system, including both LLMs and embedding models.",
+                "tags": [
+                    "Models"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of available models",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListModelsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/models/load": {
+            "post": {
+                "operationId": "loadModel",
+                "summary": "Load a model",
+                "description": "Load an LLM or Embedding model into memory with custom configuration for inference.",
+                "tags": [
+                    "Models"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoadModelRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Model loaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoadModelResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/models/unload": {
+            "post": {
+                "operationId": "unloadModel",
+                "summary": "Unload a model",
+                "description": "Unload a loaded model from memory.",
+                "tags": [
+                    "Models"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UnloadModelRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Model unloaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnloadModelResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/models/download": {
+            "post": {
+                "operationId": "downloadModel",
+                "summary": "Download a model",
+                "description": "Download LLMs and embedding models.",
+                "tags": [
+                    "Models"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DownloadModelRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Download job started or model already downloaded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DownloadModelResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/models/download/status/{job_id}": {
+            "get": {
+                "operationId": "getDownloadStatus",
+                "summary": "Get download status",
+                "description": "Get the status of model downloads.",
+                "tags": [
+                    "Models"
+                ],
+                "parameters": [
+                    {
+                        "name": "job_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The unique identifier of the download job"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Download job status",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DownloadStatusResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "API token authentication. Tokens are created in LM Studio's Developer > Server Settings."
+            }
+        },
+        "schemas": {
+            "ChatRequest": {
+                "type": "object",
+                "required": [
+                    "model",
+                    "input"
+                ],
+                "properties": {
+                    "model": {
+                        "type": "string",
+                        "description": "Unique identifier for the model to use"
+                    },
+                    "input": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "description": "Text content of the message"
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/ChatInputItem"
+                                }
+                            }
+                        ],
+                        "description": "Message to send to the model"
+                    },
+                    "system_prompt": {
+                        "type": "string",
+                        "description": "System message that sets model behavior or instructions"
+                    },
+                    "integrations": {
+                        "type": "array",
+                        "description": "List of integrations (plugins, ephemeral MCP servers, etc.) to enable for this request",
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "type": "string",
+                                    "description": "Unique identifier of a plugin to use"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/PluginIntegration"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/EphemeralMcpIntegration"
+                                }
+                            ]
+                        }
+                    },
+                    "stream": {
+                        "type": "boolean",
+                        "description": "Whether to stream partial outputs via SSE",
+                        "default": false
+                    },
+                    "temperature": {
+                        "type": "number",
+                        "description": "Randomness in token selection. 0 is deterministic, higher values increase creativity",
+                        "minimum": 0,
+                        "maximum": 1
+                    },
+                    "top_p": {
+                        "type": "number",
+                        "description": "Minimum cumulative probability for the possible next tokens",
+                        "minimum": 0,
+                        "maximum": 1
+                    },
+                    "top_k": {
+                        "type": "integer",
+                        "description": "Limits next token selection to top-k most probable tokens"
+                    },
+                    "min_p": {
+                        "type": "number",
+                        "description": "Minimum base probability for a token to be selected for output",
+                        "minimum": 0,
+                        "maximum": 1
+                    },
+                    "repeat_penalty": {
+                        "type": "number",
+                        "description": "Penalty for repeating token sequences. 1 is no penalty, higher values discourage repetition"
+                    },
+                    "max_output_tokens": {
+                        "type": "integer",
+                        "description": "Maximum number of tokens to generate"
+                    },
+                    "reasoning": {
+                        "type": "string",
+                        "description": "Reasoning setting. Will error if the model being used does not support the reasoning setting",
+                        "enum": [
+                            "off",
+                            "low",
+                            "medium",
+                            "high",
+                            "on"
+                        ]
+                    },
+                    "context_length": {
+                        "type": "integer",
+                        "description": "Number of tokens to consider as context. Higher values recommended for MCP usage"
+                    },
+                    "store": {
+                        "type": "boolean",
+                        "description": "Whether to store the chat. If set, response will return a response_id field",
+                        "default": true
+                    },
+                    "previous_response_id": {
+                        "type": "string",
+                        "description": "Identifier of existing response to append to. Must start with 'resp_'",
+                        "pattern": "^resp_"
+                    }
+                }
+            },
+            "ChatInputItem": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/TextInput"
+                    },
+                    {
+                        "$ref": "#/components/schemas/ImageInput"
+                    }
+                ],
+                "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                        "message": "#/components/schemas/TextInput",
+                        "image": "#/components/schemas/ImageInput"
+                    }
+                }
+            },
+            "TextInput": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "content"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "message"
+                        ],
+                        "description": "Type of input item"
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "Text content of the message"
+                    }
+                }
+            },
+            "ImageInput": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "data_url"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "image"
+                        ],
+                        "description": "Type of input item"
+                    },
+                    "data_url": {
+                        "type": "string",
+                        "description": "Image data as a base64-encoded data URL",
+                        "format": "uri"
+                    }
+                }
+            },
+            "PluginIntegration": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "id"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "plugin"
+                        ],
+                        "description": "Type of integration"
+                    },
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier of the plugin"
+                    },
+                    "allowed_tools": {
+                        "type": "array",
+                        "description": "List of tool names the model can call from this plugin",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "EphemeralMcpIntegration": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "server_label",
+                    "server_url"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "ephemeral_mcp"
+                        ],
+                        "description": "Type of integration"
+                    },
+                    "server_label": {
+                        "type": "string",
+                        "description": "Label to identify the MCP server"
+                    },
+                    "server_url": {
+                        "type": "string",
+                        "description": "URL of the MCP server",
+                        "format": "uri"
+                    },
+                    "allowed_tools": {
+                        "type": "array",
+                        "description": "List of tool names the model can call from this server",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "headers": {
+                        "type": "object",
+                        "description": "Custom HTTP headers to send with requests to the server",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "ChatResponse": {
+                "type": "object",
+                "required": [
+                    "model_instance_id",
+                    "output",
+                    "stats"
+                ],
+                "properties": {
+                    "model_instance_id": {
+                        "type": "string",
+                        "description": "Unique identifier for the loaded model instance that generated the response"
+                    },
+                    "output": {
+                        "type": "array",
+                        "description": "Array of output items generated",
+                        "items": {
+                            "$ref": "#/components/schemas/ChatOutputItem"
+                        }
+                    },
+                    "stats": {
+                        "$ref": "#/components/schemas/ChatStats"
+                    },
+                    "response_id": {
+                        "type": "string",
+                        "description": "Identifier of the response for subsequent requests. Starts with 'resp_'",
+                        "pattern": "^resp_"
+                    }
+                }
+            },
+            "ChatOutputItem": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/MessageOutput"
+                    },
+                    {
+                        "$ref": "#/components/schemas/ToolCallOutput"
+                    },
+                    {
+                        "$ref": "#/components/schemas/ReasoningOutput"
+                    },
+                    {
+                        "$ref": "#/components/schemas/InvalidToolCallOutput"
+                    }
+                ],
+                "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                        "message": "#/components/schemas/MessageOutput",
+                        "tool_call": "#/components/schemas/ToolCallOutput",
+                        "reasoning": "#/components/schemas/ReasoningOutput",
+                        "invalid_tool_call": "#/components/schemas/InvalidToolCallOutput"
+                    }
+                }
+            },
+            "MessageOutput": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "content"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "message"
+                        ],
+                        "description": "Type of output item"
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "Text content of the message"
+                    }
+                }
+            },
+            "ToolCallOutput": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "tool",
+                    "arguments",
+                    "output",
+                    "provider_info"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "tool_call"
+                        ],
+                        "description": "Type of output item"
+                    },
+                    "tool": {
+                        "type": "string",
+                        "description": "Name of the tool called"
+                    },
+                    "arguments": {
+                        "type": "object",
+                        "description": "Arguments passed to the tool",
+                        "additionalProperties": true
+                    },
+                    "output": {
+                        "type": "string",
+                        "description": "Result returned from the tool"
+                    },
+                    "provider_info": {
+                        "$ref": "#/components/schemas/ProviderInfo"
+                    }
+                }
+            },
+            "ReasoningOutput": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "content"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "reasoning"
+                        ],
+                        "description": "Type of output item"
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "Text content of the reasoning"
+                    }
+                }
+            },
+            "InvalidToolCallOutput": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "reason",
+                    "metadata"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "invalid_tool_call"
+                        ],
+                        "description": "Type of output item"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Reason why the tool call was invalid"
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "tool_name"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "invalid_name",
+                                    "invalid_arguments"
+                                ],
+                                "description": "Type of error that occurred"
+                            },
+                            "tool_name": {
+                                "type": "string",
+                                "description": "Name of the tool that was attempted to be called"
+                            },
+                            "arguments": {
+                                "type": "object",
+                                "description": "Arguments that were passed to the tool (only present for invalid_arguments errors)",
+                                "additionalProperties": true
+                            },
+                            "provider_info": {
+                                "description": "Information about the tool provider (only present for invalid_arguments errors)",
+                                "$ref": "#/components/schemas/ProviderInfo"
+                            }
+                        }
+                    }
+                }
+            },
+            "ProviderInfo": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "plugin",
+                            "ephemeral_mcp"
+                        ],
+                        "description": "Provider type"
+                    },
+                    "plugin_id": {
+                        "type": "string",
+                        "description": "Identifier of the plugin (when type is plugin)"
+                    },
+                    "server_label": {
+                        "type": "string",
+                        "description": "Label of the MCP server (when type is ephemeral_mcp)"
+                    }
+                }
+            },
+            "ChatStats": {
+                "type": "object",
+                "required": [
+                    "input_tokens",
+                    "total_output_tokens",
+                    "reasoning_output_tokens",
+                    "tokens_per_second",
+                    "time_to_first_token_seconds"
+                ],
+                "properties": {
+                    "input_tokens": {
+                        "type": "integer",
+                        "description": "Number of input tokens"
+                    },
+                    "total_output_tokens": {
+                        "type": "integer",
+                        "description": "Total number of output tokens generated"
+                    },
+                    "reasoning_output_tokens": {
+                        "type": "integer",
+                        "description": "Number of tokens used for reasoning"
+                    },
+                    "tokens_per_second": {
+                        "type": "number",
+                        "description": "Generation speed in tokens per second"
+                    },
+                    "time_to_first_token_seconds": {
+                        "type": "number",
+                        "description": "Time in seconds to generate the first token"
+                    },
+                    "model_load_time_seconds": {
+                        "type": "number",
+                        "description": "Time taken to load the model for this request in seconds. Present only if the model was not already loaded"
+                    }
+                }
+            },
+            "ListModelsResponse": {
+                "type": "object",
+                "required": [
+                    "models"
+                ],
+                "properties": {
+                    "models": {
+                        "type": "array",
+                        "description": "List of available models (both LLMs and embedding models)",
+                        "items": {
+                            "$ref": "#/components/schemas/ModelInfo"
+                        }
+                    }
+                }
+            },
+            "ModelInfo": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "publisher",
+                    "key",
+                    "display_name",
+                    "size_bytes",
+                    "loaded_instances",
+                    "max_context_length",
+                    "format"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "llm",
+                            "embedding"
+                        ],
+                        "description": "Type of model"
+                    },
+                    "publisher": {
+                        "type": "string",
+                        "description": "Model publisher name"
+                    },
+                    "key": {
+                        "type": "string",
+                        "description": "Unique identifier for the model"
+                    },
+                    "display_name": {
+                        "type": "string",
+                        "description": "Human-readable model name"
+                    },
+                    "architecture": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Model architecture (e.g., llama, mistral). Absent for embedding models"
+                    },
+                    "quantization": {
+                        "type": "object",
+                        "nullable": true,
+                        "required": [
+                            "name",
+                            "bits_per_weight"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Quantization method name"
+                            },
+                            "bits_per_weight": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Bits per weight for the quantization"
+                            }
+                        }
+                    },
+                    "size_bytes": {
+                        "type": "integer",
+                        "description": "Size of the model in bytes"
+                    },
+                    "params_string": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Human-readable parameter count (e.g., 7B, 13B)"
+                    },
+                    "loaded_instances": {
+                        "type": "array",
+                        "description": "List of currently loaded instances of this model",
+                        "items": {
+                            "$ref": "#/components/schemas/LoadedInstance"
+                        }
+                    },
+                    "max_context_length": {
+                        "type": "integer",
+                        "description": "Maximum context length supported by the model in number of tokens"
+                    },
+                    "format": {
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                            "gguf",
+                            "mlx",
+                            null
+                        ],
+                        "description": "Model file format"
+                    },
+                    "capabilities": {
+                        "type": "object",
+                        "description": "Model capabilities. Absent for embedding models",
+                        "properties": {
+                            "vision": {
+                                "type": "boolean",
+                                "description": "Whether the model supports vision/image inputs"
+                            },
+                            "trained_for_tool_use": {
+                                "type": "boolean",
+                                "description": "Whether the model was trained for tool/function calling"
+                            },
+                            "reasoning": {
+                                "type": "object",
+                                "description": "Public reasoning configuration for the model. Absent when no reasoning config is exposed",
+                                "required": [
+                                    "allowed_options",
+                                    "default"
+                                ],
+                                "properties": {
+                                    "allowed_options": {
+                                        "type": "array",
+                                        "description": "Allowed public reasoning settings for the model",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "off",
+                                                "on",
+                                                "low",
+                                                "medium",
+                                                "high"
+                                            ]
+                                        }
+                                    },
+                                    "default": {
+                                        "type": "string",
+                                        "enum": [
+                                            "off",
+                                            "on",
+                                            "low",
+                                            "medium",
+                                            "high"
+                                        ],
+                                        "description": "Default public reasoning setting for the model"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Model description. Absent for embedding models"
+                    },
+                    "variants": {
+                        "type": "array",
+                        "description": "List of available quantization variant names for this model. Present for multi-variant models",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "selected_variant": {
+                        "type": "string",
+                        "description": "The currently selected variant name. Present when variants is present"
+                    }
+                }
+            },
+            "LoadedInstance": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "config"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the loaded model instance"
+                    },
+                    "config": {
+                        "$ref": "#/components/schemas/LoadedInstanceConfig"
+                    }
+                }
+            },
+            "LoadedInstanceConfig": {
+                "type": "object",
+                "required": [
+                    "context_length"
+                ],
+                "properties": {
+                    "context_length": {
+                        "type": "integer",
+                        "description": "The maximum context length for the model in number of tokens"
+                    },
+                    "eval_batch_size": {
+                        "type": "integer",
+                        "description": "Number of input tokens to process together in a single batch during evaluation. Absent for embedding models"
+                    },
+                    "parallel": {
+                        "type": "integer",
+                        "description": "Maximum number of parallel predictions the instance can handle. Absent for embedding models"
+                    },
+                    "flash_attention": {
+                        "type": "boolean",
+                        "description": "Whether Flash Attention is enabled. Absent for embedding models"
+                    },
+                    "num_experts": {
+                        "type": "integer",
+                        "description": "Number of experts for MoE (Mixture of Experts) models. Absent for embedding models"
+                    },
+                    "offload_kv_cache_to_gpu": {
+                        "type": "boolean",
+                        "description": "Whether KV cache is offloaded to GPU memory. Absent for embedding models"
+                    }
+                }
+            },
+            "LoadModelRequest": {
+                "type": "object",
+                "required": [
+                    "model"
+                ],
+                "properties": {
+                    "model": {
+                        "type": "string",
+                        "description": "Unique identifier for the model to load. Can be an LLM or embedding model"
+                    },
+                    "context_length": {
+                        "type": "integer",
+                        "description": "Maximum number of tokens that the model will consider"
+                    },
+                    "eval_batch_size": {
+                        "type": "integer",
+                        "description": "Number of input tokens to process together in a single batch during evaluation"
+                    },
+                    "flash_attention": {
+                        "type": "boolean",
+                        "description": "Whether to optimize attention computation"
+                    },
+                    "num_experts": {
+                        "type": "integer",
+                        "description": "Number of experts to use during inference for MoE models"
+                    },
+                    "offload_kv_cache_to_gpu": {
+                        "type": "boolean",
+                        "description": "Whether KV cache is offloaded to GPU memory"
+                    },
+                    "echo_load_config": {
+                        "type": "boolean",
+                        "description": "If true, echoes the final load configuration in the response under load_config",
+                        "default": false
+                    }
+                }
+            },
+            "LoadModelResponse": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "instance_id",
+                    "load_time_seconds",
+                    "status"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "llm",
+                            "embedding"
+                        ],
+                        "description": "Type of the loaded model"
+                    },
+                    "instance_id": {
+                        "type": "string",
+                        "description": "Unique identifier for the loaded model instance"
+                    },
+                    "load_time_seconds": {
+                        "type": "number",
+                        "description": "Time taken to load the model in seconds"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "loaded"
+                        ],
+                        "description": "Load status"
+                    },
+                    "load_config": {
+                        "description": "The final configuration applied to the loaded model. Included only when echo_load_config is true",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/LlmLoadConfig"
+                            },
+                            {
+                                "$ref": "#/components/schemas/EmbeddingLoadConfig"
+                            }
+                        ]
+                    }
+                }
+            },
+            "LlmLoadConfig": {
+                "type": "object",
+                "required": [
+                    "context_length"
+                ],
+                "properties": {
+                    "context_length": {
+                        "type": "integer",
+                        "description": "Maximum number of tokens that the model will consider"
+                    },
+                    "eval_batch_size": {
+                        "type": "integer",
+                        "description": "Number of input tokens to process together in a single batch during evaluation"
+                    },
+                    "flash_attention": {
+                        "type": "boolean",
+                        "description": "Whether Flash Attention is enabled for optimized attention computation"
+                    },
+                    "num_experts": {
+                        "type": "integer",
+                        "description": "Number of experts for MoE models"
+                    },
+                    "offload_kv_cache_to_gpu": {
+                        "type": "boolean",
+                        "description": "Whether KV cache is offloaded to GPU memory"
+                    }
+                }
+            },
+            "EmbeddingLoadConfig": {
+                "type": "object",
+                "required": [
+                    "context_length"
+                ],
+                "properties": {
+                    "context_length": {
+                        "type": "integer",
+                        "description": "Maximum number of tokens that the model will consider"
+                    }
+                }
+            },
+            "UnloadModelRequest": {
+                "type": "object",
+                "required": [
+                    "instance_id"
+                ],
+                "properties": {
+                    "instance_id": {
+                        "type": "string",
+                        "description": "Unique identifier of the model instance to unload"
+                    }
+                }
+            },
+            "UnloadModelResponse": {
+                "type": "object",
+                "required": [
+                    "instance_id"
+                ],
+                "properties": {
+                    "instance_id": {
+                        "type": "string",
+                        "description": "Unique identifier for the unloaded model instance"
+                    }
+                }
+            },
+            "DownloadModelRequest": {
+                "type": "object",
+                "required": [
+                    "model"
+                ],
+                "properties": {
+                    "model": {
+                        "type": "string",
+                        "description": "The model to download. Accepts model catalog identifiers (e.g., openai/gpt-oss-20b) and exact Hugging Face links"
+                    },
+                    "quantization": {
+                        "type": "string",
+                        "description": "Quantization level of the model to download (e.g., Q4_K_M). Only supported for Hugging Face links"
+                    }
+                }
+            },
+            "DownloadModelResponse": {
+                "type": "object",
+                "required": [
+                    "status"
+                ],
+                "properties": {
+                    "job_id": {
+                        "type": "string",
+                        "description": "Unique identifier for the download job. Absent when status is already_downloaded"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "downloading",
+                            "paused",
+                            "completed",
+                            "failed",
+                            "already_downloaded"
+                        ],
+                        "description": "Current status of the download"
+                    },
+                    "completed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Download completion time in ISO 8601 format. Present when status is completed"
+                    },
+                    "total_size_bytes": {
+                        "type": "integer",
+                        "description": "Total size of the download in bytes. Absent when status is already_downloaded"
+                    },
+                    "started_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Download start time in ISO 8601 format. Absent when status is already_downloaded"
+                    }
+                }
+            },
+            "DownloadStatusResponse": {
+                "type": "object",
+                "required": [
+                    "job_id",
+                    "status"
+                ],
+                "properties": {
+                    "job_id": {
+                        "type": "string",
+                        "description": "Unique identifier for the download job"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "downloading",
+                            "paused",
+                            "completed",
+                            "failed"
+                        ],
+                        "description": "Current status of the download"
+                    },
+                    "bytes_per_second": {
+                        "type": "integer",
+                        "description": "Current download speed in bytes per second. Present when status is downloading"
+                    },
+                    "estimated_completion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Estimated completion time in ISO 8601 format. Present when status is downloading"
+                    },
+                    "completed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Download completion time in ISO 8601 format. Present when status is completed"
+                    },
+                    "total_size_bytes": {
+                        "type": "integer",
+                        "description": "Total size of the download in bytes"
+                    },
+                    "downloaded_bytes": {
+                        "type": "integer",
+                        "description": "Number of bytes downloaded so far"
+                    },
+                    "started_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Download start time in ISO 8601 format"
+                    }
+                }
+            }
+        }
+    }
+}
