@@ -894,6 +894,20 @@ Category: Chaucito
 Status: Sold
 ```
 
+## Streaming responses
+
+Endpoints whose success response uses a streaming content type (`application/x-ndjson`, `application/jsonl`, `application/x-jsonlines`, or `text/event-stream`) always generate an `IAsyncEnumerable<T>` return type so you can consume the response as a stream.
+
+```cs
+var stream = client.GetEvents();
+await foreach (var e in stream)
+{
+    Console.WriteLine(e.Name);
+}
+```
+
+Refit >= 14.0.0 auto-detects the frame format at runtime from the response's `Content-Type` header, so both JSON Lines and Server-Sent Events (SSE) responses can be consumed directly.
+
 ## ASP.NET Core and HttpClientFactory
 
 Here's an example Minimal API with the [`Refit.HttpClientFactory`](https://www.nuget.org/packages/Refit.HttpClientFactory) library:
