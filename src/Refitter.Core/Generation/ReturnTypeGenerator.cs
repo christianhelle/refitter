@@ -125,7 +125,7 @@ internal class ReturnTypeGenerator(
 
             var response = apiResponse.ActualResponse;
 
-            if (response.Content?.Any() == true)
+            if (response.Content.Any())
             {
                 foreach (var contentEntry in response.Content)
                 {
@@ -137,7 +137,7 @@ internal class ReturnTypeGenerator(
                 }
             }
 
-            if (operation.ActualProduces?.Any(IsStreamingContentType) == true)
+            if (operation.ActualProduces.Any(IsStreamingContentType))
             {
                 schema = response.Schema;
                 return true;
