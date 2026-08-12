@@ -62,7 +62,6 @@ EXAMPLES:
     refitter ./openapi.json --output ./IGeneratedCode.cs --interface-only
     refitter ./openapi.json --output ./GeneratedContracts.cs --contract-only
     refitter ./openapi.json --use-api-response
-    refitter ./openapi.json --use-iasync-enumerable
     refitter ./openapi.json --cancellation-tokens
     refitter ./openapi.json --no-operation-headers
     refitter ./openapi.json --ignored-operation-headers "header-one" --ignored-operation-headers "Header-Two"
@@ -105,7 +104,6 @@ OPTIONS:
         --contract-only                                          Don't generate clients
         --use-api-response                                       Return Task<IApiResponse<T>> instead of Task<T>
         --use-observable-response                                Return IObservable instead of Task
-        --use-iasync-enumerable                                   Return IAsyncEnumerable<T> for streaming responses
         --internal                                               Set the accessibility of the generated types to 'internal'
         --cancellation-tokens                                    Use cancellation tokens
         --no-operation-headers                                   Don't generate operation headers
