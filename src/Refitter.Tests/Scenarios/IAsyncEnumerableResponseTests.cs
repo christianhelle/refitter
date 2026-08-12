@@ -86,69 +86,61 @@ paths:
     [Test]
     public async Task Can_Generate_Code()
     {
-        string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
+        string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
     [Test]
-    public async Task Generates_IAsyncEnumerable_For_NDJson_When_Enabled()
+    public async Task Generates_IAsyncEnumerable_For_NDJson()
     {
-        string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
+        string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("IAsyncEnumerable<");
     }
 
     [Test]
     public async Task Generates_IAsyncEnumerable_For_NDJson_Method()
     {
-        string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
+        string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> GetEvents(");
     }
 
     [Test]
     public async Task Generates_IAsyncEnumerable_For_Jsonl_Method()
     {
-        string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
+        string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous2> GetEventsJsonl(");
     }
 
     [Test]
     public async Task Generates_IAsyncEnumerable_For_EventStream_Method()
     {
-        string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
+        string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous3> GetEventsSse(");
     }
 
     [Test]
     public async Task Generates_IAsyncEnumerable_Of_Object_For_Untyped_Streaming_Response()
     {
-        string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
+        string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("IAsyncEnumerable<object> GetEventsUntyped(");
-    }
-
-    [Test]
-    public async Task Generates_Task_Of_Collection_When_Disabled()
-    {
-        string generatedCode = await GenerateCode(returnIAsyncEnumerable: false);
-        generatedCode.Should().Contain("Task<ICollection<Anonymous>> GetEvents(");
     }
 
     [Test]
     public async Task Can_Build_Generated_Code()
     {
-        string generatedCode = await GenerateCode(returnIAsyncEnumerable: true);
+        string generatedCode = await GenerateCode();
         BuildHelper
             .BuildCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode(bool returnIAsyncEnumerable)
+    private static async Task<string> GenerateCode()
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         RefitGeneratorSettings settings = new RefitGeneratorSettings
         {
-            OpenApiPath = swaggerFile,
-            ReturnIAsyncEnumerable = returnIAsyncEnumerable
+            OpenApiPath = swaggerFile
         };
 
         RefitGenerator sut = await RefitGenerator.CreateAsync(settings);

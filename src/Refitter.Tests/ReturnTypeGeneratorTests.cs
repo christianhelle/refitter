@@ -375,47 +375,6 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = await OpenApiDocument.FromJsonAsync(spec);
-        var settings = new RefitGeneratorSettings { ReturnIAsyncEnumerable = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
-
-        var operation = document.Paths["/test"]["get"];
-        var result = sut.Generate(operation);
-
-        result.Should().Be("IAsyncEnumerable<string>");
-    }
-
-    [Test]
-    public async Task Generate_Returns_Task_Of_Collection_For_Streaming_Response_When_Disabled()
-    {
-        var spec = """
-            {
-              "openapi": "3.0.0",
-              "info": { "title": "Test", "version": "1.0" },
-              "paths": {
-                "/test": {
-                  "get": {
-                    "operationId": "getTest",
-                    "responses": {
-                      "200": {
-                        "description": "Success",
-                        "content": {
-                          "application/x-ndjson": {
-                            "schema": {
-                              "type": "array",
-                              "items": { "type": "string" }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            """;
-
-        var document = await OpenApiDocument.FromJsonAsync(spec);
         var settings = new RefitGeneratorSettings();
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
@@ -423,7 +382,7 @@ public class ReturnTypeGeneratorTests
         var operation = document.Paths["/test"]["get"];
         var result = sut.Generate(operation);
 
-        result.Should().Be("Task<ICollection<string>>");
+        result.Should().Be("IAsyncEnumerable<string>");
     }
 
     [Test]
