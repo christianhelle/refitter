@@ -418,7 +418,7 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = await OpenApiDocument.FromJsonAsync(spec);
-        var settings = new RefitGeneratorSettings { ReturnIAsyncEnumerable = true };
+        var settings = new RefitGeneratorSettings();
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
@@ -461,7 +461,6 @@ public class ReturnTypeGeneratorTests
         var document = await OpenApiDocument.FromJsonAsync(spec);
         var settings = new RefitGeneratorSettings
         {
-            ReturnIAsyncEnumerable = true,
             ReturnIApiResponse = true
         };
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
@@ -504,7 +503,7 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = await OpenApiDocument.FromJsonAsync(spec);
-        var settings = new RefitGeneratorSettings { ReturnIAsyncEnumerable = true };
+        var settings = new RefitGeneratorSettings();
         settings.ResponseTypeOverride["customOp"] = "MyCustomType";
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
@@ -548,7 +547,6 @@ public class ReturnTypeGeneratorTests
         var document = await OpenApiDocument.FromJsonAsync(spec);
         var settings = new RefitGeneratorSettings
         {
-            ReturnIAsyncEnumerable = true,
             ReturnIObservable = true
         };
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
@@ -591,7 +589,7 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = await OpenApiDocument.FromJsonAsync(spec);
-        var settings = new RefitGeneratorSettings { ReturnIAsyncEnumerable = true };
+        var settings = new RefitGeneratorSettings();
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
@@ -638,7 +636,7 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = await OpenApiDocument.FromJsonAsync(spec);
-        var settings = new RefitGeneratorSettings { ReturnIAsyncEnumerable = true };
+        var settings = new RefitGeneratorSettings();
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
@@ -674,7 +672,7 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = await OpenApiDocument.FromJsonAsync(spec);
-        var settings = new RefitGeneratorSettings { ReturnIAsyncEnumerable = true };
+        var settings = new RefitGeneratorSettings();
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 

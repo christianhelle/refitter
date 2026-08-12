@@ -17,7 +17,6 @@ public class SettingsMapperTests
             PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal,
             ReturnIApiResponse = true,
             ReturnIObservable = true,
-            ReturnIAsyncEnumerable = true,
             UseCancellationTokens = true,
             UseIsoDateFormat = true,
             MultipleInterfaces = MultipleInterfaces.ByEndpoint,
@@ -42,7 +41,6 @@ public class SettingsMapperTests
         result.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PreserveOriginal);
         result.ReturnIApiResponse.Should().BeTrue();
         result.ReturnIObservable.Should().BeTrue();
-        result.ReturnIAsyncEnumerable.Should().BeTrue();
         result.UseCancellationTokens.Should().BeTrue();
         result.UseIsoDateFormat.Should().BeTrue();
         result.MultipleInterfaces.Should().Be(MultipleInterfaces.ByEndpoint);

@@ -5,7 +5,6 @@
     "useOpenApiTitle": true,
     "interfaceName": "ApiClient"
   },
-  "returnIAsyncEnumerable": true,
   "codeGeneratorSettings": {
     "integerType": "Int64",
     "generateOptionalPropertiesAsNullable": true

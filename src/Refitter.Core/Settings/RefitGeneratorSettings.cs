@@ -138,13 +138,6 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public bool ReturnIObservable { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to return <c>IAsyncEnumerable&lt;T&gt;</c> for
-    /// streaming responses (JSON Lines content types such as <c>application/x-ndjson</c>).
-    /// </summary>
-    [Description("Return IAsyncEnumerable<T> for streaming responses.")]
-    public bool ReturnIAsyncEnumerable { get; set; }
-
-    /// <summary>
     /// Gets or sets a dictionary of operation ids and a specific response type that they should use. The type is
     /// wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).
     /// </summary>

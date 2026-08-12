@@ -27,7 +27,6 @@ public class SettingsTests
         settings.ContractOnly.Should().BeFalse();
         settings.ReturnIApiResponse.Should().BeFalse();
         settings.ReturnIObservable.Should().BeFalse();
-        settings.ReturnIAsyncEnumerable.Should().BeFalse();
         settings.InternalTypeAccessibility.Should().BeFalse();
         settings.UseCancellationTokens.Should().BeFalse();
         settings.NoOperationHeaders.Should().BeFalse();
@@ -110,7 +109,6 @@ public class SettingsTests
             NoAcceptHeaders = true,
             InterfaceOnly = true,
             ReturnIApiResponse = true,
-            ReturnIAsyncEnumerable = true,
             InternalTypeAccessibility = true,
             UseCancellationTokens = true,
             NoOperationHeaders = true,
@@ -135,7 +133,6 @@ public class SettingsTests
         settings.NoAcceptHeaders.Should().BeTrue();
         settings.InterfaceOnly.Should().BeTrue();
         settings.ReturnIApiResponse.Should().BeTrue();
-        settings.ReturnIAsyncEnumerable.Should().BeTrue();
         settings.InternalTypeAccessibility.Should().BeTrue();
         settings.UseCancellationTokens.Should().BeTrue();
         settings.NoOperationHeaders.Should().BeTrue();

@@ -81,9 +81,4 @@ public interface ICodeGenerationConfiguration
     /// Gets a value indicating whether to use cancellation tokens.
     /// </summary>
     bool UseCancellationTokens { get; }
-
-    /// <summary>
-    /// Gets a value indicating whether to return <c>IAsyncEnumerable&lt;T&gt;</c> for streaming responses.
-    /// </summary>
-    bool ReturnIAsyncEnumerable { get; }
 }

@@ -260,7 +260,6 @@ public class WriteRefitterSettingsFileTests
                 GenerateContracts = true,
                 GenerateClients = true,
                 ReturnIApiResponse = true,
-                ReturnIAsyncEnumerable = true,
                 UseCancellationTokens = true
             };
 
@@ -278,7 +277,6 @@ public class WriteRefitterSettingsFileTests
             deserializedSettings.GenerateContracts.Should().BeTrue();
             deserializedSettings.GenerateClients.Should().BeTrue();
             deserializedSettings.ReturnIApiResponse.Should().BeTrue();
-            deserializedSettings.ReturnIAsyncEnumerable.Should().BeTrue();
             deserializedSettings.UseCancellationTokens.Should().BeTrue();
         }
         finally

@@ -211,7 +211,6 @@ function RunTests
     $netCoreVariants = @(
         @{ Suffix="Disposable"; Prefix="Disposable"; Args="--disposable" },
         @{ Suffix="ImmutableRecords"; Prefix="ImmutableRecords"; Args="--immutable-records" },
-        @{ Suffix="AsyncEnumerable"; Prefix="AsyncEnumerable"; Args="--use-iasync-enumerable" },
         @{ Suffix="PolymorphicSerialization"; Prefix="PolymorphicSerialization"; Args="--use-polymorphic-serialization" },
         @{ Suffix="CollectionFormatCsv"; Prefix="CollectionFormatCsv"; Args="--collection-format csv" },
         @{ Suffix="JsonSerializerContext"; Prefix="JsonSerializerCtx"; Args="--json-serializer-context" },
