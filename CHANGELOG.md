@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Update Refit to v15.1.0 [\#1224](https://github.com/christianhelle/refitter/pull/1224) ([christianhelle](https://github.com/christianhelle))
 - Generate IAsyncEnumerable for streaming responses [\#1221](https://github.com/christianhelle/refitter/pull/1221) ([christianhelle](https://github.com/christianhelle))
 - Fix code scanning workflow permissions alerts [\#1218](https://github.com/christianhelle/refitter/pull/1218) ([christianhelle](https://github.com/christianhelle))
 
