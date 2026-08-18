@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Refit" Version="15.1.0" />
-    <PackageReference Include="Refit.HttpClientFactory" Version="15.1.0" />
+    <PackageReference Include="Refit" Version="15.2.0" />
+    <PackageReference Include="Refit.HttpClientFactory" Version="15.2.0" />
   </ItemGroup>
 
 </Project>
