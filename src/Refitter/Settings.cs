@@ -105,6 +105,11 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool NoLogging { get; set; }
 
+    [Description("Suppress all console output. Errors are still reported through the exit code")]
+    [CommandOption("--silent")]
+    [DefaultValue(false)]
+    public bool Silent { get; set; }
+
     /// <summary>
     /// The telemetry source of this invocation, e.g. <c>msbuild</c>. Used internally by the MSBuild integration.
     /// </summary>
