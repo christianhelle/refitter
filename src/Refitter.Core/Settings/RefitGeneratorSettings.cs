@@ -443,4 +443,12 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     /// </summary>
     [Description("Suffix to append to all generated contract type names. Default is null which doesn't append any suffix.")]
     public string? ContractTypeSuffix { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the CLI should suppress all console output.
+    /// </summary>
+    [Description("Suppress all console output when running the CLI tool. Default is false.")]
+    [JsonPropertyName("silent")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Silent { get; set; }
 }

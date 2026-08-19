@@ -151,4 +151,43 @@ public class SerializerTests
         var settings = new CodeGeneratorSettings();
         settings.JsonLibraryVersion.Should().Be(8.0m);
     }
+
+    [Test]
+    public void Default_Silent_Should_Be_False()
+    {
+        var settings = new RefitGeneratorSettings();
+        settings.Silent.Should().BeFalse();
+    }
+
+    [Test]
+    public void Can_Serialize_RefitGeneratorSettings_With_Silent()
+    {
+        var settings = CreateTestSettings();
+        settings.Silent = true;
+
+        var json = Serializer.Serialize(settings);
+
+        json.Should().Contain("\"silent\": true");
+    }
+
+    [Test]
+    public void Can_Deserialize_RefitGeneratorSettings_With_Silent()
+    {
+        const string json = """{"silent": true}""";
+
+        var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+
+        settings.Should().NotBeNull();
+        settings.Silent.Should().BeTrue();
+    }
+
+    [Test]
+    public void Can_Serialize_RefitGeneratorSettings_With_Default_Silent_Omits_Property()
+    {
+        var settings = CreateTestSettings();
+
+        var json = Serializer.Serialize(settings);
+
+        json.Should().NotContain("\"silent\"");
+    }
 }
