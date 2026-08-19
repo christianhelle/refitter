@@ -12,10 +12,17 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     private RefitGeneratorSettings? cachedSettings;
 
-    private static IGenerationReporter CreateReporter(Settings settings) =>
-        settings.SimpleOutput
+    private static IGenerationReporter CreateReporter(
+        Settings settings,
+        RefitGeneratorSettings? generatorSettings = null)
+    {
+        if (settings.Silent || generatorSettings?.Silent == true)
+            return new SilentGenerationReporter();
+
+        return settings.SimpleOutput
             ? new SimpleGenerationReporter()
             : new RichGenerationReporter();
+    }
 
     protected override ValidationResult Validate(CommandContext context, Settings settings)
     {
@@ -45,8 +52,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         Settings settings,
         CancellationToken cancellationToken)
     {
-        var reporter = CreateReporter(settings);
-
         if (!settings.NoLogging)
             Analytics.Configure();
 
@@ -75,6 +80,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             refitGeneratorSettings = SettingsMapper.Map(settings);
         }
 
+        var reporter = CreateReporter(settings, refitGeneratorSettings);
+
         var orchestrator = new GenerationOrchestrator();
         return await orchestrator.RunAsync(
             refitGeneratorSettings,
@@ -100,7 +107,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         var json = Serializer.Serialize(refitGeneratorSettings);
         await File.WriteAllTextAsync(settingsFilePath, json, cancellationToken);
 
-        CreateReporter(settings).ReportSettingsFileGenerated(settingsFilePath);
+        CreateReporter(settings, refitGeneratorSettings).ReportSettingsFileGenerated(settingsFilePath);
     }
 
     internal static string DetermineSettingsFilePath(Settings settings)
