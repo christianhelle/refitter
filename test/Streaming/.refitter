@@ -1,6 +1,7 @@
 {
   "openApiPath": "../OpenAPI/v3.1/lmstudio.json",
   "namespace": "Test",
+  "silent": true,
   "naming": {
     "useOpenApiTitle": true,
     "interfaceName": "ApiClient"
