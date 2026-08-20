@@ -32,6 +32,7 @@ public class SettingsTests
         settings.NoOperationHeaders.Should().BeFalse();
         settings.IgnoredOperationHeaders.Should().NotBeNull().And.BeEmpty();
         settings.NoLogging.Should().BeFalse();
+        settings.Silent.Should().BeFalse();
         settings.AdditionalNamespaces.Should().NotBeNull().And.BeEmpty();
         settings.ExcludeNamespaces.Should().NotBeNull().And.BeEmpty();
         settings.UseIsoDateFormat.Should().BeFalse();
@@ -113,6 +114,7 @@ public class SettingsTests
             UseCancellationTokens = true,
             NoOperationHeaders = true,
             NoLogging = true,
+            Silent = true,
             UseIsoDateFormat = true,
             SkipValidation = true,
             NoDeprecatedOperations = true,
@@ -137,6 +139,7 @@ public class SettingsTests
         settings.UseCancellationTokens.Should().BeTrue();
         settings.NoOperationHeaders.Should().BeTrue();
         settings.NoLogging.Should().BeTrue();
+        settings.Silent.Should().BeTrue();
         settings.UseIsoDateFormat.Should().BeTrue();
         settings.SkipValidation.Should().BeTrue();
         settings.NoDeprecatedOperations.Should().BeTrue();

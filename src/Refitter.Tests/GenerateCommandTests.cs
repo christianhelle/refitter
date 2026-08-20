@@ -568,6 +568,118 @@ public class GenerateCommandTests
         }
     }
 
+    [Test]
+    public void Program_Main_Should_Produce_No_Output_When_Silent()
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            string openApiPath = Path.Combine(workspace, "petstore.json");
+            string outputPath = Path.Combine(workspace, "Generated", "PetstoreClient.cs");
+
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": {
+                    "title": "Petstore API",
+                    "version": "1.0.0"
+                  },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "responses": {
+                          "200": {
+                            "description": "ok"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            (int ExitCode, string Output) result = InvokeProgram(
+            [
+                openApiPath,
+                "--output", outputPath,
+                "--silent",
+                "--no-logging"
+            ]);
+
+            result.ExitCode.Should().Be(0, result.Output);
+            result.Output.Should().BeEmpty();
+            File.Exists(outputPath).Should().BeTrue();
+        }
+        finally
+        {
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Program_Main_Should_Produce_No_Output_When_Settings_File_Is_Silent()
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            File.WriteAllText(
+                Path.Combine(workspace, "petstore.json"),
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": {
+                    "title": "Petstore API",
+                    "version": "1.0.0"
+                  },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "responses": {
+                          "200": {
+                            "description": "ok"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            string settingsFile = Path.Combine(workspace, "petstore.refitter");
+            File.WriteAllText(
+                settingsFile,
+                """
+                {
+                  "openApiPath": "petstore.json",
+                  "namespace": "Petstore",
+                  "outputFolder": "Generated",
+                  "outputFilename": "PetstoreClient.cs",
+                  "silent": true
+                }
+                """);
+
+            (int ExitCode, string Output) result = InvokeProgram(
+            [
+                "--settings-file", settingsFile,
+                "--no-logging"
+            ]);
+
+            result.ExitCode.Should().Be(0, result.Output);
+            result.Output.Should().BeEmpty();
+            File.Exists(Path.Combine(workspace, "Generated", "PetstoreClient.cs")).Should().BeTrue();
+        }
+        finally
+        {
+            DeleteWorkspace(workspace);
+        }
+    }
+
     private static (int ExitCode, string Output) InvokeProgram(string[] args)
     {
         var cliPath = Path.Combine(AppContext.BaseDirectory, "refitter.dll");

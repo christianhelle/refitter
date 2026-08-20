@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param (
     [Parameter(Mandatory=$false)]
     [switch]
@@ -13,12 +14,52 @@ param (
     $Parallel = $true
 )
 
-function ThrowOnNativeFailure
+# Output is suppressed by default. Pass -Verbose to show progress output
+# from this script and all child processes.
+$script:VerboseOutput = $VerbosePreference -eq "Continue"
+
+$script:ChildLogDirectory = Join-Path ([System.IO.Path]::GetTempPath()) "refitter-smoke-tests-$([guid]::NewGuid().ToString('N'))"
+New-Item -ItemType Directory -Path $script:ChildLogDirectory -Force | Out-Null
+
+function Invoke-ChildProcess
 {
-    if (-not $?)
+    param (
+        [string]$FilePath,
+        [string]$Arguments,
+        [string]$Description
+    )
+
+    Write-Verbose "$FilePath $Arguments"
+
+    if ($script:VerboseOutput)
     {
-        throw "Native Failure"
+        $p = Start-Process $FilePath -Args $Arguments -NoNewWindow -PassThru
+        $p | Wait-Process
+        return $p.ExitCode
     }
+
+    $stdoutLog = Join-Path $script:ChildLogDirectory "$([guid]::NewGuid().ToString('N')).log"
+    $stderrLog = "$stdoutLog.err"
+    $p = Start-Process $FilePath -Args $Arguments -NoNewWindow -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog -PassThru
+    $p | Wait-Process
+
+    if ($p.ExitCode -ne 0)
+    {
+        Write-Host "FAILED: $Description (exit code $($p.ExitCode))"
+        Write-Host "Command: $FilePath $Arguments"
+        if (Test-Path $stdoutLog)
+        {
+            Write-Host "-- stdout --"
+            Get-Content $stdoutLog -Tail 60 | ForEach-Object { Write-Host $_ }
+        }
+        if (Test-Path $stderrLog)
+        {
+            Write-Host "-- stderr --"
+            Get-Content $stderrLog -Tail 60 | ForEach-Object { Write-Host $_ }
+        }
+    }
+
+    return $p.ExitCode
 }
 
 function GetProcessPath([bool]$buildFromSource, [bool]$useDocker)
@@ -51,18 +92,19 @@ function StartRefitter
         [bool]$useDocker = $false
     )
 
+    if (-not $script:VerboseOutput)
+    {
+        $arguments += " --silent"
+    }
+
     if ($useDocker)
     {
         $dockerPrefix = BuildDockerPrefix
         $fullArgs = "$dockerPrefix $arguments"
-        Write-Host "docker $fullArgs"
-        Start-Process "docker" -Args $fullArgs -NoNewWindow -PassThru
+        return Invoke-ChildProcess -FilePath "docker" -Arguments $fullArgs -Description "refitter"
     }
-    else
-    {
-        Write-Host "$processPath $arguments"
-        Start-Process $processPath -Args $arguments -NoNewWindow -PassThru
-    }
+
+    return Invoke-ChildProcess -FilePath $processPath -Arguments $arguments -Description "refitter"
 }
 
 function GenerateFromSettingsFile
@@ -73,12 +115,11 @@ function GenerateFromSettingsFile
         [bool]$useDocker = $false
     )
 
-    $p = StartRefitter `
+    $exitCode = StartRefitter `
         -arguments "--no-logging --settings-file $settingsFile" `
         -processPath $processPath `
         -useDocker $useDocker
-    $p | Wait-Process
-    if ($p.ExitCode -ne 0) { throw "Refitter failed for settings file: $settingsFile" }
+    if ($exitCode -ne 0) { throw "Refitter failed for settings file: $settingsFile" }
 }
 
 function BuildSolution
@@ -93,10 +134,9 @@ function BuildSolution
     if ($noRestore) { $buildArgs += " --no-restore" }
     if ($smokeTest) { $buildArgs += " --property:SmokeTest=true" }
 
-    Write-Host "`r`nBuilding $solution`r`n"
-    $p = Start-Process "dotnet" -Args $buildArgs -NoNewWindow -PassThru
-    $p | Wait-Process
-    if ($p.ExitCode -ne 0) { throw "Build Failed: $solution" }
+    Write-Verbose "Building $solution"
+    $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments $buildArgs -Description "Build $solution"
+    if ($exitCode -ne 0) { throw "Build Failed: $solution" }
 }
 
 function CleanGeneratedCode
@@ -132,9 +172,8 @@ function RunGenerationTasks
         $task = $tasks[$i]
         $arguments = "$($task.SpecPath) --namespace $($task.Namespace) --output $($task.OutputPath) --no-logging"
         if ($task.Args) { $arguments += " $($task.Args)" }
-        $p = StartRefitter -arguments $arguments -processPath $processPath -useDocker $useDocker
-        $p | Wait-Process
-        if ($p.ExitCode -ne 0) { throw "Refitter generation failed for: $($task.SpecPath) ($($task.Namespace))" }
+        $exitCode = StartRefitter -arguments $arguments -processPath $processPath -useDocker $useDocker
+        if ($exitCode -ne 0) { throw "Refitter generation failed for: $($task.SpecPath) ($($task.Namespace))" }
     }
 }
 
@@ -222,27 +261,35 @@ function RunTests
     # ==========================================
     if ($BuildFromSource -and -not $UseDocker)
     {
-        Write-Host "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0"
-        Start-Process "dotnet" -Args "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0" -NoNewWindow -PassThru | Wait-Process
+        Write-Verbose "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0"
+        $exitCode = Invoke-ChildProcess `
+            -FilePath "dotnet" `
+            -Arguments "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0 --nologo -v q" `
+            -Description "dotnet publish"
+        if ($exitCode -ne 0) { throw "Publish failed!" }
 
-        Write-Host "refitter --version"
-        $p = Start-Process "./bin/refitter" -Args "--version" -NoNewWindow -PassThru
-        $p | Wait-Process
-        if ($p.ExitCode -ne 0) { throw "Show version failed!" }
+        $exitCode = Invoke-ChildProcess `
+            -FilePath "./bin/refitter" `
+            -Arguments "--version" `
+            -Description "refitter --version"
+        if ($exitCode -ne 0) { throw "Show version failed!" }
     }
 
     # ==========================================
     # Phase 1: Pre-restore packages
     # ==========================================
-    Write-Host "`r`n=== Pre-restoring packages ===`r`n"
-    Start-Process "dotnet" -Args "restore ./ConsoleApp/ConsoleApp.slnx --nologo -v q" -NoNewWindow -PassThru | Wait-Process
-    Start-Process "dotnet" -Args "restore ./ConsoleApp/ConsoleApp.Core.slnx --nologo -v q" -NoNewWindow -PassThru | Wait-Process
-    Start-Process "dotnet" -Args "restore ./Apizr/Sample.csproj --nologo -v q" -NoNewWindow -PassThru | Wait-Process
+    Write-Verbose "Pre-restoring packages"
+    $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "restore ./ConsoleApp/ConsoleApp.slnx --nologo -v q" -Description "restore ConsoleApp.slnx"
+    if ($exitCode -ne 0) { throw "Restore failed: ConsoleApp.slnx" }
+    $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "restore ./ConsoleApp/ConsoleApp.Core.slnx --nologo -v q" -Description "restore ConsoleApp.Core.slnx"
+    if ($exitCode -ne 0) { throw "Restore failed: ConsoleApp.Core.slnx" }
+    $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "restore ./Apizr/Sample.csproj --nologo -v q" -Description "restore Apizr/Sample.csproj"
+    if ($exitCode -ne 0) { throw "Restore failed: Apizr/Sample.csproj" }
 
     # ==========================================
     # Phase 2: Settings-file tests (individual generate + build)
     # ==========================================
-    Write-Host "`r`n=== Settings-file tests ===`r`n"
+    Write-Verbose "Settings-file tests"
 
     CleanGeneratedCode
     GenerateFromSettingsFile -settingsFile "./petstore.refitter" -processPath $processPath -useDocker $UseDocker
@@ -266,7 +313,7 @@ function RunTests
     # ==========================================
     # Phase 3: Generate all STANDARD variants (no build until all are generated)
     # ==========================================
-    Write-Host "`r`n=== Generating standard variants ===`r`n"
+    Write-Verbose "Generating standard variants"
     CleanGeneratedCode
 
     $standardTasks = @()
@@ -465,8 +512,8 @@ function RunTests
         }
     }
 
-    Write-Host "Standard generation tasks: $($standardTasks.Count)"
-    Write-Host "NetCore generation tasks: $($netCoreTasks.Count)"
+    Write-Verbose "Standard generation tasks: $($standardTasks.Count)"
+    Write-Verbose "NetCore generation tasks: $($netCoreTasks.Count)"
 
     # Execute standard generation in parallel batches
     RunGenerationTasks -tasks $standardTasks -processPath $processPath -useDocker $UseDocker
@@ -474,7 +521,7 @@ function RunTests
     # ==========================================
     # Phase 4: Build standard variants (one build validates all)
     # ==========================================
-    Write-Host "`r`n=== Building standard variants ===`r`n"
+    Write-Verbose "Building standard variants"
     BuildSolution -solution "./ConsoleApp/ConsoleApp.slnx" -noRestore -smokeTest
 
     # ==========================================
@@ -482,45 +529,41 @@ function RunTests
     # This variant uses --multiple-interfaces ByEndpoint --operation-name-template which
     # generates duplicate types per-endpoint (known limitation). We verify generation succeeds.
     # ==========================================
-    Write-Host "`r`n=== Generate-only: MultipleInterfacesWithCustomName (petstore) ===`r`n"
+    Write-Verbose "Generate-only: MultipleInterfacesWithCustomName (petstore)"
     $customNameSpec = "./OpenAPI/v3.0/petstore.json"
     $customNameArgs = "--multiple-interfaces ByEndpoint --operation-name-template ExecuteAsync"
     $customNameOutput = "./GeneratedCode/MultipleInterfacesWithCustomName_generateonly.cs"
     $customNameInvocation = "$customNameSpec --namespace GenerateOnly.MultipleInterfacesWithCustomName --output $customNameOutput --no-logging $customNameArgs"
-    $p = StartRefitter `
+    $exitCode = StartRefitter `
         -arguments $customNameInvocation `
         -processPath $processPath `
         -useDocker $UseDocker
-    $p | Wait-Process
-    if ($p.ExitCode -ne 0) { throw "Generate-only test failed: MultipleInterfacesWithCustomName; exit code $($p.ExitCode)" }
+    if ($exitCode -ne 0) { throw "Generate-only test failed: MultipleInterfacesWithCustomName; exit code $exitCode" }
     if (-not (Test-Path $customNameOutput)) { throw "Generate-only test failed: MultipleInterfacesWithCustomName" }
     Remove-Item $customNameOutput -Force
-    Write-Host "Generate-only test passed: MultipleInterfacesWithCustomName"
+    Write-Verbose "Generate-only test passed: MultipleInterfacesWithCustomName"
 
     # ==========================================
     # Phase 5: Generate netCore variants (accumulate on top of standard code)
     # Net8/Net9/Net10 can compile both standard and netCore code
     # ==========================================
-    Write-Host "`r`n=== Generating netCore variants ===`r`n"
+    Write-Verbose "Generating netCore variants"
     RunGenerationTasks -tasks $netCoreTasks -processPath $processPath -useDocker $UseDocker
 
     # ==========================================
     # Phase 6: Build netCore variants
     # ==========================================
-    Write-Host "`r`n=== Building netCore variants ===`r`n"
+    Write-Verbose "Building netCore variants"
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore -smokeTest
 
     # ==========================================
     # Phase 7: URL-based tests (network-dependent)
     # ==========================================
-    Write-Host "`r`n=== URL-based tests ===`r`n"
+    Write-Verbose "URL-based tests"
     CleanGeneratedCode
 
     @("https://petstore3.swagger.io/api/v3/openapi.json", "https://petstore3.swagger.io/api/v3/openapi.yaml") | ForEach-Object {
         $url = $_
-        $urlFormat = if ($url.EndsWith(".json")) { "json" } else { "yaml" }
-        $namespace = "PetstoreFromUri"
-        $outputPath = "PetstoreFromUri.generated.cs"
 
         try {
             Get-ChildItem './GeneratedCode/*.cs' -Recurse -ErrorAction Stop |
@@ -530,12 +573,11 @@ function RunTests
             # Ignore not-found errors (path/file doesn't exist yet)
         }
 
-        $p = StartRefitter `
-            -arguments """$url"" --namespace $namespace --output ./GeneratedCode/$outputPath --no-logging" `
+        $exitCode = StartRefitter `
+            -arguments """$url"" --namespace PetstoreFromUri --output ./GeneratedCode/PetstoreFromUri.generated.cs --no-logging" `
             -processPath $processPath `
             -useDocker $UseDocker
-        $p | Wait-Process
-        if ($p.ExitCode -ne 0) { throw "Refitter failed for URL: $url" }
+        if ($exitCode -ne 0) { throw "Refitter failed for URL: $url" }
 
         BuildSolution -solution "./ConsoleApp/ConsoleApp.slnx" -noRestore
     }
@@ -543,7 +585,7 @@ function RunTests
     # ==========================================
     # Phase 8: Operation Name Generator Tests
     # ==========================================
-    Write-Host "`r`n=== Operation Name Generator Tests ===`r`n"
+    Write-Verbose "Operation Name Generator Tests"
 
     $opNameGenerators = @(
         "Default",
@@ -560,9 +602,8 @@ function RunTests
     foreach ($gen in $opNameGenerators)
     {
         $genArgs = "./OpenAPI/v3.0/petstore.json --namespace OpNameGen_$gen --output ./GeneratedCode/OpNameGen_$gen.generated.cs --no-logging --operation-name-generator $gen"
-        $p = StartRefitter -arguments $genArgs -processPath $processPath -useDocker $UseDocker
-        $p | Wait-Process
-        if ($p.ExitCode -ne 0) { Write-Warning "Operation name generator '$gen' failed (may be expected for some generators)" }
+        $exitCode = StartRefitter -arguments $genArgs -processPath $processPath -useDocker $UseDocker
+        if ($exitCode -ne 0) { Write-Verbose "Operation name generator '$gen' failed (may be expected for some generators)" }
     }
     # Build only what was successfully generated
     if (Test-Path './GeneratedCode/OpNameGen_*.generated.cs') {
@@ -572,7 +613,7 @@ function RunTests
     # ==========================================
     # Phase 9: Collection Format Variant Tests
     # ==========================================
-    Write-Host "`r`n=== Collection Format Variant Tests ===`r`n"
+    Write-Verbose "Collection Format Variant Tests"
 
     $collectionFormats = @("Multi", "Ssv", "Tsv", "Pipes")
 
@@ -580,16 +621,15 @@ function RunTests
     foreach ($fmt in $collectionFormats)
     {
         $fmtArgs = "./OpenAPI/v3.0/petstore.json --namespace CollFmt_$fmt --output ./GeneratedCode/CollFmt_$fmt.generated.cs --no-logging --collection-format $fmt"
-        $p = StartRefitter -arguments $fmtArgs -processPath $processPath -useDocker $UseDocker
-        $p | Wait-Process
-        if ($p.ExitCode -ne 0) { throw "Collection format '$fmt' generation failed" }
+        $exitCode = StartRefitter -arguments $fmtArgs -processPath $processPath -useDocker $UseDocker
+        if ($exitCode -ne 0) { throw "Collection format '$fmt' generation failed" }
     }
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore -smokeTest
 
     # ==========================================
     # Phase 10: Combination Tests
     # ==========================================
-    Write-Host "`r`n=== Combination Tests ===`r`n"
+    Write-Verbose "Combination Tests"
 
     CleanGeneratedCode
     $combinationTasks = @(
@@ -630,9 +670,8 @@ function RunTests
             $output = $combo.Output
         }
         $fullArgs = "$($combo.Spec) --namespace $ns --output $output --no-logging $($combo.Args)"
-        $p = StartRefitter -arguments $fullArgs -processPath $processPath -useDocker $UseDocker
-        $p | Wait-Process
-        if ($p.ExitCode -ne 0) { throw "Combination test '$($combo.Name)' generation failed" }
+        $exitCode = StartRefitter -arguments $fullArgs -processPath $processPath -useDocker $UseDocker
+        if ($exitCode -ne 0) { throw "Combination test '$($combo.Name)' generation failed" }
     }
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore -smokeTest
 
@@ -644,38 +683,42 @@ function RunTests
     # OpenAPI/v3.0/asana.yaml to avoid transient HTTP errors. Generate
     # with default settings and build once to guard against regressions.
     # ==========================================
-    Write-Host "`r`n=== Asana API regression test (issue #359) ===`r`n"
+    Write-Verbose "Asana API regression test (issue #359)"
 
     CleanGeneratedCode
     $asanaArgs = "./OpenAPI/v3.0/asana.yaml --namespace Asana --output ./GeneratedCode/Asana.generated.cs --no-logging"
-    $p = StartRefitter -arguments $asanaArgs -processPath $processPath -useDocker $UseDocker
-    $p | Wait-Process
-    if ($p.ExitCode -ne 0) { throw "Asana API generation failed (issue #359 regression)" }
+    $exitCode = StartRefitter -arguments $asanaArgs -processPath $processPath -useDocker $UseDocker
+    if ($exitCode -ne 0) { throw "Asana API generation failed (issue #359 regression)" }
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore -smokeTest
 }
 
-if ($UseProduction)
+try
 {
-    Write-Host "Running smoke tests in production mode"
-    Write-Host "dotnet tool update -g refitter --prerelease"
-    Start-Process "dotnet" -Args "tool update -g refitter --prerelease" -NoNewWindow -PassThru | Wait-Process
-    ThrowOnNativeFailure
-    Write-Host "`r`n"
-}
+    if ($UseProduction)
+    {
+        Write-Verbose "Running smoke tests in production mode"
+        $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "tool update -g refitter --prerelease -v q" -Description "dotnet tool update -g refitter --prerelease"
+        if ($exitCode -ne 0) { throw "Production tool update failed" }
+    }
 
-if ($UseDocker)
+    if ($UseDocker)
+    {
+        Write-Verbose "Running smoke tests in Docker mode"
+        $exitCode = Invoke-ChildProcess -FilePath "docker" -Arguments "pull christianhelle/refitter:latest" -Description "docker pull christianhelle/refitter:latest"
+        if ($exitCode -ne 0) { throw "Docker image pull failed" }
+    }
+
+    $totalTime = Measure-Command {
+        RunTests `
+            -BuildFromSource (-not $UseProduction -and -not $UseDocker) `
+            -UseDocker $UseDocker
+    }
+    Write-Host "Smoke tests passed in $([math]::Round($totalTime.TotalSeconds, 1)) seconds"
+}
+finally
 {
-    Write-Host "Running smoke tests in Docker mode"
-    Write-Host "docker pull christianhelle/refitter:latest"
-    Start-Process "docker" -Args "pull christianhelle/refitter:latest" -NoNewWindow -PassThru | Wait-Process
-    ThrowOnNativeFailure
-    Write-Host "`r`n"
+    if (Test-Path $script:ChildLogDirectory)
+    {
+        Remove-Item -Path $script:ChildLogDirectory -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
-
-Measure-Command {
-    RunTests `
-        -BuildFromSource (-not $UseProduction -and -not $UseDocker) `
-        -UseDocker $UseDocker
-}
-Write-Host "`r`n"
-Write-Host "`r`n"

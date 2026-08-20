@@ -156,7 +156,7 @@ docker run --rm -v %cd%:/src christianhelle/refitter %*
 ```
 -n, --namespace                  Default namespace (default: GeneratedCode)
 -o, --output                     Output file path (default: Output.cs)
--s, --settings-file              Path to .refitter settings file
+-s, --settings-file              Path to .refitter settings file. Specifying this will ignore all other settings (except for --output and --silent)
     --contracts-namespace        Namespace for contracts
     --contracts-output           Separate output for contracts
     --interface-only             Generate only interfaces
@@ -181,6 +181,7 @@ docker run --rm -v %cd%:/src christianhelle/refitter %*
     --operation-name-generator   Naming strategy
     --no-banner                  Hide banner
     --simple-output              Plain text output
+    --silent                     Suppress all console output. Errors are still reported through the exit code
 ```
 
 ## Volume Mounting

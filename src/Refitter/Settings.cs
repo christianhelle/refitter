@@ -13,7 +13,7 @@ public sealed class Settings : CommandSettings
     [DefaultValue(null)]
     public string? OpenApiPath { get; set; }
 
-    [Description("Path to .refitter settings file. Specifying this will ignore all other settings (except for --output)")]
+    [Description("Path to .refitter settings file. Specifying this will ignore all other settings (except for --output and --silent)")]
     [CommandOption("-s|--settings-file")]
     public string? SettingsFilePath { get; set; }
 
@@ -104,6 +104,16 @@ public sealed class Settings : CommandSettings
     [CommandOption("--no-logging")]
     [DefaultValue(false)]
     public bool NoLogging { get; set; }
+
+    /// <summary>
+    /// Suppress all console output when running the CLI tool. Errors are still reported
+    /// through the process exit code. Can also be enabled by setting <c>"silent": true</c>
+    /// in a settings file.
+    /// </summary>
+    [Description("Suppress all console output. Errors are still reported through the exit code")]
+    [CommandOption("--silent")]
+    [DefaultValue(false)]
+    public bool Silent { get; set; }
 
     /// <summary>
     /// The telemetry source of this invocation, e.g. <c>msbuild</c>. Used internally by the MSBuild integration.

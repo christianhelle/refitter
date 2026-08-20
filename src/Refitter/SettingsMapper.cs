@@ -23,6 +23,7 @@ internal static class SettingsMapper
         result.GenerateDeprecatedOperations = !settings.NoDeprecatedOperations;
         result.GenerateDefaultAdditionalProperties = !settings.SkipDefaultAdditionalProperties;
         result.AllowRemoteReferences = settings.AllowRemoteReferences;
+        result.Silent = settings.Silent;
         result.TypeAccessibility = settings.InternalTypeAccessibility
             ? Core.TypeAccessibility.Internal
             : Core.TypeAccessibility.Public;

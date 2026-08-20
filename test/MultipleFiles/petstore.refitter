@@ -2,6 +2,7 @@
   "openApiPath": "https://petstore3.swagger.io/api/v3/openapi.json",
   "namespace": "Petstore",
   "contractsNamespace": "Petstore.Contracts",
+  "silent": true,
   "outputFolder": "Client",
   "contractsOutputFolder": "Contracts/",
   "generateMultipleFiles": true,
