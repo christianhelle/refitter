@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param (
     [Parameter(Mandatory=$false)]
     [switch]
@@ -7,17 +8,15 @@ param (
     [switch]
     $UseDocker = $false,
 
-    # Show progress output from this script and all child processes.
-    # By default, output is suppressed and only a final summary is printed.
-    [Parameter(Mandatory=$false)]
-    [switch]
-    $Verbose = $false,
-
     # Kept for backward compatibility
     [Parameter(Mandatory=$false)]
     [bool]
     $Parallel = $true
 )
+
+# Output is suppressed by default. Pass -Verbose to show progress output
+# from this script and all child processes.
+$script:VerboseOutput = $VerbosePreference -eq "Continue"
 
 $script:ChildLogDirectory = Join-Path $env:TEMP "refitter-smoke-tests-$([guid]::NewGuid().ToString('N'))"
 New-Item -ItemType Directory -Path $script:ChildLogDirectory -Force | Out-Null
@@ -32,7 +31,7 @@ function Invoke-ChildProcess
 
     Write-Verbose "$FilePath $Arguments"
 
-    if ($Verbose)
+    if ($script:VerboseOutput)
     {
         $p = Start-Process $FilePath -Args $Arguments -NoNewWindow -PassThru
         $p | Wait-Process
@@ -93,7 +92,7 @@ function StartRefitter
         [bool]$useDocker = $false
     )
 
-    if (-not $Verbose)
+    if (-not $script:VerboseOutput)
     {
         $arguments += " --silent"
     }
