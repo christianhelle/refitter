@@ -600,6 +600,7 @@ OPTIONS:
         --no-operation-headers                                   Don't generate operation headers
         --ignored-operation-headers                              A collection of headers to omit from operation signatures
         --no-logging                                             Don't log errors or collect telemetry
+        --silent                                                 Suppress all console output. Errors are still reported through the exit code
         --additional-namespace                                   Add additional namespace to generated types
         --exclude-namespace                                      Exclude namespace on generated types
         --use-iso-date-format                                    Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)
@@ -787,10 +788,10 @@ To see detailed logs if something goes wrong:
 docker run --rm -v $(pwd):/src christianhelle/refitter ./openapi.json --output ./Client.cs
 ```
 
-The `--no-logging` flag disables telemetry collection but not console output. To see minimal output, use:
+The `--no-logging` flag disables telemetry collection but not console output. To suppress all output, use `--silent`:
 
 ```shell
-docker run --rm -v $(pwd):/src christianhelle/refitter ./openapi.json --no-banner --output ./Client.cs
+docker run --rm -v $(pwd):/src christianhelle/refitter ./openapi.json --silent --output ./Client.cs
 ```
 
 ### Verifying the Image

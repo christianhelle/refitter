@@ -181,6 +181,7 @@ docker run --rm -v %cd%:/src christianhelle/refitter %*
     --operation-name-generator   Naming strategy
     --no-banner                  Hide banner
     --simple-output              Plain text output
+    --silent                     Suppress all console output
 ```
 
 ## Volume Mounting

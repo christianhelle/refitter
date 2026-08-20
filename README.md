@@ -109,6 +109,7 @@ OPTIONS:
         --no-operation-headers                                   Don't generate operation headers
         --ignored-operation-headers                              A collection of headers to omit from operation signatures. May be set multiple times
         --no-logging                                             Don't log errors or collect telemetry
+        --silent                                                 Suppress all console output. Errors are still reported through the exit code
         --additional-namespace                                   Add additional namespace to generated types
         --exclude-namespace                                      Exclude namespace on generated types
         --use-iso-date-format                                    Explicitly format date query string parameters in ISO 8601 standard date format using delimiters (2023-06-15)
