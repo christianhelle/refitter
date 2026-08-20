@@ -20,8 +20,11 @@ internal sealed class SilentGenerationReporter : IGenerationReporter
     {
     }
 
-    public Task ReportSingleFileGenerationProgressAsync(CancellationToken cancellationToken = default) =>
-        Task.CompletedTask;
+    public Task ReportSingleFileGenerationProgressAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.CompletedTask;
+    }
 
     public void ReportSingleFileOutput(string fileName, string directory, string sizeFormatted, int lines)
     {
