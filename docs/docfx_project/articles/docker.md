@@ -583,7 +583,7 @@ OPTIONS:
                                                 DEFAULT
     -h, --help                                                   Prints help information
     -v, --version                                                Prints version information
-    -s, --settings-file                                          Path to .refitter settings file. Specifying this will ignore all other settings (except for --output)
+    -s, --settings-file                                          Path to .refitter settings file. Specifying this will ignore all other settings (except for --output and --silent)
     -n, --namespace                             GeneratedCode    Default namespace to use for generated types
         --contracts-namespace                                    Default namespace to use for generated contracts
     -o, --output                                Output.cs        Path to Output file or folder (if multiple files are generated)
