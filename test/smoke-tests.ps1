@@ -692,22 +692,22 @@ function RunTests
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore -smokeTest
 }
 
-if ($UseProduction)
-{
-    Write-Verbose "Running smoke tests in production mode"
-    $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "tool update -g refitter --prerelease -v q" -Description "dotnet tool update -g refitter --prerelease"
-    if ($exitCode -ne 0) { throw "Production tool update failed" }
-}
-
-if ($UseDocker)
-{
-    Write-Verbose "Running smoke tests in Docker mode"
-    $exitCode = Invoke-ChildProcess -FilePath "docker" -Arguments "pull christianhelle/refitter:latest" -Description "docker pull christianhelle/refitter:latest"
-    if ($exitCode -ne 0) { throw "Docker image pull failed" }
-}
-
 try
 {
+    if ($UseProduction)
+    {
+        Write-Verbose "Running smoke tests in production mode"
+        $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "tool update -g refitter --prerelease -v q" -Description "dotnet tool update -g refitter --prerelease"
+        if ($exitCode -ne 0) { throw "Production tool update failed" }
+    }
+
+    if ($UseDocker)
+    {
+        Write-Verbose "Running smoke tests in Docker mode"
+        $exitCode = Invoke-ChildProcess -FilePath "docker" -Arguments "pull christianhelle/refitter:latest" -Description "docker pull christianhelle/refitter:latest"
+        if ($exitCode -ne 0) { throw "Docker image pull failed" }
+    }
+
     $totalTime = Measure-Command {
         RunTests `
             -BuildFromSource (-not $UseProduction -and -not $UseDocker) `
