@@ -481,6 +481,20 @@ public class SettingsMapperTests
     }
 
     [Test]
+    public void Map_Should_Copy_Silent()
+    {
+        Settings settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            Silent = true,
+        };
+
+        RefitGeneratorSettings result = SettingsMapper.Map(settings);
+
+        result.Silent.Should().BeTrue();
+    }
+
+    [Test]
     public void ConventionMapper_Should_Copy_Same_Name_Same_Type()
     {
         var source = new ConventionSource { Name = "test", Value = 42 };
