@@ -571,12 +571,12 @@ public class GenerateCommandTests
     [Test]
     public void Program_Main_Should_Produce_No_Output_When_Silent()
     {
-        var workspace = CreateWorkspace();
+        string workspace = CreateWorkspace();
 
         try
         {
-            var openApiPath = Path.Combine(workspace, "petstore.json");
-            var outputPath = Path.Combine(workspace, "Generated", "PetstoreClient.cs");
+            string openApiPath = Path.Combine(workspace, "petstore.json");
+            string outputPath = Path.Combine(workspace, "Generated", "PetstoreClient.cs");
 
             File.WriteAllText(
                 openApiPath,
@@ -602,7 +602,7 @@ public class GenerateCommandTests
                 }
                 """);
 
-            var result = InvokeProgram(
+            (int ExitCode, string Output) result = InvokeProgram(
             [
                 openApiPath,
                 "--output", outputPath,
@@ -623,7 +623,7 @@ public class GenerateCommandTests
     [Test]
     public void Program_Main_Should_Produce_No_Output_When_Settings_File_Is_Silent()
     {
-        var workspace = CreateWorkspace();
+        string workspace = CreateWorkspace();
 
         try
         {
@@ -651,7 +651,7 @@ public class GenerateCommandTests
                 }
                 """);
 
-            var settingsFile = Path.Combine(workspace, "petstore.refitter");
+            string settingsFile = Path.Combine(workspace, "petstore.refitter");
             File.WriteAllText(
                 settingsFile,
                 """
@@ -664,7 +664,7 @@ public class GenerateCommandTests
                 }
                 """);
 
-            var result = InvokeProgram(
+            (int ExitCode, string Output) result = InvokeProgram(
             [
                 "--settings-file", settingsFile,
                 "--no-logging"

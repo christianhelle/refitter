@@ -80,7 +80,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             refitGeneratorSettings = SettingsMapper.Map(settings);
         }
 
-        var reporter = CreateReporter(settings, refitGeneratorSettings);
+        IGenerationReporter reporter = CreateReporter(settings, refitGeneratorSettings);
 
         var orchestrator = new GenerationOrchestrator();
         return await orchestrator.RunAsync(

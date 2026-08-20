@@ -155,17 +155,17 @@ public class SerializerTests
     [Test]
     public void Default_Silent_Should_Be_False()
     {
-        var settings = new RefitGeneratorSettings();
+        RefitGeneratorSettings settings = new RefitGeneratorSettings();
         settings.Silent.Should().BeFalse();
     }
 
     [Test]
     public void Can_Serialize_RefitGeneratorSettings_With_Silent()
     {
-        var settings = CreateTestSettings();
+        RefitGeneratorSettings settings = CreateTestSettings();
         settings.Silent = true;
 
-        var json = Serializer.Serialize(settings);
+        string json = Serializer.Serialize(settings);
 
         json.Should().Contain("\"silent\": true");
     }
@@ -175,7 +175,7 @@ public class SerializerTests
     {
         const string json = """{"silent": true}""";
 
-        var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+        RefitGeneratorSettings settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
 
         settings.Should().NotBeNull();
         settings.Silent.Should().BeTrue();
@@ -184,9 +184,9 @@ public class SerializerTests
     [Test]
     public void Can_Serialize_RefitGeneratorSettings_With_Default_Silent_Omits_Property()
     {
-        var settings = CreateTestSettings();
+        RefitGeneratorSettings settings = CreateTestSettings();
 
-        var json = Serializer.Serialize(settings);
+        string json = Serializer.Serialize(settings);
 
         json.Should().NotContain("\"silent\"");
     }
