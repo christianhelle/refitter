@@ -18,7 +18,7 @@ param (
 # from this script and all child processes.
 $script:VerboseOutput = $VerbosePreference -eq "Continue"
 
-$script:ChildLogDirectory = Join-Path $env:TEMP "refitter-smoke-tests-$([guid]::NewGuid().ToString('N'))"
+$script:ChildLogDirectory = Join-Path ([System.IO.Path]::GetTempPath()) "refitter-smoke-tests-$([guid]::NewGuid().ToString('N'))"
 New-Item -ItemType Directory -Path $script:ChildLogDirectory -Force | Out-Null
 
 function Invoke-ChildProcess
@@ -279,9 +279,12 @@ function RunTests
     # Phase 1: Pre-restore packages
     # ==========================================
     Write-Verbose "Pre-restoring packages"
-    Invoke-ChildProcess -FilePath "dotnet" -Arguments "restore ./ConsoleApp/ConsoleApp.slnx --nologo -v q" -Description "restore ConsoleApp.slnx" | Out-Null
-    Invoke-ChildProcess -FilePath "dotnet" -Arguments "restore ./ConsoleApp/ConsoleApp.Core.slnx --nologo -v q" -Description "restore ConsoleApp.Core.slnx" | Out-Null
-    Invoke-ChildProcess -FilePath "dotnet" -Arguments "restore ./Apizr/Sample.csproj --nologo -v q" -Description "restore Apizr/Sample.csproj" | Out-Null
+    $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "restore ./ConsoleApp/ConsoleApp.slnx --nologo -v q" -Description "restore ConsoleApp.slnx"
+    if ($exitCode -ne 0) { throw "Restore failed: ConsoleApp.slnx" }
+    $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "restore ./ConsoleApp/ConsoleApp.Core.slnx --nologo -v q" -Description "restore ConsoleApp.Core.slnx"
+    if ($exitCode -ne 0) { throw "Restore failed: ConsoleApp.Core.slnx" }
+    $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "restore ./Apizr/Sample.csproj --nologo -v q" -Description "restore Apizr/Sample.csproj"
+    if ($exitCode -ne 0) { throw "Restore failed: Apizr/Sample.csproj" }
 
     # ==========================================
     # Phase 2: Settings-file tests (individual generate + build)
@@ -692,13 +695,15 @@ function RunTests
 if ($UseProduction)
 {
     Write-Verbose "Running smoke tests in production mode"
-    Invoke-ChildProcess -FilePath "dotnet" -Arguments "tool update -g refitter --prerelease -v q" -Description "dotnet tool update -g refitter --prerelease" | Out-Null
+    $exitCode = Invoke-ChildProcess -FilePath "dotnet" -Arguments "tool update -g refitter --prerelease -v q" -Description "dotnet tool update -g refitter --prerelease"
+    if ($exitCode -ne 0) { throw "Production tool update failed" }
 }
 
 if ($UseDocker)
 {
     Write-Verbose "Running smoke tests in Docker mode"
-    Invoke-ChildProcess -FilePath "docker" -Arguments "pull christianhelle/refitter:latest" -Description "docker pull christianhelle/refitter:latest" | Out-Null
+    $exitCode = Invoke-ChildProcess -FilePath "docker" -Arguments "pull christianhelle/refitter:latest" -Description "docker pull christianhelle/refitter:latest"
+    if ($exitCode -ne 0) { throw "Docker image pull failed" }
 }
 
 try
