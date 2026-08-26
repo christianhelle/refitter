@@ -13,6 +13,7 @@
 
 **Merged pull requests:**
 
+- Update refit monorepo to 15.2.0 [\#1225](https://github.com/christianhelle/refitter/pull/1225) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.64.6 [\#1216](https://github.com/christianhelle/refitter/pull/1216) ([renovate[bot]](https://github.com/apps/renovate))
 - Update refit monorepo to v15 [\#1215](https://github.com/christianhelle/refitter/pull/1215) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dotnet monorepo [\#1185](https://github.com/christianhelle/refitter/pull/1185) ([renovate[bot]](https://github.com/apps/renovate))
