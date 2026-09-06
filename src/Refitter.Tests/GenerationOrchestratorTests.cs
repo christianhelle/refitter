@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.OpenApi;
+using Microsoft.OpenApi.Reader;
 using Refitter.Core;
 using Refitter.Core.Validation;
 
@@ -771,6 +772,189 @@ public class GenerationOrchestratorTests
         }
     }
 
+    [Test]
+    public async Task RunAsync_Should_Return_Exit_Code_That_Survives_Process_Truncation_On_Validation_Failure()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "spec.json");
+            var outputPath = Path.Combine(workspace, "Output.cs");
+            Directory.CreateDirectory(workspace);
+
+            // A header parameter name containing a quote fails AttributeStringValidator,
+            // which surfaces as an OpenApiValidationException whose HResult is 0x80131500.
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": { "title": "Test API", "version": "1.0.0" },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "parameters": [
+                          { "name": "X-Bad\", \"Injected: yes", "in": "header", "schema": { "type": "string" } }
+                        ],
+                        "responses": { "200": { "description": "ok" } }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+            };
+
+            var cliSettings = new Settings
+            {
+                OpenApiPath = openApiPath,
+                OutputPath = outputPath,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = false,
+            };
+
+            var reporter = new SimpleGenerationReporter();
+            var orchestrator = new GenerationOrchestrator();
+            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+
+            result.Should().NotBe(0);
+
+            // Unix truncates process exit codes to the low 8 bits, so an exit code
+            // whose low byte is zero is indistinguishable from success.
+            (result & 0xFF).Should().NotBe(0);
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    [Test]
+    public async Task RunAsync_Should_Report_Validation_Diagnostics_When_Validation_Fails()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "spec.json");
+            var outputPath = Path.Combine(workspace, "Output.cs");
+            Directory.CreateDirectory(workspace);
+
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": { "title": "Test API", "version": "1.0.0" },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "parameters": [
+                          { "name": "X-Bad\", \"Injected: yes", "in": "header", "schema": { "type": "string" } }
+                        ],
+                        "responses": { "200": { "description": "ok" } }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+            };
+
+            var cliSettings = new Settings
+            {
+                OpenApiPath = openApiPath,
+                OutputPath = outputPath,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = false,
+            };
+
+            var reporter = new CapturingGenerationReporter();
+            var orchestrator = new GenerationOrchestrator();
+            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+
+            result.Should().NotBe(0);
+            reporter.GenerationFailedCalled.Should().BeTrue();
+            reporter.ValidationFailedCalled.Should().BeTrue();
+            reporter.ValidationDiagnostics.Should().NotBeEmpty();
+            reporter.ValidationDiagnostics.Should().Contain(d => d.IsError);
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    [Test]
+    public void ReportValidationDiagnostics_Reports_Both_Errors_And_Warnings()
+    {
+        OpenApiDiagnostic diagnostic = new OpenApiDiagnostic();
+        diagnostic.Errors.Add(new OpenApiError("error-pointer", "an error"));
+        diagnostic.Warnings.Add(new OpenApiError("warning-pointer", "a warning"));
+
+        OpenApiValidationException exception = new OpenApiValidationException(
+            new OpenApiValidationResult(diagnostic, new OpenApiStats()));
+
+        CapturingGenerationReporter reporter = new CapturingGenerationReporter();
+        GenerationOrchestrator.ReportValidationDiagnostics(reporter, exception);
+
+        reporter.ValidationFailedCalled.Should().BeTrue();
+        reporter.ValidationDiagnostics.Should().HaveCount(2);
+        reporter.ValidationDiagnostics
+            .Should().ContainSingle(d => d.IsError && d.Error.Message == "an error");
+        reporter.ValidationDiagnostics
+            .Should().ContainSingle(d => !d.IsError && d.Error.Message == "a warning");
+    }
+
+    [Test]
+    public void ReportValidationDiagnostics_Reports_Failure_When_There_Are_No_Diagnostics()
+    {
+        OpenApiValidationException exception = new OpenApiValidationException(
+            new OpenApiValidationResult(new OpenApiDiagnostic(), new OpenApiStats()));
+
+        CapturingGenerationReporter reporter = new CapturingGenerationReporter();
+        GenerationOrchestrator.ReportValidationDiagnostics(reporter, exception);
+
+        reporter.ValidationFailedCalled.Should().BeTrue();
+        reporter.ValidationDiagnostics.Should().BeEmpty();
+    }
+
+    [Test]
+    [Arguments(unchecked((int)0x80131500), 1)]
+    [Arguments(0, 1)]
+    [Arguments(unchecked((int)0x80131509), unchecked((int)0x80131509))]
+    [Arguments(unchecked((int)0x80070002), unchecked((int)0x80070002))]
+    public void ToProcessExitCode_Never_Truncates_To_Success(int hresult, int expected)
+    {
+        Exception exception = new Exception("boom") { HResult = hresult };
+
+        int result = GenerationOrchestrator.ToProcessExitCode(exception);
+
+        result.Should().Be(expected);
+        (result & 0xFF).Should().NotBe(0);
+    }
+
     /// <summary>
     /// Test implementation of IGenerationReporter that captures warnings for verification.
     /// </summary>
@@ -851,7 +1035,10 @@ public class GenerationOrchestratorTests
 
         public void ReportValidationFailed() => ValidationFailedCalled = true;
 
-        public void ReportValidationDiagnostic(OpenApiError error, bool isError) { }
+        public List<(OpenApiError Error, bool IsError)> ValidationDiagnostics { get; } = [];
+
+        public void ReportValidationDiagnostic(OpenApiError error, bool isError) =>
+            ValidationDiagnostics.Add((error, isError));
 
         public void ReportValidationStatistics(OpenApiValidationResult validationResult) { }
 

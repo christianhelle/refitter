@@ -81,7 +81,9 @@ public sealed class GenerationOrchestrator
             if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
                 reporter.ReportUnsupportedVersion(unsupportedSpecVersionException.SpecificationVersion);
 
-            if (exception is not OpenApiValidationException)
+            if (exception is OpenApiValidationException validationException)
+                ReportValidationDiagnostics(reporter, validationException);
+            else
                 reporter.ReportExceptionDetails(exception);
 
             if (!cliSettings.SkipValidation)
@@ -90,7 +92,29 @@ public sealed class GenerationOrchestrator
             reporter.ReportSupportHelp();
 
             await Analytics.LogError(exception, cliSettings);
-            return exception.HResult;
+            return ToProcessExitCode(exception);
         }
     }
+
+    internal static void ReportValidationDiagnostics(
+        IGenerationReporter reporter,
+        OpenApiValidationException exception)
+    {
+        reporter.ReportValidationFailed();
+
+        foreach (OpenApiError error in exception.ValidationResult.Diagnostics.Errors)
+            reporter.ReportValidationDiagnostic(error, isError: true);
+
+        foreach (OpenApiError warning in exception.ValidationResult.Diagnostics.Warnings)
+            reporter.ReportValidationDiagnostic(warning, isError: false);
+    }
+
+    /// <summary>
+    /// Maps an exception to a process exit code that stays non-zero after the platform
+    /// truncates it. Unix keeps only the low 8 bits, so HResults ending in 0x00 - such as
+    /// 0x80131500, the default for <see cref="Exception"/> and therefore for
+    /// <c>OpenApiValidationException</c> - would otherwise be reported as success.
+    /// </summary>
+    internal static int ToProcessExitCode(Exception exception) =>
+        (exception.HResult & 0xFF) != 0 ? exception.HResult : 1;
 }
