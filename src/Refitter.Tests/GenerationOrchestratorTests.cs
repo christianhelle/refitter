@@ -839,6 +839,72 @@ public class GenerationOrchestratorTests
         }
     }
 
+    [Test]
+    public async Task RunAsync_Should_Report_Validation_Diagnostics_When_Validation_Fails()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "spec.json");
+            var outputPath = Path.Combine(workspace, "Output.cs");
+            Directory.CreateDirectory(workspace);
+
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": { "title": "Test API", "version": "1.0.0" },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "parameters": [
+                          { "name": "X-Bad\", \"Injected: yes", "in": "header", "schema": { "type": "string" } }
+                        ],
+                        "responses": { "200": { "description": "ok" } }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+            };
+
+            var cliSettings = new Settings
+            {
+                OpenApiPath = openApiPath,
+                OutputPath = outputPath,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = false,
+            };
+
+            var reporter = new CapturingGenerationReporter();
+            var orchestrator = new GenerationOrchestrator();
+            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+
+            result.Should().NotBe(0);
+            reporter.GenerationFailedCalled.Should().BeTrue();
+            reporter.ValidationFailedCalled.Should().BeTrue();
+            reporter.ValidationDiagnostics.Should().NotBeEmpty();
+            reporter.ValidationDiagnostics.Should().Contain(d => d.IsError);
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
     /// <summary>
     /// Test implementation of IGenerationReporter that captures warnings for verification.
     /// </summary>
@@ -919,7 +985,10 @@ public class GenerationOrchestratorTests
 
         public void ReportValidationFailed() => ValidationFailedCalled = true;
 
-        public void ReportValidationDiagnostic(OpenApiError error, bool isError) { }
+        public List<(OpenApiError Error, bool IsError)> ValidationDiagnostics { get; } = [];
+
+        public void ReportValidationDiagnostic(OpenApiError error, bool isError) =>
+            ValidationDiagnostics.Add((error, isError));
 
         public void ReportValidationStatistics(OpenApiValidationResult validationResult) { }
 

@@ -81,7 +81,9 @@ public sealed class GenerationOrchestrator
             if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
                 reporter.ReportUnsupportedVersion(unsupportedSpecVersionException.SpecificationVersion);
 
-            if (exception is not OpenApiValidationException)
+            if (exception is OpenApiValidationException validationException)
+                ReportValidationDiagnostics(reporter, validationException);
+            else
                 reporter.ReportExceptionDetails(exception);
 
             if (!cliSettings.SkipValidation)
@@ -92,6 +94,19 @@ public sealed class GenerationOrchestrator
             await Analytics.LogError(exception, cliSettings);
             return ToProcessExitCode(exception);
         }
+    }
+
+    private static void ReportValidationDiagnostics(
+        IGenerationReporter reporter,
+        OpenApiValidationException exception)
+    {
+        reporter.ReportValidationFailed();
+
+        foreach (OpenApiError error in exception.ValidationResult.Diagnostics.Errors)
+            reporter.ReportValidationDiagnostic(error, isError: true);
+
+        foreach (OpenApiError warning in exception.ValidationResult.Diagnostics.Warnings)
+            reporter.ReportValidationDiagnostic(warning, isError: false);
     }
 
     /// <summary>
