@@ -771,6 +771,74 @@ public class GenerationOrchestratorTests
         }
     }
 
+    [Test]
+    public async Task RunAsync_Should_Return_Exit_Code_That_Survives_Process_Truncation_On_Validation_Failure()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "spec.json");
+            var outputPath = Path.Combine(workspace, "Output.cs");
+            Directory.CreateDirectory(workspace);
+
+            // A header parameter name containing a quote fails AttributeStringValidator,
+            // which surfaces as an OpenApiValidationException whose HResult is 0x80131500.
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": { "title": "Test API", "version": "1.0.0" },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "parameters": [
+                          { "name": "X-Bad\", \"Injected: yes", "in": "header", "schema": { "type": "string" } }
+                        ],
+                        "responses": { "200": { "description": "ok" } }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+            };
+
+            var cliSettings = new Settings
+            {
+                OpenApiPath = openApiPath,
+                OutputPath = outputPath,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = false,
+            };
+
+            var reporter = new SimpleGenerationReporter();
+            var orchestrator = new GenerationOrchestrator();
+            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+
+            result.Should().NotBe(0);
+
+            // Unix truncates process exit codes to the low 8 bits, so an exit code
+            // whose low byte is zero is indistinguishable from success.
+            (result & 0xFF).Should().NotBe(0);
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
     /// <summary>
     /// Test implementation of IGenerationReporter that captures warnings for verification.
     /// </summary>

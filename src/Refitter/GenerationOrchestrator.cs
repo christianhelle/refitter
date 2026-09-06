@@ -90,7 +90,16 @@ public sealed class GenerationOrchestrator
             reporter.ReportSupportHelp();
 
             await Analytics.LogError(exception, cliSettings);
-            return exception.HResult;
+            return ToProcessExitCode(exception);
         }
     }
+
+    /// <summary>
+    /// Maps an exception to a process exit code that stays non-zero after the platform
+    /// truncates it. Unix keeps only the low 8 bits, so HResults ending in 0x00 - such as
+    /// 0x80131500, the default for <see cref="Exception"/> and therefore for
+    /// <c>OpenApiValidationException</c> - would otherwise be reported as success.
+    /// </summary>
+    internal static int ToProcessExitCode(Exception exception) =>
+        (exception.HResult & 0xFF) != 0 ? exception.HResult : 1;
 }
