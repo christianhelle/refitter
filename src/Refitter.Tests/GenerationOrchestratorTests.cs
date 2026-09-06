@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.OpenApi;
+using Microsoft.OpenApi.Reader;
 using Refitter.Core;
 using Refitter.Core.Validation;
 
@@ -903,6 +904,55 @@ public class GenerationOrchestratorTests
             if (Directory.Exists(workspace))
                 Directory.Delete(workspace, recursive: true);
         }
+    }
+
+    [Test]
+    public void ReportValidationDiagnostics_Reports_Both_Errors_And_Warnings()
+    {
+        OpenApiDiagnostic diagnostic = new OpenApiDiagnostic();
+        diagnostic.Errors.Add(new OpenApiError("error-pointer", "an error"));
+        diagnostic.Warnings.Add(new OpenApiError("warning-pointer", "a warning"));
+
+        OpenApiValidationException exception = new OpenApiValidationException(
+            new OpenApiValidationResult(diagnostic, new OpenApiStats()));
+
+        CapturingGenerationReporter reporter = new CapturingGenerationReporter();
+        GenerationOrchestrator.ReportValidationDiagnostics(reporter, exception);
+
+        reporter.ValidationFailedCalled.Should().BeTrue();
+        reporter.ValidationDiagnostics.Should().HaveCount(2);
+        reporter.ValidationDiagnostics
+            .Should().ContainSingle(d => d.IsError && d.Error.Message == "an error");
+        reporter.ValidationDiagnostics
+            .Should().ContainSingle(d => !d.IsError && d.Error.Message == "a warning");
+    }
+
+    [Test]
+    public void ReportValidationDiagnostics_Reports_Failure_When_There_Are_No_Diagnostics()
+    {
+        OpenApiValidationException exception = new OpenApiValidationException(
+            new OpenApiValidationResult(new OpenApiDiagnostic(), new OpenApiStats()));
+
+        CapturingGenerationReporter reporter = new CapturingGenerationReporter();
+        GenerationOrchestrator.ReportValidationDiagnostics(reporter, exception);
+
+        reporter.ValidationFailedCalled.Should().BeTrue();
+        reporter.ValidationDiagnostics.Should().BeEmpty();
+    }
+
+    [Test]
+    [Arguments(unchecked((int)0x80131500), 1)]
+    [Arguments(0, 1)]
+    [Arguments(unchecked((int)0x80131509), unchecked((int)0x80131509))]
+    [Arguments(unchecked((int)0x80070002), unchecked((int)0x80070002))]
+    public void ToProcessExitCode_Never_Truncates_To_Success(int hresult, int expected)
+    {
+        Exception exception = new Exception("boom") { HResult = hresult };
+
+        int result = GenerationOrchestrator.ToProcessExitCode(exception);
+
+        result.Should().Be(expected);
+        (result & 0xFF).Should().NotBe(0);
     }
 
     /// <summary>

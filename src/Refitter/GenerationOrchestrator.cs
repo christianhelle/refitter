@@ -96,7 +96,7 @@ public sealed class GenerationOrchestrator
         }
     }
 
-    private static void ReportValidationDiagnostics(
+    internal static void ReportValidationDiagnostics(
         IGenerationReporter reporter,
         OpenApiValidationException exception)
     {
