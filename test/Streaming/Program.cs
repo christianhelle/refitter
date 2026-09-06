@@ -15,7 +15,6 @@ var streamResponse = api.Chat(
         Model = modelsResponse.Models.First().Key,
         Input = "Hello! What can you do?",
         Stream = true,
-        Reasoning = ChatRequestReasoning.On,
     }
 );
 
