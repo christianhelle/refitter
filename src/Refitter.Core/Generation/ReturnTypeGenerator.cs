@@ -152,11 +152,8 @@ internal class ReturnTypeGenerator(
         return false;
     }
 
-    private static bool IsStreamingOnly(IEnumerable<string>? produces)
+    private static bool IsStreamingOnly(IEnumerable<string> produces)
     {
-        if (produces is null)
-            return false;
-
         bool any = false;
         foreach (string contentType in produces)
         {
