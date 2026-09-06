@@ -137,7 +137,11 @@ internal class ReturnTypeGenerator(
                 }
             }
 
-            if (operation.ActualProduces.Any(IsStreamingContentType))
+            // Swagger 2.0 has no per-media-type schema, so the produces list is the only
+            // signal. A document-level produces list applies to every operation, so require
+            // all of them to be streaming - otherwise a single streaming entry alongside
+            // application/json would turn every operation in the document into a stream.
+            if (IsStreamingOnly(operation.ActualProduces))
             {
                 schema = response.Schema;
                 return true;
@@ -146,6 +150,23 @@ internal class ReturnTypeGenerator(
 
         schema = null;
         return false;
+    }
+
+    private static bool IsStreamingOnly(IEnumerable<string>? produces)
+    {
+        if (produces is null)
+            return false;
+
+        bool any = false;
+        foreach (string contentType in produces)
+        {
+            if (!IsStreamingContentType(contentType))
+                return false;
+
+            any = true;
+        }
+
+        return any;
     }
 
     private static bool IsStreamingContentType(string contentType)

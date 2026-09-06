@@ -796,4 +796,74 @@ public class ReturnTypeGeneratorTests
 
         result.Should().Be("Task");
     }
+
+    [Test]
+    public async Task Generate_Does_Not_Return_IAsyncEnumerable_For_Mixed_Swagger2_Produces()
+    {
+        var spec = """
+            swagger: '2.0'
+            info:
+              title: Test
+              version: 1.0.0
+            paths:
+              '/test':
+                get:
+                  operationId: getTest
+                  produces:
+                    - application/json
+                    - text/event-stream
+                  responses:
+                    '200':
+                      description: Success
+                      schema:
+                        type: array
+                        items:
+                          type: string
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<ICollection<string>>");
+    }
+
+    [Test]
+    public async Task Generate_Does_Not_Return_IAsyncEnumerable_For_Mixed_Document_Level_Swagger2_Produces()
+    {
+        var spec = """
+            swagger: '2.0'
+            info:
+              title: Test
+              version: 1.0.0
+            produces:
+              - application/json
+              - text/event-stream
+            paths:
+              '/test':
+                get:
+                  operationId: getTest
+                  responses:
+                    '200':
+                      description: Success
+                      schema:
+                        type: array
+                        items:
+                          type: string
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<ICollection<string>>");
+    }
 }
