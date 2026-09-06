@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.3...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.0-preview.115...HEAD)
+
+**Implemented enhancements:**
+
+- Fix exit code, streaming, and accept header bugs [\#1228](https://github.com/christianhelle/refitter/pull/1228) ([christianhelle](https://github.com/christianhelle))
+
+## [2.2.0-preview.115](https://github.com/christianhelle/refitter/tree/2.2.0-preview.115) (2026-08-26)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.3...2.2.0-preview.115)
 
 **Implemented enhancements:**
 
