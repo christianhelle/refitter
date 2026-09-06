@@ -33,11 +33,7 @@ internal class MethodAttributeGenerator(
                 // Responses declared as a $ref to a shared component carry no inline
                 // content, so resolve through ActualResponse the way the return type
                 // generator does - otherwise the Accept header is silently omitted.
-                var content = response.ActualResponse?.Content;
-                if (content == null)
-                    continue;
-
-                foreach (var contentType in content.Keys)
+                foreach (var contentType in response.ActualResponse.Content.Keys)
                 {
                     uniqueContentTypes.Add(contentType);
                 }
