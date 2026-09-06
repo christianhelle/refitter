@@ -30,10 +30,14 @@ internal class MethodAttributeGenerator(
             var uniqueContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var response in operation.Responses.Values)
             {
-                if (response.Content == null)
+                // Responses declared as a $ref to a shared component carry no inline
+                // content, so resolve through ActualResponse the way the return type
+                // generator does - otherwise the Accept header is silently omitted.
+                var content = response.ActualResponse?.Content;
+                if (content == null)
                     continue;
 
-                foreach (var contentType in response.Content.Keys)
+                foreach (var contentType in content.Keys)
                 {
                     uniqueContentTypes.Add(contentType);
                 }
