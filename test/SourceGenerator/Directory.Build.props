@@ -3,6 +3,8 @@
         <OutputType>Exe</OutputType>
         <LangVersion>latest</LangVersion>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <!-- Build with -p:UseProductionRefitter=true to test the released package instead of the local project -->
+        <RefitterSourceGeneratorVersion Condition="'$(RefitterSourceGeneratorVersion)' == ''">*</RefitterSourceGeneratorVersion>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="..\Program.cs">
@@ -12,7 +14,8 @@
         <Compile Include="../Generated/*.cs" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\..\..\src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" Condition="'$(UseProductionRefitter)' != 'true'" />
+        <PackageReference Include="Refitter.SourceGenerator" Version="$(RefitterSourceGeneratorVersion)" Condition="'$(UseProductionRefitter)' == 'true'" />
         <PackageReference Include="Refit" Version="15.2.0" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
