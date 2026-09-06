@@ -8,6 +8,10 @@
 
 - Fix exit code, streaming, and accept header bugs [\#1228](https://github.com/christianhelle/refitter/pull/1228) ([christianhelle](https://github.com/christianhelle))
 
+**Merged pull requests:**
+
+- Update dependency TUnit to 1.66.16 [\#1227](https://github.com/christianhelle/refitter/pull/1227) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [2.2.0-preview.115](https://github.com/christianhelle/refitter/tree/2.2.0-preview.115) (2026-08-26)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.3...2.2.0-preview.115)
