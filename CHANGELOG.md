@@ -2,22 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.0-preview.115...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.0...HEAD)
+
+**Implemented enhancements:**
+
+- IAsyncEnumerable - JSONL/application/x-ndjson [\#299](https://github.com/christianhelle/refitter/issues/299)
+
+## [2.2.0](https://github.com/christianhelle/refitter/tree/2.2.0) (2026-09-06)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.3...2.2.0)
 
 **Implemented enhancements:**
 
 - Fix exit code, streaming, and accept header bugs [\#1228](https://github.com/christianhelle/refitter/pull/1228) ([christianhelle](https://github.com/christianhelle))
-
-**Merged pull requests:**
-
-- Update dependency TUnit to 1.66.16 [\#1227](https://github.com/christianhelle/refitter/pull/1227) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [2.2.0-preview.115](https://github.com/christianhelle/refitter/tree/2.2.0-preview.115) (2026-08-26)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.3...2.2.0-preview.115)
-
-**Implemented enhancements:**
-
 - Add silent mode to CLI and smoke tests [\#1226](https://github.com/christianhelle/refitter/pull/1226) ([christianhelle](https://github.com/christianhelle))
 - Update Refit to v15.1.0 [\#1224](https://github.com/christianhelle/refitter/pull/1224) ([christianhelle](https://github.com/christianhelle))
 - Generate IAsyncEnumerable for streaming responses [\#1221](https://github.com/christianhelle/refitter/pull/1221) ([christianhelle](https://github.com/christianhelle))
@@ -25,6 +22,7 @@
 
 **Merged pull requests:**
 
+- Update dependency TUnit to 1.66.16 [\#1227](https://github.com/christianhelle/refitter/pull/1227) ([renovate[bot]](https://github.com/apps/renovate))
 - Update refit monorepo to 15.2.0 [\#1225](https://github.com/christianhelle/refitter/pull/1225) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.64.6 [\#1216](https://github.com/christianhelle/refitter/pull/1216) ([renovate[bot]](https://github.com/apps/renovate))
 - Update refit monorepo to v15 [\#1215](https://github.com/christianhelle/refitter/pull/1215) ([renovate[bot]](https://github.com/apps/renovate))
