@@ -8,6 +8,10 @@
 
 - IAsyncEnumerable - JSONL/application/x-ndjson [\#299](https://github.com/christianhelle/refitter/issues/299)
 
+**Merged pull requests:**
+
+- Update dependency TUnit to 1.66.27 [\#1229](https://github.com/christianhelle/refitter/pull/1229) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [2.2.0](https://github.com/christianhelle/refitter/tree/2.2.0) (2026-09-06)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.1.3...2.2.0)
