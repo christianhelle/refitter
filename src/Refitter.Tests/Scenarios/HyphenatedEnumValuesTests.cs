@@ -12,7 +12,7 @@ namespace Refitter.Tests.Scenarios;
 /// When enum values contain characters that require [EnumMember(Value = "...")] attributes
 /// (e.g. "allegro-pl", "AC_1_PHASE"), JsonStringEnumConverter cannot deserialize them because
 /// it uses the C# identifier name, not the [EnumMember] value.
-/// The fix is to place [JsonConverter(typeof(JsonStringEnumConverter))] on the enum TYPE
+/// The fix is to place [JsonConverter(typeof(JsonStringEnumConverter&lt;TEnum&gt;))] on the enum TYPE
 /// so users can override it via JsonSerializerOptions.Converters with a converter that
 /// respects [EnumMember] (e.g. JsonStringEnumMemberConverter).
 /// </summary>
@@ -96,7 +96,7 @@ public class HyphenatedEnumValuesTests
         {
             // [JsonConverter] should appear immediately before the enum type declaration
             generatedCode.Should().MatchRegex(
-                @"\[JsonConverter\(typeof\(JsonStringEnumConverter\)\)\][\r\n\s]+public enum");
+                @"\[JsonConverter\(typeof\(JsonStringEnumConverter<\w+>\)\)\][\r\n\s]+public enum");
             // Enum properties should NOT have [JsonConverter] directly on them
             generatedCode.Should().NotMatchRegex(
                 @"\[JsonConverter\(typeof\(JsonStringEnumConverter[^)]*\)\)\][\r\n\s]+public \w+Id\b");
@@ -135,6 +135,7 @@ public class HyphenatedEnumValuesTests
             generatedCode.Should().NotContain("[JsonConverter(typeof(JsonStringEnumConverter))]");
             generatedCode.Should().NotContain("[JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]");
             generatedCode.Should().NotContain("[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]");
+            generatedCode.Should().NotContain("JsonStringEnumConverter<");
         }
     }
 

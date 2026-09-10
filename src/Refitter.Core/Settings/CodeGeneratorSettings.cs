@@ -267,16 +267,21 @@ public class CodeGeneratorSettings
 
     /// <summary>
     /// Gets or sets a value indicating whether to inline JsonConverter attributes for enum types (default: true).
-    /// When set to true (default), the <c>[JsonConverter(typeof(JsonStringEnumConverter))]</c> attribute is placed
-    /// on the enum type declaration instead of on individual enum properties, allowing users to override the
+    /// When set to true (default), the <c>[JsonConverter(typeof(JsonStringEnumConverter&lt;TEnum&gt;))]</c> attribute
+    /// is placed on the enum type declaration instead of on individual enum properties, allowing users to override the
     /// converter via <c>JsonSerializerOptions.Converters</c> (e.g. to use <c>JsonStringEnumMemberConverter</c>
     /// for enums whose values contain hyphens or other special characters via <c>[EnumMember]</c>).
+    /// The generic converter is used because the non-generic <c>JsonStringEnumConverter</c> is annotated
+    /// <c>[RequiresDynamicCode]</c> and trips SYSLIB1034/IL3050 when the contracts are used with a
+    /// source-generated <c>JsonSerializerContext</c> or published Native AOT.
     /// When set to false, no <c>[JsonConverter]</c> attribute is emitted at all.
     /// </summary>
     [Description(
         "Gets or sets a value indicating whether to inline JsonConverter attributes for enum types (default: true). " +
-        "When set to true (default), [JsonConverter(typeof(JsonStringEnumConverter))] is placed on the enum type declaration " +
-        "so users can override it via JsonSerializerOptions.Converters. When set to false, no [JsonConverter] is emitted."
+        "When set to true (default), [JsonConverter(typeof(JsonStringEnumConverter<TEnum>))] is placed on the enum type " +
+        "declaration so users can override it via JsonSerializerOptions.Converters. The generic converter keeps the " +
+        "contracts usable with a source-generated JsonSerializerContext and Native AOT. " +
+        "When set to false, no [JsonConverter] is emitted."
     )]
     public bool InlineJsonConverters { get; set; } = true;
 

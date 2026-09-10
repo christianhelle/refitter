@@ -80,7 +80,7 @@ public class EnumConverterInjectionTests
         string generatedCode = await GenerateCodeWithInternalTypes();
 
         // All enums should have JsonConverter attribute, regardless of visibility
-        generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter))]");
+        generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter<PetStatus>))]");
 
         // Find internal enum declarations
         generatedCode.Should().Contain("internal enum PetStatus");
@@ -90,7 +90,7 @@ public class EnumConverterInjectionTests
         // Each internal enum should have its own JsonConverter
         var converterCount = System.Text.RegularExpressions.Regex.Matches(
             generatedCode,
-            @"\[JsonConverter\(typeof\(JsonStringEnumConverter\)\)\][\s\r\n]+internal enum"
+            @"\[JsonConverter\(typeof\(JsonStringEnumConverter<\w+>\)\)\][\s\r\n]+internal enum"
         ).Count;
 
         converterCount.Should().BeGreaterThanOrEqualTo(3,
@@ -104,11 +104,11 @@ public class EnumConverterInjectionTests
 
         // Public enums should also have JsonConverter
         generatedCode.Should().Contain("public enum PetStatus");
-        generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter))]");
+        generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter<PetStatus>))]");
 
         var converterCount = System.Text.RegularExpressions.Regex.Matches(
             generatedCode,
-            @"\[JsonConverter\(typeof\(JsonStringEnumConverter\)\)\][\s\r\n]+public enum"
+            @"\[JsonConverter\(typeof\(JsonStringEnumConverter<\w+>\)\)\][\s\r\n]+public enum"
         ).Count;
 
         converterCount.Should().BeGreaterThanOrEqualTo(3,
