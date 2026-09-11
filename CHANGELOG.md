@@ -11,6 +11,7 @@
 **Merged pull requests:**
 
 - Bump Microsoft.SourceLink.GitHub to 10.0.401 [\#1232](https://github.com/christianhelle/refitter/pull/1232) ([christianhelle](https://github.com/christianhelle))
+- Emit generic JsonStringEnumConverter\<TEnum\> on injected enum attributes [\#1231](https://github.com/christianhelle/refitter/pull/1231) ([aritchie](https://github.com/aritchie))
 - Update dependency TUnit to 1.66.27 [\#1229](https://github.com/christianhelle/refitter/pull/1229) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.2.0](https://github.com/christianhelle/refitter/tree/2.2.0) (2026-09-06)
