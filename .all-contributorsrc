@@ -944,6 +944,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "aritchie",
+      "name": "Allan Ritchie",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1431555?v=4",
+      "profile": "https://allanritchie.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
