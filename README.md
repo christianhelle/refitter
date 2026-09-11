@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-101-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-102-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1525,6 +1525,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://mrostamipoor.github.io/"><img src="https://avatars.githubusercontent.com/u/78902717?v=4?s=100" width="100px;" alt="Maryam Rostamipoor"/><br /><sub><b>Maryam Rostamipoor</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Amrostamipoor" title="Bug reports">🐛</a> <a href="#security-mrostamipoor" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://codez.one/"><img src="https://avatars.githubusercontent.com/u/11291885?v=4?s=100" width="100px;" alt="paule96"/><br /><sub><b>paule96</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=paule96" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/rcdailey"><img src="https://avatars.githubusercontent.com/u/1768054?v=4?s=100" width="100px;" alt="Robert Dailey"/><br /><sub><b>Robert Dailey</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Arcdailey" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=rcdailey" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://allanritchie.com"><img src="https://avatars.githubusercontent.com/u/1431555?v=4?s=100" width="100px;" alt="Allan Ritchie"/><br /><sub><b>Allan Ritchie</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=aritchie" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
