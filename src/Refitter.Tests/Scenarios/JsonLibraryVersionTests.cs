@@ -170,7 +170,9 @@ public class JsonLibraryVersionTests
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
 
-        generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter))]");
+        // Name-agnostic: the point is that the converter is present AND closed over its enum,
+        // which is what keeps the contracts usable from a source-generated JsonSerializerContext.
+        generatedCode.Should().MatchRegex(@"\[JsonConverter\(typeof\(JsonStringEnumConverter<\w+>\)\)\]");
     }
 
     [Test]

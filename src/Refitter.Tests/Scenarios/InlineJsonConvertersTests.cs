@@ -97,7 +97,7 @@ public class InlineJsonConvertersTests
 
         using (new AssertionScope())
         {
-            generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter))]");
+            generatedCode.Should().Contain("[JsonConverter(typeof(JsonStringEnumConverter<PetStatus>))]");
             generatedCode.Should().Contain("public enum PetStatus");
             generatedCode.Should().Contain("Status { get; set; }");
         }
@@ -112,7 +112,7 @@ public class InlineJsonConvertersTests
         {
             // [JsonConverter] should appear immediately before the enum type declaration
             generatedCode.Should().MatchRegex(
-                @"\[JsonConverter\(typeof\(JsonStringEnumConverter\)\)\][\r\n\s]+public enum PetStatus");
+                @"\[JsonConverter\(typeof\(JsonStringEnumConverter<PetStatus>\)\)\][\r\n\s]+public enum PetStatus");
             // The property line itself should NOT be preceded by [JsonConverter]
             generatedCode.Should().NotMatchRegex(
                 @"\[JsonConverter\(typeof\(JsonStringEnumConverter[^)]*\)\)\][\r\n\s]+public PetStatus");
@@ -134,9 +134,79 @@ public class InlineJsonConvertersTests
         var injector = new EnumStringConverterInjector();
         var result = injector.Process(new OpenApiDocument(), settings, contracts);
 
-        result.Should().Contain("[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]\r\npublic enum PetStatus");
+        result.Should().Contain("[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<PetStatus>))]\r\npublic enum PetStatus");
         Regex.Matches(result, "(?<!\\r)\\n").Should().BeEmpty();
     }
+
+    [Test]
+    public async Task Generated_Code_Uses_Generic_JsonStringEnumConverter()
+    {
+        string generatedCode = await GenerateCode(inlineJsonConverters: true);
+
+        using (new AssertionScope())
+        {
+            // The non-generic JsonStringEnumConverter is annotated [RequiresDynamicCode]: it builds
+            // EnumConverter<T> through MakeGenericType at runtime, so contracts carrying it trip
+            // SYSLIB1034 under a source-generated JsonSerializerContext and IL3050 under Native AOT.
+            generatedCode.Should().NotMatchRegex(@"JsonStringEnumConverter\s*\)\s*\)");
+            generatedCode.Should().Contain("JsonStringEnumConverter<PetStatus>");
+        }
+    }
+
+    [Test]
+    public void Injected_Converter_Closes_Over_Each_Enum_It_Is_Applied_To()
+    {
+        const string contracts =
+            "public enum First\n{\n}\n\ninternal partial enum Second\n{\n}\n\npublic enum Third : long\n{\n}\n";
+
+        var result = Inject(contracts);
+
+        using (new AssertionScope())
+        {
+            result.Should().Contain("JsonStringEnumConverter<First>");
+            // internal and partial enums are injected too - they would otherwise silently fall back
+            // to integer serialization, since the per-property converters are stripped either way
+            result.Should().Contain("JsonStringEnumConverter<Second>");
+            // an extended value range (": long") must not be swallowed into the captured type name
+            result.Should().Contain("JsonStringEnumConverter<Third>");
+            result.Should().Contain("public enum Third : long");
+        }
+    }
+
+    [Test]
+    public void Injecting_Twice_Is_Idempotent()
+    {
+        const string contracts = "public enum PetStatus\n{\n}\n";
+
+        var once = Inject(contracts);
+        var twice = Inject(once);
+
+        twice.Should().Be(once);
+    }
+
+    [Test]
+    public void Existing_Non_Generic_Converter_Is_Upgraded_To_Generic()
+    {
+        const string contracts =
+            "[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]\npublic enum PetStatus\n{\n}\n";
+
+        var result = Inject(contracts);
+
+        using (new AssertionScope())
+        {
+            result.Should().Contain("JsonStringEnumConverter<PetStatus>");
+            result.Should().NotMatchRegex(@"JsonStringEnumConverter\s*\)\s*\)");
+        }
+    }
+
+    private static string Inject(string contracts) =>
+        new EnumStringConverterInjector().Process(
+            new OpenApiDocument(),
+            new RefitGeneratorSettings
+            {
+                CodeGeneratorSettings = new CodeGeneratorSettings { InlineJsonConverters = true }
+            },
+            contracts);
 
     [Test]
     public async Task Generated_Code_Does_Not_Contain_JsonConverter_When_Disabled()
@@ -148,6 +218,7 @@ public class InlineJsonConvertersTests
             generatedCode.Should().NotContain("[JsonConverter(typeof(JsonStringEnumConverter))]");
             generatedCode.Should().NotContain("[JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]");
             generatedCode.Should().NotContain("[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]");
+            generatedCode.Should().NotContain("JsonStringEnumConverter<");
             generatedCode.Should().Contain("Status { get; set; }");
             generatedCode.Should().Contain("public enum PetStatus");
         }

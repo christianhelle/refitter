@@ -11,7 +11,7 @@ internal sealed class EnumStringConverterInjector : IContractsPostProcessor
         TimeSpan.FromSeconds(1));
 
     private static readonly Regex EnumDeclarationRegex = new(
-        @"^(\s*)((?:public|internal)\s+(?:partial\s+)?enum\s+\w+\b)",
+        @"^(\s*)((?:public|internal)\s+(?:partial\s+)?enum\s+(\w+)\b)",
         RegexOptions.Compiled | RegexOptions.Multiline,
         TimeSpan.FromSeconds(1));
 
@@ -25,7 +25,7 @@ internal sealed class EnumStringConverterInjector : IContractsPostProcessor
                 .Replace(
                     contracts,
                     match =>
-                        $"{match.Groups[1].Value}[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]{newLine}{match.Groups[1].Value}{match.Groups[2].Value}")
+                        $"{match.Groups[1].Value}[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<{match.Groups[3].Value}>))]{newLine}{match.Groups[1].Value}{match.Groups[2].Value}")
                 .TrimEnd();
         }
 
