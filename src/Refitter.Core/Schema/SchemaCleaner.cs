@@ -32,7 +32,9 @@ public class SchemaCleaner
     }
 
     /// <summary>
-    /// Removes unreferenced schemas from the OpenAPI document.
+    /// Removes unreferenced schemas and discriminator mappings from the OpenAPI document.
+    /// Mappings remain when their targets are otherwise reachable or inheritance inclusion is
+    /// enabled.
     /// </summary>
     public void RemoveUnreferencedSchema()
     {
@@ -53,8 +55,8 @@ public class SchemaCleaner
                 if (schema.DiscriminatorObject != null)
                 {
                     var mappings = schema.DiscriminatorObject.Mapping;
-                    var keepMappings = mappings.Where(x =>
-                            (x.Value.ActualSchema.Id ?? x.Value.Id) is { } id && usage.Contains(id))
+                    var keepMappings = mappings
+                        .Where(x => usedJsonSchema.Contains(x.Value.ActualSchema))
                         .ToArray();
 
                     schema.DiscriminatorObject.Mapping.Clear();
