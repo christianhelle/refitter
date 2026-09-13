@@ -7,9 +7,15 @@
 **Implemented enhancements:**
 
 - IAsyncEnumerable - JSONL/application/x-ndjson [\#299](https://github.com/christianhelle/refitter/issues/299)
+- Preserve retained discriminator mappings during schema trimming [\#1237](https://github.com/christianhelle/refitter/pull/1237) ([rcdailey](https://github.com/rcdailey))
+
+**Fixed bugs:**
+
+- trimUnusedSchema removes retained discriminator mappings [\#1235](https://github.com/christianhelle/refitter/issues/1235)
 
 **Merged pull requests:**
 
+- docs: add aritchie as a contributor for code [\#1233](https://github.com/christianhelle/refitter/pull/1233) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump Microsoft.SourceLink.GitHub to 10.0.401 [\#1232](https://github.com/christianhelle/refitter/pull/1232) ([christianhelle](https://github.com/christianhelle))
 - Emit generic JsonStringEnumConverter\<TEnum\> on injected enum attributes [\#1231](https://github.com/christianhelle/refitter/pull/1231) ([aritchie](https://github.com/aritchie))
 - Update dependency TUnit to 1.66.27 [\#1229](https://github.com/christianhelle/refitter/pull/1229) ([renovate[bot]](https://github.com/apps/renovate))
