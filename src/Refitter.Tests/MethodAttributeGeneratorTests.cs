@@ -295,4 +295,42 @@ public class MethodAttributeGeneratorTests
 
         attributes.Should().BeEmpty();
     }
+
+    [Test]
+    public async Task Generate_Lists_All_Accept_Headers_For_Mixed_Streaming_Response()
+    {
+        var spec = """
+            openapi: 3.0.0
+            info:
+              title: Test
+              version: "1.0"
+            paths:
+              /test:
+                get:
+                  operationId: getTest
+                  responses:
+                    '200':
+                      description: Success
+                      content:
+                        application/json:
+                          schema:
+                            type: string
+                        application/x-ndjson:
+                          schema:
+                            type: string
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings { AddAcceptHeaders = true };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new MethodAttributeGenerator(settings, document);
+
+        var operation = document.Paths["/test"]["get"];
+        var operationModel = generator.CreateOperationModel(operation);
+        var attributes = sut.Generate(operation, operationModel);
+
+        attributes.Should().ContainSingle(a => a.Contains("Accept"));
+        attributes.Should().Contain(a => a.Contains("application/json"));
+        attributes.Should().Contain(a => a.Contains("application/x-ndjson"));
+    }
 }
