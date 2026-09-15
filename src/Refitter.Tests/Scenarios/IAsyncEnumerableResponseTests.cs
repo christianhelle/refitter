@@ -268,6 +268,54 @@ paths:
             .BeTrue();
     }
 
+    private const string MixedRefJsonAndPrimitiveNdjsonSpec = @"
+openapi: '3.0.0'
+info:
+  title: Task Instance Logs
+  version: 1.0.0
+paths:
+  '/logs':
+    get:
+      operationId: getLog
+      summary: Get Log
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInstancesLogResponse'
+            application/x-ndjson:
+              schema:
+                type: string
+components:
+  schemas:
+    TaskInstancesLogResponse:
+      type: object
+      properties:
+        content:
+          type: string
+";
+
+    [Test]
+    public async Task Generates_Task_With_Ref_Schema_For_Mixed_Json_And_Primitive_Ndjson()
+    {
+        string generatedCode = await GenerateCode(MixedRefJsonAndPrimitiveNdjsonSpec);
+        generatedCode.Should().NotContain("IAsyncEnumerable");
+        generatedCode.Should().Contain("Task<TaskInstancesLogResponse> GetLog(");
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_For_Mixed_Ref_Json_And_Primitive_Ndjson()
+    {
+        string generatedCode = await GenerateCode(MixedRefJsonAndPrimitiveNdjsonSpec);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
     [Test]
     [Arguments(OpenApiSpec)]
     [Arguments(Swagger2Spec)]
