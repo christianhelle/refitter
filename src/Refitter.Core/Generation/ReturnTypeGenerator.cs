@@ -133,6 +133,9 @@ internal class ReturnTypeGenerator(
                         continue;
 
                     schema = contentEntry.Value?.Schema;
+                    if (IsPrimitiveSchema(schema))
+                        continue;
+
                     return true;
                 }
             }
@@ -144,6 +147,9 @@ internal class ReturnTypeGenerator(
             if (IsStreamingOnly(operation.ActualProduces))
             {
                 schema = response.Schema;
+                if (IsPrimitiveSchema(schema))
+                    continue;
+
                 return true;
             }
         }
@@ -174,6 +180,19 @@ internal class ReturnTypeGenerator(
             : contentType;
 
         return StreamingContentTypes.Contains(mediaType.Trim(), StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static bool IsPrimitiveSchema(JsonSchema? schema)
+    {
+        if (schema is null)
+            return false;
+
+        JsonSchema actual = schema.ActualTypeSchema ?? schema;
+        JsonObjectType type = actual.Type & ~JsonObjectType.Null;
+        return type is JsonObjectType.String
+            or JsonObjectType.Number
+            or JsonObjectType.Integer
+            or JsonObjectType.Boolean;
     }
 
     private string GetStreamingReturnType(JsonSchema? schema)
