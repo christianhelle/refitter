@@ -182,7 +182,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `addAcceptHeaders` -  a boolean indicating whether to add accept headers [Headers("Accept: application/json")]. Default is `true`
 - `addContentTypeHeaders` - a boolean indicating whether to add content type headers [Headers("Content-Type: application/json")]. Default is `true`
 - `returnIApiResponse` - a boolean indicating whether to return `IApiResponse<T>` objects. Default is `false`
-- `returnIAsyncEnumerable` - a boolean indicating whether streaming responses generate `IAsyncEnumerable<T>`. Default is `true`. Set to `false` to emit `Task<T>` instead
+- `returnIAsyncEnumerable` - a boolean indicating whether streaming responses generate `IAsyncEnumerable<T>`. Default is `true`. Set to `false` to skip `IAsyncEnumerable<T>` and use the normal configured return type instead
 - `responseTypeOverride` - a dictionary with operation ids (as specified in the OpenAPI document) and a particular return type to use. The types are wrapped in a task, but otherwise unmodified (so make sure to specify or import their namespaces). Default is `{}`
 - `generateOperationHeaders` - a boolean indicating whether to use operation headers in the generated methods. Default is `true`
 - `ignoredOperationHeaders` - A collection of headers to omit from operation signatures. Default is `[]`

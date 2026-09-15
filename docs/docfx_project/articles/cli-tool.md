@@ -63,6 +63,7 @@ OPTIONS:
         --contract-only                                          Don't generate clients
         --use-api-response                                       Return Task<IApiResponse<T>> instead of Task<T>
         --use-observable-response                                Return IObservable instead of Task
+        --no-async-enumerable                                    Don't generate IAsyncEnumerable for streaming responses
         --internal                                               Set the accessibility of the generated types to 'internal'
         --cancellation-tokens                                    Use cancellation tokens
         --no-operation-headers                                   Don't generate operation headers

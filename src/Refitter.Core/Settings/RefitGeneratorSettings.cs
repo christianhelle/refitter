@@ -139,7 +139,8 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
 
     /// <summary>
     /// Gets or sets a value indicating whether streaming responses generate <c>IAsyncEnumerable&lt;T&gt;</c>.
-    /// Default is <c>true</c>. Set to <c>false</c> to emit <c>Task&lt;T&gt;</c> instead.
+    /// Default is <c>true</c>. Set to <c>false</c> to skip <c>IAsyncEnumerable&lt;T&gt;</c>
+    /// and use the normal configured return type instead.
     /// </summary>
     [Description("Generate IAsyncEnumerable for streaming responses. Default is true.")]
     public bool ReturnIAsyncEnumerable { get; set; } = true;

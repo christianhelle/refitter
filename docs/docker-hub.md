@@ -163,6 +163,7 @@ docker run --rm -v %cd%:/src christianhelle/refitter %*
     --contract-only              Generate only contracts
     --use-api-response           Return IApiResponse<T>
     --use-observable-response    Return IObservable
+    --no-async-enumerable        Don't generate IAsyncEnumerable
     --internal                   Internal type accessibility
     --cancellation-tokens        Add cancellation token parameters
     --multiple-interfaces        ByEndpoint or ByTag
