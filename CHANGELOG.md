@@ -11,6 +11,7 @@
 
 **Fixed bugs:**
 
+- IAsyncEnumerable string issues [\#1241](https://github.com/christianhelle/refitter/issues/1241)
 - trimUnusedSchema removes retained discriminator mappings [\#1235](https://github.com/christianhelle/refitter/issues/1235)
 
 **Merged pull requests:**
