@@ -138,6 +138,14 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public bool ReturnIObservable { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether streaming responses generate <c>IAsyncEnumerable&lt;T&gt;</c>.
+    /// Default is <c>true</c>. Set to <c>false</c> to skip <c>IAsyncEnumerable&lt;T&gt;</c>
+    /// and use the normal configured return type instead.
+    /// </summary>
+    [Description("Generate IAsyncEnumerable for streaming responses. Default is true.")]
+    public bool ReturnIAsyncEnumerable { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets a dictionary of operation ids and a specific response type that they should use. The type is
     /// wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).
     /// </summary>

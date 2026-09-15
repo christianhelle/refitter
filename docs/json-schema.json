@@ -340,6 +340,10 @@
       "description": "Return IObservable or Task.",
       "type": "boolean"
     },
+    "returnIAsyncEnumerable": {
+      "description": "Generate IAsyncEnumerable for streaming responses. Default is true.",
+      "type": "boolean"
+    },
     "responseTypeOverride": {
       "description": "AddAcceptHeaders dictionary of operation ids and a specific response type that they should use.\r\nThe type is wrapped in a task, but otherwise unmodified (so make sure that the namespaces are imported or specified).",
       "type": "object",

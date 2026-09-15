@@ -104,6 +104,7 @@ OPTIONS:
         --contract-only                                          Don't generate clients
         --use-api-response                                       Return Task<IApiResponse<T>> instead of Task<T>
         --use-observable-response                                Return IObservable instead of Task
+        --no-async-enumerable                                    Don't generate IAsyncEnumerable for streaming responses
         --internal                                               Set the accessibility of the generated types to 'internal'
         --cancellation-tokens                                    Use cancellation tokens
         --no-operation-headers                                   Don't generate operation headers
@@ -253,6 +254,7 @@ The following is an example `.refitter` file using a single OpenAPI specificatio
   "addContentTypeHeaders": true, // Optional. Default=true
   "returnIApiResponse": false, // Optional. Default=false
   "returnIObservable": false, // Optional. Default=false. Return IObservable instead of Task
+  "returnIAsyncEnumerable": true, // Optional. Default=true. Generate IAsyncEnumerable for streaming responses
   "responseTypeOverride": { // Optional. Default={}
     "File_Upload": "IApiResponse",
     "File_Download": "System.Net.Http.HttpContent"
@@ -392,6 +394,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `addContentTypeHeaders` - a boolean indicating whether to add content type headers [Headers("Content-Type: application/json")]. Default is `true`
 - `returnIApiResponse` - a boolean indicating whether to return `IApiResponse<T>` objects. Default is `false`
 - `returnIObservable` - a boolean indicating whether to return `IObservable<T>` instead of `Task<T>`. Default is `false`
+- `returnIAsyncEnumerable` - a boolean indicating whether streaming responses generate `IAsyncEnumerable<T>`. Default is `true`. Set to `false` to skip `IAsyncEnumerable<T>` and use the normal configured return type instead
 - `responseTypeOverride` - a dictionary with operation ids (as specified in the OpenAPI document) and a particular return type to use. The types are wrapped in a task, but otherwise unmodified (so make sure to specify or import their namespaces). Default is `{}`
 - `generateOperationHeaders` - a boolean indicating whether to use operation headers in the generated methods. Default is `true`
 - `ignoredOperationHeaders` - A collection of headers to omit from operation signatures. Default is `[]`
@@ -899,7 +902,9 @@ Status: Sold
 
 Endpoints whose success response uses a streaming content type (`application/x-ndjson`, `application/jsonl`, `application/x-jsonlines`, or `text/event-stream`) generate an `IAsyncEnumerable<T>` return type by default so you can consume the response as a stream.
 
-If you set a `responseTypeOverride` for a streaming operation, it takes precedence and may produce a different return type.
+Streaming is skipped when the schema is a primitive (`string`, `number`, `integer`, or `boolean`). Those operations use the normal configured return type instead. This avoids `IAsyncEnumerable<string>` for NDJSON bodies described as a raw string.
+
+Set `returnIAsyncEnumerable` to `false` (CLI: `--no-async-enumerable`) to skip `IAsyncEnumerable<T>` and use the normal configured return type (`Task<T>`, `IObservable<T>`, or `IApiResponse` wrapping). A `responseTypeOverride` for a streaming operation still takes precedence.
 
 ```cs
 var stream = client.GetEvents();

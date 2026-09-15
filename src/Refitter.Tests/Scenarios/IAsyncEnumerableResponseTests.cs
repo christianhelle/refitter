@@ -224,13 +224,82 @@ paths:
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode(string spec)
+    private const string MixedJsonAndPrimitiveNdjsonSpec = @"
+openapi: '3.0.0'
+info:
+  title: Task Instance Logs
+  version: 1.0.0
+paths:
+  '/logs':
+    get:
+      operationId: getLog
+      summary: Get Log
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: string
+            application/x-ndjson:
+              schema:
+                type: string
+";
+
+    [Test]
+    public async Task Does_Not_Generate_IAsyncEnumerable_When_Ndjson_Schema_Is_String()
+    {
+        string generatedCode = await GenerateCode(MixedJsonAndPrimitiveNdjsonSpec);
+        generatedCode.Should().NotContain("IAsyncEnumerable");
+        generatedCode.Should().Contain("Task<Response> GetLog(");
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_For_Mixed_Json_And_Primitive_Ndjson()
+    {
+        string generatedCode = await GenerateCode(MixedJsonAndPrimitiveNdjsonSpec);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [Test]
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Does_Not_Generate_IAsyncEnumerable_When_Disabled(string spec)
+    {
+        string generatedCode = await GenerateCode(spec, settings => settings.ReturnIAsyncEnumerable = false);
+        generatedCode.Should().NotContain("IAsyncEnumerable");
+    }
+
+    [Test]
+    [Category("Integration")]
+    [Arguments(OpenApiSpec)]
+    [Arguments(Swagger2Spec)]
+    public async Task Can_Build_Generated_Code_When_IAsyncEnumerable_Disabled(string spec)
+    {
+        string generatedCode = await GenerateCode(spec, settings => settings.ReturnIAsyncEnumerable = false);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    private static async Task<string> GenerateCode(
+        string spec,
+        Action<RefitGeneratorSettings>? configure = null)
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
         RefitGeneratorSettings settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile
         };
+        configure?.Invoke(settings);
 
         RefitGenerator sut = await RefitGenerator.CreateAsync(settings);
         string generatedCode = sut.Generate();

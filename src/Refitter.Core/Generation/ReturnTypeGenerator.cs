@@ -33,7 +33,8 @@ internal class ReturnTypeGenerator(
             return $"{GetAsyncOperationType(false)}<HttpResponseMessage>";
         }
 
-        if (TryGetStreamingResponseSchema(operation, out var streamingSchema))
+        if (ShouldGenerateIAsyncEnumerable() &&
+            TryGetStreamingResponseSchema(operation, out var streamingSchema))
         {
             return GetStreamingReturnType(streamingSchema);
         }
@@ -133,6 +134,9 @@ internal class ReturnTypeGenerator(
                         continue;
 
                     schema = contentEntry.Value?.Schema;
+                    if (IsPrimitiveSchema(schema))
+                        continue;
+
                     return true;
                 }
             }
@@ -144,6 +148,9 @@ internal class ReturnTypeGenerator(
             if (IsStreamingOnly(operation.ActualProduces))
             {
                 schema = response.Schema;
+                if (IsPrimitiveSchema(schema))
+                    continue;
+
                 return true;
             }
         }
@@ -176,6 +183,19 @@ internal class ReturnTypeGenerator(
         return StreamingContentTypes.Contains(mediaType.Trim(), StringComparer.OrdinalIgnoreCase);
     }
 
+    private static bool IsPrimitiveSchema(JsonSchema? schema)
+    {
+        if (schema is null)
+            return false;
+
+        JsonSchema actual = schema.ActualTypeSchema ?? schema;
+        JsonObjectType type = actual.Type & ~JsonObjectType.Null;
+        return type is JsonObjectType.String
+            or JsonObjectType.Number
+            or JsonObjectType.Integer
+            or JsonObjectType.Boolean;
+    }
+
     private string GetStreamingReturnType(JsonSchema? schema)
     {
         JsonSchema? itemSchema = schema?.Type == NJsonSchema.JsonObjectType.Array
@@ -188,9 +208,27 @@ internal class ReturnTypeGenerator(
         return $"IAsyncEnumerable<{TrimImportedNamespaces(itemTypeName)}>";
     }
 
+    private bool ShouldGenerateIAsyncEnumerable()
+    {
+        return codeGeneration is not RefitGeneratorSettings settings || settings.ReturnIAsyncEnumerable;
+    }
+
+    private static JsonSchema? GetPreferredResponseSchema(OpenApiResponse response)
+    {
+        foreach (var contentEntry in response.Content)
+        {
+            if (IsStreamingContentType(contentEntry.Key))
+                continue;
+
+            return contentEntry.Value?.Schema ?? response.Schema;
+        }
+
+        return response.Schema;
+    }
+
     private string GetTypeName(string code, OpenApiOperation operation)
     {
-        var schema = operation.Responses[code].ActualResponse.Schema;
+        var schema = GetPreferredResponseSchema(operation.Responses[code].ActualResponse);
         var typeName = generator.GetTypeName(schema, false, null);
 
         if (!string.IsNullOrWhiteSpace(codeGeneration.CodeGeneratorSettings?.ArrayType) &&

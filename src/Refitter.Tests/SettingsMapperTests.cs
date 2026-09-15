@@ -102,6 +102,33 @@ public class SettingsMapperTests
     }
 
     [Test]
+    public void Map_Should_Negate_NoIAsyncEnumerable()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            NoIAsyncEnumerable = true,
+        };
+
+        var result = SettingsMapper.Map(settings);
+
+        result.ReturnIAsyncEnumerable.Should().BeFalse();
+    }
+
+    [Test]
+    public void Map_Should_Keep_ReturnIAsyncEnumerable_Enabled_By_Default()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+        };
+
+        var result = SettingsMapper.Map(settings);
+
+        result.ReturnIAsyncEnumerable.Should().BeTrue();
+    }
+
+    [Test]
     public void Map_Should_Negate_InterfaceOnly_To_GenerateContracts()
     {
         var settings = new Settings

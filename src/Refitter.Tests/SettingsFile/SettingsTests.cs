@@ -27,6 +27,7 @@ public class SettingsTests
         settings.ContractOnly.Should().BeFalse();
         settings.ReturnIApiResponse.Should().BeFalse();
         settings.ReturnIObservable.Should().BeFalse();
+        settings.NoIAsyncEnumerable.Should().BeFalse();
         settings.InternalTypeAccessibility.Should().BeFalse();
         settings.UseCancellationTokens.Should().BeFalse();
         settings.NoOperationHeaders.Should().BeFalse();
