@@ -23,11 +23,6 @@ public interface ICodeGenerationConfiguration
     bool ReturnIObservable { get; }
 
     /// <summary>
-    /// Gets a value indicating whether streaming responses generate <c>IAsyncEnumerable&lt;T&gt;</c>.
-    /// </summary>
-    bool ReturnIAsyncEnumerable { get; }
-
-    /// <summary>
     /// Gets the dictionary of operation ids and a specific response type that they should use.
     /// </summary>
     Dictionary<string, string> ResponseTypeOverride { get; }

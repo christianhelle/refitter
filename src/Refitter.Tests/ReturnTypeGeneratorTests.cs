@@ -820,6 +820,54 @@ public class ReturnTypeGeneratorTests
     }
 
     [Test]
+    public async Task Generate_Prefers_Json_Schema_When_Primitive_Ndjson_Is_Listed_First()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/x-ndjson": {
+                            "schema": {
+                              "type": "string"
+                            }
+                          },
+                          "application/json": {
+                            "schema": {
+                              "type": "object",
+                              "properties": {
+                                "content": { "type": "string" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<Anonymous>");
+    }
+
+    [Test]
     public async Task Generate_Returns_Task_Of_String_For_Nullable_Streaming_String_Schema()
     {
         var spec = """
@@ -949,6 +997,38 @@ public class ReturnTypeGeneratorTests
         var result = sut.Generate(operation);
 
         result.Should().Be("Task<ICollection<string>>");
+    }
+
+    [Test]
+    public async Task Generate_Returns_Task_For_Swagger2_Streaming_Response_With_Primitive_Schema()
+    {
+        var spec = """
+            swagger: '2.0'
+            info:
+              title: Test
+              version: 1.0.0
+            paths:
+              '/test':
+                get:
+                  operationId: getTest
+                  produces:
+                    - application/x-ndjson
+                  responses:
+                    '200':
+                      description: Success
+                      schema:
+                        type: string
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<string>");
     }
 
     [Test]

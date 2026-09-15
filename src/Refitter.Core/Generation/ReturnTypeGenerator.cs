@@ -33,7 +33,7 @@ internal class ReturnTypeGenerator(
             return $"{GetAsyncOperationType(false)}<HttpResponseMessage>";
         }
 
-        if (codeGeneration.ReturnIAsyncEnumerable &&
+        if (ShouldGenerateIAsyncEnumerable() &&
             TryGetStreamingResponseSchema(operation, out var streamingSchema))
         {
             return GetStreamingReturnType(streamingSchema);
@@ -208,9 +208,27 @@ internal class ReturnTypeGenerator(
         return $"IAsyncEnumerable<{TrimImportedNamespaces(itemTypeName)}>";
     }
 
+    private bool ShouldGenerateIAsyncEnumerable()
+    {
+        return codeGeneration is not RefitGeneratorSettings settings || settings.ReturnIAsyncEnumerable;
+    }
+
+    private static JsonSchema? GetPreferredResponseSchema(OpenApiResponse response)
+    {
+        foreach (var contentEntry in response.Content)
+        {
+            if (IsStreamingContentType(contentEntry.Key))
+                continue;
+
+            return contentEntry.Value?.Schema ?? response.Schema;
+        }
+
+        return response.Schema;
+    }
+
     private string GetTypeName(string code, OpenApiOperation operation)
     {
-        var schema = operation.Responses[code].ActualResponse.Schema;
+        var schema = GetPreferredResponseSchema(operation.Responses[code].ActualResponse);
         var typeName = generator.GetTypeName(schema, false, null);
 
         if (!string.IsNullOrWhiteSpace(codeGeneration.CodeGeneratorSettings?.ArrayType) &&
