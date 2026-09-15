@@ -33,7 +33,8 @@ internal class ReturnTypeGenerator(
             return $"{GetAsyncOperationType(false)}<HttpResponseMessage>";
         }
 
-        if (TryGetStreamingResponseSchema(operation, out var streamingSchema))
+        if (codeGeneration.ReturnIAsyncEnumerable &&
+            TryGetStreamingResponseSchema(operation, out var streamingSchema))
         {
             return GetStreamingReturnType(streamingSchema);
         }

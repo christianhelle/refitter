@@ -908,6 +908,50 @@ public class ReturnTypeGeneratorTests
     }
 
     [Test]
+    public async Task Generate_Returns_Task_When_ReturnIAsyncEnumerable_Is_Disabled()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/x-ndjson": {
+                            "schema": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings
+        {
+            ReturnIAsyncEnumerable = false
+        };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<ICollection<string>>");
+    }
+
+    [Test]
     public async Task Generate_Does_Not_Return_IAsyncEnumerable_For_Non_Streaming_Swagger2_Produces()
     {
         var spec = """
