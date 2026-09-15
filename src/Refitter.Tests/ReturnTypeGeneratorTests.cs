@@ -1173,4 +1173,180 @@ public class ReturnTypeGeneratorTests
 
         result.Should().Be("Task<ICollection<string>>");
     }
+
+    [Test]
+    [Arguments("application/x-ndjson")]
+    [Arguments("application/jsonl")]
+    [Arguments("application/x-jsonlines")]
+    [Arguments("text/event-stream")]
+    public async Task Generate_Returns_Task_For_Primitive_String_Across_Streaming_Media_Types(
+        string contentType)
+    {
+        var spec = $$"""
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "{{contentType}}": {
+                            "schema": { "type": "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<string>");
+    }
+
+    [Test]
+    public async Task Generate_Returns_IAsyncEnumerable_For_Mixed_Json_And_Array_Streaming_Response()
+    {
+        // Documents the current behavior: a mixed response still streams when the
+        // streaming schema is not primitive. Change deliberately, not accidentally.
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "type": "object",
+                              "properties": {
+                                "content": { "type": "string" }
+                              }
+                            }
+                          },
+                          "application/x-ndjson": {
+                            "schema": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("IAsyncEnumerable<string>");
+    }
+
+    [Test]
+    public async Task Generate_Returns_Streaming_Type_When_Later_Status_Code_Streams()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/test": {
+                  "get": {
+                    "operationId": "getTest",
+                    "responses": {
+                      "200": {
+                        "description": "Success",
+                        "content": {
+                          "application/json": {
+                            "schema": { "type": "string" }
+                          }
+                        }
+                      },
+                      "206": {
+                        "description": "Partial Content",
+                        "content": {
+                          "application/x-ndjson": {
+                            "schema": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("IAsyncEnumerable<string>");
+    }
+
+    [Test]
+    public async Task Generate_Returns_Task_For_Mixed_Swagger2_Produces_With_Primitive_Schema()
+    {
+        var spec = """
+            swagger: '2.0'
+            info:
+              title: Test
+              version: 1.0.0
+            paths:
+              '/test':
+                get:
+                  operationId: getTest
+                  produces:
+                    - application/json
+                    - application/x-ndjson
+                  responses:
+                    '200':
+                      description: Success
+                      schema:
+                        type: string
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        var operation = document.Paths["/test"]["get"];
+        var result = sut.Generate(operation);
+
+        result.Should().Be("Task<string>");
+    }
 }
