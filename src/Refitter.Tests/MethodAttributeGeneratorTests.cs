@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NSwag;
+using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -294,5 +295,43 @@ public class MethodAttributeGeneratorTests
         var attributes = sut.Generate(operation, operationModel);
 
         attributes.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task Generate_Lists_All_Accept_Headers_For_Mixed_Streaming_Response()
+    {
+        string spec = """
+            openapi: 3.0.0
+            info:
+              title: Test
+              version: "1.0"
+            paths:
+              /test:
+                get:
+                  operationId: getTest
+                  responses:
+                    '200':
+                      description: Success
+                      content:
+                        application/json:
+                          schema:
+                            type: string
+                        application/x-ndjson:
+                          schema:
+                            type: string
+            """;
+
+        OpenApiDocument document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        RefitGeneratorSettings settings = new RefitGeneratorSettings { AddAcceptHeaders = true };
+        CustomCSharpClientGenerator generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        MethodAttributeGenerator sut = new MethodAttributeGenerator(settings, document);
+
+        OpenApiOperation operation = document.Paths["/test"]["get"];
+        CSharpOperationModel operationModel = generator.CreateOperationModel(operation);
+        string[] attributes = sut.Generate(operation, operationModel);
+
+        attributes.Should().ContainSingle(a => a.Contains("Accept"))
+            .Which.Should().Contain("application/json")
+            .And.Contain("application/x-ndjson");
     }
 }

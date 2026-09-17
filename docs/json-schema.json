@@ -510,8 +510,13 @@
       "type": "string",
       "enum": [ "Multi", "Csv", "Ssv", "Tsv", "Pipes" ]
     },
-    "parameterNameGenerator": {
-      "$ref": "#/definitions/IParameterNameGenerator"
+    "customTemplateDirectory": {
+      "description": "Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates",
+      "type": [ "string", "null" ]
+    },
+    "silent": {
+      "description": "Suppress all console output when running the CLI tool. Default is false.",
+      "type": "boolean"
     },
     "authenticationHeaderStyle": {
       "description": "Controls generation of Authorization header support. Options: None (no authentication code is generated), Parameter (adds method parameters for authentication), Method (generates a Refit [Headers] attribute for bearer token authentication). Default is None.",

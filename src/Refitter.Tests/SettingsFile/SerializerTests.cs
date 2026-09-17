@@ -92,6 +92,19 @@ public class SerializerTests
     }
 
     [Test]
+    [Arguments("""{"returnIAsyncEnumerable": false}""", false)]
+    [Arguments("""{"returnIAsyncEnumerable": true}""", true)]
+    [Arguments("{}", true)]
+    public void Can_Deserialize_RefitGeneratorSettings_With_ReturnIAsyncEnumerable(
+        string json,
+        bool expected)
+    {
+        RefitGeneratorSettings settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+
+        settings.ReturnIAsyncEnumerable.Should().Be(expected);
+    }
+
+    [Test]
     public void Can_Deserialize_CodeGeneratorSettings_With_IntegerType_String_Int32()
     {
         const string json = """{"integerType": "Int32"}""";

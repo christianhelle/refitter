@@ -111,6 +111,7 @@ public class SettingsTests
             NoAcceptHeaders = true,
             InterfaceOnly = true,
             ReturnIApiResponse = true,
+            NoIAsyncEnumerable = true,
             InternalTypeAccessibility = true,
             UseCancellationTokens = true,
             NoOperationHeaders = true,
@@ -136,6 +137,7 @@ public class SettingsTests
         settings.NoAcceptHeaders.Should().BeTrue();
         settings.InterfaceOnly.Should().BeTrue();
         settings.ReturnIApiResponse.Should().BeTrue();
+        settings.NoIAsyncEnumerable.Should().BeTrue();
         settings.InternalTypeAccessibility.Should().BeTrue();
         settings.UseCancellationTokens.Should().BeTrue();
         settings.NoOperationHeaders.Should().BeTrue();
