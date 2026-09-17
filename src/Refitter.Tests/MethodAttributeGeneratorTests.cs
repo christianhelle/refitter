@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NSwag;
+using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -299,7 +300,7 @@ public class MethodAttributeGeneratorTests
     [Test]
     public async Task Generate_Lists_All_Accept_Headers_For_Mixed_Streaming_Response()
     {
-        var spec = """
+        string spec = """
             openapi: 3.0.0
             info:
               title: Test
@@ -320,17 +321,17 @@ public class MethodAttributeGeneratorTests
                             type: string
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
-        var settings = new RefitGeneratorSettings { AddAcceptHeaders = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new MethodAttributeGenerator(settings, document);
+        OpenApiDocument document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        RefitGeneratorSettings settings = new RefitGeneratorSettings { AddAcceptHeaders = true };
+        CustomCSharpClientGenerator generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        MethodAttributeGenerator sut = new MethodAttributeGenerator(settings, document);
 
-        var operation = document.Paths["/test"]["get"];
-        var operationModel = generator.CreateOperationModel(operation);
-        var attributes = sut.Generate(operation, operationModel);
+        OpenApiOperation operation = document.Paths["/test"]["get"];
+        CSharpOperationModel operationModel = generator.CreateOperationModel(operation);
+        string[] attributes = sut.Generate(operation, operationModel);
 
-        attributes.Should().ContainSingle(a => a.Contains("Accept"));
-        attributes.Should().Contain(a => a.Contains("application/json"));
-        attributes.Should().Contain(a => a.Contains("application/x-ndjson"));
+        attributes.Should().ContainSingle(a => a.Contains("Accept"))
+            .Which.Should().Contain("application/json")
+            .And.Contain("application/x-ndjson");
     }
 }
