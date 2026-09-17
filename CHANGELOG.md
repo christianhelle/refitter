@@ -18,7 +18,11 @@
 
 **Merged pull requests:**
 
+- Update dependency dotnet-sdk to v10 [\#1244](https://github.com/christianhelle/refitter/pull/1244) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add kemocca as a contributor for bug [\#1242](https://github.com/christianhelle/refitter/pull/1242) ([allcontributors[bot]](https://github.com/apps/allcontributors))
+- Update dependency ruby to v4.0.7 [\#1240](https://github.com/christianhelle/refitter/pull/1240) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Polly to 8.8.0 [\#1239](https://github.com/christianhelle/refitter/pull/1239) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.68.4 [\#1234](https://github.com/christianhelle/refitter/pull/1234) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add aritchie as a contributor for code [\#1233](https://github.com/christianhelle/refitter/pull/1233) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump Microsoft.SourceLink.GitHub to 10.0.401 [\#1232](https://github.com/christianhelle/refitter/pull/1232) ([christianhelle](https://github.com/christianhelle))
 - Emit generic JsonStringEnumConverter\<TEnum\> on injected enum attributes [\#1231](https://github.com/christianhelle/refitter/pull/1231) ([aritchie](https://github.com/aritchie))
