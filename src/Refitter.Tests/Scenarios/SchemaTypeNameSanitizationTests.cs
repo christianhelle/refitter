@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;

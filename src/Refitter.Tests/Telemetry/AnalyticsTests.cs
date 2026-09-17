@@ -1,5 +1,5 @@
 using Exceptionless;
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;

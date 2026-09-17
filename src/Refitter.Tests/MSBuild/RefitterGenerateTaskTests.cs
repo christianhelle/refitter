@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.Build.Framework;
 using Refitter.MSBuild;
 

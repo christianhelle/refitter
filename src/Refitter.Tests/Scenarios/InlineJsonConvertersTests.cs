@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;

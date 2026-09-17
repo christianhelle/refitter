@@ -1,5 +1,5 @@
-using FluentAssertions;
-using FluentAssertions.Execution;
+using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Refitter.Core;
 using Spectre.Console.Cli;
 

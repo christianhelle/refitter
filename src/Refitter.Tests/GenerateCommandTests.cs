@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Core;
 using TUnit.Core;
 

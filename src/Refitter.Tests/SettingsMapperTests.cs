@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Core;
 using Spectre.Console.Cli;
 using TUnit.Core;

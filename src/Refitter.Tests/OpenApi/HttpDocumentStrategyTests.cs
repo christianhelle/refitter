@@ -1,5 +1,5 @@
 using System.Net;
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;

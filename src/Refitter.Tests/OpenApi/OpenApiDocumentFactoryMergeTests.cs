@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using NSwag;

@@ -1,5 +1,5 @@
 using System.Text;
-using FluentAssertions;
+using AwesomeAssertions;
 using NJsonSchema;
 using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;

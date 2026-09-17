@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Core;
 using TUnit.Core;
 
