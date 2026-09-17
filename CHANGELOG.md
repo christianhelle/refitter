@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - IAsyncEnumerable - JSONL/application/x-ndjson [\#299](https://github.com/christianhelle/refitter/issues/299)
+- Add regression tests for IAsyncEnumerable return-type selection and settings schema [\#1245](https://github.com/christianhelle/refitter/pull/1245) ([christianhelle](https://github.com/christianhelle))
 - Skip IAsyncEnumerable for primitive streaming schemas [\#1243](https://github.com/christianhelle/refitter/pull/1243) ([christianhelle](https://github.com/christianhelle))
 - Preserve retained discriminator mappings during schema trimming [\#1237](https://github.com/christianhelle/refitter/pull/1237) ([rcdailey](https://github.com/rcdailey))
 
