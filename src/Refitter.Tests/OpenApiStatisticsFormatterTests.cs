@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using TUnit.Core;
 
 namespace Refitter.Tests;

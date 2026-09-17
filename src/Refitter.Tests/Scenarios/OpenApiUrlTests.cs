@@ -1,6 +1,6 @@
 #if !DEBUG
 using Refitter.Tests.TestUtilities;
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using TUnit.Core;

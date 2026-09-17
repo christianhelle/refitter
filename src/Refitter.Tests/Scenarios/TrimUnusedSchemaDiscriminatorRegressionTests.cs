@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;

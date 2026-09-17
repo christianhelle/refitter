@@ -74,11 +74,12 @@ Feature requests are welcome! Please follow the feature request template in `.gi
 - Test coverage should be comprehensive, covering both normal operation and edge cases.
 - All tests must pass before submitting a pull request.
 - **Testing Framework**: The project uses [TUnit](https://github.com/thomhurst/TUnit) instead of xUnit for unit testing, which provides 3x faster test execution.
+- **Assertion Library**: Assertions use [AwesomeAssertions](https://github.com/AwesomeAssertions/AwesomeAssertions), the Apache-2.0 community fork of FluentAssertions, not `TUnit.Assertions`.
 
 Example test pattern:
 
 ```csharp
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;

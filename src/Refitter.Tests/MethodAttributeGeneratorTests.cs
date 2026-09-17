@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Tests.UseJsonInheritanceConverter;
 using TUnit.Core;
 

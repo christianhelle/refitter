@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using NJsonSchema;
 using NJsonSchema.CodeGeneration.CSharp;
 using Refitter.Core;

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Core.Validation;
 using Refitter.Tests.Resources;
 using Refitter.Tests.TestUtilities;

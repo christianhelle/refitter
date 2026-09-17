@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;

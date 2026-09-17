@@ -1,6 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "FluentAssertions 8.x is under a commercial license; use the Apache-2.0 fork",
+      "matchDatasources": [
+        "nuget"
+      ],
+      "matchPackageNames": [
+        "FluentAssertions"
+      ],
+      "replacementName": "AwesomeAssertions",
+      "replacementVersion": "9.6.0"
+    }
   ]
 }

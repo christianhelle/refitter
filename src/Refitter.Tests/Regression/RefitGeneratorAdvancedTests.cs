@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using NJsonSchema;
 using NSwag;
 using Refitter.Core;
