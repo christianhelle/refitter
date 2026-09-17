@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.SourceGenerators.Tests.Build;
 using Refitter.SourceGenerators.Tests.TestUtilities;

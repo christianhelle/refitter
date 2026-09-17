@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using FluentAssertions;
+using AwesomeAssertions;
 using Refitter.Tests.UsePolymorphicSerialization;
 using TUnit.Core;
 

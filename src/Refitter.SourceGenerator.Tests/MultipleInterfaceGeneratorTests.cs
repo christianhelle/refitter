@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Refit;
 using Refitter.Tests.AdditionalFiles.ByEndpoint;
 using TUnit.Core;
