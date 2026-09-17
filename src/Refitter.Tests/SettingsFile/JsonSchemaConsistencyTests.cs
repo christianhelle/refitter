@@ -1,4 +1,6 @@
+using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using Refitter.Core;
 using TUnit.Core;
@@ -9,39 +11,38 @@ namespace Refitter.Tests.SettingsFile;
 public class JsonSchemaConsistencyTests
 {
     [Test]
-    public async Task JsonSchema_Should_Only_Describe_Known_Settings()
+    public async Task JsonSchema_Should_Match_Serializable_Settings()
     {
-        var schemaPath = FindRepoFile("docs", "json-schema.json");
-        using var document = JsonDocument.Parse(await File.ReadAllTextAsync(schemaPath));
-        var propertyNames = document.RootElement
+        string schemaPath = FindRepoFile("docs", "json-schema.json");
+        using JsonDocument document = JsonDocument.Parse(await File.ReadAllTextAsync(schemaPath));
+        List<string> propertyNames = document.RootElement
             .GetProperty("properties")
             .EnumerateObject()
             .Select(property => property.Name)
             .ToList();
 
-        var settingNames = typeof(RefitGeneratorSettings)
-            .GetProperties()
-            .Select(property => property.Name)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        List<string> settingNames = typeof(RefitGeneratorSettings)
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(property => property.GetCustomAttribute<JsonIgnoreAttribute>()?.Condition != JsonIgnoreCondition.Always)
+            .Select(property => property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name
+                ?? JsonNamingPolicy.CamelCase.ConvertName(property.Name))
+            .ToList();
 
         propertyNames.Should().Contain("returnIAsyncEnumerable");
-        foreach (var propertyName in propertyNames)
-        {
-            settingNames.Should().Contain(
-                propertyName,
-                $"docs/json-schema.json documents '{propertyName}' which is not a setting");
-        }
+        propertyNames.Should().BeEquivalentTo(
+            settingNames,
+            "docs/json-schema.json should describe every serializable setting and no unsupported properties");
     }
 
     private static string FindRepoFile(params string[] relativeSegments)
     {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        DirectoryInfo? directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
             if (File.Exists(Path.Combine(directory.FullName, "global.json")))
             {
-                var candidate = directory.FullName;
-                foreach (var segment in relativeSegments)
+                string candidate = directory.FullName;
+                foreach (string segment in relativeSegments)
                 {
                     candidate = Path.Combine(candidate, segment);
                 }
