@@ -88,7 +88,7 @@ public class SchemaTraversalTests
     }
 
     [Test]
-    public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Dictionary_Key()
+    public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Additional_Properties()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
             {
@@ -128,6 +128,50 @@ public class SchemaTraversalTests
 
         document.Components.Schemas.Should().ContainKey("Root");
         document.Components.Schemas.Should().ContainKey("Value");
+        document.Components.Schemas.Should().NotContainKey("Unused");
+    }
+
+    [Test]
+    public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Dictionary_Key()
+    {
+        var document = await OpenApiDocument.FromJsonAsync("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/pets": {
+                  "get": {
+                    "operationId": "GetPets",
+                    "responses": {
+                      "200": {
+                        "description": "ok",
+                        "content": {
+                          "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Root" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "components": {
+                "schemas": {
+                  "Root": { "type": "object" },
+                  "Key": { "type": "string", "enum": [ "a", "b" ] },
+                  "Unused": { "type": "integer" }
+                }
+              }
+            }
+            """);
+
+        // x-dictionaryKey has no OpenAPI 3.0 representation, so wire it up directly
+        document.Components.Schemas["Root"].DictionaryKey = document.Components.Schemas["Key"];
+
+        new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+
+        document.Components.Schemas.Should().ContainKey("Root");
+        document.Components.Schemas.Should().ContainKey("Key");
         document.Components.Schemas.Should().NotContainKey("Unused");
     }
 
