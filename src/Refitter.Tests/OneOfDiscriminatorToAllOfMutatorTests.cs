@@ -167,4 +167,81 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         document.Components!.Schemas["Base"].ActualSchema.Type
             .Should().Be(NJsonSchema.JsonObjectType.Object);
     }
+
+    [Test]
+    public void Mutate_WithoutComponents_DoesNothing()
+    {
+        var document = new OpenApiDocument
+        {
+            Info = new() { Title = "Test", Version = "1.0" }
+        };
+
+        var sut = new OneOfDiscriminatorToAllOfMutator();
+
+        var act = () => sut.Mutate(document);
+
+        act.Should().NotThrow();
+    }
+
+    [Test]
+    public async Task Mutate_Does_Not_Duplicate_Existing_AllOf_Inheritance()
+    {
+        var document = await OpenApiDocument.FromJsonAsync("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {},
+              "components": {
+                "schemas": {
+                  "Vehicle": {
+                    "oneOf": [
+                      { "$ref": "#/components/schemas/Car" }
+                    ],
+                    "discriminator": { "propertyName": "type" }
+                  },
+                  "Car": {
+                    "type": "object",
+                    "allOf": [
+                      { "$ref": "#/components/schemas/Vehicle" }
+                    ]
+                  }
+                }
+              }
+            }
+            """);
+
+        var sut = new OneOfDiscriminatorToAllOfMutator();
+        sut.Mutate(document);
+
+        var car = document.Components!.Schemas["Car"].ActualSchema;
+        car.AllOf.Should().HaveCount(1);
+    }
+
+    [Test]
+    public async Task Mutate_Without_Discriminator_Does_Not_Add_Inheritance()
+    {
+        var document = await OpenApiDocument.FromJsonAsync("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {},
+              "components": {
+                "schemas": {
+                  "Vehicle": {
+                    "oneOf": [
+                      { "$ref": "#/components/schemas/Car" }
+                    ]
+                  },
+                  "Car": { "type": "object" }
+                }
+              }
+            }
+            """);
+
+        var sut = new OneOfDiscriminatorToAllOfMutator();
+        sut.Mutate(document);
+
+        var car = document.Components!.Schemas["Car"].ActualSchema;
+        car.AllOf.Should().BeEmpty();
+    }
 }

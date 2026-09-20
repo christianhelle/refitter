@@ -279,4 +279,69 @@ public class IdentifierUtilsTests
         var result = "123-Test Name!@#Value".Sanitize();
         result.Should().Be("_123TestNameValue");
     }
+
+    [Test]
+    [Arguments(null)]
+    [Arguments("")]
+    [Arguments("   ")]
+    public void ToCompilableIdentifier_Returns_Underscore_For_Blank_Input(string? value)
+    {
+        var result = IdentifierUtils.ToCompilableIdentifier(value);
+
+        result.Should().Be("_");
+    }
+
+    [Test]
+    public void ToCompilableIdentifier_Preserves_Verbatim_Identifier()
+    {
+        var result = IdentifierUtils.ToCompilableIdentifier("@class");
+
+        result.Should().Be("@class");
+    }
+
+    [Test]
+    public void ToCompilableIdentifier_Escapes_Reserved_Keyword()
+    {
+        var result = IdentifierUtils.ToCompilableIdentifier("class");
+
+        result.Should().Be("@class");
+    }
+
+    [Test]
+    public void ToCompilableIdentifier_Falls_Back_To_Underscore_When_All_Characters_Are_Illegal()
+    {
+        var result = IdentifierUtils.ToCompilableIdentifier("@");
+
+        result.Should().Be("_");
+    }
+
+    [Test]
+    public void IsValidIdentifier_Returns_False_For_Blank_Input()
+    {
+        IdentifierUtils.IsValidIdentifier(null).Should().BeFalse();
+        IdentifierUtils.IsValidIdentifier(string.Empty).Should().BeFalse();
+    }
+
+    [Test]
+    [Arguments("@class", false)]
+    [Arguments("@valid", true)]
+    [Arguments("@", false)]
+    public void IsValidIdentifier_Handles_Verbatim_Prefix(string value, bool expected)
+    {
+        IdentifierUtils.IsValidIdentifier(value).Should().Be(expected);
+    }
+
+    [Test]
+    [Arguments("")]
+    [Arguments(null)]
+    public void EscapeReservedKeyword_Returns_Input_For_Blank_Value(string? value)
+    {
+        IdentifierUtils.EscapeReservedKeyword(value!).Should().Be(value);
+    }
+
+    [Test]
+    public void EscapeReservedKeyword_Leaves_Verbatim_Identifier_Untouched()
+    {
+        IdentifierUtils.EscapeReservedKeyword("@class").Should().Be("@class");
+    }
 }

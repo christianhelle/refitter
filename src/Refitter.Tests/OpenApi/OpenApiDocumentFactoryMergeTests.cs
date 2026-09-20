@@ -1459,6 +1459,22 @@ paths:
     private static Task<OpenApiDocument> ParseJsonDocument(string json)
         => OpenApiDocument.FromJsonAsync(json);
 
+    [Test]
+    public void Merge_Throws_On_Null_Documents()
+    {
+        var act = () => Merger.Merge(null!);
+
+        act.Should().Throw<ArgumentException>();
+    }
+
+    [Test]
+    public void Merge_Throws_On_Empty_Documents()
+    {
+        var act = () => Merger.Merge([]);
+
+        act.Should().Throw<ArgumentException>();
+    }
+
     private static OpenApiDocument InvokeMerge(params OpenApiDocument[] documents)
         => Merger.Merge(documents);
 

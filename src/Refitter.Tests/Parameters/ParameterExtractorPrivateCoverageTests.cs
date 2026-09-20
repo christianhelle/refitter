@@ -38,6 +38,14 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [Test]
+    public void EscapeString_Encodes_Generic_Control_Characters_As_Unicode_Escapes()
+    {
+        var result = ParameterNaming.EscapeString("before\u0001after");
+
+        result.Should().Be("before\\u0001after");
+    }
+
+    [Test]
     [Arguments("uint")]
     [Arguments("UInt32")]
     public void FormatNumericValue_Appends_U_Suffix_For_UInt_Types(string numericType)

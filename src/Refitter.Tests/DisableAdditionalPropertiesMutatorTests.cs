@@ -37,6 +37,25 @@ public class DisableAdditionalPropertiesMutatorTests
     }
 
     [Test]
+    public async Task Mutate_WithoutComponents_DoesNothing()
+    {
+        var document = await OpenApiDocument.FromJsonAsync("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {}
+            }
+            """);
+
+        var sut = new DisableAdditionalPropertiesMutator(generateDefaultAdditionalProperties: false);
+
+        var act = () => sut.Mutate(document);
+
+        act.Should().NotThrow();
+        document.Components.Schemas.Should().BeEmpty();
+    }
+
+    [Test]
     public async Task Mutate_WithGenerateDefaultAdditionalPropertiesTrue_DoesNotChangeAllowAdditionalProperties()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
