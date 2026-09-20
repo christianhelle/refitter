@@ -44,7 +44,7 @@ jobs:
           10.0.x
 
     - name: 🧪 Test
-      run: dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml
+      run: dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release -p:DebugType=portable --coverage --coverage-output coverage.cobertura.xml --coverage-output-format xml
 
     - name: 🗳️ Upload
       uses: actions/upload-artifact@v7
