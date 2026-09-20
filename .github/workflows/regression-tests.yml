@@ -31,6 +31,6 @@ jobs:
           10.0.x
 
     - name: 🛠️ Run smoke test script
-      run: ./smoke-tests.ps1
+      run: ./smoke-tests.sh
       working-directory: test
-      shell: pwsh
+      shell: bash
