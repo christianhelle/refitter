@@ -89,7 +89,8 @@ public class FlattenPrimitiveAllOfMutatorTests
 
     [Test]
     public async Task Mutate_WithSingleEnumAllOf_PreservesEnumeration()
-    {        var document = await OpenApiDocument.FromJsonAsync("""
+    {
+        var document = await OpenApiDocument.FromJsonAsync("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
