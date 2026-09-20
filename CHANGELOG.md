@@ -4,9 +4,14 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.1-preview.116...HEAD)
 
+**Implemented enhancements:**
+
+- Rewrite smoke-tests.sh as a pure bash script [\#1249](https://github.com/christianhelle/refitter/pull/1249) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - Update refit monorepo to v16 [\#1248](https://github.com/christianhelle/refitter/pull/1248) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.68.17 [\#1247](https://github.com/christianhelle/refitter/pull/1247) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.2.1-preview.116](https://github.com/christianhelle/refitter/tree/2.2.1-preview.116) (2026-09-19)
 
