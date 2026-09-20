@@ -44,19 +44,20 @@ public class SchemaTraversalTests
               "paths": {},
               "components": {
                 "schemas": {
-                  "Root": {
-                    "type": "array",
-                    "items": [{ "type": "string" }]
-                  }
+                  "Root": { "type": "array" }
                 }
               }
             }
             """);
 
+        // Tuple validation is not expressible in OpenAPI 3.0, so build the item schemas directly
+        var tupleItem = new JsonSchema { Type = JsonObjectType.String };
+        document.Components.Schemas["Root"].Items.Add(tupleItem);
+
         var visited = new List<JsonSchema>();
         SchemaWalker.TraverseDocumentSchemas(document, visited.Add);
 
-        visited.Should().HaveCountGreaterThan(1);
+        visited.Should().Contain(tupleItem);
     }
 
     [Test]
