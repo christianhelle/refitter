@@ -34,9 +34,9 @@ jobs:
           10.0.x
 
     - name: 🛠️ Run smoke test script (NuGet)
-      run: ./smoke-tests.ps1 -UseProduction
+      run: ./smoke-tests.sh -UseProduction
       working-directory: test
-      shell: pwsh
+      shell: bash
 
   docker:
     name: Test Docker Image
@@ -52,9 +52,9 @@ jobs:
           10.0.x
 
     - name: 🛠️ Run smoke test script (Docker)
-      run: ./smoke-tests.ps1 -UseDocker
+      run: ./smoke-tests.sh -UseDocker
       working-directory: test
-      shell: pwsh
+      shell: bash
 
   sourcegenerator:
     name: Test Source Generator (${{ matrix.os }})
