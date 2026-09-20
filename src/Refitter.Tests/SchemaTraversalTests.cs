@@ -176,20 +176,44 @@ public class SchemaTraversalTests
     }
 
     [Test]
-    public async Task SchemaCleaner_Handles_Null_Schema_Argument()
+    public async Task SchemaCleaner_Ignores_Response_Content_Without_Schema()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
-              "paths": {}
+              "paths": {
+                "/pets": {
+                  "get": {
+                    "operationId": "GetPets",
+                    "responses": {
+                      "200": {
+                        "description": "ok",
+                        "content": {
+                          "application/json": {}
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "components": {
+                "schemas": {
+                  "Unused": { "type": "integer" }
+                }
+              }
             }
             """);
 
-        var cleaner = new SchemaCleaner(document, []);
+        document.Operations
+            .Single()
+            .Operation.ActualResponses["200"]
+            .Content["application/json"]
+            .Schema.Should().BeNull();
 
-        var act = () => cleaner.RemoveUnreferencedSchema();
+        var act = () => new SchemaCleaner(document, []).RemoveUnreferencedSchema();
 
         act.Should().NotThrow();
+        document.Components.Schemas.Should().NotContainKey("Unused");
     }
 }
