@@ -89,8 +89,7 @@ public class FlattenPrimitiveAllOfMutatorTests
 
     [Test]
     public async Task Mutate_WithSingleEnumAllOf_PreservesEnumeration()
-    {
-        var document = await OpenApiDocument.FromJsonAsync("""
+    {        var document = await OpenApiDocument.FromJsonAsync("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -245,5 +244,42 @@ public class FlattenPrimitiveAllOfMutatorTests
 
         document.Components!.Schemas["TestModel"].ActualSchema.AllOf
             .Should().HaveCount(2);
+    }
+
+    [Test]
+    public async Task Mutate_WithSingleEnumAllOf_PreservesEnumerationNames()
+    {
+        var document = await OpenApiDocument.FromJsonAsync("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {},
+              "components": {
+                "schemas": {
+                  "TestModel": {
+                    "type": "object",
+                    "properties": {
+                      "priority": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": ["low", "medium", "high"],
+                            "x-enumNames": ["Low", "Medium", "High"]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """);
+
+        new FlattenPrimitiveAllOfMutator().Mutate(document);
+
+        var priority = document.Components!.Schemas["TestModel"]
+            .ActualSchema.Properties["priority"].ActualSchema;
+
+        priority.EnumerationNames.Should().BeEquivalentTo(new[] { "Low", "Medium", "High" });
     }
 }
