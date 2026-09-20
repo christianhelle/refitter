@@ -36,8 +36,7 @@ public class JsonEscapeDecodingBranchTests
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\bb");
 
-        result.Should().Contain("a");
-        result.Should().Contain("b");
+        result.Should().Be("ab");
     }
 
     [Test]
@@ -45,9 +44,7 @@ public class JsonEscapeDecodingBranchTests
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\fb");
 
-        result.Should().Contain("a");
-        result.Should().Contain("b");
-        result.Should().NotContain("\f");
+        result.Should().Be("ab");
     }
 
     [Test]
@@ -55,7 +52,6 @@ public class JsonEscapeDecodingBranchTests
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\qb");
 
-        result.Should().Contain("a");
-        result.Should().Contain("b");
+        result.Should().Be(@"a\qb");
     }
 }
