@@ -536,6 +536,202 @@ run_tests() {
     clean_generated_code
     generate_from_settings_file "./Streaming/.refitter"
     build_solution "./Streaming/Streaming.csproj"
+
+    # ==========================================
+    # Phase 3: Generate all STANDARD variants (no build until all are generated)
+    # ==========================================
+    verbose_log "Generating standard variants"
+    clean_generated_code
+    collect_tasks
+
+    verbose_log "Standard generation tasks: ${#STANDARD_SPECS[@]}"
+    verbose_log "NetCore generation tasks: ${#NETCORE_SPECS[@]}"
+
+    run_generation_tasks STANDARD_SPECS STANDARD_NAMESPACES STANDARD_OUTPUTS STANDARD_ARGS
+
+    # ==========================================
+    # Phase 4: Build standard variants (one build validates all)
+    # ==========================================
+    verbose_log "Building standard variants"
+    build_solution "./ConsoleApp/ConsoleApp.slnx" true true
+
+    # ==========================================
+    # Phase 4b: Generate-only test for MultipleInterfacesWithCustomName
+    # This variant uses --multiple-interfaces ByEndpoint --operation-name-template which
+    # generates duplicate types per-endpoint (known limitation). We verify generation succeeds.
+    # ==========================================
+    verbose_log "Generate-only: MultipleInterfacesWithCustomName (petstore)"
+    local custom_name_output="./GeneratedCode/MultipleInterfacesWithCustomName_generateonly.cs"
+    start_refitter \
+        "./OpenAPI/v3.0/petstore.json" \
+        --namespace GenerateOnly.MultipleInterfacesWithCustomName \
+        --output "$custom_name_output" \
+        --no-logging \
+        --multiple-interfaces ByEndpoint \
+        --operation-name-template ExecuteAsync
+    if [[ $? -ne 0 ]]; then
+        echo "Generate-only test failed: MultipleInterfacesWithCustomName" >&2
+        exit 1
+    fi
+    if [[ ! -f "$custom_name_output" ]]; then
+        echo "Generate-only test failed: MultipleInterfacesWithCustomName" >&2
+        exit 1
+    fi
+    rm -f "$custom_name_output"
+    verbose_log "Generate-only test passed: MultipleInterfacesWithCustomName"
+
+    # ==========================================
+    # Phase 5: Generate netCore variants (accumulate on top of standard code)
+    # Net8/Net9/Net10 can compile both standard and netCore code
+    # ==========================================
+    verbose_log "Generating netCore variants"
+    run_generation_tasks NETCORE_SPECS NETCORE_NAMESPACES NETCORE_OUTPUTS NETCORE_ARGS
+
+    # ==========================================
+    # Phase 6: Build netCore variants
+    # ==========================================
+    verbose_log "Building netCore variants"
+    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+
+    # ==========================================
+    # Phase 7: URL-based tests (network-dependent)
+    # ==========================================
+    verbose_log "URL-based tests"
+    clean_generated_code
+
+    local url
+    for url in \
+        "https://petstore3.swagger.io/api/v3/openapi.json" \
+        "https://petstore3.swagger.io/api/v3/openapi.yaml"; do
+        remove_generated_cs_files
+
+        start_refitter \
+            "$url" \
+            --namespace PetstoreFromUri \
+            --output ./GeneratedCode/PetstoreFromUri.generated.cs \
+            --no-logging
+        if [[ $? -ne 0 ]]; then
+            printf 'Refitter failed for URL: %s\n' "$url" >&2
+            exit 1
+        fi
+
+        build_solution "./ConsoleApp/ConsoleApp.slnx" true
+    done
+
+    # ==========================================
+    # Phase 8: Operation Name Generator Tests
+    # ==========================================
+    verbose_log "Operation Name Generator Tests"
+
+    local op_name_generators=(
+        "Default"
+        "MultipleClientsFromOperationId"
+        "MultipleClientsFromPathSegments"
+        "MultipleClientsFromFirstTagAndOperationId"
+        "MultipleClientsFromFirstTagAndOperationName"
+        "MultipleClientsFromFirstTagAndPathSegments"
+        "SingleClientFromOperationId"
+        "SingleClientFromPathSegments"
+    )
+
+    clean_generated_code
+    local gen
+    for gen in "${op_name_generators[@]}"; do
+        start_refitter \
+            ./OpenAPI/v3.0/petstore.json \
+            --namespace "OpNameGen_$gen" \
+            --output "./GeneratedCode/OpNameGen_$gen.generated.cs" \
+            --no-logging \
+            --operation-name-generator "$gen"
+        if [[ $? -ne 0 ]]; then
+            verbose_log "Operation name generator '$gen' failed (may be expected for some generators)"
+        fi
+    done
+    # Build only what was successfully generated
+    if compgen -G "./GeneratedCode/OpNameGen_*.generated.cs" >/dev/null; then
+        build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+    fi
+
+    # ==========================================
+    # Phase 9: Collection Format Variant Tests
+    # ==========================================
+    verbose_log "Collection Format Variant Tests"
+
+    local collection_formats=(Multi Ssv Tsv Pipes)
+    local fmt
+    clean_generated_code
+    for fmt in "${collection_formats[@]}"; do
+        start_refitter \
+            ./OpenAPI/v3.0/petstore.json \
+            --namespace "CollFmt_$fmt" \
+            --output "./GeneratedCode/CollFmt_$fmt.generated.cs" \
+            --no-logging \
+            --collection-format "$fmt"
+        if [[ $? -ne 0 ]]; then
+            printf "Collection format '%s' generation failed\n" "$fmt" >&2
+            exit 1
+        fi
+    done
+    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+
+    # ==========================================
+    # Phase 10: Combination Tests
+    # ==========================================
+    verbose_log "Combination Tests"
+
+    clean_generated_code
+    local combinations=(
+        "MultipleInterfacesByTagFiltered|--multiple-interfaces ByTag --tag pet --tag store|./OpenAPI/v3.0/petstore.json|"
+        "ImmutableRecordsPolymorphic|--immutable-records --use-polymorphic-serialization|./OpenAPI/v3.0/petstore.json|"
+        "ContractOnlyMultipleFiles|--contract-only --multiple-files|./OpenAPI/v3.0/petstore.json|./GeneratedCode/Combo_ContractOnlyMultipleFiles/"
+        "TrimSchemaKeepPattern|--trim-unused-schema --tag pet --keep-schema ^Pet.*|./OpenAPI/v3.0/petstore.json|"
+        "DisposableCancellation|--disposable --cancellation-tokens|./OpenAPI/v3.0/petstore.json|"
+    )
+
+    local combo combo_name combo_args combo_spec combo_output
+    for combo in "${combinations[@]}"; do
+        IFS='|' read -r combo_name combo_args combo_spec combo_output <<<"$combo"
+
+        local ns="Combo_$combo_name"
+        local output="./GeneratedCode/Combo_$combo_name.generated.cs"
+        if [[ -n "$combo_output" ]]; then
+            output="$combo_output"
+        fi
+
+        local -a args=("$combo_spec" --namespace "$ns" --output "$output" --no-logging)
+        local -a extra
+        read -r -a extra <<<"$combo_args"
+        args+=("${extra[@]}")
+
+        start_refitter "${args[@]}"
+        if [[ $? -ne 0 ]]; then
+            printf "Combination test '%s' generation failed\n" "$combo_name" >&2
+            exit 1
+        fi
+    done
+    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+
+    # ==========================================
+    # Phase 11: Asana API regression test (issue #359)
+    # Large real-world spec that previously failed to compile with
+    # "cannot derive from sealed type 'string'" (CS0509) because of
+    # single-primitive allOf wrappers. The spec is committed under
+    # OpenAPI/v3.0/asana.yaml to avoid transient HTTP errors. Generate
+    # with default settings and build once to guard against regressions.
+    # ==========================================
+    verbose_log "Asana API regression test (issue #359)"
+
+    clean_generated_code
+    start_refitter \
+        ./OpenAPI/v3.0/asana.yaml \
+        --namespace Asana \
+        --output ./GeneratedCode/Asana.generated.cs \
+        --no-logging
+    if [[ $? -ne 0 ]]; then
+        echo "Asana API generation failed (issue #359 regression)" >&2
+        exit 1
+    fi
+    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
 }
 
 main() {
