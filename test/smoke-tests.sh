@@ -624,19 +624,22 @@ run_tests() {
     clean_generated_code
     local gen
     for gen in "${op_name_generators[@]}"; do
-        start_refitter \
+        if ! start_refitter \
             ./OpenAPI/v3.0/petstore.json \
             --namespace "OpNameGen_$gen" \
             --output "./GeneratedCode/OpNameGen_$gen.generated.cs" \
             --no-logging \
-            --operation-name-generator "$gen"
-        if [[ $? -ne 0 ]]; then
+            --operation-name-generator "$gen"; then
             verbose_log "Operation name generator '$gen' failed (may be expected for some generators)"
         fi
     done
-    # Build only what was successfully generated
+    # Build only what was successfully generated. A total absence of output means
+    # even the Default generator failed, which is a regression worth reporting.
     if compgen -G "./GeneratedCode/OpNameGen_*.generated.cs" >/dev/null; then
         build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+    else
+        echo "Operation Name Generator Tests produced no generated files" >&2
+        exit 1
     fi
 
     # ==========================================
