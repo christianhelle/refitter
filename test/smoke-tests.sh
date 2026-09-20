@@ -148,23 +148,21 @@ get_process_path() {
     printf './bin/refitter\n'
 }
 
+# Prints the docker argument prefix as NUL-separated fields so callers can read
+# it back into an array without word-splitting paths that contain spaces.
 build_docker_prefix() {
-    local current_dir user_param prefix
+    local current_dir
     current_dir="$(pwd)"
 
-    user_param=""
+    printf 'run\0--rm\0-v\0%s:/src\0-w\0/src\0' "$current_dir"
+
     case "$(uname -s)" in
     Linux | Darwin)
-        user_param="--user $(id -u):$(id -g)"
+        printf -- '--user\0%s:%s\0' "$(id -u)" "$(id -g)"
         ;;
     esac
 
-    prefix="run --rm -v ${current_dir}:/src -w /src"
-    if [[ -n "$user_param" ]]; then
-        prefix="$prefix $user_param"
-    fi
-    prefix="$prefix christianhelle/refitter"
-    printf '%s\n' "$prefix"
+    printf 'christianhelle/refitter\0'
 }
 
 start_refitter() {
@@ -175,8 +173,10 @@ start_refitter() {
     fi
 
     if [[ "$CURRENT_USE_DOCKER" == true ]]; then
-        local -a docker_prefix
-        read -r -a docker_prefix <<<"$(build_docker_prefix)"
+        local -a docker_prefix=()
+        while IFS= read -r -d '' field; do
+            docker_prefix+=("$field")
+        done < <(build_docker_prefix)
         invoke_child_process docker "refitter" "${docker_prefix[@]}" "${args[@]}"
         return $?
     fi
