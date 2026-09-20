@@ -220,11 +220,17 @@ build_solution() {
 }
 
 # Deletes generated .cs files and generated subdirectories, keeping the
-# GeneratedCode folder itself and any non-.cs content.
+# GeneratedCode folder itself and any non-.cs content. Uses a glob loop rather
+# than find -mindepth/-maxdepth so it also works with BSD find on macOS.
 clean_generated_code() {
     if [[ -d ./GeneratedCode ]]; then
         find ./GeneratedCode -type f -name '*.cs' -delete 2>/dev/null || true
-        find ./GeneratedCode -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} + 2>/dev/null || true
+
+        local dir
+        for dir in ./GeneratedCode/*/; do
+            [[ -d "$dir" ]] || continue
+            rm -rf "$dir"
+        done
     fi
 }
 
