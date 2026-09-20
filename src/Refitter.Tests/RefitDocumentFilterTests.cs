@@ -120,6 +120,42 @@ paths:
     }
 
     [Test]
+    public void FilterByTags_Throws_On_Null_Document()
+    {
+        var act = () => RefitDocumentFilter.FilterByTags(null!, ["Foo"]);
+
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task FilterByTags_Throws_On_Null_Tags()
+    {
+        var document = await LoadDocument();
+
+        var act = () => RefitDocumentFilter.FilterByTags(document, null!);
+
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Test]
+    public void FilterByPath_Throws_On_Null_Document()
+    {
+        var act = () => RefitDocumentFilter.FilterByPath(null!, ["^/foo"]);
+
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task FilterByPath_Throws_On_Null_Patterns()
+    {
+        var document = await LoadDocument();
+
+        var act = () => RefitDocumentFilter.FilterByPath(document, null!);
+
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Test]
     public async Task FilterByTags_RemovesNonMatchingOperations()
     {
         var document = await LoadDocument();
