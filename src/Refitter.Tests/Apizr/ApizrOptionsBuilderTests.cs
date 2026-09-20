@@ -98,11 +98,11 @@ public class ApizrOptionsBuilderTests
     }
 
     [Test]
-    public void GetUsings_Appends_Blank_Line_After_Initial_Usings()
+    public void GetUsings_Terminates_Initial_Usings_With_New_Line()
     {
         var builder = new ApizrOptionsBuilder(string.Empty, "using System;");
 
-        builder.GetUsings().Should().Contain("using System;");
+        builder.GetUsings().Should().Be("using System;" + Environment.NewLine);
     }
 
     [Test]
