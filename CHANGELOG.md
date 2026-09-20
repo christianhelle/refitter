@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.1-preview.116...HEAD)
+
+**Merged pull requests:**
+
+- Update refit monorepo to v16 [\#1248](https://github.com/christianhelle/refitter/pull/1248) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [2.2.1-preview.116](https://github.com/christianhelle/refitter/tree/2.2.1-preview.116) (2026-09-19)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.1...2.2.1-preview.116)
+
+## [2.2.1](https://github.com/christianhelle/refitter/tree/2.2.1) (2026-09-19)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.0...2.2.1)
 
 **Implemented enhancements:**
 
@@ -11,6 +23,7 @@
 - Add regression tests for IAsyncEnumerable return-type selection and settings schema [\#1245](https://github.com/christianhelle/refitter/pull/1245) ([christianhelle](https://github.com/christianhelle))
 - Skip IAsyncEnumerable for primitive streaming schemas [\#1243](https://github.com/christianhelle/refitter/pull/1243) ([christianhelle](https://github.com/christianhelle))
 - Preserve retained discriminator mappings during schema trimming [\#1237](https://github.com/christianhelle/refitter/pull/1237) ([rcdailey](https://github.com/rcdailey))
+- Emit generic JsonStringEnumConverter\<TEnum\> on injected enum attributes [\#1231](https://github.com/christianhelle/refitter/pull/1231) ([aritchie](https://github.com/aritchie))
 
 **Fixed bugs:**
 
@@ -26,7 +39,6 @@
 - Update dependency TUnit to 1.68.4 [\#1234](https://github.com/christianhelle/refitter/pull/1234) ([renovate[bot]](https://github.com/apps/renovate))
 - docs: add aritchie as a contributor for code [\#1233](https://github.com/christianhelle/refitter/pull/1233) ([allcontributors[bot]](https://github.com/apps/allcontributors))
 - Bump Microsoft.SourceLink.GitHub to 10.0.401 [\#1232](https://github.com/christianhelle/refitter/pull/1232) ([christianhelle](https://github.com/christianhelle))
-- Emit generic JsonStringEnumConverter\<TEnum\> on injected enum attributes [\#1231](https://github.com/christianhelle/refitter/pull/1231) ([aritchie](https://github.com/aritchie))
 - Update dependency TUnit to 1.66.27 [\#1229](https://github.com/christianhelle/refitter/pull/1229) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.2.0](https://github.com/christianhelle/refitter/tree/2.2.0) (2026-09-06)
