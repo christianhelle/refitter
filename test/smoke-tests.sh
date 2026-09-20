@@ -68,16 +68,11 @@ trap cleanup EXIT
 CURRENT_PROCESS_PATH=""
 CURRENT_USE_DOCKER=false
 
-# Generation tasks are accumulated here and executed by run_generation_tasks
-STANDARD_SPECS=()
-STANDARD_NAMESPACES=()
-STANDARD_OUTPUTS=()
-STANDARD_ARGS=()
-
-NETCORE_SPECS=()
-NETCORE_NAMESPACES=()
-NETCORE_OUTPUTS=()
-NETCORE_ARGS=()
+# Generation tasks are accumulated here and executed by run_generation_tasks.
+# Each entry is a single "spec|namespace|output|args" record so the task list can
+# be passed to the helper by value (no namerefs, which require Bash 4.3+).
+STANDARD_TASKS=()
+NETCORE_TASKS=()
 
 # ==========================================
 # Helpers
@@ -90,29 +85,16 @@ verbose_log() {
 }
 
 reset_tasks() {
-    STANDARD_SPECS=()
-    STANDARD_NAMESPACES=()
-    STANDARD_OUTPUTS=()
-    STANDARD_ARGS=()
-
-    NETCORE_SPECS=()
-    NETCORE_NAMESPACES=()
-    NETCORE_OUTPUTS=()
-    NETCORE_ARGS=()
+    STANDARD_TASKS=()
+    NETCORE_TASKS=()
 }
 
 add_standard_task() {
-    STANDARD_SPECS+=("$1")
-    STANDARD_NAMESPACES+=("$2")
-    STANDARD_OUTPUTS+=("$3")
-    STANDARD_ARGS+=("$4")
+    STANDARD_TASKS+=("$1|$2|$3|$4")
 }
 
 add_netcore_task() {
-    NETCORE_SPECS+=("$1")
-    NETCORE_NAMESPACES+=("$2")
-    NETCORE_OUTPUTS+=("$3")
-    NETCORE_ARGS+=("$4")
+    NETCORE_TASKS+=("$1|$2|$3|$4")
 }
 
 invoke_child_process() {
@@ -254,24 +236,23 @@ remove_generated_cs_files() {
 }
 
 run_generation_tasks() {
-    local -n specs=$1
-    local -n namespaces=$2
-    local -n outputs=$3
-    local -n arg_list=$4
+    local -a tasks=("$@")
 
-    local i exit_code
-    for ((i = 0; i < ${#specs[@]}; i++)); do
-        local -a args=("${specs[i]}" --namespace "${namespaces[i]}" --output "${outputs[i]}" --no-logging)
-        if [[ -n "${arg_list[i]}" ]]; then
+    local task spec_path namespace output_path task_args exit_code
+    for task in "${tasks[@]}"; do
+        IFS='|' read -r spec_path namespace output_path task_args <<<"$task"
+
+        local -a args=("$spec_path" --namespace "$namespace" --output "$output_path" --no-logging)
+        if [[ -n "$task_args" ]]; then
             local -a extra
-            read -r -a extra <<<"${arg_list[i]}"
+            read -r -a extra <<<"$task_args"
             args+=("${extra[@]}")
         fi
 
         start_refitter "${args[@]}"
         exit_code=$?
         if [[ $exit_code -ne 0 ]]; then
-            printf 'Refitter generation failed for: %s (%s)\n' "${specs[i]}" "${namespaces[i]}" >&2
+            printf 'Refitter generation failed for: %s (%s)\n' "$spec_path" "$namespace" >&2
             exit 1
         fi
     done
@@ -544,10 +525,10 @@ run_tests() {
     clean_generated_code
     collect_tasks
 
-    verbose_log "Standard generation tasks: ${#STANDARD_SPECS[@]}"
-    verbose_log "NetCore generation tasks: ${#NETCORE_SPECS[@]}"
+    verbose_log "Standard generation tasks: ${#STANDARD_TASKS[@]}"
+    verbose_log "NetCore generation tasks: ${#NETCORE_TASKS[@]}"
 
-    run_generation_tasks STANDARD_SPECS STANDARD_NAMESPACES STANDARD_OUTPUTS STANDARD_ARGS
+    run_generation_tasks "${STANDARD_TASKS[@]}"
 
     # ==========================================
     # Phase 4: Build standard variants (one build validates all)
@@ -585,7 +566,7 @@ run_tests() {
     # Net8/Net9/Net10 can compile both standard and netCore code
     # ==========================================
     verbose_log "Generating netCore variants"
-    run_generation_tasks NETCORE_SPECS NETCORE_NAMESPACES NETCORE_OUTPUTS NETCORE_ARGS
+    run_generation_tasks "${NETCORE_TASKS[@]}"
 
     # ==========================================
     # Phase 6: Build netCore variants
