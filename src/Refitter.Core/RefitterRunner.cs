@@ -164,7 +164,7 @@ public class RefitterRunner
         }
     }
 
-    private static string[] GetOpenApiPaths(RefitGeneratorSettings settings)
+    internal static string[] GetOpenApiPaths(RefitGeneratorSettings settings)
     {
         if (settings.OpenApiPaths is { Length: > 0 })
             return settings.OpenApiPaths;
