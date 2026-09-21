@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Core.Validation;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests;
 
@@ -40,5 +41,29 @@ public class GuardClauseTests
         var act = async () => await RefitGenerator.CreateAsync(null!);
 
         await act.Should().ThrowAsync<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task RefitGenerator_CreateAsync_Throws_On_Null_KeepSchemaPatterns()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {}
+            }
+            """);
+
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            KeepSchemaPatterns = null!,
+        };
+
+        var act = async () => await RefitGenerator.CreateAsync(settings);
+
+        await act.Should()
+            .ThrowAsync<ArgumentNullException>()
+            .WithParameterName("keepSchemaPatterns");
     }
 }
