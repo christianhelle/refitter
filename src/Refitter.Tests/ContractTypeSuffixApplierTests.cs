@@ -136,4 +136,33 @@ namespace TestNamespace
         result.Should().Contain("public PetRecordDto Record");
         result.Should().Contain("public PetStructDto Struct");
     }
+
+    [Test]
+    public void ContractTypeSuffixApplier_Renames_Generic_Type_References()
+    {
+        const string code = @"
+namespace TestNamespace
+{
+    public partial class Page<T>
+    {
+        public System.Collections.Generic.ICollection<T> Items { get; set; }
+    }
+
+    public partial class Pet
+    {
+        public int Id { get; set; }
+    }
+
+    public partial class PetPage
+    {
+        public Page<Pet> Data { get; set; }
+    }
+}";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        result.Should().Contain("class PageDto<T>");
+        result.Should().Contain("PageDto<PetDto> Data");
+        result.Should().Contain("ICollection<T> Items");
+    }
 }
