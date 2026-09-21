@@ -85,15 +85,12 @@ public class SchemaCleaner
             aliases.Add(kvp.Key);
         }
 
-        if (doc.Components?.Schemas != null)
+        foreach (var kvp in doc.Components.Schemas)
         {
-            foreach (var kvp in doc.Components.Schemas)
+            var schema = kvp.Key;
+            if (keepSchemaRegexes.Any(x => x.IsMatch(schema)))
             {
-                var schema = kvp.Key;
-                if (keepSchemaRegexes.Any(x => x.IsMatch(schema)))
-                {
-                    TryPush(kvp.Value, toProcess);
-                }
+                TryPush(kvp.Value, toProcess);
             }
         }
 
