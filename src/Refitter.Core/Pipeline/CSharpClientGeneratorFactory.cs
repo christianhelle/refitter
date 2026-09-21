@@ -136,17 +136,9 @@ internal class CSharpClientGeneratorFactory
 
     private IEnumerable<string> GetNamedSchemaHints()
     {
-        if (document.Components?.Schemas != null)
+        foreach (var schemaName in document.Components.Schemas.Keys)
         {
-            foreach (var schemaName in document.Components.Schemas.Keys)
-            {
-                yield return schemaName;
-            }
-        }
-
-        if (document.Definitions == null)
-        {
-            yield break;
+            yield return schemaName;
         }
 
         foreach (var definition in document.Definitions.Keys)

@@ -37,17 +37,9 @@ internal static class SchemaWalker
     private static IEnumerable<JsonSchema?> EnumerateDocumentSchemaRoots(
         OpenApiDocument document)
     {
-        if (document.Components?.Schemas != null)
+        foreach (var schema in document.Components.Schemas.Values)
         {
-            foreach (var schema in document.Components.Schemas.Values)
-            {
-                yield return schema;
-            }
-        }
-
-        if (document.Paths == null)
-        {
-            yield break;
+            yield return schema;
         }
 
         foreach (var pathItem in document.Paths.Values)

@@ -279,11 +279,6 @@ internal static class IdentifierUtils
 
         var identifier = builder.Length == 0 ? "_" : builder.ToString();
 
-        if (!IsValidIdentifierCharacter(identifier[0], isFirstCharacter: true))
-        {
-            identifier = "_" + identifier;
-        }
-
         return EscapeReservedKeyword(identifier);
     }
 

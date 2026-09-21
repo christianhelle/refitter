@@ -419,6 +419,43 @@ public class RefitterRunnerTests
     }
 
     [Test]
+    public async Task RunAsync_With_Validation_Warnings_Should_Return_NonError_Diagnostics()
+    {
+        var workspace = CreateTempDirectory();
+        try
+        {
+            var openApiPath = CreateOpenApiSpec(workspace);
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+                GenerateContracts = false,
+                GenerateClients = true,
+            };
+
+            var diagnostic = new OpenApiDiagnostic();
+            diagnostic.Warnings.Add(new Microsoft.OpenApi.OpenApiError("test", "Something looks odd"));
+            var validationResult = new OpenApiValidationResult(diagnostic, new OpenApiStats());
+            var validator = new MockValidator(validationResult);
+
+            var runner = new RefitterRunner();
+            var result = await runner.RunAsync(
+                settings,
+                writer: null,
+                validator: validator,
+                cancellationToken: default);
+
+            result.ExitCode.Should().Be(0);
+            result.Diagnostics.Should().Contain(d => !d.IsError && d.Message.Contains("Something looks odd"));
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    [Test]
     public async Task RunAsync_With_MultipleOpenApiPaths_Should_Validate_All()
     {
         var workspace = CreateTempDirectory();

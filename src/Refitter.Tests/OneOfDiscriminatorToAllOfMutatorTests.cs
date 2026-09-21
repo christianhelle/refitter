@@ -186,6 +186,8 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     [Test]
     public async Task Mutate_Does_Not_Duplicate_Existing_AllOf_Inheritance()
     {
+        // Two union members keep NJsonSchema from collapsing Vehicle.ActualSchema onto the
+        // single referenced subtype, so the mutator actually inspects the subtypes.
         var document = await OpenApiDocument.FromJsonAsync("""
             {
               "openapi": "3.0.1",
@@ -195,7 +197,8 @@ public class OneOfDiscriminatorToAllOfMutatorTests
                 "schemas": {
                   "Vehicle": {
                     "oneOf": [
-                      { "$ref": "#/components/schemas/Car" }
+                      { "$ref": "#/components/schemas/Car" },
+                      { "$ref": "#/components/schemas/Truck" }
                     ],
                     "discriminator": { "propertyName": "type" }
                   },
@@ -204,17 +207,28 @@ public class OneOfDiscriminatorToAllOfMutatorTests
                     "allOf": [
                       { "$ref": "#/components/schemas/Vehicle" }
                     ]
+                  },
+                  "Truck": {
+                    "type": "object",
+                    "properties": { "capacity": { "type": "number" } }
                   }
                 }
               }
             }
             """);
 
+        var vehicle = document.Components!.Schemas["Vehicle"].ActualSchema;
+
         var sut = new OneOfDiscriminatorToAllOfMutator();
         sut.Mutate(document);
 
         var car = document.Components!.Schemas["Car"].ActualSchema;
+        var truck = document.Components!.Schemas["Truck"].ActualSchema;
+
         car.AllOf.Should().HaveCount(1);
+        car.AllOf.Should().OnlyContain(a => a.HasReference && a.ActualSchema == vehicle);
+        truck.AllOf.Should().HaveCount(1);
+        truck.AllOf.Should().OnlyContain(a => a.HasReference && a.ActualSchema == vehicle);
     }
 
     [Test]

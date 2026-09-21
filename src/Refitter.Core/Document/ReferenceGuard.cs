@@ -40,7 +40,7 @@ internal static class ReferenceGuard
         if (!File.Exists(fullPath))
             return;
 
-        var rootDirectory = Path.GetDirectoryName(fullPath) ?? Directory.GetCurrentDirectory();
+        string rootDirectory = Path.GetDirectoryName(fullPath);
         var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         await ValidateLocalFileAsync(fullPath, rootDirectory, allowRemoteReferences, visited, cancellationToken)
             .ConfigureAwait(false);
@@ -69,11 +69,7 @@ internal static class ReferenceGuard
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 throw new ReferenceResolutionException(
                     $"Failed to read OpenAPI document from '{url}' during reference validation: {ex.Message}", ex);
@@ -139,17 +135,13 @@ internal static class ReferenceGuard
         {
             content = await ReadAllTextAsync(filePath, cancellationToken).ConfigureAwait(false);
         }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new ReferenceResolutionException(
                 $"Failed to read OpenAPI document from '{filePath}' during reference validation: {ex.Message}", ex);
         }
 
-        var currentDirectory = Path.GetDirectoryName(filePath) ?? rootDirectory;
+        string currentDirectory = Path.GetDirectoryName(filePath);
 
         foreach (var reference in ExtractReferences(content))
         {

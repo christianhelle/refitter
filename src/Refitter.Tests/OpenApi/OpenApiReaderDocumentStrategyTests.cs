@@ -136,4 +136,69 @@ paths:
 
         result.Should().BeNull();
     }
+
+    [Test]
+    public async Task Returns_Null_When_Remote_Document_Cannot_Be_Read()
+    {
+        // Port 1 refuses the connection, so the reader fails and the NSwag fallback
+        // declines to retry remote documents
+        var strategy = new OpenApiReaderDocumentStrategy();
+        var result = await strategy.TryLoadAsync("http://127.0.0.1:1/openapi.json");
+
+        result.Should().BeNull();
+    }
+    [Test]
+    public async Task Returns_Null_When_An_External_Reference_Cannot_Be_Resolved()
+    {
+        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(folder);
+
+        var mainSpec = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": { ""title"": ""Broken Ref Test"", ""version"": ""1.0.0"" },
+  ""paths"": {
+    ""/users"": {
+      ""get"": {
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": { ""$ref"": ""./components.json#/components/schemas/User"" }
+              }
+            }
+          }
+        }
+      }
+    },
+    ""/ghosts"": {
+      ""get"": {
+        ""responses"": {
+          ""200"": {
+            ""description"": ""Success"",
+            ""content"": {
+              ""application/json"": {
+                ""schema"": { ""$ref"": ""./absent.json#/components/schemas/Ghost"" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}";
+        var componentsSpec = @"{
+  ""components"": { ""schemas"": { ""User"": { ""type"": ""object"" } } }
+}";
+
+        await File.WriteAllTextAsync(Path.Combine(folder, "main.json"), mainSpec);
+        await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
+
+        var strategy = new OpenApiReaderDocumentStrategy();
+        var result = await strategy.TryLoadAsync(Path.Combine(folder, "main.json"));
+
+        result.Should().BeNull();
+
+        Directory.Delete(folder, true);
+    }
 }

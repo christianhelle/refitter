@@ -304,4 +304,53 @@ components:
 
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
+
+    [Test]
+    public async Task Remote_Validation_Blocks_Unresolvable_Reference_By_Default()
+    {
+        // Neither an absolute URI nor resolvable against the document URI, so it is treated as remote
+        var content = MainTemplate.Replace("__REF__", "http://[unparseable");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
+    }
+
+    [Test]
+    public async Task Remote_Validation_Allows_Unresolvable_Reference_When_Enabled()
+    {
+        var content = MainTemplate.Replace("__REF__", "http://[unparseable");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Remote_Validation_Allows_Unresolvable_Root_Relative_Reference()
+    {
+        // Unparseable as a URI but root-relative, so it is not treated as a remote reference
+        var content = MainTemplate.Replace("__REF__", "//");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Throws_When_Local_File_Cannot_Be_Read()
+    {
+        var root = NewRoot();
+        var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "#/components/schemas/Pet"));
+
+        // Hold the file exclusively so the guard's read fails. .NET enforces FileShare
+        // on Unix too (via flock), so this is deterministic on the Linux CI runner as
+        // well as on Windows - verified against .NET 10 on both.
+        using var exclusive = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*Failed to read OpenAPI document*");
+    }
 }

@@ -272,4 +272,35 @@ paths:
         result.Paths.Should().NotContainKey("/bar");
         result.Paths.Should().NotContainKey("/baz");
     }
+
+    [Test]
+    public async Task FilterByTags_RemovesOperationsWithoutTags()
+    {
+        var document = await OpenApiDocument.FromJsonAsync("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/tagged": {
+                  "get": {
+                    "operationId": "getTagged",
+                    "tags": [ "Foo" ],
+                    "responses": { "200": { "description": "ok" } }
+                  }
+                },
+                "/untagged": {
+                  "get": {
+                    "operationId": "getUntagged",
+                    "responses": { "200": { "description": "ok" } }
+                  }
+                }
+              }
+            }
+            """);
+
+        var result = RefitDocumentFilter.FilterByTags(document, ["Foo"]);
+
+        result.Paths.Should().ContainKey("/tagged");
+        result.Paths.Should().NotContainKey("/untagged");
+    }
 }
