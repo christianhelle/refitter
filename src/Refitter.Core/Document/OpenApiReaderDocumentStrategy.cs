@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 using NSwag;
@@ -45,6 +44,10 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
     {
         var document = readResult.OpenApiDocument;
 
+        // Microsoft.OpenApi does not inline external components when it reads a
+        // multi-file document - the serialized output still carries the original
+        // relative "$ref". NSwag can only follow those refs when it is told which
+        // document they are relative to, so the path must be passed along.
         if (PathUtilities.IsYaml(path))
         {
             var yaml = await document
@@ -52,7 +55,7 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
                 .ConfigureAwait(false);
 
             return await OpenApiYamlDocument
-                .FromYamlAsync(yaml, cancellationToken)
+                .FromYamlAsync(yaml, path, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -61,7 +64,7 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
             .ConfigureAwait(false);
 
         return await OpenApiDocument
-            .FromJsonAsync(json, cancellationToken)
+            .FromJsonAsync(json, path, cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -86,24 +89,13 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
         }
     }
 
-    [ExcludeFromCodeCoverage]
     private static void PopulateMissingRequiredFields(
         string openApiPath,
         Result readResult)
     {
-        var document = readResult.OpenApiDocument;
-        if (document.Info is null)
-        {
-            document.Info = new()
-            {
-                Title = Path.GetFileNameWithoutExtension(openApiPath),
-                Version = readResult.OpenApiDiagnostic.SpecificationVersion.GetDisplayName()
-            };
-        }
-        else
-        {
-            document.Info.Title ??= Path.GetFileNameWithoutExtension(openApiPath);
-            document.Info.Version ??= readResult.OpenApiDiagnostic.SpecificationVersion.GetDisplayName();
-        }
+        // The reader always materializes Info, so the ??= below is only a guard.
+        var info = readResult.OpenApiDocument.Info ??= new();
+        info.Title ??= Path.GetFileNameWithoutExtension(openApiPath);
+        info.Version ??= readResult.OpenApiDiagnostic.SpecificationVersion.GetDisplayName();
     }
 }
