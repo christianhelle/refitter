@@ -336,4 +336,18 @@ components:
 
         await act.Should().NotThrowAsync();
     }
+    [Test]
+    public async Task Throws_When_Local_File_Cannot_Be_Read()
+    {
+        var root = NewRoot();
+        var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "#/components/schemas/Pet"));
+
+        // Hold the file exclusively so the guard's read fails
+        using var exclusive = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*Failed to read OpenAPI document*");
+    }
 }
