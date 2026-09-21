@@ -137,17 +137,24 @@ paths:
         string folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
-        string specFile = Path.Combine(folder, "main.yml");
-        await File.WriteAllTextAsync(specFile, spec);
-        await File.WriteAllTextAsync(Path.Combine(folder, "components.yml"), components);
-
-        RefitGeneratorSettings settings = new()
+        try
         {
-            OpenApiPath = specFile,
-            UseCancellationTokens = false
-        };
+            string specFile = Path.Combine(folder, "main.yml");
+            await File.WriteAllTextAsync(specFile, spec);
+            await File.WriteAllTextAsync(Path.Combine(folder, "components.yml"), components);
 
-        RefitGenerator sut = await RefitGenerator.CreateAsync(settings);
-        return sut.Generate();
+            RefitGeneratorSettings settings = new()
+            {
+                OpenApiPath = specFile,
+                UseCancellationTokens = false
+            };
+
+            RefitGenerator sut = await RefitGenerator.CreateAsync(settings);
+            return sut.Generate();
+        }
+        finally
+        {
+            Directory.Delete(folder, true);
+        }
     }
 }
