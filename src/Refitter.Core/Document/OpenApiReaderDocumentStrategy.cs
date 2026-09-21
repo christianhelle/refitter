@@ -80,11 +80,8 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
                 : await OpenApiDocument.FromFileAsync(path, cancellationToken)
                     .ConfigureAwait(false);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            if (ex is OperationCanceledException)
-                throw;
-
             return null;
         }
     }
