@@ -181,13 +181,8 @@ public class SchemaCleaner
         stack.Push(schema);
     }
 
-    private IEnumerable<JsonSchema> EnumerateSchema(JsonSchema? schema)
+    private IEnumerable<JsonSchema> EnumerateSchema(JsonSchema schema)
     {
-        if (schema is null)
-        {
-            return Enumerable.Empty<JsonSchema>();
-        }
-
         return EnumerateInternal(schema)
             .Where(x => x != null)
             .Select(x => x!);
