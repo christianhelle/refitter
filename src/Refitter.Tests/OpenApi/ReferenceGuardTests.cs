@@ -336,13 +336,16 @@ components:
 
         await act.Should().NotThrowAsync();
     }
+
     [Test]
     public async Task Throws_When_Local_File_Cannot_Be_Read()
     {
         var root = NewRoot();
         var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "#/components/schemas/Pet"));
 
-        // Hold the file exclusively so the guard's read fails
+        // Hold the file exclusively so the guard's read fails. .NET enforces FileShare
+        // on Unix too (via flock), so this is deterministic on the Linux CI runner as
+        // well as on Windows - verified against .NET 10 on both.
         using var exclusive = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
 
         var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
