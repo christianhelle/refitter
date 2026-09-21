@@ -26,6 +26,8 @@ internal static class ReferenceGuard
         bool allowRemoteReferences,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (string.IsNullOrWhiteSpace(openApiPath))
             return;
 

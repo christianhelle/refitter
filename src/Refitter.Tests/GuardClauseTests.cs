@@ -7,6 +7,12 @@ namespace Refitter.Tests;
 
 public class GuardClauseTests
 {
+    /// <summary>
+    /// Loopback port 1: nothing listens there, so no DNS lookup and no outbound
+    /// connection is made even if the early cancellation check ever regresses.
+    /// </summary>
+    private const string UnreachableRemoteDocument = "http://127.0.0.1:1/openapi.json";
+
     [Test]
     public async Task OpenApiValidator_Propagates_Cancellation_For_Remote_Document()
     {
@@ -14,7 +20,7 @@ public class GuardClauseTests
         await cts.CancelAsync();
 
         var act = async () => await OpenApiValidator.Validate(
-            "https://example.com/openapi.json",
+            UnreachableRemoteDocument,
             allowRemoteReferences: true,
             cts.Token);
 
@@ -28,7 +34,7 @@ public class GuardClauseTests
         await cts.CancelAsync();
 
         var act = async () => await OpenApiDocumentFactory.CreateAsync(
-            "https://example.com/openapi.json",
+            UnreachableRemoteDocument,
             allowRemoteReferences: true,
             cts.Token);
 
