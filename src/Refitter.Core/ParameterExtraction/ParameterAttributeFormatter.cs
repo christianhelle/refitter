@@ -7,11 +7,6 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ParameterAttributeFormatter
 {
-    public static string GetAliasAsAttribute(CSharpParameterModel parameterModel) =>
-        string.Equals(parameterModel.Name, parameterModel.VariableName)
-            ? string.Empty
-            : $"AliasAs(\"{ParameterNaming.EscapeString(parameterModel.Name)}\")";
-
     public static string GetAliasAsAttribute(string originalName, string variableName) =>
         string.Equals(originalName, variableName, StringComparison.Ordinal)
             ? string.Empty
