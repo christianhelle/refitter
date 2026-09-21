@@ -7,9 +7,6 @@ internal sealed class OneOfDiscriminatorToAllOfMutator : IOpenApiDocumentMutator
 {
     public void Mutate(OpenApiDocument document)
     {
-        if (document.Components?.Schemas == null)
-            return;
-
         foreach (var kvp in document.Components.Schemas)
         {
             var schema = kvp.Value?.ActualSchema;
