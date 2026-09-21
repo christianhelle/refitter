@@ -304,4 +304,36 @@ components:
 
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
+
+    [Test]
+    public async Task Remote_Validation_Blocks_Unresolvable_Reference_By_Default()
+    {
+        // Neither an absolute URI nor resolvable against the document URI, so it is treated as remote
+        var content = MainTemplate.Replace("__REF__", "http://[unparseable");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
+    }
+
+    [Test]
+    public async Task Remote_Validation_Allows_Unresolvable_Reference_When_Enabled()
+    {
+        var content = MainTemplate.Replace("__REF__", "http://[unparseable");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Test]
+    public async Task Remote_Validation_Allows_Unresolvable_Root_Relative_Reference()
+    {
+        // Unparseable as a URI but root-relative, so it is not treated as a remote reference
+        var content = MainTemplate.Replace("__REF__", "//");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
 }
