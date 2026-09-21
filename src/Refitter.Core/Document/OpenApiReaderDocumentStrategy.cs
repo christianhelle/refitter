@@ -96,19 +96,9 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
         string openApiPath,
         Result readResult)
     {
-        var document = readResult.OpenApiDocument;
-        if (document.Info is null)
-        {
-            document.Info = new()
-            {
-                Title = Path.GetFileNameWithoutExtension(openApiPath),
-                Version = readResult.OpenApiDiagnostic.SpecificationVersion.GetDisplayName()
-            };
-        }
-        else
-        {
-            document.Info.Title ??= Path.GetFileNameWithoutExtension(openApiPath);
-            document.Info.Version ??= readResult.OpenApiDiagnostic.SpecificationVersion.GetDisplayName();
-        }
+        // The reader always materializes Info, so the ??= below is only a guard.
+        var info = readResult.OpenApiDocument.Info ??= new();
+        info.Title ??= Path.GetFileNameWithoutExtension(openApiPath);
+        info.Version ??= readResult.OpenApiDiagnostic.SpecificationVersion.GetDisplayName();
     }
 }
