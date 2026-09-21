@@ -136,4 +136,15 @@ paths:
 
         result.Should().BeNull();
     }
+
+    [Test]
+    public async Task Returns_Null_When_Remote_Document_Cannot_Be_Read()
+    {
+        // Port 1 refuses the connection, so the reader fails and the NSwag fallback
+        // declines to retry remote documents
+        var strategy = new OpenApiReaderDocumentStrategy();
+        var result = await strategy.TryLoadAsync("http://127.0.0.1:1/openapi.json");
+
+        result.Should().BeNull();
+    }
 }
