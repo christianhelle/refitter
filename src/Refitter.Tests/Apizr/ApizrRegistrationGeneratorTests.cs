@@ -454,4 +454,42 @@ public class ApizrRegistrationGeneratorTests
 
         result.Should().Contain("ConfigureMyTestAPIApizrManager");
     }
+
+    [Test]
+    public void Generate_Registry_Includes_XmlDoc_Comments_When_Enabled()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            Namespace = "TestNamespace",
+            GenerateXmlDocCodeComments = true,
+            ApizrSettings = new ApizrSettings { WithRegistrationHelper = true },
+            DependencyInjectionSettings = new DependencyInjectionSettings()
+        };
+
+        var result = ApizrRegistrationGenerator.Generate(
+            settings,
+            ["ITestApi", "IOtherApi"],
+            "Test API");
+
+        result.Should().Contain("/// Extension methods for configuring Apizr managers in the service collection.");
+    }
+
+    [Test]
+    public void Generate_Registry_Omits_XmlDoc_Comments_When_Disabled()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            Namespace = "TestNamespace",
+            GenerateXmlDocCodeComments = false,
+            ApizrSettings = new ApizrSettings { WithRegistrationHelper = true },
+            DependencyInjectionSettings = new DependencyInjectionSettings()
+        };
+
+        var result = ApizrRegistrationGenerator.Generate(
+            settings,
+            ["ITestApi", "IOtherApi"],
+            "Test API");
+
+        result.Should().NotContain("/// Extension methods for configuring Apizr managers in the service collection.");
+    }
 }
