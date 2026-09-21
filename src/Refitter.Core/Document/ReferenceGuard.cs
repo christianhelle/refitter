@@ -40,7 +40,7 @@ internal static class ReferenceGuard
         if (!File.Exists(fullPath))
             return;
 
-        var rootDirectory = Path.GetDirectoryName(fullPath);
+        string rootDirectory = Path.GetDirectoryName(fullPath);
         var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         await ValidateLocalFileAsync(fullPath, rootDirectory, allowRemoteReferences, visited, cancellationToken)
             .ConfigureAwait(false);
@@ -141,7 +141,7 @@ internal static class ReferenceGuard
                 $"Failed to read OpenAPI document from '{filePath}' during reference validation: {ex.Message}", ex);
         }
 
-        var currentDirectory = Path.GetDirectoryName(filePath);
+        string currentDirectory = Path.GetDirectoryName(filePath);
 
         foreach (var reference in ExtractReferences(content))
         {
