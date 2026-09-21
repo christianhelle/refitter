@@ -144,11 +144,6 @@ internal class CSharpClientGeneratorFactory
             }
         }
 
-        if (document.Definitions == null)
-        {
-            yield break;
-        }
-
         foreach (var definition in document.Definitions.Keys)
         {
             yield return definition;
