@@ -7,6 +7,7 @@
 **Implemented enhancements:**
 
 - Check cancellation before fetching remote OpenAPI documents [\#1255](https://github.com/christianhelle/refitter/pull/1255) ([christianhelle](https://github.com/christianhelle))
+- Pass the document path to NSwag when round-tripping multi-file specs [\#1254](https://github.com/christianhelle/refitter/pull/1254) ([christianhelle](https://github.com/christianhelle))
 - Rewrite smoke-tests.sh as a pure bash script [\#1249](https://github.com/christianhelle/refitter/pull/1249) ([christianhelle](https://github.com/christianhelle))
 
 **Merged pull requests:**
