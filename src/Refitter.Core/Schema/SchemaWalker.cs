@@ -45,11 +45,6 @@ internal static class SchemaWalker
             }
         }
 
-        if (document.Paths == null)
-        {
-            yield break;
-        }
-
         foreach (var pathItem in document.Paths.Values)
         {
             if (pathItem == null)
