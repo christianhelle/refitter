@@ -1349,4 +1349,94 @@ public class ReturnTypeGeneratorTests
 
         result.Should().Be("Task<string>");
     }
+
+    [Test]
+    public async Task IsFileStreamResponse_Detects_Swagger2_File_Type_Responses()
+    {
+        var spec = """
+            {
+              "swagger": "2.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/download": {
+                  "get": {
+                    "operationId": "download",
+                    "produces": [ "application/octet-stream" ],
+                    "responses": {
+                      "200": { "description": "ok", "schema": { "type": "file" } }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(settings, generator);
+
+        sut.IsFileStreamResponse(document.Paths["/download"]["get"]).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Generate_Uses_IAsyncEnumerable_For_Non_RefitGeneratorSettings_Configuration()
+    {
+        var spec = """
+            {
+              "openapi": "3.0.0",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/stream": {
+                  "get": {
+                    "operationId": "stream",
+                    "responses": {
+                      "200": {
+                        "description": "ok",
+                        "content": {
+                          "application/x-ndjson": {
+                            "schema": { "type": "array", "items": { "type": "string" } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ReturnTypeGenerator(new StubCodeGenerationConfiguration(), generator);
+
+        sut.Generate(document.Paths["/stream"]["get"])
+            .Should().Be("IAsyncEnumerable<string>");
+    }
+
+    /// <summary>
+    /// A configuration that is not a <see cref="RefitGeneratorSettings"/>, so the generator
+    /// falls back to its default streaming behaviour.
+    /// </summary>
+    private sealed class StubCodeGenerationConfiguration : ICodeGenerationConfiguration
+    {
+        private readonly RefitGeneratorSettings inner = new();
+
+        public CodeGeneratorSettings? CodeGeneratorSettings => inner.CodeGeneratorSettings;
+        public bool ReturnIApiResponse => inner.ReturnIApiResponse;
+        public bool ReturnIObservable => inner.ReturnIObservable;
+        public Dictionary<string, string> ResponseTypeOverride => inner.ResponseTypeOverride;
+        public bool GenerateContracts => inner.GenerateContracts;
+        public bool GenerateClients => inner.GenerateClients;
+        public bool GenerateJsonSerializerContext => inner.GenerateJsonSerializerContext;
+        public bool GenerateXmlDocCodeComments => inner.GenerateXmlDocCodeComments;
+        public bool GenerateStatusCodeComments => inner.GenerateStatusCodeComments;
+        public TypeAccessibility TypeAccessibility => inner.TypeAccessibility;
+        public bool ImmutableRecords => inner.ImmutableRecords;
+        public string? CustomTemplateDirectory => inner.CustomTemplateDirectory;
+        public NSwag.CodeGeneration.IParameterNameGenerator? ParameterNameGenerator => inner.ParameterNameGenerator;
+        public bool UsePolymorphicSerialization => inner.UsePolymorphicSerialization;
+        public bool UseCancellationTokens => inner.UseCancellationTokens;
+    }
 }
