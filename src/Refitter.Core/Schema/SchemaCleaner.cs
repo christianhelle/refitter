@@ -178,74 +178,72 @@ public class SchemaCleaner
         stack.Push(schema);
     }
 
-    private IEnumerable<JsonSchema> EnumerateSchema(JsonSchema schema)
-    {
-        return EnumerateInternal(schema)
+    private IEnumerable<JsonSchema> EnumerateSchema(JsonSchema schema) =>
+        EnumerateChildSchemas(schema)
             .Where(x => x != null)
             .Select(x => x!);
 
-        IEnumerable<JsonSchema?> EnumerateInternal(JsonSchema schemaElement)
+    private IEnumerable<JsonSchema?> EnumerateChildSchemas(JsonSchema schema)
+    {
+        var schemaElement = schema.ActualSchema;
+
+        yield return schemaElement.AdditionalItemsSchema;
+        yield return schemaElement.AdditionalPropertiesSchema;
+        foreach (JsonSchema s in schemaElement.AllInheritedSchemas)
         {
-            schemaElement = schemaElement.ActualSchema;
+            yield return s;
+        }
 
-            yield return schemaElement.AdditionalItemsSchema;
-            yield return schemaElement.AdditionalPropertiesSchema;
-            foreach (JsonSchema s in schemaElement.AllInheritedSchemas)
+        if (schemaElement.DictionaryKey != null)
+        {
+            yield return schemaElement.DictionaryKey;
+        }
+
+        if (schemaElement.Item != null)
+        {
+            yield return schemaElement.Item;
+        }
+
+        foreach (JsonSchema s in schemaElement.Items)
+        {
+            yield return s;
+        }
+
+        yield return schemaElement.Not;
+
+        foreach (var subSchema in schemaElement.AllOf)
+        {
+            yield return subSchema;
+        }
+
+        if (schemaElement.DiscriminatorObject != null && IncludeInheritanceHierarchy)
+        {
+            // abstract type
+            // if we let these out, we get a bunch of "AnonymousN"-classes
+            foreach (var subSchema in schemaElement.DiscriminatorObject.Mapping)
             {
-                yield return s;
+                yield return subSchema.Value;
             }
+        }
 
-            if (schemaElement.DictionaryKey != null)
-            {
-                yield return schemaElement.DictionaryKey;
-            }
+        foreach (var subSchema in schemaElement.AnyOf)
+        {
+            yield return subSchema;
+        }
 
-            if (schemaElement.Item != null)
-            {
-                yield return schemaElement.Item;
-            }
+        foreach (var subSchema in schemaElement.OneOf)
+        {
+            yield return subSchema;
+        }
 
-            foreach (JsonSchema s in schemaElement.Items)
-            {
-                yield return s;
-            }
+        foreach (var subSchema in schemaElement.ActualProperties.Select(kvp => kvp.Value))
+        {
+            yield return subSchema;
+        }
 
-            yield return schemaElement.Not;
-
-            foreach (var subSchema in schemaElement.AllOf)
-            {
-                yield return subSchema;
-            }
-
-            if (schemaElement.DiscriminatorObject != null && IncludeInheritanceHierarchy)
-            {
-                // abstract type
-                // if we let these out, we get a bunch of "AnonymousN"-classes
-                foreach (var subSchema in schemaElement.DiscriminatorObject.Mapping)
-                {
-                    yield return subSchema.Value;
-                }
-            }
-
-            foreach (var subSchema in schemaElement.AnyOf)
-            {
-                yield return subSchema;
-            }
-
-            foreach (var subSchema in schemaElement.OneOf)
-            {
-                yield return subSchema;
-            }
-
-            foreach (var subSchema in schemaElement.ActualProperties.Select(kvp => kvp.Value))
-            {
-                yield return subSchema;
-            }
-
-            foreach (var subSchema in schemaElement.Definitions.Select(kvp => kvp.Value))
-            {
-                yield return subSchema;
-            }
+        foreach (var subSchema in schemaElement.Definitions.Select(kvp => kvp.Value))
+        {
+            yield return subSchema;
         }
     }
 }
