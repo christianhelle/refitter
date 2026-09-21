@@ -10,6 +10,7 @@
 
 **Merged pull requests:**
 
+- Update refit monorepo to 16.1.0 [\#1252](https://github.com/christianhelle/refitter/pull/1252) ([renovate[bot]](https://github.com/apps/renovate))
 - Fix NU1605 package downgrade breaking NuGet dependency submission [\#1251](https://github.com/christianhelle/refitter/pull/1251) ([christianhelle](https://github.com/christianhelle))
 - Increase Refitter.Core unit test code coverage [\#1250](https://github.com/christianhelle/refitter/pull/1250) ([christianhelle](https://github.com/christianhelle))
 - Update refit monorepo to v16 [\#1248](https://github.com/christianhelle/refitter/pull/1248) ([renovate[bot]](https://github.com/apps/renovate))
