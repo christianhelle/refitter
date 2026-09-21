@@ -216,4 +216,98 @@ public class SchemaTraversalTests
         act.Should().NotThrow();
         document.Components.Schemas.Should().NotContainKey("Unused");
     }
+
+    [Test]
+    public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Path_Item_Parameters()
+    {
+        var document = await OpenApiDocument.FromJsonAsync("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/pets": {
+                  "parameters": [
+                    {
+                      "name": "filter",
+                      "in": "query",
+                      "schema": { "$ref": "#/components/schemas/Filter" }
+                    }
+                  ]
+                }
+              },
+              "components": {
+                "schemas": {
+                  "Filter": { "type": "string", "enum": [ "a", "b" ] },
+                  "Unused": { "type": "integer" }
+                }
+              }
+            }
+            """);
+
+        new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+
+        document.Components.Schemas.Should().ContainKey("Filter");
+        document.Components.Schemas.Should().NotContainKey("Unused");
+    }
+
+    [Test]
+    public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Tuple_Items()
+    {
+        var document = await CreateDocumentWithReferencedRootAsync();
+
+        // Tuple validation is not expressible in OpenAPI 3.0, so wire up the item schema directly
+        document.Components.Schemas["Root"].Items.Add(
+            new JsonSchema { Reference = document.Components.Schemas["Value"] });
+
+        new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+
+        document.Components.Schemas.Should().ContainKey("Value");
+        document.Components.Schemas.Should().NotContainKey("Unused");
+    }
+
+    [Test]
+    public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Definitions()
+    {
+        var document = await CreateDocumentWithReferencedRootAsync();
+
+        document.Components.Schemas["Root"].Definitions["Nested"] =
+            new JsonSchema { Reference = document.Components.Schemas["Value"] };
+
+        new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+
+        document.Components.Schemas.Should().ContainKey("Value");
+        document.Components.Schemas.Should().NotContainKey("Unused");
+    }
+
+    private static Task<OpenApiDocument> CreateDocumentWithReferencedRootAsync() =>
+        OpenApiDocument.FromJsonAsync("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {
+                "/pets": {
+                  "get": {
+                    "operationId": "GetPets",
+                    "responses": {
+                      "200": {
+                        "description": "ok",
+                        "content": {
+                          "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Root" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "components": {
+                "schemas": {
+                  "Root": { "type": "object" },
+                  "Value": { "type": "string" },
+                  "Unused": { "type": "integer" }
+                }
+              }
+            }
+            """);
 }
