@@ -196,4 +196,24 @@ public class OutputPlannerAdapterTests
         planned[0].Content.Should().Be("// content 1");
         planned[1].Content.Should().Be("// content 2");
     }
+
+    [Test]
+    public void Plan_SingleFile_With_No_Generated_Files_Plans_Empty_Content()
+    {
+        var config = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "Output.cs",
+            GenerateMultipleFiles = false,
+        };
+
+        var planned = planner.Plan(
+            new GeneratorOutput(new List<GeneratedCode>()),
+            config,
+            settingsFilePath: null,
+            cliOutputPath: null);
+
+        planned.Should().ContainSingle();
+        planned[0].Content.Should().BeEmpty();
+    }
 }
