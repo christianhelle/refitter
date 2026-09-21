@@ -52,7 +52,7 @@ public class OpenApiReaderDocumentStrategyTests
     }
   }
 }";
-        var componentsSpec = @"{
+        string componentsSpec = @"{
   ""components"": {
     ""schemas"": {
       ""User"": {
@@ -66,7 +66,7 @@ public class OpenApiReaderDocumentStrategyTests
   }
 }";
 
-        var mainFile = Path.Combine(folder, "main.json");
+        string mainFile = Path.Combine(folder, "main.json");
         var componentsFile = Path.Combine(folder, "components.json");
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
@@ -101,7 +101,7 @@ paths:
               schema:
                 $ref: './components.yaml#/components/schemas/User'";
 
-        var componentsSpec = @"components:
+        string componentsSpec = @"components:
   schemas:
     User:
       type: object
@@ -111,7 +111,7 @@ paths:
         name:
           type: string";
 
-        var mainFile = Path.Combine(folder, "main.yaml");
+        string mainFile = Path.Combine(folder, "main.yaml");
         var componentsFile = Path.Combine(folder, "components.yaml");
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
@@ -128,10 +128,10 @@ paths:
     [Test]
     public async Task Json_External_References_Are_Resolved_By_The_Round_Trip()
     {
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        string folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
-        var mainSpec = @"{
+        string mainSpec = @"{
   ""openapi"": ""3.0.0"",
   ""info"": { ""title"": ""Round Trip Test"", ""version"": ""1.0.0"" },
   ""paths"": {
@@ -153,7 +153,7 @@ paths:
     }
   }
 }";
-        var componentsSpec = @"{
+        string componentsSpec = @"{
   ""components"": {
     ""schemas"": {
       ""User"": {
@@ -167,12 +167,12 @@ paths:
   }
 }";
 
-        var mainFile = Path.Combine(folder, "main.json");
+        string mainFile = Path.Combine(folder, "main.json");
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
 
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync(mainFile);
+        OpenApiReaderDocumentStrategy strategy = new();
+        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
 
@@ -192,10 +192,10 @@ paths:
     [Test]
     public async Task Yaml_External_References_Are_Resolved_By_The_Round_Trip()
     {
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        string folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
-        var mainSpec = @"openapi: 3.0.0
+        string mainSpec = @"openapi: 3.0.0
 info:
   title: YAML Round Trip Test
   version: 1.0.0
@@ -210,7 +210,7 @@ paths:
               schema:
                 $ref: './components.yaml#/components/schemas/User'";
 
-        var componentsSpec = @"components:
+        string componentsSpec = @"components:
   schemas:
     User:
       type: object
@@ -220,12 +220,12 @@ paths:
         name:
           type: string";
 
-        var mainFile = Path.Combine(folder, "main.yaml");
+        string mainFile = Path.Combine(folder, "main.yaml");
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(Path.Combine(folder, "components.yaml"), componentsSpec);
 
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync(mainFile);
+        OpenApiReaderDocumentStrategy strategy = new();
+        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
         result!.OpenApi.Should().Be("3.0.4");
@@ -239,12 +239,12 @@ paths:
     [Test]
     public async Task Populates_Missing_Info_On_The_Returned_Document()
     {
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        string folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         // No "info" block at all. The NSwag fallback leaves Info null for this
         // document, so a populated Info can only come from the round trip.
-        var mainSpec = @"{
+        string mainSpec = @"{
   ""openapi"": ""3.0.0"",
   ""paths"": {
     ""/users"": {
@@ -265,7 +265,7 @@ paths:
     }
   }
 }";
-        var componentsSpec = @"{
+        string componentsSpec = @"{
   ""components"": {
     ""schemas"": {
       ""User"": { ""type"": ""object"", ""properties"": { ""id"": { ""type"": ""integer"" } } }
@@ -273,12 +273,12 @@ paths:
   }
 }";
 
-        var mainFile = Path.Combine(folder, "no-info.json");
+        string mainFile = Path.Combine(folder, "no-info.json");
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
 
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync(mainFile);
+        OpenApiReaderDocumentStrategy strategy = new();
+        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
         result!.Info.Should().NotBeNull();
