@@ -26,6 +26,8 @@ internal static class ReferenceGuard
         bool allowRemoteReferences,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (string.IsNullOrWhiteSpace(openApiPath))
             return;
 
@@ -69,11 +71,7 @@ internal static class ReferenceGuard
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 throw new ReferenceResolutionException(
                     $"Failed to read OpenAPI document from '{url}' during reference validation: {ex.Message}", ex);
@@ -139,11 +137,7 @@ internal static class ReferenceGuard
         {
             content = await ReadAllTextAsync(filePath, cancellationToken).ConfigureAwait(false);
         }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new ReferenceResolutionException(
                 $"Failed to read OpenAPI document from '{filePath}' during reference validation: {ex.Message}", ex);

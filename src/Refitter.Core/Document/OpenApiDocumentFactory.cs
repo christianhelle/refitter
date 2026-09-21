@@ -72,6 +72,8 @@ public static class OpenApiDocumentFactory
         bool allowRemoteReferences = false,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         // For remote URLs, fetch once and reuse content for both validation and parsing
         if (PathUtilities.IsHttp(openApiPath))
         {
@@ -87,11 +89,7 @@ public static class OpenApiDocumentFactory
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiPath}'.", ex);
             }

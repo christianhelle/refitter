@@ -22,6 +22,8 @@ public static class OpenApiValidator
         bool allowRemoteReferences = false,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         // For remote URLs, fetch once and validate before parsing
         if (PathUtilities.IsHttp(openApiFile))
         {
@@ -36,11 +38,7 @@ public static class OpenApiValidator
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiFile}'.", ex);
             }
