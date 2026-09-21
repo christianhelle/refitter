@@ -67,7 +67,6 @@ public class RefitGenerator(
         string[] keepSchemaPatterns,
         bool includeInheritanceHierarchy)
     {
-        if (document == null) throw new ArgumentNullException(nameof(document));
         if (keepSchemaPatterns == null) throw new ArgumentNullException(nameof(keepSchemaPatterns));
 
         if (!removeUnusedSchema)
