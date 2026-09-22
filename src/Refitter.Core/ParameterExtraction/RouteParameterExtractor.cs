@@ -6,10 +6,7 @@ namespace Refitter.Core;
 
 internal sealed class RouteParameterExtractor
 {
-    public IEnumerable<string> Extract(
-        CSharpOperationModel operationModel,
-        OpenApiOperation operation,
-        RefitGeneratorSettings settings)
+    public IEnumerable<string> Extract(CSharpOperationModel operationModel)
     {
         var path = operationModel.Path;
 

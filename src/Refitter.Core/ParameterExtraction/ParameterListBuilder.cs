@@ -23,7 +23,7 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
     {
         var parameters = new List<string>();
 
-        parameters.AddRange(routeExtractor.Extract(operationModel, operation, settings));
+        parameters.AddRange(routeExtractor.Extract(operationModel));
 
         var (queryParameters, dynamicQuerystringCode) = queryExtractor.Extract(
             operationModel,
