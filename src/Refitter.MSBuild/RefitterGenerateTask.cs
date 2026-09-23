@@ -131,7 +131,6 @@ public class RefitterGenerateTask : MSBuildTask
 
     private List<string>? TryExecuteRefitter(string file, int totalFileCount, out bool failed)
     {
-        failed = false;
         try
         {
             return StartProcess(file, totalFileCount, out failed);
