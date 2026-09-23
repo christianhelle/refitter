@@ -9,7 +9,6 @@ namespace Refitter.SourceGenerators.Tests;
 public class MultipleInterfaceByTagGeneratorTests
 {
     private const string ExpectedNamespace = "Refitter.Tests.AdditionalFiles.ByTag";
-    private const string BaseUrl = "https://petstore3.swagger.io/api/v3";
 
     [Test]
     public void Should_Generate_IPetApi_Interface() =>
