@@ -541,6 +541,45 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void GetInstalledDotnetRuntimes_Should_Return_Reported_Runtimes()
+    {
+        try
+        {
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                startInfo.Arguments.Should().Be("--list-runtimes");
+                logOutput("Microsoft.NETCore.App 8.0.11 [/usr/share/dotnet/shared/Microsoft.NETCore.App]");
+                logOutput(" ");
+                logOutput("Microsoft.NETCore.App 10.0.0 [/usr/share/dotnet/shared/Microsoft.NETCore.App]");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            var runtimes = InvokeGetInstalledDotnetRuntimes();
+
+            runtimes.Should().Equal(
+                "Microsoft.NETCore.App 8.0.11 [/usr/share/dotnet/shared/Microsoft.NETCore.App]",
+                "Microsoft.NETCore.App 10.0.0 [/usr/share/dotnet/shared/Microsoft.NETCore.App]");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [Test]
+    [Arguments("net8.0", "net8.0")]
+    [Arguments("net10.0", "net10.0")]
+    [Arguments("tools", null)]
+    [Arguments("netpreview", null)]
+    [Arguments("net8..0", null)]
+    public void GetRuntimeTfm_Should_Only_Return_Numeric_Target_Framework_Folders(string folderName, string? expected)
+    {
+        var refitterDll = Path.Combine("packages", "refitter", folderName, "refitter.dll");
+
+        InvokeGetRuntimeTfm(refitterDll).Should().Be(expected);
+    }
+
+    [Test]
     public void Execute_Should_Fall_Back_When_Runtime_Discovery_Times_Out()
     {
         var workspace = CreateWorkspace();
@@ -896,6 +935,46 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void RunProcess_Should_Return_Exit_Code_And_Forward_Output_When_Process_Completes()
+    {
+        var outputLines = new List<string>();
+        var method = typeof(RefitterGenerateTask).GetMethod("RunProcess", BindingFlags.Static | BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+
+        var result = method!.Invoke(
+            null,
+            [
+                new ProcessStartInfo
+                {
+                    FileName = "dotnet",
+                    Arguments = "--version",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                },
+                (Action<string?>)(data =>
+                {
+                    if (!string.IsNullOrWhiteSpace(data))
+                    {
+                        lock (outputLines)
+                        {
+                            outputLines.Add(data);
+                        }
+                    }
+                }),
+                (Action<string?>)(_ => { })
+            ])
+            .Should()
+            .BeOfType<RefitterGenerateTask.ProcessExecutionResult>()
+            .Subject;
+
+        result.TimedOut.Should().BeFalse();
+        result.ExitCode.Should().Be(0);
+        outputLines.Should().NotBeEmpty();
+    }
+
+    [Test]
     public void RunProcess_Should_Return_TimedOut_Result_When_Process_Exceeds_Timeout()
     {
         try
@@ -1018,6 +1097,14 @@ public class RefitterGenerateTaskTests
             .Should()
             .BeOfType<RefitterGenerateTask.ProcessExecutionResult>()
             .Subject;
+    }
+
+    private static string? InvokeGetRuntimeTfm(string refitterDll)
+    {
+        var method = typeof(RefitterGenerateTask).GetMethod("GetRuntimeTfm", BindingFlags.Static | BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+
+        return (string?)method!.Invoke(null, [refitterDll]);
     }
 
     private static List<string> InvokeGetInstalledDotnetRuntimes()
