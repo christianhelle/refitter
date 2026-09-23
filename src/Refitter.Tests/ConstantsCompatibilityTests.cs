@@ -79,38 +79,43 @@ public class ConstantsCompatibilityTests
             }
             """);
 
-        var processStartInfo = new ProcessStartInfo("dotnet", $"build \"{projectFile}\"")
-        {
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        using var process = new Process { StartInfo = processStartInfo };
-        var output = new StringBuilder();
-        process.OutputDataReceived += (_, args) => output.AppendLine(args.Data);
-
-        var errors = new StringBuilder();
-        process.ErrorDataReceived += (_, args) => errors.AppendLine(args.Data);
-
-        var started = process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
-        process.WaitForExit();
-
-        if (!(started && process.ExitCode == 0))
-            throw new BuildFailedException(errors.ToString(), output.ToString());
-
         try
         {
-            Directory.Delete(path, true);
-        }
-        catch
-        {
-            // Ignore cleanup errors
-        }
+            var processStartInfo = new ProcessStartInfo("dotnet", $"build \"{projectFile}\"")
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
-        return true;
+            using var process = new Process { StartInfo = processStartInfo };
+            var output = new StringBuilder();
+            process.OutputDataReceived += (_, args) => output.AppendLine(args.Data);
+
+            var errors = new StringBuilder();
+            process.ErrorDataReceived += (_, args) => errors.AppendLine(args.Data);
+
+            var started = process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+
+            if (!(started && process.ExitCode == 0))
+                throw new BuildFailedException(errors.ToString(), output.ToString());
+
+            return true;
+        }
+        finally
+        {
+            try
+            {
+                Directory.Delete(path, true);
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+        }
     }
 }
