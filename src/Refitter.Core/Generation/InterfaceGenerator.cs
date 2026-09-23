@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;

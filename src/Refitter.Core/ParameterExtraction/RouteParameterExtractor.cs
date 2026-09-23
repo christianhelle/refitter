@@ -1,4 +1,3 @@
-using System;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 
