@@ -31,7 +31,7 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
             dynamicQuerystringParameterType);
         parameters.AddRange(queryParameters);
 
-        parameters.AddRange(bodyExtractor.Extract(operationModel, operation, settings));
+        parameters.AddRange(bodyExtractor.Extract(operationModel, settings));
         parameters.AddRange(headerExtractor.Extract(operationModel, operation, settings));
         parameters.AddRange(formExtractor.Extract(operationModel, operation, settings));
 

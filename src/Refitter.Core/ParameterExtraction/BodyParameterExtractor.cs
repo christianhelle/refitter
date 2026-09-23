@@ -7,7 +7,6 @@ internal sealed class BodyParameterExtractor
 {
     public IEnumerable<string> Extract(
         CSharpOperationModel operationModel,
-        OpenApiOperation operation,
         RefitGeneratorSettings settings)
     {
         var bodyParameters = operationModel.Parameters
