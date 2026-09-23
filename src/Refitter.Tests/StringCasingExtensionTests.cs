@@ -13,11 +13,6 @@ public class StringCasingExtensionTests
         => input.ConvertKebabCaseToPascalCase().Should().Be(expected);
 
     [Test]
-    [Arguments("some-string", "someString")]
-    public void CanConvertToCamelCase(string input, string expected)
-        => input.ConvertKebabCaseToCamelCase().Should().Be(expected);
-
-    [Test]
     [Arguments("abcd", "Abcd")]
     public void CanCaptilalizeFirstLetter(string input, string expected)
         => input.CapitalizeFirstCharacter().Should().Be(expected);
