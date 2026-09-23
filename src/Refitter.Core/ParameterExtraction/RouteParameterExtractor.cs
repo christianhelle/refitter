@@ -3,9 +3,9 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal sealed class RouteParameterExtractor
+internal static class RouteParameterExtractor
 {
-    public IEnumerable<string> Extract(CSharpOperationModel operationModel)
+    public static IEnumerable<string> Extract(CSharpOperationModel operationModel)
     {
         var path = operationModel.Path;
 
