@@ -184,6 +184,14 @@ public class RichGenerationReporterTests
     }
 
     [Test]
+    public void ReportSettingsFileGenerated_Handles_Path_Without_Directory()
+    {
+        var act = () =>
+            new RichGenerationReporter().ReportSettingsFileGenerated(Path.GetPathRoot(Environment.CurrentDirectory)!);
+        act.Should().NotThrow();
+    }
+
+    [Test]
     public void ReportGenerationFailed_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportGenerationFailed();
