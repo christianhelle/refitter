@@ -10,7 +10,6 @@ namespace Refitter.Core;
 /// </summary>
 internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
 {
-    private readonly RouteParameterExtractor routeExtractor = new();
     private readonly QueryParameterExtractor queryExtractor = new();
     private readonly BodyParameterExtractor bodyExtractor = new();
     private readonly HeaderParameterExtractor headerExtractor = new();
@@ -23,16 +22,15 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
     {
         var parameters = new List<string>();
 
-        parameters.AddRange(routeExtractor.Extract(operationModel, operation, settings));
+        parameters.AddRange(RouteParameterExtractor.Extract(operationModel));
 
         var (queryParameters, dynamicQuerystringCode) = queryExtractor.Extract(
             operationModel,
-            operation,
             settings,
             dynamicQuerystringParameterType);
         parameters.AddRange(queryParameters);
 
-        parameters.AddRange(bodyExtractor.Extract(operationModel, operation, settings));
+        parameters.AddRange(bodyExtractor.Extract(operationModel, settings));
         parameters.AddRange(headerExtractor.Extract(operationModel, operation, settings));
         parameters.AddRange(formExtractor.Extract(operationModel, operation, settings));
 

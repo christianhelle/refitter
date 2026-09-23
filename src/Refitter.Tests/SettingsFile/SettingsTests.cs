@@ -239,6 +239,18 @@ public class SettingsTests
     }
 
     [Test]
+    public void TryGetAuthenticationHeaderStyle_Should_Map_Flag_Without_Value_To_Method()
+    {
+        var settings = new Refitter.Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "" } };
+
+        var parsed = settings.TryGetAuthenticationHeaderStyle(out var style, out var errorMessage);
+
+        parsed.Should().BeTrue();
+        style.Should().Be(AuthenticationHeaderStyle.Method);
+        errorMessage.Should().BeNull();
+    }
+
+    [Test]
     public void TryGetAuthenticationHeaderStyle_Should_Parse_Enum_Values_Case_Insensitively()
     {
         var settings = new Refitter.Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "parameter" } };

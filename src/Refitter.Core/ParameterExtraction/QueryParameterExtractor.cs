@@ -7,7 +7,6 @@ internal sealed class QueryParameterExtractor
 {
     public (IReadOnlyList<string> Parameters, string? DynamicQuerystringCode) Extract(
         CSharpOperationModel operationModel,
-        OpenApiOperation operation,
         RefitGeneratorSettings settings,
         string dynamicQuerystringParameterType)
     {

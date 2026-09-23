@@ -841,6 +841,60 @@ public class GenerationOrchestratorTests
     }
 
     [Test]
+    public async Task RunAsync_Should_Report_Unsupported_Specification_Version()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "spec.json");
+            var outputPath = Path.Combine(workspace, "Output.cs");
+            Directory.CreateDirectory(workspace);
+
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "5.0.0",
+                  "info": { "title": "Test API", "version": "1.0.0" },
+                  "paths": {}
+                }
+                """);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+            };
+
+            var cliSettings = new Settings
+            {
+                OpenApiPath = openApiPath,
+                OutputPath = outputPath,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = false,
+            };
+
+            var reporter = new CapturingGenerationReporter();
+            var orchestrator = new GenerationOrchestrator();
+            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+
+            result.Should().NotBe(0);
+            reporter.GenerationFailedCalled.Should().BeTrue();
+            reporter.UnsupportedVersion.Should().Be("5.0.0");
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    [Test]
     public async Task RunAsync_Should_Report_Validation_Diagnostics_When_Validation_Fails()
     {
         var workspace = Path.Combine(

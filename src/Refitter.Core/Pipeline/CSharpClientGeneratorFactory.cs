@@ -9,7 +9,6 @@ internal class CSharpClientGeneratorFactory
 {
     private readonly ICodeGenerationConfiguration codeGeneration;
     private readonly INamingConfiguration naming;
-    private readonly ISchemaConfiguration schema;
     private readonly OpenApiDocument document;
     private readonly IReadOnlyList<IOpenApiDocumentMutator> mutators;
 
@@ -22,7 +21,6 @@ internal class CSharpClientGeneratorFactory
     {
         this.codeGeneration = codeGeneration;
         this.naming = naming;
-        this.schema = schema;
         this.document = document;
         this.mutators = mutators ?? CreateDefaultMutators(schema, codeGeneration);
     }
