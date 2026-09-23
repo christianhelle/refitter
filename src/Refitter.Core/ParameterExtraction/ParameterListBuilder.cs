@@ -27,7 +27,6 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
 
         var (queryParameters, dynamicQuerystringCode) = queryExtractor.Extract(
             operationModel,
-            operation,
             settings,
             dynamicQuerystringParameterType);
         parameters.AddRange(queryParameters);
