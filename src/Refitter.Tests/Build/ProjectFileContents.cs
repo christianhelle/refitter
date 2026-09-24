@@ -102,7 +102,7 @@ public static class ProjectFileContents
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""16.1.0"" />
     <PackageReference Include=""System.Text.Json"" Version=""10.0.12"" />
-    <PackageReference Include=""System.ComponentModel.Annotations"" Version=""4.5.0"" />
+    <PackageReference Include=""System.ComponentModel.Annotations"" Version=""5.0.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
     <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.12"" />
     <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.12"" />
