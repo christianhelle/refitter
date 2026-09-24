@@ -15,7 +15,7 @@ public static class BuildHelper
         return BuildCSharp("net8.0", warningsAsErrors, generatedCode);
     }
 
-    public static bool BuildCSharp(string targetFramework, params string[] generatedCode)
+    public static bool BuildCSharpForTargetFramework(string targetFramework, params string[] generatedCode)
     {
         return BuildCSharp(targetFramework, warningsAsErrors: false, generatedCode);
     }
@@ -43,6 +43,12 @@ public static class BuildHelper
 
     private static bool BuildProject(string projectContent, string[] generatedCode)
     {
+        if (generatedCode.Length == 0)
+            throw new ArgumentException("At least one source file is required", nameof(generatedCode));
+
+        if (generatedCode.Any(code => code.StartsWith("net", StringComparison.Ordinal) && !code.Contains('\n')))
+            throw new ArgumentException("A target framework was passed as source code; use BuildCSharpForTargetFramework", nameof(generatedCode));
+
         var folder = Path.GetDirectoryName(typeof(BuildHelper).Assembly.Location) ?? Path.GetTempPath();
         var path = Path.Combine(folder, Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(path);

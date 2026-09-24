@@ -21,7 +21,7 @@ public class Refit11CompatibilityTests
     {
         var generatedCode = await GenerateCode(version, filename);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -37,7 +37,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -53,7 +53,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -69,7 +69,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -85,7 +85,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -104,7 +104,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -124,7 +124,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -144,7 +144,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -160,7 +160,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -176,7 +176,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -192,7 +192,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -208,7 +208,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -224,7 +224,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -240,7 +240,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -260,7 +260,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }
@@ -281,7 +281,7 @@ public class Refit11CompatibilityTests
         };
         var generatedCode = await GenerateCode(version, filename, settings);
         BuildHelper
-            .BuildCSharp(Refit11TargetFramework, generatedCode)
+            .BuildCSharpForTargetFramework(Refit11TargetFramework, generatedCode)
             .Should()
             .BeTrue();
     }

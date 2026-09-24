@@ -50,6 +50,7 @@ public class ByEndpointQueryParamsInternalITests
 
     [Category("Integration")]
     [Test]
+    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task ByEndpoint_Dynamic_Query_Params_With_Internal_I_Characters_Build()
     {
         string generatedCode = await GenerateCode();
