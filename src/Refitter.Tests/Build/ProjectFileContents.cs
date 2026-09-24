@@ -11,23 +11,23 @@ public static class ProjectFileContents
     <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include=""Refit.HttpClientFactory"" Version=""15.2.0"" />
-    <PackageReference Include=""System.Text.Json"" Version=""10.0.0"" />
+    <PackageReference Include=""Refit.HttpClientFactory"" Version=""16.1.0"" />
+    <PackageReference Include=""System.Text.Json"" Version=""10.0.12"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""5.0.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
-    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.11"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.10"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
-    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.11"" />
+    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
+    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
-    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.0"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
+    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.2"" />
   </ItemGroup>
 </Project>";
 
@@ -41,23 +41,23 @@ public static class ProjectFileContents
     <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include=""Refit.HttpClientFactory"" Version=""15.2.0"" />
-    <PackageReference Include=""System.Text.Json"" Version=""10.0.0"" />
+    <PackageReference Include=""Refit.HttpClientFactory"" Version=""16.1.0"" />
+    <PackageReference Include=""System.Text.Json"" Version=""10.0.12"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""5.0.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
-    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.11"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.10"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
-    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.11"" />
+    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
+    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
-    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.0"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
+    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.2"" />
   </ItemGroup>
 </Project>";
 
@@ -70,23 +70,23 @@ public static class ProjectFileContents
     <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include=""Refit.HttpClientFactory"" Version=""15.2.0"" />
-    <PackageReference Include=""System.Text.Json"" Version=""10.0.0"" />
+    <PackageReference Include=""Refit.HttpClientFactory"" Version=""16.1.0"" />
+    <PackageReference Include=""System.Text.Json"" Version=""10.0.12"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""5.0.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
-    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.11"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.10"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
-    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.11"" />
+    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
+    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
-    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.0"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
+    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.2"" />
   </ItemGroup>
 </Project>";
 
@@ -100,23 +100,23 @@ public static class ProjectFileContents
     <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include=""Refit.HttpClientFactory"" Version=""15.2.0"" />
-    <PackageReference Include=""System.Text.Json"" Version=""8.0.5"" />
-    <PackageReference Include=""System.ComponentModel.Annotations"" Version=""4.5.0"" />
+    <PackageReference Include=""Refit.HttpClientFactory"" Version=""16.1.0"" />
+    <PackageReference Include=""System.Text.Json"" Version=""10.0.12"" />
+    <PackageReference Include=""System.ComponentModel.Annotations"" Version=""5.0.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
-    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.11"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.10"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
-    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.11"" />
+    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
+    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
-    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.0"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
+    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.2"" />
   </ItemGroup>
 </Project>";
 
@@ -129,23 +129,23 @@ public static class ProjectFileContents
     <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include=""Refit.HttpClientFactory"" Version=""15.2.0"" />
-    <PackageReference Include=""System.Text.Json"" Version=""10.0.0"" />
+    <PackageReference Include=""Refit.HttpClientFactory"" Version=""16.1.0"" />
+    <PackageReference Include=""System.Text.Json"" Version=""10.0.12"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""5.0.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
-    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.11"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.10"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
-    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.11"" />
+    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
+    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
-    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.0"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
+    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.2"" />
   </ItemGroup>
 </Project>";
 
@@ -159,23 +159,23 @@ public static class ProjectFileContents
     <NoWarn>NU1510;NU1903;CS1573;CS1591;SYSLIB1034</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include=""Refit.HttpClientFactory"" Version=""15.2.0"" />
-    <PackageReference Include=""System.Text.Json"" Version=""10.0.0"" />
+    <PackageReference Include=""Refit.HttpClientFactory"" Version=""16.1.0"" />
+    <PackageReference Include=""System.Text.Json"" Version=""10.0.12"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""5.0.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
-    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.11"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.10"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.1.0"" />
-    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.11"" />
+    <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.12"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
+    <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
-    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.0"" />
-    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.0"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
+    <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Akavache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.MonkeyCache"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Extensions.Microsoft.Caching"" Version=""6.4.2"" />
+    <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.2"" />
   </ItemGroup>
 </Project>";
 }
