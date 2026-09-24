@@ -13,6 +13,7 @@
 
 **Merged pull requests:**
 
+- Update NuGet packages [\#1261](https://github.com/christianhelle/refitter/pull/1261) ([christianhelle](https://github.com/christianhelle))
 - Document .NET 10 system requirements [\#1260](https://github.com/christianhelle/refitter/pull/1260) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Update dependency TUnit to 1.69.0 [\#1256](https://github.com/christianhelle/refitter/pull/1256) ([renovate[bot]](https://github.com/apps/renovate))
 - Improve Refitter.Core unit test coverage [\#1253](https://github.com/christianhelle/refitter/pull/1253) ([christianhelle](https://github.com/christianhelle))
