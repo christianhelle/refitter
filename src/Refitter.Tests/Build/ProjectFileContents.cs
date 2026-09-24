@@ -20,7 +20,7 @@ public static class ProjectFileContents
     <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
     <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
@@ -50,7 +50,7 @@ public static class ProjectFileContents
     <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
     <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
@@ -79,7 +79,7 @@ public static class ProjectFileContents
     <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
     <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
@@ -109,7 +109,7 @@ public static class ProjectFileContents
     <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
     <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
@@ -138,7 +138,7 @@ public static class ProjectFileContents
     <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
     <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
@@ -168,7 +168,7 @@ public static class ProjectFileContents
     <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.12"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
-    <PackageReference Include=""System.Reactive"" Version=""6.0.1"" />
+    <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
     <PackageReference Include=""Apizr.Integrations.FileTransfer.MediatR"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.Mapster"" Version=""6.4.2"" />
     <PackageReference Include=""Apizr.Integrations.AutoMapper"" Version=""6.4.2"" />
