@@ -20,12 +20,13 @@ public static class BuildHelper
         return BuildCSharp(targetFramework, warningsAsErrors: false, generatedCode);
     }
 
+    public static bool BuildApizrCSharp(params string[] generatedCode)
+    {
+        return BuildProject(ProjectFileContents.Net80ApizrApp, generatedCode);
+    }
+
     public static bool BuildCSharp(string targetFramework, bool warningsAsErrors, params string[] generatedCode)
     {
-        var folder = Path.GetDirectoryName(typeof(BuildHelper).Assembly.Location) ?? Path.GetTempPath();
-        var path = Path.Combine(folder, Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(path);
-        var projectFile = Path.Combine(path, "Project.csproj");
         var projectContent = (targetFramework, warningsAsErrors) switch
         {
             ("net8.0", true) => ProjectFileContents.Net80AppWithWarningsAsErrors,
@@ -37,6 +38,15 @@ public static class BuildHelper
             (_, true) => ProjectFileContents.Net80AppWithWarningsAsErrors,
             _ => ProjectFileContents.Net80App
         };
+        return BuildProject(projectContent, generatedCode);
+    }
+
+    private static bool BuildProject(string projectContent, string[] generatedCode)
+    {
+        var folder = Path.GetDirectoryName(typeof(BuildHelper).Assembly.Location) ?? Path.GetTempPath();
+        var path = Path.Combine(folder, Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(path);
+        var projectFile = Path.Combine(path, "Project.csproj");
         File.WriteAllText(projectFile, projectContent);
 
         for (int i = 0; i < generatedCode.Length; i++)

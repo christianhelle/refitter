@@ -290,7 +290,7 @@ public class ParameterExtractorEdgeCaseTests
     public async Task ApizrRequestOptions_Code_Builds()
     {
         string generatedCode = await GenerateCodeWithApizrRequestOptions();
-        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+        BuildHelper.BuildApizrCSharp(generatedCode).Should().BeTrue();
     }
 
     private static async Task<string> GenerateCodeWithApizrRequestOptions()

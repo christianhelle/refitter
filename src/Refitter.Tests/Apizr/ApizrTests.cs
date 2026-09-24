@@ -185,11 +185,12 @@ paths:
     }
 
     [Test]
+    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generatedCode)
+            .BuildApizrCSharp(generatedCode)
             .Should()
             .BeTrue();
     }

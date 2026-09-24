@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Refitter.Tests.Build;
 
 public static class ProjectFileContents
@@ -178,4 +180,14 @@ public static class ProjectFileContents
     <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.2"" />
   </ItemGroup>
 </Project>";
+
+    // Apizr 6.x is compiled against the strong-named Refit 8.0.0 assembly, while newer Refit
+    // releases are not strong-named, so Apizr output only compiles against Refit 8.
+    // CS0105 is suppressed until https://github.com/christianhelle/refitter/issues/1264 is fixed.
+    public static readonly string Net80ApizrApp = Regex
+        .Replace(
+            Net80App,
+            @"(<PackageReference Include=""Refit\.HttpClientFactory"" Version="")[^""]+",
+            "${1}8.0.0")
+        .Replace("<NoWarn>NU1510;", "<NoWarn>CS0105;NU1510;");
 }
