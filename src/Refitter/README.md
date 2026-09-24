@@ -2139,7 +2139,7 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
 
 ## System requirements
 
-.NET 8.0 or .NET 9.0
+.NET 8.0, .NET 9.0, or .NET 10.0
 
 #
 
