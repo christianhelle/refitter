@@ -10,6 +10,7 @@ rm -f Petstore.cs PetstorePreserveOriginal.cs Output.cs
 
 dotnet restore ../../src/Refitter.slnx
 dotnet clean -c Release ../../src/Refitter.slnx
+dotnet build -c Release ../../src/Refitter/Refitter.csproj
 dotnet build -c Release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c Release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
 dotnet add package Refitter.MSBuild --source .
