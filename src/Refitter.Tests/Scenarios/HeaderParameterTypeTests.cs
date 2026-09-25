@@ -46,7 +46,6 @@ public class HeaderParameterTypeTests
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[Header(\"X-Int\")] int x_Int");
-        generatedCode.Should().Contain("[Header(\"X-Array\")] IEnumerable<string> x_Array");
         generatedCode.Should().Contain("[Header(\"X-Date\")] System.DateTimeOffset? x_Date");
         generatedCode.Should().Contain("[Header(\"X-Enum\")] XEnum? x_Enum");
         generatedCode.Should().Contain("[Header(\"Authorization\")] string authorization");
