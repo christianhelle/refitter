@@ -43,8 +43,8 @@ public static class BuildHelper
 
     private static bool BuildProject(string projectContent, string[] generatedCode)
     {
-        if (generatedCode.Length == 0)
-            throw new ArgumentException("At least one source file is required", nameof(generatedCode));
+        if (generatedCode.Length == 0 || generatedCode.All(string.IsNullOrWhiteSpace))
+            throw new ArgumentException("At least one non-empty source file is required", nameof(generatedCode));
 
         if (generatedCode.Any(code => code.StartsWith("net", StringComparison.Ordinal) && !code.Contains('\n')))
             throw new ArgumentException("A target framework was passed as source code; use BuildCSharpForTargetFramework", nameof(generatedCode));
