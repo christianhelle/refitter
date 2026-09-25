@@ -18,6 +18,9 @@ Remove-Item "~\.nuget\packages\refitter.msbuild" -Force -Recurse -ErrorAction Si
 Write-Host "Building Refitter.MSBuild package..." -ForegroundColor Yellow
 dotnet clean -c Release ..\..\src\Refitter.MSBuild\Refitter.MSBuild.csproj
 dotnet build -c Release ..\..\src\Refitter\Refitter.csproj
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
 dotnet build -c Release ..\..\src\Refitter.MSBuild\Refitter.MSBuild.csproj
 dotnet pack -c Release ..\..\src\Refitter.MSBuild\Refitter.MSBuild.csproj -o .
 
