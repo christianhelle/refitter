@@ -190,4 +190,9 @@ public static class ProjectFileContents
             @"(<PackageReference Include=""Refit\.HttpClientFactory"" Version="")[^""]+",
             "${1}8.0.0")
         .Replace("<NoWarn>NU1510;", "<NoWarn>CS0105;NU1510;");
+
+    public static readonly string Net100Refit11App = Regex.Replace(
+        Net100App,
+        @"(<PackageReference Include=""Refit\.HttpClientFactory"" Version="")[^""]+",
+        "${1}11.2.0");
 }
