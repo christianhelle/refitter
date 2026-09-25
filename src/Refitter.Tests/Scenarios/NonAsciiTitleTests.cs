@@ -33,9 +33,11 @@ public class NonAsciiTitleTests
     public async Task Removes_Invalid_Characters_From_Interface_Name()
     {
         var generatedCode = await GenerateCode();
-        generatedCode.Should().NotContain("—");
-        generatedCode.Should().NotContain("«");
-        generatedCode.Should().NotContain("»");
+        var interfaceName = System.Text.RegularExpressions.Regex
+            .Match(generatedCode, @"interface\s+(\S+)")
+            .Groups[1]
+            .Value;
+        interfaceName.Should().MatchRegex(@"^[\p{L}\p{Nd}_]+$");
     }
 
     [Test]
