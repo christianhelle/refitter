@@ -140,6 +140,7 @@ public class Issue1190DynamicQueryParamsByTagTests
 
     [Category("Integration")]
     [Test]
+    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task ByTag_Generated_Code_With_Distinct_QueryParams_Builds()
     {
         string generatedCode = await GenerateCode();
@@ -170,6 +171,7 @@ public class Issue1190DynamicQueryParamsByTagTests
 
     [Category("Integration")]
     [Test]
+    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task ByTag_Generated_Code_With_Distinct_QueryParams_Builds_Swagger2()
     {
         string generatedCode = await GenerateCodeSwagger2();

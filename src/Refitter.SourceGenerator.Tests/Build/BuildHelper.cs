@@ -7,11 +7,17 @@ public static class BuildHelper
 {
     public static bool BuildCSharp(params string[] generatedCode)
     {
-        return BuildCSharp("net8.0", generatedCode);
+        return BuildCSharpForTargetFramework("net8.0", generatedCode);
     }
 
-    public static bool BuildCSharp(string targetFramework, params string[] generatedCode)
+    public static bool BuildCSharpForTargetFramework(string targetFramework, params string[] generatedCode)
     {
+        if (generatedCode.Length == 0 || generatedCode.All(string.IsNullOrWhiteSpace))
+            throw new ArgumentException("At least one non-empty source file is required", nameof(generatedCode));
+
+        if (generatedCode.Any(code => code.StartsWith("net", StringComparison.Ordinal) && !code.Contains('\n')))
+            throw new ArgumentException("A target framework was passed as source code; use BuildCSharpForTargetFramework", nameof(generatedCode));
+
         var folder = Path.GetDirectoryName(typeof(BuildHelper).Assembly.Location) ?? Path.GetTempPath();
         var path = Path.Combine(folder, Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(path);

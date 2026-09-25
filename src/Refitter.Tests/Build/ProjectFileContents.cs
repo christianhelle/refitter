@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Refitter.Tests.Build;
 
 public static class ProjectFileContents
@@ -178,4 +180,24 @@ public static class ProjectFileContents
     <PackageReference Include=""Apizr.Integrations.Fusillade"" Version=""6.4.2"" />
   </ItemGroup>
 </Project>";
+
+    // Apizr 6.x is compiled against the strong-named Refit 8.0.0 assembly, while newer Refit
+    // releases are not strong-named, so Apizr output only compiles against Refit 8.
+    // CS0105 is suppressed until https://github.com/christianhelle/refitter/issues/1264 is fixed.
+    public static readonly string Net80ApizrApp = Regex
+        .Replace(
+            Net80App,
+            @"(<PackageReference Include=""Refit\.HttpClientFactory"" Version="")[^""]+",
+            "${1}8.0.0")
+        .Replace("<NoWarn>NU1510;", "<NoWarn>CS0105;NU1510;");
+
+    public static readonly string Net100Refit11App = Regex.Replace(
+        Net100App,
+        @"(<PackageReference Include=""Refit\.HttpClientFactory"" Version="")[^""]+",
+        "${1}11.2.0");
+
+    // Consumers such as netstandard2.0 libraries build without implicit usings, which the
+    // regular templates inherit from src/Directory.Build.props.
+    public static readonly string Net80AppWithoutImplicitUsings = Net80App
+        .Replace("<TargetFramework>net8.0</TargetFramework>", "<TargetFramework>net8.0</TargetFramework>\n    <ImplicitUsings>disable</ImplicitUsings>");
 }

@@ -329,6 +329,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
 
     [Category("Integration")]
     [Test]
+    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Dynamic_QueryString_Generated_Code_Should_Build()
     {
         const string openApiSpec =

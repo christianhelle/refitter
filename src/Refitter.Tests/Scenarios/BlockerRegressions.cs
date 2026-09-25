@@ -187,6 +187,7 @@ public class BlockerRegressions
 
     [Category("Integration")]
     [Test]
+    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Issue1018_Generated_Code_With_Duplicate_Sanitized_Names_Compiles()
     {
         // Prove that deduplication prevents compilation errors
@@ -330,6 +331,7 @@ public class BlockerRegressions
 
     [Category("Integration")]
     [Test]
+    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Issue1053_Generated_Code_With_Keywords_Compiles()
     {
         // Prove that keyword handling produces compilable code

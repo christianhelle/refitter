@@ -15,17 +15,28 @@ public static class BuildHelper
         return BuildCSharp("net8.0", warningsAsErrors, generatedCode);
     }
 
-    public static bool BuildCSharp(string targetFramework, params string[] generatedCode)
+    public static bool BuildCSharpForTargetFramework(string targetFramework, params string[] generatedCode)
     {
         return BuildCSharp(targetFramework, warningsAsErrors: false, generatedCode);
     }
 
+    public static bool BuildApizrCSharp(params string[] generatedCode)
+    {
+        return BuildProject(ProjectFileContents.Net80ApizrApp, generatedCode);
+    }
+
+    public static bool BuildRefit11CSharp(params string[] generatedCode)
+    {
+        return BuildProject(ProjectFileContents.Net100Refit11App, generatedCode);
+    }
+
+    public static bool BuildCSharpWithoutImplicitUsings(params string[] generatedCode)
+    {
+        return BuildProject(ProjectFileContents.Net80AppWithoutImplicitUsings, generatedCode);
+    }
+
     public static bool BuildCSharp(string targetFramework, bool warningsAsErrors, params string[] generatedCode)
     {
-        var folder = Path.GetDirectoryName(typeof(BuildHelper).Assembly.Location) ?? Path.GetTempPath();
-        var path = Path.Combine(folder, Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(path);
-        var projectFile = Path.Combine(path, "Project.csproj");
         var projectContent = (targetFramework, warningsAsErrors) switch
         {
             ("net8.0", true) => ProjectFileContents.Net80AppWithWarningsAsErrors,
@@ -37,6 +48,21 @@ public static class BuildHelper
             (_, true) => ProjectFileContents.Net80AppWithWarningsAsErrors,
             _ => ProjectFileContents.Net80App
         };
+        return BuildProject(projectContent, generatedCode);
+    }
+
+    private static bool BuildProject(string projectContent, string[] generatedCode)
+    {
+        if (generatedCode.Length == 0 || generatedCode.All(string.IsNullOrWhiteSpace))
+            throw new ArgumentException("At least one non-empty source file is required", nameof(generatedCode));
+
+        if (generatedCode.Any(code => code.StartsWith("net", StringComparison.Ordinal) && !code.Contains('\n')))
+            throw new ArgumentException("A target framework was passed as source code; use BuildCSharpForTargetFramework", nameof(generatedCode));
+
+        var folder = Path.GetDirectoryName(typeof(BuildHelper).Assembly.Location) ?? Path.GetTempPath();
+        var path = Path.Combine(folder, Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(path);
+        var projectFile = Path.Combine(path, "Project.csproj");
         File.WriteAllText(projectFile, projectContent);
 
         for (int i = 0; i < generatedCode.Length; i++)

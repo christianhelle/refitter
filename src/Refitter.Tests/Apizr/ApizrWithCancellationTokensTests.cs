@@ -65,7 +65,7 @@ paths:
     {
         string generatedCode = await GenerateCode();
         BuildHelper
-            .BuildCSharp(generatedCode)
+            .BuildApizrCSharp(generatedCode)
             .Should()
             .BeTrue();
     }
