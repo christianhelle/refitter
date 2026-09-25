@@ -30,6 +30,11 @@ public static class BuildHelper
         return BuildProject(ProjectFileContents.Net100Refit11App, generatedCode);
     }
 
+    public static bool BuildCSharpWithoutImplicitUsings(params string[] generatedCode)
+    {
+        return BuildProject(ProjectFileContents.Net80AppWithoutImplicitUsings, generatedCode);
+    }
+
     public static bool BuildCSharp(string targetFramework, bool warningsAsErrors, params string[] generatedCode)
     {
         var projectContent = (targetFramework, warningsAsErrors) switch

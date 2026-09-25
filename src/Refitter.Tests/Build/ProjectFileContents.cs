@@ -195,4 +195,9 @@ public static class ProjectFileContents
         Net100App,
         @"(<PackageReference Include=""Refit\.HttpClientFactory"" Version="")[^""]+",
         "${1}11.2.0");
+
+    // Consumers such as netstandard2.0 libraries build without implicit usings, which the
+    // regular templates inherit from src/Directory.Build.props.
+    public static readonly string Net80AppWithoutImplicitUsings = Net80App
+        .Replace("<TargetFramework>net8.0</TargetFramework>", "<TargetFramework>net8.0</TargetFramework>\n    <ImplicitUsings>disable</ImplicitUsings>");
 }

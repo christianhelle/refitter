@@ -44,6 +44,15 @@ public class FileResponseUsingsTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [Test]
+    [Category("Integration")]
+    [Skip("https://github.com/christianhelle/refitter/issues/1272")]
+    public async Task Can_Build_Generated_Code_Without_Implicit_Usings()
+    {
+        var generatedCode = await GenerateCode();
+        BuildHelper.BuildCSharpWithoutImplicitUsings(generatedCode).Should().BeTrue();
+    }
+
     private static async Task<string> GenerateCode(Action<RefitGeneratorSettings>? configure = null)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
