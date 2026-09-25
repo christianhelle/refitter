@@ -16,6 +16,9 @@ Remove-Item "~\.nuget\packages\refitter.msbuild" -Force -Recurse -ErrorAction Si
 dotnet restore ../../src/Refitter.slnx
 dotnet clean -c release ../../src/Refitter.slnx
 dotnet build -c release ../../src/Refitter/Refitter.csproj
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
 dotnet build -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
 dotnet add package Refitter.MSBuild --source .
