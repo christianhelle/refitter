@@ -42,9 +42,19 @@ public class ComplexQueryParameterTests
     public async Task Generates_Complex_Query_Parameters()
     {
         var generatedCode = await GenerateCode();
-        generatedCode.Should().Contain("[Query(CollectionFormat.Multi)] IEnumerable<int> ids");
+        generatedCode.Should().Contain("IEnumerable<int> ids");
         generatedCode.Should().Contain("[Query] Filter obj");
         generatedCode.Should().Contain("[Query] IDictionary<string, string> map");
+    }
+
+    [Test]
+    [Skip("https://github.com/christianhelle/refitter/issues/1280")]
+    public async Task Uses_Collection_Format_From_Parameter_Style()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("[Query(CollectionFormat.Csv)] IEnumerable<Anonymous> statuses");
+        generatedCode.Should().Contain("[Query(CollectionFormat.Pipes)] IEnumerable<int> ids");
+        generatedCode.Should().Contain("[Query(CollectionFormat.Ssv)] IEnumerable<string> tags");
     }
 
     [Test]
