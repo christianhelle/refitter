@@ -14,10 +14,16 @@
 
 **Fixed bugs:**
 
+- HttpResponseMessage return type compiles only with implicit usings [\#1272](https://github.com/christianhelle/refitter/issues/1272)
+- Non-ASCII punctuation in info.title produces invalid interface name [\#1271](https://github.com/christianhelle/refitter/issues/1271)
+- TRACE operations generate a non-existent \[Trace\] Refit attribute [\#1265](https://github.com/christianhelle/refitter/issues/1265)
 - Apizr registration emits duplicate using for Http.Resilience \(CS0105\) [\#1264](https://github.com/christianhelle/refitter/issues/1264)
 
 **Merged pull requests:**
 
+- Import System.Net.Http when interfaces return HttpResponseMessage [\#1290](https://github.com/christianhelle/refitter/pull/1290) ([christianhelle](https://github.com/christianhelle))
+- Remove non-identifier characters when sanitizing names [\#1289](https://github.com/christianhelle/refitter/pull/1289) ([christianhelle](https://github.com/christianhelle))
+- Skip TRACE operations that Refit cannot express [\#1288](https://github.com/christianhelle/refitter/pull/1288) ([christianhelle](https://github.com/christianhelle))
 - Emit each Apizr registration using directive once [\#1287](https://github.com/christianhelle/refitter/pull/1287) ([christianhelle](https://github.com/christianhelle))
 - Update refit monorepo to 16.2.0 [\#1285](https://github.com/christianhelle/refitter/pull/1285) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Newtonsoft.Json.Schema to 4.0.2 [\#1284](https://github.com/christianhelle/refitter/pull/1284) ([renovate[bot]](https://github.com/apps/renovate))
