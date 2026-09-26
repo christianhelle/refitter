@@ -1436,6 +1436,7 @@ public class ReturnTypeGeneratorTests
         public bool ImmutableRecords => inner.ImmutableRecords;
         public string? CustomTemplateDirectory => inner.CustomTemplateDirectory;
         public NSwag.CodeGeneration.IParameterNameGenerator? ParameterNameGenerator => inner.ParameterNameGenerator;
+        public IParameterNameProvider? ParameterNameProvider => inner.ParameterNameProvider;
         public bool UsePolymorphicSerialization => inner.UsePolymorphicSerialization;
         public bool UseCancellationTokens => inner.UseCancellationTokens;
     }

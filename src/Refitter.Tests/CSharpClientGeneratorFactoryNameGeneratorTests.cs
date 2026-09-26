@@ -21,6 +21,11 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         public string Generate(JsonSchemaProperty property) => "Stubbed" + property.Name;
     }
 
+    private sealed class StubParameterNameProvider : IParameterNameProvider
+    {
+        public string GetParameterName(ParameterNameContext context) => "provided" + context.Name;
+    }
+
     private sealed class StubPropertyNameProvider : IPropertyNameProvider
     {
         public string GetPropertyName(PropertyNameContext context) => "Provided" + context.Name;
@@ -57,6 +62,25 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
 
         generator.Settings.ParameterNameGenerator.Should().BeSameAs(parameterNameGenerator);
+    }
+
+    [Test]
+    public async Task Create_WithParameterNameProvider_PrefersItOverParameterNameGenerator()
+    {
+        var document = await CreateDocumentAsync();
+        var parameterNameProvider = new StubParameterNameProvider();
+        var settings = new RefitGeneratorSettings
+        {
+            Namespace = "TestNamespace",
+            ParameterNameGenerator = new StubParameterNameGenerator(),
+            ParameterNameProvider = parameterNameProvider,
+        };
+
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+
+        generator.Settings.ParameterNameGenerator
+            .Should().BeOfType<ParameterNameProviderAdapter>()
+            .Which.Provider.Should().BeSameAs(parameterNameProvider);
     }
 
     [Test]

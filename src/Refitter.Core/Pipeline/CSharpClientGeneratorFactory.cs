@@ -86,7 +86,12 @@ internal class CSharpClientGeneratorFactory
             },
         };
 
-        if (codeGeneration.ParameterNameGenerator != null)
+        if (codeGeneration.ParameterNameProvider != null)
+        {
+            csharpClientGeneratorSettings.ParameterNameGenerator =
+                new ParameterNameProviderAdapter(codeGeneration.ParameterNameProvider);
+        }
+        else if (codeGeneration.ParameterNameGenerator != null)
         {
             csharpClientGeneratorSettings.ParameterNameGenerator = codeGeneration.ParameterNameGenerator;
         }

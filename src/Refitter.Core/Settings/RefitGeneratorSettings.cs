@@ -411,6 +411,13 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public IParameterNameGenerator? ParameterNameGenerator { get; set; }
 
     /// <summary>
+    /// Gets or sets a custom <see cref="IParameterNameProvider"/> that names the parameters of generated interface methods.
+    /// Takes precedence over <see cref="ParameterNameGenerator"/>.
+    /// </summary>
+    [JsonIgnore]
+    public IParameterNameProvider? ParameterNameProvider { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether to generate Security Schema Authentication headers.
     /// </summary>
     [Description("Generate Security Schema Authentication headers")]

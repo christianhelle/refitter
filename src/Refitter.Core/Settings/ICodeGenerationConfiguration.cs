@@ -73,6 +73,11 @@ public interface ICodeGenerationConfiguration
     IParameterNameGenerator? ParameterNameGenerator { get; }
 
     /// <summary>
+    /// Gets the parameter name provider.
+    /// </summary>
+    IParameterNameProvider? ParameterNameProvider { get; }
+
+    /// <summary>
     /// Gets a value indicating whether to use polymorphic serialization.
     /// </summary>
     bool UsePolymorphicSerialization { get; }
