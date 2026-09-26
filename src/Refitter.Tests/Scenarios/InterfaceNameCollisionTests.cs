@@ -61,6 +61,52 @@ public class InterfaceNameCollisionTests
     }
 
     [Test]
+    public async Task Renames_Interface_When_Suffix_Is_Skipped_Because_Target_Exists()
+    {
+        // ContractTypeSuffixApplier leaves IPet unsuffixed because IPetDto already exists
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
+            OpenApiSpec + "\n    IPetDto: { type: object, properties: { b: { type: string } } }");
+        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, ContractTypeSuffix = "Dto" };
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+
+        generatedCode.Should().MatchRegex(@"public partial class IPet\s");
+        generatedCode.Should().Contain("public partial interface IPet2");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Keeps_ByTag_Interfaces_Unique_After_Renaming_For_A_Contract()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
+            """
+            openapi: 3.0.1
+            info: { title: Tags, version: v1 }
+            paths:
+              /a:
+                get:
+                  operationId: GetA
+                  tags: [ Pets ]
+                  responses: { '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/IPetsApi' } } } } }
+              /b:
+                get:
+                  operationId: GetB
+                  tags: [ Pets2 ]
+                  responses: { '204': { description: ok } }
+            components:
+              schemas:
+                IPetsApi: { type: object, properties: { a: { type: string } } }
+            """);
+        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile, MultipleInterfaces = MultipleInterfaces.ByTag };
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+
+        System.Text.RegularExpressions.Regex.Matches(generatedCode, @"interface IPets2Api\b").Count.Should().Be(1);
+        generatedCode.Should().Contain("interface IPets22Api");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
     [Category("Integration")]
     public async Task Can_Build_Generated_Code_ByTag_With_Dependency_Injection()
     {

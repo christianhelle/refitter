@@ -103,9 +103,14 @@ internal class InterfaceGenerator
 
     private IEnumerable<string> GetContractTypeNames()
     {
+        // Mirrors ContractTypeSuffixApplier, which skips names that already end with the suffix
+        // and names whose suffixed form is already taken by another contract
         var suffix = settings.ContractTypeSuffix;
-        return generator.GeneratedTypeNames.Select(
-            name => string.IsNullOrWhiteSpace(suffix) || name.EndsWith(suffix, StringComparison.Ordinal)
+        var names = new HashSet<string>(generator.GeneratedTypeNames, StringComparer.Ordinal);
+        return names.Select(
+            name => string.IsNullOrWhiteSpace(suffix) ||
+                    name.EndsWith(suffix, StringComparison.Ordinal) ||
+                    names.Contains(name + suffix)
                 ? name
                 : name + suffix);
     }
