@@ -58,7 +58,6 @@ public class SpecialCharacterParameterNameTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Can_Build_Generated_Code_With_Dynamic_Querystring_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.UseDynamicQuerystringParameters = true);

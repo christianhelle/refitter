@@ -155,8 +155,8 @@ namespace Refitter.Tests.AdditionalFiles.SingeInterfaceWithHttpResilience
         Task UpdatePetWithForm(long petId, [Query] string name, [Query] string status);
 
         /// <summary>Deletes a pet</summary>
-        /// <param name="api_key">api_key parameter</param>
         /// <param name="petId">Pet id to delete</param>
+        /// <param name="api_key">api_key parameter</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
