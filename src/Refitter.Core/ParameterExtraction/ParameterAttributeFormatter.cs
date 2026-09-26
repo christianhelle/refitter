@@ -26,11 +26,12 @@ internal static class ParameterAttributeFormatter
 
     public static string GetBodyAttribute(
         CSharpParameterModel parameter,
-        string? contentType,
+        string contentType,
         RefitGeneratorSettings settings)
     {
         // Refit serializes bodies with the content serializer (JSON) unless told otherwise
-        if (contentType?.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase) == true)
+        var mediaType = contentType.Split(';')[0].Trim();
+        if (string.Equals(mediaType, "application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
         {
             return "Body(BodySerializationMethod.UrlEncoded)";
         }
