@@ -47,6 +47,19 @@ internal static class ParameterTypeResolver
         return type;
     }
 
+    // OpenAPI header parameters always use style: simple (comma-separated values), and Refit sends
+    // header values with ToString(), so arrays are exposed as the already-joined string
+    public static string GetHeaderParameterType(
+        ParameterModelBase parameterModel,
+        RefitGeneratorSettings settings)
+    {
+        var type = GetParameterType(parameterModel, settings);
+        if (!parameterModel.IsArray)
+            return type;
+
+        return type.EndsWith("?") ? "string?" : "string";
+    }
+
     public static string GetQueryParameterType(
         ParameterModelBase parameterModel,
         RefitGeneratorSettings settings)

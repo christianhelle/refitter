@@ -52,6 +52,29 @@ public class HeaderParameterTypeTests
     }
 
     [Test]
+    public async Task Generates_Array_Header_As_Comma_Separated_String()
+    {
+        // Refit sends header values with ToString(), so a collection would be sent as its type name
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("[Header(\"X-Array\")] string x_Array");
+        generatedCode.Should().NotContain("IEnumerable<string> x_Array");
+    }
+
+    [Test]
+    public async Task Generates_Optional_Array_Header_As_Nullable_String()
+    {
+        var generatedCode = await GenerateCode(settings => settings.OptionalParameters = true);
+        generatedCode.Should().Contain("[Header(\"X-Array\")] string? x_Array");
+    }
+
+    [Test]
+    public async Task Generates_Array_Header_As_String_With_Dynamic_Querystring_Parameters()
+    {
+        var generatedCode = await GenerateCode(settings => settings.UseDynamicQuerystringParameters = true);
+        generatedCode.Should().Contain("[Header(\"X-Array\")] string x_Array");
+    }
+
+    [Test]
     [Category("Integration")]
     public async Task Can_Build_Generated_Code()
     {
