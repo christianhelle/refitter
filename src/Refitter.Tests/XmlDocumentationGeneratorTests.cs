@@ -193,6 +193,23 @@ public class XmlDocumentationGeneratorTests
     }
 
     [Test]
+    public void Documents_Renamed_Parameter_With_Description_Of_Its_Alias()
+    {
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Parameters = { new OpenApiParameter { Name = "cancellationToken", Kind = OpenApiParameterKind.Query, Description = "Query token" } },
+        });
+        this.generator.AppendMethodDocumentation(
+            method,
+            ["[AliasAs(\"cancellationToken\")] [Query] string cancellationToken2", "CancellationToken cancellationToken = default"],
+            false,
+            docs);
+        docs.ToString().Should().Contain("/// <param name=\"cancellationToken2\">Query token</param>");
+        docs.ToString().Should().Contain("/// <param name=\"cancellationToken\">The cancellation token to cancel the request.</param>");
+    }
+
+    [Test]
     public void Can_Generate_CancellationToken_Param()
     {
         var docs = new StringBuilder();

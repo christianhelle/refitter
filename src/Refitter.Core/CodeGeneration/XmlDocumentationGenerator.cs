@@ -107,11 +107,11 @@ public class XmlDocumentationGenerator
         if (!string.IsNullOrWhiteSpace(method.Description))
             this.AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
 
-        foreach (var (name, type) in GetParameterNamesAndTypes(parameters))
+        foreach (var (name, type, alias) in GetEmittedParameters(parameters))
         {
             this.AppendXmlCommentBlock(
                 ParamKeyword,
-                GetParameterDescription(method, name, type, dynamicQuerystringParameterType),
+                GetParameterDescription(method, name, type, alias, dynamicQuerystringParameterType),
                 code,
                 new()
                 {
@@ -284,8 +284,8 @@ public class XmlDocumentationGenerator
         return description.ToString();
     }
 
-    // Reads the parameter names (without any @ keyword escape) and types from the emitted parameter list
-    private static IEnumerable<(string Name, string Type)> GetParameterNamesAndTypes(IReadOnlyList<string> parameters)
+    // Reads the parameter names (without any @ keyword escape), types and AliasAs names from the emitted parameter list
+    private static IEnumerable<(string Name, string Type, string? Alias)> GetEmittedParameters(IReadOnlyList<string> parameters)
     {
         if (parameters.Count == 0)
             return [];
@@ -294,13 +294,23 @@ public class XmlDocumentationGenerator
         return tree.GetRoot()
             .DescendantNodes()
             .OfType<ParameterSyntax>()
-            .Select(parameter => (parameter.Identifier.ValueText, parameter.Type!.ToString()));
+            .Select(parameter => (parameter.Identifier.ValueText, parameter.Type!.ToString(), GetAlias(parameter)));
     }
+
+    private static string? GetAlias(ParameterSyntax parameter) =>
+        parameter.AttributeLists
+            .SelectMany(list => list.Attributes)
+            .Where(attribute => attribute.Name.ToString() == "AliasAs")
+            .Select(attribute => attribute.ArgumentList!.Arguments[0].Expression)
+            .OfType<LiteralExpressionSyntax>()
+            .Select(literal => literal.Token.ValueText)
+            .FirstOrDefault();
 
     private static string GetParameterDescription(
         CSharpOperationModel method,
         string name,
         string type,
+        string? alias,
         string? dynamicQuerystringParameterType)
     {
         if (type == "CancellationToken")
@@ -313,7 +323,10 @@ public class XmlDocumentationGenerator
         if (type.TrimEnd('?') == dynamicQuerystringParameterType)
             return "The dynamic querystring parameter wrapping all others.";
 
-        var operationParameter = method.Parameters.FirstOrDefault(p => GetVariableNames(p).Contains(name));
+        // A parameter renamed to keep names unique is matched by the wire name in its AliasAs
+        var operationParameter =
+            method.Parameters.FirstOrDefault(p => alias != null && p.Name == alias) ??
+            method.Parameters.FirstOrDefault(p => GetVariableNames(p).Contains(name));
 
         return operationParameter?.HasDescription == true
             ? SanitizeResponseDescription(operationParameter.Description)
