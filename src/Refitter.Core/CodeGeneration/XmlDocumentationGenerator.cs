@@ -294,7 +294,7 @@ public class XmlDocumentationGenerator
         return tree.GetRoot()
             .DescendantNodes()
             .OfType<ParameterSyntax>()
-            .Select(parameter => (parameter.Identifier.ValueText, parameter.Type?.ToString() ?? string.Empty));
+            .Select(parameter => (parameter.Identifier.ValueText, parameter.Type!.ToString()));
     }
 
     private static string GetParameterDescription(
