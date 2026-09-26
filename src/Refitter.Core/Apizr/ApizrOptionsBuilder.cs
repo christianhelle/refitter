@@ -7,6 +7,7 @@ internal class ApizrOptionsBuilder : IApizrOptionsBuilder
     private readonly StringBuilder optionsCode;
     private readonly StringBuilder usingsCode;
     private readonly HashSet<ApizrPackages> packages = new();
+    private readonly HashSet<string> usingDirectives = new(StringComparer.Ordinal);
     private bool hasOptions;
 
     public ApizrOptionsBuilder(string initialOptionsCode, string initialUsings)
@@ -14,6 +15,11 @@ internal class ApizrOptionsBuilder : IApizrOptionsBuilder
         optionsCode = new StringBuilder(initialOptionsCode);
         usingsCode = new StringBuilder(initialUsings);
         usingsCode.AppendLine();
+
+        foreach (var line in initialUsings.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            usingDirectives.Add(line.Trim());
+        }
     }
 
     public bool HasOptions => hasOptions;
@@ -52,6 +58,9 @@ internal class ApizrOptionsBuilder : IApizrOptionsBuilder
 
     public void AddUsing(string usingDirective)
     {
+        if (!usingDirectives.Add(usingDirective.Trim()))
+            return;
+
         usingsCode.Append("    ");
         usingsCode.AppendLine(usingDirective);
     }

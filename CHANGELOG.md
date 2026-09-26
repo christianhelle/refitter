@@ -12,8 +12,13 @@
 - Pass the document path to NSwag when round-tripping multi-file specs [\#1254](https://github.com/christianhelle/refitter/pull/1254) ([christianhelle](https://github.com/christianhelle))
 - Rewrite smoke-tests.sh as a pure bash script [\#1249](https://github.com/christianhelle/refitter/pull/1249) ([christianhelle](https://github.com/christianhelle))
 
+**Fixed bugs:**
+
+- Apizr registration emits duplicate using for Http.Resilience \(CS0105\) [\#1264](https://github.com/christianhelle/refitter/issues/1264)
+
 **Merged pull requests:**
 
+- Emit each Apizr registration using directive once [\#1287](https://github.com/christianhelle/refitter/pull/1287) ([christianhelle](https://github.com/christianhelle))
 - Update refit monorepo to 16.2.0 [\#1285](https://github.com/christianhelle/refitter/pull/1285) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Newtonsoft.Json.Schema to 4.0.2 [\#1284](https://github.com/christianhelle/refitter/pull/1284) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.69.16 [\#1282](https://github.com/christianhelle/refitter/pull/1282) ([renovate[bot]](https://github.com/apps/renovate))

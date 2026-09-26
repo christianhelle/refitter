@@ -29,11 +29,53 @@ public class FileResponseUsingsTests
     }
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1272")]
     public async Task Generates_System_Net_Http_Using()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("using System.Net.Http;");
+    }
+
+    [Test]
+    public async Task Generates_System_Net_Http_Using_In_Each_File()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            GenerateMultipleFiles = true,
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var interfaceFile = sut.GenerateMultipleFiles().Files.First(f => f.Content.Contains("HttpResponseMessage"));
+        interfaceFile.Content.Should().Contain("using System.Net.Http;");
+    }
+
+    [Test]
+    public async Task Does_Not_Generate_System_Net_Http_Using_Without_HttpResponseMessage()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
+            OpenApiSpec.Replace("application/octet-stream: { schema: { type: string, format: binary } }", "application/json: { schema: { type: string } }"));
+        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+        generatedCode.Should().NotContain("HttpResponseMessage");
+        generatedCode.Should().NotContain("using System.Net.Http;");
+    }
+
+    [Test]
+    public async Task Does_Not_Generate_System_Net_Http_Using_For_Operation_Named_HttpResponseMessage()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
+            OpenApiSpec
+                .Replace("operationId: Download", "operationId: GetHttpResponseMessage")
+                .Replace("application/octet-stream: { schema: { type: string, format: binary } }", "application/json: { schema: { type: string } }"));
+        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+        generatedCode.Should().Contain("GetHttpResponseMessage(");
+        generatedCode.Should().NotContain("using System.Net.Http;");
     }
 
     [Test]
@@ -46,7 +88,6 @@ public class FileResponseUsingsTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1272")]
     public async Task Can_Build_Generated_Code_Without_Implicit_Usings()
     {
         var generatedCode = await GenerateCode();

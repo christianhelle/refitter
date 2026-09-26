@@ -204,6 +204,25 @@ public class IdentifierUtilsTests
     }
 
     [Test]
+    [Arguments("Pet API — «v2»", "PetAPIv2")]
+    [Arguments("Test?=~`Name", "TestName")]
+    [Arguments("«Pets»", "_Pets")]
+    [Arguments("Pet\U00010400Api", "PetApi")] // Roslyn rejects supplementary-plane characters (CS1056)
+    public void Sanitize_Removes_Characters_Invalid_In_Identifiers(string value, string expected)
+    {
+        value.Sanitize().Should().Be(expected);
+    }
+
+    [Test]
+    [Arguments("Café", "Café")]
+    [Arguments("Näme_Ünïcödé", "Näme_Ünïcödé")]
+    [Arguments("Café", "Café")]
+    public void Sanitize_Keeps_Unicode_Identifier_Characters(string value, string expected)
+    {
+        value.Sanitize().Should().Be(expected);
+    }
+
+    [Test]
     public void Sanitize_Removes_Angle_Brackets()
     {
         var result = "Test<Name>Value".Sanitize();
