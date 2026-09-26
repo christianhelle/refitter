@@ -65,7 +65,8 @@ internal class InterfaceGenerator
             .GroupBy(partitioning.GetGroupKey)
             .ToList();
 
-        var knownInterfaceIdentifiers = new HashSet<string>();
+        // Interfaces share the namespace with the contracts, so they must not reuse a contract type name
+        var knownInterfaceIdentifiers = new HashSet<string>(GetContractTypeNames());
         var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
             ? document.Info!.Title.Sanitize()
             : settings.Naming.InterfaceName;
@@ -98,6 +99,15 @@ internal class InterfaceGenerator
                 }
             }
         }
+    }
+
+    private IEnumerable<string> GetContractTypeNames()
+    {
+        var suffix = settings.ContractTypeSuffix;
+        return generator.GeneratedTypeNames.Select(
+            name => string.IsNullOrWhiteSpace(suffix) || name.EndsWith(suffix, StringComparison.Ordinal)
+                ? name
+                : name + suffix);
     }
 
     // Refit has no attribute for TRACE, so those operations cannot be expressed.
