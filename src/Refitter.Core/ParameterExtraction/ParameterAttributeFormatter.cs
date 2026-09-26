@@ -1,3 +1,4 @@
+using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
@@ -48,12 +49,23 @@ internal static class ParameterAttributeFormatter
         return "Body";
     }
 
+    // An OpenAPI 3 style/explode declared on the parameter takes precedence over the global setting
+    private static CollectionFormat GetCollectionFormat(CSharpParameterModel parameter, RefitGeneratorSettings settings) =>
+        (parameter.Style, parameter.Explode) switch
+        {
+            (OpenApiParameterStyle.PipeDelimited, _) => CollectionFormat.Pipes,
+            (OpenApiParameterStyle.SpaceDelimeted, _) => CollectionFormat.Ssv,
+            (OpenApiParameterStyle.Form or OpenApiParameterStyle.Undefined, false) => CollectionFormat.Csv,
+            (OpenApiParameterStyle.Form, _) or (OpenApiParameterStyle.Undefined, true) => CollectionFormat.Multi,
+            _ => settings.CollectionFormat,
+        };
+
     public static string GetQueryAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
     {
         return (parameter, settings) switch
         {
             { parameter.IsArray: true }
-                => $"Query(CollectionFormat.{settings.CollectionFormat})",
+                => $"Query(CollectionFormat.{GetCollectionFormat(parameter, settings)})",
             { parameter.IsDate: true, settings.UseIsoDateFormat: true }
                 => "Query(Format = \"yyyy-MM-dd\")",
             { parameter.IsDate: true, settings.CodeGeneratorSettings.DateFormat: not null }
