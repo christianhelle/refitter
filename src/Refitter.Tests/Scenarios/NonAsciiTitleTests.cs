@@ -29,7 +29,6 @@ public class NonAsciiTitleTests
     }
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1271")]
     public async Task Removes_Invalid_Characters_From_Interface_Name()
     {
         var generatedCode = await GenerateCode();
@@ -42,7 +41,6 @@ public class NonAsciiTitleTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1271")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
