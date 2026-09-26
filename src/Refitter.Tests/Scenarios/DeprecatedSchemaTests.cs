@@ -56,7 +56,7 @@ public class DeprecatedSchemaTests
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
-        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+        BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
     }
 
     [Test]
@@ -94,7 +94,7 @@ public class DeprecatedSchemaTests
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint);
-        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+        BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
     }
 
     [Test]
@@ -106,7 +106,31 @@ public class DeprecatedSchemaTests
         var sut = await RefitGenerator.CreateAsync(settings);
         var files = sut.GenerateMultipleFiles().Files.Select(f => f.Content).ToArray();
 
-        BuildHelper.BuildCSharp(files).Should().BeTrue();
+        BuildHelper.BuildCSharp(warningsAsErrors: true, files).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_With_Json_Serializer_Context()
+    {
+        var generatedCode = await GenerateCode(settings => settings.GenerateJsonSerializerContext = true);
+        BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Removes_Obsolete_From_Internal_Schemas_Used_By_Interface()
+    {
+        var generatedCode = await GenerateCode(settings => settings.TypeAccessibility = TypeAccessibility.Internal);
+        generatedCode.Should().Contain("internal partial class D");
+        generatedCode.Should().NotMatchRegex(@"\[System\.Obsolete\]\s*internal partial class (D|OldItem)\b");
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_With_Internal_Types()
+    {
+        var generatedCode = await GenerateCode(settings => settings.TypeAccessibility = TypeAccessibility.Internal);
+        BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
     }
 
     private static async Task<string> GenerateCode(Action<RefitGeneratorSettings>? configure = null)
