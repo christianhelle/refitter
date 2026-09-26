@@ -64,7 +64,7 @@ public class TrimUnusedSchemaDiscriminatorRegressionTests
     public async Task Trimming_Keeps_Mappings_For_Reachable_Union_Targets(string unionType)
     {
         RefitGenerator generator = await CreateGenerator(unionType);
-        OpenApiDocument document = generator.OpenApiDocument;
+        OpenApiDocument document = generator.NSwagDocument;
 
         document.Components.Schemas.Keys.Should().BeEquivalentTo(
             ["Result", "SonarrResult", "RadarrResult"]);
@@ -80,7 +80,7 @@ public class TrimUnusedSchemaDiscriminatorRegressionTests
         RefitGenerator generator = await CreateGenerator(
             unionType,
             includeInheritanceHierarchy: true);
-        OpenApiDocument document = generator.OpenApiDocument;
+        OpenApiDocument document = generator.NSwagDocument;
 
         document.Components.Schemas.Keys.Should().BeEquivalentTo(
             ["Result", "SonarrResult", "RadarrResult", "UnusedResult"]);
@@ -95,7 +95,7 @@ public class TrimUnusedSchemaDiscriminatorRegressionTests
     public async Task Disabling_Trimming_Keeps_All_Discriminator_Mappings(string unionType)
     {
         RefitGenerator generator = await CreateGenerator(unionType, trimUnusedSchema: false);
-        OpenApiDocument document = generator.OpenApiDocument;
+        OpenApiDocument document = generator.NSwagDocument;
 
         document.Components.Schemas.Keys.Should().BeEquivalentTo(
             ["Result", "SonarrResult", "RadarrResult", "UnusedResult"]);

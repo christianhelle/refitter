@@ -11,11 +11,22 @@ public class RefitGenerator(
 {
     private static readonly RefitCodeGenerator CodeGenerator = new();
 
+    private ApiDocumentInfo? documentInfo;
+
     /// <summary>
     /// OpenAPI specifications used to generate Refit clients and interfaces.
     /// This is the filtered/cleaned document after pipeline processing.
     /// </summary>
+    [Obsolete("Use DocumentInfo instead. OpenApiDocument exposes NSwag types and will be removed in the next major version.")]
     public OpenApiDocument OpenApiDocument => document;
+
+    /// <summary>
+    /// Describes the OpenAPI document used to generate Refit clients and interfaces,
+    /// after filtering and schema trimming.
+    /// </summary>
+    public ApiDocumentInfo DocumentInfo => documentInfo ??= new ApiDocumentInfo(document);
+
+    internal OpenApiDocument NSwagDocument => document;
 
     /// <summary>
     /// Creates a new instance of the <see cref="RefitGenerator"/> class asynchronously
