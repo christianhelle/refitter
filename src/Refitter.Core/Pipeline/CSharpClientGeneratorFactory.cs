@@ -1,3 +1,4 @@
+using NJsonSchema;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
@@ -49,6 +50,9 @@ internal class CSharpClientGeneratorFactory
         foreach (var mutator in mutators)
             mutator.Mutate(document);
 
+        // The property name generator needs the contract type names, which the generator resolves
+        CustomCSharpClientGenerator? generator = null;
+
         var csharpClientGeneratorSettings = new CSharpClientGeneratorSettings
         {
             GenerateClientClasses = false,
@@ -57,7 +61,7 @@ internal class CSharpClientGeneratorFactory
             GenerateExceptionClasses = false,
             CodeGeneratorSettings =
             {
-                PropertyNameGenerator = CreatePropertyNameGenerator(),
+                PropertyNameGenerator = CreatePropertyNameGenerator(schema => generator!.GetTypeName(schema)),
                 TypeNameGenerator = CreateTypeNameGenerator(),
                 EnumNameGenerator = new UniqueEnumNameGenerator(),
             },
@@ -90,7 +94,7 @@ internal class CSharpClientGeneratorFactory
         csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory
             = new CustomTemplateFactory(csharpClientGeneratorSettings.CSharpGeneratorSettings);
 
-        var generator = new CustomCSharpClientGenerator(
+        generator = new CustomCSharpClientGenerator(
             document,
             csharpClientGeneratorSettings);
 
@@ -106,18 +110,20 @@ internal class CSharpClientGeneratorFactory
         return generator;
     }
 
-    private IPropertyNameGenerator CreatePropertyNameGenerator()
+    private IPropertyNameGenerator CreatePropertyNameGenerator(Func<JsonSchema, string?> getTypeName)
     {
         if (codeGeneration.CodeGeneratorSettings?.PropertyNameGenerator is { } propertyNameGenerator)
         {
             return propertyNameGenerator;
         }
 
-        return naming.PropertyNamingPolicy switch
+        IPropertyNameGenerator inner = naming.PropertyNamingPolicy switch
         {
             PropertyNamingPolicy.PreserveOriginal => new PreserveOriginalPropertyNameGenerator(),
             _ => new CustomCSharpPropertyNameGenerator(),
         };
+
+        return new UniquePropertyNameGenerator(inner, getTypeName);
     }
 
     private SafeSchemaTypeNameGenerator CreateTypeNameGenerator()

@@ -10,6 +10,9 @@ internal class CustomCSharpClientGenerator(OpenApiDocument document, CSharpClien
     internal CSharpOperationModel CreateOperationModel(OpenApiOperation operation) =>
         base.CreateOperationModel(operation, Settings);
 
+    internal string? GetTypeName(NJsonSchema.JsonSchema schema) =>
+        Resolver.Types.TryGetValue(schema, out var typeName) ? typeName : null;
+
     internal bool HasGeneratedType(string typeName) =>
         Resolver.Types.Values.Contains(typeName, StringComparer.Ordinal);
 }

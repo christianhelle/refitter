@@ -205,7 +205,7 @@ public SomeComponentState State { get; set; }
     {
 
         [JsonPropertyName("type")]
-        public string Type { get; set; }
+        public string Type2 { get; set; }
 
         [JsonPropertyName("title")]
         public string Title { get; set; }
