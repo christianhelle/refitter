@@ -165,4 +165,55 @@ namespace TestNamespace
         result.Should().Contain("PageDto<PetDto> Data");
         result.Should().Contain("ICollection<T> Items");
     }
+
+    [Test]
+    public void ContractTypeSuffixApplier_Does_Not_Rename_Generic_Framework_Type_Sharing_Contract_Name()
+    {
+        const string code = @"
+namespace TestNamespace
+{
+    public partial interface ITasks
+    {
+        Task<System.Collections.Generic.ICollection<Task>> GetTasks();
+    }
+
+    public partial class Task
+    {
+        public int Id { get; set; }
+    }
+}";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        result.Should().Contain("class TaskDto");
+        result.Should().Contain("Task<System.Collections.Generic.ICollection<TaskDto>> GetTasks()");
+    }
+
+    [Test]
+    public void ContractTypeSuffixApplier_Does_Not_Rename_System_Qualified_Type_Sharing_Contract_Name()
+    {
+        const string code = @"
+namespace TestNamespace
+{
+    public partial interface ITasks
+    {
+        System.Threading.Tasks.Task DeleteTasks();
+        global::System.Threading.Tasks.Task ClearTasks();
+        TestNamespace.Task GetTask();
+        System.Object Describe(Task task);
+    }
+
+    public partial class Task
+    {
+        public int Id { get; set; }
+    }
+}";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        result.Should().Contain("System.Threading.Tasks.Task DeleteTasks()");
+        result.Should().Contain("global::System.Threading.Tasks.Task ClearTasks()");
+        result.Should().Contain("TestNamespace.TaskDto GetTask()");
+        result.Should().Contain("System.Object Describe(TaskDto task)");
+    }
 }

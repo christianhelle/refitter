@@ -26,10 +26,20 @@ internal static class ContractTypeSuffixApplier
             .OfType<BaseTypeDeclarationSyntax>()
             .ToList();
 
-        // Build set of all existing type names
+        // Build set of all existing type names, and the generic arities each name is declared with
+        var declaredArities = new Dictionary<string, HashSet<int>>(StringComparer.Ordinal);
         foreach (var typeDecl in typeDeclarations)
         {
             existingTypeNames.Add(typeDecl.Identifier.Text);
+
+            var arity = (typeDecl as TypeDeclarationSyntax)?.TypeParameterList?.Parameters.Count ?? 0;
+            if (!declaredArities.TryGetValue(typeDecl.Identifier.Text, out var arities))
+            {
+                arities = new HashSet<int>();
+                declaredArities[typeDecl.Identifier.Text] = arities;
+            }
+
+            arities.Add(arity);
         }
 
         foreach (var typeDecl in typeDeclarations)
@@ -65,7 +75,7 @@ internal static class ContractTypeSuffixApplier
             return generatedCode;
 
         // Second pass: rewrite the syntax tree with renamed types
-        var rewriter = new TypeSuffixRewriter(typeRenameMap);
+        var rewriter = new TypeSuffixRewriter(typeRenameMap, declaredArities);
         var newRoot = rewriter.Visit(root);
 
         // Return the modified code with original formatting preserved
@@ -78,10 +88,14 @@ internal static class ContractTypeSuffixApplier
     private class TypeSuffixRewriter : CSharpSyntaxRewriter
     {
         private readonly Dictionary<string, string> typeRenameMap;
+        private readonly Dictionary<string, HashSet<int>> declaredArities;
 
-        public TypeSuffixRewriter(Dictionary<string, string> typeRenameMap)
+        public TypeSuffixRewriter(
+            Dictionary<string, string> typeRenameMap,
+            Dictionary<string, HashSet<int>> declaredArities)
         {
             this.typeRenameMap = typeRenameMap;
+            this.declaredArities = declaredArities;
         }
 
         /// <summary>
@@ -135,14 +149,39 @@ internal static class ContractTypeSuffixApplier
         }
 
         /// <summary>
-        /// Rename generic type references (GenericNameSyntax like "Task&lt;Pet&gt;")
+        /// Leave type names qualified with a System namespace (e.g. "System.Threading.Tasks.Task")
+        /// untouched, since contracts never live there
+        /// </summary>
+        public override SyntaxNode? VisitQualifiedName(QualifiedNameSyntax node)
+        {
+            var left = node.Left.ToString();
+            if (left.StartsWith("global::", StringComparison.Ordinal))
+            {
+                left = left.Substring("global::".Length);
+            }
+
+            if (left != "System" && !left.StartsWith("System.", StringComparison.Ordinal))
+                return base.VisitQualifiedName(node);
+
+            // Type arguments such as ICollection<Pet> can still refer to contracts
+            return node.Right is GenericNameSyntax genericName
+                ? node.WithRight(
+                    genericName.WithTypeArgumentList(
+                        (TypeArgumentListSyntax)Visit(genericName.TypeArgumentList)!))
+                : node;
+        }
+
+        /// <summary>
+        /// Rename generic type references (GenericNameSyntax like "Page&lt;Pet&gt;") that match the arity
+        /// of a declared contract, so that framework types such as "Task&lt;Pet&gt;" are kept.
         /// The type arguments will be visited separately by VisitIdentifierName
         /// </summary>
         public override SyntaxNode? VisitGenericName(GenericNameSyntax node)
         {
             var newNode = (GenericNameSyntax)base.VisitGenericName(node)!;
 
-            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName))
+            if (typeRenameMap.TryGetValue(node.Identifier.Text, out var newName) &&
+                declaredArities[node.Identifier.Text].Contains(node.TypeArgumentList.Arguments.Count))
             {
                 newNode = newNode.WithIdentifier(
                     SyntaxFactory.Identifier(newName)
