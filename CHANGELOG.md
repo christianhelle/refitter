@@ -14,6 +14,7 @@
 
 **Fixed bugs:**
 
+- Schema named Task breaks void operations \(CS0029\) [\#1275](https://github.com/christianhelle/refitter/issues/1275)
 - HttpResponseMessage return type compiles only with implicit usings [\#1272](https://github.com/christianhelle/refitter/issues/1272)
 - Non-ASCII punctuation in info.title produces invalid interface name [\#1271](https://github.com/christianhelle/refitter/issues/1271)
 - TRACE operations generate a non-existent \[Trace\] Refit attribute [\#1265](https://github.com/christianhelle/refitter/issues/1265)
@@ -21,6 +22,7 @@
 
 **Merged pull requests:**
 
+- Fix void operations when a schema is named Task [\#1292](https://github.com/christianhelle/refitter/pull/1292) ([christianhelle](https://github.com/christianhelle))
 - Import System.Net.Http when interfaces return HttpResponseMessage [\#1290](https://github.com/christianhelle/refitter/pull/1290) ([christianhelle](https://github.com/christianhelle))
 - Remove non-identifier characters when sanitizing names [\#1289](https://github.com/christianhelle/refitter/pull/1289) ([christianhelle](https://github.com/christianhelle))
 - Skip TRACE operations that Refit cannot express [\#1288](https://github.com/christianhelle/refitter/pull/1288) ([christianhelle](https://github.com/christianhelle))
