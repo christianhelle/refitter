@@ -207,6 +207,7 @@ public class IdentifierUtilsTests
     [Arguments("Pet API — «v2»", "PetAPIv2")]
     [Arguments("Test?=~`Name", "TestName")]
     [Arguments("«Pets»", "_Pets")]
+    [Arguments("Pet\U00010400Api", "PetApi")] // Roslyn rejects supplementary-plane characters (CS1056)
     public void Sanitize_Removes_Characters_Invalid_In_Identifiers(string value, string expected)
     {
         value.Sanitize().Should().Be(expected);
