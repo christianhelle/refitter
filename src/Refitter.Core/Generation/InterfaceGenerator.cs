@@ -58,6 +58,7 @@ internal class InterfaceGenerator
                 path => path.Value,
                 (path, op)
                     => new OpenApiOperationInfo(path.Key, op.Key, op.Value))
+            .Where(op => IsSupportedByRefit(op.Verb))
             .ToList();
 
         var groups = operations
@@ -98,6 +99,10 @@ internal class InterfaceGenerator
             }
         }
     }
+
+    // Refit has no attribute for TRACE, so those operations cannot be expressed.
+    private static bool IsSupportedByRefit(string verb) =>
+        !string.Equals(verb, OpenApiOperationMethod.Trace, StringComparison.OrdinalIgnoreCase);
 
     private GeneratedCode GenerateSingleInterface(
         List<OpenApiOperationInfo> operations,

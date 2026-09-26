@@ -27,7 +27,10 @@ internal sealed class GeneratorPipeline
 
         var serializerContext = GenerateJsonSerializerContext(document, settings, contracts);
         var interfaces = GenerateClient(document, settings, interfaceGenerator);
-        var interfaceNames = interfaces.Select(c => c.TypeName).ToArray();
+        var interfaceNames = interfaces
+            .Select(c => c.TypeName)
+            .Where(name => !string.IsNullOrEmpty(name))
+            .ToArray();
         var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
             ? document.Info!.Title.Sanitize()
             : settings.Naming.InterfaceName;
@@ -116,9 +119,12 @@ internal sealed class GeneratorPipeline
 
         code.Append("}");
 
+        // Every operation can be filtered out (e.g. TRACE only), which leaves no interface
+        // to name the file after. The usings are still needed by the contracts.
+        var typeName = generatedCodes.Length > 0 ? generatedCodes[0].TypeName : string.Empty;
         return new[]
             {
-                new GeneratedCode(generatedCodes.First().TypeName, code.ToString())
+                new GeneratedCode(typeName, code.ToString())
             }
             .Union(
                 generatedCodes
