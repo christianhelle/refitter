@@ -13,8 +13,11 @@ internal sealed class FormParameterExtractor
     {
         var seenFormParameterNames = new HashSet<string>(StringComparer.Ordinal);
         var formParameters = new List<string>();
+        var operationFormParameters = operationModel.Parameters
+            .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
+            .ToList();
 
-        foreach (var p in operationModel.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter))
+        void AddOperationParameter(CSharpParameterModel p)
         {
             var variableName = ParameterNaming.ConvertToVariableName(p.VariableName);
             if (seenFormParameterNames.Add(variableName))
@@ -23,37 +26,68 @@ internal sealed class FormParameterExtractor
             }
         }
 
-        if (operation.RequestBody?.Content?.TryGetValue("multipart/form-data", out var multipartContent) == true)
+        if (operation.RequestBody?.Content.TryGetValue("multipart/form-data", out var multipartContent) == true &&
+            multipartContent.Schema != null)
         {
-            var schema = multipartContent.Schema;
-            if (schema?.Properties != null)
+            // NSwag only creates parameters for the schema's own properties, so properties that come
+            // from allOf members (e.g. a referenced schema) are added here, in schema order (#1277)
+            var visitedSchemas = new HashSet<JsonSchema>();
+            foreach (var property in GetProperties(multipartContent.Schema, visitedSchemas))
             {
-                foreach (var property in schema.Properties)
+                var operationParameter = operationFormParameters.FirstOrDefault(p => p.Name == property.Key);
+                if (operationParameter != null)
                 {
-                    var propertySchema = property.Value;
+                    AddOperationParameter(operationParameter);
+                    continue;
+                }
 
-                    var isBinary = (propertySchema.Type == JsonObjectType.String &&
-                                   propertySchema.Format == "binary") ||
-                                  (propertySchema.Type == JsonObjectType.Array &&
-                                   propertySchema.Item?.Type == JsonObjectType.String &&
-                                   propertySchema.Item?.Format == "binary");
-
-                    if (!isBinary)
-                    {
-                        var propertyType = ParameterTypeResolver.GetCSharpType(propertySchema, settings);
-                        var variableName = ParameterNaming.ConvertToVariableName(property.Key);
-
-                        if (seenFormParameterNames.Add(variableName))
-                        {
-                            var aliasAttribute = ParameterAttributeFormatter.GetAliasAsAttribute(property.Key, variableName);
-                            var parameter = $"{ParameterAttributeFormatter.JoinAttributes(aliasAttribute)}{propertyType} {variableName}";
-                            formParameters.Add(parameter);
-                        }
-                    }
+                var variableName = ParameterNaming.ConvertToVariableName(property.Key);
+                if (seenFormParameterNames.Add(variableName))
+                {
+                    var aliasAttribute = ParameterAttributeFormatter.GetAliasAsAttribute(property.Key, variableName);
+                    var propertyType = GetPropertyType(property.Value, settings);
+                    formParameters.Add($"{ParameterAttributeFormatter.JoinAttributes(aliasAttribute)}{propertyType} {variableName}");
                 }
             }
         }
 
+        foreach (var p in operationFormParameters)
+        {
+            AddOperationParameter(p);
+        }
+
         return formParameters;
     }
+
+    private static IEnumerable<KeyValuePair<string, JsonSchemaProperty>> GetProperties(
+        JsonSchema schema,
+        HashSet<JsonSchema> visitedSchemas)
+    {
+        var actualSchema = schema.ActualSchema;
+        if (!visitedSchemas.Add(actualSchema))
+            yield break;
+
+        foreach (var allOfSchema in actualSchema.AllOf)
+        {
+            foreach (var property in GetProperties(allOfSchema, visitedSchemas))
+                yield return property;
+        }
+
+        foreach (var property in actualSchema.Properties)
+            yield return property;
+    }
+
+    private static string GetPropertyType(JsonSchema propertySchema, RefitGeneratorSettings settings)
+    {
+        if (IsBinary(propertySchema))
+            return "StreamPart";
+
+        if (propertySchema.Type == JsonObjectType.Array && propertySchema.Item is { } itemSchema && IsBinary(itemSchema))
+            return "IEnumerable<StreamPart>";
+
+        return ParameterTypeResolver.GetCSharpType(propertySchema, settings);
+    }
+
+    private static bool IsBinary(JsonSchema schema) =>
+        schema.Type == JsonObjectType.String && schema.Format == "binary";
 }
