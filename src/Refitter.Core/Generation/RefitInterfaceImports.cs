@@ -12,7 +12,9 @@ internal static class RefitInterfaceImports
         "System.Text.Json.Serialization",
     ];
 
-    public static string[] GetImportedNamespaces(RefitGeneratorSettings settings)
+    public static string[] GetImportedNamespaces(
+        RefitGeneratorSettings settings,
+        bool usesHttpResponseMessage = false)
     {
         var namespaces = new List<string>(defaultNamespases);
 
@@ -29,6 +31,11 @@ internal static class RefitInterfaceImports
             settings.ReturnIObservable
                 ? "System.Reactive"
                 : "System.Threading.Tasks");
+
+        if (usesHttpResponseMessage)
+        {
+            namespaces.Add("System.Net.Http");
+        }
 
         if (settings.ExcludeNamespaces.Length != 0)
         {
@@ -53,9 +60,11 @@ internal static class RefitInterfaceImports
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
         Justification = "This tool is cross platform")]
-    public static string GenerateNamespaceImports(RefitGeneratorSettings settings)
+    public static string GenerateNamespaceImports(
+        RefitGeneratorSettings settings,
+        bool usesHttpResponseMessage = false)
     {
-        var namespaces = GetImportedNamespaces(settings);
+        var namespaces = GetImportedNamespaces(settings, usesHttpResponseMessage);
         return namespaces.Length == 0
             ? string.Empty
             : string.Join(
