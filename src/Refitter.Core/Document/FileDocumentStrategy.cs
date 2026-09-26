@@ -16,9 +16,15 @@ internal sealed class FileDocumentStrategy : IDocumentLoadingStrategy
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            string content;
+            using (var reader = new StreamReader(path))
+            {
+                content = NumericBoundsSanitizer.Sanitize(await reader.ReadToEndAsync().ConfigureAwait(false));
+            }
+
             return PathUtilities.IsYaml(path)
-                ? await OpenApiYamlDocument.FromFileAsync(path, cancellationToken).ConfigureAwait(false)
-                : await OpenApiDocument.FromFileAsync(path, cancellationToken).ConfigureAwait(false);
+                ? await OpenApiYamlDocument.FromYamlAsync(content, path, cancellationToken).ConfigureAwait(false)
+                : await OpenApiDocument.FromJsonAsync(content, path, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

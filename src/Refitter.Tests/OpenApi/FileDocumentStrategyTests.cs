@@ -59,4 +59,18 @@ public class FileDocumentStrategyTests
 
         result.Should().BeNull();
     }
+
+    [Test]
+    [Arguments(LargeNumericBoundsSpecs.Yaml, "bounds.yaml")]
+    [Arguments(LargeNumericBoundsSpecs.Json, "bounds.json")]
+    public async Task Clamps_Numeric_Bounds_Outside_Decimal_Range(string contents, string filename)
+    {
+        var swaggerFile = await TestFile.CreateSwaggerFile(contents, filename);
+        var strategy = new FileDocumentStrategy();
+        var result = await strategy.TryLoadAsync(swaggerFile);
+
+        result.Should().NotBeNull();
+        LargeNumericBoundsSpecs.GetMaximum(result!).Should().Be(decimal.MaxValue);
+        LargeNumericBoundsSpecs.GetMinimum(result!).Should().Be(decimal.MinValue);
+    }
 }
