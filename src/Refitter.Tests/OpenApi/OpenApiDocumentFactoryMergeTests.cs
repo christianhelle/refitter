@@ -53,7 +53,7 @@ paths:
         var file1 = await TestFile.CreateSwaggerFile(specWithTags, "with-tags.yaml");
         var file2 = await TestFile.CreateSwaggerFile(specWithoutTags, "without-tags.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await NSwagDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();
@@ -107,7 +107,7 @@ paths:
         var file1 = await TestFile.CreateSwaggerFile(spec1, "api1.yaml");
         var file2 = await TestFile.CreateSwaggerFile(spec2, "api2.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await NSwagDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();
@@ -160,7 +160,7 @@ paths:
         var file1 = await TestFile.CreateSwaggerFile(spec1, "api1-shared.yaml");
         var file2 = await TestFile.CreateSwaggerFile(spec2, "api2-shared.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await NSwagDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();
@@ -206,7 +206,7 @@ paths:
         var file1 = await TestFile.CreateSwaggerFile(specWithoutTags, "no-tags.yaml");
         var file2 = await TestFile.CreateSwaggerFile(specWithTags, "with-tags.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await NSwagDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();
@@ -266,7 +266,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await NSwagDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
@@ -326,7 +326,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await NSwagDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
@@ -386,7 +386,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await NSwagDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
@@ -448,7 +448,7 @@ paths:
         var file2 = await TestFile.CreateSwaggerFile(spec2, "api2.yaml");
         var file3 = await TestFile.CreateSwaggerFile(spec3, "api3.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2, file3 });
+        var merged = await NSwagDocumentFactory.CreateAsync(new[] { file1, file2, file3 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();

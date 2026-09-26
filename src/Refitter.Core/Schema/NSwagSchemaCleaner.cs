@@ -8,7 +8,7 @@ namespace Refitter.Core;
 /// Cleans up the OpenAPI schema by removing unreferenced schemas and handling inheritance hierarchies.
 /// </summary>
 
-public class SchemaCleaner
+internal class NSwagSchemaCleaner
 {
     private readonly OpenApiDocument document;
     private readonly Regex[] keepSchemaRegexes;
@@ -19,11 +19,11 @@ public class SchemaCleaner
     public bool IncludeInheritanceHierarchy { get; init; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SchemaCleaner"/> class.
+    /// Initializes a new instance of the <see cref="NSwagSchemaCleaner"/> class.
     /// </summary>
     /// <param name="document">The OpenAPI document to clean.</param>
     /// <param name="keepSchemaPatterns">Regular expression patterns for schemas to keep.</param>
-    public SchemaCleaner(OpenApiDocument document, string[] keepSchemaPatterns)
+    public NSwagSchemaCleaner(OpenApiDocument document, string[] keepSchemaPatterns)
     {
         this.document = document;
         keepSchemaRegexes = keepSchemaPatterns

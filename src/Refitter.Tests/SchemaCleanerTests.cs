@@ -16,11 +16,11 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
 
         var initialCount = document.Components.Schemas.Count;
 
-        var cleaner = new SchemaCleaner(document, []);
+        var cleaner = new NSwagSchemaCleaner(document, []);
         cleaner.RemoveUnreferencedSchema();
 
         document.Components.Schemas.Count.Should().BeLessThanOrEqualTo(initialCount);
@@ -33,9 +33,9 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
 
-        var cleaner = new SchemaCleaner(document, []);
+        var cleaner = new NSwagSchemaCleaner(document, []);
         cleaner.RemoveUnreferencedSchema();
 
         document.Components.Schemas.Should().NotBeEmpty();
@@ -50,9 +50,9 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
 
-        var cleaner = new SchemaCleaner(document, [pattern]);
+        var cleaner = new NSwagSchemaCleaner(document, [pattern]);
         cleaner.RemoveUnreferencedSchema();
 
         document.Components.Schemas.Keys.Should().Contain(k => k.Contains("Pet"));
@@ -67,9 +67,9 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
 
-        var cleaner = new SchemaCleaner(document, [])
+        var cleaner = new NSwagSchemaCleaner(document, [])
         {
             IncludeInheritanceHierarchy = includeHierarchy
         };
@@ -85,9 +85,9 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
 
-        var cleaner = new SchemaCleaner(document, [".*"]);
+        var cleaner = new NSwagSchemaCleaner(document, [".*"]);
 
         cleaner.Should().NotBeNull();
         cleaner.IncludeInheritanceHierarchy.Should().BeFalse();
@@ -99,9 +99,9 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
 
-        var cleaner = new SchemaCleaner(document, [])
+        var cleaner = new NSwagSchemaCleaner(document, [])
         {
             IncludeInheritanceHierarchy = true
         };
@@ -148,12 +148,12 @@ public class SchemaCleanerTests
 
         try
         {
-            var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+            var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
             ReferenceEquals(document.Components.Schemas["AliasItem"], document.Components.Schemas["ActualItem"])
                 .Should()
                 .BeTrue();
 
-            var cleaner = new SchemaCleaner(document, []);
+            var cleaner = new NSwagSchemaCleaner(document, []);
             cleaner.Invoking(x => x.RemoveUnreferencedSchema()).Should().NotThrow();
 
             document.Components.Schemas.Should().ContainKey("AliasItem");
@@ -246,9 +246,9 @@ public class SchemaCleanerTests
   }
 }";
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
 
-        var cleaner = new SchemaCleaner(document, [])
+        var cleaner = new NSwagSchemaCleaner(document, [])
         {
             IncludeInheritanceHierarchy = false
         };
@@ -331,12 +331,12 @@ public class SchemaCleanerTests
   }
 }";
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
 
         var animalSchema = document.Components.Schemas["Animal"];
         var initialMappingCount = animalSchema.DiscriminatorObject?.Mapping.Count ?? 0;
 
-        var cleaner = new SchemaCleaner(document, [])
+        var cleaner = new NSwagSchemaCleaner(document, [])
         {
             IncludeInheritanceHierarchy = false
         };
@@ -398,9 +398,9 @@ public class SchemaCleanerTests
   }
 }";
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
 
-        var cleaner = new SchemaCleaner(document, []);
+        var cleaner = new NSwagSchemaCleaner(document, []);
         cleaner.RemoveUnreferencedSchema();
 
         document.Components.Schemas.Should().ContainKey("Pet");
