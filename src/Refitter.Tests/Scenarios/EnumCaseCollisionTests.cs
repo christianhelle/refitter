@@ -32,8 +32,15 @@ public class EnumCaseCollisionTests
     }
 
     [Test]
+    public async Task Generates_Unique_Member_Names_And_Keeps_Values()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().MatchRegex(@"Value = @""a""\)\]\s*A = 0,");
+        generatedCode.Should().MatchRegex(@"Value = @""A""\)\]\s*A2 = 1,");
+    }
+
+    [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1267")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

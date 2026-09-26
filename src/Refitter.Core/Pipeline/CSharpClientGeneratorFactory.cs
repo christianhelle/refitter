@@ -59,6 +59,7 @@ internal class CSharpClientGeneratorFactory
             {
                 PropertyNameGenerator = CreatePropertyNameGenerator(),
                 TypeNameGenerator = CreateTypeNameGenerator(),
+                EnumNameGenerator = new UniqueEnumNameGenerator(),
             },
             CSharpGeneratorSettings =
             {
