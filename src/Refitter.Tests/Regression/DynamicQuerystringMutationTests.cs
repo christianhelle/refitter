@@ -75,8 +75,12 @@ public class DynamicQuerystringMutationTests
 
         var generatedCode = sut.Generate();
 
-        generatedCode.Should().Contain("/// <param name=\"query\">Search text</param>");
-        generatedCode.Should().Contain("/// <param name=\"page\">Page number</param>");
+        // The query parameters are folded into the wrapper, so their descriptions document its properties
+        // and the method only documents the parameters it has (#1263)
+        generatedCode.Should().Contain("/// Search text");
+        generatedCode.Should().Contain("/// Page number");
+        generatedCode.Should().NotContain("<param name=\"query\">");
+        generatedCode.Should().NotContain("<param name=\"page\">");
         generatedCode.Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
         generatedCode.Should().Contain("QueryParams queryParams");
     }

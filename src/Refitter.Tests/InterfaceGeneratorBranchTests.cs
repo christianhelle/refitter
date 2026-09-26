@@ -76,8 +76,9 @@ paths:
 
         var generatedCode = (await RefitGenerator.CreateAsync(settings)).Generate();
 
-        // NSwag models the cookie parameter, but Refit has no cookie binding so it is not emitted
-        generatedCode.Should().Contain("<param name=\"session\">");
+        // NSwag models the cookie parameter, but Refit has no cookie binding so it is not emitted,
+        // and therefore not documented either (#1263)
+        generatedCode.Should().NotContain("<param name=\"session\">");
         generatedCode.Should().Contain("Task GetFoos();");
     }
 

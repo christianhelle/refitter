@@ -224,20 +224,11 @@ internal class InterfaceGenerator
         var (parametersString, parameters, operationDynamicQuerystringParameters) =
             methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
 
-        var hasDynamicQuerystringParameter = !string.IsNullOrWhiteSpace(operationDynamicQuerystringParameters);
-        var hasApizrRequestOptionsParameter = settings.ApizrSettings?.WithRequestOptions == true;
-        var hasCancellationToken = settings.UseCancellationTokens && !hasApizrRequestOptionsParameter;
         var isApiResponseType = returnTypeGenerator.IsApiResponseType(returnType);
 
         if (settings.GenerateXmlDocCodeComments)
         {
-            docGenerator.AppendMethodDocumentation(
-                operationModel,
-                isApiResponseType,
-                hasDynamicQuerystringParameter,
-                hasApizrRequestOptionsParameter,
-                hasCancellationToken,
-                code);
+            docGenerator.AppendMethodDocumentation(operationModel, parameters, isApiResponseType, code);
         }
 
         foreach (var attribute in methodAttributeGenerator.Generate(operation, operationModel))
@@ -251,15 +242,10 @@ internal class InterfaceGenerator
 
         if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
         {
+            var nonOptionalParameters = parameters.Where(parameter => !parameter.Contains("?")).ToList();
             if (settings.GenerateXmlDocCodeComments)
             {
-                docGenerator.AppendMethodDocumentation(
-                    operationModel,
-                    isApiResponseType,
-                    false,
-                    hasApizrRequestOptionsParameter,
-                    hasCancellationToken,
-                    code);
+                docGenerator.AppendMethodDocumentation(operationModel, nonOptionalParameters, isApiResponseType, code);
             }
 
             foreach (var attribute in methodAttributeGenerator.Generate(operation, operationModel))
@@ -267,9 +253,7 @@ internal class InterfaceGenerator
                 code.AppendLine($"{Separator}{Separator}{attribute}");
             }
 
-            var nonOptionalParametersString = string.Join(
-                ", ",
-                parameters.Where(parameter => !parameter.Contains("?")));
+            var nonOptionalParametersString = string.Join(", ", nonOptionalParameters);
 
             code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(op.Path)}\")]")
                 .AppendLine($"{Separator}{Separator}{returnType} {methodName}({nonOptionalParametersString});")

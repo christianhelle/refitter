@@ -1,5 +1,7 @@
 using System.Globalization;
 using System.Text;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 
@@ -80,17 +82,16 @@ public class XmlDocumentationGenerator
     /// Appends XML docs for the given method to the given code builder.
     /// </summary>
     /// <param name="method">The NSwag model of the method's OpenAPI definition.</param>
+    /// <param name="parameters">
+    /// The parameters the method is emitted with. The param tags are written for exactly these,
+    /// so they always match the signature.
+    /// </param>
     /// <param name="hasApiResponse">Indicates whether the method returns an <c>ApiResponse</c>.</param>
-    /// <param name="hasDynamicQuerystringParameter">Indicates whether the method gets a dynamic querystring parameter</param>
-    /// <param name="hasApizrRequestOptionsParameter">Indicates whether the method gets an IApizrRequestOptions options final parameter</param>
-    /// <param name="hasCancellationToken">Indicates whether the method gets a cancellation token parameter</param>
     /// <param name="code">The builder to append the documentation to.</param>
     public void AppendMethodDocumentation(
         CSharpOperationModel method,
+        IReadOnlyList<string> parameters,
         bool hasApiResponse,
-        bool hasDynamicQuerystringParameter,
-        bool hasApizrRequestOptionsParameter,
-        bool hasCancellationToken,
         StringBuilder code)
     {
         if (!codeGeneration.GenerateXmlDocCodeComments)
@@ -102,58 +103,15 @@ public class XmlDocumentationGenerator
         if (!string.IsNullOrWhiteSpace(method.Description))
             this.AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
 
-        foreach (var parameter in method.Parameters)
-        {
-            if (parameter == null)
-                continue;
-
-            var description = parameter.HasDescription
-                ? SanitizeResponseDescription(parameter.Description)
-                : $"{parameter.VariableName} parameter";
-
-            this.AppendXmlCommentBlock(
-                ParamKeyword,
-                description,
-                code,
-                new()
-                {
-                    ["name"] = parameter.VariableName
-                });
-        }
-
-        if (hasDynamicQuerystringParameter)
+        foreach (var (name, type) in GetParameterNamesAndTypes(parameters))
         {
             this.AppendXmlCommentBlock(
                 ParamKeyword,
-                "The dynamic querystring parameter wrapping all others.",
+                GetParameterDescription(method, name, type),
                 code,
                 new()
                 {
-                    ["name"] = "queryParams"
-                });
-        }
-
-        if (hasApizrRequestOptionsParameter)
-        {
-            this.AppendXmlCommentBlock(
-                ParamKeyword,
-                "The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.",
-                code,
-                new()
-                {
-                    ["name"] = "options"
-                });
-        }
-
-        if (hasCancellationToken)
-        {
-            this.AppendXmlCommentBlock(
-                ParamKeyword,
-                "The cancellation token to cancel the request.",
-                code,
-                new()
-                {
-                    ["name"] = "cancellationToken"
+                    ["name"] = name
                 });
         }
 
@@ -213,7 +171,7 @@ public class XmlDocumentationGenerator
         code.Append($"{indent}/// <{tagName}");
         if (attributes != null)
             foreach (var attribute in attributes)
-                code.Append($" {attribute.Key}=\"{attribute.Value}\"");
+                code.Append($" {attribute.Key}=\"{EscapeSymbols(attribute.Value).Replace("\"", "&quot;")}\"");
 
         code.Append(">");
 
@@ -321,6 +279,45 @@ public class XmlDocumentationGenerator
 
         return description.ToString();
     }
+
+    // Reads the parameter names (without any @ keyword escape) and types from the emitted parameter list
+    private static IEnumerable<(string Name, string Type)> GetParameterNamesAndTypes(IReadOnlyList<string> parameters)
+    {
+        if (parameters.Count == 0)
+            return [];
+
+        var tree = CSharpSyntaxTree.ParseText($"interface I {{ void M({string.Join(", ", parameters)}); }}");
+        return tree.GetRoot()
+            .DescendantNodes()
+            .OfType<ParameterSyntax>()
+            .Select(parameter => (parameter.Identifier.ValueText, parameter.Type?.ToString() ?? string.Empty));
+    }
+
+    private static string GetParameterDescription(CSharpOperationModel method, string name, string type)
+    {
+        if (type == "CancellationToken")
+            return "The cancellation token to cancel the request.";
+
+        if (type == "IApizrRequestOptions")
+            return "The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.";
+
+        var operationParameter = method.Parameters.FirstOrDefault(p => GetVariableNames(p).Contains(name));
+        if (operationParameter == null && name == "queryParams")
+            return "The dynamic querystring parameter wrapping all others.";
+
+        return operationParameter?.HasDescription == true
+            ? SanitizeResponseDescription(operationParameter.Description)
+            : $"{name} parameter";
+    }
+
+    // The names the parameter extractors can emit for an operation parameter
+    private static IEnumerable<string> GetVariableNames(CSharpParameterModel parameter) =>
+        new[]
+            {
+                ParameterNaming.GetVariableName(parameter),
+                ParameterNaming.ConvertToVariableName(parameter.VariableName),
+            }
+            .Select(variableName => variableName.TrimStart('@'));
 
     private static string EscapeSymbols(string input)
     {
