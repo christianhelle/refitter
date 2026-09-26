@@ -14,7 +14,7 @@ internal sealed class BodyParameterExtractor
             .Select(p =>
             {
                 var variableName = ParameterNaming.GetVariableName(p);
-                return $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetBodyAttribute(p, settings), ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}";
+                return $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetBodyAttribute(p, operationModel.Consumes, settings), ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}";
             })
             .ToList();
 
