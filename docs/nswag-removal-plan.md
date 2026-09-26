@@ -1,6 +1,6 @@
 # Plan: Removing the NSwag Dependency
 
-Status: **Phase 0 in progress** (exploratory branch `feature/nswag-removal-feasibility-874777`)
+Status: **Phase 0 done, Phase 1 next** (exploratory branch `feature/nswag-removal-feasibility-874777`)
 
 ## Goal
 
@@ -57,6 +57,28 @@ Freeze today's behavior so later phases can prove they preserve it.
    nullable reference types, data annotations, `ExcludedTypeNames`, …) on a feature-rich spec.
 
 Exit: harness green on `main`, snapshots committed.
+
+**Result (done):** `src/Refitter.Tests/Parity` — 1,412 cases (34 specs × 44 variants; specs over
+500 KB only run `Default` and `NullCodeGeneratorSettings`), ~15 s. A variant only gets a snapshot
+file when its output differs from that spec's `Default`, which keeps the corpus at 808 files
+(19 MB on disk, under 1 MB compressed). Generation is deterministic across repeated runs.
+
+```bash
+# verify
+dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-build --treenode-filter "/*/*/*/*[Category=Parity]"
+# accept new output (review the git diff afterwards)
+REFITTER_UPDATE_SNAPSHOTS=1 dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-build --treenode-filter "/*/*/*/*[Category=Parity]"
+```
+
+Findings:
+
+- `v3.1/non-oauth-scopes.*` cannot be loaded today (an operation has no `responses`); it is excluded,
+  as in `test/smoke-tests.ps1`. The native loader may accept it — that would be a feature gain.
+- JSON and YAML variants of the same spec are *not* interchangeable in the corpus (e.g. the v2.0
+  petstore YAML has an extra `uploadImage` operation), so both are snapshotted independently.
+- Variants that never change output for small specs (e.g. `InlineNamedTypes`,
+  `NullCodeGeneratorSettings` in most specs) still run; they guard against the native generator
+  starting to react to settings it previously ignored.
 
 ### Phase 1 — Refitter-owned public extension points (minor release)
 
