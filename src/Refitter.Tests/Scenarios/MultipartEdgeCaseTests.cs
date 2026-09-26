@@ -79,7 +79,6 @@ public class MultipartEdgeCaseTests
     }
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1277")]
     public async Task Includes_Referenced_Properties_For_AllOf_Multipart_Body()
     {
         var generatedCode = await GenerateCode();
