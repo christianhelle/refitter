@@ -62,6 +62,38 @@ public class PropertyNameCollisionTests
 
     [Test]
     [Category("Integration")]
+    [Arguments("- $ref: '#/components/schemas/Base'")]
+    [Arguments("- type: object\n          properties: { user_name: { type: string } }")]
+    public async Task Can_Build_Generated_Code_With_Colliding_AllOf_Members(string firstMember)
+    {
+        var spec = $$"""
+            openapi: 3.0.1
+            info: { title: AllOfNames, version: v1 }
+            paths:
+              /c:
+                get:
+                  operationId: GetC
+                  responses: { '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Combined' } } } } }
+            components:
+              schemas:
+                Base:
+                  type: object
+                  properties: { user_name: { type: string } }
+                Combined:
+                  allOf:
+                    {{firstMember}}
+                    - type: object
+                      properties: { userName: { type: string } }
+            """;
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
+        var sut = await RefitGenerator.CreateAsync(new RefitGeneratorSettings { OpenApiPath = swaggerFile });
+        var generatedCode = sut.Generate();
+
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
