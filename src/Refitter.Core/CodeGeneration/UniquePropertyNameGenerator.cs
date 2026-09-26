@@ -49,6 +49,14 @@ internal sealed class UniquePropertyNameGenerator(
         foreach (var property in schema.Properties.Values)
         {
             var candidate = inner.Generate(property);
+
+            // Like NJsonSchema's class template, which does not emit inheritance discriminators as members
+            if (property.IsInheritanceDiscriminator)
+            {
+                names[property] = candidate;
+                continue;
+            }
+
             var uniqueName = candidate;
             for (var suffix = 2; !usedNames.Add(uniqueName); suffix++)
             {

@@ -58,6 +58,17 @@ public class UniquePropertyNameGeneratorTests
     }
 
     [Test]
+    public void Ignores_Inheritance_Discriminator_Properties_That_Are_Not_Emitted()
+    {
+        var schema = CreateSchema(allowAdditionalProperties: false, "$type", "type");
+        schema.DiscriminatorObject = new OpenApiDiscriminator { PropertyName = "$type" };
+
+        var names = GenerateAll(new UniquePropertyNameGenerator(new CustomCSharpPropertyNameGenerator(), _ => null), schema);
+
+        names.Should().Equal("Type", "Type");
+    }
+
+    [Test]
     public void Delegates_To_Inner_Generator_For_Properties_Without_Parent()
     {
         var property = new JsonSchemaProperty();
