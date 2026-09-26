@@ -32,7 +32,6 @@ public class XmlDocParameterMismatchTests
     }
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Documents_Keyword_Parameters_Without_Escape_Prefix()
     {
         var generatedCode = await GenerateCode();
@@ -42,7 +41,6 @@ public class XmlDocParameterMismatchTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
@@ -51,7 +49,6 @@ public class XmlDocParameterMismatchTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Can_Build_Generated_Code_With_Dynamic_Querystring_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.UseDynamicQuerystringParameters = true);

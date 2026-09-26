@@ -155,8 +155,8 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
         Task UpdatePetWithForm(long petId, [Query] string? name = default, [Query] string? status = default);
 
         /// <summary>Deletes a pet</summary>
-        /// <param name="api_key">api_key parameter</param>
         /// <param name="petId">Pet id to delete</param>
+        /// <param name="api_key">api_key parameter</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">
         /// Thrown when the request returns a non-success status code:
@@ -176,8 +176,8 @@ namespace Refitter.Tests.AdditionalFiles.OptionalParameters
 
         /// <summary>uploads an image</summary>
         /// <param name="petId">ID of pet to update</param>
-        /// <param name="additionalMetadata">Additional Metadata</param>
         /// <param name="body">body parameter</param>
+        /// <param name="additionalMetadata">Additional Metadata</param>
         /// <returns>
         /// A <see cref="Task"/> representing the <see cref="IApiResponse"/> instance containing the result:
         /// <list type="table">

@@ -179,7 +179,6 @@ paths:
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Generated_Code_With_Header_Injection_Is_Inert_And_Compiles()
     {
         string generatedCode = await GenerateCode(HeaderInjectionSpec);
@@ -227,7 +226,6 @@ paths:
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Generated_Code_With_Header_Injection_Is_Inert_And_Compiles_V2()
     {
         string generatedCode = await GenerateCode(HeaderInjectionSpecV2);
