@@ -64,6 +64,21 @@ public class FileResponseUsingsTests
     }
 
     [Test]
+    public async Task Does_Not_Generate_System_Net_Http_Using_For_Operation_Named_HttpResponseMessage()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
+            OpenApiSpec
+                .Replace("operationId: Download", "operationId: GetHttpResponseMessage")
+                .Replace("application/octet-stream: { schema: { type: string, format: binary } }", "application/json: { schema: { type: string } }"));
+        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+        generatedCode.Should().Contain("GetHttpResponseMessage(");
+        generatedCode.Should().NotContain("using System.Net.Http;");
+    }
+
+    [Test]
     [Category("Integration")]
     public async Task Can_Build_Generated_Code()
     {

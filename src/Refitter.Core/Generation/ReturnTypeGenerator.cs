@@ -58,6 +58,9 @@ internal class ReturnTypeGenerator(
         return GetReturnType(returnTypeParameter);
     }
 
+    public static bool ReturnsHttpResponseMessage(string code) =>
+        HttpResponseMessageTypeRegex.IsMatch(code);
+
     public bool IsApiResponseType(string typeName)
     {
         return HttpResponseMessageTypeRegex.IsMatch(typeName) ||
