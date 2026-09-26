@@ -197,8 +197,8 @@ namespace Refitter.Tests.AdditionalFiles.ByEndpoint
     public partial interface IDeletePetEndpoint
     {
         /// <summary>Deletes a pet</summary>
-        /// <param name="api_key">api_key parameter</param>
         /// <param name="petId">Pet id to delete</param>
+        /// <param name="api_key">api_key parameter</param>
         /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">

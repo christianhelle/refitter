@@ -88,7 +88,6 @@ public class IdentifierCorrectnessTests
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Generated_Code_With_Invalid_Multipart_Identifiers_Compiles()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers);
@@ -247,7 +246,6 @@ public class IdentifierCorrectnessTests
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Compiles()
     {
         var generatedCode = await GenerateCode(
@@ -412,7 +410,6 @@ public class IdentifierCorrectnessTests
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Generated_Code_With_Invalid_Multipart_Identifiers_Compiles_Swagger2()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
@@ -569,7 +566,6 @@ public class IdentifierCorrectnessTests
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Compiles_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -698,7 +694,6 @@ public class IdentifierCorrectnessTests
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Generated_Code_With_Unsanitized_Parameter_Name_Compiles()
     {
         var generatedCode = await GenerateCode(
@@ -758,7 +753,6 @@ public class IdentifierCorrectnessTests
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Generated_Code_With_Unsanitized_Parameter_Name_Compiles_Swagger2()
     {
         var generatedCode = await GenerateCode(

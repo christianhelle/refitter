@@ -415,7 +415,6 @@ public class XmlDocEscapingTests
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Can_Build_Generated_Code_With_Escaped_Dynamic_Querystring_Descriptions()
     {
         var settings = new RefitGeneratorSettings
@@ -521,7 +520,6 @@ public class XmlDocEscapingTests
 
     [Category("Integration")]
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1263")]
     public async Task Can_Build_Generated_Code_With_Escaped_Dynamic_Querystring_Descriptions_Swagger2()
     {
         var settings = new RefitGeneratorSettings
