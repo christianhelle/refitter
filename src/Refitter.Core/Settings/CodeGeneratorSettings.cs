@@ -263,6 +263,7 @@ public class CodeGeneratorSettings
     /// </summary>
     [Description("Gets or sets a custom IPropertyNameGenerator.")]
     [JsonIgnore]
+    [Obsolete("Use PropertyNameProvider instead. PropertyNameGenerator exposes NJsonSchema types and will be removed in the next major version.")]
     public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
 
     /// <summary>

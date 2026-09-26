@@ -408,6 +408,7 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     /// Gets or sets the parameter name generator for customizing parameter names.
     /// </summary>
     [JsonIgnore]
+    [Obsolete("Use ParameterNameProvider instead. ParameterNameGenerator exposes NSwag types and will be removed in the next major version.")]
     public IParameterNameGenerator? ParameterNameGenerator { get; set; }
 
     /// <summary>
