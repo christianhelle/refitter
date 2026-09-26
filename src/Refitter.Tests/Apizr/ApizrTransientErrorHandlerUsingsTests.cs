@@ -23,7 +23,6 @@ public class ApizrTransientErrorHandlerUsingsTests
         """;
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1264")]
     [Arguments(TransientErrorHandler.HttpResilience, "using Microsoft.Extensions.Http.Resilience;")]
     [Arguments(TransientErrorHandler.Polly, "using Polly.Extensions.Http;")]
     public async Task Emits_Transient_Error_Handler_Using_Once(TransientErrorHandler handler, string usingDirective)

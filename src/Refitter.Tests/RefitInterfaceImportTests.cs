@@ -59,4 +59,36 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().Contain("Apizr.Configuring.Request");
         refitInterfaceImport.Should().NotContain("System.Threading");
     }
+
+    [Test]
+    public void Should_Contain_SystemNetHttp_When_HttpResponseMessage_Is_Used()
+    {
+        var settings = new RefitGeneratorSettings();
+        var refitInterfaceImport = RefitInterfaceImports.GetImportedNamespaces(settings, usesHttpResponseMessage: true);
+        refitInterfaceImport.Should().Contain("System.Net.Http");
+    }
+
+    [Test]
+    public void Should_NotContain_SystemNetHttp_By_Default()
+    {
+        var settings = new RefitGeneratorSettings();
+        var refitInterfaceImport = RefitInterfaceImports.GetImportedNamespaces(settings);
+        refitInterfaceImport.Should().NotContain("System.Net.Http");
+    }
+
+    [Test]
+    public void Should_NotContain_SystemNetHttp_Excluded()
+    {
+        var settings = new RefitGeneratorSettings { ExcludeNamespaces = new string[] { "^System[.]Net[.]Http$" } };
+        var refitInterfaceImport = RefitInterfaceImports.GetImportedNamespaces(settings, usesHttpResponseMessage: true);
+        refitInterfaceImport.Should().NotContain("System.Net.Http");
+    }
+
+    [Test]
+    public void GenerateNamespaceImports_Includes_SystemNetHttp_When_HttpResponseMessage_Is_Used()
+    {
+        var settings = new RefitGeneratorSettings();
+        var imports = RefitInterfaceImports.GenerateNamespaceImports(settings, usesHttpResponseMessage: true);
+        imports.Should().Contain("using System.Net.Http;");
+    }
 }
