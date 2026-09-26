@@ -99,6 +99,20 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
 
         generator.Settings.CSharpGeneratorSettings.PropertyNameGenerator
-            .Should().BeOfType<PreserveOriginalPropertyNameGenerator>();
+            .Should().BeOfType<UniquePropertyNameGenerator>()
+            .Which.Inner.Should().BeOfType<PreserveOriginalPropertyNameGenerator>();
+    }
+
+    [Test]
+    public async Task Create_WithDefaultPropertyNamingPolicy_UsesUniqueCSharpGenerator()
+    {
+        var document = await CreateDocumentAsync();
+        var settings = new RefitGeneratorSettings { Namespace = "TestNamespace" };
+
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+
+        generator.Settings.CSharpGeneratorSettings.PropertyNameGenerator
+            .Should().BeOfType<UniquePropertyNameGenerator>()
+            .Which.Inner.Should().BeOfType<CustomCSharpPropertyNameGenerator>();
     }
 }

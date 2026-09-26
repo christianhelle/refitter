@@ -38,8 +38,62 @@ public class PropertyNameCollisionTests
     }
 
     [Test]
+    public async Task Generates_Unique_Member_Names_And_Keeps_Wire_Names()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().MatchRegex(@"JsonPropertyName\(""order""\)\]\s*public string Order2 \{");
+        generatedCode.Should().MatchRegex(@"JsonPropertyName\(""user_name""\)\]\s*public string UserName \{");
+        generatedCode.Should().MatchRegex(@"JsonPropertyName\(""userName""\)\]\s*public string UserName2 \{");
+        generatedCode.Should().MatchRegex(@"JsonPropertyName\(""AdditionalProperties""\)\]\s*public string AdditionalProperties2 \{");
+        generatedCode.Should().Contain("public IDictionary<string, object> AdditionalProperties");
+    }
+
+    [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1268")]
+    public async Task Can_Build_Generated_Code_With_Preserved_Property_Names_And_Immutable_Records()
+    {
+        var generatedCode = await GenerateCode(settings =>
+        {
+            settings.PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal;
+            settings.ImmutableRecords = true;
+        });
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
+    [Arguments("- $ref: '#/components/schemas/Base'")]
+    [Arguments("- type: object\n          properties: { user_name: { type: string } }")]
+    public async Task Can_Build_Generated_Code_With_Colliding_AllOf_Members(string firstMember)
+    {
+        var spec = $$"""
+            openapi: 3.0.1
+            info: { title: AllOfNames, version: v1 }
+            paths:
+              /c:
+                get:
+                  operationId: GetC
+                  responses: { '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Combined' } } } } }
+            components:
+              schemas:
+                Base:
+                  type: object
+                  properties: { user_name: { type: string } }
+                Combined:
+                  allOf:
+                    {{firstMember}}
+                    - type: object
+                      properties: { userName: { type: string } }
+            """;
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
+        var sut = await RefitGenerator.CreateAsync(new RefitGeneratorSettings { OpenApiPath = swaggerFile });
+        var generatedCode = sut.Generate();
+
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
