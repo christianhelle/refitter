@@ -32,7 +32,6 @@ public class ByEndpointWithoutOperationIdTests
     }
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1266")]
     public async Task Generates_Unique_Interface_Names()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint);
@@ -41,6 +40,27 @@ public class ByEndpointWithoutOperationIdTests
             .Count
             .Should()
             .Be(1);
+    }
+
+    [Test]
+    public async Task Numbers_Colliding_Interface_Names()
+    {
+        var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint);
+        generatedCode.Should().Contain("interface IUsersGetEndpoint");
+        generatedCode.Should().Contain("interface IUsersGet2Endpoint");
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_ByEndpoint_With_Dependency_Injection()
+    {
+        var generatedCode = await GenerateCode(settings =>
+        {
+            settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint;
+            settings.DependencyInjectionSettings = new DependencyInjectionSettings { BaseUrl = "https://example.com" };
+        });
+        generatedCode.Should().Contain("AddRefitClient<IUsersGet2Endpoint>");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
     [Test]
@@ -53,7 +73,6 @@ public class ByEndpointWithoutOperationIdTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1266")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_By_Endpoint()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint);

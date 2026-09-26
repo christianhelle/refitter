@@ -27,7 +27,6 @@ public class OpenApi31PathItemReferenceTests
         """;
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1274")]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
@@ -35,7 +34,6 @@ public class OpenApi31PathItemReferenceTests
     }
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1274")]
     public async Task Generates_Operations_From_Referenced_Path_Items()
     {
         var generatedCode = await GenerateCode();
@@ -44,10 +42,38 @@ public class OpenApi31PathItemReferenceTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1274")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_From_Json()
+    {
+        const string json = """
+            {
+              "openapi": "3.1.0",
+              "info": { "title": "PathItems", "version": "v1" },
+              "paths": { "/items/{id}": { "$ref": "#/components/pathItems/ItemById" } },
+              "components": {
+                "pathItems": {
+                  "ItemById": {
+                    "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+                    "get": { "operationId": "GetItem", "responses": { "204": { "description": "ok" } } },
+                    "delete": { "operationId": "DeleteItem", "responses": { "204": { "description": "ok" } } }
+                  }
+                }
+              }
+            }
+            """;
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(json);
+        var sut = await RefitGenerator.CreateAsync(new RefitGeneratorSettings { OpenApiPath = swaggerFile });
+        var generatedCode = sut.Generate();
+
+        generatedCode.Should().Contain("Task GetItem(string id);");
+        generatedCode.Should().Contain("Task DeleteItem(string id);");
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 

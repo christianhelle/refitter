@@ -65,7 +65,8 @@ internal class InterfaceGenerator
             .GroupBy(partitioning.GetGroupKey)
             .ToList();
 
-        var knownInterfaceIdentifiers = new HashSet<string>();
+        // Interfaces share the namespace with the contracts, so they must not reuse a contract type name
+        var knownInterfaceIdentifiers = new HashSet<string>(GetContractTypeNames());
         var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
             ? document.Info!.Title.Sanitize()
             : settings.Naming.InterfaceName;
@@ -100,6 +101,20 @@ internal class InterfaceGenerator
         }
     }
 
+    private IEnumerable<string> GetContractTypeNames()
+    {
+        // Mirrors ContractTypeSuffixApplier, which skips names that already end with the suffix
+        // and names whose suffixed form is already taken by another contract
+        var suffix = settings.ContractTypeSuffix;
+        var names = new HashSet<string>(generator.GeneratedTypeNames, StringComparer.Ordinal);
+        return names.Select(
+            name => string.IsNullOrWhiteSpace(suffix) ||
+                    name.EndsWith(suffix, StringComparison.Ordinal) ||
+                    names.Contains(name + suffix)
+                ? name
+                : name + suffix);
+    }
+
     // Refit has no attribute for TRACE, so those operations cannot be expressed.
     private static bool IsSupportedByRefit(string verb) =>
         !string.Equals(verb, OpenApiOperationMethod.Trace, StringComparison.OrdinalIgnoreCase);
@@ -114,6 +129,7 @@ internal class InterfaceGenerator
         var rawInterfaceName = partitioning.GetInterfaceName(string.Empty, title, baseOperationName);
         var interfaceNameSuffix = partitioning.GetInterfaceNameSuffix();
         var interfaceName = IdentifierUtils.Counted(knownInterfaceIdentifiers, rawInterfaceName, interfaceNameSuffix);
+        knownInterfaceIdentifiers.Add(interfaceName);
 
         var code = new StringBuilder();
         var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
@@ -165,6 +181,7 @@ internal class InterfaceGenerator
         var rawInterfaceName = partitioning.GetInterfaceName(groupKey, title, baseOperationName);
         var interfaceNameSuffix = partitioning.GetInterfaceNameSuffix();
         var interfaceName = IdentifierUtils.Counted(knownInterfaceIdentifiers, rawInterfaceName, interfaceNameSuffix);
+        knownInterfaceIdentifiers.Add(interfaceName);
 
         var code = new StringBuilder();
         partitioning.AppendInterfaceDocumentation(document, docGenerator, groupKey, representativeOperation, code);

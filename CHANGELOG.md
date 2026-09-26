@@ -19,14 +19,20 @@
 - Deprecated schemas used in operations cause CS0612 in the Refit stub [\#1278](https://github.com/christianhelle/refitter/issues/1278)
 - Form-urlencoded request bodies are serialized as JSON [\#1276](https://github.com/christianhelle/refitter/issues/1276)
 - Schema named Task breaks void operations \(CS0029\) [\#1275](https://github.com/christianhelle/refitter/issues/1275)
+- OpenAPI 3.1 components/pathItems references fail to load [\#1274](https://github.com/christianhelle/refitter/issues/1274)
 - Numeric bounds larger than decimal.MaxValue fail to load the spec [\#1273](https://github.com/christianhelle/refitter/issues/1273)
 - HttpResponseMessage return type compiles only with implicit usings [\#1272](https://github.com/christianhelle/refitter/issues/1272)
 - Non-ASCII punctuation in info.title produces invalid interface name [\#1271](https://github.com/christianhelle/refitter/issues/1271)
+- Enum values differing only by case generate duplicate members [\#1267](https://github.com/christianhelle/refitter/issues/1267)
+- ByEndpoint interfaces collide when operations have no operationId [\#1266](https://github.com/christianhelle/refitter/issues/1266)
 - TRACE operations generate a non-existent \[Trace\] Refit attribute [\#1265](https://github.com/christianhelle/refitter/issues/1265)
 - Apizr registration emits duplicate using for Http.Resilience \(CS0105\) [\#1264](https://github.com/christianhelle/refitter/issues/1264)
 
 **Merged pull requests:**
 
+- Give ByEndpoint interfaces unique names when operationIds are missing [\#1301](https://github.com/christianhelle/refitter/pull/1301) ([christianhelle](https://github.com/christianhelle))
+- Generate unique enum member names for values differing only by case [\#1299](https://github.com/christianhelle/refitter/pull/1299) ([christianhelle](https://github.com/christianhelle))
+- Support OpenAPI 3.1 components/pathItems references [\#1298](https://github.com/christianhelle/refitter/pull/1298) ([christianhelle](https://github.com/christianhelle))
 - Send array header parameters as comma-separated values [\#1297](https://github.com/christianhelle/refitter/pull/1297) ([christianhelle](https://github.com/christianhelle))
 - Honor OpenAPI 3 query parameter style and explode [\#1296](https://github.com/christianhelle/refitter/pull/1296) ([christianhelle](https://github.com/christianhelle))
 - Send form-urlencoded request bodies as form posts [\#1295](https://github.com/christianhelle/refitter/pull/1295) ([christianhelle](https://github.com/christianhelle))
