@@ -48,6 +48,47 @@ public static class ParityVariants
                 s => s.OperationNameGenerator = OperationNameGeneratorTypes.SingleClientFromOperationId,
             ["OperationNameFromPathSegments"] =
                 s => s.OperationNameGenerator = OperationNameGeneratorTypes.SingleClientFromPathSegments,
+            ["OperationNameMultipleFromOperationId"] =
+                s => s.OperationNameGenerator = OperationNameGeneratorTypes.MultipleClientsFromOperationId,
+            ["OperationNameMultipleFromPathSegments"] =
+                s => s.OperationNameGenerator = OperationNameGeneratorTypes.MultipleClientsFromPathSegments,
+            ["OperationNameFirstTagAndOperationId"] =
+                s => s.OperationNameGenerator = OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationId,
+            ["OperationNameFirstTagAndOperationName"] =
+                s => s.OperationNameGenerator = OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationName,
+            ["OperationNameFirstTagAndPathSegments"] =
+                s => s.OperationNameGenerator = OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndPathSegments,
+            ["OperationNameTemplate"] = s => s.OperationNameTemplate = "{operationName}Async",
+            ["TagFiltered"] = s => s.IncludeTags = ["pet", "user", "store"],
+            ["MatchPathFiltered"] = s => s.IncludePathMatches = ["^/pet/.*"],
+            ["TrimWithInheritanceHierarchy"] = s =>
+            {
+                s.TrimUnusedSchema = true;
+                s.IncludeInheritanceHierarchy = true;
+            },
+            ["AuthenticationHeaderMethod"] = s => s.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method,
+            ["AuthenticationHeaderParameter"] = s => s.AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter,
+            ["AdditionalNamespace"] = s => s.AdditionalNamespaces = ["System.ComponentModel"],
+            ["ExcludeNamespace"] = s => s.ExcludeNamespaces = ["System.Xml.Serialization"],
+            ["ContractsNamespace"] = s =>
+            {
+                s.ContractsNamespace = "GeneratedCode.Contracts";
+                s.GenerateMultipleFiles = true;
+            },
+            ["NoStatusCodeComments"] = s => s.GenerateStatusCodeComments = false,
+            ["NoIAsyncEnumerable"] = s => s.ReturnIAsyncEnumerable = false,
+            ["NoContentTypeHeaders"] = s => s.AddContentTypeHeaders = false,
+            ["NoOpenApiTitle"] = s => s.Naming.UseOpenApiTitle = false,
+            ["DependencyInjection"] = s => s.DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://example.com",
+                TransientErrorHandler = TransientErrorHandler.HttpResilience,
+            },
+            ["Apizr"] = s =>
+            {
+                s.ApizrSettings = new ApizrSettings { WithRequestOptions = true, WithRegistrationHelper = true };
+                s.OptionalParameters = true;
+            },
 
             // Contract generation options (CodeGeneratorSettings)
             ["IntegerTypeInt64"] = s => s.CodeGeneratorSettings!.IntegerType = IntegerType.Int64,

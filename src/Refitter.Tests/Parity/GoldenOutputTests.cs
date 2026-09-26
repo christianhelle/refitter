@@ -7,7 +7,7 @@ using TUnit.Core;
 namespace Refitter.Tests.Parity;
 
 /// <summary>
-/// Golden-output parity harness: generates code for every spec in test/OpenAPI with every
+/// Golden-output parity harness: generates code for every spec in <see cref="ParitySpecs"/> with every
 /// settings variant in <see cref="ParityVariants"/> and compares it to a checked-in snapshot.
 /// Set REFITTER_UPDATE_SNAPSHOTS=1 to rewrite the snapshots instead of asserting.
 /// See docs/nswag-removal-plan.md.
@@ -16,40 +16,25 @@ namespace Refitter.Tests.Parity;
 public class GoldenOutputTests
 {
     private const string UpdateSnapshotsVariable = "REFITTER_UPDATE_SNAPSHOTS";
-    private const long LargeSpecThreshold = 500 * 1024;
+    private const string GenerationFailed = "!! generation failed";
 
     private static readonly Regex GeneratedCodeVersion = new(
         """GeneratedCode\("(?<tool>[^"]+)", "[^"]+"\)""",
         RegexOptions.Compiled);
 
-    // Operations without a responses object fail to load today (also skipped by test/smoke-tests.ps1)
-    private static readonly HashSet<string> UnsupportedSpecs =
-    [
-        "v3.1/non-oauth-scopes.json",
-        "v3.1/non-oauth-scopes.yaml",
-    ];
-
     public static IEnumerable<Func<ParityCase>> Cases()
     {
-        var specsFolder = Path.Combine(RepositoryPaths.Root, "test", "OpenAPI");
-        var specs = Directory
-            .EnumerateFiles(specsFolder, "*.*", SearchOption.AllDirectories)
-            .Where(p => p.EndsWith(".json", StringComparison.OrdinalIgnoreCase)
-                        || p.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase))
-            .Select(p => Path.GetRelativePath(specsFolder, p).Replace('\\', '/'))
-            .Where(p => !UnsupportedSpecs.Contains(p))
-            .OrderBy(p => p, StringComparer.Ordinal);
-
-        foreach (var spec in specs)
+        foreach (var spec in ParitySpecs.All)
         {
             // Large specs produce megabytes per variant, so they only snapshot the contract baselines
-            var variants = new FileInfo(Path.Combine(specsFolder, spec)).Length > LargeSpecThreshold
+            var variants = spec.IsLarge
                 ? ParityVariants.LargeSpecVariants
                 : ParityVariants.All.Keys;
 
             foreach (var variant in variants)
             {
-                yield return () => new ParityCase(spec, variant);
+                var id = spec.Id;
+                yield return () => new ParityCase(id, variant);
             }
         }
     }
@@ -105,11 +90,24 @@ public class GoldenOutputTests
     {
         var settings = new RefitGeneratorSettings
         {
-            OpenApiPath = Path.Combine(RepositoryPaths.Root, "test", "OpenAPI", parityCase.Spec),
+            OpenApiPath = ParitySpecs.Get(parityCase.Spec).Path,
             CodeGeneratorSettings = new CodeGeneratorSettings(),
         };
         ParityVariants.All[parityCase.Variant](settings);
 
+        try
+        {
+            return await GenerateAsync(settings);
+        }
+        catch (Exception)
+        {
+            // Specs that cannot be generated today must keep failing, not silently start producing code
+            return GenerationFailed;
+        }
+    }
+
+    private static async Task<string> GenerateAsync(RefitGeneratorSettings settings)
+    {
         var generator = await RefitGenerator.CreateAsync(settings);
         if (!settings.GenerateMultipleFiles)
         {
@@ -156,7 +154,7 @@ public class GoldenOutputTests
     }
 }
 
-/// <summary>One spec (relative to test/OpenAPI) combined with one <see cref="ParityVariants"/> key.</summary>
+/// <summary>One <see cref="ParitySpecs"/> id combined with one <see cref="ParityVariants"/> key.</summary>
 public sealed record ParityCase(string Spec, string Variant)
 {
     public const string DefaultVariant = "Default";
