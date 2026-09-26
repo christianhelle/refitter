@@ -1,6 +1,5 @@
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
-using NSwag;
 using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
@@ -54,8 +53,8 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
                 .SerializeAsYamlAsync(specificationVersion, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            return await OpenApiYamlDocument
-                .FromYamlAsync(yaml, path, cancellationToken)
+            return await OpenApiDocumentParser
+                .ParseAsync(yaml, path, isYaml: true, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -63,8 +62,8 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
             .SerializeAsJsonAsync(specificationVersion, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        return await OpenApiDocument
-            .FromJsonAsync(json, path, cancellationToken)
+        return await OpenApiDocumentParser
+            .ParseAsync(json, path, isYaml: false, cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -77,11 +76,8 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
 
         try
         {
-            return PathUtilities.IsYaml(path)
-                ? await OpenApiYamlDocument.FromFileAsync(path, cancellationToken)
-                    .ConfigureAwait(false)
-                : await OpenApiDocument.FromFileAsync(path, cancellationToken)
-                    .ConfigureAwait(false);
+            return await OpenApiDocumentParser.FromFileAsync(path, cancellationToken)
+                .ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

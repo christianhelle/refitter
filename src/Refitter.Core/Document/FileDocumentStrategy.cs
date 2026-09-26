@@ -1,4 +1,3 @@
-using NSwag;
 using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
@@ -16,9 +15,7 @@ internal sealed class FileDocumentStrategy : IDocumentLoadingStrategy
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            return PathUtilities.IsYaml(path)
-                ? await OpenApiYamlDocument.FromFileAsync(path, cancellationToken).ConfigureAwait(false)
-                : await OpenApiDocument.FromFileAsync(path, cancellationToken).ConfigureAwait(false);
+            return await OpenApiDocumentParser.FromFileAsync(path, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

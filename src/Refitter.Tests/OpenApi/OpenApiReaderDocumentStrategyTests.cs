@@ -365,4 +365,60 @@ paths:
 
         Directory.Delete(folder, true);
     }
+
+    [Test]
+    [Arguments("yaml")]
+    [Arguments("json")]
+    public async Task Clamps_Numeric_Bounds_Outside_Decimal_Range_With_External_References(string extension)
+    {
+        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(folder);
+
+        var mainSpec = extension == "yaml"
+            ? LargeNumericBoundsSpecs.Yaml.Replace(
+                "paths: {}",
+                """
+                paths:
+                  /users:
+                    get:
+                      responses:
+                        '200':
+                          description: ok
+                          content:
+                            application/json:
+                              schema:
+                                $ref: './components.yaml#/components/schemas/User'
+                """)
+            : LargeNumericBoundsSpecs.Json.Replace(
+                "\"paths\": {}",
+                """
+                "paths": { "/users": { "get": { "responses": { "200": { "description": "ok", "content": { "application/json": { "schema": { "$ref": "./components.json#/components/schemas/User" } } } } } } } }
+                """);
+        var componentsSpec = extension == "yaml"
+            ? """
+              components:
+                schemas:
+                  User:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+              """
+            : """
+              { "components": { "schemas": { "User": { "type": "object", "properties": { "id": { "type": "integer" } } } } } }
+              """;
+
+        var mainFile = Path.Combine(folder, $"main.{extension}");
+        await File.WriteAllTextAsync(mainFile, mainSpec);
+        await File.WriteAllTextAsync(Path.Combine(folder, $"components.{extension}"), componentsSpec);
+
+        var strategy = new OpenApiReaderDocumentStrategy();
+        var result = await strategy.TryLoadAsync(mainFile);
+
+        result.Should().NotBeNull();
+        LargeNumericBoundsSpecs.GetMaximum(result!).Should().Be(decimal.MaxValue);
+        LargeNumericBoundsSpecs.GetMinimum(result!).Should().Be(decimal.MinValue);
+
+        Directory.Delete(folder, true);
+    }
 }

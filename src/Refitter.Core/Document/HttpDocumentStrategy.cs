@@ -1,5 +1,4 @@
 using System.Net;
-using NSwag;
 using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
@@ -37,11 +36,9 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
                 .ReadAsStringWithCancellationAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            return PathUtilities.IsYaml(path)
-                ? await OpenApiYamlDocument.FromYamlAsync(content, cancellationToken)
-                    .ConfigureAwait(false)
-                : await OpenApiDocument.FromJsonAsync(content, cancellationToken)
-                    .ConfigureAwait(false);
+            return await OpenApiDocumentParser
+                .ParseAsync(content, null, PathUtilities.IsYaml(path), cancellationToken)
+                .ConfigureAwait(false);
         }
         catch (Exception ex)
         {

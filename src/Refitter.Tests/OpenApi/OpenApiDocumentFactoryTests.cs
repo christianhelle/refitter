@@ -763,4 +763,15 @@ paths:
         document.Info.Title.Should().Be("YAML External Ref API");
         document.Paths.Should().ContainKey("/users/{id}");
     }
+
+    [Test]
+    public async Task Clamps_Numeric_Bounds_Outside_Decimal_Range_From_Http()
+    {
+        await using var server = new LocalHttpServer(LargeNumericBoundsSpecs.Json);
+
+        var document = await OpenApiDocumentFactory.CreateAsync(server.Url);
+
+        LargeNumericBoundsSpecs.GetMaximum(document).Should().Be(decimal.MaxValue);
+        LargeNumericBoundsSpecs.GetMinimum(document).Should().Be(decimal.MinValue);
+    }
 }
