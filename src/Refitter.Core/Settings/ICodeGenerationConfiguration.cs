@@ -65,6 +65,7 @@ public interface ICodeGenerationConfiguration
     /// <summary>
     /// Gets the custom template directory for NSwag code generation.
     /// </summary>
+    [Obsolete("Custom NSwag Liquid templates will not be supported once Refitter stops using NSwag, and this setting will be removed in the next major version.")]
     string? CustomTemplateDirectory { get; }
 
     /// <summary>

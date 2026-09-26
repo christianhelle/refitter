@@ -82,7 +82,9 @@ internal class CSharpClientGeneratorFactory
                 GenerateNativeRecords =
                     codeGeneration.ImmutableRecords ||
                     codeGeneration.CodeGeneratorSettings?.GenerateNativeRecords is true,
+#pragma warning disable CS0618 // Honored until custom templates are removed
                 TemplateDirectory = codeGeneration.CustomTemplateDirectory,
+#pragma warning restore CS0618
             },
         };
 
