@@ -25,6 +25,8 @@
 - HttpResponseMessage return type compiles only with implicit usings [\#1272](https://github.com/christianhelle/refitter/issues/1272)
 - Non-ASCII punctuation in info.title produces invalid interface name [\#1271](https://github.com/christianhelle/refitter/issues/1271)
 - Schema named like the generated interface causes CS0261 [\#1270](https://github.com/christianhelle/refitter/issues/1270)
+- Duplicate parameter names in generated method signatures \(CS0100\) [\#1269](https://github.com/christianhelle/refitter/issues/1269)
+- Colliding schema property names generate invalid contract members [\#1268](https://github.com/christianhelle/refitter/issues/1268)
 - Enum values differing only by case generate duplicate members [\#1267](https://github.com/christianhelle/refitter/issues/1267)
 - ByEndpoint interfaces collide when operations have no operationId [\#1266](https://github.com/christianhelle/refitter/issues/1266)
 - TRACE operations generate a non-existent \[Trace\] Refit attribute [\#1265](https://github.com/christianhelle/refitter/issues/1265)
@@ -33,6 +35,8 @@
 
 **Merged pull requests:**
 
+- Rename duplicate parameter names in generated methods [\#1305](https://github.com/christianhelle/refitter/pull/1305) ([christianhelle](https://github.com/christianhelle))
+- Generate unique member names for colliding schema properties [\#1304](https://github.com/christianhelle/refitter/pull/1304) ([christianhelle](https://github.com/christianhelle))
 - Include allOf member properties in multipart parameters [\#1303](https://github.com/christianhelle/refitter/pull/1303) ([christianhelle](https://github.com/christianhelle))
 - Generate XML param docs that match the emitted method parameters [\#1302](https://github.com/christianhelle/refitter/pull/1302) ([christianhelle](https://github.com/christianhelle))
 - Give ByEndpoint interfaces unique names when operationIds are missing [\#1301](https://github.com/christianhelle/refitter/pull/1301) ([christianhelle](https://github.com/christianhelle))
