@@ -1,6 +1,6 @@
 # Plan: Removing the NSwag Dependency
 
-Status: **Phase 0 done, Phase 1 next** (exploratory branch `feature/nswag-removal-feasibility-874777`)
+Status: **Phases 0 and 1 done, Phase 2 next** (exploratory branch `feature/nswag-removal-feasibility-874777`)
 
 ## Goal
 
@@ -91,6 +91,37 @@ Findings:
 
 Exit: no NSwag type is needed to use any non-obsolete API.
 
+**Result (done):**
+
+| Old (obsolete, removed in the next major) | Replacement |
+|---|---|
+| `CodeGeneratorSettings.PropertyNameGenerator` (`NJsonSchema…IPropertyNameGenerator`) | `CodeGeneratorSettings.PropertyNameProvider` (`IPropertyNameProvider`, `PropertyNameContext`) |
+| `RefitGeneratorSettings.ParameterNameGenerator` (`NSwag…IParameterNameGenerator`) | `RefitGeneratorSettings.ParameterNameProvider` (`IParameterNameProvider`, `ParameterNameContext`, `ParameterSource`) |
+| `RefitGenerator.OpenApiDocument` | `RefitGenerator.DocumentInfo` (`ApiDocumentInfo`: title, version, paths, schema names) |
+| `new RefitGenerator(settings, NSwag.OpenApiDocument)` | `RefitGenerator.CreateAsync` |
+| `OpenApiDocumentFactory`, `RefitDocumentFilter`, `SchemaCleaner` | `RefitGenerator.CreateAsync` with `IncludeTags`, `IncludePathMatches`, `TrimUnusedSchema` |
+| `CustomTemplateDirectory` (settings, `.refitter`, `--custom-template-directory`) | None; see Accepted differences |
+
+- New providers take precedence over the obsolete generators when both are set. Provided property
+  names still go through the collision de-duplication added for #1268.
+- Implementations moved to internal `NSwagDocumentFactory`, `NSwagDocumentFilter` and
+  `NSwagSchemaCleaner`; the public names are thin `[Obsolete]` facades.
+- `PublicApiNSwagIndependenceTests` fails if any non-obsolete public member exposes an NSwag or
+  NJsonSchema type. It caught the public `RefitGenerator` constructor.
+- Using `customTemplateDirectory` now produces a "Deprecated Setting" warning (CLI, MSBuild), like `usePolly`.
+
+Findings:
+
+- `codeGeneratorSettings.customTemplateDirectory` was never read: it silently had no effect.
+  It now warns that it has no effect.
+- `XmlDocumentationGenerator` was public but had only an internal constructor and no public way to
+  obtain an instance, so it was made internal instead of getting a facade.
+- Adding `ParameterNameProvider` to the public `ICodeGenerationConfiguration` interface breaks
+  anyone who implements it outside Refitter (netstandard2.0 has no default interface members).
+  This is unlikely but belongs in the release notes.
+- The source generator only surfaces the "Date Format Override" warning, so it does not show the
+  `usePolly` or `customTemplateDirectory` deprecation warnings either.
+
 ### Phase 2 — Refitter schema/document model
 
 1. Define an internal immutable model: `ApiDocument`, `ApiOperation`, `ApiParameter`,
@@ -141,10 +172,16 @@ Exit: full parity suite green with the flag on; all scenario, source-generator a
 
 Remove the packages, the flag, the NSwag code path and the workarounds listed above.
 
-## Accepted differences (to be confirmed by the maintainer)
+## Accepted differences
 
-- `CustomTemplateDirectory`: NJsonSchema Liquid templates cannot be honored without
-  re-implementing NJsonSchema's template models. Proposal: remove in the major release.
+Confirmed by the maintainer:
+
+- `CustomTemplateDirectory` is dropped in the major release: NJsonSchema Liquid templates cannot be
+  honored without re-implementing NJsonSchema's template models. Deprecated in Phase 1.
+- NSwag-typed APIs are kept as `[Obsolete]` until the next major version, which removes them.
+
+Still to confirm:
+
 - `[GeneratedCode("NJsonSchema", "x.y.z")]` on contracts becomes `[GeneratedCode("Refitter", …)]`.
 
 ## Risks
