@@ -14,6 +14,9 @@
 
 **Merged pull requests:**
 
+- Update refit monorepo to 16.2.0 [\#1285](https://github.com/christianhelle/refitter/pull/1285) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency Newtonsoft.Json.Schema to 4.0.2 [\#1284](https://github.com/christianhelle/refitter/pull/1284) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency TUnit to 1.69.16 [\#1282](https://github.com/christianhelle/refitter/pull/1282) ([renovate[bot]](https://github.com/apps/renovate))
 - Add OpenAPI edge case regression tests and fix BuildHelper no-op builds [\#1279](https://github.com/christianhelle/refitter/pull/1279) ([christianhelle](https://github.com/christianhelle))
 - Update NuGet packages [\#1261](https://github.com/christianhelle/refitter/pull/1261) ([christianhelle](https://github.com/christianhelle))
 - Document .NET 10 system requirements [\#1260](https://github.com/christianhelle/refitter/pull/1260) ([Copilot](https://github.com/apps/copilot-swe-agent))
