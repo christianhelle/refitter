@@ -20,31 +20,31 @@ internal static class ParameterNameDeduplicator
         "Body",
     };
 
-    // Parameters Refitter always appends, which keep their well-known names
-    private static readonly HashSet<string> ReservedParameterTypes = new(StringComparer.Ordinal)
-    {
-        "CancellationToken",
-        "IApizrRequestOptions",
-    };
-
     /// <summary>
     /// Renames later parameters that reuse an earlier name by adding a numeric suffix. A renamed parameter
     /// that Refit binds by name (route, query or multipart) gets an <c>AliasAs</c> attribute with its
     /// original name, so the request is unchanged.
     /// </summary>
-    public static IReadOnlyList<string> Deduplicate(IReadOnlyList<string> parameters)
+    /// <param name="parameters">The parameters of the method.</param>
+    /// <param name="hasAppendedParameter">
+    /// Whether the last parameter is the cancellation token or request options argument Refitter appends,
+    /// which keeps its well-known name.
+    /// </param>
+    public static IReadOnlyList<string> Deduplicate(IReadOnlyList<string> parameters, bool hasAppendedParameter)
     {
         var parsed = parameters.Select(Parse).ToList();
+        var appendedIndex = hasAppendedParameter ? parsed.Count - 1 : -1;
 
         var usedNames = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var parameter in parsed.Where(p => ReservedParameterTypes.Contains(p.Syntax.Type!.ToString())))
-            usedNames.Add(parameter.Syntax.Identifier.ValueText);
+        if (appendedIndex >= 0)
+            usedNames.Add(parsed[appendedIndex].Syntax.Identifier.ValueText);
 
         var result = new List<string>(parameters.Count);
-        foreach (var parameter in parsed)
+        for (var index = 0; index < parsed.Count; index++)
         {
+            var parameter = parsed[index];
             var name = parameter.Syntax.Identifier.ValueText;
-            if (ReservedParameterTypes.Contains(parameter.Syntax.Type!.ToString()) || usedNames.Add(name))
+            if (index == appendedIndex || usedNames.Add(name))
             {
                 result.Add(parameter.Text);
                 continue;

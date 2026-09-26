@@ -39,11 +39,16 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
             settings,
             operationModel.Parameters);
 
+        var hasAppendedParameter = true;
         if (settings.ApizrSettings?.WithRequestOptions == true)
             parameters.Add("[RequestOptions] IApizrRequestOptions options");
         else if (settings.UseCancellationTokens)
             parameters.Add("CancellationToken cancellationToken = default");
+        else
+            hasAppendedParameter = false;
 
-        return new ParameterList(ParameterNameDeduplicator.Deduplicate(parameters), dynamicQuerystringCode);
+        return new ParameterList(
+            ParameterNameDeduplicator.Deduplicate(parameters, hasAppendedParameter),
+            dynamicQuerystringCode);
     }
 }
