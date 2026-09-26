@@ -164,8 +164,32 @@ public class XmlDocumentationGeneratorTests
         {
             Parameters = { new OpenApiParameter { OriginalName = "testParam", Description = "TestParameter" } },
         });
-        this.generator.AppendMethodDocumentation(method, ["[Query] TestQueryParams queryParams"], false, docs);
+        this.generator.AppendMethodDocumentation(method, ["[Query] TestQueryParams queryParams"], false, docs, "TestQueryParams");
         docs.ToString().Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
+    }
+
+    [Test]
+    public void Documents_Dynamic_Querystring_Wrapper_Even_When_A_Folded_Parameter_Is_Named_QueryParams()
+    {
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Parameters = { new OpenApiParameter { Name = "queryParams", Kind = OpenApiParameterKind.Query, Description = "Folded" } },
+        });
+        this.generator.AppendMethodDocumentation(method, ["[Query] TestQueryParams? queryParams"], false, docs, "TestQueryParams");
+        docs.ToString().Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
+    }
+
+    [Test]
+    public void Documents_Parameter_Named_QueryParams_Without_Dynamic_Querystring()
+    {
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Parameters = { new OpenApiParameter { Name = "queryParams", Kind = OpenApiParameterKind.Query, Description = "Real parameter" } },
+        });
+        this.generator.AppendMethodDocumentation(method, ["[Query] string queryParams"], false, docs);
+        docs.ToString().Should().Contain("/// <param name=\"queryParams\">Real parameter</param>");
     }
 
     [Test]

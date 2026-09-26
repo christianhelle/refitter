@@ -88,11 +88,15 @@ public class XmlDocumentationGenerator
     /// </param>
     /// <param name="hasApiResponse">Indicates whether the method returns an <c>ApiResponse</c>.</param>
     /// <param name="code">The builder to append the documentation to.</param>
+    /// <param name="dynamicQuerystringParameterType">
+    /// The type of the dynamic querystring wrapper parameter, when the method may have one.
+    /// </param>
     public void AppendMethodDocumentation(
         CSharpOperationModel method,
         IReadOnlyList<string> parameters,
         bool hasApiResponse,
-        StringBuilder code)
+        StringBuilder code,
+        string? dynamicQuerystringParameterType = null)
     {
         if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
@@ -107,7 +111,7 @@ public class XmlDocumentationGenerator
         {
             this.AppendXmlCommentBlock(
                 ParamKeyword,
-                GetParameterDescription(method, name, type),
+                GetParameterDescription(method, name, type, dynamicQuerystringParameterType),
                 code,
                 new()
                 {
@@ -293,7 +297,11 @@ public class XmlDocumentationGenerator
             .Select(parameter => (parameter.Identifier.ValueText, parameter.Type?.ToString() ?? string.Empty));
     }
 
-    private static string GetParameterDescription(CSharpOperationModel method, string name, string type)
+    private static string GetParameterDescription(
+        CSharpOperationModel method,
+        string name,
+        string type,
+        string? dynamicQuerystringParameterType)
     {
         if (type == "CancellationToken")
             return "The cancellation token to cancel the request.";
@@ -301,9 +309,11 @@ public class XmlDocumentationGenerator
         if (type == "IApizrRequestOptions")
             return "The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.";
 
-        var operationParameter = method.Parameters.FirstOrDefault(p => GetVariableNames(p).Contains(name));
-        if (operationParameter == null && name == "queryParams")
+        // Identified by type, since a folded query parameter can itself be named queryParams
+        if (type.TrimEnd('?') == dynamicQuerystringParameterType)
             return "The dynamic querystring parameter wrapping all others.";
+
+        var operationParameter = method.Parameters.FirstOrDefault(p => GetVariableNames(p).Contains(name));
 
         return operationParameter?.HasDescription == true
             ? SanitizeResponseDescription(operationParameter.Description)

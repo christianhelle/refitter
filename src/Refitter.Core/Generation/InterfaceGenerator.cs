@@ -228,7 +228,12 @@ internal class InterfaceGenerator
 
         if (settings.GenerateXmlDocCodeComments)
         {
-            docGenerator.AppendMethodDocumentation(operationModel, parameters, isApiResponseType, code);
+            docGenerator.AppendMethodDocumentation(
+                operationModel,
+                parameters,
+                isApiResponseType,
+                code,
+                dynamicQuerystringParameterType);
         }
 
         foreach (var attribute in methodAttributeGenerator.Generate(operation, operationModel))
@@ -245,7 +250,12 @@ internal class InterfaceGenerator
             var nonOptionalParameters = parameters.Where(parameter => !parameter.Contains("?")).ToList();
             if (settings.GenerateXmlDocCodeComments)
             {
-                docGenerator.AppendMethodDocumentation(operationModel, nonOptionalParameters, isApiResponseType, code);
+                docGenerator.AppendMethodDocumentation(
+                    operationModel,
+                    nonOptionalParameters,
+                    isApiResponseType,
+                    code,
+                    dynamicQuerystringParameterType);
             }
 
             foreach (var attribute in methodAttributeGenerator.Generate(operation, operationModel))
