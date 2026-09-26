@@ -194,5 +194,24 @@ public class RefitterRunner
                     "Deprecated Setting",
                     "The 'usePolly' property is deprecated. Use 'transientErrorHandler: Polly' instead"));
         }
+
+#pragma warning disable CS0618
+        if (!string.IsNullOrWhiteSpace(settings.CustomTemplateDirectory))
+        {
+            warnings.Add(
+                new Warning(
+                    "Deprecated Setting",
+                    "The 'customTemplateDirectory' property is deprecated and will be removed in the next major version, " +
+                    "when Refitter stops generating code with NSwag"));
+        }
+
+        if (!string.IsNullOrWhiteSpace(settings.CodeGeneratorSettings?.CustomTemplateDirectory))
+#pragma warning restore CS0618
+        {
+            warnings.Add(
+                new Warning(
+                    "Deprecated Setting",
+                    "The 'codeGeneratorSettings.customTemplateDirectory' property has no effect and will be removed in the next major version"));
+        }
     }
 }

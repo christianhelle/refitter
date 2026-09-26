@@ -437,7 +437,8 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
     /// templates.
     /// </summary>
-    [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
+    [Description("Deprecated, will be removed in the next major version. Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
+    [Obsolete("Custom NSwag Liquid templates will not be supported once Refitter stops using NSwag, and this setting will be removed in the next major version.")]
     public string? CustomTemplateDirectory { get; set; }
 
     /// <summary>

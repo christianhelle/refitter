@@ -298,7 +298,8 @@ public class CodeGeneratorSettings
     /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
     /// templates.
     /// </summary>
-    [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
+    [Description("Deprecated and has no effect; use customTemplateDirectory at the root of the settings instead.")]
+    [Obsolete("This setting has no effect. Custom NSwag Liquid templates are configured with RefitGeneratorSettings.CustomTemplateDirectory, which is also deprecated.")]
     public string? CustomTemplateDirectory { get; set; }
 
     /// <summary>
