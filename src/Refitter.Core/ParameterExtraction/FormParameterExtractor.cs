@@ -82,8 +82,14 @@ internal sealed class FormParameterExtractor
         if (IsBinary(propertySchema))
             return "StreamPart";
 
-        if (propertySchema.Type == JsonObjectType.Array && propertySchema.Item is { } itemSchema && IsBinary(itemSchema))
-            return "IEnumerable<StreamPart>";
+        // Arrays use IEnumerable<T>, like the multipart parameters NSwag creates
+        if (propertySchema.Type == JsonObjectType.Array)
+        {
+            var itemType = propertySchema.Item is { } itemSchema
+                ? GetPropertyType(itemSchema, settings)
+                : "object";
+            return $"IEnumerable<{itemType}>";
+        }
 
         return ParameterTypeResolver.GetCSharpType(propertySchema, settings);
     }

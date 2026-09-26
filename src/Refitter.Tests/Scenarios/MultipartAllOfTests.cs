@@ -30,6 +30,18 @@ public class MultipartAllOfTests
                         - type: object
                           properties: { note: { type: string } }
               responses: { '204': { description: ok } }
+          /tagged:
+            post:
+              operationId: PostTagged
+              requestBody:
+                content:
+                  multipart/form-data:
+                    schema:
+                      allOf:
+                        - $ref: '#/components/schemas/Tagged'
+                        - type: object
+                          properties: { note: { type: string } }
+              responses: { '204': { description: ok } }
           /empty:
             post:
               operationId: PostEmpty
@@ -43,6 +55,12 @@ public class MultipartAllOfTests
               type: object
               properties:
                 attachments: { type: array, items: { type: string, format: binary } }
+            Tagged:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+                labels: { type: array, items: { type: string } }
+                raw: { type: array }
             Tags:
               type: object
               properties:
@@ -56,6 +74,13 @@ public class MultipartAllOfTests
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task PostFiles(IEnumerable<StreamPart> attachments, IEnumerable<string> labels, IEnumerable<int> ids, IEnumerable<object> raw, string note);");
+    }
+
+    [Test]
+    public async Task Uses_IEnumerable_For_Arrays_From_Referenced_Members()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("Task PostTagged(StreamPart file, IEnumerable<string> labels, IEnumerable<object> raw, string note);");
     }
 
     [Test]
