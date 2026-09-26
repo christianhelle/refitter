@@ -44,6 +44,6 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
         else if (settings.UseCancellationTokens)
             parameters.Add("CancellationToken cancellationToken = default");
 
-        return new ParameterList(parameters, dynamicQuerystringCode);
+        return new ParameterList(ParameterNameDeduplicator.Deduplicate(parameters), dynamicQuerystringCode);
     }
 }

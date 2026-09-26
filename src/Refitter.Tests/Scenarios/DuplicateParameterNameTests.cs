@@ -47,8 +47,18 @@ public class DuplicateParameterNameTests
     }
 
     [Test]
+    public async Task Renames_Duplicate_Parameters_And_Keeps_Wire_Names()
+    {
+        var generatedCode = await GenerateCode(settings => settings.UseCancellationTokens = true);
+        generatedCode.Should().Contain("Task Search([AliasAs(\"cancellationToken\")] [Query] string cancellationToken2, CancellationToken cancellationToken = default);");
+        generatedCode.Should().Contain("Task GetItem([AliasAs(\"Id\")] string idPath, [AliasAs(\"id\")] string idPath2, CancellationToken cancellationToken = default);");
+        generatedCode.Should().Contain("[AliasAs(\"id\")] string id2");
+        generatedCode.Should().Contain("<param name=\"cancellationToken2\">");
+        generatedCode.Should().Contain("<param name=\"idPath2\">");
+    }
+
+    [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1269")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
@@ -57,7 +67,6 @@ public class DuplicateParameterNameTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1269")]
     public async Task Can_Build_Generated_Code_With_Cancellation_Tokens()
     {
         var generatedCode = await GenerateCode(settings => settings.UseCancellationTokens = true);
