@@ -24,8 +24,17 @@ internal static class ParameterAttributeFormatter
         return "[" + string.Join(", ", filteredAttributes) + "] ";
     }
 
-    public static string GetBodyAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
+    public static string GetBodyAttribute(
+        CSharpParameterModel parameter,
+        string? contentType,
+        RefitGeneratorSettings settings)
     {
+        // Refit serializes bodies with the content serializer (JSON) unless told otherwise
+        if (contentType?.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            return "Body(BodySerializationMethod.UrlEncoded)";
+        }
+
         var anyType = settings.CodeGeneratorSettings?.AnyType ?? "object";
         var parameterType = ParameterTypeResolver.ResolveType(parameter.Type);
 
