@@ -114,6 +114,7 @@ internal class InterfaceGenerator
         var rawInterfaceName = partitioning.GetInterfaceName(string.Empty, title, baseOperationName);
         var interfaceNameSuffix = partitioning.GetInterfaceNameSuffix();
         var interfaceName = IdentifierUtils.Counted(knownInterfaceIdentifiers, rawInterfaceName, interfaceNameSuffix);
+        knownInterfaceIdentifiers.Add(interfaceName);
 
         var code = new StringBuilder();
         var dynamicQuerystringParametersCodeBuilder = new StringBuilder();
@@ -165,6 +166,7 @@ internal class InterfaceGenerator
         var rawInterfaceName = partitioning.GetInterfaceName(groupKey, title, baseOperationName);
         var interfaceNameSuffix = partitioning.GetInterfaceNameSuffix();
         var interfaceName = IdentifierUtils.Counted(knownInterfaceIdentifiers, rawInterfaceName, interfaceNameSuffix);
+        knownInterfaceIdentifiers.Add(interfaceName);
 
         var code = new StringBuilder();
         partitioning.AppendInterfaceDocumentation(document, docGenerator, groupKey, representativeOperation, code);
