@@ -1435,7 +1435,9 @@ public class ReturnTypeGeneratorTests
         public TypeAccessibility TypeAccessibility => inner.TypeAccessibility;
         public bool ImmutableRecords => inner.ImmutableRecords;
         public string? CustomTemplateDirectory => inner.CustomTemplateDirectory;
+#pragma warning disable CS0618 // Implements the obsolete NSwag-typed hook
         public NSwag.CodeGeneration.IParameterNameGenerator? ParameterNameGenerator => inner.ParameterNameGenerator;
+#pragma warning restore CS0618
         public IParameterNameProvider? ParameterNameProvider => inner.ParameterNameProvider;
         public bool UsePolymorphicSerialization => inner.UsePolymorphicSerialization;
         public bool UseCancellationTokens => inner.UseCancellationTokens;

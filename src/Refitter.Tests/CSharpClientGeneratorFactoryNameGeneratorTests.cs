@@ -1,3 +1,5 @@
+// Covers the obsolete NSwag-typed naming hooks until they are removed
+#pragma warning disable CS0618
 using AwesomeAssertions;
 using NJsonSchema;
 using NJsonSchema.CodeGeneration;

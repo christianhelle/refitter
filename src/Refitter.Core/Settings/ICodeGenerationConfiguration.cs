@@ -70,6 +70,7 @@ public interface ICodeGenerationConfiguration
     /// <summary>
     /// Gets the parameter name generator.
     /// </summary>
+    [Obsolete("Use ParameterNameProvider instead. ParameterNameGenerator exposes NSwag types and will be removed in the next major version.")]
     IParameterNameGenerator? ParameterNameGenerator { get; }
 
     /// <summary>
