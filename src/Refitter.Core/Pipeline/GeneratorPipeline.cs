@@ -27,6 +27,9 @@ internal sealed class GeneratorPipeline
 
         var serializerContext = GenerateJsonSerializerContext(document, settings, contracts);
         var interfaces = GenerateClient(document, settings, interfaceGenerator);
+        if (settings.GenerateClients)
+            contracts = ObsoleteContractAttributeRemover.Remove(contracts, interfaces.Select(c => c.Content));
+
         var interfaceNames = interfaces
             .Select(c => c.TypeName)
             .Where(name => !string.IsNullOrEmpty(name))
