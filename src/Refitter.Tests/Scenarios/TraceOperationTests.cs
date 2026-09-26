@@ -24,6 +24,17 @@ public class TraceOperationTests
               responses: { '200': { description: ok } }
         """;
 
+    private const string TraceOnlySpec = """
+        openapi: 3.0.1
+        info: { title: TraceOnly, version: v1 }
+        paths:
+          /r:
+            trace:
+              operationId: TraceR
+              tags: [ Diagnostics ]
+              responses: { '200': { description: ok } }
+        """;
+
     [Test]
     public async Task Can_Generate_Code()
     {
@@ -70,6 +81,27 @@ public class TraceOperationTests
             settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint;
             settings.DependencyInjectionSettings = new DependencyInjectionSettings { BaseUrl = "https://example.com" };
         });
+        generatedCode.Should().NotContain("TraceR");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Arguments(MultipleInterfaces.Unset)]
+    [Arguments(MultipleInterfaces.ByEndpoint)]
+    [Arguments(MultipleInterfaces.ByTag)]
+    public async Task Can_Generate_Code_When_All_Operations_Are_Trace(MultipleInterfaces multipleInterfaces)
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(TraceOnlySpec);
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            MultipleInterfaces = multipleInterfaces,
+            DependencyInjectionSettings = new DependencyInjectionSettings { BaseUrl = "https://example.com" },
+        };
+
+        var sut = await RefitGenerator.CreateAsync(settings);
+        var generatedCode = sut.Generate();
+
         generatedCode.Should().NotContain("TraceR");
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
