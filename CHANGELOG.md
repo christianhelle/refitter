@@ -14,7 +14,10 @@
 
 **Fixed bugs:**
 
+- Array header parameters are sent as the CLR type name [\#1281](https://github.com/christianhelle/refitter/issues/1281)
+- OpenAPI 3 query parameter style and explode are ignored [\#1280](https://github.com/christianhelle/refitter/issues/1280)
 - Deprecated schemas used in operations cause CS0612 in the Refit stub [\#1278](https://github.com/christianhelle/refitter/issues/1278)
+- Form-urlencoded request bodies are serialized as JSON [\#1276](https://github.com/christianhelle/refitter/issues/1276)
 - Schema named Task breaks void operations \(CS0029\) [\#1275](https://github.com/christianhelle/refitter/issues/1275)
 - Numeric bounds larger than decimal.MaxValue fail to load the spec [\#1273](https://github.com/christianhelle/refitter/issues/1273)
 - HttpResponseMessage return type compiles only with implicit usings [\#1272](https://github.com/christianhelle/refitter/issues/1272)
@@ -24,6 +27,9 @@
 
 **Merged pull requests:**
 
+- Send array header parameters as comma-separated values [\#1297](https://github.com/christianhelle/refitter/pull/1297) ([christianhelle](https://github.com/christianhelle))
+- Honor OpenAPI 3 query parameter style and explode [\#1296](https://github.com/christianhelle/refitter/pull/1296) ([christianhelle](https://github.com/christianhelle))
+- Send form-urlencoded request bodies as form posts [\#1295](https://github.com/christianhelle/refitter/pull/1295) ([christianhelle](https://github.com/christianhelle))
 - Build deprecated schemas used by operations with warnings as errors [\#1294](https://github.com/christianhelle/refitter/pull/1294) ([christianhelle](https://github.com/christianhelle))
 - Load specs with numeric bounds beyond decimal.MaxValue [\#1293](https://github.com/christianhelle/refitter/pull/1293) ([christianhelle](https://github.com/christianhelle))
 - Fix void operations when a schema is named Task [\#1292](https://github.com/christianhelle/refitter/pull/1292) ([christianhelle](https://github.com/christianhelle))

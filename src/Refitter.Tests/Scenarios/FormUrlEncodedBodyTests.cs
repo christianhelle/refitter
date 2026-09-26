@@ -41,11 +41,54 @@ public class FormUrlEncodedBodyTests
     }
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1276")]
     public async Task Serializes_Form_Body_As_UrlEncoded()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[Body(BodySerializationMethod.UrlEncoded)] Body body");
+    }
+
+    [Test]
+    public async Task Serializes_Form_Body_With_Charset_As_UrlEncoded()
+    {
+        var generatedCode = await GenerateCode(
+            OpenApiSpec.Replace(
+                "application/x-www-form-urlencoded:",
+                "'application/x-www-form-urlencoded; charset=utf-8':"));
+        generatedCode.Should().Contain("[Body(BodySerializationMethod.UrlEncoded)] Body body");
+    }
+
+    [Test]
+    public async Task Keeps_Default_Body_For_Other_Media_Types_With_The_Same_Prefix()
+    {
+        var generatedCode = await GenerateCode(
+            OpenApiSpec.Replace(
+                "application/x-www-form-urlencoded:",
+                "application/x-www-form-urlencoded-extra:"));
+        generatedCode.Should().Contain("[Body] Body body");
+        generatedCode.Should().NotContain("BodySerializationMethod.UrlEncoded");
+    }
+
+    [Test]
+    [Arguments("APPLICATION/X-WWW-FORM-URLENCODED")]
+    [Arguments("'application/x-www-form-urlencoded ; charset=utf-8'")]
+    public async Task Matches_Form_Media_Type_Case_Insensitively_And_Ignoring_Parameters(string mediaType)
+    {
+        var generatedCode = await GenerateCode(
+            OpenApiSpec.Replace("application/x-www-form-urlencoded:", $"{mediaType}:"));
+        generatedCode.Should().Contain("[Body(BodySerializationMethod.UrlEncoded)] Body body");
+    }
+
+    [Test]
+    public async Task Keeps_Json_Body_When_Json_Is_Also_Accepted()
+    {
+        var generatedCode = await GenerateCode(
+            OpenApiSpec.Replace(
+                "application/x-www-form-urlencoded:",
+                "application/json: { schema: { type: object, properties: { grant_type: { type: string } } } }\n"
+                + "          application/x-www-form-urlencoded:"));
+        generatedCode.Should().Contain("Content-Type: application/json");
+        generatedCode.Should().Contain("[Body] Body body");
+        generatedCode.Should().NotContain("BodySerializationMethod.UrlEncoded");
     }
 
     [Test]
@@ -56,11 +99,10 @@ public class FormUrlEncodedBodyTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    private static async Task<string> GenerateCode(Action<RefitGeneratorSettings>? configure = null)
+    private static async Task<string> GenerateCode(string spec = OpenApiSpec)
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
-        configure?.Invoke(settings);
 
         var sut = await RefitGenerator.CreateAsync(settings);
         return sut.Generate();

@@ -9,8 +9,9 @@ using OpenApiDocument = NSwag.OpenApiDocument;
 namespace Refitter.Core;
 
 /// <summary>
-/// Parses OpenAPI documents the way NSwag does, but clamps numeric bounds that do not fit in a
-/// <see cref="decimal"/> first, both in the document and in the local files it references (#1273).
+/// Parses OpenAPI documents the way NSwag does, but first clamps numeric bounds that do not fit in a
+/// <see cref="decimal"/>, both in the document and in the local files it references (#1273), and inlines
+/// path items referenced from OpenAPI 3.1 <c>components/pathItems</c> (#1274).
 /// </summary>
 internal static class OpenApiDocumentParser
 {
@@ -25,7 +26,8 @@ internal static class OpenApiDocumentParser
         bool isYaml,
         CancellationToken cancellationToken = default)
     {
-        var json = NumericBoundsSanitizer.Sanitize(isYaml ? ConvertYamlToJson(content) : content);
+        var json = PathItemReferenceInliner.Inline(
+            NumericBoundsSanitizer.Sanitize(isYaml ? ConvertYamlToJson(content) : content));
         return OpenApiDocument.FromJsonAsync(
             json,
             documentPath!,

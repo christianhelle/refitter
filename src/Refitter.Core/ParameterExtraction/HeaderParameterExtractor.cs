@@ -27,7 +27,7 @@ internal sealed class HeaderParameterExtractor
                 .Select(p =>
                 {
                     var variableName = ParameterNaming.GetVariableName(p);
-                    return $"{ParameterAttributeFormatter.JoinAttributes($"Header(\"{ParameterNaming.EscapeString(p.Name)}\")")}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}";
+                    return $"{ParameterAttributeFormatter.JoinAttributes($"Header(\"{ParameterNaming.EscapeString(p.Name)}\")")}{ParameterTypeResolver.GetHeaderParameterType(p, settings)} {variableName}";
                 })
                 .ToList();
         }
