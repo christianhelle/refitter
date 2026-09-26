@@ -56,6 +56,28 @@ public class ApizrOptionsBuilderTests
     }
 
     [Test]
+    public void AddUsing_Ignores_Directive_Already_Added()
+    {
+        var builder = new ApizrOptionsBuilder(string.Empty, string.Empty);
+
+        builder.AddUsing("using Refit;");
+        builder.AddUsing("using Refit;");
+
+        builder.GetUsings().Should().Be(Environment.NewLine + "    using Refit;" + Environment.NewLine);
+    }
+
+    [Test]
+    public void AddUsing_Ignores_Directive_In_Initial_Usings()
+    {
+        var initialUsings = "using System;" + Environment.NewLine + "    using Polly;";
+        var builder = new ApizrOptionsBuilder(string.Empty, initialUsings);
+
+        builder.AddUsing("using Polly;");
+
+        builder.GetUsings().Should().Be(initialUsings + Environment.NewLine);
+    }
+
+    [Test]
     public void AddPackage_Collects_Distinct_Packages()
     {
         var builder = new ApizrOptionsBuilder(string.Empty, string.Empty);
