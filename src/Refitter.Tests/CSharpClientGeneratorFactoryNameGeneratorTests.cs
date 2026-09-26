@@ -21,6 +21,11 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         public string Generate(JsonSchemaProperty property) => "Stubbed" + property.Name;
     }
 
+    private sealed class StubPropertyNameProvider : IPropertyNameProvider
+    {
+        public string GetPropertyName(PropertyNameContext context) => "Provided" + context.Name;
+    }
+
     private static Task<OpenApiDocument> CreateDocumentAsync() =>
         OpenApiDocument.FromJsonAsync("""
             {
@@ -84,6 +89,29 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
 
         generator.Settings.CSharpGeneratorSettings.PropertyNameGenerator
             .Should().BeSameAs(propertyNameGenerator);
+    }
+
+    [Test]
+    public async Task Create_WithPropertyNameProvider_PrefersItOverPropertyNameGenerator()
+    {
+        var document = await CreateDocumentAsync();
+        var propertyNameProvider = new StubPropertyNameProvider();
+        var settings = new RefitGeneratorSettings
+        {
+            Namespace = "TestNamespace",
+            CodeGeneratorSettings = new CodeGeneratorSettings
+            {
+                PropertyNameGenerator = new StubPropertyNameGenerator(),
+                PropertyNameProvider = propertyNameProvider,
+            },
+        };
+
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+
+        generator.Settings.CSharpGeneratorSettings.PropertyNameGenerator
+            .Should().BeOfType<UniquePropertyNameGenerator>()
+            .Which.Inner.Should().BeOfType<PropertyNameProviderAdapter>()
+            .Which.Provider.Should().BeSameAs(propertyNameProvider);
     }
 
     [Test]
