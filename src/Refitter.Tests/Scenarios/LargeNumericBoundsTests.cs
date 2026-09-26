@@ -28,7 +28,6 @@ public class LargeNumericBoundsTests
         """;
 
     [Test]
-    [Skip("https://github.com/christianhelle/refitter/issues/1273")]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
@@ -37,10 +36,29 @@ public class LargeNumericBoundsTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1273")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Generates_Property_With_Clamped_Range()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("double Value");
+        generatedCode.Should().Contain("Range(0D, 79228162514264337593543950335D)");
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_From_Json()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(Refitter.Tests.OpenApi.LargeNumericBoundsSpecs.Json);
+        var sut = await RefitGenerator.CreateAsync(new RefitGeneratorSettings { OpenApiPath = swaggerFile });
+        var generatedCode = sut.Generate();
+
+        generatedCode.Should().Contain("double Value");
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
