@@ -125,7 +125,7 @@ OPTIONS:
         --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
         --json-library-version                                     JSON library version for System.Text.Json (default: 8.0). When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names. Cannot be used with a settings file that also specifies a non-default value
-        --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+        --custom-template-directory                              Deprecated, will be removed in the next major version. Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
         --telemetry-source                                       Report the telemetry source of this invocation. Used internally by the MSBuild integration.
         --telemetry-file-count                                   Report the total number of settings files in the current workload. Used internally by the MSBuild integration.
         --telemetry-runtime                                      Report the bundled runtime selected for this invocation. Used internally by the MSBuild integration.
