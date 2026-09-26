@@ -112,6 +112,11 @@ internal class CSharpClientGeneratorFactory
 
     private IPropertyNameGenerator CreatePropertyNameGenerator(Func<JsonSchema, string?> getTypeName)
     {
+        if (codeGeneration.CodeGeneratorSettings?.PropertyNameProvider is { } propertyNameProvider)
+        {
+            return new UniquePropertyNameGenerator(new PropertyNameProviderAdapter(propertyNameProvider), getTypeName);
+        }
+
         if (codeGeneration.CodeGeneratorSettings?.PropertyNameGenerator is { } propertyNameGenerator)
         {
             return propertyNameGenerator;
@@ -193,7 +198,7 @@ internal class CSharpClientGeneratorFactory
         destination.ExcludedTypeNames = source.ExcludedTypeNames;
         destination.JsonLibraryVersion = source.JsonLibraryVersion;
 
-        if (source.PropertyNameGenerator != null)
+        if (source.PropertyNameGenerator != null && source.PropertyNameProvider == null)
         {
             destination.PropertyNameGenerator = source.PropertyNameGenerator;
         }

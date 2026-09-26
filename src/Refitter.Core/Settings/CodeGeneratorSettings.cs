@@ -266,6 +266,14 @@ public class CodeGeneratorSettings
     public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
 
     /// <summary>
+    /// Gets or sets a custom <see cref="IPropertyNameProvider"/> that names the properties of generated contracts.
+    /// Takes precedence over <see cref="PropertyNameGenerator"/> and <see cref="RefitGeneratorSettings.PropertyNamingPolicy"/>.
+    /// </summary>
+    [Description("Gets or sets a custom IPropertyNameProvider.")]
+    [JsonIgnore]
+    public IPropertyNameProvider? PropertyNameProvider { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether to inline JsonConverter attributes for enum types (default: true).
     /// When set to true (default), the <c>[JsonConverter(typeof(JsonStringEnumConverter&lt;TEnum&gt;))]</c> attribute
     /// is placed on the enum type declaration instead of on individual enum properties, allowing users to override the
