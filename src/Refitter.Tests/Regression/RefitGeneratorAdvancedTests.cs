@@ -428,8 +428,8 @@ public class RefitGeneratorAdvancedTests
             var generator = await RefitGenerator.CreateAsync(settings);
 
             // Verify the document was created and has paths from both specs
-            generator.OpenApiDocument.Should().NotBeNull();
-            generator.OpenApiDocument.Paths.Should().NotBeEmpty();
+            generator.DocumentInfo.Should().NotBeNull();
+            generator.DocumentInfo.Paths.Should().NotBeEmpty();
 
             var code = generator.Generate();
             code.Should().NotBeNullOrWhiteSpace();
@@ -610,8 +610,8 @@ public class RefitGeneratorAdvancedTests
             var generator = await RefitGenerator.CreateAsync(settings);
 
             // Verify the document was created and has paths
-            generator.OpenApiDocument.Should().NotBeNull();
-            generator.OpenApiDocument.Paths.Should().NotBeEmpty();
+            generator.DocumentInfo.Should().NotBeNull();
+            generator.DocumentInfo.Paths.Should().NotBeEmpty();
 
             var result = generator.GenerateMultipleFiles();
 
@@ -933,7 +933,7 @@ public class RefitGeneratorAdvancedTests
             };
 
             var generator = await RefitGenerator.CreateAsync(settings);
-            generator.OpenApiDocument.Info = null!;
+            generator.NSwagDocument.Info = null!;
 
             var result = generator.GenerateMultipleFiles();
 
