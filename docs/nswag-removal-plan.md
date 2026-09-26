@@ -1,0 +1,135 @@
+# Plan: Removing the NSwag Dependency
+
+Status: **Phase 0 in progress** (exploratory branch `feature/nswag-removal-feasibility-874777`)
+
+## Goal
+
+Remove `NSwag.CodeGeneration.CSharp` and `NSwag.Core.Yaml` (and with them the transitive
+`NJsonSchema*` packages) from `Refitter.Core` without dropping a user-facing feature.
+
+"Without dropping a feature" is defined mechanically: **every golden snapshot produced by
+the Phase 0 harness must be reproduced by the NSwag-free pipeline**, apart from differences
+that are explicitly accepted and listed in the "Accepted differences" section of this
+document.
+
+## Where NSwag is used today
+
+About 40 files in `Refitter.Core` import NSwag or NJsonSchema. The usage falls into four layers.
+
+| Layer | What NSwag does | Main files | Replacement |
+|---|---|---|---|
+| 1. Document model | Parses Swagger 2.0 / OpenAPI 3.x into `NSwag.OpenApiDocument` + `NJsonSchema.JsonSchema`, resolves `$ref` (incl. external files), upgrades Swagger 2 to one model | `Document/*`, `Schema/*`, `Mutators/*`, `Partitioning/*`, `RefitGenerator` | `Microsoft.OpenApi` (already referenced through OasReader) behind a Refitter-owned model |
+| 2. Operation model | `CSharpOperationModel`: parameter/response type resolution, nullability, parameter naming | `Generation/*`, `ParameterExtraction/*`, `CustomCSharpClientGenerator.CreateOperationModel` | Refitter `OperationModel` built from the Refitter schema model |
+| 3. Contract generation | NJsonSchema C# generator + Liquid templates emit DTOs, enums, inheritance, converters | `Pipeline/CSharpClientGeneratorFactory`, `GeneratorPipeline` (`generator.GenerateFile()`), `CodeGeneration/*` | Refitter contract emitter (Roslyn `SyntaxFactory` or string builder) |
+| 4. Public API | NSwag types exposed on Refitter's public surface | see below | Refitter-owned abstractions, NSwag ones obsoleted |
+
+Public API that exposes NSwag/NJsonSchema types:
+
+- `CodeGeneratorSettings.PropertyNameGenerator` (`NJsonSchema.CodeGeneration.IPropertyNameGenerator`)
+- `RefitGeneratorSettings.ParameterNameGenerator` (`NSwag.CodeGeneration.IParameterNameGenerator`)
+- `RefitGenerator.OpenApiDocument` and `OpenApiDocumentFactory.CreateAsync` (`NSwag.OpenApiDocument`)
+- `CustomTemplateDirectory` (users' Liquid templates bind to NJsonSchema template models)
+- `OperationNameGeneratorTypes` is Refitter's own enum, but its values select NSwag
+  `IOperationNameGenerator` implementations, so their behavior must be reimplemented.
+
+Workarounds that exist only because of NSwag, and which should disappear or shrink:
+`NumericBoundsSanitizer`, `PathItemReferenceInliner`, the OasReader→NSwag round-trip in
+`OpenApiReaderDocumentStrategy`, `SchemaCleaner`, the five document mutators,
+`Swagger2OptionalReferenceNullabilityNormalizer`, `EnumStringConverterInjector`,
+the regex-based `ContractTypeSuffixApplier`, `ObsoleteContractAttributeRemover`.
+
+## Phases
+
+Each phase ends in a releasable state. NSwag stays the default until Phase 5.
+
+### Phase 0 — Golden-output parity harness (no production changes)
+
+Freeze today's behavior so later phases can prove they preserve it.
+
+1. Add a `Parity` test suite in `Refitter.Tests` that, for every spec in `test/OpenAPI`
+   (v2.0, v3.0, v3.1; JSON and YAML), and for a matrix of settings variants that mirrors
+   `test/smoke-tests.ps1`, generates code and compares it to a checked-in snapshot.
+2. Snapshots live under `src/Refitter.Tests/Parity/Snapshots/<spec>/<variant>.cs`.
+   Volatile content (Refitter and NJsonSchema version numbers) is normalized before compare.
+3. Setting `REFITTER_UPDATE_SNAPSHOTS=1` rewrites the snapshots instead of asserting.
+4. Snapshot tests are tagged `[Category("Parity")]` so they can be run on their own.
+5. Extend the matrix to cover `CodeGeneratorSettings` options (date/array/dictionary types,
+   nullable reference types, data annotations, `ExcludedTypeNames`, …) on a feature-rich spec.
+
+Exit: harness green on `main`, snapshots committed.
+
+### Phase 1 — Refitter-owned public extension points (minor release)
+
+1. Introduce `Refitter.Core.IPropertyNameGenerator` / `IParameterNameGenerator` with
+   Refitter-owned inputs (`PropertyNameContext` with name, schema info, parent type name).
+2. Adapt them to NSwag internally; mark the NSwag-typed settings `[Obsolete]`.
+3. Add `RefitGenerator.Document` returning a Refitter read-only view; obsolete
+   `RefitGenerator.OpenApiDocument`.
+4. Document the `CustomTemplateDirectory` deprecation path (see Accepted differences).
+
+Exit: no NSwag type is needed to use any non-obsolete API.
+
+### Phase 2 — Refitter schema/document model
+
+1. Define an internal immutable model: `ApiDocument`, `ApiOperation`, `ApiParameter`,
+   `ApiResponse`, `ApiSchema` (type, format, nullability, enum values, properties,
+   required, allOf/oneOf/anyOf, discriminator, additionalProperties, x-* extensions).
+2. Write a loader from `Microsoft.OpenApi` (v2 reader handles 2.0/3.0/3.1 and external refs).
+3. Port filtering (`RefitDocumentFilter`), cleaning (`SchemaCleaner`), merging
+   (`DocumentMerger`), and the mutators to the new model. Most mutators become loader rules.
+4. Temporarily build the NSwag document **from** the new model is *not* planned; instead the
+   two loaders run side by side and a debug-only comparer checks that both models agree on
+   schema names, operation ids and parameter lists for every spec in `test/OpenAPI`.
+
+Exit: new model loads every spec in `test/OpenAPI` and every scenario test spec.
+
+### Phase 3 — Interface generation on the new model
+
+1. Port `ParameterExtraction/*`, `ReturnTypeGenerator`, `MethodAttributeGenerator`,
+   `XmlDocumentationGenerator`, partitioning and operation naming off `CSharpOperationModel`.
+2. Reimplement the three `OperationNameGeneratorTypes` strategies.
+3. Type-name resolution: port `SafeSchemaTypeNameGenerator`/`UniqueEnumNameGenerator` rules
+   so interface parameter types match the names contracts get.
+
+Exit: interface portion of every golden snapshot is byte-identical.
+
+### Phase 4 — Contract emitter (behind `RefitGeneratorSettings.UseNativeContractGenerator`)
+
+Order of work, each step gated by snapshots:
+
+1. Plain classes: properties, `JsonPropertyName`, XML docs, required/nullable, defaults.
+2. Enums: string/integer enums, `x-enumNames`, `JsonStringEnumConverter`, flag enums.
+3. Collections and dictionaries: `ArrayType`, `DictionaryType`, instance/base types, immutability.
+4. `AdditionalProperties` dictionary.
+5. Inheritance: allOf, discriminators, `JsonInheritanceConverter` and STJ polymorphism.
+6. Records / immutable records, `PropertySetterAccessModifier`, `TypeAccessibility`.
+7. Data annotations, date/time converters, `JsonConverters`, `GenerateJsonMethods`.
+8. Inline named any/tuple/array/dictionary, `ExcludedTypeNames`, `ContractTypeSuffix` as a
+   naming rule instead of a regex rewrite.
+9. The JSON serializer context generator reads the new type table instead of NJsonSchema's resolver.
+
+Exit: full parity suite green with the flag on; all scenario, source-generator and smoke tests green.
+
+### Phase 5 — Flip the default (major release)
+
+1. Native generator becomes default; NSwag path remains behind a flag for one major version.
+2. Remove obsolete NSwag-typed APIs; remove `CustomTemplateDirectory` or replace it.
+
+### Phase 6 — Delete NSwag
+
+Remove the packages, the flag, the NSwag code path and the workarounds listed above.
+
+## Accepted differences (to be confirmed by the maintainer)
+
+- `CustomTemplateDirectory`: NJsonSchema Liquid templates cannot be honored without
+  re-implementing NJsonSchema's template models. Proposal: remove in the major release.
+- `[GeneratedCode("NJsonSchema", "x.y.z")]` on contracts becomes `[GeneratedCode("Refitter", …)]`.
+
+## Risks
+
+| Risk | Mitigation |
+|---|---|
+| Hidden NJsonSchema edge cases not covered by specs in `test/OpenAPI` | Add regression specs from past issues to the parity corpus; run the harness against scenario-test specs too |
+| Snapshots are large and noisy in diffs | Keep matrix focused; only snapshot variants that change output |
+| Two code paths during Phases 2–5 double maintenance | Keep the flag window short; bug fixes land in the native path first |
+| Swagger 2.0 semantics differ between NSwag and Microsoft.OpenApi (e.g. optional `$ref` nullability) | Parity harness covers both v2.0 JSON and YAML |
