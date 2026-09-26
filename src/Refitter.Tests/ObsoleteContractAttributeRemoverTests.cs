@@ -96,6 +96,29 @@ public class ObsoleteContractAttributeRemoverTests
     }
 
     [Test]
+    [Arguments("internal partial class")]
+    [Arguments("public enum")]
+    [Arguments("internal enum")]
+    [Arguments("public sealed partial class")]
+    public void Removes_Obsolete_Attribute_From_Other_Declaration_Forms(string declaration)
+    {
+        var contracts = $$"""
+            namespace TestNamespace
+            {
+                [System.Obsolete]
+                {{declaration}} Used
+                {
+                }
+            }
+            """;
+
+        var result = ObsoleteContractAttributeRemover.Remove(contracts, [Interface]);
+
+        result.Should().NotContain("[System.Obsolete]");
+        result.Should().Contain($"{declaration} Used");
+    }
+
+    [Test]
     public void Returns_Contracts_Unchanged_Without_Interfaces()
     {
         ObsoleteContractAttributeRemover.Remove(Contracts, []).Should().Be(Contracts);

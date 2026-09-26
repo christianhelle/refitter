@@ -11,7 +11,7 @@ internal static class ObsoleteContractAttributeRemover
 {
     private static readonly Regex ObsoleteTypeAttributeRegex = new(
         @"^[ \t]*\[System\.Obsolete(?:\([^\r\n]*\))?\][ \t]*\r?\n" +
-        @"(?=(?:[ \t]*\[[^\r\n]*\][ \t]*\r?\n)*[ \t]*public (?:(?:abstract|sealed|partial) )*(?:class|record|struct) (?<name>\w+))",
+        @"(?=(?:[ \t]*\[[^\r\n]*\][ \t]*\r?\n)*[ \t]*(?:public|internal) (?:(?:abstract|sealed|partial) )*(?:class|record|struct|enum) (?<name>\w+))",
         RegexOptions.Compiled | RegexOptions.Multiline,
         TimeSpan.FromSeconds(5));
 
