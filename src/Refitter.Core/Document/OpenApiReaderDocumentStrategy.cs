@@ -55,7 +55,7 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
                 .ConfigureAwait(false);
 
             return await OpenApiYamlDocument
-                .FromYamlAsync(yaml, path, cancellationToken)
+                .FromYamlAsync(NumericBoundsSanitizer.Sanitize(yaml), path, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -64,7 +64,7 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
             .ConfigureAwait(false);
 
         return await OpenApiDocument
-            .FromJsonAsync(json, path, cancellationToken)
+            .FromJsonAsync(NumericBoundsSanitizer.Sanitize(json), path, cancellationToken)
             .ConfigureAwait(false);
     }
 
