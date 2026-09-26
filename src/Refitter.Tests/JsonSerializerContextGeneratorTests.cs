@@ -25,6 +25,29 @@ public class JsonSerializerContextGeneratorTests
     }
 
     [Test]
+    public void Generate_Suppresses_Obsolete_Warnings_For_Deprecated_Contracts()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                [System.Obsolete]
+                public partial class Pet
+                {
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        var disable = result.IndexOf("#pragma warning disable 612, 618", StringComparison.Ordinal);
+        var attribute = result.IndexOf("JsonSerializable(typeof(Pet))", StringComparison.Ordinal);
+        var restore = result.IndexOf("#pragma warning restore 612, 618", StringComparison.Ordinal);
+        disable.Should().BeGreaterThan(-1);
+        attribute.Should().BeGreaterThan(disable);
+        restore.Should().BeGreaterThan(attribute);
+    }
+
+    [Test]
     public void Generate_Uses_OpenApi_Title_For_Context_Name_When_Enabled()
     {
         const string contracts = """

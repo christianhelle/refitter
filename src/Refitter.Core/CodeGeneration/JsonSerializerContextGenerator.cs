@@ -33,6 +33,8 @@ internal static class JsonSerializerContextGenerator
         sb.AppendLine($"namespace {contextNamespace}");
         sb.AppendLine("{");
 
+        // Deprecated contracts are marked [Obsolete], and referencing them here would raise CS0612/CS0618
+        sb.AppendLine("#pragma warning disable 612, 618");
         foreach (var typeName in typeNames.OrderBy(t => t))
         {
             sb.AppendLine($"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}))]");
@@ -42,6 +44,7 @@ internal static class JsonSerializerContextGenerator
             $"    internal partial class {contextName} : global::System.Text.Json.Serialization.JsonSerializerContext");
         sb.AppendLine("    {");
         sb.AppendLine("    }");
+        sb.AppendLine("#pragma warning restore 612, 618");
         sb.AppendLine("}");
 
         return sb.ToString()
