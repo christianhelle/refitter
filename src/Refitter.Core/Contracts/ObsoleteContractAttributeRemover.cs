@@ -1,4 +1,6 @@
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Refitter.Core;
 
@@ -15,15 +17,14 @@ internal static class ObsoleteContractAttributeRemover
         RegexOptions.Compiled | RegexOptions.Multiline,
         TimeSpan.FromSeconds(5));
 
-    private static readonly Regex IdentifierRegex = new(
-        @"\b[A-Za-z_]\w*\b",
-        RegexOptions.Compiled,
-        TimeSpan.FromSeconds(5));
-
     public static string Remove(string contracts, IEnumerable<string> interfaceCode)
     {
+        // Names in syntax only, so route templates, header values and comments don't count as usages
         var referencedIdentifiers = new HashSet<string>(
-            interfaceCode.SelectMany(code => IdentifierRegex.Matches(code).Cast<Match>().Select(m => m.Value)),
+            interfaceCode
+                .SelectMany(code => CSharpSyntaxTree.ParseText(code).GetRoot().DescendantNodes())
+                .OfType<SimpleNameSyntax>()
+                .Select(name => name.Identifier.ValueText),
             StringComparer.Ordinal);
 
         return ObsoleteTypeAttributeRegex.Replace(

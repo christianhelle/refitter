@@ -96,6 +96,30 @@ public class ObsoleteContractAttributeRemoverTests
     }
 
     [Test]
+    public void Keeps_Obsolete_Attribute_On_Types_Only_Named_In_Routes_Strings_Or_Comments()
+    {
+        const string interfaceCode = """
+            public partial interface IApi
+            {
+                /// <summary>Unused is only mentioned here</summary>
+                // Unused
+                [Headers("X-Name: Unused")]
+                [Get("/Unused/{id}")]
+                Task<ICollection<Used>> GetUsed([AliasAs("Unused")] string id);
+            }
+            """;
+
+        var result = ObsoleteContractAttributeRemover.Remove(Contracts, [interfaceCode]);
+
+        result.Should().Contain(
+            """
+                [System.Obsolete]
+                public partial class Unused
+            """);
+        result.Should().NotContain("[System.Obsolete(\"use E\")]");
+    }
+
+    [Test]
     [Arguments("internal partial class")]
     [Arguments("public enum")]
     [Arguments("internal enum")]
