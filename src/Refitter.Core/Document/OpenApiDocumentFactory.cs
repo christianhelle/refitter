@@ -95,11 +95,10 @@ public static class OpenApiDocumentFactory
             }
 
             await ReferenceGuard.ValidateAsync(openApiPath, content, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
-            content = NumericBoundsSanitizer.Sanitize(content);
 
-            return PathUtilities.IsYaml(openApiPath)
-                ? await NSwag.OpenApiYamlDocument.FromYamlAsync(content, cancellationToken).ConfigureAwait(false)
-                : await OpenApiDocument.FromJsonAsync(content, cancellationToken).ConfigureAwait(false);
+            return await OpenApiDocumentParser
+                .ParseAsync(content, null, PathUtilities.IsYaml(openApiPath), cancellationToken)
+                .ConfigureAwait(false);
         }
 
         await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
