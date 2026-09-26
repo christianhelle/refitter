@@ -78,6 +78,23 @@ public class PathItemReferenceInlinerTests
     }
 
     [Test]
+    [Arguments(@"#\/components\/pathItems\/A")]
+    [Arguments(@"#/components/pathItems/A")]
+    public void Resolves_References_Written_With_Json_Escapes(string reference)
+    {
+        var json = $$"""
+            {
+              "paths": { "/a": { "$ref": "{{reference}}" } },
+              "components": { "pathItems": { "A": { "get": { "operationId": "GetA" } } } }
+            }
+            """;
+
+        var path = JObject.Parse(PathItemReferenceInliner.Inline(json))["paths"]!["/a"]!;
+
+        path["get"]!["operationId"]!.Value<string>().Should().Be("GetA");
+    }
+
+    [Test]
     public void Resolves_Escaped_Json_Pointer_Names()
     {
         const string json = """

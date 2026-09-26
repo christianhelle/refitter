@@ -13,7 +13,9 @@ internal static class PathItemReferenceInliner
 
     public static string Inline(string json)
     {
-        if (json.IndexOf(ComponentsPathItemsPrefix, StringComparison.Ordinal) < 0)
+        // A cheap check before parsing. References can be written with JSON escapes (e.g. "#\/components"),
+        // so look for the pathItems name rather than the whole prefix.
+        if (json.IndexOf("pathItems", StringComparison.Ordinal) < 0)
             return json;
 
         using var reader = new JsonTextReader(new StringReader(json))
