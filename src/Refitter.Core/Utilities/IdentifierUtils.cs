@@ -213,6 +213,7 @@ internal static class IdentifierUtils
         }
         var sanitized = string.Join(string.Empty, value.Split(IllegalSymbols, StringSplitOptions.RemoveEmptyEntries))
                 .Trim(dash);
+        sanitized = new string(sanitized.Where(c => IsValidIdentifierCharacter(c, isFirstCharacter: false)).ToArray());
         return EscapeReservedKeyword(sanitized);
     }
 
