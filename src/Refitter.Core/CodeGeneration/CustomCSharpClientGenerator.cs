@@ -9,4 +9,7 @@ internal class CustomCSharpClientGenerator(OpenApiDocument document, CSharpClien
 {
     internal CSharpOperationModel CreateOperationModel(OpenApiOperation operation) =>
         base.CreateOperationModel(operation, Settings);
+
+    internal bool HasGeneratedType(string typeName) =>
+        Resolver.Types.Values.Contains(typeName, StringComparer.Ordinal);
 }

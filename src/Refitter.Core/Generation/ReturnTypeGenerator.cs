@@ -268,8 +268,13 @@ internal class ReturnTypeGenerator(
     private string GetAsyncOperationType(bool withVoidReturnType)
     {
         var type = withVoidReturnType ? "<Unit>" : string.Empty;
-        return codeGeneration.ReturnIObservable
-            ? "IObservable" + type
+        if (codeGeneration.ReturnIObservable)
+            return "IObservable" + type;
+
+        // Task<T> still binds to System.Threading.Tasks.Task<T> by arity, but a plain
+        // Task would bind to a generated contract named Task.
+        return withVoidReturnType && generator.HasGeneratedType("Task")
+            ? "System.Threading.Tasks.Task"
             : "Task";
     }
 

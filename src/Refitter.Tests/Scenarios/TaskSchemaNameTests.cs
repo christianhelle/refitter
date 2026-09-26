@@ -36,10 +36,54 @@ public class TaskSchemaNameTests
 
     [Test]
     [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1275")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Fully_Qualifies_Task_For_Void_Operations()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("System.Threading.Tasks.Task DeleteTasks(");
+    }
+
+    [Test]
+    public async Task Keeps_Generic_Task_For_Operations_With_Result()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("Task<ICollection<Task>> GetTasks(");
+    }
+
+    [Test]
+    public async Task Does_Not_Qualify_Task_Without_Task_Schema()
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec.Replace("Task", "Job"));
+        var sut = await RefitGenerator.CreateAsync(new RefitGeneratorSettings { OpenApiPath = swaggerFile });
+        var generatedCode = sut.Generate();
+
+        generatedCode.Should().Contain("Task DeleteJobs(");
+        generatedCode.Should().NotContain("System.Threading.Tasks.Task");
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_And_Cancellation_Tokens()
+    {
+        var generatedCode = await GenerateCode(settings =>
+        {
+            settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint;
+            settings.UseCancellationTokens = true;
+        });
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_With_Contract_Type_Suffix()
+    {
+        var generatedCode = await GenerateCode(settings => settings.ContractTypeSuffix = "Dto");
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
