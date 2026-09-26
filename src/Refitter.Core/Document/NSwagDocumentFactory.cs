@@ -8,7 +8,7 @@ namespace Refitter.Core;
 /// Creates instances of <see cref="NSwag.OpenApiDocument"/> from file paths or URLs.
 /// Supports loading single documents or merging multiple documents into one.
 /// </summary>
-public static class OpenApiDocumentFactory
+internal static class NSwagDocumentFactory
 {
     private static readonly IDocumentLoader DocumentLoader = new DocumentLoader();
     private static readonly IDocumentMerger DocumentMerger = new DocumentMerger(new DocumentEquivalenceComparer());

@@ -39,8 +39,8 @@ public class RefitGenerator(
         if (settings == null) throw new ArgumentNullException(nameof(settings));
 
         var openApiDocument = await GetOpenApiDocument(settings, cancellationToken).ConfigureAwait(false);
-        var processed = RefitDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
-        processed = RefitDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
+        var processed = NSwagDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
+        processed = NSwagDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
         processed = await CleanSchemaAsync(
                 processed,
                 settings.TrimUnusedSchema,
@@ -56,7 +56,7 @@ public class RefitGenerator(
         CancellationToken cancellationToken = default)
     {
         if (settings.OpenApiPaths is { Length: > 0 })
-            return await OpenApiDocumentFactory
+            return await NSwagDocumentFactory
                 .CreateAsync(settings.OpenApiPaths, settings.AllowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -67,7 +67,7 @@ public class RefitGenerator(
                 nameof(settings));
         }
 
-        return await OpenApiDocumentFactory
+        return await NSwagDocumentFactory
             .CreateAsync(settings.OpenApiPath!, settings.AllowRemoteReferences, cancellationToken)
             .ConfigureAwait(false);
     }
@@ -84,7 +84,7 @@ public class RefitGenerator(
             return document;
 
         var result = await CloneDocumentAsync(document).ConfigureAwait(false);
-        var cleaner = new SchemaCleaner(result, keepSchemaPatterns)
+        var cleaner = new NSwagSchemaCleaner(result, keepSchemaPatterns)
         {
             IncludeInheritanceHierarchy = includeInheritanceHierarchy
         };

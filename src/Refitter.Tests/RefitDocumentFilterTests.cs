@@ -114,7 +114,7 @@ paths:
     public async Task FilterByTags_WithEmptyTags_ReturnsSameDocument()
     {
         var document = await LoadDocument();
-        var result = RefitDocumentFilter.FilterByTags(document, []);
+        var result = NSwagDocumentFilter.FilterByTags(document, []);
 
         result.Paths.Count.Should().Be(document.Paths.Count);
     }
@@ -122,7 +122,7 @@ paths:
     [Test]
     public void FilterByTags_Throws_On_Null_Document()
     {
-        var act = () => RefitDocumentFilter.FilterByTags(null!, ["Foo"]);
+        var act = () => NSwagDocumentFilter.FilterByTags(null!, ["Foo"]);
 
         act.Should().Throw<ArgumentNullException>();
     }
@@ -132,7 +132,7 @@ paths:
     {
         var document = await LoadDocument();
 
-        var act = () => RefitDocumentFilter.FilterByTags(document, null!);
+        var act = () => NSwagDocumentFilter.FilterByTags(document, null!);
 
         act.Should().Throw<ArgumentNullException>();
     }
@@ -140,7 +140,7 @@ paths:
     [Test]
     public void FilterByPath_Throws_On_Null_Document()
     {
-        var act = () => RefitDocumentFilter.FilterByPath(null!, ["^/foo"]);
+        var act = () => NSwagDocumentFilter.FilterByPath(null!, ["^/foo"]);
 
         act.Should().Throw<ArgumentNullException>();
     }
@@ -150,7 +150,7 @@ paths:
     {
         var document = await LoadDocument();
 
-        var act = () => RefitDocumentFilter.FilterByPath(document, null!);
+        var act = () => NSwagDocumentFilter.FilterByPath(document, null!);
 
         act.Should().Throw<ArgumentNullException>();
     }
@@ -159,7 +159,7 @@ paths:
     public async Task FilterByTags_RemovesNonMatchingOperations()
     {
         var document = await LoadDocument();
-        var result = RefitDocumentFilter.FilterByTags(document, ["Bar"]);
+        var result = NSwagDocumentFilter.FilterByTags(document, ["Bar"]);
 
         result.Paths.Should().ContainKey("/bar");
         result.Paths.Should().ContainKey("/bar/{id}");
@@ -171,7 +171,7 @@ paths:
     public async Task FilterByTags_MultipleTags_KeepsAllMatching()
     {
         var document = await LoadDocument();
-        var result = RefitDocumentFilter.FilterByTags(document, ["Foo", "Baz"]);
+        var result = NSwagDocumentFilter.FilterByTags(document, ["Foo", "Baz"]);
 
         result.Paths.Should().ContainKey("/foo");
         result.Paths.Should().ContainKey("/foo/{id}");
@@ -186,7 +186,7 @@ paths:
         var document = await LoadDocument();
         var originalCount = document.Paths.Count;
 
-        RefitDocumentFilter.FilterByTags(document, ["Bar"]);
+        NSwagDocumentFilter.FilterByTags(document, ["Bar"]);
 
         document.Paths.Count.Should().Be(originalCount);
     }
@@ -195,7 +195,7 @@ paths:
     public async Task FilterByPath_WithEmptyPatterns_ReturnsSameDocument()
     {
         var document = await LoadDocument();
-        var result = RefitDocumentFilter.FilterByPath(document, []);
+        var result = NSwagDocumentFilter.FilterByPath(document, []);
 
         result.Paths.Count.Should().Be(document.Paths.Count);
     }
@@ -204,7 +204,7 @@ paths:
     public async Task FilterByPath_KeepsMatchingPaths()
     {
         var document = await LoadDocument();
-        var result = RefitDocumentFilter.FilterByPath(document, ["^/foo"]);
+        var result = NSwagDocumentFilter.FilterByPath(document, ["^/foo"]);
 
         result.Paths.Should().ContainKey("/foo");
         result.Paths.Should().ContainKey("/foo/{id}");
@@ -216,7 +216,7 @@ paths:
     public async Task FilterByPath_MultiplePatterns_KeepsAllMatching()
     {
         var document = await LoadDocument();
-        var result = RefitDocumentFilter.FilterByPath(document, ["^/bar$", "^/baz"]);
+        var result = NSwagDocumentFilter.FilterByPath(document, ["^/bar$", "^/baz"]);
 
         result.Paths.Should().ContainKey("/bar");
         result.Paths.Should().ContainKey("/baz");
@@ -231,7 +231,7 @@ paths:
         var document = await LoadDocument();
         var originalCount = document.Paths.Count;
 
-        RefitDocumentFilter.FilterByPath(document, ["^/bar$"]);
+        NSwagDocumentFilter.FilterByPath(document, ["^/bar$"]);
 
         document.Paths.Count.Should().Be(originalCount);
     }
@@ -240,7 +240,7 @@ paths:
     public async Task FilterByTags_WithSwagger20_RemovesNonMatchingOperations()
     {
         var document = await LoadSwaggerDocument();
-        var result = RefitDocumentFilter.FilterByTags(document, ["Bar"]);
+        var result = NSwagDocumentFilter.FilterByTags(document, ["Bar"]);
 
         result.Paths.Should().ContainKey("/bar");
         result.Paths.Should().ContainKey("/bar/{id}");
@@ -252,7 +252,7 @@ paths:
     public async Task FilterByTags_WithSwagger20_MultipleTags_KeepsAllMatching()
     {
         var document = await LoadSwaggerDocument();
-        var result = RefitDocumentFilter.FilterByTags(document, ["Foo", "Baz"]);
+        var result = NSwagDocumentFilter.FilterByTags(document, ["Foo", "Baz"]);
 
         result.Paths.Should().ContainKey("/foo");
         result.Paths.Should().ContainKey("/foo/{id}");
@@ -265,7 +265,7 @@ paths:
     public async Task FilterByPath_WithSwagger20_KeepsMatchingPaths()
     {
         var document = await LoadSwaggerDocument();
-        var result = RefitDocumentFilter.FilterByPath(document, ["^/foo"]);
+        var result = NSwagDocumentFilter.FilterByPath(document, ["^/foo"]);
 
         result.Paths.Should().ContainKey("/foo");
         result.Paths.Should().ContainKey("/foo/{id}");
@@ -298,7 +298,7 @@ paths:
             }
             """);
 
-        var result = RefitDocumentFilter.FilterByTags(document, ["Foo"]);
+        var result = NSwagDocumentFilter.FilterByTags(document, ["Foo"]);
 
         result.Paths.Should().ContainKey("/tagged");
         result.Paths.Should().NotContainKey("/untagged");

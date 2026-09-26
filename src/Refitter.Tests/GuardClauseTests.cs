@@ -33,7 +33,7 @@ public class GuardClauseTests
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
 
-        var act = async () => await OpenApiDocumentFactory.CreateAsync(
+        var act = async () => await NSwagDocumentFactory.CreateAsync(
             UnreachableRemoteDocument,
             allowRemoteReferences: true,
             cts.Token);

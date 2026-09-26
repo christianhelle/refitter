@@ -8,7 +8,7 @@ namespace Refitter.Core;
 /// Filters an OpenAPI document by tags and path patterns.
 /// Each filter operation returns a new document without mutating the input.
 /// </summary>
-public static class RefitDocumentFilter
+internal static class NSwagDocumentFilter
 {
     /// <summary>
     /// Removes operations from the document that do not match any of the specified tags.

@@ -124,7 +124,7 @@ public class SchemaTraversalTests
             }
             """);
 
-        new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+        new NSwagSchemaCleaner(document, []).RemoveUnreferencedSchema();
 
         document.Components.Schemas.Should().ContainKey("Root");
         document.Components.Schemas.Should().ContainKey("Value");
@@ -168,7 +168,7 @@ public class SchemaTraversalTests
         // x-dictionaryKey has no OpenAPI 3.0 representation, so wire it up directly
         document.Components.Schemas["Root"].DictionaryKey = document.Components.Schemas["Key"];
 
-        new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+        new NSwagSchemaCleaner(document, []).RemoveUnreferencedSchema();
 
         document.Components.Schemas.Should().ContainKey("Root");
         document.Components.Schemas.Should().ContainKey("Key");
@@ -211,7 +211,7 @@ public class SchemaTraversalTests
             .Content["application/json"]
             .Schema.Should().BeNull();
 
-        var act = () => new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+        var act = () => new NSwagSchemaCleaner(document, []).RemoveUnreferencedSchema();
 
         act.Should().NotThrow();
         document.Components.Schemas.Should().NotContainKey("Unused");
@@ -244,7 +244,7 @@ public class SchemaTraversalTests
             }
             """);
 
-        new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+        new NSwagSchemaCleaner(document, []).RemoveUnreferencedSchema();
 
         document.Components.Schemas.Should().ContainKey("Filter");
         document.Components.Schemas.Should().NotContainKey("Unused");
@@ -259,7 +259,7 @@ public class SchemaTraversalTests
         document.Components.Schemas["Root"].Items.Add(
             new JsonSchema { Reference = document.Components.Schemas["Value"] });
 
-        new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+        new NSwagSchemaCleaner(document, []).RemoveUnreferencedSchema();
 
         document.Components.Schemas.Should().ContainKey("Value");
         document.Components.Schemas.Should().NotContainKey("Unused");
@@ -273,7 +273,7 @@ public class SchemaTraversalTests
         document.Components.Schemas["Root"].Definitions["Nested"] =
             new JsonSchema { Reference = document.Components.Schemas["Value"] };
 
-        new SchemaCleaner(document, []).RemoveUnreferencedSchema();
+        new NSwagSchemaCleaner(document, []).RemoveUnreferencedSchema();
 
         document.Components.Schemas.Should().ContainKey("Value");
         document.Components.Schemas.Should().NotContainKey("Unused");
