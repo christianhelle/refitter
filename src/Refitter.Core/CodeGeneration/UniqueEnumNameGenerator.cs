@@ -54,8 +54,9 @@ internal sealed class UniqueEnumNameGenerator : IEnumNameGenerator
         if (schema.EnumerationNames.Count > index)
             return schema.EnumerationNames[index];
 
-        return schema.Type.HasFlag(JsonObjectType.Integer)
-            ? "_" + value
-            : value.ToString()!;
+        if (schema.Type.HasFlag(JsonObjectType.Integer))
+            return "_" + value.ToString();
+
+        return value.ToString()!;
     }
 }
