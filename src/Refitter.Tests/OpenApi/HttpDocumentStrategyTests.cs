@@ -106,4 +106,23 @@ paths: {}";
             return handler(request, cancellationToken);
         }
     }
+
+    [Test]
+    [Arguments(LargeNumericBoundsSpecs.Yaml, "https://example.com/spec.yaml")]
+    [Arguments(LargeNumericBoundsSpecs.Json, "https://example.com/spec.json")]
+    public async Task Clamps_Numeric_Bounds_Outside_Decimal_Range(string spec, string url)
+    {
+        var handler = new MockHttpMessageHandler(
+            (_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(spec)
+            }));
+        var strategy = new HttpDocumentStrategy(new HttpClient(handler));
+
+        var result = await strategy.TryLoadAsync(url);
+
+        result.Should().NotBeNull();
+        LargeNumericBoundsSpecs.GetMaximum(result!).Should().Be(decimal.MaxValue);
+        LargeNumericBoundsSpecs.GetMinimum(result!).Should().Be(decimal.MinValue);
+    }
 }

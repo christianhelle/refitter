@@ -33,9 +33,10 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
                 .GetAsync(path, cancellationToken)
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            var content = await response.Content
-                .ReadAsStringWithCancellationAsync(cancellationToken)
-                .ConfigureAwait(false);
+            var content = NumericBoundsSanitizer.Sanitize(
+                await response.Content
+                    .ReadAsStringWithCancellationAsync(cancellationToken)
+                    .ConfigureAwait(false));
 
             return PathUtilities.IsYaml(path)
                 ? await OpenApiYamlDocument.FromYamlAsync(content, cancellationToken)
