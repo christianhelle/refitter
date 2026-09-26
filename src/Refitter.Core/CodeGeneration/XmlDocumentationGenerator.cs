@@ -10,7 +10,7 @@ namespace Refitter.Core;
 /// <summary>
 /// Generator class for creating XML documentation.
 /// </summary>
-public class XmlDocumentationGenerator
+internal class XmlDocumentationGenerator
 {
     private readonly ICodeGenerationConfiguration codeGeneration;
     private const string Separator = "    ";
