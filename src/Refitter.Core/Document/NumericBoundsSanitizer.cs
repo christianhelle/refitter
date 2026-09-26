@@ -32,6 +32,5 @@ internal static class NumericBoundsSanitizer
     }
 
     private static bool IsWithinDecimalRange(string number) =>
-        double.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) &&
-        Math.Abs(value) < (double)decimal.MaxValue;
+        decimal.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out _);
 }
