@@ -14,6 +14,7 @@
 
 **Fixed bugs:**
 
+- Deprecated schemas used in operations cause CS0612 in the Refit stub [\#1278](https://github.com/christianhelle/refitter/issues/1278)
 - Schema named Task breaks void operations \(CS0029\) [\#1275](https://github.com/christianhelle/refitter/issues/1275)
 - Numeric bounds larger than decimal.MaxValue fail to load the spec [\#1273](https://github.com/christianhelle/refitter/issues/1273)
 - HttpResponseMessage return type compiles only with implicit usings [\#1272](https://github.com/christianhelle/refitter/issues/1272)
@@ -23,6 +24,7 @@
 
 **Merged pull requests:**
 
+- Build deprecated schemas used by operations with warnings as errors [\#1294](https://github.com/christianhelle/refitter/pull/1294) ([christianhelle](https://github.com/christianhelle))
 - Load specs with numeric bounds beyond decimal.MaxValue [\#1293](https://github.com/christianhelle/refitter/pull/1293) ([christianhelle](https://github.com/christianhelle))
 - Fix void operations when a schema is named Task [\#1292](https://github.com/christianhelle/refitter/pull/1292) ([christianhelle](https://github.com/christianhelle))
 - Import System.Net.Http when interfaces return HttpResponseMessage [\#1290](https://github.com/christianhelle/refitter/pull/1290) ([christianhelle](https://github.com/christianhelle))
