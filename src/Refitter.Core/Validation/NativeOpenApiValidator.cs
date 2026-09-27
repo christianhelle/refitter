@@ -52,7 +52,12 @@ internal static class NativeOpenApiValidator
         }
 
         var (document, diagnostics) = SpecDocumentReader.Read(content, baseUrl);
-        return new OpenApiValidationResult(diagnostics, SpecStatistics.Count(document));
+
+        // Microsoft.OpenApi resolves references against the components the document was read with
+        var registered = document?.Components?.Copy();
+        var statistics = SpecStatistics.Count(document);
+        NativeAttributeStringValidator.Validate(document, registered, diagnostics);
+        return new OpenApiValidationResult(diagnostics, statistics);
     }
 
     private static byte[] ReadFile(string openApiFile)

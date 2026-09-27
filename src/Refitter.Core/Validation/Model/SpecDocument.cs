@@ -91,4 +91,26 @@ internal sealed class SpecComponents
     public Dictionary<string, SpecPathItem?>? PathItems { get; set; }
 
     public Dictionary<string, SpecMediaType?>? MediaTypes { get; set; }
+
+    /// <summary>
+    /// Copies the component maps, so components added to this document later are not in the copy.
+    /// </summary>
+    public SpecComponents Copy() =>
+        new()
+        {
+            Schemas = Copy(Schemas),
+            Responses = Copy(Responses),
+            Parameters = Copy(Parameters),
+            Examples = Copy(Examples),
+            RequestBodies = Copy(RequestBodies),
+            Headers = Copy(Headers),
+            SecuritySchemes = Copy(SecuritySchemes),
+            Links = Copy(Links),
+            Callbacks = Copy(Callbacks),
+            PathItems = Copy(PathItems),
+            MediaTypes = Copy(MediaTypes),
+        };
+
+    private static Dictionary<string, T?>? Copy<T>(Dictionary<string, T?>? components) =>
+        components == null ? null : new Dictionary<string, T?>(components, StringComparer.Ordinal);
 }
