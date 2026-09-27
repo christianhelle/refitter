@@ -79,9 +79,6 @@ internal sealed class ApiReferenceResolver
 
     private void VisitPathItem(ApiPathItem pathItem, HashSet<object> visited, ApiDocument root)
     {
-        if (!visited.Add(pathItem))
-            return;
-
         if (pathItem.ReferencePath != null && pathItem.Reference == null)
         {
             pathItem.Reference = (ApiPathItem)ResolveReference(
@@ -105,9 +102,6 @@ internal sealed class ApiReferenceResolver
 
     private void VisitOperation(ApiOperation operation, HashSet<object> visited, ApiDocument root)
     {
-        if (!visited.Add(operation))
-            return;
-
         foreach (var parameter in operation.Parameters.ToArray())
         {
             VisitSchema(parameter, visited, root, root.DocumentPath);
@@ -126,9 +120,6 @@ internal sealed class ApiReferenceResolver
 
     private void VisitRequestBody(ApiRequestBody requestBody, HashSet<object> visited, object root, string? documentPath)
     {
-        if (!visited.Add(requestBody))
-            return;
-
         if (requestBody.ReferencePath != null && requestBody.Reference == null)
         {
             requestBody.Reference = (ApiRequestBody)ResolveReference(
@@ -148,9 +139,6 @@ internal sealed class ApiReferenceResolver
 
     private void VisitResponse(ApiResponse response, HashSet<object> visited, object root, string? documentPath)
     {
-        if (!visited.Add(response))
-            return;
-
         if (response.ReferencePath != null && response.Reference == null)
         {
             response.Reference = (ApiResponse)ResolveReference(

@@ -27,9 +27,6 @@ internal sealed class DerivedSchemaFinder
 
     private void VisitDocument(ApiDocument document)
     {
-        if (!visited.Add(document))
-            return;
-
         isSwagger2 = document.SchemaType == ApiSchemaType.Swagger2;
         foreach (var path in document.Paths.ToList())
         {
@@ -79,9 +76,6 @@ internal sealed class DerivedSchemaFinder
 
     private void VisitOperation(ApiOperation operation)
     {
-        if (!visited.Add(operation))
-            return;
-
         foreach (var parameter in operation.Parameters.ToList())
         {
             VisitSchema(parameter, null);
