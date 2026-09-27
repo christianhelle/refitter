@@ -1,0 +1,773 @@
+using System.Text;
+using System.Text.Json;
+
+namespace Refitter.Core;
+
+/// <summary>
+/// Writes an <see cref="ApiDocument"/> as JSON in the specification it was read from.
+/// </summary>
+/// <remarks>
+/// Copies of a document (e.g. before filtering or trimming it) are made by writing and reading it again, which is
+/// how they have always been made. That normalizes the document: operation IDs are generated, references point
+/// to where their target was first found, and schemas shared by several names become separate schemas.
+/// See THIRD-PARTY-NOTICES.md.
+/// </remarks>
+internal sealed class ApiDocumentWriter
+{
+    private readonly ApiDocument document;
+    private readonly bool isSwagger2;
+    private readonly Dictionary<object, string> referencePaths;
+
+    private ApiDocumentWriter(ApiDocument document)
+    {
+        this.document = document;
+        isSwagger2 = document.SchemaType == ApiSchemaType.Swagger2;
+        referencePaths = ApiJsonPathFinder.FindReferencePaths(document);
+    }
+
+    public static string Write(ApiDocument document)
+    {
+        document.GenerateOperationIds();
+        return new ApiDocumentWriter(document).WriteDocument();
+    }
+
+    /// <summary>Copies a document by writing and reading it.</summary>
+    public static ApiDocument Clone(ApiDocument document) =>
+        ApiDocumentLoader.Load(Write(document), documentPath: null, isYaml: false);
+
+    private string WriteDocument()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = false }))
+        {
+            writer.WriteStartObject();
+            if (isSwagger2)
+            {
+                if (document.Swagger != null)
+                    writer.WriteString("swagger", document.Swagger);
+            }
+            else if (document.OpenApi != null)
+            {
+                writer.WriteString("openapi", document.OpenApi);
+            }
+
+            if (document.Info != null)
+            {
+                writer.WritePropertyName("info");
+                writer.WriteStartObject();
+                WriteString(writer, "title", document.Info.Title);
+                WriteString(writer, "description", document.Info.Description);
+                WriteString(writer, "version", document.Info.Version);
+                writer.WriteEndObject();
+            }
+
+            if (isSwagger2)
+            {
+                WriteStringList(writer, "consumes", document.Consumes);
+                WriteStringList(writer, "produces", document.Produces);
+            }
+
+            writer.WritePropertyName("paths");
+            writer.WriteStartObject();
+            foreach (var path in document.Paths)
+            {
+                writer.WritePropertyName(path.Key);
+                WritePathItem(writer, path.Value);
+            }
+
+            writer.WriteEndObject();
+
+            if (isSwagger2)
+            {
+                WriteSchemaDictionary(writer, "definitions", document.Definitions);
+                WriteDictionary(writer, "parameters", document.Parameters, WriteParameter);
+                WriteDictionary(writer, "responses", document.Responses, WriteResponse);
+                WriteDictionary(writer, "securityDefinitions", document.SecurityDefinitions, WriteSecurityScheme);
+            }
+            else
+            {
+                writer.WritePropertyName("components");
+                writer.WriteStartObject();
+                WriteSchemaDictionary(writer, "schemas", document.Components.Schemas);
+                WriteDictionary(writer, "requestBodies", document.Components.RequestBodies, WriteRequestBody);
+                WriteDictionary(writer, "responses", document.Components.Responses, WriteResponse);
+                WriteDictionary(writer, "parameters", document.Components.Parameters, WriteParameter);
+                WriteDictionary(writer, "headers", document.Components.Headers, WriteParameter);
+                WriteDictionary(writer, "securitySchemes", document.Components.SecuritySchemes, WriteSecurityScheme);
+                writer.WriteEndObject();
+            }
+
+            WriteSecurityRequirements(writer, "security", document.Security);
+
+            writer.WritePropertyName("tags");
+            writer.WriteStartArray();
+            foreach (var tag in document.Tags)
+            {
+                writer.WriteStartObject();
+                WriteString(writer, "name", tag.Name);
+                WriteString(writer, "description", tag.Description);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+            WriteExtensionData(writer, document.ExtensionData);
+            writer.WriteEndObject();
+        }
+
+        return Encoding.UTF8.GetString(stream.ToArray());
+    }
+
+    private void WritePathItem(Utf8JsonWriter writer, ApiPathItem pathItem)
+    {
+        writer.WriteStartObject();
+        WriteString(writer, "summary", pathItem.Summary);
+        WriteString(writer, "description", pathItem.Description);
+        WriteExtensionData(writer, pathItem.ExtensionData);
+        if (pathItem.Parameters.Count > 0)
+        {
+            writer.WritePropertyName("parameters");
+            writer.WriteStartArray();
+            foreach (var parameter in pathItem.Parameters)
+                WriteParameter(writer, parameter);
+            writer.WriteEndArray();
+        }
+
+        foreach (var operation in pathItem)
+        {
+            writer.WritePropertyName(operation.Key.ToLowerInvariant());
+            WriteOperation(writer, operation.Value);
+        }
+
+        writer.WriteEndObject();
+    }
+
+    private void WriteOperation(Utf8JsonWriter writer, ApiOperation operation)
+    {
+        writer.WriteStartObject();
+        WriteStringList(writer, "tags", operation.Tags);
+        WriteString(writer, "summary", operation.Summary);
+        WriteString(writer, "description", operation.Description);
+        WriteString(writer, "operationId", operation.OperationId);
+        if (isSwagger2)
+        {
+            if (operation.Consumes != null)
+                WriteStringList(writer, "consumes", operation.Consumes);
+            if (operation.Produces != null)
+                WriteStringList(writer, "produces", operation.Produces);
+        }
+
+        var parameters = isSwagger2
+            ? operation.Parameters.ToList()
+            : operation.Parameters.Where(p => p.Kind != ApiParameterKind.Body).ToList();
+        writer.WritePropertyName("parameters");
+        writer.WriteStartArray();
+        foreach (var parameter in parameters)
+            WriteParameter(writer, parameter);
+        writer.WriteEndArray();
+
+        if (!isSwagger2 && operation.RequestBody != null)
+        {
+            writer.WritePropertyName("requestBody");
+            WriteRequestBody(writer, operation.RequestBody);
+        }
+
+        writer.WritePropertyName("responses");
+        writer.WriteStartObject();
+        foreach (var response in operation.Responses)
+        {
+            writer.WritePropertyName(response.Key);
+            WriteResponse(writer, response.Value);
+        }
+
+        writer.WriteEndObject();
+
+        if (operation.IsDeprecated)
+            writer.WriteBoolean("deprecated", true);
+
+        if (operation.Security != null)
+            WriteSecurityRequirements(writer, "security", operation.Security);
+
+        WriteExtensionData(writer, operation.ExtensionData);
+        writer.WriteEndObject();
+    }
+
+    private void WriteRequestBody(Utf8JsonWriter writer, ApiRequestBody requestBody)
+    {
+        writer.WriteStartObject();
+        if (requestBody.Reference != null)
+        {
+            writer.WriteString("$ref", GetReferencePath(requestBody.Reference.ActualRequestBody));
+        }
+
+        WriteString(writer, "x-name", requestBody.Name);
+        WriteString(writer, "description", requestBody.Description);
+        if (requestBody.Content.Count > 0)
+        {
+            writer.WritePropertyName("content");
+            writer.WriteStartObject();
+            foreach (var mediaType in requestBody.Content)
+            {
+                writer.WritePropertyName(mediaType.Key);
+                WriteMediaType(writer, mediaType.Value);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        if (requestBody.IsRequired)
+            writer.WriteBoolean("required", true);
+
+        if (requestBody.Position.HasValue)
+            writer.WriteNumber("x-position", requestBody.Position.Value);
+
+        writer.WriteEndObject();
+    }
+
+    private void WriteMediaType(Utf8JsonWriter writer, ApiMediaType mediaType)
+    {
+        writer.WriteStartObject();
+        if (mediaType.Schema != null)
+        {
+            writer.WritePropertyName("schema");
+            WriteSchema(writer, mediaType.Schema);
+        }
+
+        if (mediaType.Example != null)
+        {
+            writer.WritePropertyName("example");
+            WriteRawValue(writer, mediaType.Example);
+        }
+
+        writer.WriteEndObject();
+    }
+
+    private void WriteResponse(Utf8JsonWriter writer, ApiResponse response)
+    {
+        writer.WriteStartObject();
+        if (response.Reference != null)
+        {
+            writer.WriteString("$ref", GetReferencePath(response.Reference.ActualResponse));
+        }
+
+        writer.WriteString("description", response.Description ?? string.Empty);
+        if (response.Headers.Count > 0)
+        {
+            writer.WritePropertyName("headers");
+            writer.WriteStartObject();
+            foreach (var header in response.Headers)
+            {
+                writer.WritePropertyName(header.Key);
+                WriteParameter(writer, header.Value);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        if (isSwagger2)
+        {
+            if (response.IsNullableRaw.HasValue)
+                writer.WriteBoolean("x-nullable", response.IsNullableRaw.Value);
+
+            if (response.Schema != null)
+            {
+                writer.WritePropertyName("schema");
+                WriteSchema(writer, response.Schema);
+            }
+
+            if (response.Examples != null)
+            {
+                writer.WritePropertyName("examples");
+                WriteRawValue(writer, response.Examples);
+            }
+        }
+        else if (response.Content.Count > 0)
+        {
+            writer.WritePropertyName("content");
+            writer.WriteStartObject();
+            foreach (var mediaType in response.Content)
+            {
+                writer.WritePropertyName(mediaType.Key);
+                WriteMediaType(writer, mediaType.Value);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        WriteExtensionData(writer, response.ExtensionData);
+        writer.WriteEndObject();
+    }
+
+    private void WriteSecurityScheme(Utf8JsonWriter writer, ApiSecurityScheme securityScheme)
+    {
+        writer.WriteStartObject();
+        var type = securityScheme.Type;
+        if (isSwagger2)
+        {
+            type = type switch
+            {
+                ApiSecuritySchemeType.Http => ApiSecuritySchemeType.Basic,
+                ApiSecuritySchemeType.OpenIdConnect => ApiSecuritySchemeType.OAuth2,
+                _ => type,
+            };
+        }
+
+        writer.WriteString("type", type switch
+        {
+            ApiSecuritySchemeType.Basic => "basic",
+            ApiSecuritySchemeType.ApiKey => "apiKey",
+            ApiSecuritySchemeType.OAuth2 => "oauth2",
+            ApiSecuritySchemeType.Http => "http",
+            ApiSecuritySchemeType.OpenIdConnect => "openIdConnect",
+            _ => "undefined",
+        });
+        WriteString(writer, "description", securityScheme.Description);
+        WriteString(writer, "name", securityScheme.Name);
+        if (securityScheme.In != ApiSecurityApiKeyLocation.Undefined)
+            writer.WriteString("in", securityScheme.In.ToString().ToLowerInvariant());
+
+        if (!isSwagger2)
+        {
+            WriteString(writer, "scheme", securityScheme.Scheme);
+            WriteString(writer, "bearerFormat", securityScheme.BearerFormat);
+            WriteString(writer, "openIdConnectUrl", securityScheme.OpenIdConnectUrl);
+        }
+
+        writer.WriteEndObject();
+    }
+
+    private void WriteParameter(Utf8JsonWriter writer, ApiParameter parameter) => WriteSchema(writer, parameter);
+
+    private void WriteSchemaDictionary(Utf8JsonWriter writer, string name, IDictionary<string, ApiSchema> schemas)
+    {
+        writer.WritePropertyName(name);
+        writer.WriteStartObject();
+        foreach (var schema in schemas)
+        {
+            writer.WritePropertyName(schema.Key);
+            WriteSchema(writer, schema.Value);
+        }
+
+        writer.WriteEndObject();
+    }
+
+    private static void WriteDictionary<T>(
+        Utf8JsonWriter writer,
+        string name,
+        IDictionary<string, T> items,
+        Action<Utf8JsonWriter, T> write)
+    {
+        writer.WritePropertyName(name);
+        writer.WriteStartObject();
+        foreach (var item in items)
+        {
+            writer.WritePropertyName(item.Key);
+            write(writer, item.Value);
+        }
+
+        writer.WriteEndObject();
+    }
+
+    private void WriteSchema(Utf8JsonWriter writer, ApiSchema schema)
+    {
+        writer.WriteStartObject();
+        var parameter = schema as ApiParameter;
+        var property = schema as ApiSchemaProperty;
+
+        WriteString(writer, "$schema", schema.SchemaVersion);
+        WriteString(writer, "id", schema.Id);
+        if (!(isSwagger2 && parameter != null))
+            WriteString(writer, "title", schema.Title);
+
+        WriteType(writer, schema.Type);
+        WriteDiscriminator(writer, schema);
+
+        if (parameter != null)
+        {
+            if (!string.IsNullOrEmpty(parameter.Name))
+                writer.WriteString("name", parameter.Name);
+            WriteString(writer, "x-originalName", parameter.OriginalName);
+            if (parameter.Kind != ApiParameterKind.Undefined)
+                writer.WriteString("in", ParameterKindName(parameter.Kind));
+            if (parameter.Style != ApiParameterStyle.Undefined)
+                writer.WriteString("style", ParameterStyleName(parameter.Style));
+            if (parameter.Explode.HasValue)
+                writer.WriteBoolean("explode", parameter.Explode.Value);
+            if (parameter.IsRequired)
+                writer.WriteBoolean("required", true);
+            if (parameter.AllowEmptyValue)
+                writer.WriteBoolean("allowEmptyValue", true);
+            if (parameter.CollectionFormat != ApiParameterCollectionFormat.Undefined)
+                writer.WriteString("collectionFormat", parameter.CollectionFormat.ToString().ToLowerInvariant());
+            if (parameter.Schema != null)
+            {
+                writer.WritePropertyName("schema");
+                WriteSchema(writer, parameter.Schema);
+            }
+
+            if (parameter.CustomSchema != null)
+            {
+                writer.WritePropertyName("x-schema");
+                WriteSchema(writer, parameter.CustomSchema);
+            }
+
+            if (!isSwagger2 && parameter.Position.HasValue)
+                writer.WriteNumber("x-position", parameter.Position.Value);
+        }
+
+        WriteString(writer, "description", schema.Description);
+        WriteString(writer, "format", schema.Format);
+        if (schema.Default != null)
+        {
+            writer.WritePropertyName("default");
+            WriteRawValue(writer, schema.Default);
+        }
+
+        WriteDecimal(writer, "multipleOf", schema.MultipleOf);
+        WriteDecimal(writer, "maximum", schema.Maximum);
+        WriteDecimal(writer, "minimum", schema.Minimum);
+        if (schema.MaxLength.HasValue)
+            writer.WriteNumber("maxLength", schema.MaxLength.Value);
+        if (schema.MinLength.HasValue)
+            writer.WriteNumber("minLength", schema.MinLength.Value);
+        WriteString(writer, "pattern", schema.Pattern);
+        if (schema.MaxItems != 0)
+            writer.WriteNumber("maxItems", schema.MaxItems);
+        if (schema.MinItems != 0)
+            writer.WriteNumber("minItems", schema.MinItems);
+        if (schema.UniqueItems)
+            writer.WriteBoolean("uniqueItems", true);
+        if (schema.MaxProperties != 0)
+            writer.WriteNumber("maxProperties", schema.MaxProperties);
+        if (schema.MinProperties != 0)
+            writer.WriteNumber("minProperties", schema.MinProperties);
+        if (schema.IsDeprecated)
+            writer.WriteBoolean(isSwagger2 ? "x-deprecated" : "deprecated", true);
+        WriteString(writer, "x-deprecatedMessage", schema.DeprecatedMessage);
+        if (schema.IsAbstract)
+            writer.WriteBoolean("x-abstract", true);
+        if (schema.IsNullableRaw.HasValue)
+            writer.WriteBoolean(isSwagger2 ? "x-nullable" : "nullable", schema.IsNullableRaw.Value);
+        if (schema.Example != null)
+        {
+            writer.WritePropertyName("example");
+            WriteRawValue(writer, schema.Example);
+        }
+
+        if (schema.IsFlagEnumerable)
+            writer.WriteBoolean("x-enumFlags", true);
+
+        if (schema.DictionaryKey != null)
+        {
+            writer.WritePropertyName("x-dictionaryKey");
+            WriteSchema(writer, schema.DictionaryKey);
+        }
+
+        if (schema.Not != null)
+        {
+            writer.WritePropertyName("not");
+            WriteSchema(writer, schema.Not);
+        }
+
+        WriteExclusiveBound(writer, "exclusiveMaximum", schema.ExclusiveMaximum, schema.IsExclusiveMaximum);
+        WriteExclusiveBound(writer, "exclusiveMinimum", schema.ExclusiveMinimum, schema.IsExclusiveMinimum);
+
+        if (schema.AdditionalItemsSchema != null)
+        {
+            writer.WritePropertyName("additionalItems");
+            WriteSchema(writer, schema.AdditionalItemsSchema);
+        }
+        else if (!schema.AllowAdditionalItems)
+        {
+            writer.WriteBoolean("additionalItems", false);
+        }
+
+        if (schema.AdditionalPropertiesSchema != null)
+        {
+            writer.WritePropertyName("additionalProperties");
+            WriteSchema(writer, schema.AdditionalPropertiesSchema);
+        }
+        else if (isSwagger2)
+        {
+            // Swagger 2.0 schemas only allow additional properties when they say so, which is written as {}
+            if (schema.AllowAdditionalProperties &&
+                (schema.Type.IsObject() || schema.Type == ApiObjectType.None) &&
+                !schema.HasReference &&
+                schema.AllOf.Count == 0 &&
+                parameter == null)
+            {
+                writer.WritePropertyName("additionalProperties");
+                writer.WriteStartObject();
+                writer.WriteEndObject();
+            }
+        }
+        else if (!schema.AllowAdditionalProperties)
+        {
+            writer.WriteBoolean("additionalProperties", false);
+        }
+
+        if (schema.Item != null)
+        {
+            writer.WritePropertyName("items");
+            WriteSchema(writer, schema.Item);
+        }
+        else if (schema.Items.Count > 0)
+        {
+            writer.WritePropertyName("items");
+            writer.WriteStartArray();
+            foreach (var item in schema.Items)
+                WriteSchema(writer, item);
+            writer.WriteEndArray();
+        }
+
+        if (parameter == null && schema.RequiredProperties.Count > 0)
+            WriteStringList(writer, "required", schema.RequiredProperties);
+
+        if (schema.Properties.Count > 0)
+        {
+            writer.WritePropertyName("properties");
+            writer.WriteStartObject();
+            foreach (var item in schema.Properties)
+            {
+                writer.WritePropertyName(item.Key);
+                WriteSchema(writer, item.Value);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        if (schema.PatternProperties.Count > 0)
+        {
+            writer.WritePropertyName("patternProperties");
+            writer.WriteStartObject();
+            foreach (var item in schema.PatternProperties)
+            {
+                writer.WritePropertyName(item.Key);
+                WriteSchema(writer, item.Value);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        if (schema.Definitions.Count > 0)
+            WriteSchemaDictionary(writer, "definitions", schema.Definitions);
+
+        if (schema.EnumerationNames.Count > 0)
+            WriteStringList(writer, "x-enumNames", schema.EnumerationNames);
+
+        if (schema.EnumerationDescriptions.Count > 0)
+        {
+            writer.WritePropertyName("x-enum-descriptions");
+            writer.WriteStartArray();
+            foreach (var description in schema.EnumerationDescriptions)
+            {
+                if (description == null)
+                    writer.WriteNullValue();
+                else
+                    writer.WriteStringValue(description);
+            }
+
+            writer.WriteEndArray();
+        }
+
+        if (schema.Enumeration.Count > 0)
+        {
+            writer.WritePropertyName("enum");
+            writer.WriteStartArray();
+            foreach (var value in schema.Enumeration)
+                WriteRawValue(writer, value);
+            writer.WriteEndArray();
+        }
+
+        WriteSchemaList(writer, "allOf", schema.AllOf);
+        WriteSchemaList(writer, "anyOf", schema.AnyOf);
+        WriteSchemaList(writer, "oneOf", schema.OneOf);
+
+        if (schema.Reference != null)
+        {
+            writer.WriteString("$ref", GetSchemaReferencePath(schema.Reference));
+        }
+
+        if (property != null)
+        {
+            if (property.IsReadOnly)
+                writer.WriteBoolean("readOnly", true);
+            if (property.IsWriteOnly)
+                writer.WriteBoolean(isSwagger2 ? "x-writeOnly" : "writeOnly", true);
+        }
+
+        WriteExtensionData(writer, schema.ExtensionData);
+        writer.WriteEndObject();
+    }
+
+    private void WriteDiscriminator(Utf8JsonWriter writer, ApiSchema schema)
+    {
+        if (schema.DiscriminatorObject == null)
+            return;
+
+        if (isSwagger2)
+        {
+            WriteString(writer, "discriminator", schema.DiscriminatorObject.PropertyName);
+            return;
+        }
+
+        writer.WritePropertyName("discriminator");
+        writer.WriteStartObject();
+        WriteString(writer, "propertyName", schema.DiscriminatorObject.PropertyName);
+        if (schema.DiscriminatorObject.Mapping.Count > 0)
+        {
+            writer.WritePropertyName("mapping");
+            writer.WriteStartObject();
+            foreach (var mapping in schema.DiscriminatorObject.Mapping)
+            {
+                var path = mapping.Value.Reference != null
+                    ? GetSchemaReferencePath(mapping.Value.Reference)
+                    : mapping.Value.ReferencePath;
+                if (path == null)
+                    writer.WriteNull(mapping.Key);
+                else
+                    writer.WriteString(mapping.Key, path);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndObject();
+    }
+
+    private void WriteSchemaList(Utf8JsonWriter writer, string name, IList<ApiSchema> schemas)
+    {
+        if (schemas.Count == 0)
+            return;
+
+        writer.WritePropertyName(name);
+        writer.WriteStartArray();
+        foreach (var schema in schemas)
+            WriteSchema(writer, schema);
+        writer.WriteEndArray();
+    }
+
+    private static void WriteType(Utf8JsonWriter writer, ApiObjectType type)
+    {
+        var types = ApiObjectTypeExtensions.AllTypes.Where(t => type.HasFlag(t)).ToList();
+        if (types.Count == 1)
+        {
+            writer.WriteString("type", types[0].ToJsonName());
+        }
+        else if (types.Count > 1)
+        {
+            writer.WritePropertyName("type");
+            writer.WriteStartArray();
+            foreach (var t in types)
+                writer.WriteStringValue(t.ToJsonName());
+            writer.WriteEndArray();
+        }
+    }
+
+    private static void WriteExclusiveBound(Utf8JsonWriter writer, string name, decimal? bound, bool isExclusive)
+    {
+        if (bound.HasValue)
+            WriteDecimal(writer, name, bound);
+        else if (isExclusive)
+            writer.WriteBoolean(name, true);
+    }
+
+    private static void WriteDecimal(Utf8JsonWriter writer, string name, decimal? value)
+    {
+        if (!value.HasValue)
+            return;
+
+        // Decimals are written with at least one decimal place, so they are read with it
+        var text = value.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        writer.WritePropertyName(name);
+        writer.WriteRawValue(text.IndexOf('.') >= 0 ? text : text + ".0", skipInputValidation: true);
+    }
+
+    private void WriteSecurityRequirements(Utf8JsonWriter writer, string name, List<ApiSecurityRequirement> requirements)
+    {
+        writer.WritePropertyName(name);
+        writer.WriteStartArray();
+        foreach (var requirement in requirements)
+        {
+            writer.WriteStartObject();
+            foreach (var scheme in requirement)
+            {
+                writer.WritePropertyName(scheme.Key);
+                writer.WriteStartArray();
+                foreach (var scope in scheme.Value)
+                    writer.WriteStringValue(scope);
+                writer.WriteEndArray();
+            }
+
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteString(Utf8JsonWriter writer, string name, string? value)
+    {
+        if (value != null)
+            writer.WriteString(name, value);
+    }
+
+    private static void WriteStringList(Utf8JsonWriter writer, string name, IEnumerable<string> values)
+    {
+        writer.WritePropertyName(name);
+        writer.WriteStartArray();
+        foreach (var value in values)
+            writer.WriteStringValue(value);
+        writer.WriteEndArray();
+    }
+
+    private static void WriteExtensionData(Utf8JsonWriter writer, Dictionary<string, object?>? extensionData)
+    {
+        if (extensionData == null)
+            return;
+
+        foreach (var item in extensionData)
+        {
+            writer.WritePropertyName(item.Key);
+            WriteRawValue(writer, item.Value);
+        }
+    }
+
+    private static void WriteRawValue(Utf8JsonWriter writer, object? value) =>
+        writer.WriteRawValue(RawJson.ToIndentedString(value), skipInputValidation: true);
+
+    // A reference points to where its actual schema was first found. For a parameter that is the schema of the
+    // referenced parameter, which is why referenced parameters are lost in copies.
+    private string GetSchemaReferencePath(ApiSchema reference) => GetReferencePath(reference.ActualSchema);
+
+    private string GetReferencePath(object target) =>
+        referencePaths.TryGetValue(target, out var path)
+            ? path
+            : throw new InvalidOperationException(
+                "Could not find the JSON path of a referenced schema: " + target.GetType().FullName +
+                ". Manually referenced schemas must be added to the 'Definitions' of a parent schema.");
+
+    private static string ParameterKindName(ApiParameterKind kind) =>
+        kind switch
+        {
+            ApiParameterKind.Body => "body",
+            ApiParameterKind.Query => "query",
+            ApiParameterKind.Path => "path",
+            ApiParameterKind.Header => "header",
+            ApiParameterKind.FormData => "formData",
+            ApiParameterKind.ModelBinding => "modelbinding",
+            ApiParameterKind.Cookie => "cookie",
+            _ => "undefined",
+        };
+
+    private static string ParameterStyleName(ApiParameterStyle style) =>
+        style switch
+        {
+            ApiParameterStyle.Simple => "simple",
+            ApiParameterStyle.Label => "label",
+            ApiParameterStyle.Matrix => "matrix",
+            ApiParameterStyle.Form => "form",
+            ApiParameterStyle.SpaceDelimited => "spaceDelimited",
+            ApiParameterStyle.PipeDelimited => "pipeDelimited",
+            ApiParameterStyle.DeepObject => "deepObject",
+            _ => "undefined",
+        };
+}

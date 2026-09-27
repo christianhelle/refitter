@@ -40,6 +40,7 @@
     <Compile Include="../Refitter.Core/Mutators/*.cs" />
     <Compile Include="../Refitter.Core/OpenApi/*.cs" />
     <Compile Include="../Refitter.Core/OpenApi/Reading/*.cs" />
+    <Compile Include="../Refitter.Core/OpenApi/Writing/*.cs" />
     <Compile Include="../Refitter.Core/ParameterExtraction/*.cs" />
     <Compile Include="../Refitter.Core/Partitioning/*.cs" />
     <Compile Include="../Refitter.Core/Pipeline/*.cs" />
