@@ -883,7 +883,7 @@ internal sealed class OpenApiV3Reader
         var requirement = new SpecSecurityRequirement();
         foreach (var scheme in node.CheckMapNode("security", context))
         {
-            requirement.Add(new SpecReference(scheme.Key, null));
+            requirement.Add(SpecReferences.Create(scheme.Key, null));
             scheme.Value.CreateSimpleList("String", item => item.GetScalarValue(), context);
         }
 
@@ -910,13 +910,13 @@ internal sealed class OpenApiV3Reader
         var isExternal = !segments[0].StartsWith("#", StringComparison.OrdinalIgnoreCase);
         if (version == OpenApiSpecificationVersion.OpenApi3_0)
         {
-            return new SpecReference(
+            return SpecReferences.Create(
                 segments[segments.Length - 1],
                 isExternal ? pointer.Split('#')[0].TrimEnd('#') : null);
         }
 
         var hasFragment = pointer.Contains('#');
-        return new SpecReference(
+        return SpecReferences.Create(
             hasFragment ? segments[segments.Length - 1] : pointer,
             isExternal && hasFragment ? pointer.Split('#')[0].TrimEnd('#') : null);
     }

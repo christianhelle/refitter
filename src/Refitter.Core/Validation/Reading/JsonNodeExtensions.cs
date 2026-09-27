@@ -77,7 +77,7 @@ internal static class JsonNodeExtensions
     public static Dictionary<string, T?> CreateMap<T>(
         this JsonNode? node,
         string typeName,
-        Func<JsonNode, ParsingContext, T> map,
+        Func<JsonNode, ParsingContext, T?> map,
         ParsingContext context)
         where T : class
     {

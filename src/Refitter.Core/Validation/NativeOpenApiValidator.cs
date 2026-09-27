@@ -16,6 +16,7 @@ internal static class NativeOpenApiValidator
         cancellationToken.ThrowIfCancellationRequested();
 
         byte[] content;
+        Uri? baseUrl = null;
         if (PathUtilities.IsHttp(openApiFile))
         {
             string text;
@@ -45,9 +46,12 @@ internal static class NativeOpenApiValidator
                 .ConfigureAwait(false);
 
             content = ReadFile(openApiFile);
+
+            // Microsoft.OpenApi reads local files relative to their folder
+            baseUrl = new Uri($"file://{new FileInfo(openApiFile).DirectoryName}{Path.DirectorySeparatorChar}");
         }
 
-        var (document, diagnostics) = SpecDocumentReader.Read(content);
+        var (document, diagnostics) = SpecDocumentReader.Read(content, baseUrl);
         return new OpenApiValidationResult(diagnostics, SpecStatistics.Count(document));
     }
 

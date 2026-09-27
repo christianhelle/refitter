@@ -11,8 +11,15 @@ namespace Refitter.Core.Validation.Reading;
 internal sealed class ParsingContext(ValidationDiagnostics diagnostics)
 {
     private readonly Stack<string> currentLocation = new();
+    private readonly Dictionary<string, object> tempStorage = new(StringComparer.Ordinal);
+    private readonly Dictionary<object, Dictionary<string, object>> scopedTempStorage = new();
 
     public ValidationDiagnostics Diagnostics { get; } = diagnostics;
+
+    /// <summary>
+    /// The location a local file is read from, which Swagger 2.0 servers default to.
+    /// </summary>
+    public Uri? BaseUrl { get; set; }
 
     /// <summary>
     /// Reads the document with the reader for the specification version it declares.
@@ -24,8 +31,9 @@ internal sealed class ParsingContext(ValidationDiagnostics diagnostics)
         var version = GetVersion(jsonNode);
         if (version.Equals("2.0", StringComparison.OrdinalIgnoreCase))
         {
+            var document = new OpenApiV2Reader().LoadDocument(jsonNode, this);
             Diagnostics.SpecificationVersion = OpenApiSpecificationVersion.OpenApi2_0;
-            return new SpecDocument();
+            return document;
         }
 
         if (version.StartsWith("3.0", StringComparison.OrdinalIgnoreCase))
@@ -51,6 +59,34 @@ internal sealed class ParsingContext(ValidationDiagnostics diagnostics)
         var document = new OpenApiV3Reader(version).LoadDocument(jsonNode, this);
         Diagnostics.SpecificationVersion = version;
         return document;
+    }
+
+    /// <summary>
+    /// Values the Swagger 2.0 reader keeps between fields, globally or for one object.
+    /// </summary>
+    public T? GetFromTempStorage<T>(string key, object? scope = null)
+    {
+        var storage = scope == null ? tempStorage : scopedTempStorage.TryGetValue(scope, out var scoped) ? scoped : null;
+        return storage != null && storage.TryGetValue(key, out var value) ? (T)value : default;
+    }
+
+    public void SetTempStorage(string key, object? value, object? scope = null)
+    {
+        Dictionary<string, object> storage;
+        if (scope == null)
+        {
+            storage = tempStorage;
+        }
+        else if (!scopedTempStorage.TryGetValue(scope, out storage!))
+        {
+            storage = new Dictionary<string, object>(StringComparer.Ordinal);
+            scopedTempStorage[scope] = storage;
+        }
+
+        if (value == null)
+            storage.Remove(key);
+        else
+            storage[key] = value;
     }
 
     public void StartObject(string objectName) => currentLocation.Push(objectName);

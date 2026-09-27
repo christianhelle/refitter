@@ -15,7 +15,7 @@ internal static class SpecDocumentReader
     /// Reads JSON or YAML content. The format is decided by the first character that is not white space.
     /// </summary>
     /// <returns>The document, which is <c>null</c> when the content could not be read, and the diagnostics.</returns>
-    public static (SpecDocument? Document, ValidationDiagnostics Diagnostics) Read(byte[] content)
+    public static (SpecDocument? Document, ValidationDiagnostics Diagnostics) Read(byte[] content, Uri? baseUrl = null)
     {
         var diagnostics = new ValidationDiagnostics();
         JsonNode jsonNode;
@@ -39,7 +39,7 @@ internal static class SpecDocumentReader
             jsonNode = YamlToJsonConverter.Read(reader);
         }
 
-        var context = new ParsingContext(diagnostics);
+        var context = new ParsingContext(diagnostics) { BaseUrl = baseUrl };
         try
         {
             return (context.Parse(jsonNode), diagnostics);
