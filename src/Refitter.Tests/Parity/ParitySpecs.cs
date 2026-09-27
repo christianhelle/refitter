@@ -65,7 +65,8 @@ public static class ParitySpecs
 
         foreach (var (field, content) in fields)
         {
-            if (!seenContents.Add(content))
+            // Checkouts can differ in line endings, so specs that only differ in them are the same spec
+            if (!seenContents.Add(content.Replace("\r\n", "\n")))
                 continue;
 
             var id = GetId(field);
