@@ -146,6 +146,12 @@ public class OpenApiModelTests
 
         var invalid = new ApiSchema { Type = ApiObjectType.String, ExtensionData = new() { ["nullable"] = "maybe" } };
         invalid.IsNullable(ApiSchemaType.OpenApi3).Should().BeFalse();
+
+        var empty = new ApiSchema { Type = ApiObjectType.String, ExtensionData = new() { ["nullable"] = null } };
+        empty.IsNullable(ApiSchemaType.OpenApi3).Should().BeFalse();
+
+        var other = new ApiSchema { Type = ApiObjectType.String, ExtensionData = new() { ["x-other"] = true } };
+        other.IsNullable(ApiSchemaType.OpenApi3).Should().BeFalse();
     }
 
     [Test]
@@ -192,6 +198,19 @@ public class OpenApiModelTests
         var parameter = new ApiParameter { Reference = target };
 
         parameter.ActualSchema.Type.Should().Be(ApiObjectType.Integer);
+    }
+
+    [Test]
+    public void Parameters_Prefer_Their_Schema_Then_Their_Custom_Schema()
+    {
+        var schema = new ApiSchema { Type = ApiObjectType.Integer };
+        var customSchema = new ApiSchema { Type = ApiObjectType.Boolean };
+
+        new ApiParameter { Schema = schema, CustomSchema = customSchema }.ActualSchema.Should().BeSameAs(schema);
+        new ApiParameter { CustomSchema = customSchema }.ActualSchema.Should().BeSameAs(customSchema);
+
+        var bare = new ApiParameter();
+        bare.ActualSchema.Should().BeSameAs(bare);
     }
 
     [Test]

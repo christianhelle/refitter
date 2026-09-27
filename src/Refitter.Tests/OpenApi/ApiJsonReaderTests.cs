@@ -598,6 +598,7 @@ public class ApiJsonReaderTests
         ReadSchema("""{ "uniqueItems": 0 }""").UniqueItems.Should().BeFalse();
         ReadSchema("""{ "uniqueItems": null }""").UniqueItems.Should().BeFalse();
         FluentActions.Invoking(() => ReadSchema("""{ "uniqueItems": "yes" }""")).Should().Throw<ApiDocumentReadException>();
+        FluentActions.Invoking(() => ReadSchema("""{ "uniqueItems": [] }""")).Should().Throw<ApiDocumentReadException>();
     }
 
     [Test]
