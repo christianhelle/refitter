@@ -400,17 +400,7 @@ internal sealed class ApiReferenceResolver
         switch (node)
         {
             case ApiDocument apiDocument:
-                return segment switch
-                {
-                    "paths" => apiDocument.Paths,
-                    "components" => apiDocument.Components,
-                    "definitions" => apiDocument.Definitions,
-                    "parameters" => apiDocument.Parameters,
-                    "responses" => apiDocument.Responses,
-                    "securityDefinitions" => apiDocument.SecurityDefinitions,
-                    "tags" => apiDocument.Tags,
-                    _ => GetExtensionData(apiDocument.ExtensionData, segment),
-                };
+                return GetDocumentChild(apiDocument, segment);
             case ApiComponents components:
                 return segment switch
                 {
@@ -476,6 +466,29 @@ internal sealed class ApiReferenceResolver
         }
     }
 
+    private static object? GetDocumentChild(ApiDocument apiDocument, string segment)
+    {
+        switch (segment)
+        {
+            case "paths":
+                return apiDocument.Paths;
+            case "components":
+                return apiDocument.Components;
+            case "definitions":
+                return apiDocument.Definitions;
+            case "parameters":
+                return apiDocument.Parameters;
+            case "responses":
+                return apiDocument.Responses;
+            case "securityDefinitions":
+                return apiDocument.SecurityDefinitions;
+            case "tags":
+                return apiDocument.Tags;
+            default:
+                return GetExtensionData(apiDocument.ExtensionData, segment);
+        }
+    }
+
     private static object? GetSchemaChild(ApiSchema schema, string segment)
     {
         var extensionData = GetExtensionData(schema.ExtensionData, segment);
@@ -493,22 +506,35 @@ internal sealed class ApiReferenceResolver
             }
         }
 
-        return segment switch
+        switch (segment)
         {
-            "properties" => schema.Properties.Count > 0 ? schema.Properties : null,
-            "patternProperties" => schema.PatternProperties.Count > 0 ? schema.PatternProperties : null,
-            "definitions" => schema.Definitions.Count > 0 ? schema.Definitions : null,
-            "items" => (object?)schema.Item ?? (schema.Items.Count > 0 ? schema.Items : null),
-            "additionalProperties" => schema.AdditionalPropertiesSchema,
-            "additionalItems" => schema.AdditionalItemsSchema,
-            "allOf" => schema.AllOf.Count > 0 ? schema.AllOf : null,
-            "anyOf" => schema.AnyOf.Count > 0 ? schema.AnyOf : null,
-            "oneOf" => schema.OneOf.Count > 0 ? schema.OneOf : null,
-            "not" => schema.Not,
-            "x-dictionaryKey" => schema.DictionaryKey,
-            "discriminator" => schema.DiscriminatorObject,
-            _ => null,
-        };
+            case "properties":
+                return schema.Properties.Count > 0 ? schema.Properties : null;
+            case "patternProperties":
+                return schema.PatternProperties.Count > 0 ? schema.PatternProperties : null;
+            case "definitions":
+                return schema.Definitions.Count > 0 ? schema.Definitions : null;
+            case "items":
+                return (object?)schema.Item ?? (schema.Items.Count > 0 ? schema.Items : null);
+            case "additionalProperties":
+                return schema.AdditionalPropertiesSchema;
+            case "additionalItems":
+                return schema.AdditionalItemsSchema;
+            case "allOf":
+                return schema.AllOf.Count > 0 ? schema.AllOf : null;
+            case "anyOf":
+                return schema.AnyOf.Count > 0 ? schema.AnyOf : null;
+            case "oneOf":
+                return schema.OneOf.Count > 0 ? schema.OneOf : null;
+            case "not":
+                return schema.Not;
+            case "x-dictionaryKey":
+                return schema.DictionaryKey;
+            case "discriminator":
+                return schema.DiscriminatorObject;
+            default:
+                return null;
+        }
     }
 
     private static object? GetExtensionData(Dictionary<string, object?>? extensionData, string segment) =>

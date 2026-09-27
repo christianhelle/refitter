@@ -745,29 +745,49 @@ internal sealed class ApiDocumentWriter
                 "Could not find the JSON path of a referenced schema: " + target.GetType().FullName +
                 ". Manually referenced schemas must be added to the 'Definitions' of a parent schema.");
 
-    private static string ParameterKindName(ApiParameterKind kind) =>
-        kind switch
+    private static string ParameterKindName(ApiParameterKind kind)
+    {
+        switch (kind)
         {
-            ApiParameterKind.Body => "body",
-            ApiParameterKind.Query => "query",
-            ApiParameterKind.Path => "path",
-            ApiParameterKind.Header => "header",
-            ApiParameterKind.FormData => "formData",
-            ApiParameterKind.ModelBinding => "modelbinding",
-            ApiParameterKind.Cookie => "cookie",
-            _ => "undefined",
-        };
+            case ApiParameterKind.Body:
+                return "body";
+            case ApiParameterKind.Query:
+                return "query";
+            case ApiParameterKind.Path:
+                return "path";
+            case ApiParameterKind.Header:
+                return "header";
+            case ApiParameterKind.FormData:
+                return "formData";
+            case ApiParameterKind.ModelBinding:
+                return "modelbinding";
+            case ApiParameterKind.Cookie:
+                return "cookie";
+            default:
+                return "undefined";
+        }
+    }
 
-    private static string ParameterStyleName(ApiParameterStyle style) =>
-        style switch
+    private static string ParameterStyleName(ApiParameterStyle style)
+    {
+        switch (style)
         {
-            ApiParameterStyle.Simple => "simple",
-            ApiParameterStyle.Label => "label",
-            ApiParameterStyle.Matrix => "matrix",
-            ApiParameterStyle.Form => "form",
-            ApiParameterStyle.SpaceDelimited => "spaceDelimited",
-            ApiParameterStyle.PipeDelimited => "pipeDelimited",
-            ApiParameterStyle.DeepObject => "deepObject",
-            _ => "undefined",
-        };
+            case ApiParameterStyle.Simple:
+                return "simple";
+            case ApiParameterStyle.Label:
+                return "label";
+            case ApiParameterStyle.Matrix:
+                return "matrix";
+            case ApiParameterStyle.Form:
+                return "form";
+            case ApiParameterStyle.SpaceDelimited:
+                return "spaceDelimited";
+            case ApiParameterStyle.PipeDelimited:
+                return "pipeDelimited";
+            case ApiParameterStyle.DeepObject:
+                return "deepObject";
+            default:
+                return "undefined";
+        }
+    }
 }

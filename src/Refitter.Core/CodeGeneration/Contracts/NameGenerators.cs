@@ -165,17 +165,30 @@ internal class DefaultContractEnumNameGenerator : IContractEnumNameGenerator
         if (string.IsNullOrEmpty(name))
             return "Empty";
 
-        name = name switch
+        switch (name)
         {
-            "=" => "Eq",
-            "!=" => "Ne",
-            ">" => "Gt",
-            "<" => "Lt",
-            ">=" => "Ge",
-            "<=" => "Le",
-            "~=" => "Approx",
-            _ => name,
-        };
+            case "=":
+                name = "Eq";
+                break;
+            case "!=":
+                name = "Ne";
+                break;
+            case ">":
+                name = "Gt";
+                break;
+            case "<":
+                name = "Lt";
+                break;
+            case ">=":
+                name = "Ge";
+                break;
+            case "<=":
+                name = "Le";
+                break;
+            case "~=":
+                name = "Approx";
+                break;
+        }
 
         if (name!.StartsWith("-", StringComparison.Ordinal))
             name = "Minus" + name.Substring(1);

@@ -44,19 +44,30 @@ internal static class ApiObjectTypeExtensions
 
     public static bool IsFile(this ApiObjectType type) => (type & ApiObjectType.File) != 0;
 
-    public static ApiObjectType Parse(string? value) =>
-        value switch
+    public static ApiObjectType Parse(string? value)
+    {
+        switch (value)
         {
-            "array" => ApiObjectType.Array,
-            "boolean" => ApiObjectType.Boolean,
-            "integer" => ApiObjectType.Integer,
-            "number" => ApiObjectType.Number,
-            "null" => ApiObjectType.Null,
-            "object" => ApiObjectType.Object,
-            "string" => ApiObjectType.String,
-            "file" => ApiObjectType.File,
-            _ => ApiObjectType.None,
-        };
+            case "array":
+                return ApiObjectType.Array;
+            case "boolean":
+                return ApiObjectType.Boolean;
+            case "integer":
+                return ApiObjectType.Integer;
+            case "number":
+                return ApiObjectType.Number;
+            case "null":
+                return ApiObjectType.Null;
+            case "object":
+                return ApiObjectType.Object;
+            case "string":
+                return ApiObjectType.String;
+            case "file":
+                return ApiObjectType.File;
+            default:
+                return ApiObjectType.None;
+        }
+    }
 
     public static string ToJsonName(this ApiObjectType type) => type.ToString().ToLowerInvariant();
 
