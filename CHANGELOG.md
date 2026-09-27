@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Delete temporary files created by unit tests [\#1306](https://github.com/christianhelle/refitter/pull/1306) ([christianhelle](https://github.com/christianhelle))
 - Move MSBuild build dependency into the solution [\#1283](https://github.com/christianhelle/refitter/pull/1283) ([christianhelle](https://github.com/christianhelle))
 - Remove dead and unused code [\#1257](https://github.com/christianhelle/refitter/pull/1257) ([christianhelle](https://github.com/christianhelle))
 - Check cancellation before fetching remote OpenAPI documents [\#1255](https://github.com/christianhelle/refitter/pull/1255) ([christianhelle](https://github.com/christianhelle))
