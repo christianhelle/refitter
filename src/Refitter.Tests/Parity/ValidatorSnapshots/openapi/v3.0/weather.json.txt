@@ -1,0 +1,7 @@
+== file
+version: OpenApi3_0
+statistics: path items 2, operations 2, parameters 2, request bodies 0, responses 2, links 0, callbacks 0, schemas 9, headers 0
+== url
+version: OpenApi3_0
+error: #/paths/~1weatherforecast~1{code} | The path signature '/weatherforecast/{}' MUST be unique.
+statistics: path items 2, operations 2, parameters 2, request bodies 0, responses 2, links 0, callbacks 0, schemas 9, headers 0

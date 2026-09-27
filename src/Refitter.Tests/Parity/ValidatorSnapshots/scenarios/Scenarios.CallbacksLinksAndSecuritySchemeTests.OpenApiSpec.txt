@@ -1,0 +1,6 @@
+== file
+version: OpenApi3_0
+statistics: path items 3, operations 3, parameters 1, request bodies 2, responses 3, links 1, callbacks 1, schemas 7, headers 0
+== url
+version: OpenApi3_0
+statistics: path items 3, operations 3, parameters 1, request bodies 2, responses 3, links 1, callbacks 1, schemas 7, headers 0

@@ -1,0 +1,4 @@
+== file
+exception: UnsupportedSpecificationVersion: OpenAPI specification version '1.2' is not supported.
+== url
+exception: UnsupportedSpecificationVersion: OpenAPI specification version '1.2' is not supported.

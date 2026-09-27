@@ -1,0 +1,8 @@
+== file
+version: OpenApi3_0
+statistics: path items 32, operations 33, parameters 158, request bodies 18, responses 72, links 0, callbacks 0, schemas 2210, headers 0
+== url
+version: OpenApi3_0
+error: #/paths/~1resellers~1v6~1orders~1{ordernumber} | The path signature '/resellers/v6/orders/{}' MUST be unique.
+error: #/paths/~1resellers~1v6~1orders~1{OrderNumber} | The path signature '/resellers/v6/orders/{}' MUST be unique.
+statistics: path items 32, operations 33, parameters 158, request bodies 18, responses 72, links 0, callbacks 0, schemas 2210, headers 0

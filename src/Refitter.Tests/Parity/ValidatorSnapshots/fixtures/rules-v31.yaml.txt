@@ -1,0 +1,11 @@
+== file
+version: OpenApi3_1
+statistics: path items 3, operations 3, parameters 1, request bodies 0, responses 2, links 0, callbacks 0, schemas 3, headers 0
+== url
+version: OpenApi3_1
+error: #/info/license/name | The field 'name' in 'license' object is REQUIRED.
+error: #/paths/~1pets~1{id}/get/parameters/0/required | "required" must be true when parameter location is "path"
+error: #/webhooks/newPet/post/responses | Responses must contain at least one response
+error: #/components/schemas/Pet/discriminator | Schema  must contain property specified in the discriminator kind in the required field list.
+warning: #/paths/~1pets~1{id}/get/responses/200/content/application~1json/schema/$ref | The schema reference '#/components/schemas/Missing' does not point to an existing schema.
+statistics: path items 3, operations 3, parameters 1, request bodies 0, responses 2, links 0, callbacks 0, schemas 3, headers 0

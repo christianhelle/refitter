@@ -1,0 +1,7 @@
+== file
+version: OpenApi3_0
+statistics: path items 1, operations 1, parameters 3, request bodies 0, responses 1, links 0, callbacks 0, schemas 3, headers 0
+== url
+version: OpenApi3_0
+error: #/paths/~1pets~1{id}/parameters/1/in | Declared path parameter "missing" needs to be defined as a path parameter at either the path or operation level
+statistics: path items 1, operations 1, parameters 3, request bodies 0, responses 1, links 0, callbacks 0, schemas 3, headers 0

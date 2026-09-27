@@ -1,0 +1,28 @@
+== file
+version: OpenApi3_0
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+statistics: path items 1, operations 1, parameters 5, request bodies 0, responses 1, links 0, callbacks 0, schemas 0, headers 0
+== url
+version: OpenApi3_0
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | format is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error:  | type is not a valid property at #/paths/~1t~1foo~1{id}/get/parameters
+error: #/info/title | The field 'title' in 'info' object is REQUIRED.
+error: #/info/version | The field 'version' in 'info' object is REQUIRED.
+statistics: path items 1, operations 1, parameters 5, request bodies 0, responses 1, links 0, callbacks 0, schemas 0, headers 0

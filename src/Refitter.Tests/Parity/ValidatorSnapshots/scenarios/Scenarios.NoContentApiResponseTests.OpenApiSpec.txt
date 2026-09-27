@@ -1,0 +1,12 @@
+== file
+version: OpenApi3_0
+error:  | schema is not a valid property at #/paths/~1orders~1{orderId}~1order-items~1{orderItemId}/delete/responses/default
+error:  | definitions is not a valid property at #/
+error:  | parameters is not a valid property at #/
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 2, links 0, callbacks 0, schemas 0, headers 0
+== url
+version: OpenApi3_0
+error:  | schema is not a valid property at #/paths/~1orders~1{orderId}~1order-items~1{orderItemId}/delete/responses/default
+error:  | definitions is not a valid property at #/
+error:  | parameters is not a valid property at #/
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 2, links 0, callbacks 0, schemas 0, headers 0

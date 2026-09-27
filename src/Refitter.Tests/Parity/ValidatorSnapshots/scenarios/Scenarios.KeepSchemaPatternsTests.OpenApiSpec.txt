@@ -1,0 +1,8 @@
+== file
+version: OpenApi3_0
+statistics: path items 0, operations 0, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 23, headers 0
+== url
+version: OpenApi3_0
+error: #/info/title | The field 'title' in 'info' object is REQUIRED.
+error: #/info/version | The field 'version' in 'info' object is REQUIRED.
+statistics: path items 0, operations 0, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 23, headers 0

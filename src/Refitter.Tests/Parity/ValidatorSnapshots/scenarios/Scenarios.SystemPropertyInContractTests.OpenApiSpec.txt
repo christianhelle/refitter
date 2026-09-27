@@ -1,0 +1,16 @@
+== file
+version: OpenApi3_0
+error:  | swagger is not a valid property at #/
+error:  | host is not a valid property at #/
+error:  | basePath is not a valid property at #/
+error:  | schemes is not a valid property at #/
+error:  | definitions is not a valid property at #/
+statistics: path items 0, operations 0, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 0, headers 0
+== url
+version: OpenApi3_0
+error:  | swagger is not a valid property at #/
+error:  | host is not a valid property at #/
+error:  | basePath is not a valid property at #/
+error:  | schemes is not a valid property at #/
+error:  | definitions is not a valid property at #/
+statistics: path items 0, operations 0, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 0, headers 0

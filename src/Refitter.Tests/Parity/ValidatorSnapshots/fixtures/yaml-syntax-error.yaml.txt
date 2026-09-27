@@ -1,0 +1,4 @@
+== file
+exception: SyntaxErrorException: (Lin: 3, Col: 10, Chr: 47) - (Lin: 3, Col: 10, Chr: 47): Mapping values are not allowed in this context.
+== url
+exception: SyntaxErrorException: (Lin: 3, Col: 10, Chr: 47) - (Lin: 3, Col: 10, Chr: 47): Mapping values are not allowed in this context.

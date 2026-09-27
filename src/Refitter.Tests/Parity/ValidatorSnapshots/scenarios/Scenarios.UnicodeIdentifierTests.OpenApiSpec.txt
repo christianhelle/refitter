@@ -1,0 +1,7 @@
+== file
+version: OpenApi3_0
+statistics: path items 2, operations 2, parameters 1, request bodies 0, responses 2, links 0, callbacks 0, schemas 4, headers 0
+== url
+version: OpenApi3_0
+error: #/components | The key 'Größe' in 'schemas' of components MUST match the regular expression '^[a-zA-Z0-9\.\-_]+$'.
+statistics: path items 2, operations 2, parameters 1, request bodies 0, responses 2, links 0, callbacks 0, schemas 4, headers 0

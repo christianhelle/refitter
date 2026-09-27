@@ -1,0 +1,4 @@
+== file
+exception: InvalidOperationException: No documents found in the YAML stream.
+== url
+exception: InvalidOperationException: No documents found in the YAML stream.

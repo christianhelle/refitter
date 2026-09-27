@@ -1,0 +1,5 @@
+== file
+version: OpenApi2_0
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 0, headers 0
+== url
+exception: ReferenceResolutionException: Remote '$ref' "./components.yml#/definitions/User" in "<url>" was blocked. Remote reference resolution is disabled by default; pass --allow-remote-refs (or set allowRemoteReferences: true) to enable it.

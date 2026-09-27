@@ -1,0 +1,14 @@
+== file
+version: OpenApi3_1
+error:  | bogusRoot is not a valid property at #/
+error:  | bogusInfo is not a valid property at #/info
+error:  | bogusOperation is not a valid property at #/paths/~1pets/get
+warning:  | $schema is not a valid property at #/
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 2, headers 0
+== url
+version: OpenApi3_1
+error:  | bogusRoot is not a valid property at #/
+error:  | bogusInfo is not a valid property at #/info
+error:  | bogusOperation is not a valid property at #/paths/~1pets/get
+warning:  | $schema is not a valid property at #/
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 2, headers 0

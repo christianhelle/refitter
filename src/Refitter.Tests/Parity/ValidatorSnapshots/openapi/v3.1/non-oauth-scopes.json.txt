@@ -1,0 +1,7 @@
+== file
+version: OpenApi3_1
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 0, headers 0
+== url
+version: OpenApi3_1
+error: #/paths/~1users/get/responses | Responses must contain at least one response
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 0, headers 0
