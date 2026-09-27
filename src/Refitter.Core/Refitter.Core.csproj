@@ -15,8 +15,8 @@
     <PackageReference Include="Fluid.Core" Version="2.30.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.401" PrivateAssets="all" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.7.1" />
-    <PackageReference Include="NSwag.Core.Yaml" Version="14.7.1" />
+    <PackageReference Include="System.Text.Json" Version="9.0.9" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
     <PackageReference Include="OasReader" Version="3.7.0.20" />
   </ItemGroup>
 
