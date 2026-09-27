@@ -951,11 +951,30 @@ internal sealed class ApiJsonReader
                 break;
             case JsonValueKind.Null:
                 break;
+            case JsonValueKind.Number when value.GetRawText().IndexOfAny(['.', 'e', 'E']) >= 0 &&
+                                           TryConvertDoubleToDecimal(value.GetDouble(), out var fractionalBound):
+                // Bounds that can be a boolean are read as a double first, which drops trailing zeros
+                setBound(fractionalBound);
+                break;
             default:
                 var bound = ReadNullableDecimal(value, clamp: true);
                 if (bound.HasValue)
                     setBound(bound.Value);
                 break;
+        }
+    }
+
+    private static bool TryConvertDoubleToDecimal(double value, out decimal result)
+    {
+        try
+        {
+            result = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch (OverflowException)
+        {
+            result = 0;
+            return false;
         }
     }
 
