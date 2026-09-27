@@ -48,7 +48,7 @@ public class HttpDocumentStrategyTests
         var result = await strategy.TryLoadAsync("https://example.com/spec.json");
 
         result.Should().NotBeNull();
-        result!.Info.Title.Should().Be("Test API");
+        result!.Info!.Title.Should().Be("Test API");
     }
 
     [Test]
@@ -70,7 +70,7 @@ paths: {}";
         var result = await strategy.TryLoadAsync("https://example.com/spec.yaml");
 
         result.Should().NotBeNull();
-        result!.Info.Title.Should().Be("YAML Test API");
+        result!.Info!.Title.Should().Be("YAML Test API");
     }
 
     [Test]

@@ -1,16 +1,13 @@
 using System.Text.RegularExpressions;
-using NJsonSchema;
-using NSwag;
 
 namespace Refitter.Core;
 
 /// <summary>
 /// Cleans up the OpenAPI schema by removing unreferenced schemas and handling inheritance hierarchies.
 /// </summary>
-
-internal class NSwagSchemaCleaner
+internal class SchemaCleaner
 {
-    private readonly OpenApiDocument document;
+    private readonly ApiDocument document;
     private readonly Regex[] keepSchemaRegexes;
 
     /// <summary>
@@ -19,11 +16,11 @@ internal class NSwagSchemaCleaner
     public bool IncludeInheritanceHierarchy { get; init; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="NSwagSchemaCleaner"/> class.
+    /// Initializes a new instance of the <see cref="SchemaCleaner"/> class.
     /// </summary>
     /// <param name="document">The OpenAPI document to clean.</param>
     /// <param name="keepSchemaPatterns">Regular expression patterns for schemas to keep.</param>
-    public NSwagSchemaCleaner(OpenApiDocument document, string[] keepSchemaPatterns)
+    public SchemaCleaner(ApiDocument document, string[] keepSchemaPatterns)
     {
         this.document = document;
         keepSchemaRegexes = keepSchemaPatterns
@@ -69,10 +66,10 @@ internal class NSwagSchemaCleaner
         }
     }
 
-    private (IReadOnlyCollection<JsonSchema>, HashSet<string>) FindUsedJsonSchema(OpenApiDocument doc)
+    private (IReadOnlyCollection<ApiSchema>, HashSet<string>) FindUsedJsonSchema(ApiDocument doc)
     {
-        var toProcess = new Stack<JsonSchema>();
-        var schemaIdLookup = new Dictionary<JsonSchema, List<string>>();
+        var toProcess = new Stack<ApiSchema>();
+        var schemaIdLookup = new Dictionary<ApiSchema, List<string>>();
         foreach (var kvp in document.Components.Schemas)
         {
             var actualSchema = kvp.Value.ActualSchema;
@@ -96,14 +93,14 @@ internal class NSwagSchemaCleaner
 
         foreach (var pathItem in doc.Paths.Select(kvp => kvp.Value))
         {
-            foreach (JsonSchema? schema in GetSchemaForPath(pathItem))
+            foreach (ApiSchema? schema in GetSchemaForPath(pathItem))
             {
                 TryPush(schema, toProcess);
             }
         }
 
         var seenIds = new HashSet<string>();
-        var seen = new HashSet<JsonSchema>();
+        var seen = new HashSet<ApiSchema>();
         while (toProcess.Count > 0)
         {
             var schema = toProcess.Pop();
@@ -130,7 +127,7 @@ internal class NSwagSchemaCleaner
         return (seen, seenIds);
     }
 
-    private IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
+    private IEnumerable<ApiSchema?> GetSchemaForPath(ApiPathItem pathItem)
     {
         foreach (var p in pathItem.Parameters)
         {
@@ -168,7 +165,7 @@ internal class NSwagSchemaCleaner
         }
     }
 
-    private void TryPush(JsonSchema? schema, Stack<JsonSchema> stack)
+    private void TryPush(ApiSchema? schema, Stack<ApiSchema> stack)
     {
         if (schema == null)
         {
@@ -178,18 +175,18 @@ internal class NSwagSchemaCleaner
         stack.Push(schema);
     }
 
-    private IEnumerable<JsonSchema> EnumerateSchema(JsonSchema schema) =>
+    private IEnumerable<ApiSchema> EnumerateSchema(ApiSchema schema) =>
         EnumerateChildSchemas(schema)
             .Where(x => x != null)
             .Select(x => x!);
 
-    private IEnumerable<JsonSchema?> EnumerateChildSchemas(JsonSchema schema)
+    private IEnumerable<ApiSchema?> EnumerateChildSchemas(ApiSchema schema)
     {
         var schemaElement = schema.ActualSchema;
 
         yield return schemaElement.AdditionalItemsSchema;
         yield return schemaElement.AdditionalPropertiesSchema;
-        foreach (JsonSchema s in schemaElement.AllInheritedSchemas)
+        foreach (ApiSchema s in schemaElement.AllInheritedSchemas)
         {
             yield return s;
         }
@@ -204,7 +201,7 @@ internal class NSwagSchemaCleaner
             yield return schemaElement.Item;
         }
 
-        foreach (JsonSchema s in schemaElement.Items)
+        foreach (ApiSchema s in schemaElement.Items)
         {
             yield return s;
         }

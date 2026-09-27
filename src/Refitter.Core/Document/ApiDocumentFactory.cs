@@ -8,8 +8,8 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ApiDocumentFactory
 {
-    private static readonly IApiDocumentLoader DocumentLoader = new ApiDocumentStrategyLoader();
-    private static readonly ApiDocumentMerger DocumentMerger = new ApiDocumentMerger(new ApiDocumentEquivalenceComparer());
+    private static readonly IDocumentLoader DocumentLoader = new DocumentLoader();
+    private static readonly IDocumentMerger DocumentMerger = new DocumentMerger(new DocumentEquivalenceComparer());
 
     /// <summary>
     /// Creates a merged <see cref="ApiDocument"/> from multiple paths or URLs.

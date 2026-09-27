@@ -15,7 +15,7 @@ public class SettingsCliRegressionTests
     public void Issue1054_CreateAsync_Should_Throw_ArgumentNullException_For_Null_Paths()
     {
         // #1054: Correct exception type for null CreateAsync(IEnumerable)
-        Func<Task> act = async () => await NSwagDocumentFactory.CreateAsync((IEnumerable<string>)null!);
+        Func<Task> act = async () => await ApiDocumentFactory.CreateAsync((IEnumerable<string>)null!);
         act.Should().ThrowAsync<ArgumentNullException>();
     }
 

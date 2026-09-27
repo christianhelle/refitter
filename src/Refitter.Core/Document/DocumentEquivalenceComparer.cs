@@ -1,19 +1,18 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NJsonSchema;
-using OpenApiDocument = NSwag.OpenApiDocument;
+using System.Globalization;
+using System.Text;
+using System.Text.Json;
 
 namespace Refitter.Core;
 
+/// <summary>
+/// Decides whether two parts of different documents (paths, schemas, security schemes) describe the same thing,
+/// by comparing their JSON with the properties of every object sorted.
+/// </summary>
 internal sealed class DocumentEquivalenceComparer
 {
     /// <summary>
     /// Determines whether two values are equivalent by comparing their canonical representations.
     /// </summary>
-    /// <typeparam name="TValue">The type of values to compare.</typeparam>
-    /// <param name="existingValue">The existing value to compare.</param>
-    /// <param name="incomingValue">The incoming value to compare.</param>
-    /// <returns>True if the values are equivalent; otherwise, false.</returns>
     public bool AreEquivalent<TValue>(TValue existingValue, TValue incomingValue)
     {
         if (ReferenceEquals(existingValue, incomingValue) ||
@@ -24,9 +23,10 @@ internal sealed class DocumentEquivalenceComparer
 
         try
         {
-            return JToken.DeepEquals(
-                CreateCanonicalJsonToken(existingValue!),
-                CreateCanonicalJsonToken(incomingValue!));
+            return string.Equals(
+                CreateCanonicalJson(existingValue!),
+                CreateCanonicalJson(incomingValue!),
+                StringComparison.Ordinal);
         }
         catch
         {
@@ -35,138 +35,59 @@ internal sealed class DocumentEquivalenceComparer
     }
 
     /// <summary>
-    /// Creates a canonical JSON token representation of the given value for comparison purposes.
+    /// Creates the canonical JSON of a value: the JSON of a document containing it, with sorted properties.
+    /// Schemas that cannot be written in a document of their own are described by their main keywords.
     /// </summary>
-    /// <param name="value">The value to convert to a canonical JSON token.</param>
-    /// <returns>A canonical JToken representation of the value.</returns>
-    public JToken CreateCanonicalJsonToken(object value)
+    public string CreateCanonicalJson(object value)
     {
         try
         {
-            return NormalizeJsonToken(JToken.Parse(CreateOpenApiJson(value)));
+            using var json = JsonDocument.Parse(CreateOpenApiJson(value));
+            var builder = new StringBuilder();
+            WriteCanonical(builder, json.RootElement);
+            return builder.ToString();
         }
-        catch when (value is JsonSchema schema)
+        catch when (value is ApiSchema schema)
         {
-            return CreateCanonicalSchemaToken(schema, new HashSet<JsonSchema>(JsonSchemaReferenceComparer.Instance));
+            return CreateCanonicalSchemaJson(schema, new HashSet<ApiSchema>());
         }
     }
 
-    /// <summary>
-    /// Normalizes a JSON token by recursively sorting object properties and preserving array order.
-    /// </summary>
-    /// <param name="token">The JSON token to normalize.</param>
-    /// <returns>A normalized copy of the JSON token.</returns>
-    public JToken NormalizeJsonToken(JToken token)
-        => token switch
-        {
-            JObject jsonObject => new JObject(
-                jsonObject
-                    .Properties()
-                    .OrderBy(property => property.Name, StringComparer.Ordinal)
-                    .Select(property => new JProperty(property.Name, NormalizeJsonToken(property.Value)))),
-            JArray jsonArray => new JArray(jsonArray.Select(NormalizeJsonToken)),
-            _ => token.DeepClone()
-        };
-
-    /// <summary>
-    /// Creates a canonical JSON token representation of a JSON schema for comparison purposes.
-    /// </summary>
-    /// <param name="schema">The JSON schema to convert.</param>
-    /// <param name="visited">A set of already-visited schemas to handle circular references.</param>
-    /// <returns>A canonical JToken representation of the schema.</returns>
-    public JToken CreateCanonicalSchemaToken(JsonSchema schema, ISet<JsonSchema> visited)
+    internal string CreateOpenApiJson(object value)
     {
-        if (schema.Reference != null)
-            return CreateCanonicalSchemaReferenceToken(schema.Reference, visited);
-
-        var actualSchema = schema.ActualSchema;
-        if (!visited.Add(actualSchema))
-            return new JObject { ["$ref"] = "#" };
-
-        var json = new JObject
+        var document = new ApiDocument
         {
-            ["type"] = actualSchema.Type.ToString(),
-            ["format"] = actualSchema.Format,
-            ["title"] = actualSchema.Title,
-            ["description"] = actualSchema.Description,
-            ["nullable"] = actualSchema.IsNullableRaw,
-            ["allowAdditionalProperties"] = actualSchema.AllowAdditionalProperties
+            Info = new ApiInfo { Title = "Refitter equivalence comparison", Version = "1.0" },
         };
 
-        AddSchemaToken(json, "additionalProperties", actualSchema.AdditionalPropertiesSchema, visited);
-        AddSchemaToken(json, "items", actualSchema.Item, visited);
-        AddSchemaArray(json, "allOf", actualSchema.AllOf.OrderBy(s => CreateCanonicalSchemaToken(s, new HashSet<JsonSchema>(visited, JsonSchemaReferenceComparer.Instance)).ToString(Formatting.None), StringComparer.Ordinal), visited);
-        AddSchemaArray(json, "oneOf", actualSchema.OneOf.OrderBy(s => CreateCanonicalSchemaToken(s, new HashSet<JsonSchema>(visited, JsonSchemaReferenceComparer.Instance)).ToString(Formatting.None), StringComparer.Ordinal), visited);
-        AddSchemaArray(json, "anyOf", actualSchema.AnyOf.OrderBy(s => CreateCanonicalSchemaToken(s, new HashSet<JsonSchema>(visited, JsonSchemaReferenceComparer.Instance)).ToString(Formatting.None), StringComparer.Ordinal), visited);
-
-        if (actualSchema.RequiredProperties.Count > 0)
-            json["required"] = new JArray(actualSchema.RequiredProperties.OrderBy(name => name, StringComparer.Ordinal));
-
-        if (actualSchema.Properties.Count > 0)
+        switch (value)
         {
-            json["properties"] = new JObject(
-                actualSchema.Properties
-                    .OrderBy(property => property.Key, StringComparer.Ordinal)
-                    .Select(property => new JProperty(
-                        property.Key,
-                        CreateCanonicalSchemaToken(property.Value, new HashSet<JsonSchema>(visited, JsonSchemaReferenceComparer.Instance)))));
+            case ApiDocument apiDocument:
+                return ApiDocumentWriter.Write(apiDocument);
+            case ApiSchema schema:
+                document.Definitions["Schema"] = schema;
+                AddReferencedSchemas(document.Definitions, schema);
+                break;
+            case ApiPathItem pathItem:
+                document.AddPath("/_", pathItem);
+                break;
+            case ApiSecurityScheme securityScheme:
+                document.SecurityDefinitions["SecurityScheme"] = securityScheme;
+                break;
+            default:
+                return JsonSerializer.Serialize(value);
         }
 
-        if (actualSchema.Enumeration.Count > 0)
-            json["enum"] = new JArray(actualSchema.Enumeration.OrderBy(value => value?.ToString() ?? string.Empty, StringComparer.Ordinal).Select(value => value != null ? JToken.FromObject(value) : JValue.CreateNull()));
-
-        if (actualSchema.ExtensionData is { Count: > 0 })
-        {
-            json["extensions"] = new JObject(
-                actualSchema.ExtensionData
-                    .OrderBy(extension => extension.Key, StringComparer.Ordinal)
-                    .Select(extension => new JProperty(
-                        extension.Key,
-                        extension.Value != null ? NormalizeJsonToken(JToken.FromObject(extension.Value)) : JValue.CreateNull())));
-        }
-
-        return RemoveNullProperties(json);
+        return ApiDocumentWriter.Write(document);
     }
 
     /// <summary>
-    /// Removes all properties with null values from a JSON object.
+    /// Adds a schema and the schemas it (transitively) references to the definitions, named after their reference.
     /// </summary>
-    /// <param name="json">The JSON object to process.</param>
-    /// <returns>The modified JSON object with null properties removed.</returns>
-    public JObject RemoveNullProperties(JObject json)
+    internal void AddReferencedSchemas(IDictionary<string, ApiSchema> definitions, ApiSchema schema)
     {
-        foreach (var property in json.Properties().Where(property => property.Value.Type == JTokenType.Null).ToArray())
-        {
-            property.Remove();
-        }
-
-        return json;
-    }
-
-    /// <summary>
-    /// Creates a JSON string representation of an OpenAPI-related object.
-    /// </summary>
-    /// <param name="value">The value to serialize to JSON.</param>
-    /// <returns>A JSON string representation of the value.</returns>
-    public string CreateOpenApiJson(object value)
-        => value switch
-        {
-            OpenApiDocument document => document.ToJson(),
-            JsonSchema schema => CreateDocumentWithSchema(schema).ToJson(),
-            NSwag.OpenApiPathItem pathItem => CreateDocumentWithPath(pathItem).ToJson(),
-            NSwag.OpenApiSecurityScheme securityScheme => CreateDocumentWithSecurityScheme(securityScheme).ToJson(),
-            _ => JsonConvert.SerializeObject(value, Formatting.None)
-        };
-
-    /// <summary>
-    /// Recursively adds a schema and all its referenced schemas to the definitions dictionary.
-    /// </summary>
-    /// <param name="definitions">The dictionary to add schema definitions to.</param>
-    /// <param name="schema">The root schema to process.</param>
-    public void AddReferencedSchemas(IDictionary<string, JsonSchema> definitions, JsonSchema schema)
-    {
-        var visited = new HashSet<JsonSchema>(JsonSchemaReferenceComparer.Instance);
-        var schemasToProcess = new Stack<JsonSchema>();
+        var visited = new HashSet<ApiSchema>();
+        var schemasToProcess = new Stack<ApiSchema>();
         schemasToProcess.Push(schema);
 
         while (schemasToProcess.Count > 0)
@@ -188,14 +109,9 @@ internal sealed class DocumentEquivalenceComparer
         }
     }
 
-    /// <summary>
-    /// Extracts the definition name from a schema's reference path.
-    /// </summary>
-    /// <param name="schema">The schema to extract the definition name from.</param>
-    /// <returns>The definition name if found; otherwise, null.</returns>
-    public string? GetDefinitionName(JsonSchema schema)
+    internal static string? GetDefinitionName(ApiSchema schema)
     {
-        var referencePath = ((NJsonSchema.References.IJsonReferenceBase)schema).ReferencePath;
+        var referencePath = schema.ReferencePath;
         if (string.IsNullOrWhiteSpace(referencePath))
             return null;
 
@@ -205,60 +121,7 @@ internal sealed class DocumentEquivalenceComparer
             : null;
     }
 
-    private JToken CreateCanonicalSchemaReferenceToken(JsonSchema reference, ISet<JsonSchema> visited) =>
-        visited.Contains(reference)
-            ? new JObject { ["$ref"] = "#" }
-            : CreateCanonicalSchemaToken(reference, new HashSet<JsonSchema>(visited, JsonSchemaReferenceComparer.Instance));
-
-    private void AddSchemaToken(JObject json, string propertyName, JsonSchema? schema, ISet<JsonSchema> visited)
-    {
-        if (schema != null)
-            json[propertyName] = CreateCanonicalSchemaToken(schema, new HashSet<JsonSchema>(visited, JsonSchemaReferenceComparer.Instance));
-    }
-
-    private void AddSchemaArray(JObject json, string propertyName, IEnumerable<JsonSchema> schemas, ISet<JsonSchema> visited)
-    {
-        object[] items = schemas
-            .Select(schema => CreateCanonicalSchemaToken(schema, new HashSet<JsonSchema>(visited, JsonSchemaReferenceComparer.Instance)))
-            .ToArray<object>();
-
-        if (items.Length > 0)
-            json[propertyName] = new JArray(items);
-    }
-
-    private OpenApiDocument CreateDocumentWithSchema(JsonSchema schema)
-    {
-        var document = CreateSerializationDocument();
-        document.Definitions["Schema"] = schema;
-        AddReferencedSchemas(document.Definitions, schema);
-        return document;
-    }
-
-    private static OpenApiDocument CreateDocumentWithPath(NSwag.OpenApiPathItem pathItem)
-    {
-        var document = CreateSerializationDocument();
-        document.Paths["/_"] = pathItem;
-        return document;
-    }
-
-    private static OpenApiDocument CreateDocumentWithSecurityScheme(NSwag.OpenApiSecurityScheme securityScheme)
-    {
-        var document = CreateSerializationDocument();
-        document.SecurityDefinitions["SecurityScheme"] = securityScheme;
-        return document;
-    }
-
-    private static OpenApiDocument CreateSerializationDocument()
-        => new()
-        {
-            Info =
-            {
-                Title = "Refitter equivalence comparison",
-                Version = "1.0",
-            },
-        };
-
-    private static IEnumerable<JsonSchema?> EnumerateTraversableSchemas(JsonSchema schema)
+    private static IEnumerable<ApiSchema?> EnumerateTraversableSchemas(ApiSchema schema)
     {
         yield return schema.AdditionalItemsSchema;
         yield return schema.AdditionalPropertiesSchema;
@@ -266,35 +129,170 @@ internal sealed class DocumentEquivalenceComparer
         yield return schema.Item;
 
         foreach (var item in schema.Items)
-        {
             yield return item;
-        }
 
         yield return schema.Not;
 
         foreach (var property in schema.Properties.Values)
-        {
             yield return property;
-        }
 
         foreach (var subSchema in schema.AllOf)
-        {
             yield return subSchema;
-        }
 
         foreach (var subSchema in schema.OneOf)
-        {
             yield return subSchema;
-        }
 
         foreach (var subSchema in schema.AnyOf)
-        {
             yield return subSchema;
-        }
 
         foreach (var definition in schema.Definitions.Values)
-        {
             yield return definition;
+    }
+
+    internal string CreateCanonicalSchemaJson(ApiSchema schema, ISet<ApiSchema> visited)
+    {
+        if (schema.Reference != null)
+        {
+            return visited.Contains(schema.Reference)
+                ? "{\"$ref\":\"#\"}"
+                : CreateCanonicalSchemaJson(schema.Reference, new HashSet<ApiSchema>(visited));
+        }
+
+        var actualSchema = schema.ActualSchema;
+        if (!visited.Add(actualSchema))
+            return "{\"$ref\":\"#\"}";
+
+        var properties = new SortedDictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["type"] = Quote(actualSchema.Type.ToString()),
+            ["allowAdditionalProperties"] = actualSchema.AllowAdditionalProperties ? "true" : "false",
+        };
+
+        AddString(properties, "format", actualSchema.Format);
+        AddString(properties, "title", actualSchema.Title);
+        AddString(properties, "description", actualSchema.Description);
+        if (actualSchema.IsNullableRaw.HasValue)
+            properties["nullable"] = actualSchema.IsNullableRaw.Value ? "true" : "false";
+
+        AddSchema(properties, "additionalProperties", actualSchema.AdditionalPropertiesSchema, visited);
+        AddSchema(properties, "items", actualSchema.Item, visited);
+        AddSchemaArray(properties, "allOf", actualSchema.AllOf, visited);
+        AddSchemaArray(properties, "oneOf", actualSchema.OneOf, visited);
+        AddSchemaArray(properties, "anyOf", actualSchema.AnyOf, visited);
+
+        if (actualSchema.RequiredProperties.Count > 0)
+        {
+            properties["required"] = "[" + string.Join(
+                ",",
+                actualSchema.RequiredProperties.OrderBy(name => name, StringComparer.Ordinal).Select(Quote)) + "]";
+        }
+
+        if (actualSchema.Properties.Count > 0)
+        {
+            properties["properties"] = "{" + string.Join(
+                ",",
+                actualSchema.Properties
+                    .OrderBy(property => property.Key, StringComparer.Ordinal)
+                    .Select(property => Quote(property.Key) + ":" +
+                                        CreateCanonicalSchemaJson(property.Value, new HashSet<ApiSchema>(visited)))) + "}";
+        }
+
+        if (actualSchema.Enumeration.Count > 0)
+        {
+            properties["enum"] = "[" + string.Join(
+                ",",
+                actualSchema.Enumeration
+                    .OrderBy(value => value?.ToString() ?? string.Empty, StringComparer.Ordinal)
+                    .Select(CanonicalRawJson)) + "]";
+        }
+
+        if (actualSchema.ExtensionData is { Count: > 0 })
+        {
+            properties["extensions"] = "{" + string.Join(
+                ",",
+                actualSchema.ExtensionData
+                    .OrderBy(extension => extension.Key, StringComparer.Ordinal)
+                    .Select(extension => Quote(extension.Key) + ":" + CanonicalRawJson(extension.Value))) + "}";
+        }
+
+        return "{" + string.Join(",", properties.Select(p => Quote(p.Key) + ":" + p.Value)) + "}";
+    }
+
+    private void AddSchema(SortedDictionary<string, string> properties, string name, ApiSchema? schema, ISet<ApiSchema> visited)
+    {
+        if (schema != null)
+            properties[name] = CreateCanonicalSchemaJson(schema, new HashSet<ApiSchema>(visited));
+    }
+
+    private void AddSchemaArray(SortedDictionary<string, string> properties, string name, IEnumerable<ApiSchema> schemas, ISet<ApiSchema> visited)
+    {
+        var items = schemas
+            .Select(schema => CreateCanonicalSchemaJson(schema, new HashSet<ApiSchema>(visited)))
+            .OrderBy(json => json, StringComparer.Ordinal)
+            .ToList();
+
+        if (items.Count > 0)
+            properties[name] = "[" + string.Join(",", items) + "]";
+    }
+
+    private static void AddString(SortedDictionary<string, string> properties, string name, string? value)
+    {
+        if (value != null)
+            properties[name] = Quote(value);
+    }
+
+    private static string CanonicalRawJson(object? value)
+    {
+        var text = value is null or RawJsonObject or RawJsonArray or string or bool or DateTime or IFormattable
+            ? RawJson.ToIndentedString(value)
+            : JsonSerializer.Serialize(value);
+        using var json = JsonDocument.Parse(text);
+        var builder = new StringBuilder();
+        WriteCanonical(builder, json.RootElement);
+        return builder.ToString();
+    }
+
+    private static string Quote(string value) => JsonSerializer.Serialize(value);
+
+    private static void WriteCanonical(StringBuilder builder, JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+                builder.Append('{');
+                var first = true;
+                foreach (var property in element.EnumerateObject().OrderBy(p => p.Name, StringComparer.Ordinal))
+                {
+                    if (!first)
+                        builder.Append(',');
+                    first = false;
+                    builder.Append(Quote(property.Name)).Append(':');
+                    WriteCanonical(builder, property.Value);
+                }
+
+                builder.Append('}');
+                break;
+            case JsonValueKind.Array:
+                builder.Append('[');
+                var index = 0;
+                foreach (var item in element.EnumerateArray())
+                {
+                    if (index++ > 0)
+                        builder.Append(',');
+                    WriteCanonical(builder, item);
+                }
+
+                builder.Append(']');
+                break;
+            case JsonValueKind.Number:
+                builder.Append(
+                    element.TryGetDecimal(out var number)
+                        ? number.ToString("G29", CultureInfo.InvariantCulture)
+                        : element.GetRawText());
+                break;
+            default:
+                builder.Append(element.GetRawText());
+                break;
         }
     }
 }

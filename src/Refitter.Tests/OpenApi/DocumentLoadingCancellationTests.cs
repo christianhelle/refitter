@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Resources;
 
@@ -54,7 +53,7 @@ public class DocumentLoadingCancellationTests
 
     private sealed class CancellingStrategy : IDocumentLoadingStrategy
     {
-        public Task<OpenApiDocument?> TryLoadAsync(string path, CancellationToken cancellationToken = default)
+        public Task<ApiDocument?> TryLoadAsync(string path, CancellationToken cancellationToken = default)
             => throw new OperationCanceledException();
     }
 }

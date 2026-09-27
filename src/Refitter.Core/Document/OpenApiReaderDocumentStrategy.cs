@@ -1,12 +1,11 @@
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
-using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
 
 internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
 {
-    public async Task<OpenApiDocument?> TryLoadAsync(
+    public async Task<ApiDocument?> TryLoadAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
@@ -30,12 +29,11 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
         catch (Exception ex) when (ex is not OperationCanceledException
                                        and not TaskCanceledException)
         {
-            return await FallbackToNSwagAsync(path, cancellationToken)
-                .ConfigureAwait(false);
+            return FallbackToFile(path);
         }
     }
 
-    private static async Task<OpenApiDocument> SerializeRoundTripAsync(
+    private static async Task<ApiDocument> SerializeRoundTripAsync(
         Result readResult,
         string path,
         OpenApiSpecVersion specificationVersion,
@@ -45,7 +43,7 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
 
         // Microsoft.OpenApi does not inline external components when it reads a
         // multi-file document - the serialized output still carries the original
-        // relative "$ref". NSwag can only follow those refs when it is told which
+        // relative "$ref". The loader can only follow those refs when it is told which
         // document they are relative to, so the path must be passed along.
         if (PathUtilities.IsYaml(path))
         {
@@ -53,31 +51,24 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
                 .SerializeAsYamlAsync(specificationVersion, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            return await OpenApiDocumentParser
-                .ParseAsync(yaml, path, isYaml: true, cancellationToken)
-                .ConfigureAwait(false);
+            return ApiDocumentLoader.Load(yaml, path, isYaml: true);
         }
 
         var json = await document
             .SerializeAsJsonAsync(specificationVersion, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        return await OpenApiDocumentParser
-            .ParseAsync(json, path, isYaml: false, cancellationToken)
-            .ConfigureAwait(false);
+        return ApiDocumentLoader.Load(json, path, isYaml: false);
     }
 
-    private static async Task<OpenApiDocument?> FallbackToNSwagAsync(
-        string path,
-        CancellationToken cancellationToken)
+    private static ApiDocument? FallbackToFile(string path)
     {
         if (PathUtilities.IsHttp(path))
             return null;
 
         try
         {
-            return await OpenApiDocumentParser.FromFileAsync(path, cancellationToken)
-                .ConfigureAwait(false);
+            return ApiDocumentLoader.LoadFile(path);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

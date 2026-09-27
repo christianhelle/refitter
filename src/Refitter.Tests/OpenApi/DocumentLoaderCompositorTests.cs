@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;
@@ -54,7 +53,7 @@ public class DocumentLoaderCompositorTests
         var result = await loader.LoadAsync("test.json");
 
         result.Should().NotBeNull();
-        result.Info.Title.Should().Be("First Success");
+        result.Info!.Title.Should().Be("First Success");
     }
 
     [Test]
@@ -71,7 +70,7 @@ public class DocumentLoaderCompositorTests
         var result = await loader.LoadAsync("test.json");
 
         result.Should().NotBeNull();
-        result.Info.Title.Should().Be("Third Time");
+        result.Info!.Title.Should().Be("Third Time");
     }
 
     [Test]
@@ -88,13 +87,13 @@ public class DocumentLoaderCompositorTests
         var result = await loader.LoadAsync(swaggerFile);
 
         result.Should().NotBeNull();
-        result.Info.Title.Should().Be("Default Strategies Test");
+        result.Info!.Title.Should().Be("Default Strategies Test");
     }
 
     private sealed class NullReturningStrategy : IDocumentLoadingStrategy
     {
-        public Task<OpenApiDocument?> TryLoadAsync(string path, CancellationToken cancellationToken = default)
-            => Task.FromResult<OpenApiDocument?>(null);
+        public Task<ApiDocument?> TryLoadAsync(string path, CancellationToken cancellationToken = default)
+            => Task.FromResult<ApiDocument?>(null);
     }
 
     private sealed class SuccessStrategy : IDocumentLoadingStrategy
@@ -106,19 +105,19 @@ public class DocumentLoaderCompositorTests
             this.title = title;
         }
 
-        public Task<OpenApiDocument?> TryLoadAsync(string path, CancellationToken cancellationToken = default)
+        public Task<ApiDocument?> TryLoadAsync(string path, CancellationToken cancellationToken = default)
         {
-            var doc = new OpenApiDocument
+            var doc = new ApiDocument
             {
                 Info = new() { Title = title, Version = "1.0.0" }
             };
-            return Task.FromResult<OpenApiDocument?>(doc);
+            return Task.FromResult<ApiDocument?>(doc);
         }
     }
 
     private sealed class FailingStrategy : IDocumentLoadingStrategy
     {
-        public Task<OpenApiDocument?> TryLoadAsync(string path, CancellationToken cancellationToken = default)
+        public Task<ApiDocument?> TryLoadAsync(string path, CancellationToken cancellationToken = default)
             => throw new InvalidOperationException("Strategy failed");
     }
 }

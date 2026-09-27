@@ -75,7 +75,7 @@ public class OpenApiReaderDocumentStrategyTests
         var result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
-        result!.Info.Title.Should().Be("External Ref Test");
+        result!.Info!.Title.Should().Be("External Ref Test");
 
         Directory.Delete(folder, true);
     }
@@ -120,7 +120,7 @@ paths:
         var result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
-        result!.Info.Title.Should().Be("YAML External Ref Test");
+        result!.Info!.Title.Should().Be("YAML External Ref Test");
 
         Directory.Delete(folder, true);
     }
@@ -172,7 +172,7 @@ paths:
         await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
 
         OpenApiReaderDocumentStrategy strategy = new();
-        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
+        ApiDocument? result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
 
@@ -225,7 +225,7 @@ paths:
         await File.WriteAllTextAsync(Path.Combine(folder, "components.yaml"), componentsSpec);
 
         OpenApiReaderDocumentStrategy strategy = new();
-        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
+        ApiDocument? result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
         result!.OpenApi.Should().Be("3.0.4");
@@ -278,12 +278,12 @@ paths:
         await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
 
         OpenApiReaderDocumentStrategy strategy = new();
-        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
+        ApiDocument? result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
         result!.Info.Should().NotBeNull();
-        result.Info.Title.Should().Be("no-info");
-        result.Info.Version.Should().NotBeNullOrEmpty();
+        result.Info!.Title.Should().Be("no-info");
+        result.Info!.Version.Should().NotBeNullOrEmpty();
         result.Components.Schemas.Should().ContainKey("User");
 
         Directory.Delete(folder, true);
