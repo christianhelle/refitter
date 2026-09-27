@@ -30,23 +30,27 @@ internal sealed class ParsingContext(ValidationDiagnostics diagnostics)
 
         if (version.StartsWith("3.0", StringComparison.OrdinalIgnoreCase))
         {
-            Diagnostics.SpecificationVersion = OpenApiSpecificationVersion.OpenApi3_0;
-            return new SpecDocument();
+            return Load(OpenApiSpecificationVersion.OpenApi3_0, jsonNode);
         }
 
         if (version.StartsWith("3.1", StringComparison.OrdinalIgnoreCase))
         {
-            Diagnostics.SpecificationVersion = OpenApiSpecificationVersion.OpenApi3_1;
-            return new SpecDocument();
+            return Load(OpenApiSpecificationVersion.OpenApi3_1, jsonNode);
         }
 
         if (version.StartsWith("3.2", StringComparison.OrdinalIgnoreCase))
         {
-            Diagnostics.SpecificationVersion = OpenApiSpecificationVersion.OpenApi3_2;
-            return new SpecDocument();
+            return Load(OpenApiSpecificationVersion.OpenApi3_2, jsonNode);
         }
 
         throw new UnsupportedSpecificationVersionException(version);
+    }
+
+    private SpecDocument Load(OpenApiSpecificationVersion version, JsonNode jsonNode)
+    {
+        var document = new OpenApiV3Reader(version).LoadDocument(jsonNode, this);
+        Diagnostics.SpecificationVersion = version;
+        return document;
     }
 
     public void StartObject(string objectName) => currentLocation.Push(objectName);

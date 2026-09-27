@@ -1,0 +1,991 @@
+using System.Globalization;
+using System.Text.Json.Nodes;
+using Refitter.Core.Validation.Model;
+
+namespace Refitter.Core.Validation.Reading;
+
+/// <summary>
+/// Reads OpenAPI 3.0, 3.1 and 3.2 documents, reporting what the Microsoft.OpenApi (MIT license) deserializers of
+/// those versions report.
+/// </summary>
+internal sealed class OpenApiV3Reader
+{
+    private static readonly IReadOnlyDictionary<string, SpecParameterLocation> ParameterLocations =
+        new Dictionary<string, SpecParameterLocation>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["query"] = SpecParameterLocation.Query,
+            ["header"] = SpecParameterLocation.Header,
+            ["path"] = SpecParameterLocation.Path,
+            ["cookie"] = SpecParameterLocation.Cookie,
+            ["querystring"] = SpecParameterLocation.QueryString,
+        };
+
+    private static readonly IReadOnlyDictionary<string, int> ParameterStyles =
+        new[] { "matrix", "label", "form", "simple", "spaceDelimited", "pipeDelimited", "deepObject", "cookie" }
+            .Select((name, index) => (name, index))
+            .ToDictionary(style => style.name, style => style.index, StringComparer.OrdinalIgnoreCase);
+
+    private static readonly IReadOnlyDictionary<string, SpecSecuritySchemeType> SecuritySchemeTypes =
+        new Dictionary<string, SpecSecuritySchemeType>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["apiKey"] = SpecSecuritySchemeType.ApiKey,
+            ["http"] = SpecSecuritySchemeType.Http,
+            ["oauth2"] = SpecSecuritySchemeType.OAuth2,
+            ["openIdConnect"] = SpecSecuritySchemeType.OpenIdConnect,
+            ["mutualTLS"] = SpecSecuritySchemeType.MutualTls,
+        };
+
+    private static readonly IReadOnlyDictionary<string, int> XmlNodeTypes =
+        new[] { "element", "attribute", "text", "cdata", "none" }
+            .Select((name, index) => (name, index))
+            .ToDictionary(nodeType => nodeType.name, nodeType => nodeType.index, StringComparer.OrdinalIgnoreCase);
+
+    private static readonly HashSet<string> StandardHttpMethods = new(StringComparer.Ordinal)
+    {
+        "get", "put", "post", "delete", "options", "head", "patch", "trace", "query",
+    };
+
+    private readonly OpenApiSpecificationVersion version;
+    private readonly FieldMap<SpecDocument> documentFields;
+    private readonly FieldMap<SpecInfo> infoFields;
+    private readonly FieldMap<SpecContact> contactFields;
+    private readonly FieldMap<SpecLicense> licenseFields;
+    private readonly FieldMap<SpecServer> serverFields;
+    private readonly FieldMap<SpecServerVariable> serverVariableFields;
+    private readonly FieldMap<SpecComponents> componentsFields;
+    private readonly FieldMap<SpecPaths> pathsFields;
+    private readonly FieldMap<SpecPathItem> pathItemFields;
+    private readonly FieldMap<SpecOperation> operationFields;
+    private readonly FieldMap<SpecParameter> parameterFields;
+    private readonly FieldMap<SpecRequestBody> requestBodyFields;
+    private readonly FieldMap<SpecMediaType> mediaTypeFields;
+    private readonly FieldMap<SpecEncoding> encodingFields;
+    private readonly FieldMap<SpecResponses> responsesFields;
+    private readonly FieldMap<SpecResponse> responseFields;
+    private readonly FieldMap<SpecHeader> headerFields;
+    private readonly FieldMap<SpecLink> linkFields;
+    private readonly FieldMap<SpecCallback> callbackFields;
+    private readonly FieldMap<SpecExample> exampleFields;
+    private readonly FieldMap<SpecSchema> schemaFields;
+    private readonly FieldMap<SpecDiscriminator> discriminatorFields;
+    private readonly FieldMap<object> xmlFields;
+    private readonly FieldMap<SpecSecurityScheme> securitySchemeFields;
+    private readonly FieldMap<SpecOAuthFlows> oAuthFlowsFields;
+    private readonly FieldMap<SpecOAuthFlow> oAuthFlowFields;
+    private readonly FieldMap<SpecTag> tagFields;
+    private readonly FieldMap<SpecExternalDocs> externalDocsFields;
+
+    public OpenApiV3Reader(OpenApiSpecificationVersion version)
+    {
+        this.version = version;
+        var is31 = version >= OpenApiSpecificationVersion.OpenApi3_1;
+        var is32 = version >= OpenApiSpecificationVersion.OpenApi3_2;
+
+        documentFields = new FieldMap<SpecDocument>()
+            .Field("openapi", (_, _, _) => { })
+            .Field("info", (o, n, c) => o.Info = LoadInfo(n, c))
+            .Field("servers", (o, n, c) => o.Servers = n.CreateList("OpenApiServer", LoadServer, c))
+            .Field("paths", (o, n, c) => o.Paths = LoadPaths(n, c))
+            .Field("components", (o, n, c) => o.Components = LoadComponents(n, c))
+            .Field("tags", (o, n, c) =>
+            {
+                var tags = DistinctTags(n.CreateList("OpenApiTag", LoadTag, c));
+                if (tags.Count > 0)
+                    o.Tags = tags;
+            })
+            .Field("externalDocs", (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c))
+            .Field("security", (o, n, c) => o.Security = n.CreateList("OpenApiSecurityRequirement", LoadSecurityRequirement, c));
+        if (is31)
+        {
+            documentFields
+                .Field("jsonSchemaDialect", (_, n, _) => n.GetScalarValue())
+                .Field("webhooks", (o, n, c) => o.Webhooks = n.CreateMap("IOpenApiPathItem", LoadPathItem, c));
+        }
+
+        if (is32)
+        {
+            documentFields.Field("$self", (_, n, _) => n.GetScalarValue()).Extensions();
+        }
+        else
+        {
+            documentFields.Pattern(FieldMap<SpecDocument>.IsExtension, (_, p, n, _) =>
+            {
+                if (!p.Equals("x-oai-$self", StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                var self = n.GetScalarValue();
+                if (self != null && !is31)
+                    _ = new Uri(self, UriKind.Absolute);
+            });
+        }
+
+        infoFields = new FieldMap<SpecInfo>()
+            .Field("title", (o, n, _) => o.Title = n.GetScalarValue())
+            .Field("version", (o, n, _) => o.Version = n.GetScalarValue())
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("termsOfService", (_, n, _) => ReadUri(n))
+            .Field("contact", (o, n, c) => o.Contact = LoadContact(n, c))
+            .Field("license", (o, n, c) => o.License = LoadLicense(n, c))
+            .Extensions();
+        if (is31)
+            infoFields.Field("summary", (_, n, _) => n.GetScalarValue());
+
+        contactFields = new FieldMap<SpecContact>()
+            .Field("name", (_, n, _) => n.GetScalarValue())
+            .Field("email", (o, n, _) => o.Email = n.GetScalarValue())
+            .Field("url", (_, n, _) => ReadUri(n))
+            .Extensions();
+
+        licenseFields = new FieldMap<SpecLicense>()
+            .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
+            .Field("url", (_, n, _) => ReadUri(n))
+            .Extensions();
+        if (is31)
+            licenseFields.Field("identifier", (_, n, _) => n.GetScalarValue());
+
+        serverFields = new FieldMap<SpecServer>()
+            .Field("url", (o, n, _) => o.Url = n.GetScalarValue())
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("variables", (o, n, c) => o.Variables = n.CreateMap("OpenApiServerVariable", LoadServerVariable, c));
+        if (is32)
+            serverFields.Field("name", (_, n, _) => n.GetScalarValue()).Extensions();
+        else
+            serverFields.Pattern(FieldMap<SpecServer>.IsExtension, (_, p, n, _) => ReadIfNamed(p, "x-oai-name", n));
+
+        serverVariableFields = new FieldMap<SpecServerVariable>()
+            .Field("enum", (_, n, c) => n.CreateSimpleList("String", item => item.GetScalarValue(), c))
+            .Field("default", (o, n, _) => o.Default = n.GetScalarValue())
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Extensions();
+
+        componentsFields = new FieldMap<SpecComponents>()
+            .Field("schemas", (o, n, c) => o.Schemas = n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field("responses", (o, n, c) => o.Responses = n.CreateMap("IOpenApiResponse", LoadResponse, c))
+            .Field("parameters", (o, n, c) => o.Parameters = n.CreateMap("IOpenApiParameter", LoadParameter, c))
+            .Field("examples", (o, n, c) => o.Examples = n.CreateMap("IOpenApiExample", LoadExample, c))
+            .Field("requestBodies", (o, n, c) => o.RequestBodies = n.CreateMap("IOpenApiRequestBody", LoadRequestBody, c))
+            .Field("headers", (o, n, c) => o.Headers = n.CreateMap("IOpenApiHeader", LoadHeader, c))
+            .Field("securitySchemes", (o, n, c) => o.SecuritySchemes = n.CreateMap("IOpenApiSecurityScheme", LoadSecurityScheme, c))
+            .Field("links", (o, n, c) => o.Links = n.CreateMap("IOpenApiLink", LoadLink, c))
+            .Field("callbacks", (o, n, c) => o.Callbacks = n.CreateMap("IOpenApiCallback", LoadCallback, c))
+            .Extensions();
+        if (is31)
+            componentsFields.Field("pathItems", (o, n, c) => o.PathItems = n.CreateMap("IOpenApiPathItem", LoadPathItem, c));
+        if (is32)
+            componentsFields.Field("mediaTypes", (o, n, c) => o.MediaTypes = n.CreateMap("IOpenApiMediaType", LoadMediaType, c));
+
+        pathsFields = new FieldMap<SpecPaths>()
+            .Pattern(s => s.StartsWith("/", StringComparison.OrdinalIgnoreCase), (o, k, n, c) => o.Add(k, LoadPathItem(n, c)))
+            .Extensions();
+
+        pathItemFields = new FieldMap<SpecPathItem>()
+            .Field("summary", (_, n, _) => n.GetScalarValue())
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("get", (o, n, c) => o.AddOperation("get", LoadOperation(n, c)))
+            .Field("put", (o, n, c) => o.AddOperation("put", LoadOperation(n, c)))
+            .Field("post", (o, n, c) => o.AddOperation("post", LoadOperation(n, c)))
+            .Field("delete", (o, n, c) => o.AddOperation("delete", LoadOperation(n, c)))
+            .Field("options", (o, n, c) => o.AddOperation("options", LoadOperation(n, c)))
+            .Field("head", (o, n, c) => o.AddOperation("head", LoadOperation(n, c)))
+            .Field("patch", (o, n, c) => o.AddOperation("patch", LoadOperation(n, c)))
+            .Field("trace", (o, n, c) => o.AddOperation("trace", LoadOperation(n, c)))
+            .Field("servers", (_, n, c) => n.CreateList("OpenApiServer", LoadServer, c))
+            .Field("parameters", (o, n, c) => o.Parameters = n.CreateList("IOpenApiParameter", LoadParameter, c))
+            .Extensions();
+        if (is32)
+        {
+            pathItemFields
+                .Field("query", (o, n, c) => o.AddOperation("query", LoadOperation(n, c)))
+                .Field("additionalOperations", LoadAdditionalOperations);
+        }
+
+        operationFields = new FieldMap<SpecOperation>()
+            .Field("tags", (_, n, c) => n.CreateSimpleList("OpenApiTagReference", item => item.GetScalarValue(), c))
+            .Field("summary", (_, n, _) => n.GetScalarValue())
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("externalDocs", (_, n, c) => LoadExternalDocs(n, c))
+            .Field("operationId", (_, n, _) => n.GetScalarValue())
+            .Field("parameters", (o, n, c) => o.Parameters = n.CreateList("IOpenApiParameter", LoadParameter, c))
+            .Field("requestBody", (o, n, c) => o.RequestBody = LoadRequestBody(n, c))
+            .Field("responses", (o, n, c) => o.Responses = LoadResponses(n, c))
+            .Field("callbacks", (o, n, c) => o.Callbacks = n.CreateMap("IOpenApiCallback", LoadCallback, c))
+            .Field("deprecated", (_, n, _) => ReadBool(n))
+            .Field("security", (o, n, c) =>
+            {
+                if (n is JsonArray)
+                    o.Security = n.CreateList("OpenApiSecurityRequirement", LoadSecurityRequirement, c);
+            })
+            .Field("servers", (_, n, c) => n.CreateList("OpenApiServer", LoadServer, c))
+            .Extensions();
+
+        parameterFields = new FieldMap<SpecParameter>()
+            .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
+            .Field("in", (o, n, c) =>
+            {
+                if (n.GetScalarValue().TryGetEnum(ParameterLocations, c, out var location))
+                    o.In = location;
+            })
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("required", (o, n, _) =>
+            {
+                var required = n.GetScalarValue();
+                if (required != null)
+                    o.Required = bool.Parse(required);
+            })
+            .Field("deprecated", (_, n, _) => ReadBool(n))
+            .Field("allowEmptyValue", (_, n, _) => ReadBool(n))
+            .Field("allowReserved", (_, n, _) => ReadBool(n))
+            .Field("style", (_, n, c) => n.GetScalarValue().TryGetEnum(ParameterStyles, c, out int _))
+            .Field("explode", (_, n, _) => ReadBool(n))
+            .Field("schema", (o, n, c) => o.Schema = LoadSchema(n, c))
+            .Field("content", (o, n, c) => o.Content = n.CreateMap("IOpenApiMediaType", LoadMediaType, c))
+            .Field("examples", (o, n, c) => o.Examples = n.CreateMap("IOpenApiExample", LoadExample, c))
+            .Field("example", (_, _, _) => { })
+            .Extensions();
+
+        requestBodyFields = new FieldMap<SpecRequestBody>()
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("content", (o, n, c) => o.Content = n.CreateMap("IOpenApiMediaType", LoadMediaType, c))
+            .Field("required", (_, n, _) => ReadBool(n))
+            .Extensions();
+
+        mediaTypeFields = new FieldMap<SpecMediaType>()
+            .Field("schema", (o, n, c) => o.Schema = LoadSchema(n, c))
+            .Field("examples", (o, n, c) => o.Examples = n.CreateMap("IOpenApiExample", LoadExample, c))
+            .Field("example", (_, _, _) => { })
+            .Field("encoding", (o, n, c) => o.Encoding = n.CreateMap("OpenApiEncoding", LoadEncoding, c));
+        if (is32)
+        {
+            mediaTypeFields
+                .Field("itemSchema", (_, n, c) => LoadSchema(n, c))
+                .Field("itemEncoding", (_, n, c) => LoadEncoding(n, c))
+                .Field("prefixEncoding", (_, n, c) => n.CreateList("OpenApiEncoding", LoadEncoding, c))
+                .Extensions();
+        }
+        else
+        {
+            mediaTypeFields
+                .Field("x-oai-itemEncoding", (_, n, c) => LoadEncoding(n, c))
+                .Field("x-oai-prefixEncoding", (_, n, c) => n.CreateList("OpenApiEncoding", LoadEncoding, c))
+                .Pattern(FieldMap<SpecMediaType>.IsExtension, (_, p, n, c) =>
+                {
+                    if (p.Equals("x-oai-itemSchema", StringComparison.OrdinalIgnoreCase))
+                        LoadSchema(n, c);
+                });
+        }
+
+        encodingFields = new FieldMap<SpecEncoding>()
+            .Field("contentType", (_, n, _) => n.GetScalarValue())
+            .Field("headers", (o, n, c) => o.Headers = n.CreateMap("IOpenApiHeader", LoadHeader, c))
+            .Field("style", (_, n, c) => n.GetScalarValue().TryGetEnum(ParameterStyles, c, out int _))
+            .Field("explode", (_, n, _) => ReadBool(n))
+            .Field("allowReserved", (_, n, _) => ReadBool(n))
+            .Extensions();
+        if (is32)
+        {
+            encodingFields
+                .Field("encoding", (_, n, c) => n.CreateMap("OpenApiEncoding", LoadEncoding, c))
+                .Field("itemEncoding", (_, n, c) => LoadEncoding(n, c))
+                .Field("prefixEncoding", (_, n, c) => n.CreateList("OpenApiEncoding", LoadEncoding, c));
+        }
+
+        responsesFields = new FieldMap<SpecResponses>()
+            .Pattern(s => !FieldMap<SpecResponses>.IsExtension(s), (o, p, n, c) => o.Add(p, LoadResponse(n, c)))
+            .Extensions();
+
+        responseFields = new FieldMap<SpecResponse>()
+            .Field("description", (o, n, _) => o.Description = n.GetScalarValue())
+            .Field("headers", (o, n, c) => o.Headers = n.CreateMap("IOpenApiHeader", LoadHeader, c))
+            .Field("content", (o, n, c) => o.Content = n.CreateMap("IOpenApiMediaType", LoadMediaType, c))
+            .Field("links", (o, n, c) => o.Links = n.CreateMap("IOpenApiLink", LoadLink, c));
+        if (is32)
+            responseFields.Field("summary", (_, n, _) => n.GetScalarValue()).Extensions();
+        else
+            responseFields.Pattern(FieldMap<SpecResponse>.IsExtension, (_, p, n, _) => ReadIfNamed(p, "x-oai-summary", n));
+
+        headerFields = new FieldMap<SpecHeader>()
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("required", (_, n, _) => ReadBool(n))
+            .Field("deprecated", (_, n, _) => ReadBool(n))
+            .Field("allowEmptyValue", (_, n, _) => ReadBool(n))
+            .Field("allowReserved", (_, n, _) => ReadBool(n))
+            .Field("style", (_, n, c) => n.GetScalarValue().TryGetEnum(ParameterStyles, c, out int _))
+            .Field("explode", (_, n, _) => ReadBool(n))
+            .Field("schema", (o, n, c) => o.Schema = LoadSchema(n, c))
+            .Field("content", (o, n, c) => o.Content = n.CreateMap("IOpenApiMediaType", LoadMediaType, c))
+            .Field("examples", (o, n, c) => o.Examples = n.CreateMap("IOpenApiExample", LoadExample, c))
+            .Field("example", (o, n, _) => o.Example = n)
+            .Extensions();
+
+        linkFields = new FieldMap<SpecLink>()
+            .Field("operationRef", (_, n, _) => n.GetScalarValue())
+            .Field("operationId", (_, n, _) => n.GetScalarValue())
+            .Field("parameters", (_, n, c) => n.CreateSimpleMap("RuntimeExpressionAnyWrapper", LoadRuntimeExpressionAnyWrapper, c))
+            .Field("requestBody", (_, n, _) => LoadRuntimeExpressionAnyWrapper(n))
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("server", (o, n, c) => o.Server = LoadServer(n, c))
+            .Extensions();
+
+        callbackFields = new FieldMap<SpecCallback>()
+            .Pattern(s => !FieldMap<SpecCallback>.IsExtension(s), (o, p, n, c) =>
+            {
+                RuntimeExpressions.Validate(p);
+                (o.PathItems ??= new Dictionary<string, SpecPathItem?>(StringComparer.Ordinal))[p] = LoadPathItem(n, c);
+            })
+            .Extensions();
+
+        exampleFields = new FieldMap<SpecExample>()
+            .Field("summary", (_, n, _) => n.GetScalarValue())
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("value", (_, _, _) => { })
+            .Field("externalValue", (_, n, _) => n.GetScalarValue());
+        if (is32)
+        {
+            exampleFields
+                .Field("dataValue", (_, _, _) => { })
+                .Field("serializedValue", (_, n, _) => n.GetScalarValue())
+                .Extensions();
+        }
+        else
+        {
+            exampleFields
+                .Pattern(s => s.Equals("x-oai-dataValue", StringComparison.OrdinalIgnoreCase), (_, _, _, _) => { })
+                .Pattern(s => s.Equals("x-oai-serializedValue", StringComparison.OrdinalIgnoreCase), (_, _, n, _) => n.GetScalarValue())
+                .Extensions();
+        }
+
+        schemaFields = CreateSchemaFields(is31);
+
+        discriminatorFields = new FieldMap<SpecDiscriminator>()
+            .Field("propertyName", (o, n, _) => o.PropertyName = n.GetScalarValue())
+            .Field("mapping", (o, n, c) => o.Mapping = n.CreateSimpleMap("OpenApiSchemaReference", LoadMapping, c));
+        if (is32)
+        {
+            discriminatorFields.Field("defaultMapping", (_, n, _) => LoadMapping(n)).Extensions();
+        }
+        else if (is31)
+        {
+            discriminatorFields.Pattern(FieldMap<SpecDiscriminator>.IsExtension, (_, p, n, _) =>
+            {
+                if (p.Equals("x-oas-default-mapping", StringComparison.OrdinalIgnoreCase))
+                    LoadMapping(n);
+            });
+        }
+
+        xmlFields = new FieldMap<object>()
+            .Field("name", (_, n, _) => n.GetScalarValue())
+            .Field("namespace", (_, n, _) =>
+            {
+                var xmlNamespace = n.GetScalarValue();
+                if (xmlNamespace != null)
+                    _ = new Uri(xmlNamespace, UriKind.Absolute);
+            })
+            .Field("prefix", (_, n, _) => n.GetScalarValue())
+            .Extensions();
+        if (is32)
+        {
+            xmlFields.Field("nodeType", (_, n, c) => n.GetScalarValue().TryGetEnum(XmlNodeTypes, c, out int _));
+        }
+        else
+        {
+            xmlFields
+                .Field("attribute", (_, n, _) => ReadBool(n))
+                .Field("wrapped", (_, n, _) => ReadBool(n));
+        }
+
+        securitySchemeFields = new FieldMap<SpecSecurityScheme>()
+            .Field("type", (o, n, c) =>
+            {
+                if (n.GetScalarValue().TryGetEnum(SecuritySchemeTypes, c, out var type))
+                    o.Type = type;
+            })
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
+            .Field("in", (o, n, c) =>
+            {
+                if (n.GetScalarValue().TryGetEnum(ParameterLocations, c, out var location))
+                    o.In = location;
+            })
+            .Field("scheme", (_, n, _) => n.GetScalarValue())
+            .Field("bearerFormat", (_, n, _) => n.GetScalarValue())
+            .Field("openIdConnectUrl", (_, n, _) => ReadUri(n))
+            .Field("flows", (o, n, c) => o.Flows = LoadOAuthFlows(n, c));
+        if (is32)
+        {
+            securitySchemeFields
+                .Field("oauth2MetadataUrl", (_, n, _) => ReadUri(n))
+                .Field("deprecated", (_, n, _) => ReadBool(n))
+                .Extensions();
+        }
+        else
+        {
+            securitySchemeFields.Pattern(FieldMap<SpecSecurityScheme>.IsExtension, (_, p, n, _) =>
+            {
+                if (p.Equals("x-oai-deprecated", StringComparison.OrdinalIgnoreCase))
+                    ReadBool(n);
+            });
+        }
+
+        oAuthFlowsFields = new FieldMap<SpecOAuthFlows>()
+            .Field("implicit", (o, n, c) => o.Implicit = LoadOAuthFlow(n, c))
+            .Field("password", (o, n, c) => o.Password = LoadOAuthFlow(n, c))
+            .Field("clientCredentials", (o, n, c) => o.ClientCredentials = LoadOAuthFlow(n, c))
+            .Field("authorizationCode", (o, n, c) => o.AuthorizationCode = LoadOAuthFlow(n, c));
+        if (is32)
+        {
+            oAuthFlowsFields.Field("deviceAuthorization", (o, n, c) => o.DeviceAuthorization = LoadOAuthFlow(n, c)).Extensions();
+        }
+        else
+        {
+            oAuthFlowsFields
+                .Pattern(
+                    s => s.Equals("x-oai-deviceAuthorization", StringComparison.OrdinalIgnoreCase),
+                    (o, _, n, c) => o.DeviceAuthorization = LoadOAuthFlow(n, c))
+                .Extensions();
+        }
+
+        oAuthFlowFields = new FieldMap<SpecOAuthFlow>()
+            .Field("authorizationUrl", (o, n, _) => o.AuthorizationUrl = ReadUri(n))
+            .Field("tokenUrl", (o, n, _) => o.TokenUrl = ReadUri(n))
+            .Field("refreshUrl", (_, n, _) => ReadUri(n))
+            .Field("scopes", (o, n, c) => o.Scopes = n.CreateSimpleMap("String", item => item.GetScalarValue(), c)
+                .Where(scope => scope.Value != null)
+                .ToDictionary(scope => scope.Key, scope => scope.Value!, StringComparer.Ordinal));
+        if (is32)
+        {
+            oAuthFlowFields.Field("deviceAuthorizationUrl", (_, n, _) => ReadUri(n)).Extensions();
+        }
+        else
+        {
+            oAuthFlowFields.Pattern(FieldMap<SpecOAuthFlow>.IsExtension, (_, p, n, _) =>
+            {
+                if (p.Equals("x-oai-deviceAuthorizationUrl", StringComparison.OrdinalIgnoreCase))
+                    ReadUri(n);
+            });
+        }
+
+        tagFields = new FieldMap<SpecTag>()
+            .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("externalDocs", (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c));
+        if (is32)
+        {
+            tagFields
+                .Field("summary", (_, n, _) => n.GetScalarValue())
+                .Field("parent", (_, n, _) => n.GetScalarValue())
+                .Field("kind", (_, n, _) => n.GetScalarValue())
+                .Extensions();
+        }
+        else
+        {
+            tagFields.Pattern(FieldMap<SpecTag>.IsExtension, (_, p, n, _) =>
+            {
+                if (p.Equals("x-oas-summary", StringComparison.OrdinalIgnoreCase)
+                    || p.Equals("x-oas-parent", StringComparison.OrdinalIgnoreCase)
+                    || p.Equals("x-oas-kind", StringComparison.OrdinalIgnoreCase))
+                {
+                    n.GetScalarValue();
+                }
+            });
+        }
+
+        externalDocsFields = new FieldMap<SpecExternalDocs>()
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("url", (o, n, _) => o.Url = ReadUri(n))
+            .Extensions();
+    }
+
+    public SpecDocument LoadDocument(JsonNode jsonNode, ParsingContext context)
+    {
+        var document = new SpecDocument();
+        jsonNode.CheckMapNode("OpenAPI", context).ParseMap(document, documentFields, context);
+        return document;
+    }
+
+    private FieldMap<SpecSchema> CreateSchemaFields(bool is31)
+    {
+        var fields = new FieldMap<SpecSchema>()
+            .Field("title", (_, n, _) => n.GetScalarValue())
+            .Field("multipleOf", (_, n, _) =>
+            {
+                var multipleOf = n.GetScalarValue();
+                if (multipleOf != null)
+                    decimal.Parse(multipleOf, NumberStyles.Float, CultureInfo.InvariantCulture);
+            })
+            .Field("maximum", (_, n, _) => n.GetScalarValue())
+            .Field("minimum", (_, n, _) => n.GetScalarValue())
+            .Field("maxLength", (_, n, _) => ReadInt(n))
+            .Field("minLength", (_, n, _) => ReadInt(n))
+            .Field("pattern", (_, n, _) => n.GetScalarValue())
+            .Field("maxItems", (_, n, _) => ReadInt(n))
+            .Field("minItems", (_, n, _) => ReadInt(n))
+            .Field("uniqueItems", (_, n, _) => ReadBool(n))
+            .Field("maxProperties", (_, n, _) => ReadInt(n))
+            .Field("minProperties", (_, n, _) => ReadInt(n))
+            .Field("required", (o, n, c) => o.Required = new HashSet<string>(
+                n.CreateSimpleList("String", item => item.GetScalarValue(), c).OfType<string>(),
+                StringComparer.Ordinal))
+            .Field("enum", (_, n, c) => n.CreateListOfAny(c))
+            .Field("allOf", (o, n, c) => o.AllOf = n.CreateList("IOpenApiSchema", LoadSchema, c))
+            .Field("oneOf", (o, n, c) => o.OneOf = n.CreateList("IOpenApiSchema", LoadSchema, c))
+            .Field("anyOf", (o, n, c) => o.AnyOf = n.CreateList("IOpenApiSchema", LoadSchema, c))
+            .Field("not", (o, n, c) => o.Not = LoadSchema(n, c))
+            .Field("items", (o, n, c) => o.Items = LoadSchema(n, c))
+            .Field("properties", (o, n, c) => o.Properties = n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field("additionalProperties", (o, n, c) =>
+            {
+                if (n is JsonValue)
+                    ReadBool(n);
+                else
+                    o.AdditionalProperties = LoadSchema(n, c);
+            })
+            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field("format", (_, n, _) => n.GetScalarValue())
+            .Field("default", (_, _, _) => { })
+            .Field("discriminator", (o, n, c) => o.Discriminator = LoadDiscriminator(n, c))
+            .Field("readOnly", (_, n, _) => ReadBool(n))
+            .Field("writeOnly", (_, n, _) => ReadBool(n))
+            .Field("xml", (_, n, c) => LoadXml(n, c))
+            .Field("externalDocs", (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c))
+            .Field("example", (_, _, _) => { })
+            .Field("deprecated", (_, n, _) => ReadBool(n))
+            .Extensions();
+
+        if (!is31)
+        {
+            return fields
+                .Field("exclusiveMaximum", (_, n, _) => bool.Parse(n.GetScalarValue()!))
+                .Field("exclusiveMinimum", (_, n, _) => bool.Parse(n.GetScalarValue()!))
+                .Field("type", (_, n, _) => n.GetScalarValue()?.ToJsonSchemaType())
+                .Field("nullable", (_, n, _) => bool.TryParse(n.GetScalarValue(), out _))
+                .Field("x-jsonschema-patternProperties", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+                .Field("x-jsonschema-unevaluatedProperties", (_, n, c) => ReadBoolOrSchema(n, c))
+                .Field("x-jsonschema-$anchor", (_, n, _) => n.GetScalarValue())
+                .Field("x-jsonschema-contentEncoding", (_, n, _) => n.GetScalarValue())
+                .Field("x-jsonschema-contentMediaType", (_, n, _) => n.GetScalarValue())
+                .Field("x-jsonschema-contentSchema", (_, n, c) => LoadSchema(n, c))
+                .Field("x-jsonschema-contains", (_, n, c) => LoadSchema(n, c))
+                .Field("x-jsonschema-maxContains", (_, n, _) => ReadUnsignedInt(n))
+                .Field("x-jsonschema-minContains", (_, n, _) => ReadUnsignedInt(n))
+                .Field("x-jsonschema-propertyNames", (_, n, c) => LoadSchema(n, c))
+                .Field("x-jsonschema-dependentSchemas", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+                .Field("x-jsonschema-if", (_, n, c) => LoadSchema(n, c))
+                .Field("x-jsonschema-then", (_, n, c) => LoadSchema(n, c))
+                .Field("x-jsonschema-else", (_, n, c) => LoadSchema(n, c));
+        }
+
+        return fields
+            .Field("$schema", (_, n, _) => n.GetScalarValue())
+            .Field("$id", (_, n, _) => n.GetScalarValue())
+            .Field("$comment", (_, n, _) => n.GetScalarValue())
+            .Field("$vocabulary", (_, n, c) => n.CreateSimpleMap("Nullable`1", ReadNullableBool, c))
+            .Field("$dynamicRef", (_, n, _) => n.GetScalarValue())
+            .Field("$dynamicAnchor", (_, n, _) => n.GetScalarValue())
+            .Field("$defs", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field("$anchor", (_, n, _) => n.GetScalarValue())
+            .Field("exclusiveMaximum", (_, n, _) => n.GetScalarValue())
+            .Field("exclusiveMinimum", (_, n, _) => n.GetScalarValue())
+            .Field("contains", (_, n, c) => LoadSchema(n, c))
+            .Field("maxContains", (_, n, _) => ReadUnsignedInt(n))
+            .Field("minContains", (_, n, _) => ReadUnsignedInt(n))
+            .Field("unevaluatedProperties", (_, n, c) => ReadBoolOrSchema(n, c))
+            .Field("contentEncoding", (_, n, _) => n.GetScalarValue())
+            .Field("contentMediaType", (_, n, _) => n.GetScalarValue())
+            .Field("contentSchema", (_, n, c) => LoadSchema(n, c))
+            .Field("type", (_, n, c) =>
+            {
+                if (n is JsonValue)
+                {
+                    n.GetScalarValue()?.ToJsonSchemaType();
+                    return;
+                }
+
+                foreach (var type in n.CreateSimpleList("String", item => item.GetScalarValue(), c).Where(type => type != null))
+                {
+                    type!.ToJsonSchemaType();
+                }
+            })
+            .Field("const", (_, n, _) => n.GetScalarValue())
+            .Field("patternProperties", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field("propertyNames", (_, n, c) => LoadSchema(n, c))
+            .Field("nullable", (_, n, _) =>
+            {
+                var nullable = n.GetScalarValue();
+                if (nullable != null)
+                    bool.Parse(nullable);
+            })
+            .Field("examples", (_, n, c) => n.CreateListOfAny(c))
+            .Field("dependentRequired", (_, n, c) => n.CreateArrayMap("String", item => item.GetScalarValue(), c))
+            .Field("dependentSchemas", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field("if", (_, n, c) => LoadSchema(n, c))
+            .Field("then", (_, n, c) => LoadSchema(n, c))
+            .Field("else", (_, n, c) => LoadSchema(n, c));
+    }
+
+    private SpecInfo LoadInfo(JsonNode node, ParsingContext context)
+    {
+        var info = new SpecInfo();
+        node.CheckMapNode("Info", context).ParseMap(info, infoFields, context);
+        return info;
+    }
+
+    private SpecContact LoadContact(JsonNode node, ParsingContext context)
+    {
+        var contact = new SpecContact();
+        (node as JsonObject).ParseMap(contact, contactFields, context);
+        return contact;
+    }
+
+    private SpecLicense LoadLicense(JsonNode node, ParsingContext context)
+    {
+        var license = new SpecLicense();
+        node.CheckMapNode("License", context).ParseMap(license, licenseFields, context);
+        return license;
+    }
+
+    private SpecServer LoadServer(JsonNode node, ParsingContext context)
+    {
+        var server = new SpecServer();
+        node.CheckMapNode("server", context).ParseMap(server, serverFields, context);
+        return server;
+    }
+
+    private SpecServerVariable LoadServerVariable(JsonNode node, ParsingContext context)
+    {
+        var serverVariable = new SpecServerVariable();
+        node.CheckMapNode("serverVariable", context).ParseMap(serverVariable, serverVariableFields, context);
+        return serverVariable;
+    }
+
+    private SpecComponents LoadComponents(JsonNode node, ParsingContext context)
+    {
+        var components = new SpecComponents();
+        node.CheckMapNode("components", context).ParseMap(components, componentsFields, context);
+        return components;
+    }
+
+    private SpecPaths LoadPaths(JsonNode node, ParsingContext context)
+    {
+        var paths = new SpecPaths();
+        node.CheckMapNode("Paths", context).ParseMap(paths, pathsFields, context);
+        return paths;
+    }
+
+    private SpecPathItem LoadPathItem(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("PathItem", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (reference != null)
+            return new SpecPathItem { Reference = GetReference(reference) };
+
+        var pathItem = new SpecPathItem();
+        jsonObject.ParseMap(pathItem, pathItemFields, context);
+        return pathItem;
+    }
+
+    private void LoadAdditionalOperations(SpecPathItem pathItem, JsonNode node, ParsingContext context)
+    {
+        foreach (var operation in node.CheckMapNode("additionalOperations", context)
+                     .Where(operation => !StandardHttpMethods.Contains(operation.Key))
+                     .ToList())
+        {
+            pathItem.AddOperation(operation.Key.ToLowerInvariant(), LoadOperation(operation.Value ?? JsonNullSentinel.JsonNull, context));
+        }
+    }
+
+    private SpecOperation LoadOperation(JsonNode node, ParsingContext context)
+    {
+        var operation = new SpecOperation();
+        node.CheckMapNode("Operation", context).ParseMap(operation, operationFields, context);
+        return operation;
+    }
+
+    private SpecParameter LoadParameter(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("parameter", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (reference != null)
+            return new SpecParameter { Reference = GetReference(reference) };
+
+        var parameter = new SpecParameter();
+        jsonObject.ParseMap(parameter, parameterFields, context);
+        return parameter;
+    }
+
+    private SpecRequestBody LoadRequestBody(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("requestBody", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (reference != null)
+            return new SpecRequestBody { Reference = GetReference(reference) };
+
+        var requestBody = new SpecRequestBody();
+        jsonObject.ParseMap(requestBody, requestBodyFields, context);
+        return requestBody;
+    }
+
+    private SpecMediaType LoadMediaType(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("content", context);
+        if (version >= OpenApiSpecificationVersion.OpenApi3_2)
+        {
+            var reference = jsonObject.GetReferencePointer();
+            if (reference != null)
+                return new SpecMediaType { Reference = GetReference(reference) };
+        }
+
+        var mediaType = new SpecMediaType();
+        jsonObject.ParseMap(mediaType, mediaTypeFields, context);
+        return mediaType;
+    }
+
+    private SpecEncoding LoadEncoding(JsonNode node, ParsingContext context)
+    {
+        var encoding = new SpecEncoding();
+        node.CheckMapNode("encoding", context).ParseMap(encoding, encodingFields, context);
+        return encoding;
+    }
+
+    private SpecResponses LoadResponses(JsonNode node, ParsingContext context)
+    {
+        var responses = new SpecResponses();
+        node.CheckMapNode("Responses", context).ParseMap(responses, responsesFields, context);
+        return responses;
+    }
+
+    private SpecResponse LoadResponse(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("response", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (reference != null)
+            return new SpecResponse { Reference = GetReference(reference) };
+
+        var response = new SpecResponse();
+        jsonObject.ParseMap(response, responseFields, context);
+        return response;
+    }
+
+    private SpecHeader LoadHeader(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("header", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (reference != null)
+            return new SpecHeader { Reference = GetReference(reference) };
+
+        var header = new SpecHeader();
+        jsonObject.ParseMap(header, headerFields, context);
+        return header;
+    }
+
+    private SpecLink LoadLink(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("link", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (reference != null)
+            return new SpecLink { Reference = GetReference(reference) };
+
+        var link = new SpecLink();
+        jsonObject.ParseMap(link, linkFields, context);
+        return link;
+    }
+
+    private SpecCallback LoadCallback(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("callback", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (reference != null)
+            return new SpecCallback { Reference = GetReference(reference) };
+
+        var callback = new SpecCallback();
+        jsonObject.ParseMap(callback, callbackFields, context);
+        return callback;
+    }
+
+    private SpecExample LoadExample(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("example", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (reference != null)
+            return new SpecExample { Reference = GetReference(reference) };
+
+        var example = new SpecExample();
+        jsonObject.ParseMap(example, exampleFields, context);
+        return example;
+    }
+
+    private SpecSchema LoadSchema(JsonNode node, ParsingContext context)
+    {
+        if (version >= OpenApiSpecificationVersion.OpenApi3_1
+            && node is JsonValue value
+            && value.TryGetValue<bool>(out var allowed))
+        {
+            return allowed ? new SpecSchema() : new SpecSchema { Not = new SpecSchema() };
+        }
+
+        var jsonObject = node.CheckMapNode("schema", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (version >= OpenApiSpecificationVersion.OpenApi3_1 && jsonObject.TryGetPropertyValue("$id", out var id))
+            id?.GetScalarValue();
+
+        if (reference != null)
+            return new SpecSchema { Reference = GetReference(reference) };
+
+        var schema = new SpecSchema();
+        if (version >= OpenApiSpecificationVersion.OpenApi3_1)
+            jsonObject.ParseMap(schema, schemaFields, context, (_, _, _) => { });
+        else
+            jsonObject.ParseMap(schema, schemaFields, context);
+
+        return schema;
+    }
+
+    private SpecDiscriminator LoadDiscriminator(JsonNode node, ParsingContext context)
+    {
+        var discriminator = new SpecDiscriminator();
+        node.CheckMapNode("discriminator", context).ParseMap(discriminator, discriminatorFields, context);
+        return discriminator;
+    }
+
+    private SpecSchema LoadMapping(JsonNode node) =>
+        new() { Reference = GetReference(node.GetScalarValue() ?? throw new InvalidOperationException("Could not get a pointer reference")) };
+
+    private void LoadXml(JsonNode node, ParsingContext context) =>
+        node.CheckMapNode("xml", context).ParseMap(new object(), xmlFields, context);
+
+    private SpecSecurityScheme LoadSecurityScheme(JsonNode node, ParsingContext context)
+    {
+        var jsonObject = node.CheckMapNode("securityScheme", context);
+        var reference = jsonObject.GetReferencePointer();
+        if (reference != null)
+            return new SpecSecurityScheme { Reference = GetReference(reference) };
+
+        var securityScheme = new SpecSecurityScheme();
+        jsonObject.ParseMap(securityScheme, securitySchemeFields, context);
+        return securityScheme;
+    }
+
+    private SpecOAuthFlows LoadOAuthFlows(JsonNode node, ParsingContext context)
+    {
+        var flows = new SpecOAuthFlows();
+        node.CheckMapNode("OAuthFlows", context).ParseMap(flows, oAuthFlowsFields, context);
+        return flows;
+    }
+
+    private SpecOAuthFlow LoadOAuthFlow(JsonNode node, ParsingContext context)
+    {
+        var flow = new SpecOAuthFlow();
+        node.CheckMapNode("OAuthFlow", context).ParseMap(flow, oAuthFlowFields, context);
+        return flow;
+    }
+
+    private SpecSecurityRequirement LoadSecurityRequirement(JsonNode node, ParsingContext context)
+    {
+        var requirement = new SpecSecurityRequirement();
+        foreach (var scheme in node.CheckMapNode("security", context))
+        {
+            requirement.Add(new SpecReference(scheme.Key, null));
+            scheme.Value.CreateSimpleList("String", item => item.GetScalarValue(), context);
+        }
+
+        return requirement;
+    }
+
+    private SpecTag LoadTag(JsonNode node, ParsingContext context)
+    {
+        var tag = new SpecTag();
+        node.CheckMapNode("tag", context).ParseMap(tag, tagFields, context);
+        return tag;
+    }
+
+    private SpecExternalDocs LoadExternalDocs(JsonNode node, ParsingContext context)
+    {
+        var externalDocs = new SpecExternalDocs();
+        node.CheckMapNode("externalDocs", context).ParseMap(externalDocs, externalDocsFields, context);
+        return externalDocs;
+    }
+
+    private SpecReference GetReference(string pointer)
+    {
+        var segments = pointer.Split('/');
+        var isExternal = !segments[0].StartsWith("#", StringComparison.OrdinalIgnoreCase);
+        if (version == OpenApiSpecificationVersion.OpenApi3_0)
+        {
+            return new SpecReference(
+                segments[segments.Length - 1],
+                isExternal ? pointer.Split('#')[0].TrimEnd('#') : null);
+        }
+
+        var hasFragment = pointer.Contains('#');
+        return new SpecReference(
+            hasFragment ? segments[segments.Length - 1] : pointer,
+            isExternal && hasFragment ? pointer.Split('#')[0].TrimEnd('#') : null);
+    }
+
+    /// <summary>
+    /// Keeps the first tag of each name, as Microsoft.OpenApi keeps the tags in a set compared by name.
+    /// </summary>
+    internal static List<SpecTag> DistinctTags(IEnumerable<SpecTag> tags)
+    {
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        var hasUnnamed = false;
+        return tags
+            .Where(tag => tag.Name == null ? !hasUnnamed && (hasUnnamed = true) : names.Add(tag.Name))
+            .ToList();
+    }
+
+    private static string? LoadRuntimeExpressionAnyWrapper(JsonNode node)
+    {
+        var value = node.GetScalarValue();
+        if (value != null && value.StartsWith("$", StringComparison.OrdinalIgnoreCase))
+            RuntimeExpressions.Validate(value);
+
+        return value;
+    }
+
+    private void ReadBoolOrSchema(JsonNode node, ParsingContext context)
+    {
+        if (node is JsonValue)
+            ReadBool(node);
+        else
+            LoadSchema(node, context);
+    }
+
+    private static void ReadIfNamed(string name, string expected, JsonNode node)
+    {
+        if (name.Equals(expected, StringComparison.OrdinalIgnoreCase))
+            node.GetScalarValue();
+    }
+
+    private static Uri? ReadUri(JsonNode node)
+    {
+        var value = node.GetScalarValue();
+        return value != null ? new Uri(value, UriKind.RelativeOrAbsolute) : null;
+    }
+
+    private static void ReadBool(JsonNode node)
+    {
+        var value = node.GetScalarValue();
+        if (value != null)
+            bool.Parse(value);
+    }
+
+    private static bool? ReadNullableBool(JsonNode node)
+    {
+        var value = node.GetScalarValue();
+        return value == null ? null : bool.Parse(value);
+    }
+
+    private static void ReadInt(JsonNode node)
+    {
+        var value = node.GetScalarValue();
+        if (value != null)
+            int.Parse(value, CultureInfo.InvariantCulture);
+    }
+
+    private static void ReadUnsignedInt(JsonNode node)
+    {
+        var value = node.GetScalarValue();
+        if (value != null)
+            uint.Parse(value, CultureInfo.InvariantCulture);
+    }
+}

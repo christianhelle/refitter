@@ -47,8 +47,8 @@ internal static class NativeOpenApiValidator
             content = ReadFile(openApiFile);
         }
 
-        var (_, diagnostics) = SpecDocumentReader.Read(content);
-        return new OpenApiValidationResult(diagnostics, new OpenApiStats());
+        var (document, diagnostics) = SpecDocumentReader.Read(content);
+        return new OpenApiValidationResult(diagnostics, SpecStatistics.Count(document));
     }
 
     private static byte[] ReadFile(string openApiFile)
