@@ -1,0 +1,110 @@
+openapi: 3.0.1
+info:
+  title: Rule violations
+  version: 1.0.0
+  contact:
+    name: Someone
+    email: not-an-email
+  license:
+    url: https://example.com/license
+externalDocs:
+  description: No url
+servers:
+  - description: No url
+  - url: https://{region}.example.com
+    variables:
+      region:
+        enum: [eu, us]
+tags:
+  - description: No name
+paths:
+  pets:
+    get:
+      responses: {}
+  /pets/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+        - name: other
+          in: path
+          required: true
+          schema:
+            type: string
+        - in: query
+          schema:
+            type: string
+        - name: noLocation
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '2XX':
+          description: Range
+        '600':
+          description: Out of range
+        ok:
+          description: Not a status code
+  /pets/{petId}:
+    get:
+      responses:
+        default:
+          description: Duplicate signature
+components:
+  schemas:
+    Pet:
+      type: object
+      discriminator:
+        propertyName: kind
+      properties:
+        name:
+          type: string
+    Pet Name:
+      type: string
+    Base:
+      type: object
+      required: [kind]
+      discriminator:
+        propertyName: kind
+      properties:
+        kind:
+          type: string
+    Composite:
+      discriminator:
+        propertyName: kind
+      oneOf:
+        - $ref: '#/components/schemas/Base'
+        - $ref: '#/components/schemas/Pet'
+  parameters:
+    bad key!:
+      name: x
+      in: query
+      schema:
+        type: string
+    PathInComponents:
+      name: notInAnyPath
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    no/slash:
+      description: Bad key
+  securitySchemes:
+    oauth:
+      type: oauth2
+      flows:
+        implicit:
+          scopes: {}
+        authorizationCode:
+          authorizationUrl: https://example.com/auth
+        clientCredentials:
+          tokenUrl: https://example.com/token
+          scopes:
+            read: Read

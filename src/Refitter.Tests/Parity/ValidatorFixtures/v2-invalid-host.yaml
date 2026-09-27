@@ -1,0 +1,6 @@
+swagger: '2.0'
+info:
+  title: Invalid host
+  version: 1.0.0
+host: https://example.com/api
+paths: {}

@@ -1,0 +1,20 @@
+openapi: 3.0.1
+info:
+  title: Undefined security scheme
+  version: 1.0.0
+security:
+  - missing: []
+  - defined: []
+paths:
+  /pets:
+    get:
+      security:
+        - alsoMissing: [read]
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    defined:
+      type: http
+      scheme: basic

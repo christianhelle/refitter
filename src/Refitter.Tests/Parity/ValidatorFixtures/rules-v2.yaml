@@ -1,0 +1,64 @@
+swagger: '2.0'
+info:
+  title: Rule violations
+  version: 1.0.0
+  contact:
+    email: not-an-email
+  license:
+    url: https://example.com/license
+externalDocs:
+  description: No url
+tags:
+  - description: No name
+paths:
+  pets:
+    get:
+      responses: {}
+  /pets/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          type: string
+        - name: other
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/Pet'
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Missing'
+        ok:
+          description: Not a status code
+  /pets/{petId}:
+    get:
+      responses:
+        default:
+          description: Duplicate signature
+definitions:
+  Pet:
+    type: object
+    discriminator: kind
+    properties:
+      name:
+        type: string
+  Pet Name:
+    type: string
+parameters:
+  bad key!:
+    name: x
+    in: query
+    type: string
+securityDefinitions:
+  oauth:
+    type: oauth2
+    flow: implicit
+    scopes: {}
+  oauthNoScopes:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: https://example.com/auth

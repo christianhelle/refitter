@@ -1,0 +1,33 @@
+openapi: 3.0.1
+$schema: https://example.com/schema
+bogusRoot: true
+info:
+  title: Unknown properties
+  version: 1.0.0
+  bogusInfo: 1
+paths:
+  /pets:
+    bogusPathItem: 1
+    get:
+      bogusOperation: true
+      parameters:
+        - name: limit
+          in: query
+          bogusParameter: 1
+          schema:
+            type: integer
+            bogusSchema: 1
+      responses:
+        '200':
+          description: OK
+          bogusResponse: 1
+components:
+  bogusComponents: {}
+  schemas:
+    Pet:
+      type: object
+      x-custom: allowed
+      properties:
+        name:
+          type: string
+          unknownKeyword: 1

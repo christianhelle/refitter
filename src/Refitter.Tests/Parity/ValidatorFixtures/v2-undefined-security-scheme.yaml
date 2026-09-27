@@ -1,0 +1,17 @@
+swagger: '2.0'
+info:
+  title: Undefined security scheme
+  version: 1.0.0
+security:
+  - missing: []
+paths:
+  /pets:
+    get:
+      security:
+        - defined: []
+      responses:
+        '200':
+          description: OK
+securityDefinitions:
+  defined:
+    type: basic

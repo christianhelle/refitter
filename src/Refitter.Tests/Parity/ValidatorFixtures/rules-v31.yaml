@@ -1,0 +1,41 @@
+openapi: 3.1.0
+info:
+  title: Rule violations
+  version: 1.0.0
+  license:
+    identifier: MIT
+paths:
+  /pets/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Missing'
+components:
+  pathItems:
+    bad key!:
+      get:
+        responses:
+          '200':
+            description: OK
+  schemas:
+    Pet:
+      type: object
+      discriminator:
+        propertyName: kind
+      properties:
+        name:
+          type: string
+webhooks:
+  newPet:
+    post:
+      responses: {}

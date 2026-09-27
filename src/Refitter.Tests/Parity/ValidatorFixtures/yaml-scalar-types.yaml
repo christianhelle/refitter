@@ -1,0 +1,23 @@
+openapi: 3.0.1
+info:
+  title: 123
+  version: 1.0
+paths:
+  /pets/{id}:
+    get:
+      deprecated: yes
+      parameters:
+        - name: id
+          in: path
+          required: "true"
+          schema:
+            type: integer
+            minimum: "1"
+            maximum: 1e3
+            default: 0x1F
+            enum: [1, 2, ~, null]
+      responses:
+        200:
+          description: OK
+        '404':
+          description: Not found

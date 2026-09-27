@@ -1,0 +1,33 @@
+swagger: '2.0'
+info:
+  title: Unrecognized enum values
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      parameters:
+        - name: a
+          in: cookie
+          type: string
+        - name: b
+          in: query
+          type: array
+          collectionFormat: sideways
+          items:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Rate:
+              type: array
+              collectionFormat: sideways
+              items:
+                type: string
+securityDefinitions:
+  weird:
+    type: carrier-pigeon
+  key:
+    type: apiKey
+    name: X-Key
+    in: cookiejar

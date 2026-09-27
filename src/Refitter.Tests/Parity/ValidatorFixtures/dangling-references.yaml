@@ -1,0 +1,29 @@
+openapi: 3.0.1
+info:
+  title: Dangling references
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/Missing'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Missing'
+        default:
+          $ref: '#/components/responses/Missing'
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/Owner'
+        vet:
+          $ref: '#/components/schemas/Vet'
+    Owner:
+      type: object

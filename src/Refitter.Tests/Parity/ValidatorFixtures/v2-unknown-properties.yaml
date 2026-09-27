@@ -1,0 +1,27 @@
+swagger: '2.0'
+bogusRoot: true
+info:
+  title: Unknown properties
+  version: 1.0.0
+  bogusInfo: 1
+paths:
+  /pets:
+    get:
+      bogusOperation: true
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          bogusParameter: 1
+      responses:
+        '200':
+          description: OK
+          bogusResponse: 1
+definitions:
+  Pet:
+    type: object
+    x-custom: allowed
+    properties:
+      name:
+        type: string
+        unknownKeyword: 1
