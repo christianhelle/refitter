@@ -6,8 +6,8 @@ using TUnit.Core;
 namespace Refitter.Tests;
 
 /// <summary>
-/// Guards the Refitter.Core public API against exposing NSwag or NJsonSchema types outside of
-/// members that are already obsolete. See docs/nswag-removal-plan.md (Phase 1).
+/// Guards the Refitter.Core public API against exposing NSwag or NJsonSchema types.
+/// See docs/nswag-removal-plan.md.
 /// </summary>
 public class PublicApiNSwagIndependenceTests
 {
@@ -15,11 +15,10 @@ public class PublicApiNSwagIndependenceTests
         BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 
     [Test]
-    public void Non_Obsolete_Public_Api_Does_Not_Expose_NSwag_Types()
+    public void Public_Api_Does_Not_Expose_NSwag_Types()
     {
         var violations = typeof(RefitGenerator).Assembly
             .GetExportedTypes()
-            .Where(type => !IsObsolete(type))
             .SelectMany(FindViolations)
             .OrderBy(violation => violation, StringComparer.Ordinal)
             .ToList();
@@ -35,7 +34,7 @@ public class PublicApiNSwagIndependenceTests
                 yield return $"{type.FullName} inherits {inherited.FullName}";
         }
 
-        foreach (var member in type.GetMembers(DeclaredPublicMembers).Where(m => !IsObsolete(m)))
+        foreach (var member in type.GetMembers(DeclaredPublicMembers))
         {
             var exposed = member switch
             {
@@ -65,14 +64,4 @@ public class PublicApiNSwagIndependenceTests
         return assemblyName.StartsWith("NSwag", StringComparison.Ordinal)
                || assemblyName.StartsWith("NJsonSchema", StringComparison.Ordinal);
     }
-
-    private static bool IsObsolete(MemberInfo member) =>
-        member.IsDefined(typeof(ObsoleteAttribute), inherit: false)
-        || member is MethodInfo { IsSpecialName: true } accessor && IsObsoleteAccessor(accessor);
-
-    // Property accessors carry the property's [Obsolete] only on the property itself
-    private static bool IsObsoleteAccessor(MethodInfo accessor) =>
-        accessor.DeclaringType!
-            .GetProperties(DeclaredPublicMembers)
-            .Any(p => (p.GetMethod == accessor || p.SetMethod == accessor) && IsObsolete(p));
 }
