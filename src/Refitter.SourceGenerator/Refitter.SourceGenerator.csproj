@@ -47,6 +47,8 @@
     <Compile Include="../Refitter.Core/Settings/*.cs" />
     <Compile Include="../Refitter.Core/Utilities/*.cs" />
     <Compile Include="../Refitter.Core/Validation/*.cs" />
+    <Compile Include="../Refitter.Core/Validation/Model/*.cs" />
+    <Compile Include="../Refitter.Core/Validation/Reading/*.cs" />
     <EmbeddedResource Include="../Refitter.Core/CodeGeneration/Contracts/Templates/*.liquid" LogicalName="Refitter.Core.Templates.%(Filename)%(Extension)" />
   </ItemGroup>
 
