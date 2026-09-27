@@ -13,29 +13,11 @@ public class RefitGenerator
     private readonly OpenApiDocument document;
     private ApiDocumentInfo? documentInfo;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RefitGenerator"/> class from an already loaded document.
-    /// </summary>
-    /// <param name="settings">The settings used to generate code.</param>
-    /// <param name="document">The OpenAPI document to generate code from.</param>
-    [Obsolete("Use RefitGenerator.CreateAsync instead. This constructor exposes NSwag types and will be removed in the next major version.")]
-    public RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument document)
-        : this(document, settings)
-    {
-    }
-
     private RefitGenerator(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         this.settings = settings;
         this.document = document;
     }
-
-    /// <summary>
-    /// OpenAPI specifications used to generate Refit clients and interfaces.
-    /// This is the filtered/cleaned document after pipeline processing.
-    /// </summary>
-    [Obsolete("Use DocumentInfo instead. OpenApiDocument exposes NSwag types and will be removed in the next major version.")]
-    public OpenApiDocument OpenApiDocument => document;
 
     /// <summary>
     /// Describes the OpenAPI document used to generate Refit clients and interfaces,
