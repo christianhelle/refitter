@@ -1,0 +1,103 @@
+using System.Net;
+
+namespace Refitter.Core;
+
+/// <summary>
+/// Creates instances of <see cref="ApiDocument"/> from file paths or URLs.
+/// Supports loading single documents or merging multiple documents into one.
+/// </summary>
+internal static class ApiDocumentFactory
+{
+    private static readonly IApiDocumentLoader DocumentLoader = new ApiDocumentStrategyLoader();
+    private static readonly ApiDocumentMerger DocumentMerger = new ApiDocumentMerger(new ApiDocumentEquivalenceComparer());
+
+    /// <summary>
+    /// Creates a merged <see cref="ApiDocument"/> from multiple paths or URLs.
+    /// The first document serves as the base; paths and schemas from subsequent documents are merged in.
+    /// </summary>
+    /// <param name="openApiPaths">The paths or URLs to the OpenAPI specifications.</param>
+    /// <param name="allowRemoteReferences">When false, remote and out-of-tree <c>$ref</c> references are rejected.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A merged <see cref="ApiDocument"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="openApiPaths"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="openApiPaths"/> is empty.</exception>
+    public static async Task<ApiDocument> CreateAsync(
+        IEnumerable<string> openApiPaths,
+        bool allowRemoteReferences = false,
+        CancellationToken cancellationToken = default)
+    {
+        if (openApiPaths == null)
+            throw new ArgumentNullException(nameof(openApiPaths));
+
+        var paths = openApiPaths.ToArray();
+        if (paths.Length == 0)
+            throw new ArgumentException("At least one OpenAPI path must be specified.", nameof(openApiPaths));
+
+        if (paths.Length == 1)
+            return await CreateAsync(paths[0], allowRemoteReferences, cancellationToken).ConfigureAwait(false);
+
+        var documents = new ApiDocument[paths.Length];
+        for (var i = 0; i < paths.Length; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            documents[i] = await CreateAsync(paths[i], allowRemoteReferences, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        return DocumentMerger.Merge(documents);
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="ApiDocument"/> class asynchronously.
+    /// </summary>
+    /// <param name="openApiPath">The path or URL to the OpenAPI specification.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A new instance of the <see cref="ApiDocument"/> class.</returns>
+    public static Task<ApiDocument> CreateAsync(
+        string openApiPath,
+        CancellationToken cancellationToken) =>
+        CreateAsync(openApiPath, allowRemoteReferences: false, cancellationToken);
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="ApiDocument"/> class asynchronously.
+    /// </summary>
+    /// <param name="openApiPath">The path or URL to the OpenAPI specification.</param>
+    /// <param name="allowRemoteReferences">When false, remote and out-of-tree <c>$ref</c> references are rejected.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A new instance of the <see cref="ApiDocument"/> class.</returns>
+    public static async Task<ApiDocument> CreateAsync(
+        string openApiPath,
+        bool allowRemoteReferences = false,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        // For remote URLs, fetch once and reuse content for both validation and parsing
+        if (PathUtilities.IsHttp(openApiPath))
+        {
+            string content;
+            try
+            {
+                using var handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
+                using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
+                using var httpResponse = await client.SendAsync(
+                    new HttpRequestMessage(HttpMethod.Get, openApiPath),
+                    cancellationToken).ConfigureAwait(false);
+                content = await httpResponse.Content
+                    .ReadAsStringWithCancellationAsync(cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiPath}'.", ex);
+            }
+
+            await ReferenceGuard.ValidateAsync(openApiPath, content, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
+
+            return ApiDocumentLoader.Load(content, null, PathUtilities.IsYaml(openApiPath));
+        }
+
+        await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
+        return await DocumentLoader.LoadAsync(openApiPath, cancellationToken).ConfigureAwait(false);
+    }
+}
