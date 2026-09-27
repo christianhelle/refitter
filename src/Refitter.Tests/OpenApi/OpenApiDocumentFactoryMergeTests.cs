@@ -4,6 +4,7 @@ using NJsonSchema;
 using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Resources;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.OpenApi;
 
@@ -217,7 +218,7 @@ paths:
     public async Task PopulateMissingRequiredFields_Handles_External_References()
     {
         // Test that external reference handling works correctly
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         var mainSpec = @"{
@@ -277,7 +278,7 @@ paths:
     public async Task PopulateMissingRequiredFields_Preserves_Existing_Title()
     {
         // Test that when title is present, it's preserved
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         var mainSpec = @"{
@@ -337,7 +338,7 @@ paths:
     public async Task PopulateMissingRequiredFields_Creates_Info_With_External_Refs()
     {
         // Test that when Info is minimal with external references, it's populated
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         var mainSpec = @"{
