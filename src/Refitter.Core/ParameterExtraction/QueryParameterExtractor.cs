@@ -1,17 +1,15 @@
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
 internal sealed class QueryParameterExtractor
 {
     public (IReadOnlyList<string> Parameters, string? DynamicQuerystringCode) Extract(
-        CSharpOperationModel operationModel,
+        OperationModel operationModel,
         RefitGeneratorSettings settings,
         string dynamicQuerystringParameterType)
     {
         var queryParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Query)
+            .Where(p => p.Kind == ApiParameterKind.Query)
             .ToList();
 
         return settings.UseDynamicQuerystringParameters && queryParameters.Count >= 2
@@ -20,7 +18,7 @@ internal sealed class QueryParameterExtractor
     }
 
     private static (IReadOnlyList<string> Parameters, string? DynamicQuerystringCode) ExtractDynamic(
-        List<CSharpParameterModel> queryParameters,
+        List<OperationParameterModel> queryParameters,
         RefitGeneratorSettings settings,
         string dynamicQuerystringParameterType)
     {
@@ -45,7 +43,7 @@ internal sealed class QueryParameterExtractor
     }
 
     private static List<string> ExtractSimple(
-        List<CSharpParameterModel> queryParameters,
+        List<OperationParameterModel> queryParameters,
         RefitGeneratorSettings settings)
     {
         return queryParameters

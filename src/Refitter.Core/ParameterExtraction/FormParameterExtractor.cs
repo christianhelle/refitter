@@ -1,23 +1,20 @@
-using NJsonSchema;
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
 internal sealed class FormParameterExtractor
 {
     public IEnumerable<string> Extract(
-        CSharpOperationModel operationModel,
-        OpenApiOperation operation,
+        OperationModel operationModel,
+        ApiOperation operation,
         RefitGeneratorSettings settings)
     {
         var seenFormParameterNames = new HashSet<string>(StringComparer.Ordinal);
         var formParameters = new List<string>();
         var operationFormParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
+            .Where(p => p.Kind == ApiParameterKind.FormData && !p.IsBinaryBodyParameter)
             .ToList();
 
-        void AddOperationParameter(CSharpParameterModel p)
+        void AddOperationParameter(OperationParameterModel p)
         {
             var variableName = ParameterNaming.ConvertToVariableName(p.VariableName);
             if (seenFormParameterNames.Add(variableName))
@@ -31,7 +28,7 @@ internal sealed class FormParameterExtractor
         {
             // NSwag only creates parameters for the schema's own properties, so properties that come
             // from allOf members (e.g. a referenced schema) are added here, in schema order (#1277)
-            var visitedSchemas = new HashSet<JsonSchema>();
+            var visitedSchemas = new HashSet<ApiSchema>();
             foreach (var property in GetProperties(multipartContent.Schema, visitedSchemas))
             {
                 var operationParameter = operationFormParameters.FirstOrDefault(p => p.Name == property.Key);
@@ -59,9 +56,9 @@ internal sealed class FormParameterExtractor
         return formParameters;
     }
 
-    private static IEnumerable<KeyValuePair<string, JsonSchemaProperty>> GetProperties(
-        JsonSchema schema,
-        HashSet<JsonSchema> visitedSchemas)
+    private static IEnumerable<KeyValuePair<string, ApiSchemaProperty>> GetProperties(
+        ApiSchema schema,
+        HashSet<ApiSchema> visitedSchemas)
     {
         var actualSchema = schema.ActualSchema;
         if (!visitedSchemas.Add(actualSchema))
@@ -77,13 +74,13 @@ internal sealed class FormParameterExtractor
             yield return property;
     }
 
-    private static string GetPropertyType(JsonSchema propertySchema, RefitGeneratorSettings settings)
+    private static string GetPropertyType(ApiSchema propertySchema, RefitGeneratorSettings settings)
     {
         if (IsBinary(propertySchema))
             return "StreamPart";
 
         // Arrays use IEnumerable<T>, like the multipart parameters NSwag creates
-        if (propertySchema.Type == JsonObjectType.Array)
+        if (propertySchema.Type == ApiObjectType.Array)
         {
             var itemType = propertySchema.Item is { } itemSchema
                 ? GetPropertyType(itemSchema, settings)
@@ -94,6 +91,6 @@ internal sealed class FormParameterExtractor
         return ParameterTypeResolver.GetCSharpType(propertySchema, settings);
     }
 
-    private static bool IsBinary(JsonSchema schema) =>
-        schema.Type == JsonObjectType.String && schema.Format == "binary";
+    private static bool IsBinary(ApiSchema schema) =>
+        schema.Type == ApiObjectType.String && schema.Format == "binary";
 }

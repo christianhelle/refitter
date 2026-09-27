@@ -1,15 +1,13 @@
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
 internal class MethodAttributeGenerator(
     RefitGeneratorSettings settings,
-    OpenApiDocument document)
+    ApiDocument document)
     : IMethodAttributeGenerator
 {
 
-    public string[] Generate(OpenApiOperation operation, CSharpOperationModel operationModel)
+    public string[] Generate(ApiOperation operation, OperationModel operationModel)
     {
         var attributes = new List<string>();
 
@@ -25,7 +23,7 @@ internal class MethodAttributeGenerator(
 
         var headers = new List<string>();
 
-        if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
+        if (settings.AddAcceptHeaders && document.SchemaType is >= ApiSchemaType.OpenApi3)
         {
             var uniqueContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var response in operation.Responses.Values)
@@ -45,7 +43,7 @@ internal class MethodAttributeGenerator(
             }
         }
 
-        if (settings.AddContentTypeHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
+        if (settings.AddContentTypeHeaders && document.SchemaType is >= ApiSchemaType.OpenApi3)
         {
             var uniqueContentTypes = operation.RequestBody?.Content.Keys ?? Array.Empty<string>();
             var contentType =
@@ -68,7 +66,7 @@ internal class MethodAttributeGenerator(
                     continue;
                 }
 
-                if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: var scheme }
+                if (securityScheme is { Type: ApiSecuritySchemeType.Http, Scheme: var scheme }
                     && string.Equals(scheme, "bearer", StringComparison.OrdinalIgnoreCase))
                 {
                     headers.Add("\"Authorization: Bearer\"");

@@ -1,5 +1,4 @@
 using System.Text;
-using NSwag;
 
 namespace Refitter.Core;
 
@@ -31,7 +30,7 @@ internal class SingleInterfacePartitioning(
     public bool IsSingleInterface => true;
 
     public void AppendInterfaceDocumentation(
-        OpenApiDocument document,
+        ApiDocument document,
         XmlDocumentationGenerator docGenerator,
         string groupKey,
         OpenApiOperationInfo representativeOperation,

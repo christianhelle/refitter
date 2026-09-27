@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -27,9 +25,9 @@ public class MethodAttributeGeneratorTests
                       description: Success
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodAttributeGenerator(settings, document);
 
         var operation = document.Paths["/test"]["get"];
@@ -66,9 +64,9 @@ public class MethodAttributeGeneratorTests
                       description: Success
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodAttributeGenerator(settings, document);
 
         var operation = document.Paths["/test"]["post"];
@@ -99,9 +97,9 @@ public class MethodAttributeGeneratorTests
                             type: string
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings { AddAcceptHeaders = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodAttributeGenerator(settings, document);
 
         var operation = document.Paths["/test"]["get"];
@@ -137,9 +135,9 @@ public class MethodAttributeGeneratorTests
                       description: Created
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings { AddContentTypeHeaders = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodAttributeGenerator(settings, document);
 
         var operation = document.Paths["/test"]["post"];
@@ -170,9 +168,9 @@ public class MethodAttributeGeneratorTests
                             type: string
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings { AddAcceptHeaders = false };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodAttributeGenerator(settings, document);
 
         var operation = document.Paths["/test"]["get"];
@@ -206,12 +204,12 @@ public class MethodAttributeGeneratorTests
                   scheme: bearer
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings
         {
             AuthenticationHeaderStyle = AuthenticationHeaderStyle.Method
         };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodAttributeGenerator(settings, document);
 
         var operation = document.Paths["/test"]["get"];
@@ -248,9 +246,9 @@ public class MethodAttributeGeneratorTests
                       description: Success
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings { AddContentTypeHeaders = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodAttributeGenerator(settings, document);
 
         var operation = document.Paths["/test"]["post"];
@@ -281,13 +279,13 @@ public class MethodAttributeGeneratorTests
                             type: string
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings
         {
             AddAcceptHeaders = false,
             AddContentTypeHeaders = false
         };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodAttributeGenerator(settings, document);
 
         var operation = document.Paths["/test"]["get"];
@@ -321,13 +319,13 @@ public class MethodAttributeGeneratorTests
                             type: string
             """;
 
-        OpenApiDocument document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        ApiDocument document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         RefitGeneratorSettings settings = new RefitGeneratorSettings { AddAcceptHeaders = true };
-        CustomCSharpClientGenerator generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        ContractGenerator generator = new ContractGeneratorFactory(settings, document).Create();
         MethodAttributeGenerator sut = new MethodAttributeGenerator(settings, document);
 
-        OpenApiOperation operation = document.Paths["/test"]["get"];
-        CSharpOperationModel operationModel = generator.CreateOperationModel(operation);
+        ApiOperation operation = document.Paths["/test"]["get"];
+        OperationModel operationModel = generator.CreateOperationModel(operation);
         string[] attributes = sut.Generate(operation, operationModel);
 
         attributes.Should().ContainSingle(a => a.Contains("Accept"))

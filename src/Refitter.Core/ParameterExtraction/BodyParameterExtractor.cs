@@ -1,16 +1,14 @@
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
 internal sealed class BodyParameterExtractor
 {
     public IEnumerable<string> Extract(
-        CSharpOperationModel operationModel,
+        OperationModel operationModel,
         RefitGeneratorSettings settings)
     {
         var bodyParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
+            .Where(p => p.Kind == ApiParameterKind.Body && !p.IsBinaryBodyParameter)
             .Select(p =>
             {
                 var variableName = ParameterNaming.GetVariableName(p);
@@ -19,7 +17,7 @@ internal sealed class BodyParameterExtractor
             .ToList();
 
         var binaryBodyParameters = operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Body && p.IsBinaryBodyParameter)
+            .Where(p => p.Kind == ApiParameterKind.Body && p.IsBinaryBodyParameter)
             .Select(p =>
             {
                 var variableName = ParameterNaming.GetVariableName(p);

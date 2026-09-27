@@ -1,5 +1,3 @@
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -9,8 +7,8 @@ internal class MethodSignatureGenerator(RefitGeneratorSettings settings)
     private readonly ParameterListBuilder parameterListBuilder = new(settings);
 
     public (string ParametersString, IReadOnlyList<string> Parameters, string? DynamicQuerystringParameters) Generate(
-        CSharpOperationModel operationModel,
-        OpenApiOperation operation,
+        OperationModel operationModel,
+        ApiOperation operation,
         string dynamicQuerystringParameterType)
     {
         var parameterList = parameterListBuilder.Build(

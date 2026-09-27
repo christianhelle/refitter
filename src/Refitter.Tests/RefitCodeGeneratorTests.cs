@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
@@ -59,7 +58,7 @@ paths:
     public async Task Generate_Produces_Valid_Code()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
-        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
         var settings = new RefitGeneratorSettings
         {
             Namespace = "TestNamespace",
@@ -77,8 +76,8 @@ paths:
     public async Task Generate_WithFilteredDocument_ProducesValidCode()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
-        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
-        var filtered = NSwagDocumentFilter.FilterByTags(document, ["Bar"]);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
+        var filtered = ApiDocumentFilter.FilterByTags(document, ["Bar"]);
         var settings = new RefitGeneratorSettings
         {
             Namespace = "TestNamespace",
@@ -97,7 +96,7 @@ paths:
     public async Task Generate_Compiles_Successfully()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
-        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
         var settings = new RefitGeneratorSettings
         {
             Namespace = "TestNamespace",
@@ -116,7 +115,7 @@ paths:
     public async Task GenerateMultipleFiles_Produces_Output()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
-        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
         var settings = new RefitGeneratorSettings
         {
             Namespace = "TestNamespace",
@@ -137,7 +136,7 @@ paths:
     public async Task Generate_WithSwagger20_Produces_Valid_Code()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);
-        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
         var settings = new RefitGeneratorSettings
         {
             Namespace = "TestNamespace",
@@ -155,7 +154,7 @@ paths:
     public async Task GenerateMultipleFiles_WithSwagger20_Produces_Output()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);
-        var document = await NSwagDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
         var settings = new RefitGeneratorSettings
         {
             Namespace = "TestNamespace",

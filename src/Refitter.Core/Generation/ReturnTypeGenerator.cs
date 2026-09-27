@@ -1,12 +1,10 @@
 using System.Text.RegularExpressions;
-using NJsonSchema;
-using NSwag;
 
 namespace Refitter.Core;
 
 internal class ReturnTypeGenerator(
     ICodeGenerationConfiguration codeGeneration,
-    CustomCSharpClientGenerator generator)
+    ContractGenerator generator)
     : IReturnTypeGenerator
 {
     private static readonly Regex HttpResponseMessageTypeRegex = new(
@@ -19,9 +17,9 @@ internal class ReturnTypeGenerator(
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(1));
 
-    public string Generate(OpenApiOperation operation)
+    public string Generate(ApiOperation operation)
     {
-        if (codeGeneration.ResponseTypeOverride.TryGetValue(operation.OperationId, out var type))
+        if (codeGeneration.ResponseTypeOverride.TryGetValue(operation.OperationId!, out var type))
         {
             return type is null or "void"
                 ? GetAsyncOperationType(true)
@@ -67,7 +65,7 @@ internal class ReturnTypeGenerator(
                ApiResponseTypeRegex.IsMatch(typeName);
     }
 
-    public bool IsFileStreamResponse(OpenApiOperation operation)
+    public bool IsFileStreamResponse(ApiOperation operation)
     {
         var successCodes = new[] { "200", "201", "202", "203", "206", "2XX" };
 
@@ -86,7 +84,7 @@ internal class ReturnTypeGenerator(
                 if (IsFileContentType(contentEntry.Key))
                 {
                     var schema = contentEntry.Value?.Schema;
-                    if (schema?.Format == "binary" || schema?.Type == NJsonSchema.JsonObjectType.File)
+                    if (schema?.Format == "binary" || schema?.Type == ApiObjectType.File)
                         return true;
                 }
             }
@@ -118,7 +116,7 @@ internal class ReturnTypeGenerator(
         "text/event-stream",
     ];
 
-    private static bool TryGetStreamingResponseSchema(OpenApiOperation operation, out JsonSchema? schema)
+    private static bool TryGetStreamingResponseSchema(ApiOperation operation, out ApiSchema? schema)
     {
         var successCodes = new[] { "200", "201", "202", "203", "206", "2XX", "default" };
 
@@ -186,22 +184,22 @@ internal class ReturnTypeGenerator(
         return StreamingContentTypes.Contains(mediaType.Trim(), StringComparer.OrdinalIgnoreCase);
     }
 
-    private static bool IsPrimitiveSchema(JsonSchema? schema)
+    private static bool IsPrimitiveSchema(ApiSchema? schema)
     {
         if (schema is null)
             return false;
 
-        JsonSchema actual = schema.ActualTypeSchema ?? schema;
-        JsonObjectType type = actual.Type & ~JsonObjectType.Null;
-        return type is JsonObjectType.String
-            or JsonObjectType.Number
-            or JsonObjectType.Integer
-            or JsonObjectType.Boolean;
+        ApiSchema actual = schema.ActualTypeSchema ?? schema;
+        ApiObjectType type = actual.Type & ~ApiObjectType.Null;
+        return type is ApiObjectType.String
+            or ApiObjectType.Number
+            or ApiObjectType.Integer
+            or ApiObjectType.Boolean;
     }
 
-    private string GetStreamingReturnType(JsonSchema? schema)
+    private string GetStreamingReturnType(ApiSchema? schema)
     {
-        JsonSchema? itemSchema = schema?.Type == NJsonSchema.JsonObjectType.Array
+        ApiSchema? itemSchema = schema?.Type == ApiObjectType.Array
             ? schema.Item
             : schema;
         string itemTypeName = itemSchema is null
@@ -216,7 +214,7 @@ internal class ReturnTypeGenerator(
         return codeGeneration is not RefitGeneratorSettings settings || settings.ReturnIAsyncEnumerable;
     }
 
-    private static JsonSchema? GetPreferredResponseSchema(OpenApiResponse response)
+    private static ApiSchema? GetPreferredResponseSchema(ApiResponse response)
     {
         foreach (var contentEntry in response.Content)
         {
@@ -229,13 +227,13 @@ internal class ReturnTypeGenerator(
         return response.Schema;
     }
 
-    private string GetTypeName(string code, OpenApiOperation operation)
+    private string GetTypeName(string code, ApiOperation operation)
     {
         var schema = GetPreferredResponseSchema(operation.Responses[code].ActualResponse);
         var typeName = generator.GetTypeName(schema, false, null);
 
         if (!string.IsNullOrWhiteSpace(codeGeneration.CodeGeneratorSettings?.ArrayType) &&
-            schema?.Type == NJsonSchema.JsonObjectType.Array)
+            schema?.Type == ApiObjectType.Array)
         {
             typeName = typeName
                 .Replace("ICollection", codeGeneration.CodeGeneratorSettings!.ArrayType)

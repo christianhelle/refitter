@@ -1,5 +1,4 @@
 using System.Globalization;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -62,7 +61,7 @@ internal static class ParameterDefaultValueFormatter
 
     public static string GetDefaultValueForParameter(
         string parameterString,
-        ICollection<CSharpParameterModel> parameterModels)
+        ICollection<OperationParameterModel> parameterModels)
     {
         var parts = parameterString.Split([' '], StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length == 0)

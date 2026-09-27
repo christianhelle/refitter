@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using AwesomeAssertions;
 using AwesomeAssertions.Execution;
-using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
@@ -132,7 +131,7 @@ public class InlineJsonConvertersTests
         };
 
         var injector = new EnumStringConverterInjector();
-        var result = injector.Process(new OpenApiDocument(), settings, contracts);
+        var result = injector.Process(new ApiDocument(), settings, contracts);
 
         result.Should().Contain("[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<PetStatus>))]\r\npublic enum PetStatus");
         Regex.Matches(result, "(?<!\\r)\\n").Should().BeEmpty();
@@ -201,7 +200,7 @@ public class InlineJsonConvertersTests
 
     private static string Inject(string contracts) =>
         new EnumStringConverterInjector().Process(
-            new OpenApiDocument(),
+            new ApiDocument(),
             new RefitGeneratorSettings
             {
                 CodeGeneratorSettings = new CodeGeneratorSettings { InlineJsonConverters = true }

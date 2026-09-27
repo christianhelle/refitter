@@ -1,5 +1,4 @@
 using System.Text;
-using NSwag;
 
 namespace Refitter.Core;
 
@@ -12,7 +11,7 @@ internal sealed class RefitCodeGenerator
     /// <summary>
     /// Generates all Refit code as a single string.
     /// </summary>
-    public string Generate(OpenApiDocument document, RefitGeneratorSettings settings)
+    public string Generate(ApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
         return FormatSingleFile(result, settings, settings, settings);
@@ -21,23 +20,25 @@ internal sealed class RefitCodeGenerator
     /// <summary>
     /// Generates Refit code as multiple files (interfaces, contracts, DI, serializer context).
     /// </summary>
-    public GeneratorOutput GenerateMultipleFiles(OpenApiDocument document, RefitGeneratorSettings settings)
+    public GeneratorOutput GenerateMultipleFiles(ApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
         return new(FormatMultipleFiles(result, settings, settings, document));
     }
 
     private static GenerationResult RunPipeline(
-        OpenApiDocument document,
+        ApiDocument document,
         RefitGeneratorSettings settings)
     {
-        var factory = new CSharpClientGeneratorFactory(settings, document);
+        var factory = new ContractGeneratorFactory(settings, document);
         var generator = factory.Create();
+        var operationNameGenerator = new RefitterOperationNameGenerator(document, settings);
         var docGenerator = new XmlDocumentationGenerator(settings);
-        var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
+        var interfaceGenerator = new InterfaceGenerator(settings, document, generator, operationNameGenerator, docGenerator);
 
         var pipeline = new GeneratorPipeline(
             interfaceGenerator,
+            operationNameGenerator,
             [
                 new Swagger2OptionalReferenceNullabilityNormalizer(),
                 new EnumStringConverterInjector(),
@@ -79,7 +80,7 @@ internal sealed class RefitCodeGenerator
         GenerationResult result,
         ICodeGenerationConfiguration codeGeneration,
         INamingConfiguration naming,
-        OpenApiDocument document)
+        ApiDocument document)
     {
         var generatedFiles = new List<GeneratedCode>(result.Interfaces);
 

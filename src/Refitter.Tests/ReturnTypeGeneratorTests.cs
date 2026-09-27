@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -28,9 +27,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -68,9 +67,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -108,9 +107,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings { ReturnIApiResponse = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -148,9 +147,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings { ReturnIObservable = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -189,9 +188,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -229,9 +228,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -270,9 +269,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -285,11 +284,11 @@ public class ReturnTypeGeneratorTests
     public async Task IsApiResponseType_Detects_Task_Of_HttpResponseMessage()
     {
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(
+        var generator = new ContractGeneratorFactory(
             settings,
-            await OpenApiDocument.FromJsonAsync("""
+            ApiDocumentLoader.Load("""
                 { "openapi": "3.0.0", "info": { "title": "Test", "version": "1.0" }, "paths": {} }
-                """))
+                """, null, isYaml: false))
             .Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
@@ -327,10 +326,10 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
         settings.ResponseTypeOverride["customOp"] = "MyCustomType";
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -374,9 +373,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -417,9 +416,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -458,12 +457,12 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings
         {
             ReturnIApiResponse = true
         };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -502,10 +501,10 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
         settings.ResponseTypeOverride["customOp"] = "MyCustomType";
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -544,12 +543,12 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings
         {
             ReturnIObservable = true
         };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -588,9 +587,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -635,9 +634,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -671,9 +670,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -712,10 +711,10 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        document.Paths["/test"]["get"].Responses["200"].ActualResponse.Content["text/event-stream"] = null;
+        var generator = new ContractGeneratorFactory(settings, document).Create();
+        document.Paths["/test"]["get"].Responses["200"].ActualResponse.Content["text/event-stream"] = null!;
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -759,9 +758,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -808,9 +807,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -856,9 +855,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -897,9 +896,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -944,9 +943,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -985,12 +984,12 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings
         {
             ReturnIAsyncEnumerable = false
         };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -1020,9 +1019,9 @@ public class ReturnTypeGeneratorTests
                         type: string
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -1054,9 +1053,9 @@ public class ReturnTypeGeneratorTests
                           type: string
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -1092,10 +1091,10 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
         settings.ResponseTypeOverride["customOp"] = "void";
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -1128,9 +1127,9 @@ public class ReturnTypeGeneratorTests
                           type: string
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -1163,9 +1162,9 @@ public class ReturnTypeGeneratorTests
                           type: string
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
@@ -1206,12 +1205,12 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        OpenApiDocument document = await OpenApiDocument.FromJsonAsync(spec);
+        ApiDocument document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         RefitGeneratorSettings settings = new RefitGeneratorSettings();
-        CustomCSharpClientGenerator generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        ContractGenerator generator = new ContractGeneratorFactory(settings, document).Create();
         ReturnTypeGenerator sut = new ReturnTypeGenerator(settings, generator);
 
-        OpenApiOperation operation = document.Paths["/test"]["get"];
+        ApiOperation operation = document.Paths["/test"]["get"];
         string result = sut.Generate(operation);
 
         result.Should().Be("Task<string>");
@@ -1257,12 +1256,12 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        OpenApiDocument document = await OpenApiDocument.FromJsonAsync(spec);
+        ApiDocument document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         RefitGeneratorSettings settings = new RefitGeneratorSettings();
-        CustomCSharpClientGenerator generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        ContractGenerator generator = new ContractGeneratorFactory(settings, document).Create();
         ReturnTypeGenerator sut = new ReturnTypeGenerator(settings, generator);
 
-        OpenApiOperation operation = document.Paths["/test"]["get"];
+        ApiOperation operation = document.Paths["/test"]["get"];
         string result = sut.Generate(operation);
 
         result.Should().Be("IAsyncEnumerable<string>");
@@ -1306,12 +1305,12 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        OpenApiDocument document = await OpenApiDocument.FromJsonAsync(spec);
+        ApiDocument document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         RefitGeneratorSettings settings = new RefitGeneratorSettings();
-        CustomCSharpClientGenerator generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        ContractGenerator generator = new ContractGeneratorFactory(settings, document).Create();
         ReturnTypeGenerator sut = new ReturnTypeGenerator(settings, generator);
 
-        OpenApiOperation operation = document.Paths["/test"]["get"];
+        ApiOperation operation = document.Paths["/test"]["get"];
         string result = sut.Generate(operation);
 
         result.Should().Be("IAsyncEnumerable<string>");
@@ -1339,12 +1338,12 @@ public class ReturnTypeGeneratorTests
                         type: string
             """;
 
-        OpenApiDocument document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        ApiDocument document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         RefitGeneratorSettings settings = new RefitGeneratorSettings();
-        CustomCSharpClientGenerator generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        ContractGenerator generator = new ContractGeneratorFactory(settings, document).Create();
         ReturnTypeGenerator sut = new ReturnTypeGenerator(settings, generator);
 
-        OpenApiOperation operation = document.Paths["/test"]["get"];
+        ApiOperation operation = document.Paths["/test"]["get"];
         string result = sut.Generate(operation);
 
         result.Should().Be("Task<string>");
@@ -1371,9 +1370,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(settings, generator);
 
         sut.IsFileStreamResponse(document.Paths["/download"]["get"]).Should().BeTrue();
@@ -1406,9 +1405,9 @@ public class ReturnTypeGeneratorTests
             }
             """;
 
-        var document = await OpenApiDocument.FromJsonAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new ReturnTypeGenerator(new StubCodeGenerationConfiguration(), generator);
 
         sut.Generate(document.Paths["/stream"]["get"])

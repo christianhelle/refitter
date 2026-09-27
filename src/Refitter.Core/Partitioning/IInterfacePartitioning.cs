@@ -1,5 +1,4 @@
 using System.Text;
-using NSwag;
 
 namespace Refitter.Core;
 
@@ -39,7 +38,7 @@ internal interface IInterfacePartitioning
     /// Appends interface-level documentation to the StringBuilder.
     /// </summary>
     void AppendInterfaceDocumentation(
-        OpenApiDocument document,
+        ApiDocument document,
         XmlDocumentationGenerator docGenerator,
         string groupKey,
         OpenApiOperationInfo representativeOperation,

@@ -1,12 +1,11 @@
 using System.Text;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
 internal static class DynamicQuerystringParameterBuilder
 {
     public static string Build(
-        List<CSharpParameterModel> queryParameters,
+        List<OperationParameterModel> queryParameters,
         string dynamicQuerystringParameterType,
         RefitGeneratorSettings settings)
     {
@@ -47,7 +46,7 @@ internal static class DynamicQuerystringParameterBuilder
             propertiesCodeBuilder.AppendLine();
             if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
             {
-                var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(operationParameter.Description);
+                var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(operationParameter.Description!);
                 AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
             }
 
