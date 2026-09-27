@@ -27,7 +27,7 @@ public class ValidatorParityTests
     [MethodDataSource(nameof(Cases))]
     public async Task Validation_Matches_Snapshot(ValidatorParitySpec spec)
     {
-        var actual = await DescribeAsync(spec);
+        var actual = await DescribeAsync(spec, path => OpenApiValidator.Validate(path));
         var snapshotPath = GetSnapshotPath(spec);
 
         if (Environment.GetEnvironmentVariable(UpdateSnapshotsVariable) == "1")
@@ -42,6 +42,65 @@ public class ValidatorParityTests
 
         var expected = (await File.ReadAllTextAsync(snapshotPath)).Replace("\r\n", "\n");
         actual.Should().Be(expected, $"validating {spec.Id} should match {snapshotPath}");
+    }
+
+    /// <summary>
+    /// Ratchet for the native validator that replaces Microsoft.OpenApi: every spec must match its snapshot,
+    /// except the ones listed in NativeValidatorGaps.txt, which must not match yet so the list stays accurate.
+    /// Set REFITTER_UPDATE_NATIVE_GAPS=1 to rewrite the list instead of asserting.
+    /// </summary>
+    [Test]
+    public async Task Native_Validation_Matches_Snapshots_Except_Known_Gaps()
+    {
+        var gapsPath = Path.Combine(TestsFolder, "Parity", "NativeValidatorGaps.txt");
+        var knownGaps = File.Exists(gapsPath)
+            ? File.ReadAllLines(gapsPath).Where(line => line.Length > 0).ToHashSet(StringComparer.Ordinal)
+            : [];
+
+        var gaps = new List<string>();
+        var firstDifferences = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var spec in ValidatorParitySpecs.All)
+        {
+            var expected = (await File.ReadAllTextAsync(GetSnapshotPath(spec))).Replace("\r\n", "\n");
+            var actual = await DescribeAsync(spec, path => NativeOpenApiValidator.Validate(path));
+            if (actual != expected)
+            {
+                gaps.Add(spec.Id);
+                firstDifferences[spec.Id] = DescribeFirstDifference(expected, actual);
+            }
+        }
+
+        if (Environment.GetEnvironmentVariable("REFITTER_UPDATE_NATIVE_GAPS") == "1")
+        {
+            await File.WriteAllLinesAsync(gapsPath, gaps);
+            return;
+        }
+
+        var regressions = gaps
+            .Where(id => !knownGaps.Contains(id))
+            .Select(id => $"{id}: {firstDifferences[id]}")
+            .ToList();
+        var closedGaps = knownGaps.Where(id => !gaps.Contains(id)).ToList();
+
+        regressions.Should().BeEmpty("these specs no longer match their snapshots");
+        closedGaps.Should().BeEmpty("these specs match their snapshots now, so remove them from {0}", gapsPath);
+    }
+
+    private static string DescribeFirstDifference(string expected, string actual)
+    {
+        var expectedLines = expected.Split('\n');
+        var actualLines = actual.Split('\n');
+        var index = 0;
+        while (index < expectedLines.Length
+               && index < actualLines.Length
+               && expectedLines[index] == actualLines[index])
+        {
+            index++;
+        }
+
+        var expectedLine = index < expectedLines.Length ? expectedLines[index] : "<end>";
+        var actualLine = index < actualLines.Length ? actualLines[index] : "<end>";
+        return $"line {index + 1} expected '{expectedLine}' but was '{actualLine}'";
     }
 
     [Test]
@@ -62,28 +121,32 @@ public class ValidatorParityTests
     private static string GetSnapshotPath(ValidatorParitySpec spec) =>
         Path.Combine(SnapshotsFolder, spec.Id.Replace('/', Path.DirectorySeparatorChar) + ".txt");
 
-    private static async Task<string> DescribeAsync(ValidatorParitySpec spec)
+    private static async Task<string> DescribeAsync(
+        ValidatorParitySpec spec,
+        Func<string, Task<OpenApiValidationResult>> validate)
     {
         var output = new StringBuilder();
         var directory = Path.GetDirectoryName(spec.Path)!;
 
         output.Append("== file\n");
-        output.Append(Normalize(await ValidateAsync(spec.Path), directory, null));
+        output.Append(Normalize(await ValidateAsync(spec.Path, validate), directory, null));
 
         var content = await File.ReadAllTextAsync(spec.Path);
         await using var server = new LocalHttpServer(content, IsYaml(spec.Path) ? "application/yaml" : "application/json");
         output.Append("== url\n");
-        output.Append(Normalize(await ValidateAsync(server.Url), directory, server.Url));
+        output.Append(Normalize(await ValidateAsync(server.Url, validate), directory, server.Url));
 
         return output.ToString();
     }
 
-    private static async Task<string> ValidateAsync(string openApiPath)
+    private static async Task<string> ValidateAsync(
+        string openApiPath,
+        Func<string, Task<OpenApiValidationResult>> validate)
     {
         OpenApiValidationResult result;
         try
         {
-            result = await OpenApiValidator.Validate(openApiPath);
+            result = await validate(openApiPath);
         }
         catch (Exception exception)
         {
