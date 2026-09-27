@@ -128,12 +128,6 @@ internal sealed class ContractTypeResolver
         return IsDefinitionTypeSchema(schema.ActualSchema) ? schema : schema.ActualSchema;
     }
 
-    public bool GeneratesType(ApiSchema schema)
-    {
-        schema = GetResolvableSchema(schema);
-        return schema.HasReference || (schema.IsObject && !schema.IsDictionary && !schema.IsAnyType);
-    }
-
     private bool IsDefinitionTypeSchema(ApiSchema schema)
     {
         if ((schema.IsDictionary && !Settings.InlineNamedDictionaries) ||

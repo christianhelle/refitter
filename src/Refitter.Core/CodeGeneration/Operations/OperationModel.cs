@@ -67,10 +67,6 @@ internal sealed class OperationModel
 
     public ApiOperation Operation => operation;
 
-    public string? Id => operation.OperationId;
-
-    public List<string> Tags => operation.Tags;
-
     public string? Path { get; set; }
 
     public string? HttpMethod { get; set; }
@@ -84,15 +80,9 @@ internal sealed class OperationModel
 
     public string MethodAccessModifier => "public";
 
-    public bool IsInterfaceMethod => true;
-
     public string HttpMethodUpper => ConversionUtilities.ConvertToUpperCamelCase(HttpMethod, firstCharacterMustBeAlpha: false);
 
-    public string HttpMethodLower => ConversionUtilities.ConvertToLowerCamelCase(HttpMethod, firstCharacterMustBeAlpha: false);
-
     public bool IsGetOrDeleteOrHead => HttpMethod is "get" or "delete" or "head";
-
-    public bool IsGetOrHead => HttpMethod is "get" or "head";
 
     public IList<OperationParameterModel> Parameters { get; }
 
@@ -105,8 +95,6 @@ internal sealed class OperationModel
     public bool HasSuccessResponse => Responses.Any(r => r.IsSuccess);
 
     public OperationResponseModel? SuccessResponse => Responses.FirstOrDefault(r => r.IsSuccess);
-
-    public bool HasOnlyDefaultResponse => Responses.Count == 0 && HasDefaultResponse;
 
     public OperationParameterModel? ContentParameter
     {
@@ -129,8 +117,6 @@ internal sealed class OperationModel
     }
 
     public bool HasContent => ContentParameter != null;
-
-    public bool HasBody => HasContent || HasFormParameters;
 
     public IEnumerable<OperationParameterModel> PathParameters => Parameters.Where(p => p.Kind == ApiParameterKind.Path);
 
@@ -257,7 +243,7 @@ internal sealed class OperationModel
 
     public IEnumerable<ExceptionDescriptionModel> ExceptionDescriptions =>
         Responses
-            .Where(r => r.ThrowsException)
+            .Where(r => !r.IsSuccess)
             .SelectMany(r => r.InheritsExceptionSchema
                 ? [new ExceptionDescriptionModel(r.Type, r.ExceptionDescription)]
                 : Array.Empty<ExceptionDescriptionModel>());
@@ -464,15 +450,7 @@ internal sealed class OperationParameterModel
         Schema.Item?.ActualSchema.Format == "date" &&
         generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != "string";
 
-    public bool IsDateOrDateTimeArray => IsDateArray || IsDateTimeArray;
-
-    public bool IsObjectArray =>
-        IsArray &&
-        (Schema.Item?.ActualSchema.Type == ApiObjectType.Object || (Schema.Item?.ActualSchema.IsAnyType ?? false));
-
     public bool IsObject => Schema.ActualSchema.Type == ApiObjectType.Object;
-
-    public bool IsBody => Kind == ApiParameterKind.Body;
 
     public bool IsQuery => Kind == ApiParameterKind.Query;
 
@@ -559,8 +537,6 @@ internal sealed class OperationResponseModel
                    (primarySuccessResponse == null || primarySuccessResponse.Type == Type);
         }
     }
-
-    public bool ThrowsException => !IsSuccess;
 
     public string ExceptionDescription =>
         string.IsNullOrEmpty(response.Description)
