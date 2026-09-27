@@ -828,7 +828,13 @@ internal sealed class OpenApiV3Reader
             id?.GetScalarValue();
 
         if (reference != null)
-            return new SpecSchema { Reference = GetReference(reference) };
+        {
+            var schemaReference = GetReference(reference);
+            if (version >= OpenApiSpecificationVersion.OpenApi3_1)
+                schemaReference = schemaReference with { JsonPointer = GetJsonPointerPath(reference, context.GetLocation()) };
+
+            return new SpecSchema { Reference = schemaReference };
+        }
 
         var schema = new SpecSchema();
         if (version >= OpenApiSpecificationVersion.OpenApi3_1)
@@ -919,6 +925,41 @@ internal sealed class OpenApiV3Reader
         return SpecReferences.Create(
             hasFragment ? segments[segments.Length - 1] : pointer,
             isExternal && hasFragment ? pointer.Split('#')[0].TrimEnd('#') : null);
+    }
+
+    /// <summary>
+    /// The pointer Microsoft.OpenApi keeps for an OpenAPI 3.1 schema reference: a pointer relative to the
+    /// document is resolved against where the reference is, and a component pointer is kept as is.
+    /// </summary>
+    private static string? GetJsonPointerPath(string pointer, string location)
+    {
+        if (pointer.StartsWith("#/", StringComparison.OrdinalIgnoreCase)
+            && !pointer.ToLowerInvariant().Contains("/components/schemas"))
+        {
+            return ResolveRelativePointer(location, pointer);
+        }
+
+        return pointer.Contains('#') || pointer.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? pointer : null;
+    }
+
+    private static string ResolveRelativePointer(string location, string relativeReference)
+    {
+        var locationSegments = location.TrimStart('#').Split(['/'], StringSplitOptions.RemoveEmptyEntries).ToList();
+        var referenceSegments = relativeReference.TrimStart('#').Split(['/'], StringSplitOptions.RemoveEmptyEntries);
+        for (var i = 0; i <= locationSegments.Count - referenceSegments.Length; i++)
+        {
+            if (referenceSegments.SequenceEqual(locationSegments.Skip(i).Take(referenceSegments.Length), StringComparer.Ordinal))
+            {
+                var prefix = locationSegments.Take(i + referenceSegments.Length).ToArray();
+                if (prefix.Length > 0)
+                    return "#/" + string.Join("/", prefix);
+            }
+        }
+
+        if (location.StartsWith("#/components/schemas/", StringComparison.OrdinalIgnoreCase))
+            return "#/" + string.Join("/", locationSegments.Take(3).Concat(referenceSegments));
+
+        return "#/" + string.Join("/", locationSegments.Take(locationSegments.Count - referenceSegments.Length).Concat(referenceSegments));
     }
 
     /// <summary>

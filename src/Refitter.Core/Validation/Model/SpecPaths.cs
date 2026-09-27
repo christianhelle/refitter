@@ -5,7 +5,13 @@ namespace Refitter.Core.Validation.Model;
 /// <summary>
 /// A <c>$ref</c> to a component: its id and, for a reference into another file, the file.
 /// </summary>
-internal sealed record SpecReference(string Id, string? ExternalResource);
+internal sealed record SpecReference(string Id, string? ExternalResource)
+{
+    /// <summary>
+    /// The JSON pointer an OpenAPI 3.1 schema reference was written with, when it is not a component.
+    /// </summary>
+    public string? JsonPointer { get; init; }
+}
 
 /// <summary>
 /// An element that is either defined in place or, when <see cref="Reference"/> is set, only refers to one.
@@ -38,7 +44,10 @@ internal sealed class SpecOperation
 
     public SpecRequestBody? RequestBody { get; set; }
 
-    public SpecResponses? Responses { get; set; }
+    /// <summary>
+    /// Starts empty, like in Microsoft.OpenApi, so an operation without responses breaks a validation rule.
+    /// </summary>
+    public SpecResponses? Responses { get; set; } = new();
 
     public Dictionary<string, SpecCallback?>? Callbacks { get; set; }
 

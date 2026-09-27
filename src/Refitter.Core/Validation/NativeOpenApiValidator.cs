@@ -55,8 +55,15 @@ internal static class NativeOpenApiValidator
 
         // Microsoft.OpenApi resolves references against the components the document was read with
         var registered = document?.Components?.Copy();
-        if (document != null && !PathUtilities.IsHttp(openApiFile))
+        if (PathUtilities.IsHttp(openApiFile))
+        {
+            // Microsoft.OpenApi only applied its validation rules to documents downloaded from a URL
+            SpecRuleValidator.Validate(document, diagnostics);
+        }
+        else if (document != null)
+        {
             ExternalReferenceMerger.Merge(document, openApiFile, registered);
+        }
 
         var statistics = SpecStatistics.Count(document);
         NativeAttributeStringValidator.Validate(document, registered, diagnostics);
