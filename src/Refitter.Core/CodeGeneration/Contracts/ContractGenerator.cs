@@ -146,9 +146,19 @@ internal sealed class ContractGenerator
             pending = GetTypesRequiringGeneration(processedTypes);
         }
 
-        var result = artifactOrder.Select(name => artifacts[name]).ToList();
+        var result = new List<ContractArtifact>(artifactOrder.Count);
+        var usesInheritanceConverter = false;
+        var usesDateFormatConverter = false;
+        foreach (var name in artifactOrder)
+        {
+            var artifact = artifacts[name];
+            result.Add(artifact);
+            usesInheritanceConverter |= artifact.Code.Contains("JsonInheritanceConverter");
+            usesDateFormatConverter |= artifact.Code.Contains("DateFormatConverter");
+        }
+
         var utilities = new List<ContractArtifact>();
-        if (result.Any(r => r.Code.Contains("JsonInheritanceConverter")))
+        if (usesInheritanceConverter)
         {
             if (!Settings.ExcludedTypeNames.Contains("JsonInheritanceAttribute"))
             {
@@ -165,8 +175,7 @@ internal sealed class ContractGenerator
             }
         }
 
-        if (result.Any(r => r.Code.Contains("DateFormatConverter")) &&
-            !Settings.ExcludedTypeNames.Contains("DateFormatConverter"))
+        if (usesDateFormatConverter && !Settings.ExcludedTypeNames.Contains("DateFormatConverter"))
         {
             utilities.Add(new ContractArtifact(
                 "DateFormatConverter",

@@ -557,10 +557,10 @@ internal sealed class EnumTemplateModel(string typeName, ApiSchema schema, Contr
             case ulong ul:
                 valueInt64 = (long)ul;
                 return true;
-            case float f when Math.Floor(f) == f:
+            case float f when IsWholeNumber(f):
                 valueInt64 = (long)f;
                 return true;
-            case double d when Math.Floor(d) == d:
+            case double d when IsWholeNumber(d):
                 valueInt64 = (long)d;
                 return true;
             default:
@@ -568,6 +568,11 @@ internal sealed class EnumTemplateModel(string typeName, ApiSchema schema, Contr
                 return false;
         }
     }
+
+    // Whether Math.Floor(value) == value: the fractional part is exactly zero (no positive double is smaller
+    // than double.Epsilon), and infinities count as whole numbers
+    private static bool IsWholeNumber(double value) =>
+        double.IsInfinity(value) || Math.Abs(value - Math.Floor(value)) < double.Epsilon;
 }
 
 /// <summary>An enum member in the enum template.</summary>
