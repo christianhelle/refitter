@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using NJsonSchema;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -12,7 +10,7 @@ public class FixMissingIntegerTypesMutatorTests
     [Test]
     public async Task Mutate_WithFormatInt32AndNoType_SetsTypeToInteger()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -28,7 +26,7 @@ public class FixMissingIntegerTypesMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new FixMissingIntegerTypesMutator();
         sut.Mutate(document);
@@ -37,13 +35,13 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["formattedId"]
             .ActualSchema;
 
-        schema.Type.Should().Be(JsonObjectType.Integer);
+        schema.Type.Should().Be(ApiObjectType.Integer);
     }
 
     [Test]
     public async Task Mutate_WithFormatInt64AndNoType_SetsTypeToInteger()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -59,7 +57,7 @@ public class FixMissingIntegerTypesMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new FixMissingIntegerTypesMutator();
         sut.Mutate(document);
@@ -68,13 +66,13 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["bigId"]
             .ActualSchema;
 
-        schema.Type.Should().Be(JsonObjectType.Integer);
+        schema.Type.Should().Be(ApiObjectType.Integer);
     }
 
     [Test]
     public async Task Mutate_WithFormatFloatAndNoType_SetsTypeToNumber()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -90,7 +88,7 @@ public class FixMissingIntegerTypesMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new FixMissingIntegerTypesMutator();
         sut.Mutate(document);
@@ -99,13 +97,13 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["price"]
             .ActualSchema;
 
-        schema.Type.Should().Be(JsonObjectType.Number);
+        schema.Type.Should().Be(ApiObjectType.Number);
     }
 
     [Test]
     public async Task Mutate_WithFormatDoubleAndNoType_SetsTypeToNumber()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -121,7 +119,7 @@ public class FixMissingIntegerTypesMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new FixMissingIntegerTypesMutator();
         sut.Mutate(document);
@@ -130,13 +128,13 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["score"]
             .ActualSchema;
 
-        schema.Type.Should().Be(JsonObjectType.Number);
+        schema.Type.Should().Be(ApiObjectType.Number);
     }
 
     [Test]
     public async Task Mutate_WithFormatInt32AndExistingType_DoesNotChangeType()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -152,7 +150,7 @@ public class FixMissingIntegerTypesMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new FixMissingIntegerTypesMutator();
         sut.Mutate(document);
@@ -161,13 +159,13 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["count"]
             .ActualSchema;
 
-        schema.Type.Should().Be(JsonObjectType.Integer);
+        schema.Type.Should().Be(ApiObjectType.Integer);
     }
 
     [Test]
     public async Task Mutate_WithoutFormat_DoesNotChangeType()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -183,7 +181,7 @@ public class FixMissingIntegerTypesMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var expectedType = document.Components!.Schemas["TestModel"]
             .ActualSchema.Properties["name"]

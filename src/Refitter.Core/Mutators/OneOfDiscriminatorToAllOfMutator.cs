@@ -1,40 +1,33 @@
-using NJsonSchema;
-using NSwag;
-
 namespace Refitter.Core;
 
-internal sealed class OneOfDiscriminatorToAllOfMutator : IOpenApiDocumentMutator
+/// <summary>Turns a discriminated oneOf/anyOf union into inheritance (the members derive from the union schema).</summary>
+internal sealed class OneOfDiscriminatorToAllOfMutator : IDocumentMutator
 {
-    public void Mutate(OpenApiDocument document)
+    public void Mutate(ApiDocument document)
     {
-        foreach (var kvp in document.Components.Schemas)
+        foreach (var definition in document.Components.Schemas)
         {
-            var schema = kvp.Value?.ActualSchema;
-            if (schema == null)
-                continue;
-
-            if (schema.DiscriminatorObject == null)
+            var schema = definition.Value?.ActualSchema;
+            if (schema?.DiscriminatorObject == null)
                 continue;
 
             var unionSchemas = schema.OneOf.Concat(schema.AnyOf).ToArray();
             if (unionSchemas.Length == 0)
                 continue;
 
-            if (schema.Type == JsonObjectType.None || schema.Type == JsonObjectType.Null)
-                schema.Type = JsonObjectType.Object;
+            if (schema.Type is ApiObjectType.None or ApiObjectType.Null)
+                schema.Type = ApiObjectType.Object;
 
-            foreach (var subSchemaRef in unionSchemas)
+            foreach (var subSchemaReference in unionSchemas)
             {
-                var subSchema = subSchemaRef?.ActualSchema;
+                var subSchema = subSchemaReference?.ActualSchema;
                 if (subSchema == null)
                     continue;
 
-                bool alreadyInherits = subSchema.AllOf.Any(
-                    a => a.HasReference && a.ActualSchema == schema);
+                var alreadyInherits = subSchema.AllOf.Any(a => a.HasReference && a.ActualSchema == schema);
                 if (!alreadyInherits)
                 {
-                    var reference = new JsonSchema { Reference = schema };
-                    subSchema.AllOf.Add(reference);
+                    subSchema.AllOf.Add(new ApiSchema { Reference = schema });
                 }
             }
 

@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -11,7 +10,7 @@ public class DisableAdditionalPropertiesMutatorTests
     [Test]
     public async Task Mutate_WithGenerateDefaultAdditionalPropertiesFalse_SetsAllowAdditionalPropertiesToFalse()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -27,7 +26,7 @@ public class DisableAdditionalPropertiesMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new DisableAdditionalPropertiesMutator(generateDefaultAdditionalProperties: false);
         sut.Mutate(document);
@@ -39,13 +38,13 @@ public class DisableAdditionalPropertiesMutatorTests
     [Test]
     public async Task Mutate_WithoutComponents_DoesNothing()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
               "paths": {}
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new DisableAdditionalPropertiesMutator(generateDefaultAdditionalProperties: false);
 
@@ -58,7 +57,7 @@ public class DisableAdditionalPropertiesMutatorTests
     [Test]
     public async Task Mutate_WithGenerateDefaultAdditionalPropertiesTrue_DoesNotChangeAllowAdditionalProperties()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -74,7 +73,7 @@ public class DisableAdditionalPropertiesMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var expected = document.Components!.Schemas["TestModel"].ActualSchema.AllowAdditionalProperties;
 
@@ -88,13 +87,13 @@ public class DisableAdditionalPropertiesMutatorTests
     [Test]
     public async Task Mutate_WithNoComponentsSchemas_DoesNotThrow()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
               "paths": {}
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new DisableAdditionalPropertiesMutator(generateDefaultAdditionalProperties: false);
         var act = () => sut.Mutate(document);
@@ -105,7 +104,7 @@ public class DisableAdditionalPropertiesMutatorTests
     [Test]
     public async Task Mutate_WithGenerateDefaultAdditionalPropertiesFalse_AppliesToAllSchemas()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -123,7 +122,7 @@ public class DisableAdditionalPropertiesMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new DisableAdditionalPropertiesMutator(generateDefaultAdditionalProperties: false);
         sut.Mutate(document);

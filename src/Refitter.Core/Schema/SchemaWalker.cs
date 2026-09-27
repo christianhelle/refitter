@@ -1,153 +1,99 @@
-using NJsonSchema;
-using NSwag;
-
 namespace Refitter.Core;
 
+/// <summary>Visits every schema of a document once.</summary>
 internal static class SchemaWalker
 {
-    public static void TraverseDocumentSchemas(
-        OpenApiDocument document,
-        Action<JsonSchema> visitor)
+    public static void TraverseDocumentSchemas(ApiDocument document, Action<ApiSchema> visitor)
     {
-        var visited = new HashSet<JsonSchema>(JsonSchemaReferenceComparer.Instance);
-        var schemasToProcess = new Stack<JsonSchema>();
+        var visited = new HashSet<ApiSchema>();
+        var schemasToProcess = new Stack<ApiSchema>();
 
         foreach (var schema in EnumerateDocumentSchemaRoots(document))
         {
-            TryPush(schema, schemasToProcess);
+            if (schema != null)
+                schemasToProcess.Push(schema);
         }
 
         while (schemasToProcess.Count > 0)
         {
             var actualSchema = schemasToProcess.Pop().ActualSchema;
             if (!visited.Add(actualSchema))
-            {
                 continue;
-            }
 
             visitor(actualSchema);
 
             foreach (var childSchema in EnumerateTraversableSchemas(actualSchema))
             {
-                TryPush(childSchema, schemasToProcess);
+                if (childSchema != null)
+                    schemasToProcess.Push(childSchema);
             }
         }
     }
 
-    private static IEnumerable<JsonSchema?> EnumerateDocumentSchemaRoots(
-        OpenApiDocument document)
+    private static IEnumerable<ApiSchema?> EnumerateDocumentSchemaRoots(ApiDocument document)
     {
         foreach (var schema in document.Components.Schemas.Values)
-        {
             yield return schema;
-        }
 
         foreach (var pathItem in document.Paths.Values)
         {
             if (pathItem == null)
-            {
                 continue;
-            }
 
             foreach (var parameter in pathItem.Parameters)
-            {
                 yield return parameter;
-            }
 
             foreach (var operation in pathItem.Values)
             {
                 if (operation == null)
-                {
                     continue;
-                }
 
                 foreach (var parameter in operation.ActualParameters)
-                {
                     yield return parameter;
-                }
 
                 if (operation.RequestBody?.Content != null)
                 {
                     foreach (var content in operation.RequestBody.Content.Values)
-                    {
                         yield return content.Schema;
-                    }
                 }
 
                 foreach (var response in operation.ActualResponses.Values)
                 {
-                    if (response.Headers != null)
-                    {
-                        foreach (var header in response.Headers.Values)
-                        {
-                            yield return header;
-                        }
-                    }
-
-                    if (response.Content == null)
-                    {
-                        continue;
-                    }
+                    foreach (var header in response.Headers.Values)
+                        yield return header;
 
                     foreach (var content in response.Content.Values)
-                    {
                         yield return content.Schema;
-                    }
                 }
             }
         }
     }
 
-    private static IEnumerable<JsonSchema?> EnumerateTraversableSchemas(JsonSchema schema)
+    private static IEnumerable<ApiSchema?> EnumerateTraversableSchemas(ApiSchema schema)
     {
         yield return schema.AdditionalItemsSchema;
         yield return schema.AdditionalPropertiesSchema;
         yield return schema.DictionaryKey;
         yield return schema.Item;
 
-        if (schema.Items.Count != 0)
-        {
-            foreach (var item in schema.Items)
-            {
-                yield return item;
-            }
-        }
+        foreach (var item in schema.Items)
+            yield return item;
 
         yield return schema.Not;
 
         foreach (var property in schema.Properties.Values)
-        {
             yield return property;
-        }
 
         foreach (var subSchema in schema.AllOf)
-        {
             yield return subSchema;
-        }
 
         foreach (var subSchema in schema.OneOf)
-        {
             yield return subSchema;
-        }
 
         foreach (var subSchema in schema.AnyOf)
-        {
             yield return subSchema;
-        }
 
         foreach (var definition in schema.Definitions.Values)
-        {
             yield return definition;
-        }
-    }
-
-    private static void TryPush(JsonSchema? schema, Stack<JsonSchema> stack)
-    {
-        if (schema == null)
-        {
-            return;
-        }
-
-        stack.Push(schema);
     }
 }

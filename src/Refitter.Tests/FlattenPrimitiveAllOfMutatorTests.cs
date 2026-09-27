@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using NJsonSchema;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -12,7 +10,7 @@ public class FlattenPrimitiveAllOfMutatorTests
     [Test]
     public async Task Mutate_WithSingleStringAllOf_CollapsesToString()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -32,29 +30,29 @@ public class FlattenPrimitiveAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new FlattenPrimitiveAllOfMutator().Mutate(document);
 
         var parent = document.Components!.Schemas["TestModel"]
             .ActualSchema.Properties["parent"].ActualSchema;
 
-        parent.Type.Should().Be(JsonObjectType.String);
+        parent.Type.Should().Be(ApiObjectType.String);
         parent.AllOf.Should().BeEmpty();
         parent.Description.Should().Be("the parent id");
     }
 
     [Test]
-    [Arguments("integer", "int64", JsonObjectType.Integer)]
-    [Arguments("number", "double", JsonObjectType.Number)]
-    [Arguments("boolean", null, JsonObjectType.Boolean)]
+    [Arguments("integer", "int64")]
+    [Arguments("number", "double")]
+    [Arguments("boolean", null)]
     public async Task Mutate_WithSinglePrimitiveAllOf_CollapsesToPrimitive(
         string jsonType,
-        string? format,
-        JsonObjectType expectedType)
+        string? format)
     {
+        var expectedType = ApiObjectTypeExtensions.Parse(jsonType);
         var formatJson = format == null ? "" : $", \"format\": \"{format}\"";
-        var document = await OpenApiDocument.FromJsonAsync($$"""
+        var document = ApiDocumentLoader.Load($$"""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -74,7 +72,7 @@ public class FlattenPrimitiveAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new FlattenPrimitiveAllOfMutator().Mutate(document);
 
@@ -90,7 +88,7 @@ public class FlattenPrimitiveAllOfMutatorTests
     [Test]
     public async Task Mutate_WithSingleEnumAllOf_PreservesEnumeration()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -110,14 +108,14 @@ public class FlattenPrimitiveAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new FlattenPrimitiveAllOfMutator().Mutate(document);
 
         var priority = document.Components!.Schemas["TestModel"]
             .ActualSchema.Properties["priority"].ActualSchema;
 
-        priority.Type.Should().Be(JsonObjectType.String);
+        priority.Type.Should().Be(ApiObjectType.String);
         priority.AllOf.Should().BeEmpty();
         priority.IsEnumeration.Should().BeTrue();
         priority.Enumeration.Should().BeEquivalentTo(new[] { "low", "medium", "high" });
@@ -126,7 +124,7 @@ public class FlattenPrimitiveAllOfMutatorTests
     [Test]
     public async Task Mutate_WithRefToPrimitiveAllOf_CollapsesToPrimitive()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -147,21 +145,21 @@ public class FlattenPrimitiveAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new FlattenPrimitiveAllOfMutator().Mutate(document);
 
         var id = document.Components!.Schemas["TestModel"]
             .ActualSchema.Properties["id"].ActualSchema;
 
-        id.Type.Should().Be(JsonObjectType.String);
+        id.Type.Should().Be(ApiObjectType.String);
         id.AllOf.Should().BeEmpty();
     }
 
     [Test]
     public async Task Mutate_WithRefToObjectAllOf_LeavesSchemaUnchanged()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -180,19 +178,19 @@ public class FlattenPrimitiveAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new FlattenPrimitiveAllOfMutator().Mutate(document);
 
         var actual = document.Components!.Schemas["TestModel"].ActualSchema;
-        actual.Type.Should().Be(JsonObjectType.Object);
+        actual.Type.Should().Be(ApiObjectType.Object);
         actual.Properties.Should().ContainKey("name");
     }
 
     [Test]
     public async Task Mutate_WithObjectPropertiesAndAllOf_LeavesSchemaUnchanged()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -208,7 +206,7 @@ public class FlattenPrimitiveAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new FlattenPrimitiveAllOfMutator().Mutate(document);
 
@@ -219,7 +217,7 @@ public class FlattenPrimitiveAllOfMutatorTests
     [Test]
     public async Task Mutate_WithMultipleAllOfItems_LeavesSchemaUnchanged()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -239,7 +237,7 @@ public class FlattenPrimitiveAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new FlattenPrimitiveAllOfMutator().Mutate(document);
 
@@ -250,7 +248,7 @@ public class FlattenPrimitiveAllOfMutatorTests
     [Test]
     public async Task Mutate_WithSingleEnumAllOf_PreservesEnumerationNames()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -274,7 +272,7 @@ public class FlattenPrimitiveAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new FlattenPrimitiveAllOfMutator().Mutate(document);
 

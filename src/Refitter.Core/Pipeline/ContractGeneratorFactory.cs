@@ -8,12 +8,12 @@ internal sealed class ContractGeneratorFactory
     private readonly ICodeGenerationConfiguration codeGeneration;
     private readonly INamingConfiguration naming;
     private readonly ApiDocument document;
-    private readonly IReadOnlyList<IApiDocumentMutator> mutators;
+    private readonly IReadOnlyList<IDocumentMutator> mutators;
 
     public ContractGeneratorFactory(
         RefitGeneratorSettings settings,
         ApiDocument document,
-        IReadOnlyList<IApiDocumentMutator>? mutators = null)
+        IReadOnlyList<IDocumentMutator>? mutators = null)
     {
         codeGeneration = settings;
         naming = settings;
@@ -21,13 +21,13 @@ internal sealed class ContractGeneratorFactory
         this.mutators = mutators ?? CreateDefaultMutators(settings);
     }
 
-    private static IReadOnlyList<IApiDocumentMutator> CreateDefaultMutators(RefitGeneratorSettings settings) =>
+    private static IReadOnlyList<IDocumentMutator> CreateDefaultMutators(RefitGeneratorSettings settings) =>
     [
-        new DisableAdditionalPropertiesApiMutator(settings.GenerateDefaultAdditionalProperties),
-        new FlattenPrimitiveAllOfApiMutator(),
-        new OneOfDiscriminatorToAllOfApiMutator(),
-        new FixMissingIntegerTypesApiMutator(),
-        new CustomIntegerTypeApiMutator(settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32),
+        new DisableAdditionalPropertiesMutator(settings.GenerateDefaultAdditionalProperties),
+        new FlattenPrimitiveAllOfMutator(),
+        new OneOfDiscriminatorToAllOfMutator(),
+        new FixMissingIntegerTypesMutator(),
+        new CustomIntegerTypeMutator(settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32),
     ];
 
     public ContractGenerator Create()

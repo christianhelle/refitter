@@ -1,19 +1,16 @@
 using AwesomeAssertions;
-using NJsonSchema;
-using NJsonSchema.CodeGeneration.CSharp;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
-public class CSharpClientGeneratorFactoryIntegrationTests
+public class ContractGeneratorFactoryIntegrationTests
 {
     [Test]
     public async Task Create_AppliesMutatorsInOrder_BeforeBuildingGenerator()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -36,7 +33,7 @@ public class CSharpClientGeneratorFactoryIntegrationTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var settings = new RefitGeneratorSettings
         {
@@ -47,7 +44,7 @@ public class CSharpClientGeneratorFactoryIntegrationTests
             },
         };
 
-        var mutators = new IOpenApiDocumentMutator[]
+        var mutators = new IDocumentMutator[]
         {
             new DisableAdditionalPropertiesMutator(settings.GenerateDefaultAdditionalProperties),
             new OneOfDiscriminatorToAllOfMutator(),
@@ -56,19 +53,19 @@ public class CSharpClientGeneratorFactoryIntegrationTests
                 settings.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32),
         };
 
-        var factory = new CSharpClientGeneratorFactory(settings, document, mutators);
+        var factory = new ContractGeneratorFactory(settings, document, mutators);
         var generator = factory.Create();
 
         generator.Should().NotBeNull();
         generator.Settings.Should().NotBeNull();
-        generator.Settings.CSharpGeneratorSettings.Should().NotBeNull();
-        generator.Settings.CSharpGeneratorSettings.Namespace.Should().Be("TestNamespace");
+        generator.Settings.Should().NotBeNull();
+        generator.Settings.Namespace.Should().Be("TestNamespace");
     }
 
     [Test]
     public async Task Create_WithExplicitMutators_AppliesAllMutations()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -85,7 +82,7 @@ public class CSharpClientGeneratorFactoryIntegrationTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var settings = new RefitGeneratorSettings
         {
@@ -96,25 +93,25 @@ public class CSharpClientGeneratorFactoryIntegrationTests
             },
         };
 
-        var mutators = new IOpenApiDocumentMutator[]
+        var mutators = new IDocumentMutator[]
         {
             new FixMissingIntegerTypesMutator(),
             new CustomIntegerTypeMutator(IntegerType.Int64),
         };
 
-        var factory = new CSharpClientGeneratorFactory(settings, document, mutators);
+        var factory = new ContractGeneratorFactory(settings, document, mutators);
         factory.Create();
 
         var props = document.Components!.Schemas["TestModel"].ActualSchema.Properties;
 
-        props["missingType"].ActualSchema.Type.Should().Be(JsonObjectType.Integer);
+        props["missingType"].ActualSchema.Type.Should().Be(ApiObjectType.Integer);
         props["integerNoFormat"].ActualSchema.Format.Should().Be("int64");
     }
 
     [Test]
     public async Task Create_WithDefaultMutators_UsesStandardMutationOrder()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -134,7 +131,7 @@ public class CSharpClientGeneratorFactoryIntegrationTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var settings = new RefitGeneratorSettings
         {
@@ -142,26 +139,26 @@ public class CSharpClientGeneratorFactoryIntegrationTests
             UsePolymorphicSerialization = true,
         };
 
-        var factory = new CSharpClientGeneratorFactory(settings, document);
+        var factory = new ContractGeneratorFactory(settings, document);
         var generator = factory.Create();
 
         var vehicle = document.Components!.Schemas["Vehicle"].ActualSchema;
         vehicle.OneOf.Should().BeEmpty();
 
-        generator.Settings.CSharpGeneratorSettings.TemplateFactory
-            .Should().NotBeNull();
+        generator.Settings.JsonPolymorphicSerializationStyle
+            .Should().Be(ContractPolymorphicSerializationStyle.SystemTextJson);
     }
 
     [Test]
     public async Task Create_WithCodeGeneratorSettings_AppliesExplictPropertyCopies()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
               "paths": {}
             }
-            """);
+            """, null, isYaml: false);
 
         var settings = new RefitGeneratorSettings
         {
@@ -174,37 +171,37 @@ public class CSharpClientGeneratorFactoryIntegrationTests
             },
         };
 
-        var factory = new CSharpClientGeneratorFactory(settings, document);
+        var factory = new ContractGeneratorFactory(settings, document);
         var generator = factory.Create();
 
-        generator.Settings.CSharpGeneratorSettings.GenerateDataAnnotations
+        generator.Settings.GenerateDataAnnotations
             .Should().BeFalse();
-        generator.Settings.CSharpGeneratorSettings.ExcludedTypeNames
+        generator.Settings.ExcludedTypeNames
             .Should().Contain("SomeType");
-        generator.Settings.CSharpGeneratorSettings.GenerateNativeRecords
+        generator.Settings.GenerateNativeRecords
             .Should().BeTrue();
     }
 
     [Test]
     public async Task Create_WithoutCodeGeneratorSettings_DoesNotThrow()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
               "paths": {}
             }
-            """);
+            """, null, isYaml: false);
 
         var settings = new RefitGeneratorSettings
         {
             Namespace = "TestNamespace",
         };
 
-        var factory = new CSharpClientGeneratorFactory(settings, document);
+        var factory = new ContractGeneratorFactory(settings, document);
         var generator = factory.Create();
 
         generator.Should().NotBeNull();
-        generator.Settings.CSharpGeneratorSettings.Namespace.Should().Be("TestNamespace");
+        generator.Settings.Namespace.Should().Be("TestNamespace");
     }
 }

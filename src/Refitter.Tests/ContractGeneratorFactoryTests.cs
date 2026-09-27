@@ -6,7 +6,7 @@ using TUnit.Core;
 
 namespace Refitter.Tests;
 
-public class CSharpClientGeneratorFactoryTests
+public class ContractGeneratorFactoryTests
 {
     #region ProcessSchemaForIntegerType Tests
 
