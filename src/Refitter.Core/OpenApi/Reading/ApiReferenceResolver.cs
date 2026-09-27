@@ -265,7 +265,7 @@ internal sealed class ApiReferenceResolver
         }
         else if (documentPath != null)
         {
-            var parts = Regex.Split(referencePath, "(?=#)");
+            var parts = Regex.Split(referencePath, "(?=#)", RegexOptions.None, TimeSpan.FromSeconds(1));
             location = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(documentPath) ?? string.Empty, parts[0])) +
                        (parts.Length > 1 ? parts[1] : string.Empty);
         }

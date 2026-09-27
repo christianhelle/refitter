@@ -8,7 +8,7 @@ namespace Refitter.Core;
 /// </summary>
 internal sealed class ApiParameter : ApiSchema
 {
-    private static readonly Regex AppJsonRegex = new(@"application\/(\S+?)?\+?json;?(\S+)?", RegexOptions.Compiled);
+    private static readonly Regex AppJsonRegex = new(@"application\/(\S+?)?\+?json;?(\S+)?", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     private string name = string.Empty;
     private ApiParameterKind kind;
@@ -381,7 +381,7 @@ internal sealed class ApiMediaType
 /// <summary>A response of an operation.</summary>
 internal sealed class ApiResponse
 {
-    private static readonly Regex AppJsonRegex = new(@"application\/(\S+?)?\+?json;?(\S+)?", RegexOptions.Compiled);
+    private static readonly Regex AppJsonRegex = new(@"application\/(\S+?)?\+?json;?(\S+)?", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     private ApiResponse? reference;
 

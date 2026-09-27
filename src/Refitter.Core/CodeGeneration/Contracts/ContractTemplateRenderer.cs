@@ -24,19 +24,23 @@ internal sealed class ContractTemplateRenderer
 
     private static readonly Regex TabCountRegex = new(
         @"(\s*)?\{%(-)?\s+template\s+([a-zA-Z0-9_.]+)(\s*?.*?)\s(-)?%}",
-        RegexOptions.Compiled | RegexOptions.Singleline);
+        RegexOptions.Compiled | RegexOptions.Singleline,
+        TimeSpan.FromSeconds(5));
 
     private static readonly Regex CSharpDocsRegex = new(
         "(\n( )*)([^\n]*?) \\| csharpdocs }}",
-        RegexOptions.Compiled | RegexOptions.Singleline);
+        RegexOptions.Compiled | RegexOptions.Singleline,
+        TimeSpan.FromSeconds(5));
 
     private static readonly Regex TabRegex = new(
         "(\n( )*)([^\n]*?) \\| tab }}",
-        RegexOptions.Compiled | RegexOptions.Singleline);
+        RegexOptions.Compiled | RegexOptions.Singleline,
+        TimeSpan.FromSeconds(5));
 
     private static readonly Regex EmptyTemplateCleanupRegex = new(
         "^[ ]+__EMPTY-TEMPLATE__$[\\n]{0,1}",
-        RegexOptions.Multiline | RegexOptions.Compiled);
+        RegexOptions.Multiline | RegexOptions.Compiled,
+        TimeSpan.FromSeconds(5));
 
     private static readonly ConcurrentDictionary<(string Template, string Directory), IFluidTemplate> Templates = new();
 

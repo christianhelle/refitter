@@ -21,7 +21,7 @@ internal static class ConversionUtilities
     private static readonly char[] CamelCaseCleanupChars = [' ', '/'];
     private static readonly char[] WhiteSpaceChars = ['\n', '\r', '\t', ' '];
     private static readonly char[] CSharpDocLineBreakChars = ['\r', '\n'];
-    private static readonly Regex CSharpDocLineBreakRegex = new("^( *)/// ", RegexOptions.Multiline | RegexOptions.Compiled);
+    private static readonly Regex CSharpDocLineBreakRegex = new("^( *)/// ", RegexOptions.Multiline | RegexOptions.Compiled, TimeSpan.FromSeconds(5));
 
     public static string ConvertToLowerCamelCase(string? input, bool firstCharacterMustBeAlpha) =>
         ConvertToCamelCase(input, firstCharacterMustBeAlpha, CamelCaseMode.FirstLower);

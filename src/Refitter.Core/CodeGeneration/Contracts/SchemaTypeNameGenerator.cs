@@ -16,8 +16,8 @@ internal interface ISchemaTypeNameGenerator
 internal class SchemaTypeNameGenerator : ISchemaTypeNameGenerator
 {
     private static readonly char[] TypeNameHintCleanupChars = ['[', ']', '<', '>', ',', ' '];
-    private static readonly Regex NonWordCharacterRegex = new(@"\W", RegexOptions.Compiled);
-    private static readonly Regex RepeatedUnderscoreRegex = new("[_]{2,}", RegexOptions.Compiled);
+    private static readonly Regex NonWordCharacterRegex = new(@"\W", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+    private static readonly Regex RepeatedUnderscoreRegex = new("[_]{2,}", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
     private readonly string[] reservedTypeNames = ["object"];
 
     public virtual string Generate(ApiSchema schema, string? typeNameHint, IEnumerable<string> reservedTypeNames)

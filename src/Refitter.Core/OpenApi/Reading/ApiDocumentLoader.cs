@@ -21,7 +21,8 @@ internal static class ApiDocumentLoader
 
     private static readonly Regex SchemaTypeRegex = new(
         "(?:\\\"(?<schemaType>openapi|swagger)\\\")(?:\\s*:\\s*)(?:\\\"(?<schemaVersion>[^\"]*)\\\")",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        RegexOptions.IgnoreCase | RegexOptions.Compiled,
+        TimeSpan.FromSeconds(5));
 
     public static ApiDocument LoadFile(string path) =>
         Load(File.ReadAllText(path), path, PathUtilities.IsYaml(path));

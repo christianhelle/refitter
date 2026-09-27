@@ -8,7 +8,7 @@ namespace Refitter.Core;
 /// </summary>
 internal sealed class ContractValueGenerator(ContractGeneratorSettings settings)
 {
-    private static readonly Regex NumberRegex = new(@"^[0-9]+(\.[0-9]+)?$", RegexOptions.Compiled);
+    private static readonly Regex NumberRegex = new(@"^[0-9]+(\.[0-9]+)?$", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     private static readonly HashSet<string> UnsupportedFormatStrings = new(StringComparer.Ordinal)
     {
