@@ -472,6 +472,7 @@ internal sealed class ApiJsonReader
                     securityScheme.Type = ReadEnum(
                         value,
                         ApiSecuritySchemeType.Undefined,
+                        ("undefined", ApiSecuritySchemeType.Undefined),
                         ("basic", ApiSecuritySchemeType.Basic),
                         ("apiKey", ApiSecuritySchemeType.ApiKey),
                         ("oauth2", ApiSecuritySchemeType.OAuth2),
