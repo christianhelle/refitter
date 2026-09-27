@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -11,7 +10,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     [Test]
     public async Task Mutate_WithOneOfAndDiscriminator_AddsAllOfToSubtypes()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -36,7 +35,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new OneOfDiscriminatorToAllOfMutator();
         sut.Mutate(document);
@@ -46,7 +45,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         var truck = document.Components!.Schemas["Truck"].ActualSchema;
 
         vehicle.OneOf.Should().BeEmpty();
-        vehicle.Type.Should().Be(NJsonSchema.JsonObjectType.Object);
+        vehicle.Type.Should().Be(ApiObjectType.Object);
 
         car.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == vehicle);
         truck.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == vehicle);
@@ -55,7 +54,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     [Test]
     public async Task Mutate_WithAnyOfAndDiscriminator_AddsAllOfToSubtypes()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -80,7 +79,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new OneOfDiscriminatorToAllOfMutator();
         sut.Mutate(document);
@@ -90,7 +89,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         var bankTransfer = document.Components!.Schemas["BankTransfer"].ActualSchema;
 
         payment.AnyOf.Should().BeEmpty();
-        payment.Type.Should().Be(NJsonSchema.JsonObjectType.Object);
+        payment.Type.Should().Be(ApiObjectType.Object);
 
         creditCard.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == payment);
         bankTransfer.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == payment);
@@ -99,7 +98,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     [Test]
     public async Task Mutate_WithoutDiscriminator_DoesNotChangeSchemas()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -113,7 +112,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var expectedOneOf = document.Components!.Schemas["TestModel"].ActualSchema.OneOf.Count;
 
@@ -127,13 +126,13 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     [Test]
     public async Task Mutate_WithNoComponentsSchemas_DoesNotThrow()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
               "paths": {}
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new OneOfDiscriminatorToAllOfMutator();
         var act = () => sut.Mutate(document);
@@ -144,7 +143,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     [Test]
     public async Task Mutate_WithDiscriminatorButNoUnionSchemas_DoesNotChange()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -159,19 +158,19 @@ public class OneOfDiscriminatorToAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new OneOfDiscriminatorToAllOfMutator();
         sut.Mutate(document);
 
         document.Components!.Schemas["Base"].ActualSchema.Type
-            .Should().Be(NJsonSchema.JsonObjectType.Object);
+            .Should().Be(ApiObjectType.Object);
     }
 
     [Test]
     public void Mutate_WithoutComponents_DoesNothing()
     {
-        var document = new OpenApiDocument
+        var document = new ApiDocument
         {
             Info = new() { Title = "Test", Version = "1.0" }
         };
@@ -188,7 +187,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     {
         // Two union members keep NJsonSchema from collapsing Vehicle.ActualSchema onto the
         // single referenced subtype, so the mutator actually inspects the subtypes.
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -215,7 +214,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var vehicle = document.Components!.Schemas["Vehicle"].ActualSchema;
 
@@ -234,7 +233,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     [Test]
     public async Task Mutate_Without_Discriminator_Does_Not_Add_Inheritance()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -250,7 +249,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new OneOfDiscriminatorToAllOfMutator();
         sut.Mutate(document);

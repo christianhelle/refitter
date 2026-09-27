@@ -1,27 +1,21 @@
-using NJsonSchema;
-using NSwag;
-
 namespace Refitter.Core;
 
-internal sealed class FixMissingIntegerTypesMutator : IOpenApiDocumentMutator
+/// <summary>Gives schemas with an integer or number format but no type that type.</summary>
+internal sealed class FixMissingIntegerTypesMutator : IDocumentMutator
 {
-    public void Mutate(OpenApiDocument document)
-    {
-        SchemaWalker.TraverseDocumentSchemas(document, FixSchemaTypeFromFormat);
-    }
+    public void Mutate(ApiDocument document) => SchemaWalker.TraverseDocumentSchemas(document, Fix);
 
-    private static void FixSchemaTypeFromFormat(JsonSchema schema)
+    private static void Fix(ApiSchema schema)
     {
-        if ((schema.Type == JsonObjectType.None || schema.Type == JsonObjectType.Null) &&
-            !string.IsNullOrEmpty(schema.Format))
+        if ((schema.Type == ApiObjectType.None || schema.Type == ApiObjectType.Null) && !string.IsNullOrEmpty(schema.Format))
         {
-            if (schema.Format == "int32" || schema.Format == "int64")
+            if (schema.Format is "int32" or "int64")
             {
-                schema.Type = JsonObjectType.Integer;
+                schema.Type = ApiObjectType.Integer;
             }
-            else if (schema.Format == "float" || schema.Format == "double")
+            else if (schema.Format is "float" or "double")
             {
-                schema.Type = JsonObjectType.Number;
+                schema.Type = ApiObjectType.Number;
             }
         }
     }

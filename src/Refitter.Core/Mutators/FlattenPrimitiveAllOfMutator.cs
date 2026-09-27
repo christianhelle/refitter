@@ -1,40 +1,28 @@
-using NJsonSchema;
-using NSwag;
-
 namespace Refitter.Core;
 
 /// <summary>
-/// Collapses a schema whose <c>allOf</c> contains a single primitive sub-schema
-/// (e.g. <c>{ "allOf": [ { "type": "string" } ] }</c>) into that primitive type.
+/// Collapses a schema whose <c>allOf</c> contains a single primitive sub-schema (e.g. a <c>$ref</c> wrapped to add a
+/// description) into that primitive type, so no class is generated that derives from a primitive type.
 /// </summary>
-/// <remarks>
-/// OpenAPI specifications frequently wrap a primitive in <c>allOf</c> purely to
-/// attach a description (since a sibling <c>description</c> next to a <c>$ref</c>
-/// is not allowed in OpenAPI 3.0). NSwag treats every <c>allOf</c> as
-/// composition and would otherwise generate a class deriving from the primitive
-/// type, e.g. <c>public partial class Parent : string</c>, which is invalid C#
-/// because <see cref="string"/> and the other primitive types are sealed.
-/// </remarks>
-internal sealed class FlattenPrimitiveAllOfMutator : IOpenApiDocumentMutator
+internal sealed class FlattenPrimitiveAllOfMutator : IDocumentMutator
 {
-    public void Mutate(OpenApiDocument document)
-    {
-        SchemaWalker.TraverseDocumentSchemas(document, Flatten);
-    }
+    public void Mutate(ApiDocument document) => SchemaWalker.TraverseDocumentSchemas(document, Flatten);
 
-    private static void Flatten(JsonSchema schema)
+    private static void Flatten(ApiSchema schema)
     {
         if (schema.AllOf.Count != 1)
             return;
 
-        if (schema.Type == JsonObjectType.Object ||
+        if (schema.Type == ApiObjectType.Object ||
             schema.Properties.Count != 0 ||
             schema.OneOf.Count != 0 ||
             schema.AnyOf.Count != 0)
+        {
             return;
+        }
 
-        JsonSchema? inner = schema.AllOf.First().ActualSchema;
-        if (inner == null || !IsPrimitive(inner.Type))
+        var inner = schema.AllOf.First().ActualSchema;
+        if (!IsPrimitive(inner.Type))
             return;
 
         schema.Type = inner.Type;
@@ -45,19 +33,16 @@ internal sealed class FlattenPrimitiveAllOfMutator : IOpenApiDocumentMutator
 
         if (inner.IsEnumeration)
         {
-            foreach (object? value in inner.Enumeration)
+            foreach (var value in inner.Enumeration)
                 schema.Enumeration.Add(value);
 
-            foreach (string name in inner.EnumerationNames)
+            foreach (var name in inner.EnumerationNames)
                 schema.EnumerationNames.Add(name);
         }
 
         schema.AllOf.Clear();
     }
 
-    private static bool IsPrimitive(JsonObjectType type) =>
-        type == JsonObjectType.String ||
-        type == JsonObjectType.Integer ||
-        type == JsonObjectType.Number ||
-        type == JsonObjectType.Boolean;
+    private static bool IsPrimitive(ApiObjectType type) =>
+        type is ApiObjectType.String or ApiObjectType.Integer or ApiObjectType.Number or ApiObjectType.Boolean;
 }

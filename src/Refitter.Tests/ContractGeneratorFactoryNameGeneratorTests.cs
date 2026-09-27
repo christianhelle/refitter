@@ -1,11 +1,10 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
 namespace Refitter.Tests;
 
-public class CSharpClientGeneratorFactoryNameGeneratorTests
+public class ContractGeneratorFactoryNameGeneratorTests
 {
     private sealed class StubParameterNameProvider : IParameterNameProvider
     {
@@ -17,8 +16,8 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         public string GetPropertyName(PropertyNameContext context) => "Provided" + context.Name;
     }
 
-    private static Task<OpenApiDocument> CreateDocumentAsync() =>
-        OpenApiDocument.FromJsonAsync("""
+    private static Task<ApiDocument> CreateDocumentAsync() =>
+        Task.FromResult(ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -32,7 +31,7 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false));
 
     [Test]
     public async Task Create_WithParameterNameProvider_UsesIt()
@@ -45,10 +44,10 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
             ParameterNameProvider = parameterNameProvider,
         };
 
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
 
         generator.Settings.ParameterNameGenerator
-            .Should().BeOfType<ParameterNameProviderAdapter>()
+            .Should().BeOfType<ProviderOperationParameterNameGenerator>()
             .Which.Provider.Should().BeSameAs(parameterNameProvider);
     }
 
@@ -58,10 +57,10 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         var document = await CreateDocumentAsync();
         var settings = new RefitGeneratorSettings { Namespace = "TestNamespace" };
 
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
 
         generator.Settings.ParameterNameGenerator.Should().NotBeNull();
-        generator.Settings.ParameterNameGenerator.Should().NotBeOfType<ParameterNameProviderAdapter>();
+        generator.Settings.ParameterNameGenerator.Should().NotBeOfType<ProviderOperationParameterNameGenerator>();
     }
 
     [Test]
@@ -78,11 +77,11 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
             },
         };
 
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
 
-        generator.Settings.CSharpGeneratorSettings.PropertyNameGenerator
-            .Should().BeOfType<UniquePropertyNameGenerator>()
-            .Which.Inner.Should().BeOfType<PropertyNameProviderAdapter>()
+        generator.Settings.PropertyNameGenerator
+            .Should().BeOfType<UniqueContractPropertyNameGenerator>()
+            .Which.Inner.Should().BeOfType<ProviderContractPropertyNameGenerator>()
             .Which.Provider.Should().BeSameAs(propertyNameProvider);
     }
 
@@ -96,11 +95,11 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
             PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal,
         };
 
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
 
-        generator.Settings.CSharpGeneratorSettings.PropertyNameGenerator
-            .Should().BeOfType<UniquePropertyNameGenerator>()
-            .Which.Inner.Should().BeOfType<PreserveOriginalPropertyNameGenerator>();
+        generator.Settings.PropertyNameGenerator
+            .Should().BeOfType<UniqueContractPropertyNameGenerator>()
+            .Which.Inner.Should().BeOfType<PreserveOriginalContractPropertyNameGenerator>();
     }
 
     [Test]
@@ -109,10 +108,10 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         var document = await CreateDocumentAsync();
         var settings = new RefitGeneratorSettings { Namespace = "TestNamespace" };
 
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
 
-        generator.Settings.CSharpGeneratorSettings.PropertyNameGenerator
-            .Should().BeOfType<UniquePropertyNameGenerator>()
-            .Which.Inner.Should().BeOfType<CustomCSharpPropertyNameGenerator>();
+        generator.Settings.PropertyNameGenerator
+            .Should().BeOfType<UniqueContractPropertyNameGenerator>()
+            .Which.Inner.Should().BeOfType<ContractPropertyNameGenerator>();
     }
 }

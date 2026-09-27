@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using NJsonSchema;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -12,7 +10,7 @@ public class CustomIntegerTypeMutatorTests
     [Test]
     public async Task Mutate_WithInt64_AddsInt64FormatToIntegerSchemasWithoutFormat()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -28,7 +26,7 @@ public class CustomIntegerTypeMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new CustomIntegerTypeMutator(IntegerType.Int64);
         sut.Mutate(document);
@@ -43,7 +41,7 @@ public class CustomIntegerTypeMutatorTests
     [Test]
     public async Task Mutate_WithInt32_DoesNotAddFormat()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -59,7 +57,7 @@ public class CustomIntegerTypeMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new CustomIntegerTypeMutator(IntegerType.Int32);
         sut.Mutate(document);
@@ -74,7 +72,7 @@ public class CustomIntegerTypeMutatorTests
     [Test]
     public async Task Mutate_WithInt64_DoesNotChangeIntegerSchemaWithExistingFormat()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -90,7 +88,7 @@ public class CustomIntegerTypeMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new CustomIntegerTypeMutator(IntegerType.Int64);
         sut.Mutate(document);
@@ -105,7 +103,7 @@ public class CustomIntegerTypeMutatorTests
     [Test]
     public async Task Mutate_WithInt64_OnlyAffectsIntegerSchemas()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -123,7 +121,7 @@ public class CustomIntegerTypeMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new CustomIntegerTypeMutator(IntegerType.Int64);
         sut.Mutate(document);
@@ -137,7 +135,7 @@ public class CustomIntegerTypeMutatorTests
     [Test]
     public async Task Mutate_WithInt64_AppliesToArrayItemSchemas()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -156,7 +154,7 @@ public class CustomIntegerTypeMutatorTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         var sut = new CustomIntegerTypeMutator(IntegerType.Int64);
         sut.Mutate(document);

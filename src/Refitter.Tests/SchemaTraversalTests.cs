@@ -27,7 +27,7 @@ public class SchemaTraversalTests
             """, null, isYaml: false);
 
         var visited = new List<ApiSchema>();
-        ApiSchemaWalker.TraverseDocumentSchemas(document, visited.Add);
+        SchemaWalker.TraverseDocumentSchemas(document, visited.Add);
 
         visited.Select(s => s.Type).Should().Contain(ApiObjectType.String);
     }
@@ -53,7 +53,7 @@ public class SchemaTraversalTests
         document.Components.Schemas["Root"].Items.Add(tupleItem);
 
         var visited = new List<ApiSchema>();
-        ApiSchemaWalker.TraverseDocumentSchemas(document, visited.Add);
+        SchemaWalker.TraverseDocumentSchemas(document, visited.Add);
 
         visited.Should().Contain(tupleItem);
     }
@@ -80,7 +80,7 @@ public class SchemaTraversalTests
             """, null, isYaml: false);
 
         var visited = new List<ApiSchema>();
-        ApiSchemaWalker.TraverseDocumentSchemas(document, visited.Add);
+        SchemaWalker.TraverseDocumentSchemas(document, visited.Add);
 
         visited.Select(s => s.Type).Should().Contain(ApiObjectType.Boolean);
     }

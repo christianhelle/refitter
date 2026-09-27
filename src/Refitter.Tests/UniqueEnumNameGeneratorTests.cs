@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NJsonSchema;
 using Refitter.Core;
 
 namespace Refitter.Tests;
@@ -11,7 +10,7 @@ public class UniqueEnumNameGeneratorTests
     {
         var schema = CreateStringEnum("a", "A", "b", "a-");
 
-        var names = GenerateAll(new UniqueEnumNameGenerator(), schema);
+        var names = GenerateAll(new UniqueContractEnumNameGenerator(), schema);
 
         names.Should().Equal("A", "A2", "B", "A3");
     }
@@ -21,7 +20,7 @@ public class UniqueEnumNameGeneratorTests
     {
         var schema = CreateStringEnum("available", "pending", "sold");
 
-        var names = GenerateAll(new UniqueEnumNameGenerator(), schema);
+        var names = GenerateAll(new UniqueContractEnumNameGenerator(), schema);
 
         names.Should().Equal("Available", "Pending", "Sold");
     }
@@ -31,7 +30,7 @@ public class UniqueEnumNameGeneratorTests
     {
         var schema = CreateStringEnum("a", "A2", "A");
 
-        var names = GenerateAll(new UniqueEnumNameGenerator(), schema);
+        var names = GenerateAll(new UniqueContractEnumNameGenerator(), schema);
 
         names.Should().Equal("A", "A2", "A3");
     }
@@ -39,14 +38,14 @@ public class UniqueEnumNameGeneratorTests
     [Test]
     public void Uses_Enumeration_Names_And_Integer_Value_Names()
     {
-        var schema = new JsonSchema { Type = JsonObjectType.Integer };
+        var schema = new ApiSchema { Type = ApiObjectType.Integer };
         schema.Enumeration.Add(1);
         schema.Enumeration.Add(2);
         schema.Enumeration.Add(3);
         schema.EnumerationNames.Add("One");
         schema.EnumerationNames.Add("one");
 
-        var names = GenerateAll(new UniqueEnumNameGenerator(), schema);
+        var names = GenerateAll(new UniqueContractEnumNameGenerator(), schema);
 
         names.Should().Equal("One", "One2", "_3");
     }
@@ -56,7 +55,7 @@ public class UniqueEnumNameGeneratorTests
     {
         var schema = CreateStringEnum("a", null, "A");
 
-        var generator = new UniqueEnumNameGenerator();
+        var generator = new UniqueContractEnumNameGenerator();
 
         generator.Generate(0, "a", "a", schema).Should().Be("A");
         generator.Generate(2, "A", "A", schema).Should().Be("A2");
@@ -66,15 +65,15 @@ public class UniqueEnumNameGeneratorTests
     public void Returns_The_Same_Names_When_Enumerated_Again()
     {
         var schema = CreateStringEnum("a", "A");
-        var generator = new UniqueEnumNameGenerator();
+        var generator = new UniqueContractEnumNameGenerator();
 
         GenerateAll(generator, schema).Should().Equal("A", "A2");
         GenerateAll(generator, schema).Should().Equal("A", "A2");
     }
 
-    private static JsonSchema CreateStringEnum(params string?[] values)
+    private static ApiSchema CreateStringEnum(params string?[] values)
     {
-        var schema = new JsonSchema { Type = JsonObjectType.String };
+        var schema = new ApiSchema { Type = ApiObjectType.String };
         foreach (var value in values)
         {
             schema.Enumeration.Add(value);
@@ -83,7 +82,7 @@ public class UniqueEnumNameGeneratorTests
         return schema;
     }
 
-    private static List<string> GenerateAll(UniqueEnumNameGenerator generator, JsonSchema schema) =>
+    private static List<string> GenerateAll(UniqueContractEnumNameGenerator generator, ApiSchema schema) =>
         schema.Enumeration
             .Select((value, index) => (value, index))
             .Where(x => x.value is not null)

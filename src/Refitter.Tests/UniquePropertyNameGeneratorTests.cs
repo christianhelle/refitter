@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NJsonSchema;
 using Refitter.Core;
 
 namespace Refitter.Tests;
@@ -11,7 +10,7 @@ public class UniquePropertyNameGeneratorTests
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "user_name", "userName", "UserName", "email");
 
-        var names = GenerateAll(new UniquePropertyNameGenerator(new CustomCSharpPropertyNameGenerator(), _ => null), schema);
+        var names = GenerateAll(new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => null), schema);
 
         names.Should().Equal("UserName", "UserName2", "UserName3", "Email");
     }
@@ -21,7 +20,7 @@ public class UniquePropertyNameGeneratorTests
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "order", "id");
 
-        var names = GenerateAll(new UniquePropertyNameGenerator(new CustomCSharpPropertyNameGenerator(), _ => "Order"), schema);
+        var names = GenerateAll(new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => "Order"), schema);
 
         names.Should().Equal("Order2", "Id");
     }
@@ -31,7 +30,7 @@ public class UniquePropertyNameGeneratorTests
     {
         var schema = CreateSchema(allowAdditionalProperties: true, "AdditionalProperties");
 
-        var names = GenerateAll(new UniquePropertyNameGenerator(new CustomCSharpPropertyNameGenerator(), _ => null), schema);
+        var names = GenerateAll(new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => null), schema);
 
         names.Should().Equal("AdditionalProperties2");
     }
@@ -41,7 +40,7 @@ public class UniquePropertyNameGeneratorTests
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "AdditionalProperties");
 
-        var names = GenerateAll(new UniquePropertyNameGenerator(new CustomCSharpPropertyNameGenerator(), _ => null), schema);
+        var names = GenerateAll(new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => null), schema);
 
         names.Should().Equal("AdditionalProperties");
     }
@@ -50,9 +49,9 @@ public class UniquePropertyNameGeneratorTests
     public void Reserves_Additional_Properties_For_Typed_Additional_Properties()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "AdditionalProperties");
-        schema.AdditionalPropertiesSchema = new JsonSchema { Type = JsonObjectType.String };
+        schema.AdditionalPropertiesSchema = new ApiSchema { Type = ApiObjectType.String };
 
-        var names = GenerateAll(new UniquePropertyNameGenerator(new CustomCSharpPropertyNameGenerator(), _ => null), schema);
+        var names = GenerateAll(new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => null), schema);
 
         names.Should().Equal("AdditionalProperties2");
     }
@@ -61,9 +60,9 @@ public class UniquePropertyNameGeneratorTests
     public void Ignores_Inheritance_Discriminator_Properties_That_Are_Not_Emitted()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "$type", "type");
-        schema.DiscriminatorObject = new OpenApiDiscriminator { PropertyName = "$type" };
+        schema.DiscriminatorObject = new ApiDiscriminator { PropertyName = "$type" };
 
-        var names = GenerateAll(new UniquePropertyNameGenerator(new CustomCSharpPropertyNameGenerator(), _ => null), schema);
+        var names = GenerateAll(new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => null), schema);
 
         names.Should().Equal("Type", "Type");
     }
@@ -71,9 +70,9 @@ public class UniquePropertyNameGeneratorTests
     [Test]
     public void Delegates_To_Inner_Generator_For_Properties_Without_Parent()
     {
-        var property = new JsonSchemaProperty();
+        var property = new ApiSchemaProperty();
 
-        var name = new UniquePropertyNameGenerator(new CustomCSharpPropertyNameGenerator(), _ => null).Generate(property);
+        var name = new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => null).Generate(property);
 
         name.Should().Be("_");
     }
@@ -82,23 +81,23 @@ public class UniquePropertyNameGeneratorTests
     public void Returns_The_Same_Names_When_Generated_Again()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "a", "A");
-        var generator = new UniquePropertyNameGenerator(new CustomCSharpPropertyNameGenerator(), _ => null);
+        var generator = new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => null);
 
         GenerateAll(generator, schema).Should().Equal("A", "A2");
         GenerateAll(generator, schema).Should().Equal("A", "A2");
     }
 
-    private static JsonSchema CreateSchema(bool allowAdditionalProperties, params string[] propertyNames)
+    private static ApiSchema CreateSchema(bool allowAdditionalProperties, params string[] propertyNames)
     {
-        var schema = new JsonSchema { Type = JsonObjectType.Object, AllowAdditionalProperties = allowAdditionalProperties };
+        var schema = new ApiSchema { Type = ApiObjectType.Object, AllowAdditionalProperties = allowAdditionalProperties };
         foreach (var propertyName in propertyNames)
         {
-            schema.Properties[propertyName] = new JsonSchemaProperty { Type = JsonObjectType.String };
+            schema.Properties[propertyName] = new ApiSchemaProperty { Type = ApiObjectType.String };
         }
 
         return schema;
     }
 
-    private static List<string> GenerateAll(UniquePropertyNameGenerator generator, JsonSchema schema) =>
+    private static List<string> GenerateAll(UniqueContractPropertyNameGenerator generator, ApiSchema schema) =>
         schema.Properties.Values.Select(generator.Generate).ToList();
 }
