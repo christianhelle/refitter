@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
+using Refitter.Tests.TestUtilities;
 using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
@@ -919,7 +920,7 @@ public class RuntimeCompatibilityTests
 
     private static string CreateTempFile(string content)
     {
-        var tempFile = Path.GetTempFileName();
+        var tempFile = Path.Combine(TestDirectory.CreateFolder(), Path.GetRandomFileName());
         File.WriteAllText(tempFile, content);
         return tempFile;
     }
