@@ -26,7 +26,7 @@ internal sealed class FormParameterExtractor
         if (operation.RequestBody?.Content.TryGetValue("multipart/form-data", out var multipartContent) == true &&
             multipartContent.Schema != null)
         {
-            // NSwag only creates parameters for the schema's own properties, so properties that come
+            // The operation model only has parameters for the schema's own properties, so properties that come
             // from allOf members (e.g. a referenced schema) are added here, in schema order (#1277)
             var visitedSchemas = new HashSet<ApiSchema>();
             foreach (var property in GetProperties(multipartContent.Schema, visitedSchemas))
@@ -79,7 +79,7 @@ internal sealed class FormParameterExtractor
         if (IsBinary(propertySchema))
             return "StreamPart";
 
-        // Arrays use IEnumerable<T>, like the multipart parameters NSwag creates
+        // Arrays use IEnumerable<T>, like the multipart parameters of the operation model
         if (propertySchema.Type == ApiObjectType.Array)
         {
             var itemType = propertySchema.Item is { } itemSchema

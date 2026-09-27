@@ -191,7 +191,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
 - `allowRemoteReferences`: When `true`, remote (`http`/`https`) `$ref` references inside the document are resolved. Disabled by default to prevent generation-time SSRF and remote file inclusion. Local `$ref` references are always confined to the input document's directory tree. Default is `false`
 - `silent`: Set to `true` to suppress all console output when running the CLI tool. Errors are still reported through the exit code. Default is `false`
-- `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
+- `operationNameGenerator`: The strategy used to name operations and to group them into interfaces. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
 - `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization.
@@ -212,7 +212,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
   - `withOptionalMediation` - Tells if Apizr should handle optional request mediation (extended only)
   - `withMappingProvider` - Set the mapping provider to be used
   - `withFileTransfer` - Tells if Apizr should handle file transfer
-- `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
+- `codeGeneratorSettings` - Setting this allows customization of the generated types and contracts
   - `requiredPropertiesMustBeDefined` - Default is true,
   - `generateDataAnnotations` - Default is true,
   - `anyType` - Default is `object`,

@@ -629,7 +629,7 @@ OPTIONS:
                                                                  - Ssv (space separated values)
                                                                  - Tsv (tab separated values)
                                                                  - Pipes (pipe separated values)
-        --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
+        --operation-name-generator              Default          The strategy used to name operations and to group them into interfaces.
                                                                  May be one of:
                                                                  - Default
                                                                  - MultipleClientsFromOperationId
@@ -649,7 +649,7 @@ OPTIONS:
         --use-dynamic-querystring-parameters                     Enable wrapping multiple query parameters into a single complex one. Default is no wrapping.
                                                                  See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information
         --use-polymorphic-serialization                          Use System.Text.Json polymorphic serialization.
-                                                                 Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
+                                                                 Replaces JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
                                                                  To have the native support of inheritance (de)serialization and fallback to base types when
                                                                  payloads with (yet) unknown types are offered by newer versions of an API
                                                                  See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information

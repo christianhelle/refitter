@@ -285,9 +285,9 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public DependencyInjectionSettings? DependencyInjectionSettings { get; set; }
 
     /// <summary>
-    /// Gets or sets the settings describing how to generate types using NSwag
+    /// Gets or sets the settings describing how to generate contract types
     /// </summary>
-    [Description("The settings describing how to generate types using NSwag.")]
+    [Description("The settings describing how to generate contract types.")]
     public CodeGeneratorSettings? CodeGeneratorSettings { get; set; }
 
     /// <summary>
@@ -329,9 +329,9 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public bool IncludeInheritanceHierarchy { get; set; }
 
     /// <summary>
-    /// The NSwag IOperationNameGenerator implementation to use
+    /// The strategy used to name operations and to group them into interfaces
     /// </summary>
-    [Description("The NSwag IOperationNameGenerator implementation to use.")]
+    [Description("The strategy used to name operations and to group them into interfaces.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
 
@@ -388,7 +388,7 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     /// <summary>
     /// Set to <c>true</c> to use System.Text.Json polymorphic serialization. Default is <c>false</c>
     /// Gets a value indicating whether to use System.Text.Json polymorphic serialization
-    /// Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
+    /// Replaces JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
     /// To have the native support of inheritance (de)serialization and fallback to base types when
     /// payloads with (yet) unknown types are offered by newer versions of an API
     /// See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
@@ -396,7 +396,7 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     [Description(
         """
         Use System.Text.Json polymorphic serialization. Default is false.
-        Replace NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
+        Replace JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
         To have the native support of inheritance (de)serialization and fallback to base types when
         payloads with (yet) unknown types are offered by newer versions of an API
         See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information

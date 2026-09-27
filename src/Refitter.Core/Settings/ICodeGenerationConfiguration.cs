@@ -7,7 +7,7 @@ namespace Refitter.Core;
 public interface ICodeGenerationConfiguration
 {
     /// <summary>
-    /// Gets the NSwag code generator settings.
+    /// Gets the settings describing how to generate contract types.
     /// </summary>
     CodeGeneratorSettings? CodeGeneratorSettings { get; }
 
