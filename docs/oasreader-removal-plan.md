@@ -16,7 +16,7 @@ Remove the `OasReader` package, and with it `Microsoft.OpenApi` and `Microsoft.O
 - `OpenApiValidator` reads documents with its own reader in `Refitter.Core/Validation`. It has one reader for
   Swagger 2.0 and one for OpenAPI 3.0, 3.1 and 3.2, and parses YAML with YamlDotNet. On top of that it reproduces
   Microsoft.OpenApi's rule set, statistics walker, reference resolution and OasReader's multi-file merge.
-- `ValidatorParityTests` validates 390 documents both as a local file and over HTTP. It matches the snapshots
+- `ValidatorParityTests` validates 387 documents both as a local file and over HTTP. It matches the snapshots
   recorded from the Microsoft.OpenApi implementation, including its crashes on malformed values (for example
   `required: yes`) and its quirks (for example rules only running for URL inputs).
 - YAML syntax errors come from YamlDotNet instead of SharpYaml. Positions are converted to SharpYaml's zero-based
