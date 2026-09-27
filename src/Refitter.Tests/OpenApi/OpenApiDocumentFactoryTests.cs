@@ -33,6 +33,19 @@ public class OpenApiDocumentFactoryTests
     }
 
     [Test]
+    public async Task Create_From_Remote_Json_Throws_For_Error_Responses()
+    {
+        var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
+        await using var server = new LocalHttpServer(openApiSpec, statusCode: 404, statusText: "Not Found");
+
+        var act = () => ApiDocumentFactory.CreateAsync(server.Url);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Failed to download OpenAPI document*")
+            .WithInnerException(typeof(HttpRequestException));
+    }
+
+    [Test]
     public async Task Create_From_Remote_Json_Throws_When_Download_Fails()
     {
         var act = () => ApiDocumentFactory.CreateAsync("http://127.0.0.1:1/openapi.json");

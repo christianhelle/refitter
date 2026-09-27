@@ -83,6 +83,7 @@ internal static class ApiDocumentFactory
                 using var httpResponse = await client.SendAsync(
                     new HttpRequestMessage(HttpMethod.Get, openApiPath),
                     cancellationToken).ConfigureAwait(false);
+                httpResponse.EnsureSuccessStatusCode();
                 content = await httpResponse.Content
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
