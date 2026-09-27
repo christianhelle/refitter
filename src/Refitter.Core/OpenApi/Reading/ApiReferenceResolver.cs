@@ -303,12 +303,14 @@ internal sealed class ApiReferenceResolver
         object result = target switch
         {
             ReferenceTarget.Parameter => reader.ReadParameter(json.RootElement),
-            ReferenceTarget.Response => throw new NotSupportedException("References to responses in extension data are not supported."),
-            ReferenceTarget.RequestBody => throw new NotSupportedException("References to request bodies in extension data are not supported."),
-            ReferenceTarget.PathItem => throw new NotSupportedException("References to path items in extension data are not supported."),
+            ReferenceTarget.Response => reader.ReadResponse(json.RootElement),
+            ReferenceTarget.RequestBody => reader.ReadRequestBody(json.RootElement),
+            ReferenceTarget.PathItem => reader.ReadPathItem(json.RootElement),
             _ => reader.ReadSchema(json.RootElement),
         };
 
+        // The references inside responses, request bodies and path items read this way are not resolved,
+        // like before
         if (result is ApiSchema schema)
         {
             var visited = new HashSet<object>();

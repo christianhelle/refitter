@@ -215,7 +215,7 @@ internal sealed class ApiJsonReader
         }
     }
 
-    private ApiPathItem ReadPathItem(JsonElement element)
+    public ApiPathItem ReadPathItem(JsonElement element)
     {
         EnsureObject(element, "path item");
         var pathItem = new ApiPathItem();
@@ -337,7 +337,7 @@ internal sealed class ApiJsonReader
         return operation;
     }
 
-    private ApiRequestBody ReadRequestBody(JsonElement element)
+    public ApiRequestBody ReadRequestBody(JsonElement element)
     {
         EnsureObject(element, "request body");
         var requestBody = new ApiRequestBody();
@@ -399,7 +399,7 @@ internal sealed class ApiJsonReader
         return mediaType;
     }
 
-    private ApiResponse ReadResponse(JsonElement element)
+    public ApiResponse ReadResponse(JsonElement element)
     {
         EnsureObject(element, "response");
         var isSwagger2 = schemaType == ApiSchemaType.Swagger2;
