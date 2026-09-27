@@ -34,9 +34,7 @@ public class SerializerTests
         Serializer
             .Deserialize<RefitGeneratorSettings>(json)
             .Should()
-            .BeEquivalentTo(settings, options => options
-                .Excluding(s => s.ParameterNameGenerator)
-                .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
+            .BeEquivalentTo(settings);
     }
 
     [Test]
@@ -55,9 +53,7 @@ public class SerializerTests
         Serializer
             .Deserialize<RefitGeneratorSettings>(json)
             .Should()
-            .BeEquivalentTo(settings, options => options
-                .Excluding(s => s.ParameterNameGenerator)
-                .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
+            .BeEquivalentTo(settings);
     }
 
     [Test]
@@ -70,9 +66,7 @@ public class SerializerTests
         Serializer
             .Deserialize<RefitGeneratorSettings>(json)
             .Should()
-            .BeEquivalentTo(settings, options => options
-                .Excluding(s => s.ParameterNameGenerator)
-                .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
+            .BeEquivalentTo(settings);
     }
 
     [Test]

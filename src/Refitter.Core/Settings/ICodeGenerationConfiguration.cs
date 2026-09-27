@@ -1,4 +1,3 @@
-using NSwag.CodeGeneration;
 
 namespace Refitter.Core;
 
@@ -67,12 +66,6 @@ public interface ICodeGenerationConfiguration
     /// </summary>
     [Obsolete("Custom NSwag Liquid templates will not be supported once Refitter stops using NSwag, and this setting will be removed in the next major version.")]
     string? CustomTemplateDirectory { get; }
-
-    /// <summary>
-    /// Gets the parameter name generator.
-    /// </summary>
-    [Obsolete("Use ParameterNameProvider instead. ParameterNameGenerator exposes NSwag types and will be removed in the next major version.")]
-    IParameterNameGenerator? ParameterNameGenerator { get; }
 
     /// <summary>
     /// Gets the parameter name provider.

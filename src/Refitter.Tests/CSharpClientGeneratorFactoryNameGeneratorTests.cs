@@ -1,10 +1,5 @@
-// Covers the obsolete NSwag-typed naming hooks until they are removed
-#pragma warning disable CS0618
 using AwesomeAssertions;
-using NJsonSchema;
-using NJsonSchema.CodeGeneration;
 using NSwag;
-using NSwag.CodeGeneration;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -12,17 +7,6 @@ namespace Refitter.Tests;
 
 public class CSharpClientGeneratorFactoryNameGeneratorTests
 {
-    private sealed class StubParameterNameGenerator : IParameterNameGenerator
-    {
-        public string Generate(OpenApiParameter parameter, IEnumerable<OpenApiParameter> allParameters) =>
-            "stubbed" + parameter.Name;
-    }
-
-    private sealed class StubPropertyNameGenerator : IPropertyNameGenerator
-    {
-        public string Generate(JsonSchemaProperty property) => "Stubbed" + property.Name;
-    }
-
     private sealed class StubParameterNameProvider : IParameterNameProvider
     {
         public string GetParameterName(ParameterNameContext context) => "provided" + context.Name;
@@ -51,30 +35,13 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
             """);
 
     [Test]
-    public async Task Create_WithCustomParameterNameGenerator_UsesIt()
-    {
-        var document = await CreateDocumentAsync();
-        var parameterNameGenerator = new StubParameterNameGenerator();
-        var settings = new RefitGeneratorSettings
-        {
-            Namespace = "TestNamespace",
-            ParameterNameGenerator = parameterNameGenerator,
-        };
-
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-
-        generator.Settings.ParameterNameGenerator.Should().BeSameAs(parameterNameGenerator);
-    }
-
-    [Test]
-    public async Task Create_WithParameterNameProvider_PrefersItOverParameterNameGenerator()
+    public async Task Create_WithParameterNameProvider_UsesIt()
     {
         var document = await CreateDocumentAsync();
         var parameterNameProvider = new StubParameterNameProvider();
         var settings = new RefitGeneratorSettings
         {
             Namespace = "TestNamespace",
-            ParameterNameGenerator = new StubParameterNameGenerator(),
             ParameterNameProvider = parameterNameProvider,
         };
 
@@ -94,31 +61,11 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
 
         generator.Settings.ParameterNameGenerator.Should().NotBeNull();
-        generator.Settings.ParameterNameGenerator.Should().NotBeOfType<StubParameterNameGenerator>();
+        generator.Settings.ParameterNameGenerator.Should().NotBeOfType<ParameterNameProviderAdapter>();
     }
 
     [Test]
-    public async Task Create_WithCustomPropertyNameGenerator_UsesIt()
-    {
-        var document = await CreateDocumentAsync();
-        var propertyNameGenerator = new StubPropertyNameGenerator();
-        var settings = new RefitGeneratorSettings
-        {
-            Namespace = "TestNamespace",
-            CodeGeneratorSettings = new CodeGeneratorSettings
-            {
-                PropertyNameGenerator = propertyNameGenerator,
-            },
-        };
-
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-
-        generator.Settings.CSharpGeneratorSettings.PropertyNameGenerator
-            .Should().BeSameAs(propertyNameGenerator);
-    }
-
-    [Test]
-    public async Task Create_WithPropertyNameProvider_PrefersItOverPropertyNameGenerator()
+    public async Task Create_WithPropertyNameProvider_UsesIt()
     {
         var document = await CreateDocumentAsync();
         var propertyNameProvider = new StubPropertyNameProvider();
@@ -127,7 +74,6 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
             Namespace = "TestNamespace",
             CodeGeneratorSettings = new CodeGeneratorSettings
             {
-                PropertyNameGenerator = new StubPropertyNameGenerator(),
                 PropertyNameProvider = propertyNameProvider,
             },
         };
