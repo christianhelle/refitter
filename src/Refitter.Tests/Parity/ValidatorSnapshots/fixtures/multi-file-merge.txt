@@ -1,0 +1,6 @@
+== file
+version: OpenApi3_0
+error: apiKey | Security scheme 'apiKey' has header name 'X"Key' containing illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass.
+statistics: path items 2, operations 2, parameters 2, request bodies 0, responses 3, links 0, callbacks 0, schemas 9, headers 0
+== url
+exception: ReferenceResolutionException: Remote '$ref' "components.yaml#/components/parameters/Unsafe" in "<url>" was blocked. Remote reference resolution is disabled by default; pass --allow-remote-refs (or set allowRemoteReferences: true) to enable it.

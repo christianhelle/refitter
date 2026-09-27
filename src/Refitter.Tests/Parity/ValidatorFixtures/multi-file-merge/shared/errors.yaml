@@ -1,0 +1,16 @@
+openapi: 3.0.1
+info:
+  title: Errors
+  version: 1.0.0
+paths: {}
+components:
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string

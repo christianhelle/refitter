@@ -1,0 +1,37 @@
+openapi: 3.0.1
+info:
+  title: Components
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/Owner'
+        tags:
+          type: array
+          items:
+            type: string
+    Owner:
+      type: object
+      properties:
+        name:
+          type: string
+  parameters:
+    Unsafe:
+      name: X"Header
+      in: header
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: X"Key
+      in: header

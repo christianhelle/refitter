@@ -1,0 +1,30 @@
+openapi: 3.0.1
+info:
+  title: Merges components from full documents
+  version: 1.0.0
+security:
+  - apiKey: []
+paths:
+  /pets:
+    get:
+      parameters:
+        - $ref: 'components.yaml#/components/parameters/Unsafe'
+        - $ref: './components.yaml#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'components.yaml#/components/schemas/Pet'
+        default:
+          $ref: 'shared/errors.yaml#/components/responses/Error'
+  /owners:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'fragment.yaml#/Owner'
