@@ -1,5 +1,3 @@
-using NJsonSchema;
-using NSwag.CodeGeneration.Models;
 
 namespace Refitter.Core;
 
@@ -32,7 +30,7 @@ internal static class ParameterTypeResolver
         TrimImportedNamespaces(FindSupportedType(typeName));
 
     public static string GetParameterType(
-        ParameterModelBase parameterModel,
+        OperationParameterModel parameterModel,
         RefitGeneratorSettings settings)
     {
         var type = TrimImportedNamespaces(
@@ -50,7 +48,7 @@ internal static class ParameterTypeResolver
     // OpenAPI header parameters always use style: simple (comma-separated values), and Refit sends
     // header values with ToString(), so arrays are exposed as the already-joined string
     public static string GetHeaderParameterType(
-        ParameterModelBase parameterModel,
+        OperationParameterModel parameterModel,
         RefitGeneratorSettings settings)
     {
         var type = GetParameterType(parameterModel, settings);
@@ -61,7 +59,7 @@ internal static class ParameterTypeResolver
     }
 
     public static string GetQueryParameterType(
-        ParameterModelBase parameterModel,
+        OperationParameterModel parameterModel,
         RefitGeneratorSettings settings)
     {
         var type = GetParameterType(parameterModel, settings);
@@ -73,20 +71,20 @@ internal static class ParameterTypeResolver
         return type;
     }
 
-    public static string GetCSharpType(JsonSchema propertySchema, RefitGeneratorSettings settings)
+    public static string GetCSharpType(ApiSchema propertySchema, RefitGeneratorSettings settings)
     {
         var type = propertySchema.Type switch
         {
-            JsonObjectType.String => "string",
-            JsonObjectType.Integer => GetIntegerTypeName(propertySchema, settings),
-            JsonObjectType.Number => "double",
-            JsonObjectType.Boolean => "bool",
-            JsonObjectType.Array => GetArrayType(propertySchema, settings),
-            JsonObjectType.Object => "object",
+            ApiObjectType.String => "string",
+            ApiObjectType.Integer => GetIntegerTypeName(propertySchema, settings),
+            ApiObjectType.Number => "double",
+            ApiObjectType.Boolean => "bool",
+            ApiObjectType.Array => GetArrayType(propertySchema, settings),
+            ApiObjectType.Object => "object",
             _ => "object"
         };
 
-        if (settings.OptionalParameters && propertySchema.IsNullable(SchemaType.OpenApi3))
+        if (settings.OptionalParameters && propertySchema.IsNullable(ApiSchemaType.OpenApi3))
         {
             type += "?";
         }
@@ -94,7 +92,7 @@ internal static class ParameterTypeResolver
         return type;
     }
 
-    public static string GetIntegerTypeName(JsonSchema schema, RefitGeneratorSettings settings)
+    public static string GetIntegerTypeName(ApiSchema schema, RefitGeneratorSettings settings)
     {
         if (schema.Format == "int64")
             return "long";
@@ -105,7 +103,7 @@ internal static class ParameterTypeResolver
         return integerType == IntegerType.Int64 ? "long" : "int";
     }
 
-    public static string GetArrayType(JsonSchema arraySchema, RefitGeneratorSettings settings)
+    public static string GetArrayType(ApiSchema arraySchema, RefitGeneratorSettings settings)
     {
         if (arraySchema.Item != null)
         {

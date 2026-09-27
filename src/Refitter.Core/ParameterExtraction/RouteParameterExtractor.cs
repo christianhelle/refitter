@@ -1,16 +1,14 @@
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
 internal static class RouteParameterExtractor
 {
-    public static IEnumerable<string> Extract(CSharpOperationModel operationModel)
+    public static IEnumerable<string> Extract(OperationModel operationModel)
     {
-        var path = operationModel.Path;
+        var path = operationModel.Path!;
 
         return operationModel.Parameters
-            .Where(p => p.Kind == OpenApiParameterKind.Path)
+            .Where(p => p.Kind == ApiParameterKind.Path)
             .OrderBy(p => GetUrlPosition(path, p.Name))
             .Select(p =>
             {

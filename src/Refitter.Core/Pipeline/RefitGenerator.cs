@@ -1,5 +1,3 @@
-using NSwag;
-
 namespace Refitter.Core;
 
 /// <summary>
@@ -10,10 +8,10 @@ public class RefitGenerator
     private static readonly RefitCodeGenerator CodeGenerator = new();
 
     private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
+    private readonly ApiDocument document;
     private ApiDocumentInfo? documentInfo;
 
-    private RefitGenerator(OpenApiDocument document, RefitGeneratorSettings settings)
+    private RefitGenerator(ApiDocument document, RefitGeneratorSettings settings)
     {
         this.settings = settings;
         this.document = document;
@@ -25,7 +23,7 @@ public class RefitGenerator
     /// </summary>
     public ApiDocumentInfo DocumentInfo => documentInfo ??= new ApiDocumentInfo(document);
 
-    internal OpenApiDocument NSwagDocument => document;
+    internal ApiDocument Document => document;
 
     /// <summary>
     /// Creates a new instance of the <see cref="RefitGenerator"/> class asynchronously
@@ -38,24 +36,23 @@ public class RefitGenerator
         if (settings == null) throw new ArgumentNullException(nameof(settings));
 
         var openApiDocument = await GetOpenApiDocument(settings, cancellationToken).ConfigureAwait(false);
-        var processed = NSwagDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
-        processed = NSwagDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
-        processed = await CleanSchemaAsync(
-                processed,
-                settings.TrimUnusedSchema,
-                settings.KeepSchemaPatterns,
-                settings.IncludeInheritanceHierarchy)
-            .ConfigureAwait(false);
+        var processed = ApiDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
+        processed = ApiDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
+        processed = CleanSchema(
+            processed,
+            settings.TrimUnusedSchema,
+            settings.KeepSchemaPatterns,
+            settings.IncludeInheritanceHierarchy);
 
         return new(processed, settings);
     }
 
-    private static async Task<OpenApiDocument> GetOpenApiDocument(
+    private static async Task<ApiDocument> GetOpenApiDocument(
         RefitGeneratorSettings settings,
         CancellationToken cancellationToken = default)
     {
         if (settings.OpenApiPaths is { Length: > 0 })
-            return await NSwagDocumentFactory
+            return await ApiDocumentFactory
                 .CreateAsync(settings.OpenApiPaths, settings.AllowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -66,13 +63,13 @@ public class RefitGenerator
                 nameof(settings));
         }
 
-        return await NSwagDocumentFactory
+        return await ApiDocumentFactory
             .CreateAsync(settings.OpenApiPath!, settings.AllowRemoteReferences, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    private static async Task<OpenApiDocument> CleanSchemaAsync(
-        OpenApiDocument document,
+    private static ApiDocument CleanSchema(
+        ApiDocument document,
         bool removeUnusedSchema,
         string[] keepSchemaPatterns,
         bool includeInheritanceHierarchy)
@@ -82,8 +79,8 @@ public class RefitGenerator
         if (!removeUnusedSchema)
             return document;
 
-        var result = await CloneDocumentAsync(document).ConfigureAwait(false);
-        var cleaner = new NSwagSchemaCleaner(result, keepSchemaPatterns)
+        var result = ApiDocumentWriter.Clone(document);
+        var cleaner = new ApiSchemaCleaner(result, keepSchemaPatterns)
         {
             IncludeInheritanceHierarchy = includeInheritanceHierarchy
         };
@@ -91,9 +88,6 @@ public class RefitGenerator
         cleaner.RemoveUnreferencedSchema();
         return result;
     }
-
-    private static async Task<OpenApiDocument> CloneDocumentAsync(OpenApiDocument document)
-        => await OpenApiDocument.FromJsonAsync(document.ToJson()).ConfigureAwait(false);
 
     /// <summary>
     /// Generates Refit clients and interfaces based on an OpenAPI specification

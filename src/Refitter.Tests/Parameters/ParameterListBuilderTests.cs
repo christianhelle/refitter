@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -139,12 +137,12 @@ public class ParameterListBuilderTests
         result.Parameters.Last().Should().Contain("limit").And.Contain("= default");
     }
 
-    private static async Task<(CSharpOperationModel OperationModel, OpenApiOperation Operation, RefitGeneratorSettings Settings)> SetupAsync(
+    private static async Task<(OperationModel OperationModel, ApiOperation Operation, RefitGeneratorSettings Settings)> SetupAsync(
         string spec,
         RefitGeneratorSettings settings)
     {
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
         return (operationModel, operation, settings);

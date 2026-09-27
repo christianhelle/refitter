@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -12,7 +11,7 @@ internal static class OptionalParameterReorderer
     public static List<string> Reorder(
         List<string> parameters,
         RefitGeneratorSettings settings,
-        ICollection<CSharpParameterModel> parameterModels)
+        ICollection<OperationParameterModel> parameterModels)
     {
         if (!settings.OptionalParameters || settings.ApizrSettings?.WithRequestOptions == true)
             return parameters;

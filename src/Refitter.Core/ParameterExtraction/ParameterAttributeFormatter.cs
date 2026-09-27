@@ -1,5 +1,3 @@
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -26,7 +24,7 @@ internal static class ParameterAttributeFormatter
     }
 
     public static string GetBodyAttribute(
-        CSharpParameterModel parameter,
+        OperationParameterModel parameter,
         string contentType,
         RefitGeneratorSettings settings)
     {
@@ -50,17 +48,17 @@ internal static class ParameterAttributeFormatter
     }
 
     // An OpenAPI 3 style/explode declared on the parameter takes precedence over the global setting
-    private static CollectionFormat GetCollectionFormat(CSharpParameterModel parameter, RefitGeneratorSettings settings) =>
+    private static CollectionFormat GetCollectionFormat(OperationParameterModel parameter, RefitGeneratorSettings settings) =>
         (parameter.Style, parameter.Explode) switch
         {
-            (OpenApiParameterStyle.PipeDelimited, _) => CollectionFormat.Pipes,
-            (OpenApiParameterStyle.SpaceDelimeted, _) => CollectionFormat.Ssv,
-            (OpenApiParameterStyle.Form or OpenApiParameterStyle.Undefined, false) => CollectionFormat.Csv,
-            (OpenApiParameterStyle.Form, _) or (OpenApiParameterStyle.Undefined, true) => CollectionFormat.Multi,
+            (ApiParameterStyle.PipeDelimited, _) => CollectionFormat.Pipes,
+            (ApiParameterStyle.SpaceDelimited, _) => CollectionFormat.Ssv,
+            (ApiParameterStyle.Form or ApiParameterStyle.Undefined, false) => CollectionFormat.Csv,
+            (ApiParameterStyle.Form, _) or (ApiParameterStyle.Undefined, true) => CollectionFormat.Multi,
             _ => settings.CollectionFormat,
         };
 
-    public static string GetQueryAttribute(CSharpParameterModel parameter, RefitGeneratorSettings settings)
+    public static string GetQueryAttribute(OperationParameterModel parameter, RefitGeneratorSettings settings)
     {
         return (parameter, settings) switch
         {

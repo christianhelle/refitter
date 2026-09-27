@@ -1,5 +1,3 @@
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -16,8 +14,8 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
     private readonly FormParameterExtractor formExtractor = new();
 
     public ParameterList Build(
-        CSharpOperationModel operationModel,
-        OpenApiOperation operation,
+        OperationModel operationModel,
+        ApiOperation operation,
         string dynamicQuerystringParameterType)
     {
         var parameters = new List<string>();

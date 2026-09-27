@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -100,7 +99,7 @@ public class GeneratorPipelineTests
                 FirstBackoffRetryInSeconds = 0.5
             }
         };
-        var document = await OpenApiDocument.FromJsonAsync(OpenApiSpec);
+        var document = ApiDocumentLoader.Load(OpenApiSpec, null, isYaml: false);
 
         var result = RunPipeline(document, settings);
 
@@ -120,7 +119,7 @@ public class GeneratorPipelineTests
             GenerateMultipleFiles = true,
             MultipleInterfaces = MultipleInterfaces.ByTag
         };
-        var document = await OpenApiYamlDocument.FromYamlAsync(ByTagOpenApiSpec);
+        var document = ApiDocumentLoader.Load(ByTagOpenApiSpec, null, isYaml: true);
 
         var result = RunPipeline(document, settings);
         var combinedInterfaces = string.Join("\n", result.Interfaces.Select(code => code.Content));
@@ -129,13 +128,15 @@ public class GeneratorPipelineTests
         combinedInterfaces.Should().NotContainAny("Info2(", "Info3(", "InfoGet2(", "InfoGet3(", "InfoGET2(", "InfoGET3(");
     }
 
-    private static GenerationResult RunPipeline(OpenApiDocument document, RefitGeneratorSettings settings)
+    private static GenerationResult RunPipeline(ApiDocument document, RefitGeneratorSettings settings)
     {
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var docGenerator = new XmlDocumentationGenerator(settings);
-        var interfaceGenerator = new InterfaceGenerator(settings, document, generator, docGenerator);
+        var operationNameGenerator = new RefitterOperationNameGenerator(document, settings);
+        var interfaceGenerator = new InterfaceGenerator(settings, document, generator, operationNameGenerator, docGenerator);
         var pipeline = new GeneratorPipeline(
             interfaceGenerator,
+            operationNameGenerator,
             Array.Empty<IContractsPostProcessor>());
         return pipeline.Run(document, settings, generator);
     }

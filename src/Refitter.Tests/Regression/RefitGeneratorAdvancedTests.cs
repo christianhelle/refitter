@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using NJsonSchema;
-using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
@@ -765,7 +763,7 @@ public class RefitGeneratorAdvancedTests
             """;
 
         var normalizer = new Swagger2OptionalReferenceNullabilityNormalizer();
-        var document = new OpenApiDocument { SchemaType = SchemaType.Swagger2 };
+        var document = new ApiDocument { SchemaType = ApiSchemaType.Swagger2 };
         var settings = new RefitGeneratorSettings
         {
             CodeGeneratorSettings = new CodeGeneratorSettings
@@ -823,7 +821,7 @@ public class RefitGeneratorAdvancedTests
             """;
 
         var normalizer = new Swagger2OptionalReferenceNullabilityNormalizer();
-        var document = new OpenApiDocument { SchemaType = SchemaType.Swagger2 };
+        var document = new ApiDocument { SchemaType = ApiSchemaType.Swagger2 };
         var settings = new RefitGeneratorSettings
         {
             CodeGeneratorSettings = new CodeGeneratorSettings
@@ -933,7 +931,7 @@ public class RefitGeneratorAdvancedTests
             };
 
             var generator = await RefitGenerator.CreateAsync(settings);
-            generator.NSwagDocument.Info = null!;
+            generator.Document.Info = null!;
 
             var result = generator.GenerateMultipleFiles();
 

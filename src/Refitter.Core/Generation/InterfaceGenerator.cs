@@ -1,6 +1,4 @@
 using System.Text;
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
@@ -9,8 +7,9 @@ internal class InterfaceGenerator
     private const string Separator = "    ";
 
     private readonly RefitGeneratorSettings settings;
-    private readonly OpenApiDocument document;
-    private readonly CustomCSharpClientGenerator generator;
+    private readonly ApiDocument document;
+    private readonly ContractGenerator generator;
+    private readonly IApiOperationNameGenerator operationNameGenerator;
     private readonly XmlDocumentationGenerator docGenerator;
     private readonly IReturnTypeGenerator returnTypeGenerator;
     private readonly IMethodAttributeGenerator methodAttributeGenerator;
@@ -18,13 +17,15 @@ internal class InterfaceGenerator
 
     internal InterfaceGenerator(
         RefitGeneratorSettings settings,
-        OpenApiDocument document,
-        CustomCSharpClientGenerator generator,
+        ApiDocument document,
+        ContractGenerator generator,
+        IApiOperationNameGenerator operationNameGenerator,
         XmlDocumentationGenerator docGenerator)
         : this(
             settings,
             document,
             generator,
+            operationNameGenerator,
             docGenerator,
             new ReturnTypeGenerator(settings, generator),
             new MethodAttributeGenerator(settings, document),
@@ -34,8 +35,9 @@ internal class InterfaceGenerator
 
     private InterfaceGenerator(
         RefitGeneratorSettings settings,
-        OpenApiDocument document,
-        CustomCSharpClientGenerator generator,
+        ApiDocument document,
+        ContractGenerator generator,
+        IApiOperationNameGenerator operationNameGenerator,
         XmlDocumentationGenerator docGenerator,
         IReturnTypeGenerator returnTypeGenerator,
         IMethodAttributeGenerator methodAttributeGenerator,
@@ -44,11 +46,11 @@ internal class InterfaceGenerator
         this.settings = settings;
         this.document = document;
         this.generator = generator;
+        this.operationNameGenerator = operationNameGenerator;
         this.docGenerator = docGenerator;
         this.returnTypeGenerator = returnTypeGenerator;
         this.methodAttributeGenerator = methodAttributeGenerator;
         this.methodSignatureGenerator = methodSignatureGenerator;
-        generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
     public IEnumerable<GeneratedCode> Generate(IInterfacePartitioning partitioning)
@@ -68,7 +70,7 @@ internal class InterfaceGenerator
         // Interfaces share the namespace with the contracts, so they must not reuse a contract type name
         var knownInterfaceIdentifiers = new HashSet<string>(GetContractTypeNames());
         var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
-            ? document.Info!.Title.Sanitize()
+            ? document.Info!.Title!.Sanitize()
             : settings.Naming.InterfaceName;
 
         if (partitioning.IsSingleInterface)
@@ -117,7 +119,7 @@ internal class InterfaceGenerator
 
     // Refit has no attribute for TRACE, so those operations cannot be expressed.
     private static bool IsSupportedByRefit(string verb) =>
-        !string.Equals(verb, OpenApiOperationMethod.Trace, StringComparison.OrdinalIgnoreCase);
+        !string.Equals(verb, "trace", StringComparison.OrdinalIgnoreCase);
 
     private GeneratedCode GenerateSingleInterface(
         List<OpenApiOperationInfo> operations,
@@ -291,8 +293,8 @@ internal class InterfaceGenerator
     }
 
     private static string GetParameterSignature(
-        OpenApiOperation operation,
-        CSharpOperationModel operationModel)
+        ApiOperation operation,
+        OperationModel operationModel)
     {
         var parts = new List<string>();
 
@@ -300,11 +302,11 @@ internal class InterfaceGenerator
             .Where(p => !p.IsBinaryBodyParameter)
             .OrderBy(p => p.Kind switch
             {
-                OpenApiParameterKind.Path => 0,
-                OpenApiParameterKind.Query => 1,
-                OpenApiParameterKind.Body => 2,
-                OpenApiParameterKind.Header => 3,
-                OpenApiParameterKind.FormData => 4,
+                ApiParameterKind.Path => 0,
+                ApiParameterKind.Query => 1,
+                ApiParameterKind.Body => 2,
+                ApiParameterKind.Header => 3,
+                ApiParameterKind.FormData => 4,
                 _ => 99,
             }))
         {
@@ -322,10 +324,7 @@ internal class InterfaceGenerator
 
     private string GetBaseOperationName(OpenApiOperationInfo op)
     {
-        return generator
-            .BaseSettings
-            .OperationNameGenerator
-            .GetOperationName(document, op.Path, op.Verb, op.Operation);
+        return operationNameGenerator.GetOperationName(document, op.Path, op.Verb, op.Operation);
     }
 
     private string GenerateInterfaceDeclaration(string interfaceName, bool isSingleInterface)

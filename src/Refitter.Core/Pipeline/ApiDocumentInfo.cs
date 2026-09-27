@@ -1,4 +1,3 @@
-using NSwag;
 
 namespace Refitter.Core;
 
@@ -7,7 +6,7 @@ namespace Refitter.Core;
 /// </summary>
 public sealed class ApiDocumentInfo
 {
-    internal ApiDocumentInfo(OpenApiDocument document)
+    internal ApiDocumentInfo(ApiDocument document)
     {
         Title = document.Info?.Title;
         Version = document.Info?.Version;

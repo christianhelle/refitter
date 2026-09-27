@@ -1,10 +1,9 @@
-using NSwag;
 
 namespace Refitter.Core;
 
 internal interface IReturnTypeGenerator
 {
-    string Generate(OpenApiOperation operation);
+    string Generate(ApiOperation operation);
 
     bool IsApiResponseType(string typeName);
 }
