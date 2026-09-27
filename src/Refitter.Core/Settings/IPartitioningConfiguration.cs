@@ -31,7 +31,7 @@ public interface IPartitioningConfiguration
     bool GenerateDeprecatedOperations { get; }
 
     /// <summary>
-    /// Gets the NSwag IOperationNameGenerator implementation to use.
+    /// Gets the strategy used to name operations and to group them into interfaces.
     /// </summary>
     OperationNameGeneratorTypes OperationNameGenerator { get; }
 }

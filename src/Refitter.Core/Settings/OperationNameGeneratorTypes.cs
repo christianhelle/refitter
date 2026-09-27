@@ -3,9 +3,9 @@ using System.ComponentModel;
 namespace Refitter.Core;
 
 /// <summary>
-/// The NSwag IOperationNameGenerator implementation to use
+/// The strategy used to name operations and to group them into interfaces
 /// </summary>
-[Description("The NSwag IOperationNameGenerator implementation to use")]
+[Description("The strategy used to name operations and to group them into interfaces")]
 public enum OperationNameGeneratorTypes
 {
     /// <summary>

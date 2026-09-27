@@ -42,7 +42,7 @@ Run these first if source generator tests fail with missing generated types.
 
 | Project | TFM | Role |
 |---|---|---|
-| `Refitter.Core` | `netstandard2.0` | Core generation logic (NSwag-based) |
+| `Refitter.Core` | `netstandard2.0` | Core generation logic (own OpenAPI model and Liquid templates) |
 | `Refitter` | `net8.0;net9.0;net10.0` | CLI tool (`PackAsTool`, container support) |
 | `Refitter.MSBuild` | `netstandard2.0` | MSBuild task; references `Refitter.Core` directly (in-process); no CLI binary dependency |
 | `Refitter.SourceGenerator` | `netstandard2.0` | Roslyn source generator; emits code in-memory via `AddSource()` (not to disk since v2.0.0) |

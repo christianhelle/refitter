@@ -79,7 +79,7 @@ internal class XmlDocumentationGenerator
     /// <summary>
     /// Appends XML docs for the given method to the given code builder.
     /// </summary>
-    /// <param name="method">The NSwag model of the method's OpenAPI definition.</param>
+    /// <param name="method">The model of the method's OpenAPI definition.</param>
     /// <param name="parameters">
     /// The parameters the method is emitted with. The param tags are written for exactly these,
     /// so they always match the signature.
