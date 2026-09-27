@@ -6,7 +6,7 @@ using TUnit.Core;
 namespace Refitter.Tests;
 
 /// <summary>
-/// Guards the Refitter.Core public API against exposing NSwag or NJsonSchema types.
+/// Guards the Refitter.Core public API against exposing NSwag, NJsonSchema or Microsoft.OpenApi types.
 /// See docs/nswag-removal-plan.md.
 /// </summary>
 public class PublicApiNSwagIndependenceTests
@@ -19,18 +19,30 @@ public class PublicApiNSwagIndependenceTests
     {
         var violations = typeof(RefitGenerator).Assembly
             .GetExportedTypes()
-            .SelectMany(FindViolations)
+            .SelectMany(type => FindViolations(type, ExposesNSwag))
             .OrderBy(violation => violation, StringComparer.Ordinal)
             .ToList();
 
         violations.Should().BeEmpty();
     }
 
-    private static IEnumerable<string> FindViolations(Type type)
+    [Test]
+    public void Public_Api_Does_Not_Expose_Microsoft_OpenApi_Types()
+    {
+        var violations = typeof(RefitGenerator).Assembly
+            .GetExportedTypes()
+            .SelectMany(type => FindViolations(type, ExposesMicrosoftOpenApi))
+            .OrderBy(violation => violation, StringComparer.Ordinal)
+            .ToList();
+
+        violations.Should().BeEmpty();
+    }
+
+    private static IEnumerable<string> FindViolations(Type type, Func<Type, bool> isForbidden)
     {
         foreach (var inherited in new[] { type.BaseType }.Concat(type.GetInterfaces()))
         {
-            if (inherited != null && ExposesNSwag(inherited))
+            if (inherited != null && isForbidden(inherited))
                 yield return $"{type.FullName} inherits {inherited.FullName}";
         }
 
@@ -47,21 +59,28 @@ public class PublicApiNSwagIndependenceTests
                 _ => Enumerable.Empty<Type>(),
             };
 
-            foreach (var exposedType in exposed.Where(ExposesNSwag))
+            foreach (var exposedType in exposed.Where(isForbidden))
                 yield return $"{type.FullName}.{member.Name} exposes {exposedType.FullName}";
         }
     }
 
-    private static bool ExposesNSwag(Type type)
+    private static bool ExposesMicrosoftOpenApi(Type type) =>
+        ExposesAssembly(type, name => name.StartsWith("Microsoft.OpenApi", StringComparison.Ordinal));
+
+    private static bool ExposesNSwag(Type type) =>
+        ExposesAssembly(
+            type,
+            name => name.StartsWith("NSwag", StringComparison.Ordinal)
+                    || name.StartsWith("NJsonSchema", StringComparison.Ordinal));
+
+    private static bool ExposesAssembly(Type type, Func<string, bool> isForbiddenAssembly)
     {
         if (type.HasElementType)
-            return ExposesNSwag(type.GetElementType()!);
+            return ExposesAssembly(type.GetElementType()!, isForbiddenAssembly);
 
-        if (type.IsGenericType && type.GetGenericArguments().Any(ExposesNSwag))
+        if (type.IsGenericType && type.GetGenericArguments().Any(t => ExposesAssembly(t, isForbiddenAssembly)))
             return true;
 
-        var assemblyName = type.Assembly.GetName().Name ?? string.Empty;
-        return assemblyName.StartsWith("NSwag", StringComparison.Ordinal)
-               || assemblyName.StartsWith("NJsonSchema", StringComparison.Ordinal);
+        return isForbiddenAssembly(type.Assembly.GetName().Name ?? string.Empty);
     }
 }

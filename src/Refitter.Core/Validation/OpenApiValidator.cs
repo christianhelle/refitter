@@ -69,13 +69,13 @@ public static class OpenApiValidator
             var msDocument = loadResult.Document;
             var diagnostic = loadResult.Diagnostic ?? new OpenApiDiagnostic();
 
-            var statsVisitor = new OpenApiStats();
-            var walker = new OpenApiWalker(statsVisitor);
+            var statistics = new OpenApiStats();
+            var walker = new OpenApiWalker(new OpenApiStatsVisitor(statistics));
             walker.Walk(msDocument);
 
             AttributeStringValidator.Validate(msDocument, diagnostic);
 
-            return new(ToValidationDiagnostics(diagnostic), statsVisitor);
+            return new(ToValidationDiagnostics(diagnostic), statistics);
         }
 
         // For local files, validate first (reads once), then parse with OpenApiMultiFileReader
@@ -87,7 +87,7 @@ public static class OpenApiValidator
             cancellationToken: cancellationToken);
 
         var stats = new OpenApiStats();
-        var openApiWalker = new OpenApiWalker(stats);
+        var openApiWalker = new OpenApiWalker(new OpenApiStatsVisitor(stats));
         openApiWalker.Walk(result.OpenApiDocument);
 
         AttributeStringValidator.Validate(result.OpenApiDocument, result.OpenApiDiagnostic);

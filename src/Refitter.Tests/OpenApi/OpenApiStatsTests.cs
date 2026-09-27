@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using Microsoft.OpenApi;
 using Refitter.Core.Validation;
 
 namespace Refitter.Tests.OpenApi;
@@ -24,133 +23,29 @@ public class OpenApiStatsTests
     }
 
     [Test]
-    public void Visit_Parameter_Should_Increment_ParameterCount()
-    {
-        var stats = new OpenApiStats();
-
-        stats.Visit((IOpenApiParameter)new OpenApiParameter());
-
-        stats.ParameterCount.Should().Be(1);
-    }
-
-    [Test]
-    public void Visit_Schema_Should_Increment_SchemaCount()
-    {
-        var stats = new OpenApiStats();
-
-        stats.Visit((IOpenApiSchema)new OpenApiSchema());
-
-        stats.SchemaCount.Should().Be(1);
-    }
-
-    [Test]
-    public void Visit_Headers_Should_Increment_HeaderCount()
-    {
-        var stats = new OpenApiStats();
-        var headers = new Dictionary<string, IOpenApiHeader>
-        {
-            { "X-Custom", new OpenApiHeader() },
-            { "Authorization", new OpenApiHeader() },
-        };
-
-        stats.Visit(headers);
-
-        stats.HeaderCount.Should().Be(2);
-    }
-
-    [Test]
-    public void Visit_PathItem_Should_Increment_PathItemCount()
-    {
-        var stats = new OpenApiStats();
-
-        stats.Visit((IOpenApiPathItem)new OpenApiPathItem());
-
-        stats.PathItemCount.Should().Be(1);
-    }
-
-    [Test]
-    public void Visit_RequestBody_Should_Increment_RequestBodyCount()
-    {
-        var stats = new OpenApiStats();
-
-        stats.Visit((IOpenApiRequestBody)new OpenApiRequestBody());
-
-        stats.RequestBodyCount.Should().Be(1);
-    }
-
-    [Test]
-    public void Visit_Response_Should_Increment_ResponseCount()
-    {
-        var stats = new OpenApiStats();
-        var response = new OpenApiResponses
-        {
-            { "200", new OpenApiResponse() },
-            { "404", new OpenApiResponse() },
-            { "500", new OpenApiResponse() },
-        };
-
-        stats.Visit(response);
-
-        stats.ResponseCount.Should().Be(3);
-    }
-
-    [Test]
-    public void Visit_Operation_Should_Increment_OperationCount()
-    {
-        var stats = new OpenApiStats();
-        var operation = new OpenApiOperation();
-
-        stats.Visit(operation);
-
-        stats.OperationCount.Should().Be(1);
-    }
-
-    [Test]
-    public void Visit_Link_Should_Increment_LinkCount()
-    {
-        var stats = new OpenApiStats();
-
-        stats.Visit((IOpenApiLink)new OpenApiLink());
-
-        stats.LinkCount.Should().Be(1);
-    }
-
-    [Test]
-    public void Visit_Callback_Should_Increment_CallbackCount()
-    {
-        var stats = new OpenApiStats();
-
-        stats.Visit((IOpenApiCallback)new OpenApiCallback());
-
-        stats.CallbackCount.Should().Be(1);
-    }
-
-    [Test]
     public void ToString_Should_Return_Formatted_Statistics()
     {
-        var stats = new OpenApiStats();
-        stats.Visit((IOpenApiPathItem)new OpenApiPathItem());
-        stats.Visit(new OpenApiOperation());
-        stats.Visit((IOpenApiParameter)new OpenApiParameter());
-        stats.Visit((IOpenApiSchema)new OpenApiSchema());
+        var stats = new OpenApiStats
+        {
+            PathItemCount = 1,
+            OperationCount = 2,
+            ParameterCount = 3,
+            RequestBodyCount = 4,
+            ResponseCount = 5,
+            LinkCount = 6,
+            CallbackCount = 7,
+            SchemaCount = 8,
+            HeaderCount = 9,
+        };
 
-        var output = stats.ToString();
-
-        output.Should().Contain("Path Items: 1");
-        output.Should().Contain("Operations: 1");
-        output.Should().Contain("Parameters: 1");
-        output.Should().Contain("Schemas: 1");
-    }
-
-    [Test]
-    public void Multiple_Visits_Should_Accumulate_Counts()
-    {
-        var stats = new OpenApiStats();
-
-        stats.Visit((IOpenApiParameter)new OpenApiParameter());
-        stats.Visit((IOpenApiParameter)new OpenApiParameter());
-        stats.Visit((IOpenApiParameter)new OpenApiParameter());
-
-        stats.ParameterCount.Should().Be(3);
+        stats.ToString().Replace("\r\n", "\n").Should().Be(
+            " - Path Items: 1\n" +
+            " - Operations: 2\n" +
+            " - Parameters: 3\n" +
+            " - Request Bodies: 4\n" +
+            " - Responses: 5\n" +
+            " - Links: 6\n" +
+            " - Callbacks: 7\n" +
+            " - Schemas: 8");
     }
 }
