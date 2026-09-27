@@ -153,7 +153,7 @@ internal sealed class SingleClientFromOperationIdApiOperationNameGenerator : IAp
 /// <summary>A single client, operation names from all path segments.</summary>
 internal sealed class SingleClientFromPathSegmentsApiOperationNameGenerator : IApiOperationNameGenerator
 {
-    private static readonly Regex PathParameterRegex = new(@"\{.*?\}", RegexOptions.Compiled);
+    private static readonly Regex PathParameterRegex = new(@"\{.*?\}", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     public bool SupportsMultipleClients => true;
 

@@ -12,7 +12,7 @@ namespace Refitter.Core;
 /// </remarks>
 internal class ApiSchema
 {
-    private static readonly Regex TypeNameTitleRegex = new("^[a-zA-Z0-9_]*$", RegexOptions.Compiled);
+    private static readonly Regex TypeNameTitleRegex = new("^[a-zA-Z0-9_]*$", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     private ApiSchema? reference;
     private ApiObjectType type;

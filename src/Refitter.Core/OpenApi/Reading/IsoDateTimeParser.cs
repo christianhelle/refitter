@@ -12,11 +12,13 @@ internal static class IsoDateTimeParser
 {
     private static readonly Regex IsoRegex = new(
         @"^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})T(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})(?:\.(?<fraction>\d{1,7}))?(?<zone>Z|z|[+-]\d{2}(?::?\d{2})?)?$",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        TimeSpan.FromSeconds(1));
 
     private static readonly Regex MicrosoftDateRegex = new(
         @"^/Date\((?<ticks>-?\d+)(?<offset>[+-]\d{4})?\)/$",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        TimeSpan.FromSeconds(1));
 
     public static bool TryParse(string text, out DateTime value)
     {
