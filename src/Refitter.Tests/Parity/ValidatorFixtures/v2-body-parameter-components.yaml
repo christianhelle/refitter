@@ -1,0 +1,69 @@
+swagger: '2.0'
+info:
+  title: Body parameters in components
+  version: 1.0.0
+consumes: [application/json, text/json]
+produces: [application/json]
+paths:
+  /pets:
+    parameters:
+      - $ref: '#/parameters/Limit'
+    post:
+      parameters:
+        - $ref: '#/parameters/Pet'
+        - name: bogus
+          in: query
+          type: string
+          bogusParameter: 1
+      responses:
+        '200':
+          description: OK
+          examples:
+            application/json:
+              name: Rex
+            text/plain: Rex
+          schema:
+            $ref: '#/definitions/Pet'
+          headers:
+            X-Rate:
+              type: integer
+              multipleOf: 1e2
+    put:
+      produces: [application/xml]
+      parameters:
+        - name: pet
+          in: body
+          schema:
+            $ref: '#/definitions/Pet'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Pet'
+          x-examples:
+            first:
+              summary: First
+              value: []
+definitions:
+  Pet:
+    type: object
+    properties:
+      name:
+        type: string
+parameters:
+  Pet:
+    name: pet
+    in: body
+    unknownField: 1
+    schema:
+      $ref: '#/definitions/Pet'
+  Limit:
+    name: limit
+    in: query
+    type: integer
+    unknownField: 1
+responses:
+  NotFound:
+    description: Not found

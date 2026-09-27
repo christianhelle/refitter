@@ -1,0 +1,19 @@
+== file
+version: OpenApi2_0
+error: #/info/license | OpenApiLicense must be a map/object
+error:  | $ref is not a valid property at #/paths/~1pets
+error: #/paths/~1pets/get/parameters/type | Invalid schema type identifier: strng
+error:  | exclusiveMaximum is not a valid property at #/paths/~1pets/get/parameters
+error:  | oneOf is not a valid property at #/definitions/Pet/properties/bad
+error: #/securityDefinitions/oauth/scopes/nested | Expected scalar while parsing String
+statistics: path items 1, operations 1, parameters 2, request bodies 0, responses 1, links 0, callbacks 0, schemas 6, headers 0
+== url
+version: OpenApi2_0
+error: #/info/license | OpenApiLicense must be a map/object
+error:  | $ref is not a valid property at #/paths/~1pets
+error: #/paths/~1pets/get/parameters/type | Invalid schema type identifier: strng
+error:  | exclusiveMaximum is not a valid property at #/paths/~1pets/get/parameters
+error:  | oneOf is not a valid property at #/definitions/Pet/properties/bad
+error: #/securityDefinitions/oauth/scopes/nested | Expected scalar while parsing String
+error: #/paths/~1pets/get/parameters/1/in | Declared path parameter "id" needs to be defined as a path parameter at either the path or operation level
+statistics: path items 1, operations 1, parameters 2, request bodies 0, responses 1, links 0, callbacks 0, schemas 6, headers 0

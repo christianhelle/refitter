@@ -1,0 +1,9 @@
+== file
+version: OpenApi3_0
+error:  | << is not a valid property at #/paths/~1pets/post
+statistics: path items 1, operations 3, parameters 0, request bodies 0, responses 2, links 0, callbacks 0, schemas 2, headers 0
+== url
+version: OpenApi3_0
+error:  | << is not a valid property at #/paths/~1pets/post
+error: #/paths/~1pets/post/responses | Responses must contain at least one response
+statistics: path items 1, operations 3, parameters 0, request bodies 0, responses 2, links 0, callbacks 0, schemas 2, headers 0

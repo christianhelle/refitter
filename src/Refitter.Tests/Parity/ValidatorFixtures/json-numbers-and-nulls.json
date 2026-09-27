@@ -1,0 +1,14 @@
+{
+  "openapi": "3.0.1",
+  "info": { "title": "Numbers", "version": 1.0, "description": null },
+  "paths": {
+    "/pets": {
+      "get": {
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maxLength": 10.0 } }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  }
+}

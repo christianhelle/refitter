@@ -1,0 +1,74 @@
+openapi: 3.2.0
+$self: https://example.com/openapi.yaml
+info:
+  title: OpenAPI 3.2 features
+  version: 1.0.0
+tags:
+  - name: pets
+    summary: Pets
+    kind: nav
+    parent: animals
+  - name: animals
+paths:
+  /pets:
+    query:
+      responses:
+        '200':
+          description: OK
+    additionalOperations:
+      COPY:
+        responses:
+          '200':
+            description: OK
+      get:
+        responses:
+          '200':
+            description: Ignored standard method
+    get:
+      responses:
+        '200':
+          summary: A summary
+          description: OK
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/Pets'
+            application/jsonl:
+              itemSchema:
+                type: object
+              itemEncoding:
+                contentType: application/json
+              prefixEncoding:
+                - contentType: text/plain
+components:
+  mediaTypes:
+    Pets:
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/Pet'
+  schemas:
+    Pet:
+      type: object
+      discriminator:
+        propertyName: kind
+        defaultMapping: '#/components/schemas/Pet'
+      xml:
+        nodeType: sideways
+      properties:
+        kind:
+          type: string
+  examples:
+    Pet:
+      dataValue:
+        kind: dog
+      serializedValue: '{"kind":"dog"}'
+  securitySchemes:
+    oauth:
+      type: oauth2
+      deprecated: true
+      oauth2MetadataUrl: https://example.com/.well-known/oauth
+      flows:
+        deviceAuthorization:
+          deviceAuthorizationUrl: https://example.com/device
+          tokenUrl: https://example.com/token
+          scopes: {}

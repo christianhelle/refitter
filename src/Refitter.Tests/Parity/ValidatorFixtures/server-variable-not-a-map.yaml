@@ -1,0 +1,9 @@
+openapi: 3.0.1
+info:
+  title: Server variable that is not a map
+  version: 1.0.0
+servers:
+  - url: https://{region}.example.com
+    variables:
+      region: eu
+paths: {}
