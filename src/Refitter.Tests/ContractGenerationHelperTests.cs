@@ -47,6 +47,15 @@ public class ContractGenerationHelperTests
     }
 
     [Test]
+    public void Resolves_Nullable_Durations_From_The_Configured_Type()
+    {
+        var schema = new ApiSchema { Type = ApiObjectType.String, Format = "duration" };
+
+        Resolve(schema, isNullable: true, s => s.TimeSpanType = "string").Should().Be("string");
+        Resolve(schema, isNullable: true, s => s.TimeSpanType = null!).Should().Be("?");
+    }
+
+    [Test]
     public void Resolves_Integers_Outside_The_Int_Range_As_Longs()
     {
         Resolve(new ApiSchema { Type = ApiObjectType.Integer, Maximum = 5_000_000_000 }).Should().Be("long");

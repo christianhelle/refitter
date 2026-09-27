@@ -144,6 +144,43 @@ public class OperationModelTests
     }
 
     [Test]
+    public void Explodes_OpenApi3_Query_And_Cookie_Arrays_Unless_Told_Otherwise()
+    {
+        var (model, _) = Create("""
+            {
+              "parameters": [
+                { "name": "q", "in": "query", "schema": { "type": "array", "items": { "type": "string" } } },
+                { "name": "c", "in": "cookie", "schema": { "type": "array", "items": { "type": "string" } } },
+                { "name": "h", "in": "header", "schema": { "type": "array", "items": { "type": "string" } } },
+                { "name": "e", "in": "header", "explode": true, "schema": { "type": "array", "items": { "type": "string" } } },
+                { "name": "s", "in": "query", "schema": { "type": "string" } }
+              ],
+              "responses": {}
+            }
+            """);
+
+        model.Parameters.ToDictionary(p => p.Name, p => p.IsExplodedArray)
+            .Should().Equal(new Dictionary<string, bool> { ["q"] = true, ["c"] = true, ["h"] = false, ["e"] = true, ["s"] = false });
+    }
+
+    [Test]
+    public void Explodes_Swagger2_Arrays_Only_With_The_Multi_Collection_Format()
+    {
+        var (model, _) = Create("""
+            {
+              "parameters": [
+                { "name": "csv", "in": "query", "type": "array", "items": { "type": "string" } },
+                { "name": "multi", "in": "query", "type": "array", "collectionFormat": "multi", "items": { "type": "string" } }
+              ],
+              "responses": {}
+            }
+            """, "\"swagger\": \"2.0\"");
+
+        model.Parameters.ToDictionary(p => p.Name, p => p.IsExplodedArray)
+            .Should().Equal(new Dictionary<string, bool> { ["csv"] = false, ["multi"] = true });
+    }
+
+    [Test]
     public void Describes_Responses()
     {
         var (model, _) = Create("""

@@ -269,4 +269,38 @@ public class NativeModelBranchTests
         json.Should().Contain("1E+300").And.Contain("\"x-one\":1.5");
         comparer.AreEquivalent(pathItem, pathItem).Should().BeTrue();
     }
+
+    [Test]
+    public void Names_Duplicate_Get_Operations_Returning_Arrays_GetAll()
+    {
+        var document = Load("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "T", "version": "1" },
+              "paths": {
+                "/pets": { "get": { "operationId": "pets_getPets", "responses": { "200": { "description": "ok", "content": { "application/json": { "schema": { "type": "array", "items": { "type": "string" } } } } } } } },
+                "/pets/{id}": { "get": { "operationId": "pets_getPets", "responses": { "200": { "description": "ok", "content": { "application/json": { "schema": { "type": "string" } } } } } } },
+                "/owners": { "get": { "operationId": "pets_getPets", "responses": { "201": { "description": "ok" } } } }
+              }
+            }
+            """);
+        var generator = new MultipleClientsFromOperationIdApiOperationNameGenerator();
+        string Name(string path) => generator.GetOperationName(document, path, "get", document.Paths[path]["get"]);
+
+        Name("/pets").Should().Be("GetAllPets");
+        Name("/pets/{id}").Should().Be("getPets");
+        Name("/owners").Should().Be("getPets");
+    }
+
+    [Test]
+    public void Client_Models_Create_The_Configured_Json_Converters()
+    {
+        var document = Load("""{ "openapi": "3.0.1", "info": { "title": "T", "version": "1" }, "paths": {} }""");
+        var settings = new ContractGeneratorSettings { JsonConverters = ["A", "B"] };
+
+        new ClientTemplateModel("Client", [], document, settings).JsonConvertersArrayCode
+            .Should().Be("new System.Text.Json.Serialization.JsonConverter[] { new A(), new B() }");
+        new ClientTemplateModel("Client", [], document, new ContractGeneratorSettings()).JsonConvertersArrayCode
+            .Should().BeEmpty();
+    }
 }

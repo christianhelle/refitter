@@ -11,6 +11,17 @@ public class ContractGeneratorFactoryNameGeneratorTests
         public string GetParameterName(ParameterNameContext context) => "provided" + context.Name;
     }
 
+    private sealed class RecordingParameterNameProvider : IParameterNameProvider
+    {
+        public List<ParameterNameContext> Contexts { get; } = new();
+
+        public string GetParameterName(ParameterNameContext context)
+        {
+            Contexts.Add(context);
+            return context.Name;
+        }
+    }
+
     private sealed class StubPropertyNameProvider : IPropertyNameProvider
     {
         public string GetPropertyName(PropertyNameContext context) => "Provided" + context.Name;
@@ -49,6 +60,40 @@ public class ContractGeneratorFactoryNameGeneratorTests
         generator.Settings.ParameterNameGenerator
             .Should().BeOfType<ProviderOperationParameterNameGenerator>()
             .Which.Provider.Should().BeSameAs(parameterNameProvider);
+    }
+
+    [Test]
+    public void Parameter_Name_Providers_Receive_The_Parameter_Source()
+    {
+        var provider = new RecordingParameterNameProvider();
+        var generator = new ProviderOperationParameterNameGenerator(provider);
+        ApiParameterKind[] kinds =
+        [
+            ApiParameterKind.Path,
+            ApiParameterKind.Query,
+            ApiParameterKind.Header,
+            ApiParameterKind.Cookie,
+            ApiParameterKind.Body,
+            ApiParameterKind.FormData,
+            ApiParameterKind.ModelBinding,
+            ApiParameterKind.Undefined,
+        ];
+        var parameters = kinds.Select(kind => new ApiParameter { Name = kind.ToString(), Kind = kind, IsRequired = kind == ApiParameterKind.Path }).ToList();
+
+        foreach (var parameter in parameters)
+            generator.Generate(parameter, parameters);
+
+        provider.Contexts.Select(c => c.Source).Should().Equal(
+            ParameterSource.Path,
+            ParameterSource.Query,
+            ParameterSource.Header,
+            ParameterSource.Cookie,
+            ParameterSource.Body,
+            ParameterSource.Form,
+            ParameterSource.Other,
+            ParameterSource.Other);
+        provider.Contexts[0].IsRequired.Should().BeTrue();
+        provider.Contexts[0].AllParameterNames.Should().HaveCount(kinds.Length);
     }
 
     [Test]
