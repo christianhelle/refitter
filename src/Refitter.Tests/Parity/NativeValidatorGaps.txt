@@ -14,7 +14,6 @@ fixtures/v2-missing-info.yaml
 fixtures/v2-unrecognized-enum-values.yaml
 fixtures/v2-wrong-node-types.yaml
 fixtures/wrong-node-types.yaml
-fixtures/multi-file-merge
 scenarios/Apizr.ApizrTests.OpenApiSpec
 scenarios/Apizr.ApizrWithCancellationTokensTests.OpenApiSpec
 scenarios/Parameters.ParameterExtractorEdgeCaseTests.OpenApiSpecComplexMultipart
