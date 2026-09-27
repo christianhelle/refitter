@@ -46,6 +46,13 @@ internal sealed class LocalHttpServer : IAsyncDisposable
         catch (ObjectDisposedException)
         {
         }
+        catch (InvalidOperationException)
+        {
+            // Stopping the listener before anyone connected ends the pending accept this way
+        }
+        catch (SocketException)
+        {
+        }
 
         cancellationTokenSource.Dispose();
     }
