@@ -64,6 +64,24 @@ public class GoldenOutputTests
         }
     }
 
+    [Test]
+    public void Every_Snapshot_Belongs_To_A_Spec()
+    {
+        var specFolders = ParitySpecs.All
+            .Select(spec => Path.GetDirectoryName(new ParityCase(spec.Id, ParityCase.DefaultVariant).DefaultSnapshotPath)!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var snapshotsFolder = Path.Combine(RepositoryPaths.Root, "src", "Refitter.Tests", "Parity", "Snapshots");
+
+        var orphans = Directory
+            .EnumerateFiles(snapshotsFolder, "*.cs.snap", SearchOption.AllDirectories)
+            .Select(Path.GetDirectoryName)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Where(folder => !specFolders.Contains(folder!))
+            .ToList();
+
+        orphans.Should().BeEmpty("snapshots of removed specs should be deleted");
+    }
+
     private static async Task UpdateSnapshotAsync(ParityCase parityCase, string actual)
     {
         var snapshotPath = parityCase.SnapshotPath;
