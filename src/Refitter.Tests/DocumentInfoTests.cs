@@ -92,16 +92,6 @@ definitions:
         generator.DocumentInfo.SchemaNames.Should().BeEquivalentTo("Pet");
     }
 
-    [Test]
-    public async Task Obsolete_OpenApiDocument_Still_Returns_Generated_Document()
-    {
-        var generator = await CreateGenerator(OpenApiV3Spec, new RefitGeneratorSettings());
-
-#pragma warning disable CS0618 // Covers the obsolete NSwag-typed property until it is removed
-        generator.OpenApiDocument.Should().BeSameAs(generator.NSwagDocument);
-#pragma warning restore CS0618
-    }
-
     private static async Task<RefitGenerator> CreateGenerator(string spec, RefitGeneratorSettings settings)
     {
         settings.OpenApiPath = await SwaggerFileHelper.CreateSwaggerFile(spec);
