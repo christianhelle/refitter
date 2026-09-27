@@ -590,7 +590,7 @@ internal sealed class ApiJsonReader
 
             if (property != null)
             {
-                if ((isOpenApi3 || isSwagger2) ? name == "readOnly" : isJsonSchema ? name == "readonly" : name == "x-readOnly")
+                if (isJsonSchema ? name == "readonly" : name == "readOnly")
                 {
                     property.IsReadOnly = ReadBoolean(value);
                     continue;
