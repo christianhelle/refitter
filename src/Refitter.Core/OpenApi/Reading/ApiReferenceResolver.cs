@@ -309,12 +309,21 @@ internal sealed class ApiReferenceResolver
             _ => reader.ReadSchema(json.RootElement),
         };
 
-        // The references inside responses, request bodies and path items read this way are not resolved,
-        // like before
-        if (result is ApiSchema schema)
+        var visited = new HashSet<object>();
+        switch (result)
         {
-            var visited = new HashSet<object>();
-            VisitSchema(schema, visited, document, document.DocumentPath);
+            case ApiSchema schema:
+                VisitSchema(schema, visited, document, document.DocumentPath);
+                break;
+            case ApiResponse response:
+                VisitResponse(response, visited, document, document.DocumentPath);
+                break;
+            case ApiRequestBody requestBody:
+                VisitRequestBody(requestBody, visited, document, document.DocumentPath);
+                break;
+            case ApiPathItem pathItem:
+                VisitPathItem(pathItem, visited, document);
+                break;
         }
 
         return result;
