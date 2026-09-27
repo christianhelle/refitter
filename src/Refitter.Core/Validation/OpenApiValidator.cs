@@ -15,10 +15,27 @@ public static class OpenApiValidator
     /// <param name="allowRemoteReferences">When false, remote and out-of-tree <c>$ref</c> references are rejected.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>A <see cref="OpenApiValidationResult"/> containing diagnostics and element counts.</returns>
+    /// <exception cref="UnsupportedSpecificationVersionException">Thrown when the document declares a specification version that is not supported.</exception>
     public static async Task<OpenApiValidationResult> Validate(
         string openApiFile,
         bool allowRemoteReferences = false,
         CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await ValidateCoreAsync(openApiFile, allowRemoteReferences, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (OpenApiUnsupportedSpecVersionException exception)
+        {
+            throw new UnsupportedSpecificationVersionException(exception.SpecificationVersion, exception);
+        }
+    }
+
+    private static async Task<OpenApiValidationResult> ValidateCoreAsync(
+        string openApiFile,
+        bool allowRemoteReferences,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

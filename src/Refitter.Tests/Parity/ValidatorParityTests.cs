@@ -116,7 +116,7 @@ public class ValidatorParityTests
     {
         var kind = exception.GetType().Name switch
         {
-            "OpenApiUnsupportedSpecVersionException" => "UnsupportedSpecificationVersion",
+            "UnsupportedSpecificationVersionException" => "UnsupportedSpecificationVersion",
             var name => name,
         };
 

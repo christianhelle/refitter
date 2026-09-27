@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
 
@@ -78,7 +77,7 @@ public sealed class GenerationOrchestrator
         {
             reporter.ReportGenerationFailed();
 
-            if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
+            if (exception is UnsupportedSpecificationVersionException unsupportedSpecVersionException)
                 reporter.ReportUnsupportedVersion(unsupportedSpecVersionException.SpecificationVersion);
 
             if (exception is OpenApiValidationException validationException)

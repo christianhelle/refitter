@@ -108,6 +108,21 @@ public class OpenApiValidatorTests
     }
 
     [Test]
+    public async Task Validate_Should_Throw_When_The_Specification_Version_Is_Not_Supported()
+    {
+        var openApiPath = await SwaggerFileHelper.CreateSwaggerJsonFile(
+            """
+            { "openapi": "4.0.0", "info": { "title": "Test API", "version": "1.0.0" }, "paths": {} }
+            """);
+
+        var act = () => OpenApiValidator.Validate(openApiPath);
+
+        var exception = await act.Should().ThrowAsync<UnsupportedSpecificationVersionException>()
+            .WithMessage("OpenAPI specification version '4.0.0' is not supported.");
+        exception.Which.SpecificationVersion.Should().Be("4.0.0");
+    }
+
+    [Test]
     public async Task Validate_Should_Throw_InvalidOperationException_When_Remote_Download_Fails()
     {
         var act = () => OpenApiValidator.Validate("http://127.0.0.1:1/openapi.json");
