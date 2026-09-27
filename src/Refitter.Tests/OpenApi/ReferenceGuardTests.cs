@@ -52,7 +52,7 @@ components:
     }
 
     private static string NewRoot() =>
-        Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
 
     [Test]
     public async Task Blocks_Remote_Reference_By_Default()

@@ -56,9 +56,6 @@ public static class BuildHelper
 
         var result = startResult && process.ExitCode == 0;
 
-        if (!result)
-            throw new BuildFailedException(errors.ToString(), output.ToString());
-
         try
         {
             Directory.Delete(path, true);
@@ -67,6 +64,9 @@ public static class BuildHelper
         {
             // Ignore cleanup errors
         }
+
+        if (!result)
+            throw new BuildFailedException(errors.ToString(), output.ToString());
 
         return result;
     }

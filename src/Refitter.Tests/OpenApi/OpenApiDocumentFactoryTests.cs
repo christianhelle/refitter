@@ -392,7 +392,7 @@ paths:
     [Test]
     public async Task Create_From_OpenApi_34_File_With_External_References_Returns_NotNull()
     {
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         var mainSpec = @"{
@@ -452,7 +452,7 @@ paths:
     public async Task Create_From_Json_File_With_External_References_Serializes_As_Json()
     {
         // Create a test folder for both files
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         // Create a main spec with external reference
@@ -511,7 +511,7 @@ paths:
     public async Task Create_From_Yaml_File_With_External_References_Serializes_As_Yaml()
     {
         // Create a test folder for both files
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         // Create a main YAML spec with external reference
@@ -556,7 +556,7 @@ paths:
     public async Task Create_Populates_Missing_Info_When_Null()
     {
         // Create a test folder for both files
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         // Spec with minimal info and external reference - OpenAPI requires info.title and info.version
@@ -630,7 +630,7 @@ paths:
     {
         // Test that external references are handled properly (covers lines 27-42)
         // This tests the SerializeAsJson path
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         var mainSpec = @"{
@@ -708,7 +708,7 @@ paths:
     {
         // Test that external references are handled properly (covers lines 27-42)
         // This tests the SerializeAsYaml path
-        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
         var mainSpec = @"openapi: 3.0.0
