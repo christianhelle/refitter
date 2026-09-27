@@ -80,7 +80,7 @@ public class RefitGenerator
             return document;
 
         var result = ApiDocumentWriter.Clone(document);
-        var cleaner = new ApiSchemaCleaner(result, keepSchemaPatterns)
+        var cleaner = new SchemaCleaner(result, keepSchemaPatterns)
         {
             IncludeInheritanceHierarchy = includeInheritanceHierarchy
         };

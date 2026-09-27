@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 using Refitter.Tests.TestUtilities;
 using TUnit.Core;

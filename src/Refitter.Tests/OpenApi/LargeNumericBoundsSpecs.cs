@@ -3,6 +3,8 @@ namespace Refitter.Tests.OpenApi;
 /// <summary>
 /// Specs with numeric bounds outside the decimal range, as Swashbuckle emits for [Range(0, double.MaxValue)] (#1273).
 /// </summary>
+using Refitter.Core;
+
 internal static class LargeNumericBoundsSpecs
 {
     public const string Yaml = """
@@ -35,9 +37,9 @@ internal static class LargeNumericBoundsSpecs
         }
         """;
 
-    public static decimal? GetMaximum(NSwag.OpenApiDocument document) =>
+    public static decimal? GetMaximum(ApiDocument document) =>
         document.Components.Schemas["M"].Properties["value"].Maximum;
 
-    public static decimal? GetMinimum(NSwag.OpenApiDocument document) =>
+    public static decimal? GetMinimum(ApiDocument document) =>
         document.Components.Schemas["M"].Properties["value"].Minimum;
 }

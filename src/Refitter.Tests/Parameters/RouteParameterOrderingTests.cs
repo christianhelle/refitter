@@ -19,7 +19,7 @@ public class RouteParameterOrderingTests
     /// The spec definition order is:          paramB, paramA
     ///
     /// Refitter's <see cref="RouteParameterExtractor"/> extracts parameters
-    /// from <c>CSharpOperationModel.Parameters</c> in the order NSwag provides
+    /// from <c>OperationModel.Parameters</c> in the order the operation model provides
     /// them — i.e., the OpenAPI document parameter definition order — without
     /// any sorting by URL position. This is the bug this test proves.
     /// </summary>

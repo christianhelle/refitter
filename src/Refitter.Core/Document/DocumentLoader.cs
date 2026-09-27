@@ -1,5 +1,3 @@
-using OpenApiDocument = NSwag.OpenApiDocument;
-
 namespace Refitter.Core;
 
 internal sealed class DocumentLoader : IDocumentLoader
@@ -19,7 +17,7 @@ internal sealed class DocumentLoader : IDocumentLoader
         this.strategies = strategies.ToList();
     }
 
-    public async Task<OpenApiDocument> LoadAsync(
+    public async Task<ApiDocument> LoadAsync(
         string path,
         CancellationToken cancellationToken = default)
     {

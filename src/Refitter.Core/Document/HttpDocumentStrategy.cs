@@ -1,5 +1,4 @@
 using System.Net;
-using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
 
@@ -17,7 +16,7 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
         this.httpClient = httpClient;
     }
 
-    public async Task<OpenApiDocument?> TryLoadAsync(
+    public async Task<ApiDocument?> TryLoadAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
@@ -36,9 +35,7 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
                 .ReadAsStringWithCancellationAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            return await OpenApiDocumentParser
-                .ParseAsync(content, null, PathUtilities.IsYaml(path), cancellationToken)
-                .ConfigureAwait(false);
+            return ApiDocumentLoader.Load(content, null, PathUtilities.IsYaml(path));
         }
         catch (Exception ex)
         {
