@@ -102,10 +102,10 @@ public sealed class GenerationOrchestrator
     {
         reporter.ReportValidationFailed();
 
-        foreach (OpenApiError error in exception.ValidationResult.Diagnostics.Errors)
+        foreach (ValidationIssue error in exception.ValidationResult.Diagnostics.Errors)
             reporter.ReportValidationDiagnostic(error, isError: true);
 
-        foreach (OpenApiError warning in exception.ValidationResult.Diagnostics.Warnings)
+        foreach (ValidationIssue warning in exception.ValidationResult.Diagnostics.Warnings)
             reporter.ReportValidationDiagnostic(warning, isError: false);
     }
 

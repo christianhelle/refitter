@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using Microsoft.OpenApi.Reader;
 using Refitter.Core.Validation;
 
 namespace Refitter.Tests.OpenApi;
@@ -10,7 +9,7 @@ public class OpenApiValidationExceptionTests
     [Test]
     public void Should_Have_Correct_Message()
     {
-        var diagnostic = new OpenApiDiagnostic();
+        var diagnostic = new ValidationDiagnostics();
         var stats = new OpenApiStats();
         var validationResult = new OpenApiValidationResult(diagnostic, stats);
 
@@ -22,7 +21,7 @@ public class OpenApiValidationExceptionTests
     [Test]
     public void Should_Expose_ValidationResult_Property()
     {
-        var diagnostic = new OpenApiDiagnostic();
+        var diagnostic = new ValidationDiagnostics();
         var stats = new OpenApiStats();
         var validationResult = new OpenApiValidationResult(diagnostic, stats);
 
@@ -34,7 +33,7 @@ public class OpenApiValidationExceptionTests
     [Test]
     public void Should_Be_Throwable()
     {
-        var diagnostic = new OpenApiDiagnostic();
+        var diagnostic = new ValidationDiagnostics();
         var stats = new OpenApiStats();
         var validationResult = new OpenApiValidationResult(diagnostic, stats);
 
@@ -47,7 +46,7 @@ public class OpenApiValidationExceptionTests
     [Test]
     public void Should_Inherit_From_Exception()
     {
-        var diagnostic = new OpenApiDiagnostic();
+        var diagnostic = new ValidationDiagnostics();
         var stats = new OpenApiStats();
         var validationResult = new OpenApiValidationResult(diagnostic, stats);
 

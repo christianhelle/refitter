@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Reader;
 using Refitter.Core;
 using Refitter.Core.Validation;
 
@@ -963,9 +961,9 @@ public class GenerationOrchestratorTests
     [Test]
     public void ReportValidationDiagnostics_Reports_Both_Errors_And_Warnings()
     {
-        OpenApiDiagnostic diagnostic = new OpenApiDiagnostic();
-        diagnostic.Errors.Add(new OpenApiError("error-pointer", "an error"));
-        diagnostic.Warnings.Add(new OpenApiError("warning-pointer", "a warning"));
+        ValidationDiagnostics diagnostic = new ValidationDiagnostics();
+        diagnostic.Errors.Add(new ValidationIssue("error-pointer", "an error"));
+        diagnostic.Warnings.Add(new ValidationIssue("warning-pointer", "a warning"));
 
         OpenApiValidationException exception = new OpenApiValidationException(
             new OpenApiValidationResult(diagnostic, new OpenApiStats()));
@@ -985,7 +983,7 @@ public class GenerationOrchestratorTests
     public void ReportValidationDiagnostics_Reports_Failure_When_There_Are_No_Diagnostics()
     {
         OpenApiValidationException exception = new OpenApiValidationException(
-            new OpenApiValidationResult(new OpenApiDiagnostic(), new OpenApiStats()));
+            new OpenApiValidationResult(new ValidationDiagnostics(), new OpenApiStats()));
 
         CapturingGenerationReporter reporter = new CapturingGenerationReporter();
         GenerationOrchestrator.ReportValidationDiagnostics(reporter, exception);
@@ -1027,7 +1025,7 @@ public class GenerationOrchestratorTests
         public void ReportFileWritten(string outputPath) { }
         public async Task<OpenApiValidationResult> ValidateWithProgressAsync(Func<Task<OpenApiValidationResult>> validate, CancellationToken cancellationToken = default) => await validate();
         public void ReportValidationFailed() { }
-        public void ReportValidationDiagnostic(OpenApiError error, bool isError) { }
+        public void ReportValidationDiagnostic(ValidationIssue error, bool isError) { }
         public void ReportValidationStatistics(OpenApiValidationResult validationResult) { }
         public void ReportSuccess(TimeSpan duration, bool multipleFiles) { }
         public void ReportDonationBanner() { }
@@ -1089,9 +1087,9 @@ public class GenerationOrchestratorTests
 
         public void ReportValidationFailed() => ValidationFailedCalled = true;
 
-        public List<(OpenApiError Error, bool IsError)> ValidationDiagnostics { get; } = [];
+        public List<(ValidationIssue Error, bool IsError)> ValidationDiagnostics { get; } = [];
 
-        public void ReportValidationDiagnostic(OpenApiError error, bool isError) =>
+        public void ReportValidationDiagnostic(ValidationIssue error, bool isError) =>
             ValidationDiagnostics.Add((error, isError));
 
         public void ReportValidationStatistics(OpenApiValidationResult validationResult) { }

@@ -58,7 +58,7 @@ public static class OpenApiValidator
 
             AttributeStringValidator.Validate(msDocument, diagnostic);
 
-            return new(diagnostic, statsVisitor);
+            return new(ToValidationDiagnostics(diagnostic), statsVisitor);
         }
 
         // For local files, validate first (reads once), then parse with OpenApiMultiFileReader
@@ -76,7 +76,29 @@ public static class OpenApiValidator
         AttributeStringValidator.Validate(result.OpenApiDocument, result.OpenApiDiagnostic);
 
         return new(
-            result.OpenApiDiagnostic,
+            ToValidationDiagnostics(result.OpenApiDiagnostic),
             stats);
+    }
+
+    private static ValidationDiagnostics ToValidationDiagnostics(OpenApiDiagnostic diagnostic)
+    {
+        var diagnostics = new ValidationDiagnostics
+        {
+            SpecificationVersion = diagnostic.SpecificationVersion switch
+            {
+                OpenApiSpecVersion.OpenApi3_0 => OpenApiSpecificationVersion.OpenApi3_0,
+                OpenApiSpecVersion.OpenApi3_1 => OpenApiSpecificationVersion.OpenApi3_1,
+                OpenApiSpecVersion.OpenApi3_2 => OpenApiSpecificationVersion.OpenApi3_2,
+                _ => OpenApiSpecificationVersion.OpenApi2_0,
+            },
+        };
+
+        foreach (var error in diagnostic.Errors)
+            diagnostics.Errors.Add(new ValidationIssue(error.Pointer, error.Message));
+
+        foreach (var warning in diagnostic.Warnings)
+            diagnostics.Warnings.Add(new ValidationIssue(warning.Pointer, warning.Message));
+
+        return diagnostics;
     }
 }
