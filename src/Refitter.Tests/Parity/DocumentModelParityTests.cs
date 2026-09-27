@@ -11,7 +11,9 @@ namespace Refitter.Tests.Parity;
 /// Temporary differential test for the NSwag removal: the native document model must describe every parity
 /// spec exactly like the NSwag model does. Deleted together with NSwag.
 /// </summary>
+// NSwag keeps (thread static) state while reading and writing documents, which makes concurrent reads unreliable
 [Category("Parity")]
+[NotInParallel("NSwagDocument")]
 public class DocumentModelParityTests
 {
     public static IEnumerable<Func<string>> Specs() =>
@@ -44,6 +46,42 @@ public class DocumentModelParityTests
         catch (Exception exception)
         {
             actual = expected == "!! load failed" ? "!! load failed" : "!! load failed: " + exception;
+        }
+
+        if (expected != actual)
+        {
+            throw new InvalidOperationException(DescribeFirstDifference(expected, actual));
+        }
+    }
+
+    [Test]
+    [MethodDataSource(nameof(Specs))]
+    public async Task Native_Document_Copy_Matches_NSwag(string specId)
+    {
+        var path = ParitySpecs.Get(specId).Path;
+
+        string expected;
+        try
+        {
+            var nswagDocument = await OpenApiDocumentParser.FromFileAsync(path);
+            var copy = await OpenApiDocument.FromJsonAsync(nswagDocument.ToJson());
+            expected = new NSwagDumper(copy).Dump();
+        }
+        catch (Exception exception)
+        {
+            expected = "!! copy failed";
+            _ = exception;
+        }
+
+        string actual;
+        try
+        {
+            var nativeDocument = ApiDocumentLoader.LoadFile(path);
+            actual = new NativeDumper(ApiDocumentWriter.Clone(nativeDocument)).Dump();
+        }
+        catch (Exception exception)
+        {
+            actual = expected == "!! copy failed" ? "!! copy failed" : "!! copy failed: " + exception;
         }
 
         if (expected != actual)
