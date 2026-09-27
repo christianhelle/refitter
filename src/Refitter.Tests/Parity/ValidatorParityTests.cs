@@ -70,6 +70,13 @@ public class ValidatorParityTests
             }
         }
 
+        // Lists the first difference of every gap, to see what the native validator still gets wrong
+        var reportPath = Environment.GetEnvironmentVariable("REFITTER_NATIVE_GAPS_REPORT");
+        if (!string.IsNullOrEmpty(reportPath))
+        {
+            await File.WriteAllLinesAsync(reportPath, gaps.Select(id => $"{id}\t{firstDifferences[id]}"));
+        }
+
         if (Environment.GetEnvironmentVariable("REFITTER_UPDATE_NATIVE_GAPS") == "1")
         {
             await File.WriteAllLinesAsync(gapsPath, gaps);
