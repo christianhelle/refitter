@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Text.Json.Serialization;
-using NJsonSchema.CodeGeneration;
 
 namespace Refitter.Core;
 
@@ -259,16 +258,8 @@ public class CodeGeneratorSettings
     public string? DateTimeFormat { get; set; }
 
     /// <summary>
-    /// Gets or sets a custom <see cref="IPropertyNameGenerator"/>.
-    /// </summary>
-    [Description("Gets or sets a custom IPropertyNameGenerator.")]
-    [JsonIgnore]
-    [Obsolete("Use PropertyNameProvider instead. PropertyNameGenerator exposes NJsonSchema types and will be removed in the next major version.")]
-    public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
-
-    /// <summary>
     /// Gets or sets a custom <see cref="IPropertyNameProvider"/> that names the properties of generated contracts.
-    /// Takes precedence over <see cref="PropertyNameGenerator"/> and <see cref="RefitGeneratorSettings.PropertyNamingPolicy"/>.
+    /// Takes precedence over <see cref="RefitGeneratorSettings.PropertyNamingPolicy"/>.
     /// </summary>
     [Description("Gets or sets a custom IPropertyNameProvider.")]
     [JsonIgnore]

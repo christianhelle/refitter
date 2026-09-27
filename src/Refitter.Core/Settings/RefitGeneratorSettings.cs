@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using NSwag.CodeGeneration;
+
 
 namespace Refitter.Core;
 
@@ -405,15 +405,7 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public bool UsePolymorphicSerialization { get; set; }
 
     /// <summary>
-    /// Gets or sets the parameter name generator for customizing parameter names.
-    /// </summary>
-    [JsonIgnore]
-    [Obsolete("Use ParameterNameProvider instead. ParameterNameGenerator exposes NSwag types and will be removed in the next major version.")]
-    public IParameterNameGenerator? ParameterNameGenerator { get; set; }
-
-    /// <summary>
     /// Gets or sets a custom <see cref="IParameterNameProvider"/> that names the parameters of generated interface methods.
-    /// Takes precedence over <see cref="ParameterNameGenerator"/>.
     /// </summary>
     [JsonIgnore]
     public IParameterNameProvider? ParameterNameProvider { get; set; }

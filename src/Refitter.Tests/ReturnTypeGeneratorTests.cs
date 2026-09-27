@@ -1437,9 +1437,6 @@ public class ReturnTypeGeneratorTests
 #pragma warning disable CS0618 // Deprecated custom templates are still honored
         public string? CustomTemplateDirectory => inner.CustomTemplateDirectory;
 #pragma warning restore CS0618
-#pragma warning disable CS0618 // Implements the obsolete NSwag-typed hook
-        public NSwag.CodeGeneration.IParameterNameGenerator? ParameterNameGenerator => inner.ParameterNameGenerator;
-#pragma warning restore CS0618
         public IParameterNameProvider? ParameterNameProvider => inner.ParameterNameProvider;
         public bool UsePolymorphicSerialization => inner.UsePolymorphicSerialization;
         public bool UseCancellationTokens => inner.UseCancellationTokens;

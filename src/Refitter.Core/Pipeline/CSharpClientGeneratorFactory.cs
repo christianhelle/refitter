@@ -93,12 +93,6 @@ internal class CSharpClientGeneratorFactory
             csharpClientGeneratorSettings.ParameterNameGenerator =
                 new ParameterNameProviderAdapter(codeGeneration.ParameterNameProvider);
         }
-#pragma warning disable CS0618 // Kept until the NSwag-typed hook is removed
-        else if (codeGeneration.ParameterNameGenerator != null)
-        {
-            csharpClientGeneratorSettings.ParameterNameGenerator = codeGeneration.ParameterNameGenerator;
-        }
-#pragma warning restore CS0618
 
         csharpClientGeneratorSettings.CSharpGeneratorSettings.TemplateFactory
             = new CustomTemplateFactory(csharpClientGeneratorSettings.CSharpGeneratorSettings);
@@ -125,13 +119,6 @@ internal class CSharpClientGeneratorFactory
         {
             return new UniquePropertyNameGenerator(new PropertyNameProviderAdapter(propertyNameProvider), getTypeName);
         }
-
-#pragma warning disable CS0618 // Kept until the NSwag-typed hook is removed
-        if (codeGeneration.CodeGeneratorSettings?.PropertyNameGenerator is { } propertyNameGenerator)
-        {
-            return propertyNameGenerator;
-        }
-#pragma warning restore CS0618
 
         IPropertyNameGenerator inner = naming.PropertyNamingPolicy switch
         {
