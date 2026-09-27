@@ -329,8 +329,8 @@ internal sealed class ApiReferenceResolver
             var isHttp = documentLocation.StartsWith("http://", StringComparison.Ordinal) ||
                          documentLocation.StartsWith("https://", StringComparison.Ordinal);
             var content = isHttp ? loadUrl(documentLocation) : File.ReadAllText(documentLocation);
-            if (PathUtilities.IsYaml(documentLocation) || !content.TrimStart().StartsWith("{", StringComparison.Ordinal))
-                content = OpenApiDocumentParser.ConvertYamlToJson(content);
+            var isYaml = PathUtilities.IsYaml(documentLocation) || !content.TrimStart().StartsWith("{", StringComparison.Ordinal);
+            content = ApiDocumentLoader.PrepareJson(content, isYaml);
 
             externalDocument = new ExternalDocument(documentLocation, JsonDocument.Parse(content, ApiDocumentLoader.JsonOptions));
             externalDocuments[documentLocation] = externalDocument;

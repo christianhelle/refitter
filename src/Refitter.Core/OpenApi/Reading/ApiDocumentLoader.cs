@@ -1,7 +1,9 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text;
 using System.Text.RegularExpressions;
+using YamlDotNet.Serialization;
 
 namespace Refitter.Core;
 
@@ -26,7 +28,7 @@ internal static class ApiDocumentLoader
 
     public static ApiDocument Load(string content, string? documentPath, bool isYaml)
     {
-        var json = isYaml ? OpenApiDocumentParser.ConvertYamlToJson(content) : content;
+        var json = PrepareJson(content, isYaml);
         var schemaType = DetectSchemaType(json);
 
         using var jsonDocument = JsonDocument.Parse(InlinePathItemReferences(json), JsonOptions);
@@ -35,6 +37,56 @@ internal static class ApiDocumentLoader
 
         new ApiReferenceResolver(document, DownloadText).Resolve();
         return document;
+    }
+
+    /// <summary>Converts YAML to JSON, and escapes the control characters that JSON strings cannot contain.</summary>
+    internal static string PrepareJson(string content, bool isYaml) =>
+        EscapeControlCharactersInStrings(isYaml ? ConvertYamlToJson(content) : content);
+
+    /// <summary>Converts YAML to JSON. Every scalar becomes a string (null stays null).</summary>
+    internal static string ConvertYamlToJson(string yaml)
+    {
+        var yamlObject = new DeserializerBuilder().Build().Deserialize(new StringReader(yaml));
+        return new SerializerBuilder().JsonCompatible().Build().Serialize(yamlObject!);
+    }
+
+    /// <summary>
+    /// Escapes control characters (e.g. tabs) that appear unescaped in JSON strings, which documents have
+    /// always been allowed to contain.
+    /// </summary>
+    internal static string EscapeControlCharactersInStrings(string json)
+    {
+        StringBuilder? builder = null;
+        var inString = false;
+        var escaped = false;
+        for (var i = 0; i < json.Length; i++)
+        {
+            var c = json[i];
+            if (inString && !escaped && c < ' ')
+            {
+                builder ??= new StringBuilder(json.Length + 16).Append(json, 0, i);
+                builder.Append("\\u").Append(((int)c).ToString("x4", System.Globalization.CultureInfo.InvariantCulture));
+                continue;
+            }
+
+            if (inString)
+            {
+                if (escaped)
+                    escaped = false;
+                else if (c == '\\')
+                    escaped = true;
+                else if (c == '"')
+                    inString = false;
+            }
+            else if (c == '"')
+            {
+                inString = true;
+            }
+
+            builder?.Append(c);
+        }
+
+        return builder?.ToString() ?? json;
     }
 
     /// <summary>Detects the specification from the version field, and falls back to Swagger 2.0.</summary>
