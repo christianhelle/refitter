@@ -1,11 +1,14 @@
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Reader;
+using Refitter.Core.Validation.Reading;
 
 namespace Refitter.Core.Validation;
 
 /// <summary>
 /// Validates an OpenAPI specification file and collects statistics about its contents.
 /// </summary>
+/// <remarks>
+/// The diagnostics and statistics reproduce those of Microsoft.OpenApi (MIT license), which Refitter used to
+/// validate with: the same problems are reported, at the same JSON pointers and with the same messages.
+/// </remarks>
 public static class OpenApiValidator
 {
     /// <summary>
@@ -21,35 +24,20 @@ public static class OpenApiValidator
         bool allowRemoteReferences = false,
         CancellationToken cancellationToken = default)
     {
-        try
-        {
-            return await ValidateCoreAsync(openApiFile, allowRemoteReferences, cancellationToken)
-                .ConfigureAwait(false);
-        }
-        catch (OpenApiUnsupportedSpecVersionException exception)
-        {
-            throw new UnsupportedSpecificationVersionException(exception.SpecificationVersion, exception);
-        }
-    }
-
-    private static async Task<OpenApiValidationResult> ValidateCoreAsync(
-        string openApiFile,
-        bool allowRemoteReferences,
-        CancellationToken cancellationToken)
-    {
         cancellationToken.ThrowIfCancellationRequested();
 
-        // For remote URLs, fetch once and validate before parsing
+        byte[] content;
+        Uri? baseUrl = null;
         if (PathUtilities.IsHttp(openApiFile))
         {
-            string content;
+            string text;
             try
             {
                 using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
                 using var httpResponse = await client.SendAsync(
                     new HttpRequestMessage(HttpMethod.Get, openApiFile),
                     cancellationToken).ConfigureAwait(false);
-                content = await httpResponse.Content
+                text = await httpResponse.Content
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
@@ -58,64 +46,51 @@ public static class OpenApiValidator
                 throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiFile}'.", ex);
             }
 
-            await ReferenceGuard.ValidateAsync(openApiFile, content, allowRemoteReferences, cancellationToken)
+            await ReferenceGuard.ValidateAsync(openApiFile, text, allowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
 
-            // Parse the already-fetched content using Microsoft.OpenApi
-            var readerSettings = new OpenApiReaderSettings();
-            readerSettings.AddYamlReader();
-            using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content));
-            var loadResult = await OpenApiDocument.LoadAsync(stream, settings: readerSettings, cancellationToken: cancellationToken).ConfigureAwait(false);
-            var msDocument = loadResult.Document;
-            var diagnostic = loadResult.Diagnostic ?? new OpenApiDiagnostic();
+            content = System.Text.Encoding.UTF8.GetBytes(text);
+        }
+        else
+        {
+            await ReferenceGuard.ValidateAsync(openApiFile, allowRemoteReferences, cancellationToken)
+                .ConfigureAwait(false);
 
-            var statistics = new OpenApiStats();
-            var walker = new OpenApiWalker(new OpenApiStatsVisitor(statistics));
-            walker.Walk(msDocument);
+            content = ReadFile(openApiFile);
 
-            AttributeStringValidator.Validate(msDocument, diagnostic);
-
-            return new(ToValidationDiagnostics(diagnostic), statistics);
+            // Microsoft.OpenApi reads local files relative to their folder
+            baseUrl = new Uri($"file://{new FileInfo(openApiFile).DirectoryName}{Path.DirectorySeparatorChar}");
         }
 
-        // For local files, validate first (reads once), then parse with OpenApiMultiFileReader
-        await ReferenceGuard.ValidateAsync(openApiFile, allowRemoteReferences, cancellationToken)
-            .ConfigureAwait(false);
+        var (document, diagnostics) = SpecDocumentReader.Read(content, baseUrl);
 
-        var result = await OpenApiMultiFileReader.Read(
-            openApiFile,
-            cancellationToken: cancellationToken);
+        // Microsoft.OpenApi resolves references against the components the document was read with
+        var registered = document?.Components?.Copy();
+        if (PathUtilities.IsHttp(openApiFile))
+        {
+            // Microsoft.OpenApi only applied its validation rules to documents downloaded from a URL
+            SpecRuleValidator.Validate(document, diagnostics);
+        }
+        else if (document != null)
+        {
+            ExternalReferenceMerger.Merge(document, openApiFile, registered);
+        }
 
-        var stats = new OpenApiStats();
-        var openApiWalker = new OpenApiWalker(new OpenApiStatsVisitor(stats));
-        openApiWalker.Walk(result.OpenApiDocument);
-
-        AttributeStringValidator.Validate(result.OpenApiDocument, result.OpenApiDiagnostic);
-
-        return new(
-            ToValidationDiagnostics(result.OpenApiDiagnostic),
-            stats);
+        var statistics = SpecStatistics.Count(document);
+        AttributeStringValidator.Validate(document, registered, diagnostics);
+        return new OpenApiValidationResult(diagnostics, statistics);
     }
 
-    private static ValidationDiagnostics ToValidationDiagnostics(OpenApiDiagnostic diagnostic)
+    private static byte[] ReadFile(string openApiFile)
     {
-        var diagnostics = new ValidationDiagnostics
+        try
         {
-            SpecificationVersion = diagnostic.SpecificationVersion switch
-            {
-                OpenApiSpecVersion.OpenApi3_0 => OpenApiSpecificationVersion.OpenApi3_0,
-                OpenApiSpecVersion.OpenApi3_1 => OpenApiSpecificationVersion.OpenApi3_1,
-                OpenApiSpecVersion.OpenApi3_2 => OpenApiSpecificationVersion.OpenApi3_2,
-                _ => OpenApiSpecificationVersion.OpenApi2_0,
-            },
-        };
-
-        foreach (var error in diagnostic.Errors)
-            diagnostics.Errors.Add(new ValidationIssue(error.Pointer, error.Message));
-
-        foreach (var warning in diagnostic.Warnings)
-            diagnostics.Warnings.Add(new ValidationIssue(warning.Pointer, warning.Message));
-
-        return diagnostics;
+            return File.ReadAllBytes(openApiFile);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException
+                                       or System.Security.SecurityException)
+        {
+            throw new InvalidOperationException("Could not open the file at " + openApiFile, ex);
+        }
     }
 }

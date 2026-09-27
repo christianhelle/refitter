@@ -1,5 +1,4 @@
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Reader;
+using Refitter.Core.Validation.Model;
 
 namespace Refitter.Core.Validation;
 
@@ -14,115 +13,119 @@ internal static class AttributeStringValidator
     internal static bool ContainsUnsafeCharacters(string? value) =>
         value != null && value.Any(c => c is '"' or '\\' || char.IsControl(c));
 
-    internal static void Validate(OpenApiDocument? document, OpenApiDiagnostic diagnostic)
+    /// <param name="document">The document to check.</param>
+    /// <param name="registered">The components references resolve against.</param>
+    /// <param name="diagnostics">The diagnostics to add errors to.</param>
+    internal static void Validate(SpecDocument? document, SpecComponents? registered, ValidationDiagnostics diagnostics)
     {
         if (document == null)
             return;
 
-        ValidateSecuritySchemes(document, diagnostic);
+        ValidateSecuritySchemes(document, registered, diagnostics);
 
         if (document.Paths == null)
             return;
 
         // Accept/Content-Type headers are only emitted from content map keys for OpenAPI 3.0+,
         // so only reject unsafe content-type keys for those documents to avoid Swagger 2.0 false positives.
-        var validateContentTypes = diagnostic.SpecificationVersion != OpenApiSpecVersion.OpenApi2_0;
+        var validateContentTypes = diagnostics.SpecificationVersion != OpenApiSpecificationVersion.OpenApi2_0;
 
         foreach (var path in document.Paths)
         {
-            ValidatePath(path.Key, diagnostic);
+            ValidatePath(path.Key, diagnostics);
 
-            if (path.Value?.Operations == null)
+            var operations = SpecReferences.Resolve(path.Value, c => c.PathItems, registered)?.Operations;
+            if (operations == null)
                 continue;
 
-            foreach (var operation in path.Value.Operations.Values)
+            foreach (var operation in operations.Values)
             {
-                if (operation == null)
-                    continue;
-
-                ValidateHeaderParameters(operation, diagnostic);
+                ValidateHeaderParameters(operation, registered, diagnostics);
 
                 if (validateContentTypes)
-                    ValidateContentTypeKeys(operation, diagnostic);
+                    ValidateContentTypeKeys(operation, registered, diagnostics);
             }
         }
     }
 
-    private static void ValidateSecuritySchemes(OpenApiDocument document, OpenApiDiagnostic diagnostic)
+    private static void ValidateSecuritySchemes(SpecDocument document, SpecComponents? registered, ValidationDiagnostics diagnostics)
     {
         if (document.Components?.SecuritySchemes == null)
             return;
 
-        // Validate security scheme names for API-key schemes with header location
         foreach (var securityScheme in document.Components.SecuritySchemes)
         {
-            if (securityScheme.Value?.Type == SecuritySchemeType.ApiKey
-                && securityScheme.Value.In == ParameterLocation.Header
-                && ContainsUnsafeCharacters(securityScheme.Value.Name))
+            var scheme = SpecReferences.Resolve(securityScheme.Value, c => c.SecuritySchemes, registered);
+            if (scheme?.Type == SpecSecuritySchemeType.ApiKey
+                && scheme.In == SpecParameterLocation.Header
+                && ContainsUnsafeCharacters(scheme.Name))
             {
-                diagnostic.Errors.Add(new OpenApiError(
+                diagnostics.Errors.Add(new ValidationIssue(
                     securityScheme.Key,
-                    $"Security scheme '{securityScheme.Key}' has header name '{securityScheme.Value.Name}' containing illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
+                    $"Security scheme '{securityScheme.Key}' has header name '{scheme.Name}' containing illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
             }
         }
     }
 
-    private static void ValidatePath(string path, OpenApiDiagnostic diagnostic)
+    private static void ValidatePath(string path, ValidationDiagnostics diagnostics)
     {
         if (ContainsUnsafeCharacters(path))
         {
-            diagnostic.Errors.Add(new OpenApiError(
+            diagnostics.Errors.Add(new ValidationIssue(
                 path,
                 $"Path '{path}' contains illegal characters (quotes, backslashes, or control characters) and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
         }
     }
 
-    private static void ValidateHeaderParameters(OpenApiOperation operation, OpenApiDiagnostic diagnostic)
+    private static void ValidateHeaderParameters(SpecOperation operation, SpecComponents? registered, ValidationDiagnostics diagnostics)
     {
         if (operation.Parameters == null)
             return;
 
-        foreach (var parameter in operation.Parameters)
+        foreach (var reference in operation.Parameters)
         {
-            if (parameter.In == ParameterLocation.Header && ContainsUnsafeCharacters(parameter.Name))
+            var parameter = SpecReferences.Resolve(reference, c => c.Parameters, registered);
+            if (parameter?.In == SpecParameterLocation.Header && ContainsUnsafeCharacters(parameter.Name))
             {
-                diagnostic.Errors.Add(new OpenApiError(
+                diagnostics.Errors.Add(new ValidationIssue(
                     parameter.Name ?? string.Empty,
                     $"Header parameter name '{parameter.Name}' contains illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
             }
         }
     }
 
-    private static void ValidateContentTypeKeys(OpenApiOperation operation, OpenApiDiagnostic diagnostic)
+    private static void ValidateContentTypeKeys(SpecOperation operation, SpecComponents? registered, ValidationDiagnostics diagnostics)
     {
-        if (operation.RequestBody?.Content != null)
+        var requestBody = SpecReferences.Resolve(operation.RequestBody, c => c.RequestBodies, registered);
+        if (requestBody?.Content != null)
         {
-            foreach (var contentType in operation.RequestBody.Content.Keys)
+            foreach (var contentType in requestBody.Content.Keys)
             {
-                AddContentTypeErrorIfUnsafe(contentType, diagnostic);
+                AddContentTypeErrorIfUnsafe(contentType, diagnostics);
             }
         }
 
         if (operation.Responses == null)
             return;
 
-        foreach (var response in operation.Responses.Values)
+        foreach (var reference in operation.Responses.Values)
         {
+            var response = SpecReferences.Resolve(reference, c => c.Responses, registered);
             if (response?.Content == null)
                 continue;
 
             foreach (var contentType in response.Content.Keys)
             {
-                AddContentTypeErrorIfUnsafe(contentType, diagnostic);
+                AddContentTypeErrorIfUnsafe(contentType, diagnostics);
             }
         }
     }
 
-    private static void AddContentTypeErrorIfUnsafe(string contentType, OpenApiDiagnostic diagnostic)
+    private static void AddContentTypeErrorIfUnsafe(string contentType, ValidationDiagnostics diagnostics)
     {
         if (ContainsUnsafeCharacters(contentType))
         {
-            diagnostic.Errors.Add(new OpenApiError(
+            diagnostics.Errors.Add(new ValidationIssue(
                 contentType,
                 $"Content type '{contentType}' contains illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
         }
