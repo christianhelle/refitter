@@ -35,7 +35,7 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
                 .ReadAsStringWithCancellationAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            return ApiDocumentLoader.Load(content, null, PathUtilities.IsYaml(path));
+            return ApiDocumentLoader.Load(content, path, PathUtilities.IsYaml(path));
         }
         catch (Exception ex)
         {

@@ -95,7 +95,7 @@ internal static class ApiDocumentFactory
 
             await ReferenceGuard.ValidateAsync(openApiPath, content, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
 
-            return ApiDocumentLoader.Load(content, null, PathUtilities.IsYaml(openApiPath));
+            return ApiDocumentLoader.Load(content, openApiPath, PathUtilities.IsYaml(openApiPath));
         }
 
         await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);

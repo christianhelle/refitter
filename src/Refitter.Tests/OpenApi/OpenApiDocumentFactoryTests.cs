@@ -30,6 +30,7 @@ public class OpenApiDocumentFactoryTests
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
         document.Info!.Title.Should().NotBeNullOrWhiteSpace();
+        document.DocumentPath.Should().Be(server.Url);
     }
 
     [Test]
