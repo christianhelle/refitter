@@ -123,36 +123,11 @@ internal sealed class ContractGenerator
 
     private IEnumerable<ContractArtifact> GenerateTypes()
     {
-        var processedTypes = new HashSet<string>(StringComparer.Ordinal);
-        var artifacts = new Dictionary<string, ContractArtifact>(StringComparer.Ordinal);
-        var artifactOrder = new List<string>();
-
-        var pending = GetTypesRequiringGeneration(processedTypes);
-        while (pending.Count > 0)
-        {
-            foreach (var type in pending)
-            {
-                processedTypes.Add(type.Value);
-                var artifact = GenerateType(type.Key, type.Value);
-                if (!Settings.ExcludedTypeNames.Contains(artifact.TypeName))
-                {
-                    if (!artifacts.ContainsKey(artifact.TypeName))
-                        artifactOrder.Add(artifact.TypeName);
-
-                    artifacts[artifact.TypeName] = artifact;
-                }
-            }
-
-            pending = GetTypesRequiringGeneration(processedTypes);
-        }
-
-        var result = new List<ContractArtifact>(artifactOrder.Count);
+        var result = GenerateSchemaTypes();
         var usesInheritanceConverter = false;
         var usesDateFormatConverter = false;
-        foreach (var name in artifactOrder)
+        foreach (var artifact in result)
         {
-            var artifact = artifacts[name];
-            result.Add(artifact);
             usesInheritanceConverter |= artifact.Code.Contains("JsonInheritanceConverter");
             usesDateFormatConverter |= artifact.Code.Contains("DateFormatConverter");
         }
@@ -183,6 +158,35 @@ internal sealed class ContractGenerator
         }
 
         return result.Concat(utilities);
+    }
+
+    /// <summary>Generates the types of the schemas, including the ones the generated types refer to.</summary>
+    private List<ContractArtifact> GenerateSchemaTypes()
+    {
+        var processedTypes = new HashSet<string>(StringComparer.Ordinal);
+        var artifacts = new Dictionary<string, ContractArtifact>(StringComparer.Ordinal);
+        var artifactOrder = new List<string>();
+
+        var pending = GetTypesRequiringGeneration(processedTypes);
+        while (pending.Count > 0)
+        {
+            foreach (var type in pending)
+            {
+                processedTypes.Add(type.Value);
+                var artifact = GenerateType(type.Key, type.Value);
+                if (!Settings.ExcludedTypeNames.Contains(artifact.TypeName))
+                {
+                    if (!artifacts.ContainsKey(artifact.TypeName))
+                        artifactOrder.Add(artifact.TypeName);
+
+                    artifacts[artifact.TypeName] = artifact;
+                }
+            }
+
+            pending = GetTypesRequiringGeneration(processedTypes);
+        }
+
+        return artifactOrder.Select(name => artifacts[name]).ToList();
     }
 
     private List<KeyValuePair<ApiSchema, string>> GetTypesRequiringGeneration(HashSet<string> processedTypes) =>
