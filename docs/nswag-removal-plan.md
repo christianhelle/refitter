@@ -1,6 +1,6 @@
 # Plan: Removing the NSwag Dependency
 
-Status: **Phases 0 and 1 done, Phase 2 next** (exploratory branch `feature/nswag-removal-feasibility-874777`)
+Status: **All phases done. NSwag, NJsonSchema and Newtonsoft.Json are no longer dependencies** (branch `feature/nswag-removal-feasibility-874777`). See "Outcome" below.
 
 ## Goal
 
@@ -12,7 +12,49 @@ the Phase 0 harness must be reproduced by the NSwag-free pipeline**, apart from 
 that are explicitly accepted and listed in the "Accepted differences" section of this
 document.
 
-## Where NSwag is used today
+## Outcome
+
+The plan was carried out differently from the phases below in two ways:
+
+- **No `Microsoft.OpenApi` model and no feature flag.** Byte-identical output is far easier to reach by
+  reproducing NSwag's own semantics than by mapping a different model onto them. So Refitter.Core now has
+  its own OpenAPI model and reader (`src/Refitter.Core/OpenApi`) that behave like NSwag and NJsonSchema. That
+  covers keyword handling per spec version, reference resolution including external files, and the JSON
+  round trip used to copy documents. The contract generator (`src/Refitter.Core/CodeGeneration/Contracts`)
+  ports NJsonSchema's and NSwag's C# generation and renders their Liquid templates with Fluid. Code and
+  templates adapted from NJsonSchema and NSwag (MIT) are attributed in `THIRD-PARTY-NOTICES.md`. Because the
+  output is identical, the pipeline was switched without a flag.
+- **Differential tests instead of a debug comparer.** While both implementations existed, temporary tests
+  compared the native document model, document copies and contracts with NSwag's for every parity spec and
+  setting. All matched, and the tests were removed together with NSwag.
+
+Verification:
+
+- Every golden snapshot (19,000+ cases: every spec in `test/OpenAPI` plus every scenario-test spec, times
+  about 70 settings variants) is reproduced byte for byte.
+- The CLI built from the last NSwag-based commit and the NSwag-free CLI produce identical output for every
+  spec in `test/OpenAPI` and for the remote specs used by the tests, with 31 flag combinations (1,271 runs).
+- The unit, integration and source generator tests pass.
+
+Behavior changes:
+
+- The obsolete NSwag-typed APIs were removed: `OpenApiDocumentFactory`, `RefitDocumentFilter`,
+  `SchemaCleaner`, the `RefitGenerator(settings, OpenApiDocument)` constructor, `RefitGenerator.OpenApiDocument`,
+  `CodeGeneratorSettings.PropertyNameGenerator` and `RefitGeneratorSettings.ParameterNameGenerator`.
+  `PublicApiNSwagIndependenceTests` now guards the whole public API.
+- OpenAPI 3 documents that reference responses outside `components` (e.g. `#/responses/errors`, as in
+  https://developers.intellihr.io/docs/v1/swagger.json) could be loaded but not generated with NSwag,
+  because the references inside those responses were never resolved. They are now resolved.
+
+Still open:
+
+- `CustomTemplateDirectory` still works, because the ported templates are rendered with template models
+  equivalent to NJsonSchema's. It is still marked deprecated; keep it and remove the deprecation, or remove it.
+- The generated code still says `GeneratedCode("NJsonSchema"/"NSwag", "14.7.1.0 ...")` and "Generated using the
+  NSwag toolchain" (`ContractTemplateRenderer.ToolchainVersion` and the templates), to keep the output identical.
+  Changing it is a one-line, explicitly accepted snapshot difference.
+
+## Where NSwag was used
 
 About 40 files in `Refitter.Core` import NSwag or NJsonSchema. The usage falls into four layers.
 
