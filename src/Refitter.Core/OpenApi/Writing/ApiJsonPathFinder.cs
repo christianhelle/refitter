@@ -9,6 +9,8 @@ namespace Refitter.Core;
 /// </remarks>
 internal sealed class ApiJsonPathFinder
 {
+    private const char PathSeparator = '/';
+
     private readonly bool isSwagger2;
     private readonly Dictionary<object, string> paths = new();
 
@@ -68,7 +70,7 @@ internal sealed class ApiJsonPathFinder
 
         // Only the operations of a path item are searched
         foreach (var operation in pathItem)
-            VisitOperation(operation.Value, path + "/" + operation.Key);
+            VisitOperation(operation.Value, path + PathSeparator + operation.Key);
     }
 
     private void VisitOperation(ApiOperation operation, string path)
@@ -129,7 +131,7 @@ internal sealed class ApiJsonPathFinder
     private void VisitSchemas(IEnumerable<KeyValuePair<string, ApiSchema>> schemas, string path)
     {
         foreach (var schema in schemas)
-            VisitSchema(schema.Value, path + "/" + schema.Key);
+            VisitSchema(schema.Value, path + PathSeparator + schema.Key);
     }
 
     private void VisitSchema(ApiSchema schema, string path)
