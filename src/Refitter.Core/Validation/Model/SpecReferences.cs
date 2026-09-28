@@ -5,12 +5,12 @@ internal static class SpecReferences
     /// <summary>
     /// Creates a reference, failing on an empty id like the Microsoft.OpenApi (MIT license) reference types do.
     /// </summary>
-    public static SpecReference Create(string id, string? externalResource)
+    public static SpecReference Create(string referenceId, string? externalResource)
     {
-        if (string.IsNullOrWhiteSpace(id))
-            throw new ArgumentNullException("referenceId", "Value cannot be null or empty: referenceId");
+        if (string.IsNullOrWhiteSpace(referenceId))
+            throw new ArgumentNullException(nameof(referenceId), "Value cannot be null or empty: " + nameof(referenceId));
 
-        return new SpecReference(id, externalResource);
+        return new SpecReference(referenceId, externalResource);
     }
 
     /// <summary>
