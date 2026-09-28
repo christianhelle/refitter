@@ -64,7 +64,6 @@ public interface ICodeGenerationConfiguration
     /// <summary>
     /// Gets the custom directory with Liquid templates for the generated contracts.
     /// </summary>
-    [Obsolete("Custom Liquid templates are deprecated, and this setting will be removed in the next major version.")]
     string? CustomTemplateDirectory { get; }
 
     /// <summary>

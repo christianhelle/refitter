@@ -46,9 +46,7 @@ internal sealed class ContractGeneratorFactory
                 ? ContractPolymorphicSerializationStyle.SystemTextJson
                 : ContractPolymorphicSerializationStyle.JsonInheritanceConverter,
             TypeAccessModifier = codeGeneration.TypeAccessibility.ToString().ToLowerInvariant(),
-#pragma warning disable CS0618 // Honored until custom templates are removed
             TemplateDirectory = codeGeneration.CustomTemplateDirectory,
-#pragma warning restore CS0618
             PropertyNameGenerator = CreatePropertyNameGenerator(schema => generator!.GetTypeName(schema)),
             TypeNameGenerator = CreateTypeNameGenerator(),
             EnumNameGenerator = new UniqueContractEnumNameGenerator(),

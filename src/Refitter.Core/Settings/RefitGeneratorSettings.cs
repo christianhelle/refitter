@@ -429,8 +429,7 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     /// Gets or sets a directory path which contains Liquid templates for the generated contracts. If null or empty,
     /// uses the built-in templates.
     /// </summary>
-    [Description("Deprecated, will be removed in the next major version. Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.")]
-    [Obsolete("Custom Liquid templates are deprecated, and this setting will be removed in the next major version.")]
+    [Description("Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.")]
     public string? CustomTemplateDirectory { get; set; }
 
     /// <summary>

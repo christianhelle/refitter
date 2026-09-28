@@ -1433,9 +1433,7 @@ public class ReturnTypeGeneratorTests
         public bool GenerateStatusCodeComments => inner.GenerateStatusCodeComments;
         public TypeAccessibility TypeAccessibility => inner.TypeAccessibility;
         public bool ImmutableRecords => inner.ImmutableRecords;
-#pragma warning disable CS0618 // Deprecated custom templates are still honored
         public string? CustomTemplateDirectory => inner.CustomTemplateDirectory;
-#pragma warning restore CS0618
         public IParameterNameProvider? ParameterNameProvider => inner.ParameterNameProvider;
         public bool UsePolymorphicSerialization => inner.UsePolymorphicSerialization;
         public bool UseCancellationTokens => inner.UseCancellationTokens;

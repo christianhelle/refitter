@@ -319,7 +319,7 @@ public sealed class Settings : CommandSettings
     [DefaultValue(IntegerType.Int32)]
     public IntegerType IntegerType { get; set; } = IntegerType.Int32;
 
-    [Description("Deprecated, will be removed in the next major version. Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.")]
+    [Description("Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.")]
     [CommandOption("--custom-template-directory")]
     [DefaultValue(null)]
     public string? CustomTemplateDirectory { get; set; } = null;

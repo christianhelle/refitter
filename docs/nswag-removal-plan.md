@@ -46,10 +46,11 @@ Behavior changes:
   https://developers.intellihr.io/docs/v1/swagger.json) could be loaded but not generated with NSwag,
   because the references inside those responses were never resolved. They are now resolved.
 
-Still open:
+Follow-ups after parity:
 
-- `CustomTemplateDirectory` still works, because the ported templates are rendered with template models
-  equivalent to NJsonSchema's. It is still marked deprecated; keep it and remove the deprecation, or remove it.
+- `CustomTemplateDirectory` is kept and no longer deprecated. It still works, because the ported templates are
+  rendered with template models equivalent to NJsonSchema's, and it no longer produces a "Deprecated Setting"
+  warning. `codeGeneratorSettings.customTemplateDirectory` stays deprecated, because it never had any effect.
 - Done after parity was reached: the "Generated using the NSwag toolchain" header comment is removed, and the
   generated contracts say `GeneratedCode("Refitter", "<Refitter version>")` like the interfaces do. Settings,
   docs and tests no longer refer to NSwag; `THIRD-PARTY-NOTICES.md` keeps the license notices for the ported code.
@@ -218,8 +219,10 @@ Remove the packages, the flag, the NSwag code path and the workarounds listed ab
 
 Confirmed by the maintainer:
 
-- `CustomTemplateDirectory` is dropped in the major release: NJsonSchema Liquid templates cannot be
-  honored without re-implementing NJsonSchema's template models. Deprecated in Phase 1.
+- `CustomTemplateDirectory` was to be dropped in the major release, on the assumption that NJsonSchema
+  Liquid templates could not be honored without re-implementing NJsonSchema's template models. It was
+  deprecated in Phase 1. The native generator did re-implement those template models, so the setting is kept
+  and the deprecation is removed.
 - NSwag-typed APIs are kept as `[Obsolete]` until the next major version, which removes them.
 
 Still to confirm:

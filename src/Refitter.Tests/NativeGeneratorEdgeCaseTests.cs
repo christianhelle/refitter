@@ -143,9 +143,7 @@ public class NativeGeneratorEdgeCaseTests
               "components": { "schemas": { "Status": { "type": "string", "enum": ["a"] } } }
             }
             """);
-#pragma warning disable CS0618 // Custom templates are deprecated but still supported
         var settings = new RefitGeneratorSettings { CustomTemplateDirectory = templateDirectory };
-#pragma warning restore CS0618
         return new ContractGeneratorFactory(settings, document).Create();
     }
 }

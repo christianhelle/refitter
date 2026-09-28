@@ -290,7 +290,7 @@ public class CodeGeneratorSettings
     /// uses the built-in templates.
     /// </summary>
     [Description("Deprecated and has no effect; use customTemplateDirectory at the root of the settings instead.")]
-    [Obsolete("This setting has no effect. Custom Liquid templates are configured with RefitGeneratorSettings.CustomTemplateDirectory, which is also deprecated.")]
+    [Obsolete("This setting has no effect. Custom Liquid templates are configured with RefitGeneratorSettings.CustomTemplateDirectory.")]
     public string? CustomTemplateDirectory { get; set; }
 
     /// <summary>

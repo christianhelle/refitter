@@ -656,7 +656,7 @@ OPTIONS:
         --disposable                                             Generate refit clients that implement IDisposable
         --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
-        --custom-template-directory                              Deprecated, will be removed in the next major version. Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.
+        --custom-template-directory                              Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.
         --telemetry-source                                       Report the telemetry source of this invocation. Used internally by the MSBuild integration.
         --telemetry-file-count                                   Report the total number of settings files in the current workload. Used internally by the MSBuild integration.
         --telemetry-runtime                                      Report the bundled runtime selected for this invocation. Used internally by the MSBuild integration.
@@ -765,8 +765,6 @@ docker run --rm -v $(pwd):/src christianhelle/refitter ./openapi.json --settings
 #### Issue: Custom template directory not accessible
 
 **Problem:** Custom templates can't be found.
-
-> **Note:** `--custom-template-directory` is deprecated and will be removed in the next major version.
 
 **Solution:** Mount the template directory:
 

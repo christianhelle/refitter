@@ -196,14 +196,6 @@ public class RefitterRunner
         }
 
 #pragma warning disable CS0618
-        if (!string.IsNullOrWhiteSpace(settings.CustomTemplateDirectory))
-        {
-            warnings.Add(
-                new Warning(
-                    "Deprecated Setting",
-                    "The 'customTemplateDirectory' property is deprecated and will be removed in the next major version"));
-        }
-
         if (!string.IsNullOrWhiteSpace(settings.CodeGeneratorSettings?.CustomTemplateDirectory))
 #pragma warning restore CS0618
         {

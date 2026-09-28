@@ -283,7 +283,7 @@ public class RefitterRunnerTests
     }
 
     [Test]
-    public async Task RunAsync_Should_Detect_Deprecated_CustomTemplateDirectory_Warning()
+    public async Task RunAsync_Should_Not_Warn_About_CustomTemplateDirectory()
     {
         var workspace = CreateTempDirectory();
         try
@@ -292,9 +292,7 @@ public class RefitterRunnerTests
             {
                 OpenApiPath = CreateOpenApiSpec(workspace),
                 Namespace = "TestNamespace",
-#pragma warning disable CS0618
                 CustomTemplateDirectory = workspace,
-#pragma warning restore CS0618
             };
 
             var result = await new RefitterRunner().RunAsync(
@@ -304,9 +302,7 @@ public class RefitterRunnerTests
                 cancellationToken: default);
 
             result.ExitCode.Should().Be(0);
-            result.Warnings.Should().ContainSingle(w =>
-                w.Title == "Deprecated Setting" &&
-                w.Description.Contains("'customTemplateDirectory'"));
+            result.Warnings.Should().NotContain(w => w.Description.Contains("'customTemplateDirectory'"));
         }
         finally
         {

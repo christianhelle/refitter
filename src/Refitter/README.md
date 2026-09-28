@@ -269,7 +269,7 @@ The following is an example `.refitter` file
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
     ],
-    "customTemplateDirectory": "./path/to/directory/" // Optional. Deprecated, will be removed in the next major version.
+    "customTemplateDirectory": "./path/to/directory/" // Optional
   }
 }
 ```

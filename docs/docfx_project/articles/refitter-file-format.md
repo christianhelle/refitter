@@ -130,7 +130,7 @@ The following is an example `.refitter` file
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
     ],
-    "customTemplateDirectory": "./path/to/directory/" //Optional. Deprecated, will be removed in the next major version.
+    "customTemplateDirectory": "./path/to/directory/" //Optional
     "jsonLibraryVersion": 8.0 // Optional. Default=8.0. JSON library version for System.Text.Json. When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names
   }
 }
