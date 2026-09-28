@@ -178,11 +178,10 @@ internal sealed class ExternalReferenceMerger
         static bool IsExternal(SpecReferenceable? element) => element?.Reference?.ExternalResource != null;
     }
 
+    /// <remarks>Called after merging, which always leaves the document with components.</remarks>
     private static bool ExistsInDocument(SpecDocument document, SpecComponentType type, string id)
     {
-        var components = document.Components;
-        if (components == null)
-            return false;
+        var components = document.Components!;
 
         return type switch
         {
