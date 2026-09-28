@@ -245,7 +245,7 @@ internal sealed class SpecRuleValidator
 
     private void Walk(SpecPathItem? pathItem)
     {
-        if (pathItem == null || pathItem.Reference != null || pathItemLoop.Contains(pathItem))
+        if (pathItem is not { Reference: null } || pathItemLoop.Contains(pathItem))
             return;
 
         pathItemLoop.Push(pathItem);
@@ -288,7 +288,7 @@ internal sealed class SpecRuleValidator
 
     private void Walk(SpecParameter? parameter)
     {
-        if (parameter == null || parameter.Reference != null)
+        if (parameter is not { Reference: null })
             return;
 
         if (parameter.Name == null)
@@ -317,7 +317,7 @@ internal sealed class SpecRuleValidator
 
     private void Walk(SpecRequestBody? requestBody)
     {
-        if (requestBody == null || requestBody.Reference != null)
+        if (requestBody is not { Reference: null })
             return;
 
         if (requestBody.Content != null)
@@ -346,7 +346,7 @@ internal sealed class SpecRuleValidator
 
     private void Walk(SpecResponse? response)
     {
-        if (response == null || response.Reference != null)
+        if (response is not { Reference: null })
             return;
 
         if (response.Description == null)
@@ -370,7 +370,7 @@ internal sealed class SpecRuleValidator
 
     private void Walk(SpecMediaType? mediaType)
     {
-        if (mediaType == null || mediaType.Reference != null)
+        if (mediaType is not { Reference: null })
             return;
 
         if (mediaType.Schema != null)
@@ -400,7 +400,7 @@ internal sealed class SpecRuleValidator
 
     private void Walk(SpecHeader? header)
     {
-        if (header == null || header.Reference != null)
+        if (header is not { Reference: null })
             return;
 
         if (header.Content != null)
@@ -412,7 +412,7 @@ internal sealed class SpecRuleValidator
 
     private void Walk(SpecLink? link)
     {
-        if (link == null || link.Reference != null)
+        if (link is not { Reference: null })
             return;
 
         if (link.Server != null)
@@ -421,7 +421,7 @@ internal sealed class SpecRuleValidator
 
     private void Walk(SpecCallback? callback)
     {
-        if (callback == null || callback.Reference != null || callback.PathItems == null)
+        if (callback is not { Reference: null } || callback.PathItems == null)
             return;
 
         foreach (var pathItem in callback.PathItems)

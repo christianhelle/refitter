@@ -51,7 +51,7 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecPathItem? pathItem)
     {
-        if (pathItem == null || pathItem.Reference != null || pathItemLoop.Contains(pathItem))
+        if (pathItem is not { Reference: null } || pathItemLoop.Contains(pathItem))
             return;
 
         pathItemLoop.Push(pathItem);
@@ -84,7 +84,7 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecParameter? parameter)
     {
-        if (parameter == null || parameter.Reference != null)
+        if (parameter is not { Reference: null })
             return;
 
         stats.ParameterCount++;
@@ -94,7 +94,7 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecRequestBody? requestBody)
     {
-        if (requestBody == null || requestBody.Reference != null)
+        if (requestBody is not { Reference: null })
             return;
 
         stats.RequestBodyCount++;
@@ -103,7 +103,7 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecResponse? response)
     {
-        if (response == null || response.Reference != null)
+        if (response is not { Reference: null })
             return;
 
         WalkAll(response.Content, Walk);
@@ -113,7 +113,7 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecMediaType? mediaType)
     {
-        if (mediaType == null || mediaType.Reference != null)
+        if (mediaType is not { Reference: null })
             return;
 
         Walk(mediaType.Schema);
@@ -132,7 +132,7 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecHeader? header)
     {
-        if (header == null || header.Reference != null)
+        if (header is not { Reference: null })
             return;
 
         WalkAll(header.Content, Walk);
@@ -141,7 +141,7 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecLink? link)
     {
-        if (link == null || link.Reference != null)
+        if (link is not { Reference: null })
             return;
 
         stats.LinkCount++;
@@ -149,7 +149,7 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecCallback? callback)
     {
-        if (callback == null || callback.Reference != null)
+        if (callback is not { Reference: null })
             return;
 
         stats.CallbackCount++;
@@ -158,7 +158,7 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecSchema? schema)
     {
-        if (schema == null || schema.Reference != null || schemaLoop.Contains(schema))
+        if (schema is not { Reference: null } || schemaLoop.Contains(schema))
             return;
 
         schemaLoop.Push(schema);
