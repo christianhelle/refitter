@@ -18,12 +18,6 @@ internal sealed class FieldMap<T>
         return this;
     }
 
-    public FieldMap<T> Without(string name)
-    {
-        Fixed.Remove(name);
-        return this;
-    }
-
     public FieldMap<T> Pattern(Func<string, bool> matches, Action<T, string, JsonNode, ParsingContext> read)
     {
         Patterns.Add((matches, read));
