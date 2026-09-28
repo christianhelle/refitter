@@ -119,7 +119,7 @@ internal sealed class ContractTypeResolver
         }
     }
 
-    public ApiSchema RemoveNullability(ApiSchema schema) =>
+    public static ApiSchema RemoveNullability(ApiSchema schema) =>
         schema.OneOf.FirstOrDefault(o => !o.IsNullable(ApiSchemaType.JsonSchema)) ?? schema;
 
     public ApiSchema GetResolvableSchema(ApiSchema schema)

@@ -104,7 +104,7 @@ internal sealed class ApiJsonReader
     public ApiParameter ReadParameter(JsonElement element) =>
         (ApiParameter)ReadSchema(element, new ApiParameter(schemaType));
 
-    private ApiInfo ReadInfo(JsonElement element)
+    private static ApiInfo ReadInfo(JsonElement element)
     {
         EnsureObject(element, "info");
         var info = new ApiInfo();

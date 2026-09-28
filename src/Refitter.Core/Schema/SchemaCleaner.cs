@@ -127,7 +127,7 @@ internal class SchemaCleaner
         return (seen, seenIds);
     }
 
-    private IEnumerable<ApiSchema?> GetSchemaForPath(ApiPathItem pathItem)
+    private static IEnumerable<ApiSchema?> GetSchemaForPath(ApiPathItem pathItem)
     {
         foreach (var p in pathItem.Parameters)
         {
@@ -165,7 +165,7 @@ internal class SchemaCleaner
         }
     }
 
-    private void TryPush(ApiSchema? schema, Stack<ApiSchema> stack)
+    private static void TryPush(ApiSchema? schema, Stack<ApiSchema> stack)
     {
         if (schema == null)
         {

@@ -682,7 +682,7 @@ internal sealed class ApiDocumentWriter
         writer.WriteRawValue(text.IndexOf('.') >= 0 ? text : text + ".0", skipInputValidation: true);
     }
 
-    private void WriteSecurityRequirements(Utf8JsonWriter writer, string name, List<ApiSecurityRequirement> requirements)
+    private static void WriteSecurityRequirements(Utf8JsonWriter writer, string name, List<ApiSecurityRequirement> requirements)
     {
         writer.WritePropertyName(name);
         writer.WriteStartArray();
