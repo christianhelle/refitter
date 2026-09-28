@@ -371,7 +371,6 @@ internal sealed class ApiDocumentWriter
     {
         writer.WriteStartObject();
         var parameter = schema as ApiParameter;
-        var property = schema as ApiSchemaProperty;
 
         WriteString(writer, "$schema", schema.SchemaVersion);
         WriteString(writer, "id", schema.Id);
@@ -382,109 +381,107 @@ internal sealed class ApiDocumentWriter
         WriteDiscriminator(writer, schema);
 
         if (parameter != null)
-        {
-            if (!string.IsNullOrEmpty(parameter.Name))
-                writer.WriteString("name", parameter.Name);
-            WriteString(writer, "x-originalName", parameter.OriginalName);
-            if (parameter.Kind != ApiParameterKind.Undefined)
-                writer.WriteString("in", ParameterKindName(parameter.Kind));
-            if (parameter.Style != ApiParameterStyle.Undefined)
-                writer.WriteString("style", ParameterStyleName(parameter.Style));
-            if (parameter.Explode.HasValue)
-                writer.WriteBoolean("explode", parameter.Explode.Value);
-            if (parameter.IsRequired)
-                writer.WriteBoolean("required", true);
-            if (parameter.AllowEmptyValue)
-                writer.WriteBoolean("allowEmptyValue", true);
-            if (parameter.CollectionFormat != ApiParameterCollectionFormat.Undefined)
-                writer.WriteString("collectionFormat", parameter.CollectionFormat.ToString().ToLowerInvariant());
-            if (parameter.Schema != null)
-            {
-                writer.WritePropertyName("schema");
-                WriteSchema(writer, parameter.Schema);
-            }
+            WriteParameterKeywords(writer, parameter);
 
-            if (parameter.CustomSchema != null)
-            {
-                writer.WritePropertyName("x-schema");
-                WriteSchema(writer, parameter.CustomSchema);
-            }
+        WriteValueKeywords(writer, schema);
+        WriteSubschemas(writer, schema, parameter);
+        WriteEnumeration(writer, schema);
 
-            if (!isSwagger2 && parameter.Position.HasValue)
-                writer.WriteNumber("x-position", parameter.Position.Value);
-        }
+        WriteSchemaList(writer, "allOf", schema.AllOf);
+        WriteSchemaList(writer, "anyOf", schema.AnyOf);
+        WriteSchemaList(writer, "oneOf", schema.OneOf);
 
+        if (schema.Reference != null)
+            writer.WriteString("$ref", GetSchemaReferencePath(schema.Reference));
+
+        if (schema is ApiSchemaProperty property)
+            WritePropertyKeywords(writer, property);
+
+        WriteExtensionData(writer, schema.ExtensionData);
+        writer.WriteEndObject();
+    }
+
+    private void WriteParameterKeywords(Utf8JsonWriter writer, ApiParameter parameter)
+    {
+        if (!string.IsNullOrEmpty(parameter.Name))
+            writer.WriteString("name", parameter.Name);
+        WriteString(writer, "x-originalName", parameter.OriginalName);
+        if (parameter.Kind != ApiParameterKind.Undefined)
+            writer.WriteString("in", ParameterKindName(parameter.Kind));
+        if (parameter.Style != ApiParameterStyle.Undefined)
+            writer.WriteString("style", ParameterStyleName(parameter.Style));
+        if (parameter.Explode.HasValue)
+            writer.WriteBoolean("explode", parameter.Explode.Value);
+        WriteTrue(writer, "required", parameter.IsRequired);
+        WriteTrue(writer, "allowEmptyValue", parameter.AllowEmptyValue);
+        if (parameter.CollectionFormat != ApiParameterCollectionFormat.Undefined)
+            writer.WriteString("collectionFormat", parameter.CollectionFormat.ToString().ToLowerInvariant());
+        WriteOptionalSchema(writer, "schema", parameter.Schema);
+        WriteOptionalSchema(writer, "x-schema", parameter.CustomSchema);
+
+        if (!isSwagger2 && parameter.Position.HasValue)
+            writer.WriteNumber("x-position", parameter.Position.Value);
+    }
+
+    private void WriteValueKeywords(Utf8JsonWriter writer, ApiSchema schema)
+    {
         WriteString(writer, OpenApiKeywords.Description, schema.Description);
         WriteString(writer, "format", schema.Format);
-        if (schema.Default != null)
-        {
-            writer.WritePropertyName("default");
-            WriteRawValue(writer, schema.Default);
-        }
-
+        WriteOptionalRawValue(writer, "default", schema.Default);
         WriteDecimal(writer, "multipleOf", schema.MultipleOf);
         WriteDecimal(writer, "maximum", schema.Maximum);
         WriteDecimal(writer, "minimum", schema.Minimum);
-        if (schema.MaxLength.HasValue)
-            writer.WriteNumber("maxLength", schema.MaxLength.Value);
-        if (schema.MinLength.HasValue)
-            writer.WriteNumber("minLength", schema.MinLength.Value);
+        WriteOptionalNumber(writer, "maxLength", schema.MaxLength);
+        WriteOptionalNumber(writer, "minLength", schema.MinLength);
         WriteString(writer, "pattern", schema.Pattern);
-        if (schema.MaxItems != 0)
-            writer.WriteNumber("maxItems", schema.MaxItems);
-        if (schema.MinItems != 0)
-            writer.WriteNumber("minItems", schema.MinItems);
-        if (schema.UniqueItems)
-            writer.WriteBoolean("uniqueItems", true);
-        if (schema.MaxProperties != 0)
-            writer.WriteNumber("maxProperties", schema.MaxProperties);
-        if (schema.MinProperties != 0)
-            writer.WriteNumber("minProperties", schema.MinProperties);
-        if (schema.IsDeprecated)
-            writer.WriteBoolean(isSwagger2 ? "x-deprecated" : "deprecated", true);
+        WriteNonZero(writer, "maxItems", schema.MaxItems);
+        WriteNonZero(writer, "minItems", schema.MinItems);
+        WriteTrue(writer, "uniqueItems", schema.UniqueItems);
+        WriteNonZero(writer, "maxProperties", schema.MaxProperties);
+        WriteNonZero(writer, "minProperties", schema.MinProperties);
+        WriteTrue(writer, isSwagger2 ? "x-deprecated" : "deprecated", schema.IsDeprecated);
         WriteString(writer, "x-deprecatedMessage", schema.DeprecatedMessage);
-        if (schema.IsAbstract)
-            writer.WriteBoolean("x-abstract", true);
+        WriteTrue(writer, "x-abstract", schema.IsAbstract);
         if (schema.IsNullableRaw.HasValue)
             writer.WriteBoolean(isSwagger2 ? "x-nullable" : "nullable", schema.IsNullableRaw.Value);
-        if (schema.Example != null)
-        {
-            writer.WritePropertyName("example");
-            WriteRawValue(writer, schema.Example);
-        }
+        WriteOptionalRawValue(writer, "example", schema.Example);
+        WriteTrue(writer, "x-enumFlags", schema.IsFlagEnumerable);
+    }
 
-        if (schema.IsFlagEnumerable)
-            writer.WriteBoolean("x-enumFlags", true);
-
-        if (schema.DictionaryKey != null)
-        {
-            writer.WritePropertyName("x-dictionaryKey");
-            WriteSchema(writer, schema.DictionaryKey);
-        }
-
-        if (schema.Not != null)
-        {
-            writer.WritePropertyName("not");
-            WriteSchema(writer, schema.Not);
-        }
+    private void WriteSubschemas(Utf8JsonWriter writer, ApiSchema schema, ApiParameter? parameter)
+    {
+        WriteOptionalSchema(writer, "x-dictionaryKey", schema.DictionaryKey);
+        WriteOptionalSchema(writer, "not", schema.Not);
 
         WriteExclusiveBound(writer, "exclusiveMaximum", schema.ExclusiveMaximum, schema.IsExclusiveMaximum);
         WriteExclusiveBound(writer, "exclusiveMinimum", schema.ExclusiveMinimum, schema.IsExclusiveMinimum);
 
         if (schema.AdditionalItemsSchema != null)
-        {
-            writer.WritePropertyName("additionalItems");
-            WriteSchema(writer, schema.AdditionalItemsSchema);
-        }
+            WriteOptionalSchema(writer, "additionalItems", schema.AdditionalItemsSchema);
         else if (!schema.AllowAdditionalItems)
-        {
             writer.WriteBoolean("additionalItems", false);
-        }
 
+        WriteAdditionalProperties(writer, schema, parameter);
+        WriteItems(writer, schema);
+
+        if (parameter == null && schema.RequiredProperties.Count > 0)
+            WriteStringList(writer, "required", schema.RequiredProperties);
+
+        if (schema.Properties.Count > 0)
+            WriteDictionary(writer, "properties", schema.Properties, WriteSchema);
+
+        if (schema.PatternProperties.Count > 0)
+            WriteDictionary(writer, "patternProperties", schema.PatternProperties, WriteSchema);
+
+        if (schema.Definitions.Count > 0)
+            WriteSchemaDictionary(writer, "definitions", schema.Definitions);
+    }
+
+    private void WriteAdditionalProperties(Utf8JsonWriter writer, ApiSchema schema, ApiParameter? parameter)
+    {
         if (schema.AdditionalPropertiesSchema != null)
         {
-            writer.WritePropertyName("additionalProperties");
-            WriteSchema(writer, schema.AdditionalPropertiesSchema);
+            WriteOptionalSchema(writer, "additionalProperties", schema.AdditionalPropertiesSchema);
         }
         else if (isSwagger2)
         {
@@ -504,11 +501,13 @@ internal sealed class ApiDocumentWriter
         {
             writer.WriteBoolean("additionalProperties", false);
         }
+    }
 
+    private void WriteItems(Utf8JsonWriter writer, ApiSchema schema)
+    {
         if (schema.Item != null)
         {
-            writer.WritePropertyName("items");
-            WriteSchema(writer, schema.Item);
+            WriteOptionalSchema(writer, "items", schema.Item);
         }
         else if (schema.Items.Count > 0)
         {
@@ -518,39 +517,10 @@ internal sealed class ApiDocumentWriter
                 WriteSchema(writer, item);
             writer.WriteEndArray();
         }
+    }
 
-        if (parameter == null && schema.RequiredProperties.Count > 0)
-            WriteStringList(writer, "required", schema.RequiredProperties);
-
-        if (schema.Properties.Count > 0)
-        {
-            writer.WritePropertyName("properties");
-            writer.WriteStartObject();
-            foreach (var item in schema.Properties)
-            {
-                writer.WritePropertyName(item.Key);
-                WriteSchema(writer, item.Value);
-            }
-
-            writer.WriteEndObject();
-        }
-
-        if (schema.PatternProperties.Count > 0)
-        {
-            writer.WritePropertyName("patternProperties");
-            writer.WriteStartObject();
-            foreach (var item in schema.PatternProperties)
-            {
-                writer.WritePropertyName(item.Key);
-                WriteSchema(writer, item.Value);
-            }
-
-            writer.WriteEndObject();
-        }
-
-        if (schema.Definitions.Count > 0)
-            WriteSchemaDictionary(writer, "definitions", schema.Definitions);
-
+    private static void WriteEnumeration(Utf8JsonWriter writer, ApiSchema schema)
+    {
         if (schema.EnumerationNames.Count > 0)
             WriteStringList(writer, "x-enumNames", schema.EnumerationNames);
 
@@ -577,26 +547,48 @@ internal sealed class ApiDocumentWriter
                 WriteRawValue(writer, value);
             writer.WriteEndArray();
         }
+    }
 
-        WriteSchemaList(writer, "allOf", schema.AllOf);
-        WriteSchemaList(writer, "anyOf", schema.AnyOf);
-        WriteSchemaList(writer, "oneOf", schema.OneOf);
+    private void WritePropertyKeywords(Utf8JsonWriter writer, ApiSchemaProperty property)
+    {
+        WriteTrue(writer, "readOnly", property.IsReadOnly);
+        WriteTrue(writer, isSwagger2 ? "x-writeOnly" : "writeOnly", property.IsWriteOnly);
+    }
 
-        if (schema.Reference != null)
-        {
-            writer.WriteString("$ref", GetSchemaReferencePath(schema.Reference));
-        }
+    private void WriteOptionalSchema(Utf8JsonWriter writer, string name, ApiSchema? schema)
+    {
+        if (schema == null)
+            return;
 
-        if (property != null)
-        {
-            if (property.IsReadOnly)
-                writer.WriteBoolean("readOnly", true);
-            if (property.IsWriteOnly)
-                writer.WriteBoolean(isSwagger2 ? "x-writeOnly" : "writeOnly", true);
-        }
+        writer.WritePropertyName(name);
+        WriteSchema(writer, schema);
+    }
 
-        WriteExtensionData(writer, schema.ExtensionData);
-        writer.WriteEndObject();
+    private static void WriteOptionalRawValue(Utf8JsonWriter writer, string name, object? value)
+    {
+        if (value == null)
+            return;
+
+        writer.WritePropertyName(name);
+        WriteRawValue(writer, value);
+    }
+
+    private static void WriteOptionalNumber(Utf8JsonWriter writer, string name, int? value)
+    {
+        if (value.HasValue)
+            writer.WriteNumber(name, value.Value);
+    }
+
+    private static void WriteNonZero(Utf8JsonWriter writer, string name, int value)
+    {
+        if (value != 0)
+            writer.WriteNumber(name, value);
+    }
+
+    private static void WriteTrue(Utf8JsonWriter writer, string name, bool value)
+    {
+        if (value)
+            writer.WriteBoolean(name, true);
     }
 
     private void WriteDiscriminator(Utf8JsonWriter writer, ApiSchema schema)
