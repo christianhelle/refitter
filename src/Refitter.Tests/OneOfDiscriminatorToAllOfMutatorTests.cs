@@ -185,7 +185,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     [Test]
     public async Task Mutate_Does_Not_Duplicate_Existing_AllOf_Inheritance()
     {
-        // Two union members keep NJsonSchema from collapsing Vehicle.ActualSchema onto the
+        // Two union members keep the schema model from collapsing Vehicle.ActualSchema onto the
         // single referenced subtype, so the mutator actually inspects the subtypes.
         var document = ApiDocumentLoader.Load("""
             {

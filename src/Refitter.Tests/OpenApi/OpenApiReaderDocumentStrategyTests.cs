@@ -178,10 +178,10 @@ paths:
 
         // Microsoft.OpenApi normalizes the spec version to the latest patch of the
         // detected version, so "3.0.4" proves the document came out of the round trip
-        // rather than out of the NSwag fallback, which would report the original "3.0.0".
+        // rather than out of the file fallback, which would report the original "3.0.0".
         result!.OpenApi.Should().Be("3.0.4");
 
-        // The external component is only reachable if NSwag was given the document path.
+        // The external component is only reachable if the loader was given the document path.
         result.Components.Schemas.Should().ContainKey("User");
         result.Components.Schemas["User"].Properties.Should().ContainKey("id");
         result.Components.Schemas["User"].Properties.Should().ContainKey("name");
@@ -242,7 +242,7 @@ paths:
         string folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
-        // No "info" block at all. The NSwag fallback leaves Info null for this
+        // No "info" block at all. The file fallback leaves Info null for this
         // document, so a populated Info can only come from the round trip.
         string mainSpec = @"{
   ""openapi"": ""3.0.0"",
@@ -304,7 +304,7 @@ paths:
     [Test]
     public async Task Returns_Null_When_Remote_Document_Cannot_Be_Read()
     {
-        // Port 1 refuses the connection, so the reader fails and the NSwag fallback
+        // Port 1 refuses the connection, so the reader fails and the file fallback
         // declines to retry remote documents
         var strategy = new OpenApiReaderDocumentStrategy();
         var result = await strategy.TryLoadAsync("http://127.0.0.1:1/openapi.json");

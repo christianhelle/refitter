@@ -376,8 +376,8 @@ public class XmlDocumentationGeneratorTests
 
         var method = CreateOperationModel(operation);
 
-        // Verify that ResultDescription picked up the description (NSwag might escape it, which is what we want to test)
-        // If NSwag escapes it, it will look like "\u..."
+        // Verify that ResultDescription picked up the description (it might be escaped, which is what we want to test)
+        // If it is escaped, it will look like "\u..."
         // Our generator should decode it back.
 
         generator.AppendMethodDocumentation(method, [], false, docs);

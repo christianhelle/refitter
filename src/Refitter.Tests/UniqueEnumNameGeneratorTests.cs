@@ -51,7 +51,7 @@ public class UniqueEnumNameGeneratorTests
     }
 
     [Test]
-    public void Ignores_Null_Values_Like_NJsonSchema()
+    public void Ignores_Null_Values()
     {
         var schema = CreateStringEnum("a", null, "A");
 

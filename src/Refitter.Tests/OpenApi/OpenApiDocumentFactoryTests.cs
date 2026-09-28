@@ -303,7 +303,7 @@ paths:
     }
 
     [Test]
-    public async Task Create_From_Invalid_File_Falls_Back_To_NSwag()
+    public async Task Create_From_Invalid_File_Falls_Back_To_Reading_The_File()
     {
         var spec = @"{
   ""openapi"": ""3.0.0"",
@@ -331,12 +331,12 @@ paths:
     }
 
     [Test]
-    public async Task Create_From_Json_File_Without_External_References_Uses_NSwag()
+    public async Task Create_From_Json_File_Without_External_References_Loads_The_File()
     {
         var spec = @"{
   ""openapi"": ""3.0.0"",
   ""info"": {
-    ""title"": ""Direct NSwag Test"",
+    ""title"": ""Direct Load Test"",
     ""version"": ""1.0.0""
   },
   ""paths"": {
@@ -369,15 +369,15 @@ paths:
         var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
-        document.Info!.Title.Should().Be("Direct NSwag Test");
+        document.Info!.Title.Should().Be("Direct Load Test");
     }
 
     [Test]
-    public async Task Create_From_Yaml_File_Without_External_References_Uses_NSwag()
+    public async Task Create_From_Yaml_File_Without_External_References_Loads_The_File()
     {
         var spec = @"openapi: 3.0.0
 info:
-  title: YAML NSwag Test
+  title: YAML Load Test
   version: 1.0.0
 paths:
   /users:
@@ -400,7 +400,7 @@ paths:
         var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
-        document.Info!.Title.Should().Be("YAML NSwag Test");
+        document.Info!.Title.Should().Be("YAML Load Test");
     }
 
     [Test]

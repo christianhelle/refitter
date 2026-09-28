@@ -4,7 +4,7 @@ using Refitter.Core;
 namespace Refitter.Tests.Regression;
 
 /// <summary>
-/// Regression tests for Issue #1039: dynamic querystring extraction mutates the shared NSwag model.
+/// Regression tests for Issue #1039: dynamic querystring extraction mutates the shared document model.
 /// Validates that XML documentation still sees the original query parameters after wrapper generation.
 /// </summary>
 
