@@ -201,8 +201,7 @@ public class RefitterRunner
             warnings.Add(
                 new Warning(
                     "Deprecated Setting",
-                    "The 'customTemplateDirectory' property is deprecated and will be removed in the next major version, " +
-                    "when Refitter stops generating code with NSwag"));
+                    "The 'customTemplateDirectory' property is deprecated and will be removed in the next major version"));
         }
 
         if (!string.IsNullOrWhiteSpace(settings.CodeGeneratorSettings?.CustomTemplateDirectory))

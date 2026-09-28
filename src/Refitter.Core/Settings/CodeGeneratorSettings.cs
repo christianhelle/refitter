@@ -286,11 +286,11 @@ public class CodeGeneratorSettings
     public bool InlineJsonConverters { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
-    /// templates.
+    /// Gets or sets a directory path which contains Liquid templates for the generated contracts. If null or empty,
+    /// uses the built-in templates.
     /// </summary>
     [Description("Deprecated and has no effect; use customTemplateDirectory at the root of the settings instead.")]
-    [Obsolete("This setting has no effect. Custom NSwag Liquid templates are configured with RefitGeneratorSettings.CustomTemplateDirectory, which is also deprecated.")]
+    [Obsolete("This setting has no effect. Custom Liquid templates are configured with RefitGeneratorSettings.CustomTemplateDirectory, which is also deprecated.")]
     public string? CustomTemplateDirectory { get; set; }
 
     /// <summary>

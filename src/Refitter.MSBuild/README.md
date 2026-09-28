@@ -307,4 +307,4 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
   - `excludedTypeNames` - Default is empty
-  - `customTemplateDirectory` - Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+  - `customTemplateDirectory` - Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.

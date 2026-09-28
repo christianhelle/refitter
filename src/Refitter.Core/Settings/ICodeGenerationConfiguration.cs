@@ -62,9 +62,9 @@ public interface ICodeGenerationConfiguration
     bool ImmutableRecords { get; }
 
     /// <summary>
-    /// Gets the custom template directory for NSwag code generation.
+    /// Gets the custom directory with Liquid templates for the generated contracts.
     /// </summary>
-    [Obsolete("Custom NSwag Liquid templates will not be supported once Refitter stops using NSwag, and this setting will be removed in the next major version.")]
+    [Obsolete("Custom Liquid templates are deprecated, and this setting will be removed in the next major version.")]
     string? CustomTemplateDirectory { get; }
 
     /// <summary>
