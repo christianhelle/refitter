@@ -30,7 +30,7 @@ public class NumericBoundsTests
             _ => schema.ExclusiveMinimum,
         };
         bound.Should().Be(sign > 0 ? decimal.MaxValue : decimal.MinValue);
-        schema.Type.Should().Be(ApiObjectType.Number);
+        schema.Type.Should().Be(ApiObjectTypes.Number);
     }
 
     [Test]
@@ -78,7 +78,7 @@ public class NumericBoundsTests
             """);
 
         var maximumProperty = schema.Properties["maximum"];
-        maximumProperty.Type.Should().Be(ApiObjectType.Number);
+        maximumProperty.Type.Should().Be(ApiObjectTypes.Number);
         maximumProperty.Maximum.Should().Be(decimal.MaxValue);
     }
 

@@ -1,3 +1,6 @@
+#nullable enable
+
+using System.Diagnostics.CodeAnalysis;
 namespace Refitter.Core;
 
 /// <summary>
@@ -5,6 +8,10 @@ namespace Refitter.Core;
 /// Creating it resolves (and so names) the types of the parameters. The members are also the ones the client
 /// templates have always used, see <see cref="ContractGenerator"/>. See THIRD-PARTY-NOTICES.md.
 /// </summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class OperationModel
 {
     private static readonly HashSet<string> ReservedKeywords = new(StringComparer.Ordinal)
@@ -67,10 +74,6 @@ internal sealed class OperationModel
 
     public ApiOperation Operation => operation;
 
-    public string? Id => operation.OperationId;
-
-    public List<string> Tags => operation.Tags;
-
     public string? Path { get; set; }
 
     public string? HttpMethod { get; set; }
@@ -84,15 +87,9 @@ internal sealed class OperationModel
 
     public string MethodAccessModifier => "public";
 
-    public bool IsInterfaceMethod => true;
-
     public string HttpMethodUpper => ConversionUtilities.ConvertToUpperCamelCase(HttpMethod, firstCharacterMustBeAlpha: false);
 
-    public string HttpMethodLower => ConversionUtilities.ConvertToLowerCamelCase(HttpMethod, firstCharacterMustBeAlpha: false);
-
     public bool IsGetOrDeleteOrHead => HttpMethod is "get" or "delete" or "head";
-
-    public bool IsGetOrHead => HttpMethod is "get" or "head";
 
     public IList<OperationParameterModel> Parameters { get; }
 
@@ -105,8 +102,6 @@ internal sealed class OperationModel
     public bool HasSuccessResponse => Responses.Any(r => r.IsSuccess);
 
     public OperationResponseModel? SuccessResponse => Responses.FirstOrDefault(r => r.IsSuccess);
-
-    public bool HasOnlyDefaultResponse => Responses.Count == 0 && HasDefaultResponse;
 
     public OperationParameterModel? ContentParameter
     {
@@ -130,8 +125,6 @@ internal sealed class OperationModel
 
     public bool HasContent => ContentParameter != null;
 
-    public bool HasBody => HasContent || HasFormParameters;
-
     public IEnumerable<OperationParameterModel> PathParameters => Parameters.Where(p => p.Kind == ApiParameterKind.Path);
 
     public IEnumerable<OperationParameterModel> QueryParameters =>
@@ -154,8 +147,8 @@ internal sealed class OperationModel
         (operation.ActualRequestBody?.Content.ContainsKey("application/x-www-form-urlencoded") ?? false);
 
     public bool ConsumesJson =>
-        operation.ActualConsumes.Contains("application/json") ||
-        (operation.ActualRequestBody?.Content.ContainsKey("application/json") ?? false);
+        operation.ActualConsumes.Contains(ContentTypeConstants.Json) ||
+        (operation.ActualRequestBody?.Content.ContainsKey(ContentTypeConstants.Json) ?? false);
 
     public string? Summary => ConversionUtilities.TrimWhiteSpaces(operation.Summary);
 
@@ -182,11 +175,11 @@ internal sealed class OperationModel
         get
         {
             var consumes = operation.ActualConsumes;
-            if (consumes.Contains("application/json"))
-                return "application/json";
+            if (consumes.Contains(ContentTypeConstants.Json))
+                return ContentTypeConstants.Json;
 
             var contentType = consumes.FirstOrDefault() ?? operation.ActualRequestBody?.Content.Keys.FirstOrDefault();
-            return contentType?.Replace("\"", "\\\"") ?? "application/json";
+            return contentType?.Replace("\"", "\\\"") ?? ContentTypeConstants.Json;
         }
     }
 
@@ -195,11 +188,11 @@ internal sealed class OperationModel
         get
         {
             var produces = operation.ActualProduces;
-            if (produces.Contains("application/json"))
-                return "application/json";
+            if (produces.Contains(ContentTypeConstants.Json))
+                return ContentTypeConstants.Json;
 
             var contentType = produces.FirstOrDefault() ?? SuccessResponse?.Produces;
-            return contentType?.Replace("\"", "\\\"") ?? "application/json";
+            return contentType?.Replace("\"", "\\\"") ?? ContentTypeConstants.Json;
         }
     }
 
@@ -238,9 +231,9 @@ internal sealed class OperationModel
     public bool HasResult => UnwrappedResultType != "void";
 
     public string? UnwrappedResultDefaultValue =>
-        HasResult
-            ? "default(" + UnwrappedResultType + ")" + (settings.GenerateNullableReferenceTypes ? "!" : string.Empty)
-            : null;
+        HasResult ? "default(" + UnwrappedResultType + ")" + NullForgivingSuffix : null;
+
+    private string NullForgivingSuffix => settings.GenerateNullableReferenceTypes ? "!" : string.Empty;
 
     public string? ResultDescription
     {
@@ -257,7 +250,7 @@ internal sealed class OperationModel
 
     public IEnumerable<ExceptionDescriptionModel> ExceptionDescriptions =>
         Responses
-            .Where(r => r.ThrowsException)
+            .Where(r => !r.IsSuccess)
             .SelectMany(r => r.InheritsExceptionSchema
                 ? [new ExceptionDescriptionModel(r.Type, r.ExceptionDescription)]
                 : Array.Empty<ExceptionDescriptionModel>());
@@ -274,7 +267,7 @@ internal sealed class OperationModel
         if (parameter.IsBinaryBodyParameter)
             return parameter.HasBinaryBodyWithMultipleMimeTypes ? "FileParameter" : "System.IO.Stream";
 
-        if (actualSchema.Type == ApiObjectType.Array && actualSchema.Item?.IsBinary == true)
+        if (actualSchema.Type == ApiObjectTypes.Array && actualSchema.Item?.IsBinary == true)
             return "System.Collections.Generic.IEnumerable<FileParameter>";
 
         if (actualSchema.IsBinary)
@@ -295,9 +288,9 @@ internal sealed class OperationModel
         if (parameter.IsXmlBodyParameter)
             return "string";
 
-        if (parameter.CollectionFormat == ApiParameterCollectionFormat.Multi && (schema.Type & ApiObjectType.Array) == 0)
+        if (parameter.CollectionFormat == ApiParameterCollectionFormat.Multi && (schema.Type & ApiObjectTypes.Array) == 0)
         {
-            schema = new ApiSchema { Type = ApiObjectType.Array, Item = schema };
+            schema = new ApiSchema { Type = ApiObjectTypes.Array, Item = schema };
         }
 
         var typeNameHint = !schema.HasTypeNameTitle
@@ -326,7 +319,7 @@ internal sealed class OperationModel
                     Kind = ApiParameterKind.FormData,
                     Schema = p.Value,
                     Description = p.Value.Description,
-                    CollectionFormat = (p.Value.Type & ApiObjectType.Array) != ApiObjectType.None && p.Value.Item != null
+                    CollectionFormat = (p.Value.Type & ApiObjectTypes.Array) != ApiObjectTypes.None && p.Value.Item != null
                         ? ApiParameterCollectionFormat.Multi
                         : ApiParameterCollectionFormat.Undefined,
                     Position = count + 100 + i,
@@ -362,6 +355,8 @@ internal sealed class ExceptionDescriptionModel(string type, string description)
 /// <summary>The C# view of an operation parameter.</summary>
 internal sealed class OperationParameterModel
 {
+    private const string StringType = "string";
+
     private readonly ApiParameter parameter;
     private readonly IList<ApiParameter> allParameters;
     private readonly ContractGenerator generator;
@@ -434,13 +429,13 @@ internal sealed class OperationParameterModel
 
     public bool HasBinaryBodyWithMultipleMimeTypes => parameter.HasBinaryBodyWithMultipleMimeTypes;
 
-    public bool IsDate => Schema.Format == "date" && generator.GetTypeName(Schema, IsNullable, null) != "string";
+    public bool IsDate => Schema.Format == "date" && generator.GetTypeName(Schema, IsNullable, null) != StringType;
 
-    public bool IsDateTime => Schema.Format == "date-time" && generator.GetTypeName(Schema, IsNullable, null) != "string";
+    public bool IsDateTime => Schema.Format == "date-time" && generator.GetTypeName(Schema, IsNullable, null) != StringType;
 
     public bool IsDateOrDateTime => IsDate || IsDateTime;
 
-    public bool IsArray => Schema.Type.HasFlag(ApiObjectType.Array) || parameter.CollectionFormat == ApiParameterCollectionFormat.Multi;
+    public bool IsArray => Schema.Type.HasFlag(ApiObjectTypes.Array) || parameter.CollectionFormat == ApiParameterCollectionFormat.Multi;
 
     public bool IsExplodedArray =>
         IsArray &&
@@ -448,7 +443,7 @@ internal sealed class OperationParameterModel
             ? parameter.CollectionFormat == ApiParameterCollectionFormat.Multi
             : Explode ?? Kind is ApiParameterKind.Query or ApiParameterKind.Cookie);
 
-    public bool IsStringArray => IsArray && Schema.Item?.ActualSchema.Type.HasFlag(ApiObjectType.String) == true;
+    public bool IsStringArray => IsArray && Schema.Item?.ActualSchema.Type.HasFlag(ApiObjectTypes.String) == true;
 
     public bool IsFile => Schema.IsBinary || (IsArray && Schema.Item?.IsBinary == true);
 
@@ -457,22 +452,14 @@ internal sealed class OperationParameterModel
     public bool IsDateTimeArray =>
         IsArray &&
         Schema.Item?.ActualSchema.Format == "date-time" &&
-        generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != "string";
+        generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != StringType;
 
     public bool IsDateArray =>
         IsArray &&
         Schema.Item?.ActualSchema.Format == "date" &&
-        generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != "string";
+        generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != StringType;
 
-    public bool IsDateOrDateTimeArray => IsDateArray || IsDateTimeArray;
-
-    public bool IsObjectArray =>
-        IsArray &&
-        (Schema.Item?.ActualSchema.Type == ApiObjectType.Object || (Schema.Item?.ActualSchema.IsAnyType ?? false));
-
-    public bool IsObject => Schema.ActualSchema.Type == ApiObjectType.Object;
-
-    public bool IsBody => Kind == ApiParameterKind.Body;
+    public bool IsObject => Schema.ActualSchema.Type == ApiObjectTypes.Object;
 
     public bool IsQuery => Kind == ApiParameterKind.Query;
 
@@ -491,7 +478,7 @@ internal sealed class ParameterPropertyModel(string key, ApiSchemaProperty prope
 
     public string Name { get; } = name;
 
-    public bool IsCollection => property.Type == ApiObjectType.Array;
+    public bool IsCollection => property.Type == ApiObjectTypes.Array;
 }
 
 /// <summary>The C# view of an operation response.</summary>
@@ -539,7 +526,7 @@ internal sealed class OperationResponseModel
         ActualResponseSchema.Format is "date" or "date-time" &&
         generator.GetTypeName(ActualResponseSchema, IsNullable, "Response") != "string";
 
-    public bool IsPlainText => !response.Content.ContainsKey("application/json") && response.Content.ContainsKey("text/plain");
+    public bool IsPlainText => !response.Content.ContainsKey(ContentTypeConstants.Json) && response.Content.ContainsKey("text/plain");
 
     public bool IsFile => IsSuccess && response.IsBinary(operation);
 
@@ -560,12 +547,10 @@ internal sealed class OperationResponseModel
         }
     }
 
-    public bool ThrowsException => !IsSuccess;
-
     public string ExceptionDescription =>
-        string.IsNullOrEmpty(response.Description)
+        NullCheck.IsNullOrEmpty(response.Description)
             ? "A server side error occurred."
-            : ConversionUtilities.ConvertToStringLiteral(response.Description!);
+            : ConversionUtilities.ConvertToStringLiteral(response.Description);
 
     public string? Produces
     {
@@ -574,8 +559,8 @@ internal sealed class OperationResponseModel
             if (response.Content.ContainsKey("*/*"))
                 return "*/*";
 
-            if (response.Content.ContainsKey("application/json"))
-                return "application/json";
+            if (response.Content.ContainsKey(ContentTypeConstants.Json))
+                return ContentTypeConstants.Json;
 
             return response.Content.FirstOrDefault().Key;
         }

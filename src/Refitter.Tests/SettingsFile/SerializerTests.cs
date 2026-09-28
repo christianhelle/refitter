@@ -1,4 +1,4 @@
-// Covers the obsolete NSwag-typed naming hooks until they are removed
+// Covers obsolete settings until they are removed
 #pragma warning disable CS0618
 using AwesomeAssertions;
 using Refitter.Core;
@@ -35,6 +35,16 @@ public class SerializerTests
             .Deserialize<RefitGeneratorSettings>(json)
             .Should()
             .BeEquivalentTo(settings);
+    }
+
+    [Test]
+    public void Deserialize_Ignores_The_Removed_CodeGeneratorSettings_CustomTemplateDirectory()
+    {
+        var settings = Serializer.Deserialize<RefitGeneratorSettings>(
+            """{ "codeGeneratorSettings": { "customTemplateDirectory": "./templates", "dateType": "System.DateOnly" } }""");
+
+        settings.CodeGeneratorSettings!.DateType.Should().Be("System.DateOnly");
+        settings.CustomTemplateDirectory.Should().BeNull();
     }
 
     [Test]

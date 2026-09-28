@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Text.RegularExpressions;
 
 namespace Refitter.Core;
@@ -65,7 +67,7 @@ internal class ReturnTypeGenerator(
                ApiResponseTypeRegex.IsMatch(typeName);
     }
 
-    public bool IsFileStreamResponse(ApiOperation operation)
+    public static bool IsFileStreamResponse(ApiOperation operation)
     {
         var successCodes = new[] { "200", "201", "202", "203", "206", "2XX" };
 
@@ -84,7 +86,7 @@ internal class ReturnTypeGenerator(
                 if (IsFileContentType(contentEntry.Key))
                 {
                     var schema = contentEntry.Value?.Schema;
-                    if (schema?.Format == "binary" || schema?.Type == ApiObjectType.File)
+                    if (schema?.Format == "binary" || schema?.Type == ApiObjectTypes.File)
                         return true;
                 }
             }
@@ -126,38 +128,41 @@ internal class ReturnTypeGenerator(
                 continue;
 
             var response = apiResponse.ActualResponse;
-
-            if (response.Content.Any())
+            if (TryGetStreamingContentSchema(response, out schema) ||
+                TryGetStreamingProducesSchema(operation, response, out schema))
             {
-                foreach (var contentEntry in response.Content)
-                {
-                    if (!IsStreamingContentType(contentEntry.Key))
-                        continue;
-
-                    schema = contentEntry.Value?.Schema;
-                    if (IsPrimitiveSchema(schema))
-                        continue;
-
-                    return true;
-                }
-            }
-
-            // Swagger 2.0 has no per-media-type schema, so the produces list is the only
-            // signal. A document-level produces list applies to every operation, so require
-            // all of them to be streaming - otherwise a single streaming entry alongside
-            // application/json would turn every operation in the document into a stream.
-            if (IsStreamingOnly(operation.ActualProduces))
-            {
-                schema = response.Schema;
-                if (IsPrimitiveSchema(schema))
-                    continue;
-
                 return true;
             }
         }
 
         schema = null;
         return false;
+    }
+
+    private static bool TryGetStreamingContentSchema(ApiResponse response, out ApiSchema? schema)
+    {
+        foreach (var contentEntry in response.Content)
+        {
+            if (!IsStreamingContentType(contentEntry.Key))
+                continue;
+
+            schema = contentEntry.Value?.Schema;
+            if (!IsPrimitiveSchema(schema))
+                return true;
+        }
+
+        schema = null;
+        return false;
+    }
+
+    private static bool TryGetStreamingProducesSchema(ApiOperation operation, ApiResponse response, out ApiSchema? schema)
+    {
+        // Swagger 2.0 has no per-media-type schema, so the produces list is the only
+        // signal. A document-level produces list applies to every operation, so require
+        // all of them to be streaming - otherwise a single streaming entry alongside
+        // application/json would turn every operation in the document into a stream.
+        schema = response.Schema;
+        return IsStreamingOnly(operation.ActualProduces) && !IsPrimitiveSchema(schema);
     }
 
     private static bool IsStreamingOnly(IEnumerable<string> produces)
@@ -190,16 +195,16 @@ internal class ReturnTypeGenerator(
             return false;
 
         ApiSchema actual = schema.ActualTypeSchema ?? schema;
-        ApiObjectType type = actual.Type & ~ApiObjectType.Null;
-        return type is ApiObjectType.String
-            or ApiObjectType.Number
-            or ApiObjectType.Integer
-            or ApiObjectType.Boolean;
+        ApiObjectTypes type = actual.Type & ~ApiObjectTypes.Null;
+        return type is ApiObjectTypes.String
+            or ApiObjectTypes.Number
+            or ApiObjectTypes.Integer
+            or ApiObjectTypes.Boolean;
     }
 
     private string GetStreamingReturnType(ApiSchema? schema)
     {
-        ApiSchema? itemSchema = schema?.Type == ApiObjectType.Array
+        ApiSchema? itemSchema = schema?.Type == ApiObjectTypes.Array
             ? schema.Item
             : schema;
         string itemTypeName = itemSchema is null
@@ -232,12 +237,12 @@ internal class ReturnTypeGenerator(
         var schema = GetPreferredResponseSchema(operation.Responses[code].ActualResponse);
         var typeName = generator.GetTypeName(schema, false, null);
 
-        if (!string.IsNullOrWhiteSpace(codeGeneration.CodeGeneratorSettings?.ArrayType) &&
-            schema?.Type == ApiObjectType.Array)
+        if (!NullCheck.IsNullOrWhiteSpace(codeGeneration.CodeGeneratorSettings?.ArrayType) &&
+            schema?.Type == ApiObjectTypes.Array)
         {
             typeName = typeName
-                .Replace("ICollection", codeGeneration.CodeGeneratorSettings!.ArrayType)
-                .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings!.ArrayType);
+                .Replace("ICollection", codeGeneration.CodeGeneratorSettings.ArrayType)
+                .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings.ArrayType);
         }
 
         return typeName;

@@ -10,7 +10,7 @@ namespace Refitter.Tests.Scenarios;
 /// <summary>
 /// Tests for JsonLibraryVersion setting that controls enum attribute generation.
 /// When JsonLibraryVersion is set to 9.0+, enums may use [JsonStringEnumMemberName] attributes
-/// (requires NSwag/NJsonSchema version that supports this in their Enum.liquid template).
+/// (supported by the Enum.liquid template).
 /// When JsonLibraryVersion is 8.0 or below (default), enums use [EnumMember] attributes.
 /// </summary>
 

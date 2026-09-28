@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -31,28 +33,29 @@ internal static class ConversionUtilities
 
     private static string ConvertToCamelCase(string? input, bool firstCharacterMustBeAlpha, CamelCaseMode mode)
     {
-        if (string.IsNullOrEmpty(input))
+        if (NullCheck.IsNullOrEmpty(input))
             return string.Empty;
 
-        if (input!.IndexOfAny(CamelCaseCleanupChars) != -1)
+        if (input.IndexOfAny(CamelCaseCleanupChars) != -1)
             input = input.Replace(' ', '_').Replace('/', '_');
 
-        if (input.IndexOf('-') == -1)
-        {
-            var first = input[0];
-            if (char.IsNumber(first))
-                return firstCharacterMustBeAlpha ? "_" + input : input;
+        return input.IndexOf('-') == -1
+            ? ConvertWordToCamelCase(input, firstCharacterMustBeAlpha, mode)
+            : ConvertHyphenatedToCamelCase(input, firstCharacterMustBeAlpha, mode);
+    }
 
-            var converted = mode switch
-            {
-                CamelCaseMode.FirstUpper => char.ToUpperInvariant(first),
-                CamelCaseMode.FirstLower => char.ToLowerInvariant(first),
-                _ => first,
-            };
+    private static string ConvertWordToCamelCase(string input, bool firstCharacterMustBeAlpha, CamelCaseMode mode)
+    {
+        var first = input[0];
+        if (char.IsNumber(first))
+            return firstCharacterMustBeAlpha ? "_" + input : input;
 
-            return converted != first ? converted + input.Substring(1) : input;
-        }
+        var converted = ChangeCase(first, mode);
+        return converted != first ? converted + input.Substring(1) : input;
+    }
 
+    private static string ConvertHyphenatedToCamelCase(string input, bool firstCharacterMustBeAlpha, CamelCaseMode mode)
+    {
         var builder = new StringBuilder(input.Length + 1);
         var capitalizeNext = false;
         for (var i = 0; i < input.Length; i++)
@@ -74,18 +77,9 @@ internal static class ConversionUtilities
             if (i == 0)
             {
                 if (firstCharacterMustBeAlpha && char.IsNumber(c))
-                {
                     builder.Append('_');
-                }
                 else
-                {
-                    c = mode switch
-                    {
-                        CamelCaseMode.FirstUpper => char.ToUpperInvariant(c),
-                        CamelCaseMode.FirstLower => char.ToLowerInvariant(c),
-                        _ => c,
-                    };
-                }
+                    c = ChangeCase(c, mode);
             }
 
             builder.Append(c);
@@ -93,6 +87,14 @@ internal static class ConversionUtilities
 
         return builder.ToString();
     }
+
+    private static char ChangeCase(char c, CamelCaseMode mode) =>
+        mode switch
+        {
+            CamelCaseMode.FirstUpper => char.ToUpperInvariant(c),
+            CamelCaseMode.FirstLower => char.ToLowerInvariant(c),
+            _ => c,
+        };
 
     public static string ConvertToStringLiteral(string input, string? prefix = null, string? postfix = null)
     {

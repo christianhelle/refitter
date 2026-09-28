@@ -208,8 +208,7 @@ components:
         // Schema is manipulated to return ARRAY of WarehouseResponse
         // previously (<= 0.9.9.0) this wasn't accomodated.
         //
-        // For whatever reason NSwag OpenApi-Schema doesn't contain Schema for "Items"
-        // Instead it's inside "Item"
+        // The schema model keeps a single array item schema in "Item" rather than "Items"
         generatedCode.Should().Contain("Task<ICollection<WarehouseResponse>> CreateWarehouse([Query] string token, [Body] Warehouse ");
 
         generatedCode.Should().NotContain("class UserComponent");

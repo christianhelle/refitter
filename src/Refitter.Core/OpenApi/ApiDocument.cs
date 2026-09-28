@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Refitter.Core;
 
 /// <summary>An OpenAPI (3.x) or Swagger (2.0) document.</summary>
@@ -71,22 +73,31 @@ internal sealed class ApiDocument
         duplicatedOperationIds.Clear();
         foreach (var operation in operations)
         {
-            if (string.IsNullOrEmpty(operation.Operation.OperationId))
+            var operationId = operation.Operation.OperationId;
+            if (NullCheck.IsNullOrEmpty(operationId))
             {
-                operation.Operation.OperationId = GetOperationNameFromPath(operation);
+                operationId = GetOperationNameFromPath(operation);
+                operation.Operation.OperationId = operationId;
             }
 
-            if (!operationIds.Add(operation.Operation.OperationId!))
-            {
-                duplicatedOperationIds.Add(operation.Operation.OperationId!);
-            }
+            if (!operationIds.Add(operationId))
+                duplicatedOperationIds.Add(operationId);
         }
 
         if (duplicatedOperationIds.Count == 0)
             return;
 
-        operations = operations.Where(o => duplicatedOperationIds.Contains(o.Operation.OperationId!)).ToList();
+        operations = operations.Where(o => o.Operation.OperationId is { } id && duplicatedOperationIds.Contains(id)).ToList();
 
+        AppendAllToArrayOperations(operations);
+        AppendMethods(operations);
+        if (AppendCounterToFirstDuplicates(operations))
+            GenerateOperationIds(operations, operationIds, duplicatedOperationIds);
+    }
+
+    /// <summary>Tells duplicates apart by appending "All" to the ones that return arrays.</summary>
+    private static void AppendAllToArrayOperations(List<ApiOperationDescription> operations)
+    {
         foreach (var group in operations.GroupBy(o => o.Operation.OperationId))
         {
             if (group.Count() <= 1)
@@ -96,15 +107,14 @@ internal sealed class ApiDocument
             if (arrayResponses.Count() == group.Count())
                 continue;
 
-            foreach (var operation in group)
-            {
-                if (operation.Operation.HasActualResponse(IsSuccessArrayResponse))
-                {
-                    operation.Operation.OperationId += "All";
-                }
-            }
+            foreach (var operation in arrayResponses)
+                operation.Operation.OperationId += "All";
         }
+    }
 
+    /// <summary>Tells duplicates apart by appending their HTTP methods, when these differ.</summary>
+    private static void AppendMethods(List<ApiOperationDescription> operations)
+    {
         foreach (var group in operations.GroupBy(o => o.Operation.OperationId))
         {
             if (group.Count() <= 1)
@@ -114,37 +124,35 @@ internal sealed class ApiDocument
                 continue;
 
             foreach (var operation in group)
-            {
                 operation.Operation.OperationId += operation.Method.ToUpperInvariant();
-            }
         }
+    }
 
-        foreach (var group in operations.GroupBy(o => o.Operation.OperationId))
-        {
-            var list = group.ToList();
-            if (group.Count() <= 1)
-                continue;
+    /// <summary>Numbers the first group of remaining duplicates, and returns whether there was one.</summary>
+    private static bool AppendCounterToFirstDuplicates(List<ApiOperationDescription> operations)
+    {
+        var duplicates = operations
+            .GroupBy(o => o.Operation.OperationId)
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicates == null)
+            return false;
 
-            var counter = 2;
-            foreach (var operation in list.Skip(1))
-            {
-                operation.Operation.OperationId += counter++;
-            }
+        var counter = 2;
+        foreach (var operation in duplicates.Skip(1))
+            operation.Operation.OperationId += counter++;
 
-            GenerateOperationIds(operations, operationIds, duplicatedOperationIds);
-            break;
-        }
+        return true;
     }
 
     private static bool IsSuccessArrayResponse(string code, ApiResponse response) =>
         HttpUtilities.IsSuccessStatusCode(code) &&
-        response.Schema?.ActualSchema.Type == ApiObjectType.Array;
+        response.Schema?.ActualSchema.Type == ApiObjectTypes.Array;
 
     private static string GetOperationNameFromPath(ApiOperationDescription operation)
     {
         var segments = operation.Path.Trim('/').Split('/');
         var lastSegment = segments.LastOrDefault(s => !s.Contains('{'));
-        return !string.IsNullOrEmpty(lastSegment) ? lastSegment! : "Anonymous";
+        return !NullCheck.IsNullOrEmpty(lastSegment) ? lastSegment : "Anonymous";
     }
 }
 

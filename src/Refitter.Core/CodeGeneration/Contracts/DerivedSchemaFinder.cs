@@ -27,9 +27,6 @@ internal sealed class DerivedSchemaFinder
 
     private void VisitDocument(ApiDocument document)
     {
-        if (!visited.Add(document))
-            return;
-
         isSwagger2 = document.SchemaType == ApiSchemaType.Swagger2;
         foreach (var path in document.Paths.ToList())
         {
@@ -79,9 +76,6 @@ internal sealed class DerivedSchemaFinder
 
     private void VisitOperation(ApiOperation operation)
     {
-        if (!visited.Add(operation))
-            return;
-
         foreach (var parameter in operation.Parameters.ToList())
         {
             VisitSchema(parameter, null);
@@ -104,11 +98,8 @@ internal sealed class DerivedSchemaFinder
         if (requestBody.Reference != null)
             VisitRequestBody(requestBody.Reference);
 
-        foreach (var mediaType in requestBody.Content.ToList())
-        {
-            if (mediaType.Value.Schema != null)
-                VisitSchema(mediaType.Value.Schema, "schema");
-        }
+        foreach (var schema in requestBody.Content.Select(mediaType => mediaType.Value.Schema).OfType<ApiSchema>().ToList())
+            VisitSchema(schema, "schema");
     }
 
     private void VisitResponse(ApiResponse response)
@@ -130,11 +121,8 @@ internal sealed class DerivedSchemaFinder
 
         if (!isSwagger2)
         {
-            foreach (var mediaType in response.Content.ToList())
-            {
-                if (mediaType.Value.Schema != null)
-                    VisitSchema(mediaType.Value.Schema, "schema");
-            }
+            foreach (var schema in response.Content.Select(mediaType => mediaType.Value.Schema).OfType<ApiSchema>().ToList())
+                VisitSchema(schema, "schema");
         }
     }
 
@@ -157,58 +145,48 @@ internal sealed class DerivedSchemaFinder
             order.Add(schema);
         }
 
-        if (schema.Reference != null)
-            VisitSchema(schema.Reference, null);
+        // Each collection is copied when it is reached, like the schemas themselves are visited
+        VisitOptionalSchema(schema.Reference, null);
+        VisitOptionalSchema(schema.AdditionalItemsSchema, null);
+        VisitOptionalSchema(schema.AdditionalPropertiesSchema, null);
+        VisitOptionalSchema(schema.Item, null);
+        VisitUnnamedSchemas(schema.Items.ToList());
+        VisitUnnamedSchemas(schema.AllOf.ToList());
+        VisitUnnamedSchemas(schema.AnyOf.ToList());
+        VisitUnnamedSchemas(schema.OneOf.ToList());
+        VisitOptionalSchema(schema.Not, null);
+        VisitOptionalSchema(schema.DictionaryKey, null);
 
-        if (schema.AdditionalItemsSchema != null)
-            VisitSchema(schema.AdditionalItemsSchema, null);
+        if (schema.DiscriminatorObject != null)
+            VisitNamedSchemas(schema.DiscriminatorObject.Mapping.ToList());
 
-        if (schema.AdditionalPropertiesSchema != null)
-            VisitSchema(schema.AdditionalPropertiesSchema, null);
-
-        if (schema.Item != null)
-            VisitSchema(schema.Item, null);
-
-        foreach (var item in schema.Items.ToList())
-            VisitSchema(item, null);
-
-        foreach (var item in schema.AllOf.ToList())
-            VisitSchema(item, null);
-
-        foreach (var item in schema.AnyOf.ToList())
-            VisitSchema(item, null);
-
-        foreach (var item in schema.OneOf.ToList())
-            VisitSchema(item, null);
-
-        if (schema.Not != null)
-            VisitSchema(schema.Not, null);
-
-        if (schema.DictionaryKey != null)
-            VisitSchema(schema.DictionaryKey, null);
-
-        if (schema.DiscriminatorObject != null && schema.DiscriminatorObject.Mapping.Count > 0)
-        {
-            foreach (var mapping in schema.DiscriminatorObject.Mapping.ToList())
-                VisitSchema(mapping.Value, mapping.Key);
-        }
-
-        foreach (var property in schema.Properties.ToList())
-            VisitSchema(property.Value, property.Key);
-
-        foreach (var property in schema.PatternProperties.ToList())
-            VisitSchema(property.Value, null);
-
-        foreach (var definition in schema.Definitions.ToList())
-            VisitSchema(definition.Value, definition.Key);
+        VisitNamedSchemas(schema.Properties.ToList());
+        VisitUnnamedSchemas(schema.PatternProperties.Select(property => property.Value).ToList());
+        VisitNamedSchemas(schema.Definitions.ToList());
 
         if (schema is ApiParameter parameter)
         {
-            if (parameter.Schema != null)
-                VisitSchema(parameter.Schema, "schema");
-
-            if (parameter.CustomSchema != null)
-                VisitSchema(parameter.CustomSchema, "x-schema");
+            VisitOptionalSchema(parameter.Schema, "schema");
+            VisitOptionalSchema(parameter.CustomSchema, "x-schema");
         }
+    }
+
+    private void VisitOptionalSchema(ApiSchema? schema, string? typeNameHint)
+    {
+        if (schema != null)
+            VisitSchema(schema, typeNameHint);
+    }
+
+    private void VisitUnnamedSchemas(IEnumerable<ApiSchema> schemas)
+    {
+        foreach (var schema in schemas)
+            VisitSchema(schema, null);
+    }
+
+    private void VisitNamedSchemas<T>(IEnumerable<KeyValuePair<string, T>> schemas)
+        where T : ApiSchema
+    {
+        foreach (var schema in schemas)
+            VisitSchema(schema.Value, schema.Key);
     }
 }

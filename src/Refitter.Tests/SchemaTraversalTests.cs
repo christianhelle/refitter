@@ -29,7 +29,7 @@ public class SchemaTraversalTests
         var visited = new List<ApiSchema>();
         SchemaWalker.TraverseDocumentSchemas(document, visited.Add);
 
-        visited.Select(s => s.Type).Should().Contain(ApiObjectType.String);
+        visited.Select(s => s.Type).Should().Contain(ApiObjectTypes.String);
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class SchemaTraversalTests
             """, null, isYaml: false);
 
         // Tuple validation is not expressible in OpenAPI 3.0, so build the item schemas directly
-        var tupleItem = new ApiSchema { Type = ApiObjectType.String };
+        var tupleItem = new ApiSchema { Type = ApiObjectTypes.String };
         document.Components.Schemas["Root"].Items.Add(tupleItem);
 
         var visited = new List<ApiSchema>();
@@ -82,7 +82,7 @@ public class SchemaTraversalTests
         var visited = new List<ApiSchema>();
         SchemaWalker.TraverseDocumentSchemas(document, visited.Add);
 
-        visited.Select(s => s.Type).Should().Contain(ApiObjectType.Boolean);
+        visited.Select(s => s.Type).Should().Contain(ApiObjectTypes.Boolean);
     }
 
     [Test]

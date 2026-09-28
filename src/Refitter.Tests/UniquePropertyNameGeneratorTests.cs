@@ -49,7 +49,7 @@ public class UniquePropertyNameGeneratorTests
     public void Reserves_Additional_Properties_For_Typed_Additional_Properties()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "AdditionalProperties");
-        schema.AdditionalPropertiesSchema = new ApiSchema { Type = ApiObjectType.String };
+        schema.AdditionalPropertiesSchema = new ApiSchema { Type = ApiObjectTypes.String };
 
         var names = GenerateAll(new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => null), schema);
 
@@ -89,10 +89,10 @@ public class UniquePropertyNameGeneratorTests
 
     private static ApiSchema CreateSchema(bool allowAdditionalProperties, params string[] propertyNames)
     {
-        var schema = new ApiSchema { Type = ApiObjectType.Object, AllowAdditionalProperties = allowAdditionalProperties };
+        var schema = new ApiSchema { Type = ApiObjectTypes.Object, AllowAdditionalProperties = allowAdditionalProperties };
         foreach (var propertyName in propertyNames)
         {
-            schema.Properties[propertyName] = new ApiSchemaProperty { Type = ApiObjectType.String };
+            schema.Properties[propertyName] = new ApiSchemaProperty { Type = ApiObjectTypes.String };
         }
 
         return schema;

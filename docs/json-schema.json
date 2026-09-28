@@ -189,11 +189,6 @@
         "dateTimeFormat": {
           "description": "Gets or sets the date-time string format to use",
           "type": "string"
-        },
-        "customTemplateDirectory": {
-          "description": "Deprecated and has no effect; use customTemplateDirectory at the root of the settings instead.",
-          "type": "string",
-          "deprecated": true
         }
       }
     },
@@ -512,9 +507,8 @@
       "enum": [ "Multi", "Csv", "Ssv", "Tsv", "Pipes" ]
     },
     "customTemplateDirectory": {
-      "description": "Deprecated, will be removed in the next major version. Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates",
-      "type": [ "string", "null" ],
-      "deprecated": true
+      "description": "Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.",
+      "type": [ "string", "null" ]
     },
     "silent": {
       "description": "Suppress all console output when running the CLI tool. Default is false.",

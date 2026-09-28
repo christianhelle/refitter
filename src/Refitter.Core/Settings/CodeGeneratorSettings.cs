@@ -286,14 +286,6 @@ public class CodeGeneratorSettings
     public bool InlineJsonConverters { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
-    /// templates.
-    /// </summary>
-    [Description("Deprecated and has no effect; use customTemplateDirectory at the root of the settings instead.")]
-    [Obsolete("This setting has no effect. Custom NSwag Liquid templates are configured with RefitGeneratorSettings.CustomTemplateDirectory, which is also deprecated.")]
-    public string? CustomTemplateDirectory { get; set; }
-
-    /// <summary>
     /// Gets or sets the JSON library version to use (applies only to System.Text.Json, default: 8.0).
     /// When set to 9.0 or higher, enums will use [JsonStringEnum] attributes with member name support,
     /// enabling .NET 9+ JsonStringEnumMemberName support for custom enum value names.

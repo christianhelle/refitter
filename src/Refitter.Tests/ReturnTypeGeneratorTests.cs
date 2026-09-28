@@ -189,12 +189,9 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
-        var settings = new RefitGeneratorSettings();
-        var generator = new ContractGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
-        var result = sut.IsFileStreamResponse(operation);
+        var result = ReturnTypeGenerator.IsFileStreamResponse(operation);
 
         result.Should().BeTrue();
     }
@@ -229,12 +226,9 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
-        var settings = new RefitGeneratorSettings();
-        var generator = new ContractGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
-        var result = sut.IsFileStreamResponse(operation);
+        var result = ReturnTypeGenerator.IsFileStreamResponse(operation);
 
         result.Should().BeFalse();
     }
@@ -1371,11 +1365,8 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
-        var settings = new RefitGeneratorSettings();
-        var generator = new ContractGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
 
-        sut.IsFileStreamResponse(document.Paths["/download"]["get"]).Should().BeTrue();
+        ReturnTypeGenerator.IsFileStreamResponse(document.Paths["/download"]["get"]).Should().BeTrue();
     }
 
     [Test]
@@ -1433,9 +1424,7 @@ public class ReturnTypeGeneratorTests
         public bool GenerateStatusCodeComments => inner.GenerateStatusCodeComments;
         public TypeAccessibility TypeAccessibility => inner.TypeAccessibility;
         public bool ImmutableRecords => inner.ImmutableRecords;
-#pragma warning disable CS0618 // Deprecated custom templates are still honored
         public string? CustomTemplateDirectory => inner.CustomTemplateDirectory;
-#pragma warning restore CS0618
         public IParameterNameProvider? ParameterNameProvider => inner.ParameterNameProvider;
         public bool UsePolymorphicSerialization => inner.UsePolymorphicSerialization;
         public bool UseCancellationTokens => inner.UseCancellationTokens;

@@ -53,9 +53,7 @@ public class SettingsMapperTests
         result.UsePolymorphicSerialization.Should().BeTrue();
         result.GenerateDisposableClients.Should().BeTrue();
         result.CollectionFormat.Should().Be(CollectionFormat.Csv);
-#pragma warning disable CS0618 // Deprecated custom templates are still honored
         result.CustomTemplateDirectory.Should().Be("./templates");
-#pragma warning restore CS0618
         result.SecurityScheme.Should().Be("bearer");
         result.GenerateJsonSerializerContext.Should().BeTrue();
         result.ContractsNamespace.Should().Be("MyApi.Contracts");

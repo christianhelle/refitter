@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Text.RegularExpressions;
 
 namespace Refitter.Core;
@@ -15,7 +17,6 @@ internal class ApiSchema
     private static readonly Regex TypeNameTitleRegex = new("^[a-zA-Z0-9_]*$", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     private ApiSchema? reference;
-    private ApiObjectType type;
     private ApiSchema? item;
     private ApiSchema? additionalItemsSchema;
     private bool allowAdditionalItems = true;
@@ -133,11 +134,7 @@ internal class ApiSchema
 
     public ApiSchema? ParentSchema => Parent as ApiSchema;
 
-    public ApiObjectType Type
-    {
-        get => type;
-        set => type = value;
-    }
+    public ApiObjectTypes Type { get; set; }
 
     public ApiSchema? Reference
     {
@@ -152,7 +149,7 @@ internal class ApiSchema
 
             if (value != null)
             {
-                type = ApiObjectType.None;
+                Type = ApiObjectTypes.None;
             }
         }
     }
@@ -278,7 +275,7 @@ internal class ApiSchema
         (AdditionalPropertiesSchema != null || PatternProperties.Count > 0);
 
     public bool IsAnyType =>
-        (Type.IsObject() || Type == ApiObjectType.None) &&
+        (Type.IsObject() || Type == ApiObjectTypes.None) &&
         Reference == null &&
         AllOf.Count == 0 &&
         AnyOf.Count == 0 &&
@@ -293,7 +290,7 @@ internal class ApiSchema
         Reference != null || HasAllOfSchemaReference || HasOneOfSchemaReference || HasAnyOfSchemaReference;
 
     public bool HasAllOfSchemaReference =>
-        Type == ApiObjectType.None &&
+        Type == ApiObjectTypes.None &&
         AnyOf.Count == 0 &&
         OneOf.Count == 0 &&
         Properties.Count == 0 &&
@@ -305,7 +302,7 @@ internal class ApiSchema
         AllOf.Any(s => s.HasReference);
 
     public bool HasOneOfSchemaReference =>
-        Type == ApiObjectType.None &&
+        Type == ApiObjectTypes.None &&
         AnyOf.Count == 0 &&
         AllOf.Count == 0 &&
         Properties.Count == 0 &&
@@ -317,7 +314,7 @@ internal class ApiSchema
         OneOf.Any(s => s.HasReference);
 
     public bool HasAnyOfSchemaReference =>
-        Type == ApiObjectType.None &&
+        Type == ApiObjectTypes.None &&
         AllOf.Count == 0 &&
         OneOf.Count == 0 &&
         Properties.Count == 0 &&
@@ -365,7 +362,7 @@ internal class ApiSchema
             if (withObjectType != null)
                 return withObjectType.ActualSchema;
 
-            return AllOf.FirstOrDefault()?.ActualSchema;
+            return AllOf[0].ActualSchema;
         }
     }
 
@@ -402,13 +399,9 @@ internal class ApiSchema
             if (Properties.Count > 0)
                 return true;
 
-            foreach (var schema in AllOf)
-            {
-                if (schema.ActualSchema != InheritedSchema && schema.ActualSchema.HasActualProperties)
-                    return true;
-            }
-
-            return false;
+            return AllOf
+                .Select(schema => schema.ActualSchema)
+                .Any(schema => schema != InheritedSchema && schema.HasActualProperties);
         }
     }
 
@@ -451,14 +444,8 @@ internal class ApiSchema
         if (Type.IsNull())
             return true;
 
-        if (Type == ApiObjectType.None || Type.IsNull())
-        {
-            foreach (var schema in OneOf)
-            {
-                if (schema.IsNullable(schemaType))
-                    return true;
-            }
-        }
+        if ((Type == ApiObjectTypes.None || Type.IsNull()) && OneOf.Any(schema => schema.IsNullable(schemaType)))
+            return true;
 
         var actualSchema = ActualSchema;
         if (actualSchema != this && actualSchema.IsNullable(schemaType))

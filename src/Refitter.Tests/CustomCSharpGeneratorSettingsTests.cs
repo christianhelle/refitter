@@ -378,9 +378,7 @@ public class CustomCSharpGeneratorSettingsTests
     {
         var settings = new RefitGeneratorSettings();
         settings.ReturnIApiResponse = true;
-#pragma warning disable CS0618 // Deprecated custom templates are still honored
         settings.CustomTemplateDirectory = "./Templates/";
-#pragma warning restore CS0618
         var generatedCode = await GenerateCode(version, filename, settings);
         generatedCode.Should().Contain("/* Example Custom Template Text */");
         generatedCode.Should().Contain("public partial class Pet");

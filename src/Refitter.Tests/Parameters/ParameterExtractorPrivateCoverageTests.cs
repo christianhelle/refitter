@@ -113,19 +113,19 @@ public class ParameterExtractorPrivateCoverageTests
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
 
         var numberType = ParameterTypeResolver.GetCSharpType(
-            new ApiSchema { Type = ApiObjectType.Number },
+            new ApiSchema { Type = ApiObjectTypes.Number },
             settings);
 
         var objectType = ParameterTypeResolver.GetCSharpType(
-            new ApiSchema { Type = ApiObjectType.Object },
+            new ApiSchema { Type = ApiObjectTypes.Object },
             settings);
 
         var unknownType = ParameterTypeResolver.GetCSharpType(
-            new ApiSchema { Type = ApiObjectType.None },
+            new ApiSchema { Type = ApiObjectTypes.None },
             settings);
 
         var nullableStringType = ParameterTypeResolver.GetCSharpType(
-            new ApiSchema { Type = ApiObjectType.String, IsNullableRaw = true },
+            new ApiSchema { Type = ApiObjectTypes.String, IsNullableRaw = true },
             settings);
 
         numberType.Should().Be("double");
@@ -155,7 +155,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetArrayType_Returns_Object_Array_When_Item_Is_Missing()
     {
         var result = ParameterTypeResolver.GetArrayType(
-            new ApiSchema { Type = ApiObjectType.Array },
+            new ApiSchema { Type = ApiObjectTypes.Array },
             new RefitGeneratorSettings());
 
         result.Should().Be("object[]");

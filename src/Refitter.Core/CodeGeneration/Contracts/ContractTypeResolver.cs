@@ -6,6 +6,8 @@ namespace Refitter.Core;
 /// </summary>
 internal sealed class ContractTypeResolver
 {
+    private const string StringType = "string";
+
     private readonly Dictionary<ApiSchema, string> generatedTypeNames = new();
     private readonly List<KeyValuePair<ApiSchema, string>> registrationOrder = new();
     private readonly HashSet<string> reservedTypeNames = new(StringComparer.Ordinal);
@@ -41,34 +43,54 @@ internal sealed class ContractTypeResolver
             return "System.Exception";
 
         var markAsNullableReference = Settings.GenerateNullableReferenceTypes && isNullable;
-
-        if (schema.ActualTypeSchema.IsAnyType &&
-            schema.ActualDiscriminator == null &&
-            schema.InheritedSchema == null &&
-            schema.AllOf.Count == 0 &&
-            !generatedTypeNames.ContainsKey(schema) &&
-            !schema.HasReference)
-        {
+        if (IsUntypedAnyType(schema))
             return markAsNullableReference ? Settings.AnyType + "?" : Settings.AnyType;
-        }
 
-        var type = schema.ActualTypeSchema.Type;
-        if (type == ApiObjectType.None && schema.ActualTypeSchema.IsEnumeration)
-        {
-            type = schema.ActualTypeSchema.Enumeration.All(v => v is int)
-                ? ApiObjectType.Integer
-                : ApiObjectType.String;
-        }
+        var type = GetValueType(schema.ActualTypeSchema);
+        return ResolveValueType(schema.ActualTypeSchema, type, isNullable) ??
+               ResolveReferenceType(schema, type, isNullable, markAsNullableReference, typeNameHint);
+    }
 
+    /// <summary>Whether a schema allows any value and is not a type of its own.</summary>
+    private bool IsUntypedAnyType(ApiSchema schema) =>
+        schema.ActualTypeSchema.IsAnyType &&
+        schema.ActualDiscriminator == null &&
+        schema.InheritedSchema == null &&
+        schema.AllOf.Count == 0 &&
+        !generatedTypeNames.ContainsKey(schema) &&
+        !schema.HasReference;
+
+    /// <summary>The type of a schema, where an untyped enumeration of integers is an integer and any other a string.</summary>
+    private static ApiObjectTypes GetValueType(ApiSchema actualTypeSchema)
+    {
+        if (actualTypeSchema.Type != ApiObjectTypes.None || !actualTypeSchema.IsEnumeration)
+            return actualTypeSchema.Type;
+
+        return actualTypeSchema.Enumeration.All(v => v is int) ? ApiObjectTypes.Integer : ApiObjectTypes.String;
+    }
+
+    /// <summary>The C# type of numbers, integers and booleans, or null for other types.</summary>
+    private string? ResolveValueType(ApiSchema actualTypeSchema, ApiObjectTypes type, bool isNullable)
+    {
         if (type.IsNumber())
-            return ResolveNumber(schema.ActualTypeSchema, isNullable);
+            return ResolveNumber(actualTypeSchema, isNullable);
 
-        if (type.IsInteger() && !schema.ActualTypeSchema.IsEnumeration)
-            return ResolveInteger(schema.ActualTypeSchema, isNullable);
+        if (type.IsInteger() && !actualTypeSchema.IsEnumeration)
+            return ResolveInteger(actualTypeSchema, isNullable);
 
         if (type.IsBoolean())
             return isNullable ? "bool?" : "bool";
 
+        return null;
+    }
+
+    private string ResolveReferenceType(
+        ApiSchema schema,
+        ApiObjectTypes type,
+        bool isNullable,
+        bool markAsNullableReference,
+        string? typeNameHint)
+    {
         var nullableReferenceSuffix = markAsNullableReference ? "?" : string.Empty;
         if (schema.IsBinary)
             return "byte[]" + nullableReferenceSuffix;
@@ -119,19 +141,13 @@ internal sealed class ContractTypeResolver
         }
     }
 
-    public ApiSchema RemoveNullability(ApiSchema schema) =>
+    public static ApiSchema RemoveNullability(ApiSchema schema) =>
         schema.OneOf.FirstOrDefault(o => !o.IsNullable(ApiSchemaType.JsonSchema)) ?? schema;
 
     public ApiSchema GetResolvableSchema(ApiSchema schema)
     {
         schema = RemoveNullability(schema);
         return IsDefinitionTypeSchema(schema.ActualSchema) ? schema : schema.ActualSchema;
-    }
-
-    public bool GeneratesType(ApiSchema schema)
-    {
-        schema = GetResolvableSchema(schema);
-        return schema.HasReference || (schema.IsObject && !schema.IsDictionary && !schema.IsAnyType);
     }
 
     private bool IsDefinitionTypeSchema(ApiSchema schema)
@@ -148,7 +164,7 @@ internal sealed class ContractTypeResolver
 
         if (!schema.IsTuple && !schema.IsDictionary && !schema.IsArray)
         {
-            if (!schema.IsEnumeration && schema.Type != ApiObjectType.None)
+            if (!schema.IsEnumeration && schema.Type != ApiObjectTypes.None)
                 return schema.Type.IsObject();
 
             return true;
@@ -163,22 +179,14 @@ internal sealed class ContractTypeResolver
         switch (schema.Format)
         {
             case "date":
-                return !isNullable || Settings.DateType?.ToLowerInvariant() == "string"
-                    ? Settings.DateType + suffix
-                    : Settings.DateType + "?";
+                return ResolveDateOrTime(Settings.DateType, isNullable, suffix);
             case "date-time":
-                return !isNullable || Settings.DateTimeType?.ToLowerInvariant() == "string"
-                    ? Settings.DateTimeType + suffix
-                    : Settings.DateTimeType + "?";
+                return ResolveDateOrTime(Settings.DateTimeType, isNullable, suffix);
             case "time":
-                return !isNullable || Settings.TimeType?.ToLowerInvariant() == "string"
-                    ? Settings.TimeType + suffix
-                    : Settings.TimeType + "?";
+                return ResolveDateOrTime(Settings.TimeType, isNullable, suffix);
             case "duration":
             case "time-span":
-                return !isNullable || Settings.TimeSpanType?.ToLowerInvariant() == "string"
-                    ? Settings.TimeSpanType + suffix
-                    : Settings.TimeSpanType + "?";
+                return ResolveDateOrTime(Settings.TimeSpanType, isNullable, suffix);
             case "uri":
                 return "System.Uri" + suffix;
             case "guid":
@@ -188,9 +196,15 @@ internal sealed class ContractTypeResolver
             case "byte":
                 return "byte[]" + suffix;
             default:
-                return "string" + suffix;
+                return StringType + suffix;
         }
     }
+
+    /// <summary>A configured date or time type, which is a value type unless it is configured as a string.</summary>
+    private static string ResolveDateOrTime(string? typeName, bool isNullable, string suffix) =>
+        !isNullable || typeName?.ToLowerInvariant() == StringType
+            ? typeName + suffix
+            : typeName + "?";
 
     private static string ResolveInteger(ApiSchema schema, bool isNullable)
     {
@@ -206,15 +220,12 @@ internal sealed class ContractTypeResolver
                 return isNullable ? "ulong?" : "ulong";
         }
 
-        if ((schema.Minimum.HasValue || schema.Maximum.HasValue) &&
-            string.IsNullOrEmpty(schema.Format) &&
-            schema.Type == ApiObjectType.Integer)
+        if (string.IsNullOrEmpty(schema.Format) &&
+            schema.Type == ApiObjectTypes.Integer &&
+            (schema.Minimum < int.MinValue || schema.Minimum > int.MaxValue ||
+             schema.Maximum < int.MinValue || schema.Maximum > int.MaxValue))
         {
-            if (schema.Minimum < int.MinValue || schema.Minimum > int.MaxValue ||
-                schema.Maximum < int.MinValue || schema.Maximum > int.MaxValue)
-            {
-                return isNullable ? "long?" : "long";
-            }
+            return isNullable ? "long?" : "long";
         }
 
         return isNullable ? "int?" : "int";
@@ -257,7 +268,7 @@ internal sealed class ContractTypeResolver
     private string ResolveDictionary(ApiSchema schema)
     {
         var valueType = ResolveDictionaryValueType(schema, "object");
-        var keyType = ResolveDictionaryKeyType(schema, "string");
+        var keyType = ResolveDictionaryKeyType(schema, StringType);
         return Settings.DictionaryType + "<" + keyType + ", " + valueType + ">";
     }
 

@@ -45,7 +45,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         var truck = document.Components!.Schemas["Truck"].ActualSchema;
 
         vehicle.OneOf.Should().BeEmpty();
-        vehicle.Type.Should().Be(ApiObjectType.Object);
+        vehicle.Type.Should().Be(ApiObjectTypes.Object);
 
         car.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == vehicle);
         truck.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == vehicle);
@@ -89,7 +89,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         var bankTransfer = document.Components!.Schemas["BankTransfer"].ActualSchema;
 
         payment.AnyOf.Should().BeEmpty();
-        payment.Type.Should().Be(ApiObjectType.Object);
+        payment.Type.Should().Be(ApiObjectTypes.Object);
 
         creditCard.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == payment);
         bankTransfer.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == payment);
@@ -164,7 +164,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         sut.Mutate(document);
 
         document.Components!.Schemas["Base"].ActualSchema.Type
-            .Should().Be(ApiObjectType.Object);
+            .Should().Be(ApiObjectTypes.Object);
     }
 
     [Test]
@@ -185,7 +185,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     [Test]
     public async Task Mutate_Does_Not_Duplicate_Existing_AllOf_Inheritance()
     {
-        // Two union members keep NJsonSchema from collapsing Vehicle.ActualSchema onto the
+        // Two union members keep the schema model from collapsing Vehicle.ActualSchema onto the
         // single referenced subtype, so the mutator actually inspects the subtypes.
         var document = ApiDocumentLoader.Load("""
             {

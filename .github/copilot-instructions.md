@@ -188,7 +188,7 @@ dotnet run --project src/Refitter --configuration Release --framework net9.0 -- 
 - `--collection-format`: Control query parameter collection formatting (Multi/Csv/Ssv/Tsv/Pipes)
 - `--no-banner`: Hide donation banner in CLI output
 - `--integer-type`: Set the .NET type for OpenAPI integers without a format specifier (Int32/Int64)
-- `--custom-template-directory`: Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+- `--custom-template-directory`: Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.
 
 ### Working with OpenAPI Specifications
 

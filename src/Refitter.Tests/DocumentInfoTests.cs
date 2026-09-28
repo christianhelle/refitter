@@ -92,6 +92,20 @@ definitions:
         generator.DocumentInfo.SchemaNames.Should().BeEquivalentTo("Pet");
     }
 
+    [Test]
+    public async Task Has_No_Title_Or_Version_Without_Info()
+    {
+        var generator = await CreateGenerator(
+            """
+            openapi: 3.0.1
+            paths: {}
+            """,
+            new RefitGeneratorSettings());
+
+        generator.DocumentInfo.Title.Should().BeNull();
+        generator.DocumentInfo.Version.Should().BeNull();
+    }
+
     private static async Task<RefitGenerator> CreateGenerator(string spec, RefitGeneratorSettings settings)
     {
         settings.OpenApiPath = await SwaggerFileHelper.CreateSwaggerFile(spec);

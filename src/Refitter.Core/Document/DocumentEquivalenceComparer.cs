@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -84,7 +86,7 @@ internal sealed class DocumentEquivalenceComparer
     /// <summary>
     /// Adds a schema and the schemas it (transitively) references to the definitions, named after their reference.
     /// </summary>
-    internal void AddReferencedSchemas(IDictionary<string, ApiSchema> definitions, ApiSchema schema)
+    internal static void AddReferencedSchemas(IDictionary<string, ApiSchema> definitions, ApiSchema schema)
     {
         var visited = new HashSet<ApiSchema>();
         var schemasToProcess = new Stack<ApiSchema>();
@@ -112,10 +114,10 @@ internal sealed class DocumentEquivalenceComparer
     internal static string? GetDefinitionName(ApiSchema schema)
     {
         var referencePath = schema.ReferencePath;
-        if (string.IsNullOrWhiteSpace(referencePath))
+        if (NullCheck.IsNullOrWhiteSpace(referencePath))
             return null;
 
-        var separatorIndex = referencePath!.LastIndexOf('/');
+        var separatorIndex = referencePath.LastIndexOf('/');
         return separatorIndex >= 0 && separatorIndex < referencePath.Length - 1
             ? Uri.UnescapeDataString(referencePath.Substring(separatorIndex + 1))
             : null;

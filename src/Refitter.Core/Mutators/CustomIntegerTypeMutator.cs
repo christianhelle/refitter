@@ -10,7 +10,7 @@ internal sealed class CustomIntegerTypeMutator(IntegerType customIntegerType) : 
 
         SchemaWalker.TraverseDocumentSchemas(document, schema =>
         {
-            if (schema.Type == ApiObjectType.Integer && string.IsNullOrEmpty(schema.Format))
+            if (schema.Type == ApiObjectTypes.Integer && string.IsNullOrEmpty(schema.Format))
                 schema.Format = "int64";
         });
     }

@@ -13,7 +13,7 @@ internal sealed class FlattenPrimitiveAllOfMutator : IDocumentMutator
         if (schema.AllOf.Count != 1)
             return;
 
-        if (schema.Type == ApiObjectType.Object ||
+        if (schema.Type == ApiObjectTypes.Object ||
             schema.Properties.Count != 0 ||
             schema.OneOf.Count != 0 ||
             schema.AnyOf.Count != 0)
@@ -21,7 +21,7 @@ internal sealed class FlattenPrimitiveAllOfMutator : IDocumentMutator
             return;
         }
 
-        var inner = schema.AllOf.First().ActualSchema;
+        var inner = schema.AllOf[0].ActualSchema;
         if (!IsPrimitive(inner.Type))
             return;
 
@@ -43,6 +43,6 @@ internal sealed class FlattenPrimitiveAllOfMutator : IDocumentMutator
         schema.AllOf.Clear();
     }
 
-    private static bool IsPrimitive(ApiObjectType type) =>
-        type is ApiObjectType.String or ApiObjectType.Integer or ApiObjectType.Number or ApiObjectType.Boolean;
+    private static bool IsPrimitive(ApiObjectTypes type) =>
+        type is ApiObjectTypes.String or ApiObjectTypes.Integer or ApiObjectTypes.Number or ApiObjectTypes.Boolean;
 }

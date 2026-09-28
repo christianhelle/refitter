@@ -49,6 +49,7 @@ public class HttpDocumentStrategyTests
 
         result.Should().NotBeNull();
         result!.Info!.Title.Should().Be("Test API");
+        result.DocumentPath.Should().Be("https://example.com/spec.json");
     }
 
     [Test]

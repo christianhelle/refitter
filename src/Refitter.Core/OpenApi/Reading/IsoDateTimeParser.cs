@@ -33,9 +33,17 @@ internal static class IsoDateTimeParser
             return false;
 
         var match = IsoRegex.Match(text);
-        if (!match.Success)
+        if (!match.Success || !TryGetDateTime(match, out var dateTime))
             return false;
 
+        value = ApplyZone(dateTime, match.Groups["zone"]);
+        return true;
+    }
+
+    /// <summary>The date and time of a match, before its time zone is applied.</summary>
+    private static bool TryGetDateTime(Match match, out DateTime dateTime)
+    {
+        dateTime = default;
         var year = Parse(match, "year");
         var month = Parse(match, "month");
         var day = Parse(match, "day");
@@ -50,10 +58,7 @@ internal static class IsoDateTimeParser
             return false;
 
         var is24Hour = hour == 24;
-        if (is24Hour)
-            hour = 0;
-
-        var dateTime = new DateTime(year, month, day, hour, minute, second);
+        dateTime = new DateTime(year, month, day, is24Hour ? 0 : hour, minute, second, DateTimeKind.Unspecified);
         var fraction = match.Groups["fraction"];
         if (fraction.Success)
         {
@@ -64,18 +69,16 @@ internal static class IsoDateTimeParser
         if (is24Hour)
             dateTime = dateTime.AddDays(1);
 
-        var zone = match.Groups["zone"];
+        return true;
+    }
+
+    private static DateTime ApplyZone(DateTime dateTime, Group zone)
+    {
         if (!zone.Success)
-        {
-            value = dateTime;
-            return true;
-        }
+            return dateTime;
 
         if (zone.Value is "Z" or "z")
-        {
-            value = new DateTime(dateTime.Ticks, DateTimeKind.Utc);
-            return true;
-        }
+            return new DateTime(dateTime.Ticks, DateTimeKind.Utc);
 
         var sign = zone.Value[0] == '-' ? -1 : 1;
         var offsetText = zone.Value.Substring(1).Replace(":", string.Empty);
@@ -86,12 +89,10 @@ internal static class IsoDateTimeParser
         if (ticks < DateTime.MinValue.Ticks || ticks > DateTime.MaxValue.Ticks)
         {
             ticks += dateTime.ToLocalTime().Ticks - dateTime.Ticks;
-            value = new DateTime(Math.Min(Math.Max(ticks, DateTime.MinValue.Ticks), DateTime.MaxValue.Ticks), DateTimeKind.Local);
-            return true;
+            return new DateTime(Math.Min(Math.Max(ticks, DateTime.MinValue.Ticks), DateTime.MaxValue.Ticks), DateTimeKind.Local);
         }
 
-        value = new DateTime(ticks, DateTimeKind.Utc).ToLocalTime();
-        return true;
+        return new DateTime(ticks, DateTimeKind.Utc).ToLocalTime();
     }
 
     private static bool TryParseMicrosoftDate(string text, out DateTime value)
@@ -104,7 +105,7 @@ internal static class IsoDateTimeParser
             return false;
         }
 
-        var utc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(milliseconds);
+        var utc = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).UtcDateTime;
         value = match.Groups["offset"].Success ? utc.ToLocalTime() : utc;
         return true;
     }

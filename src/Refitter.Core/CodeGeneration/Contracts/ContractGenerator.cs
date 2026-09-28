@@ -12,6 +12,9 @@ internal sealed class ContractGenerator
 {
     public const string BinaryResponseTypeName = "FileResponse";
 
+    private const string JsonInheritanceConverterName = "JsonInheritanceConverter";
+    private const string DateFormatConverterName = "DateFormatConverter";
+
     private readonly ApiDocument document;
     private readonly ContractTemplateRenderer renderer;
 
@@ -128,8 +131,8 @@ internal sealed class ContractGenerator
         var usesDateFormatConverter = false;
         foreach (var artifact in result)
         {
-            usesInheritanceConverter |= artifact.Code.Contains("JsonInheritanceConverter");
-            usesDateFormatConverter |= artifact.Code.Contains("DateFormatConverter");
+            usesInheritanceConverter |= artifact.Code.Contains(JsonInheritanceConverterName);
+            usesDateFormatConverter |= artifact.Code.Contains(DateFormatConverterName);
         }
 
         var utilities = new List<ContractArtifact>();
@@ -142,19 +145,19 @@ internal sealed class ContractGenerator
                     renderer.Render("JsonInheritanceAttribute", new JsonInheritanceConverterTemplateModel(Settings))));
             }
 
-            if (!Settings.ExcludedTypeNames.Contains("JsonInheritanceConverter"))
+            if (!Settings.ExcludedTypeNames.Contains(JsonInheritanceConverterName))
             {
                 utilities.Add(new ContractArtifact(
-                    "JsonInheritanceConverter",
-                    renderer.Render("JsonInheritanceConverter", new JsonInheritanceConverterTemplateModel(Settings))));
+                    JsonInheritanceConverterName,
+                    renderer.Render(JsonInheritanceConverterName, new JsonInheritanceConverterTemplateModel(Settings))));
             }
         }
 
-        if (usesDateFormatConverter && !Settings.ExcludedTypeNames.Contains("DateFormatConverter"))
+        if (usesDateFormatConverter && !Settings.ExcludedTypeNames.Contains(DateFormatConverterName))
         {
             utilities.Add(new ContractArtifact(
-                "DateFormatConverter",
-                renderer.Render("DateFormatConverter", new DateFormatConverterTemplateModel(Settings))));
+                DateFormatConverterName,
+                renderer.Render(DateFormatConverterName, new DateFormatConverterTemplateModel(Settings))));
         }
 
         return result.Concat(utilities);

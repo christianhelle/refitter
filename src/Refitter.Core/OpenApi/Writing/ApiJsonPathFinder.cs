@@ -9,6 +9,8 @@ namespace Refitter.Core;
 /// </remarks>
 internal sealed class ApiJsonPathFinder
 {
+    private const char PathSeparator = '/';
+
     private readonly bool isSwagger2;
     private readonly Dictionary<object, string> paths = new();
 
@@ -68,7 +70,7 @@ internal sealed class ApiJsonPathFinder
 
         // Only the operations of a path item are searched
         foreach (var operation in pathItem)
-            VisitOperation(operation.Value, path + "/" + operation.Key);
+            VisitOperation(operation.Value, path + PathSeparator + operation.Key);
     }
 
     private void VisitOperation(ApiOperation operation, string path)
@@ -126,10 +128,23 @@ internal sealed class ApiJsonPathFinder
         }
     }
 
-    private void VisitSchemas(IEnumerable<KeyValuePair<string, ApiSchema>> schemas, string path)
+    private void VisitSchemas<T>(IEnumerable<KeyValuePair<string, T>> schemas, string path)
+        where T : ApiSchema
     {
         foreach (var schema in schemas)
-            VisitSchema(schema.Value, path + "/" + schema.Key);
+            VisitSchema(schema.Value, path + PathSeparator + schema.Key);
+    }
+
+    private void VisitSchemaList(IList<ApiSchema> schemas, string path)
+    {
+        for (var i = 0; i < schemas.Count; i++)
+            VisitSchema(schemas[i], path + PathSeparator + i);
+    }
+
+    private void VisitOptionalSchema(ApiSchema? schema, string path)
+    {
+        if (schema != null)
+            VisitSchema(schema, path);
     }
 
     private void VisitSchema(ApiSchema schema, string path)
@@ -146,41 +161,25 @@ internal sealed class ApiJsonPathFinder
         // The members of a parameter come before the members of its schema
         if (schema is ApiParameter parameter)
         {
-            if (parameter.Schema != null)
-                VisitSchema(parameter.Schema, path + "/schema");
-            if (parameter.CustomSchema != null)
-                VisitSchema(parameter.CustomSchema, path + "/x-schema");
+            VisitOptionalSchema(parameter.Schema, path + "/schema");
+            VisitOptionalSchema(parameter.CustomSchema, path + "/x-schema");
         }
 
-        if (schema.DictionaryKey != null)
-            VisitSchema(schema.DictionaryKey, path + "/x-dictionaryKey");
-        if (schema.Not != null)
-            VisitSchema(schema.Not, path + "/not");
-        if (schema.AdditionalItemsSchema != null)
-            VisitSchema(schema.AdditionalItemsSchema, path + "/additionalItems");
-        if (schema.AdditionalPropertiesSchema != null)
-            VisitSchema(schema.AdditionalPropertiesSchema, path + "/additionalProperties");
+        VisitOptionalSchema(schema.DictionaryKey, path + "/x-dictionaryKey");
+        VisitOptionalSchema(schema.Not, path + "/not");
+        VisitOptionalSchema(schema.AdditionalItemsSchema, path + "/additionalItems");
+        VisitOptionalSchema(schema.AdditionalPropertiesSchema, path + "/additionalProperties");
 
         if (schema.Item != null)
-        {
             VisitSchema(schema.Item, path + "/items");
-        }
         else
-        {
-            for (var i = 0; i < schema.Items.Count; i++)
-                VisitSchema(schema.Items[i], path + "/items/" + i);
-        }
+            VisitSchemaList(schema.Items, path + "/items");
 
-        foreach (var property in schema.Properties)
-            VisitSchema(property.Value, path + "/properties/" + property.Key);
-        foreach (var property in schema.PatternProperties)
-            VisitSchema(property.Value, path + "/patternProperties/" + property.Key);
+        VisitSchemas(schema.Properties, path + "/properties");
+        VisitSchemas(schema.PatternProperties, path + "/patternProperties");
         VisitSchemas(schema.Definitions, path + "/definitions");
-        for (var i = 0; i < schema.AllOf.Count; i++)
-            VisitSchema(schema.AllOf[i], path + "/allOf/" + i);
-        for (var i = 0; i < schema.AnyOf.Count; i++)
-            VisitSchema(schema.AnyOf[i], path + "/anyOf/" + i);
-        for (var i = 0; i < schema.OneOf.Count; i++)
-            VisitSchema(schema.OneOf[i], path + "/oneOf/" + i);
+        VisitSchemaList(schema.AllOf, path + "/allOf");
+        VisitSchemaList(schema.AnyOf, path + "/anyOf");
+        VisitSchemaList(schema.OneOf, path + "/oneOf");
     }
 }

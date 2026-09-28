@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Refitter.Core;
 
 /// <summary>
@@ -44,11 +46,9 @@ internal sealed class ContractGeneratorFactory
             Namespace = naming.ContractsNamespace ?? naming.Namespace,
             JsonPolymorphicSerializationStyle = codeGeneration.UsePolymorphicSerialization
                 ? ContractPolymorphicSerializationStyle.SystemTextJson
-                : ContractPolymorphicSerializationStyle.NJsonSchema,
+                : ContractPolymorphicSerializationStyle.JsonInheritanceConverter,
             TypeAccessModifier = codeGeneration.TypeAccessibility.ToString().ToLowerInvariant(),
-#pragma warning disable CS0618 // Honored until custom templates are removed
             TemplateDirectory = codeGeneration.CustomTemplateDirectory,
-#pragma warning restore CS0618
             PropertyNameGenerator = CreatePropertyNameGenerator(schema => generator!.GetTypeName(schema)),
             TypeNameGenerator = CreateTypeNameGenerator(),
             EnumNameGenerator = new UniqueContractEnumNameGenerator(),

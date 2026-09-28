@@ -8,11 +8,8 @@ internal static class SchemaWalker
         var visited = new HashSet<ApiSchema>();
         var schemasToProcess = new Stack<ApiSchema>();
 
-        foreach (var schema in EnumerateDocumentSchemaRoots(document))
-        {
-            if (schema != null)
-                schemasToProcess.Push(schema);
-        }
+        foreach (var schema in EnumerateDocumentSchemaRoots(document).OfType<ApiSchema>())
+            schemasToProcess.Push(schema);
 
         while (schemasToProcess.Count > 0)
         {
@@ -22,11 +19,8 @@ internal static class SchemaWalker
 
             visitor(actualSchema);
 
-            foreach (var childSchema in EnumerateTraversableSchemas(actualSchema))
-            {
-                if (childSchema != null)
-                    schemasToProcess.Push(childSchema);
-            }
+            foreach (var childSchema in EnumerateTraversableSchemas(actualSchema).OfType<ApiSchema>())
+                schemasToProcess.Push(childSchema);
         }
     }
 
@@ -35,37 +29,37 @@ internal static class SchemaWalker
         foreach (var schema in document.Components.Schemas.Values)
             yield return schema;
 
-        foreach (var pathItem in document.Paths.Values)
+        foreach (var schema in document.Paths.Values.Where(pathItem => pathItem != null).SelectMany(EnumeratePathItemSchemas))
+            yield return schema;
+    }
+
+    private static IEnumerable<ApiSchema?> EnumeratePathItemSchemas(ApiPathItem pathItem)
+    {
+        foreach (var parameter in pathItem.Parameters)
+            yield return parameter;
+
+        foreach (var schema in pathItem.Values.Where(operation => operation != null).SelectMany(EnumerateOperationSchemas))
+            yield return schema;
+    }
+
+    private static IEnumerable<ApiSchema?> EnumerateOperationSchemas(ApiOperation operation)
+    {
+        foreach (var parameter in operation.GetActualParameters())
+            yield return parameter;
+
+        if (operation.RequestBody?.Content != null)
         {
-            if (pathItem == null)
-                continue;
+            foreach (var content in operation.RequestBody.Content.Values)
+                yield return content.Schema;
+        }
 
-            foreach (var parameter in pathItem.Parameters)
-                yield return parameter;
+        foreach (var response in operation.ActualResponses.Values)
+        {
+            foreach (var header in response.Headers.Values)
+                yield return header;
 
-            foreach (var operation in pathItem.Values)
-            {
-                if (operation == null)
-                    continue;
-
-                foreach (var parameter in operation.ActualParameters)
-                    yield return parameter;
-
-                if (operation.RequestBody?.Content != null)
-                {
-                    foreach (var content in operation.RequestBody.Content.Values)
-                        yield return content.Schema;
-                }
-
-                foreach (var response in operation.ActualResponses.Values)
-                {
-                    foreach (var header in response.Headers.Values)
-                        yield return header;
-
-                    foreach (var content in response.Content.Values)
-                        yield return content.Schema;
-                }
-            }
+            foreach (var content in response.Content.Values)
+                yield return content.Schema;
         }
     }
 

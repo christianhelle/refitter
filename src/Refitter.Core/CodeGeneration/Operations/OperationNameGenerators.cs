@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Text.RegularExpressions;
 
 namespace Refitter.Core;
@@ -25,25 +27,17 @@ internal class MultipleClientsFromOperationIdApiOperationNameGenerator : IApiOpe
         var clientName = GetClientName(operation);
         var operationName = GetOperationName(operation);
 
-        var hasOperationWithSameName = false;
-        foreach (var pathItem in document.Paths)
-        {
-            foreach (var other in pathItem.Value.ActualPathItem)
-            {
-                if (other.Value != operation &&
-                    GetOperationName(other.Value) == operationName &&
-                    GetClientName(other.Value) == clientName)
-                {
-                    hasOperationWithSameName = true;
-                    break;
-                }
-            }
-        }
+        var hasOperationWithSameName = document.Paths
+            .SelectMany(pathItem => pathItem.Value.ActualPathItem.Select(other => other.Value))
+            .Any(other =>
+                other != operation &&
+                GetOperationName(other) == operationName &&
+                GetClientName(other) == clientName);
 
         if (hasOperationWithSameName &&
             operationName.StartsWith("get", StringComparison.InvariantCultureIgnoreCase) &&
             operation.ActualResponses.TryGetValue("200", out var response) &&
-            response.Schema?.ActualSchema.Type.HasFlag(ApiObjectType.Array) == true)
+            response.Schema?.ActualSchema.Type.HasFlag(ApiObjectTypes.Array) == true)
         {
             return "GetAll" + operationName.Substring(3);
         }
@@ -136,7 +130,7 @@ internal sealed class MultipleClientsFromPathSegmentsApiOperationNameGenerator :
         path.Split('/').Where(p => !p.Contains('{') && !string.IsNullOrWhiteSpace(p)).Reverse().FirstOrDefault() ?? "Index";
 
     internal static string CapitalizeFirst(string name) =>
-        string.IsNullOrEmpty(name) ? string.Empty : char.ToUpperInvariant(name[0]) + (name.Length > 1 ? name.Substring(1) : string.Empty);
+        string.IsNullOrEmpty(name) ? string.Empty : char.ToUpperInvariant(name[0]) + name.Substring(1);
 }
 
 /// <summary>A single client, operation names from the operation ID.</summary>
@@ -244,15 +238,8 @@ internal sealed class RefitterOperationNameGenerator : IApiOperationNameGenerato
     private bool HasDuplicateOperationNames(ApiDocument document)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var path in document.Paths)
-        {
-            foreach (var operation in path.Value)
-            {
-                if (!seen.Add(GetOperationName(document, path.Key, operation.Key, operation.Value)))
-                    return true;
-            }
-        }
-
-        return false;
+        return document.Paths
+            .SelectMany(path => path.Value, (path, operation) => GetOperationName(document, path.Key, operation.Key, operation.Value))
+            .Any(name => !seen.Add(name));
     }
 }

@@ -30,6 +30,20 @@ public class OpenApiDocumentFactoryTests
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
         document.Info!.Title.Should().NotBeNullOrWhiteSpace();
+        document.DocumentPath.Should().Be(server.Url);
+    }
+
+    [Test]
+    public async Task Create_From_Remote_Json_Throws_For_Error_Responses()
+    {
+        var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
+        await using var server = new LocalHttpServer(openApiSpec, statusCode: 404, statusText: "Not Found");
+
+        var act = () => ApiDocumentFactory.CreateAsync(server.Url);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Failed to download OpenAPI document*")
+            .WithInnerException(typeof(HttpRequestException));
     }
 
     [Test]
@@ -289,7 +303,7 @@ paths:
     }
 
     [Test]
-    public async Task Create_From_Invalid_File_Falls_Back_To_NSwag()
+    public async Task Create_From_Invalid_File_Falls_Back_To_Reading_The_File()
     {
         var spec = @"{
   ""openapi"": ""3.0.0"",
@@ -317,12 +331,12 @@ paths:
     }
 
     [Test]
-    public async Task Create_From_Json_File_Without_External_References_Uses_NSwag()
+    public async Task Create_From_Json_File_Without_External_References_Loads_The_File()
     {
         var spec = @"{
   ""openapi"": ""3.0.0"",
   ""info"": {
-    ""title"": ""Direct NSwag Test"",
+    ""title"": ""Direct Load Test"",
     ""version"": ""1.0.0""
   },
   ""paths"": {
@@ -355,15 +369,15 @@ paths:
         var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
-        document.Info!.Title.Should().Be("Direct NSwag Test");
+        document.Info!.Title.Should().Be("Direct Load Test");
     }
 
     [Test]
-    public async Task Create_From_Yaml_File_Without_External_References_Uses_NSwag()
+    public async Task Create_From_Yaml_File_Without_External_References_Loads_The_File()
     {
         var spec = @"openapi: 3.0.0
 info:
-  title: YAML NSwag Test
+  title: YAML Load Test
   version: 1.0.0
 paths:
   /users:
@@ -386,7 +400,7 @@ paths:
         var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
-        document.Info!.Title.Should().Be("YAML NSwag Test");
+        document.Info!.Title.Should().Be("YAML Load Test");
     }
 
     [Test]

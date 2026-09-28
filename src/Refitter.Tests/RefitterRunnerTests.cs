@@ -282,7 +282,7 @@ public class RefitterRunnerTests
     }
 
     [Test]
-    public async Task RunAsync_Should_Detect_Deprecated_CustomTemplateDirectory_Warning()
+    public async Task RunAsync_Should_Not_Warn_About_CustomTemplateDirectory()
     {
         var workspace = CreateTempDirectory();
         try
@@ -291,9 +291,7 @@ public class RefitterRunnerTests
             {
                 OpenApiPath = CreateOpenApiSpec(workspace),
                 Namespace = "TestNamespace",
-#pragma warning disable CS0618
                 CustomTemplateDirectory = workspace,
-#pragma warning restore CS0618
             };
 
             var result = await new RefitterRunner().RunAsync(
@@ -303,46 +301,7 @@ public class RefitterRunnerTests
                 cancellationToken: default);
 
             result.ExitCode.Should().Be(0);
-            result.Warnings.Should().ContainSingle(w =>
-                w.Title == "Deprecated Setting" &&
-                w.Description.Contains("'customTemplateDirectory'"));
-        }
-        finally
-        {
-            if (Directory.Exists(workspace))
-                Directory.Delete(workspace, recursive: true);
-        }
-    }
-
-    [Test]
-    public async Task RunAsync_Should_Warn_That_CodeGeneratorSettings_CustomTemplateDirectory_Has_No_Effect()
-    {
-        var workspace = CreateTempDirectory();
-        try
-        {
-            var settings = new RefitGeneratorSettings
-            {
-                OpenApiPath = CreateOpenApiSpec(workspace),
-                Namespace = "TestNamespace",
-                CodeGeneratorSettings = new CodeGeneratorSettings
-                {
-#pragma warning disable CS0618
-                    CustomTemplateDirectory = workspace,
-#pragma warning restore CS0618
-                },
-            };
-
-            var result = await new RefitterRunner().RunAsync(
-                settings,
-                writer: null,
-                validator: null,
-                cancellationToken: default);
-
-            result.ExitCode.Should().Be(0);
-            result.Warnings.Should().ContainSingle(w =>
-                w.Title == "Deprecated Setting" &&
-                w.Description.Contains("'codeGeneratorSettings.customTemplateDirectory'") &&
-                w.Description.Contains("has no effect"));
+            result.Warnings.Should().NotContain(w => w.Description.Contains("'customTemplateDirectory'"));
         }
         finally
         {

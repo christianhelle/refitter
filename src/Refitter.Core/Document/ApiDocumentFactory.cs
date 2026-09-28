@@ -83,6 +83,7 @@ internal static class ApiDocumentFactory
                 using var httpResponse = await client.SendAsync(
                     new HttpRequestMessage(HttpMethod.Get, openApiPath),
                     cancellationToken).ConfigureAwait(false);
+                httpResponse.EnsureSuccessStatusCode();
                 content = await httpResponse.Content
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);
@@ -94,7 +95,7 @@ internal static class ApiDocumentFactory
 
             await ReferenceGuard.ValidateAsync(openApiPath, content, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
 
-            return ApiDocumentLoader.Load(content, null, PathUtilities.IsYaml(openApiPath));
+            return ApiDocumentLoader.Load(content, openApiPath, PathUtilities.IsYaml(openApiPath));
         }
 
         await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);

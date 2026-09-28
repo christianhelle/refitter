@@ -80,7 +80,7 @@ internal sealed class FormParameterExtractor
             return "StreamPart";
 
         // Arrays use IEnumerable<T>, like the multipart parameters of the operation model
-        if (propertySchema.Type == ApiObjectType.Array)
+        if (propertySchema.Type == ApiObjectTypes.Array)
         {
             var itemType = propertySchema.Item is { } itemSchema
                 ? GetPropertyType(itemSchema, settings)
@@ -92,5 +92,5 @@ internal sealed class FormParameterExtractor
     }
 
     private static bool IsBinary(ApiSchema schema) =>
-        schema.Type == ApiObjectType.String && schema.Format == "binary";
+        schema.Type == ApiObjectTypes.String && schema.Format == "binary";
 }

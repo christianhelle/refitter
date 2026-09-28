@@ -1,3 +1,6 @@
+#nullable enable
+
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Refitter.Core;
@@ -6,6 +9,10 @@ namespace Refitter.Core;
 // way (and order) the generated code has always been based on. See THIRD-PARTY-NOTICES.md.
 
 /// <summary>The model of the class template.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class ClassTemplateModel
 {
     private readonly ContractTypeResolver resolver;
@@ -120,10 +127,9 @@ internal sealed class ClassTemplateModel
 
     public bool IsTuple => schema.ActualTypeSchema.IsTuple;
 
-    public string[] TupleTypes =>
+    public IEnumerable<string> TupleTypes =>
         schema.ActualTypeSchema.Items
-            .Select(i => resolver.Resolve(i, i.IsNullable(settings.SchemaType), string.Empty))
-            .ToArray();
+            .Select(i => resolver.Resolve(i, i.IsNullable(settings.SchemaType), string.Empty));
 
     public bool HasInheritance => schema.InheritedTypeSchema != null;
 
@@ -176,9 +182,10 @@ internal sealed class ClassTemplateModel
             var mapping = discriminator.Mapping.SingleOrDefault(m => m.Value.ActualTypeSchema == schema.ActualTypeSchema);
             ClassName = resolver.GetOrGenerateTypeName(schema, typeName);
             IsAbstract = schema.ActualTypeSchema.IsAbstract;
-            Discriminator = mapping.Value != null
-                ? mapping.Key
-                : !string.IsNullOrEmpty(typeName) ? typeName! : ClassName;
+            if (mapping.Value != null)
+                Discriminator = mapping.Key;
+            else
+                Discriminator = !NullCheck.IsNullOrEmpty(typeName) ? typeName : ClassName;
         }
 
         public string Discriminator { get; }
@@ -192,7 +199,14 @@ internal sealed class ClassTemplateModel
 /// <summary>The model of a property in the class template.</summary>
 internal sealed class PropertyModel
 {
-    private static readonly HashSet<string?> RangeFormats = new() { "int32", "float", "double", "int64", "uint64", "decimal" };
+    private const string Int32Format = "int32";
+    private const string Int64Format = "int64";
+    private const string DoubleFormat = "double";
+    private const string DecimalFormat = "decimal";
+    private const string DoubleType = "double";
+    private const string DecimalType = "decimal";
+
+    private static readonly HashSet<string?> RangeFormats = new() { Int32Format, "float", DoubleFormat, Int64Format, "uint64", DecimalFormat };
 
     private readonly ClassTemplateModel classTemplateModel;
     private readonly ApiSchemaProperty property;
@@ -286,9 +300,9 @@ internal sealed class PropertyModel
         (property.ActualTypeSchema.Type.IsNumber() || property.ActualTypeSchema.Type.IsInteger()) &&
         (property.ActualSchema.Maximum.HasValue || property.ActualSchema.Minimum.HasValue);
 
-    private bool IsDecimalRange => GetSchemaFormat(property.ActualSchema) == "decimal";
+    private bool IsDecimalRange => GetSchemaFormat(property.ActualSchema) == DecimalFormat;
 
-    public string? RangeType => IsDecimalRange ? "decimal" : null;
+    public string? RangeType => IsDecimalRange ? DecimalType : null;
 
     public string RangeMinimumValue
     {
@@ -301,7 +315,7 @@ internal sealed class PropertyModel
             var minimum = actualSchema.Minimum;
             if (minimum.HasValue && actualSchema.IsExclusiveMinimum)
             {
-                if (schemaFormat is "int32" or "int64")
+                if (schemaFormat is Int32Format or Int64Format)
                     minimum += 1m;
                 else if (actualSchema.MultipleOf.HasValue)
                     minimum += actualSchema.MultipleOf;
@@ -311,7 +325,7 @@ internal sealed class PropertyModel
                 return ContractValueGenerator.ConvertNumberToString(minimum ?? decimal.MinValue);
 
             return minimum.HasValue
-                ? settings.ValueGenerator.GetNumericValue(actualSchema.Type, EnsureBounds(schemaFormat, minimum.Value), rangeFormat)
+                ? ContractValueGenerator.GetNumericValue(actualSchema.Type, EnsureBounds(schemaFormat, minimum.Value), rangeFormat)
                 : rangeType + ".MinValue";
         }
     }
@@ -327,7 +341,7 @@ internal sealed class PropertyModel
             var maximum = actualSchema.Maximum;
             if (maximum.HasValue && actualSchema.IsExclusiveMaximum)
             {
-                if (schemaFormat is "int32" or "int64")
+                if (schemaFormat is Int32Format or Int64Format)
                     maximum -= 1m;
                 else if (actualSchema.MultipleOf.HasValue)
                     maximum -= actualSchema.MultipleOf;
@@ -337,7 +351,7 @@ internal sealed class PropertyModel
                 return ContractValueGenerator.ConvertNumberToString(maximum ?? decimal.MaxValue);
 
             return maximum.HasValue
-                ? settings.ValueGenerator.GetNumericValue(actualSchema.Type, EnsureBounds(schemaFormat, maximum.Value), rangeFormat)
+                ? ContractValueGenerator.GetNumericValue(actualSchema.Type, EnsureBounds(schemaFormat, maximum.Value), rangeFormat)
                 : rangeType + ".MaxValue";
         }
     }
@@ -410,50 +424,54 @@ internal sealed class PropertyModel
     private string? GetSchemaFormat(ApiSchema schema)
     {
         if (Type is "long" or "long?")
-            return "int64";
+            return Int64Format;
 
         if (schema.Format == null)
         {
             switch (schema.Type)
             {
-                case ApiObjectType.Integer:
-                    return "int32";
-                case ApiObjectType.Number:
-                    return "double";
+                case ApiObjectTypes.Integer:
+                    return Int32Format;
+                case ApiObjectTypes.Number:
+                    return DoubleFormat;
             }
         }
 
         return schema.Format;
     }
 
-    private static string GetRangeFormat(string? format) => RangeFormats.Contains(format) ? format! : "double";
+    private static string GetRangeFormat(string? format) => RangeFormats.Contains(format) ? format! : DoubleFormat;
 
     private static string GetRangeType(string? format) =>
         format switch
         {
-            "int32" => "int",
+            Int32Format => "int",
             "float" => "float",
-            "double" => "double",
-            "int64" => "long",
+            DoubleFormat => DoubleType,
+            Int64Format => "long",
             "uint64" => "ulong",
-            "decimal" => "decimal",
-            _ => "double",
+            DecimalFormat => DecimalType,
+            _ => DoubleType,
         };
 
     private static decimal EnsureBounds(string? format, decimal value) =>
         format switch
         {
-            "int32" => Clamp(value, int.MinValue, int.MaxValue),
-            "int64" => Clamp(value, long.MinValue, long.MaxValue),
+            Int32Format => Clamp(value, int.MinValue, int.MaxValue),
+            Int64Format => Clamp(value, long.MinValue, long.MaxValue),
             "uint64" => Clamp(value, 0m, ulong.MaxValue),
             _ => value,
         };
 
     private static decimal Clamp(decimal value, decimal min, decimal max) =>
-        value < min ? min : value > max ? max : value;
+        Math.Max(min, Math.Min(max, value));
 }
 
 /// <summary>The model of the enum template.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class EnumTemplateModel(string typeName, ApiSchema schema, ContractGeneratorSettings settings)
 {
     public string Name { get; } = typeName;
@@ -464,7 +482,7 @@ internal sealed class EnumTemplateModel(string typeName, ApiSchema schema, Contr
 
     public IDictionary<string, object?>? ExtensionData => schema.ExtensionData;
 
-    public bool IsStringEnum => schema.Type != ApiObjectType.Integer;
+    public bool IsStringEnum => schema.Type != ApiObjectTypes.Integer;
 
     public string TypeAccessModifier => settings.TypeAccessModifier;
 
@@ -476,57 +494,59 @@ internal sealed class EnumTemplateModel(string typeName, ApiSchema schema, Contr
 
     public bool HasExtendedValueRange => schema.Format == "int64";
 
-    public IEnumerable<EnumerationItemModel> Enums
+    public IEnumerable<EnumerationItemModel> Enums => CreateEnums();
+
+    private List<EnumerationItemModel> CreateEnums()
     {
-        get
+        var items = new List<EnumerationItemModel>();
+        for (var i = 0; i < schema.Enumeration.Count; i++)
         {
-            var items = new List<EnumerationItemModel>();
-            for (var i = 0; i < schema.Enumeration.Count; i++)
-            {
-                var value = schema.Enumeration[i];
-                if (value == null)
-                    continue;
+            var value = schema.Enumeration[i];
+            if (value == null)
+                continue;
 
-                var description = schema.EnumerationDescriptions.Count > i ? schema.EnumerationDescriptions[i] : null;
-                if (schema.Type.IsInteger())
-                {
-                    var name = schema.EnumerationNames.Count > i ? schema.EnumerationNames[i] : "_" + value;
-                    if (schema.IsFlagEnumerable && TryGetInt64(value, out var valueInt64))
-                    {
-                        items.Add(new EnumerationItemModel(
-                            settings.EnumNameGenerator.Generate(i, name, value, schema),
-                            name,
-                            value.ToString()!,
-                            description,
-                            valueInt64.ToString(CultureInfo.InvariantCulture),
-                            valueInt64.ToString(CultureInfo.InvariantCulture)));
-                    }
-                    else
-                    {
-                        items.Add(new EnumerationItemModel(
-                            settings.EnumNameGenerator.Generate(i, name, value, schema),
-                            name,
-                            value.ToString()!,
-                            description,
-                            value.ToString(),
-                            (1 << i).ToString(CultureInfo.InvariantCulture)));
-                    }
-                }
-                else
-                {
-                    var name = schema.EnumerationNames.Count > i ? schema.EnumerationNames[i] : value.ToString()!;
-                    items.Add(new EnumerationItemModel(
-                        settings.EnumNameGenerator.Generate(i, name, value, schema),
-                        name,
-                        value.ToString()!,
-                        description,
-                        i.ToString(CultureInfo.InvariantCulture),
-                        (1 << i).ToString(CultureInfo.InvariantCulture)));
-                }
-            }
-
-            return items;
+            var description = schema.EnumerationDescriptions.Count > i ? schema.EnumerationDescriptions[i] : null;
+            items.Add(schema.Type.IsInteger()
+                ? CreateIntegerItem(i, value, description)
+                : CreateStringItem(i, value, description));
         }
+
+        return items;
+    }
+
+    private EnumerationItemModel CreateIntegerItem(int index, object value, string? description)
+    {
+        var name = schema.EnumerationNames.Count > index ? schema.EnumerationNames[index] : "_" + value;
+        if (schema.IsFlagEnumerable && TryGetInt64(value, out var valueInt64))
+        {
+            return new EnumerationItemModel(
+                settings.EnumNameGenerator.Generate(index, name, value, schema),
+                name,
+                value.ToString()!,
+                description,
+                valueInt64.ToString(CultureInfo.InvariantCulture),
+                valueInt64.ToString(CultureInfo.InvariantCulture));
+        }
+
+        return new EnumerationItemModel(
+            settings.EnumNameGenerator.Generate(index, name, value, schema),
+            name,
+            value.ToString()!,
+            description,
+            value.ToString(),
+            (1 << index).ToString(CultureInfo.InvariantCulture));
+    }
+
+    private EnumerationItemModel CreateStringItem(int index, object value, string? description)
+    {
+        var name = schema.EnumerationNames.Count > index ? schema.EnumerationNames[index] : value.ToString()!;
+        return new EnumerationItemModel(
+            settings.EnumNameGenerator.Generate(index, name, value, schema),
+            name,
+            value.ToString()!,
+            description,
+            index.ToString(CultureInfo.InvariantCulture),
+            (1 << index).ToString(CultureInfo.InvariantCulture));
     }
 
     private static bool TryGetInt64(object value, out long valueInt64)
@@ -598,6 +618,10 @@ internal sealed class EnumerationItemModel(
 }
 
 /// <summary>The model of the JSON inheritance converter and attribute templates.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class JsonInheritanceConverterTemplateModel(ContractGeneratorSettings settings)
 {
     public bool UseSystemTextJson => true;
@@ -607,6 +631,10 @@ internal sealed class JsonInheritanceConverterTemplateModel(ContractGeneratorSet
 }
 
 /// <summary>The model of the date format converter template.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class DateFormatConverterTemplateModel(ContractGeneratorSettings settings)
 {
     public bool GenerateDateFormatConverterClass => !settings.ExcludedTypeNames.Contains("DateFormatConverter");
@@ -617,6 +645,10 @@ internal sealed class DateFormatConverterTemplateModel(ContractGeneratorSettings
 }
 
 /// <summary>The model of the file template that contains all contracts.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class ContractFileTemplateModel(
     string classes,
     ApiDocument document,
@@ -650,14 +682,25 @@ internal sealed class ContractFileTemplateModel(
                 return false;
 
             var operations = document.GetOperations().ToList();
-            return operations.Any(o => o.Operation.ActualParameters.Any(p => p.ActualTypeSchema.IsBinary)) ||
-                   operations.Any(o => o.Operation.ActualRequestBody?.Content.Any(c =>
-                       c.Value.Schema?.IsBinary == true ||
-                       (c.Value.Schema?.ActualSchema.ActualProperties.Any(p =>
-                           p.Value.IsBinary ||
-                           p.Value.Item?.IsBinary == true ||
-                           p.Value.Items.Any(i => i.IsBinary)) ?? false)) == true);
+            return operations.Any(o => o.Operation.GetActualParameters().Any(p => p.ActualTypeSchema.IsBinary)) ||
+                   operations.Any(o => HasBinaryContent(o.Operation.ActualRequestBody));
         }
+    }
+
+    private static bool HasBinaryContent(ApiRequestBody? requestBody) =>
+        requestBody != null && requestBody.Content.Any(c => IsBinaryContent(c.Value));
+
+    private static bool IsBinaryContent(ApiMediaType content)
+    {
+        var schema = content.Schema;
+        if (schema == null)
+            return false;
+
+        return schema.IsBinary ||
+               schema.ActualSchema.ActualProperties.Any(p =>
+                   p.Value.IsBinary ||
+                   (p.Value.Item != null && p.Value.Item.IsBinary) ||
+                   p.Value.Items.Any(i => i.IsBinary));
     }
 
     public bool GenerateFileResponseClass =>

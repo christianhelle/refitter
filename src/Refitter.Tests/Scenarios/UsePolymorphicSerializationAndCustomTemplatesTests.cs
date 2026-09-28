@@ -235,9 +235,7 @@ components:
         {
             OpenApiPath = swaggerFile,
             UsePolymorphicSerialization = true,
-#pragma warning disable CS0618 // Deprecated custom templates are still honored
             CustomTemplateDirectory = "./Templates/",
-#pragma warning restore CS0618
         };
 
         var sut = await RefitGenerator.CreateAsync(settings);

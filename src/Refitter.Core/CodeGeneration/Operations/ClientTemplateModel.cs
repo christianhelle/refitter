@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Refitter.Core;
 
 /// <summary>
@@ -5,6 +7,10 @@ namespace Refitter.Core;
 /// resolves the response types of the operations in the order the contract type names have always depended on.
 /// See <see cref="ContractGenerator"/> and THIRD-PARTY-NOTICES.md.
 /// </summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class ClientTemplateModel(
     string controllerClassName,
     IEnumerable<OperationModel> operations,
@@ -15,11 +21,7 @@ internal sealed class ClientTemplateModel(
 
     public bool HasBaseClass => false;
 
-    public string? BaseClass => null;
-
     public bool HasConfigurationClass => false;
-
-    public string? ConfigurationClass => null;
 
     public bool HasBaseType => false;
 
@@ -27,21 +29,11 @@ internal sealed class ClientTemplateModel(
 
     public bool DisposeHttpClient => true;
 
-    public bool UseHttpClientCreationMethod => false;
-
     public string HttpClientType => "System.Net.Http.HttpClient";
 
     public bool UseHttpRequestMessageCreationMethod => false;
 
     public bool GenerateClientInterfaces => false;
-
-    public bool SuppressClientInterfacesOutput => false;
-
-    public bool SuppressClientClassesOutput => false;
-
-    public string? ClientBaseInterface => null;
-
-    public bool HasClientBaseInterface => false;
 
     public bool HasBaseUrl => !string.IsNullOrEmpty(BaseUrl);
 
@@ -61,11 +53,7 @@ internal sealed class ClientTemplateModel(
 
     public string ClientClassAccessModifier => "public";
 
-    public string ClientInterfaceAccessModifier => "public";
-
     public IEnumerable<OperationModel> Operations { get; } = operations;
-
-    public IEnumerable<OperationModel> InterfaceOperations => Operations;
 
     public bool WrapDtoExceptions => true;
 
@@ -92,15 +80,9 @@ internal sealed class ClientTemplateModel(
             ? "new System.Text.Json.Serialization.JsonConverter[] { " + string.Join(", ", converters.Select(c => "new " + c + "()")) + " }"
             : string.Empty;
 
-    public string? Title => document.Info?.Title;
-
     public string? Description => document.Info?.Description;
 
-    public string? Version => document.Info?.Version;
-
     public bool GenerateNullableReferenceTypes => settings.GenerateNullableReferenceTypes;
-
-    public bool WrapResponses => false;
 
     public string ResponseClass => "SwaggerResponse";
 
