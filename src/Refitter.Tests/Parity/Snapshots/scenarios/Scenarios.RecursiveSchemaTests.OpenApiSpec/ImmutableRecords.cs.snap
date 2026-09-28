@@ -55,7 +55,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Node
     {
         [JsonConstructor]
@@ -86,7 +86,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record A
     {
         [JsonConstructor]
@@ -109,7 +109,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record B
     {
         [JsonConstructor]

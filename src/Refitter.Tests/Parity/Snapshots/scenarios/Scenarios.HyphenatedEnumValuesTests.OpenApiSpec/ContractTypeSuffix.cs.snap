@@ -50,7 +50,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class MarketplaceReferenceDto
     {
 
@@ -59,7 +59,7 @@ public MarketplaceReferenceIdDto? Id { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<MarketplaceIdDto>))]
     public enum MarketplaceIdDto
     {
@@ -72,7 +72,7 @@ public MarketplaceReferenceIdDto? Id { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<MarketplaceReferenceIdDto>))]
     public enum MarketplaceReferenceIdDto
     {

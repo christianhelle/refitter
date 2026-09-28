@@ -50,7 +50,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class BodyDto
     {
 
@@ -75,7 +75,7 @@ public BodyGrantTypeDto GrantType { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ResponseDto
     {
 
@@ -93,7 +93,7 @@ public BodyGrantTypeDto GrantType { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<BodyGrantTypeDto>))]
     public enum BodyGrantTypeDto
     {

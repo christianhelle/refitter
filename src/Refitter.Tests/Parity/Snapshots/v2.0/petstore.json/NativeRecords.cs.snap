@@ -414,7 +414,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Order
     {
         [JsonConstructor]
@@ -451,7 +451,7 @@ public OrderStatus? Status { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record User
     {
         [JsonConstructor]
@@ -496,7 +496,7 @@ public OrderStatus? Status { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Category
     {
         [JsonConstructor]
@@ -514,7 +514,7 @@ public OrderStatus? Status { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Tag
     {
         [JsonConstructor]
@@ -532,7 +532,7 @@ public OrderStatus? Status { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Pet
     {
         [JsonConstructor]
@@ -571,7 +571,7 @@ public PetStatus? Status { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ApiResponse
     {
         [JsonConstructor]
@@ -593,7 +593,7 @@ public PetStatus? Status { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Anonymous>))]
     public enum Anonymous
     {
@@ -609,7 +609,7 @@ public PetStatus? Status { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<OrderStatus>))]
     public enum OrderStatus
     {
@@ -625,7 +625,7 @@ public PetStatus? Status { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<PetStatus>))]
     public enum PetStatus
     {
@@ -641,7 +641,7 @@ public PetStatus? Status { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class FileParameter
     {
         public FileParameter(System.IO.Stream data)

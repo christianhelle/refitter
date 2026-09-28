@@ -52,7 +52,7 @@ namespace GeneratedCode
 
     [JsonInheritanceConverterDto(typeof(AnimalDto), "type")]
     [JsonInheritanceAttributeDto("Dog", typeof(DogDto))]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AnimalDto
     {
 
@@ -71,7 +71,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class DogDto : AnimalDto
     {
 
@@ -80,7 +80,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple = true)]
     internal class JsonInheritanceAttributeDto : System.Attribute
     {
@@ -95,7 +95,7 @@ namespace GeneratedCode
         public System.Type Type { get; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal class JsonInheritanceConverterAttributeDto : JsonConverterAttribute
     {
         public string DiscriminatorName { get; }

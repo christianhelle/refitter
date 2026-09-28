@@ -71,7 +71,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Anonymous
     {
         [JsonConstructor]
@@ -98,7 +98,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Anonymous2
     {
         [JsonConstructor]
@@ -125,7 +125,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Anonymous3
     {
         [JsonConstructor]
@@ -152,7 +152,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class FileResponse : System.IDisposable
     {
         private System.IDisposable _client;

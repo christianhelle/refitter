@@ -91,7 +91,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record User
     {
         [JsonConstructor]
@@ -118,7 +118,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Repository
     {
         [JsonConstructor]
@@ -145,7 +145,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Pullrequest
     {
         [JsonConstructor]
@@ -180,7 +180,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<State>))]
     public enum State
     {

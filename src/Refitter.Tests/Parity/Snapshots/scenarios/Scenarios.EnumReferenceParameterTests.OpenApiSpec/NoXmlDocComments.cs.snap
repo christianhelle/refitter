@@ -46,7 +46,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Kind>))]
     public enum Kind
     {
@@ -59,7 +59,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<NumKind>))]
     public enum NumKind : long
     {

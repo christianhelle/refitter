@@ -87,7 +87,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Item
     {
 
@@ -99,7 +99,7 @@ public ItemKind? Kind { get; set; } = default!;
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Error
     {
 
@@ -108,7 +108,7 @@ public ItemKind? Kind { get; set; } = default!;
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<ItemKind>))]
     public enum ItemKind
     {
@@ -121,7 +121,7 @@ public ItemKind? Kind { get; set; } = default!;
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class FileParameter
     {
         public FileParameter(System.IO.Stream data)
@@ -148,7 +148,7 @@ public ItemKind? Kind { get; set; } = default!;
         public string? ContentType { get; private set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class FileResponse : System.IDisposable
     {
         private System.IDisposable? _client;

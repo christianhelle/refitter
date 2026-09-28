@@ -49,7 +49,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Response
     {
 
@@ -70,7 +70,7 @@ namespace GeneratedCode
     [JsonInheritanceConverter(typeof(Vehicle), "vehicleType")]
     [JsonInheritanceAttribute("car", typeof(Car))]
     [JsonInheritanceAttribute("truck", typeof(Truck))]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Vehicle
     {
 
@@ -85,7 +85,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Car : Vehicle
     {
 
@@ -97,7 +97,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Truck : Vehicle
     {
 
@@ -109,7 +109,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple = true)]
     internal class JsonInheritanceAttribute : System.Attribute
     {
@@ -124,7 +124,7 @@ namespace GeneratedCode
         public System.Type Type { get; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
     {
         public string DiscriminatorName { get; }

@@ -59,7 +59,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class FileResponse : System.IDisposable
     {
         private System.IDisposable _client;

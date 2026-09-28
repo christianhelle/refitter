@@ -60,7 +60,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Response
     {
 
@@ -81,7 +81,7 @@ namespace GeneratedCode
     [JsonInheritanceConverter(typeof(Payment), "paymentType")]
     [JsonInheritanceAttribute("credit", typeof(CreditCard))]
     [JsonInheritanceAttribute("bank", typeof(BankTransfer))]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Payment
     {
 
@@ -96,7 +96,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class CreditCard : Payment
     {
 
@@ -108,7 +108,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class BankTransfer : Payment
     {
 
@@ -120,7 +120,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple = true)]
     internal class JsonInheritanceAttribute : System.Attribute
     {
@@ -135,7 +135,7 @@ namespace GeneratedCode
         public System.Type Type { get; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
     {
         public string DiscriminatorName { get; }

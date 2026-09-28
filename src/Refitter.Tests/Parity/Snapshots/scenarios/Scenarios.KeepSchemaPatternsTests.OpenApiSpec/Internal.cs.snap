@@ -42,7 +42,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class Metadata
     {
 
@@ -65,7 +65,7 @@ namespace GeneratedCode
     [JsonInheritanceAttribute("Warehouse", typeof(Warehouse))]
     [JsonInheritanceAttribute("UserComponent", typeof(UserComponent))]
     [JsonInheritanceAttribute("UserComponent2", typeof(UserComponent2))]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class SomeComponent : Component
     {
 
@@ -74,7 +74,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<SomeComponentState>))]
     internal enum SomeComponentState
     {
@@ -93,7 +93,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class SomeComponentType : Component
     {
 
@@ -111,7 +111,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class Component
     {
 
@@ -123,7 +123,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class LoadingAddress : SomeComponent
     {
 
@@ -132,7 +132,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class Warehouse : SomeComponent
     {
 
@@ -141,7 +141,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class UserComponent : SomeComponent
     {
 
@@ -150,7 +150,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class UserComponent2 : UserComponent
     {
 
@@ -159,7 +159,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple = true)]
     internal class JsonInheritanceAttribute : System.Attribute
     {
@@ -174,7 +174,7 @@ public SomeComponentState State { get; set; }
         public System.Type Type { get; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
     {
         public string DiscriminatorName { get; }

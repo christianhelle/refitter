@@ -55,7 +55,7 @@ namespace GeneratedCode
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "animalType", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]
     [JsonDerivedType(typeof(Dog), typeDiscriminator: "dog")]
     [JsonDerivedType(typeof(Cat), typeDiscriminator: "cat")]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Animal
     {
 
@@ -74,7 +74,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Dog : Animal
     {
 
@@ -83,7 +83,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Cat : Animal
     {
 

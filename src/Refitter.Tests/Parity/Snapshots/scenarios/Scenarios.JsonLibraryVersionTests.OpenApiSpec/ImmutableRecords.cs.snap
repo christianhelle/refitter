@@ -50,7 +50,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record StatusResponse
     {
         [JsonConstructor]
@@ -68,7 +68,7 @@ public StatusResponseEnvironment? Environment { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Environment>))]
     public enum Environment
     {
@@ -84,7 +84,7 @@ public StatusResponseEnvironment? Environment { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<StatusResponseEnvironment>))]
     public enum StatusResponseEnvironment
     {
@@ -100,7 +100,7 @@ public StatusResponseEnvironment? Environment { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<StatusResponseStatus>))]
     public enum StatusResponseStatus
     {

@@ -50,7 +50,7 @@ namespace GeneratedCode
     
 
     [JsonInheritanceConverterDto(typeof(ResultDto), "service")]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ResultDto
     {
 
@@ -65,7 +65,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class SonarrResultDto
     {
 
@@ -83,7 +83,7 @@ public SonarrResultServiceDto Service { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RadarrResultDto
     {
 
@@ -101,7 +101,7 @@ public RadarrResultServiceDto Service { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class UnusedResultDto
     {
 
@@ -119,7 +119,7 @@ public UnusedResultServiceDto Service { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<SonarrResultServiceDto>))]
     public enum SonarrResultServiceDto
     {
@@ -129,7 +129,7 @@ public UnusedResultServiceDto Service { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<RadarrResultServiceDto>))]
     public enum RadarrResultServiceDto
     {
@@ -139,7 +139,7 @@ public UnusedResultServiceDto Service { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<UnusedResultServiceDto>))]
     public enum UnusedResultServiceDto
     {
@@ -149,7 +149,7 @@ public UnusedResultServiceDto Service { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple = true)]
     internal class JsonInheritanceAttributeDto : System.Attribute
     {
@@ -164,7 +164,7 @@ public UnusedResultServiceDto Service { get; set; }
         public System.Type Type { get; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal class JsonInheritanceConverterAttributeDto : JsonConverterAttribute
     {
         public string DiscriminatorName { get; }

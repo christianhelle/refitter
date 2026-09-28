@@ -55,7 +55,7 @@ namespace GeneratedCode.Contracts
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RequestModel
     {
 
@@ -94,7 +94,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ResponseModel
     {
 
@@ -133,7 +133,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class BaseType
     {
 
@@ -151,7 +151,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class TypeA
     {
 
@@ -169,7 +169,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class TypeB
     {
 
@@ -187,7 +187,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AllOfExample : BaseType
     {
 
@@ -196,7 +196,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AnyOfExample
     {
 
@@ -211,7 +211,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AllOfExample2 : BaseType
     {
 
@@ -220,7 +220,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AnyOfExample2
     {
 

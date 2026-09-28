@@ -358,7 +358,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Error
     {
         [JsonConstructor]
@@ -389,7 +389,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record EventType
     {
         [JsonConstructor]
@@ -423,7 +423,7 @@ namespace GeneratedCode
     /// <summary>
     /// A merge field available for use in webhook payload.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record EventTypeMergeField
     {
         [JsonConstructor]
@@ -447,7 +447,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProblemDetails
     {
         [JsonConstructor]
@@ -493,7 +493,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record StringStringKeyValuePair
     {
         [JsonConstructor]
@@ -517,7 +517,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Webhook
     {
         [JsonConstructor]
@@ -605,7 +605,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record WebhookCreatedResult
     {
         [JsonConstructor]
@@ -626,7 +626,7 @@ namespace GeneratedCode
     /// <summary>
     /// Array of objects along with a cursor.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record WebhookCursorResults
     {
         [JsonConstructor]

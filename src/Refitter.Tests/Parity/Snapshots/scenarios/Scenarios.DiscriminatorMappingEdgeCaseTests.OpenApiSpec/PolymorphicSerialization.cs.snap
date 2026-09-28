@@ -53,7 +53,7 @@ namespace GeneratedCode
     [JsonDerivedType(typeof(Cat), typeDiscriminator: "cat-type")]
     [JsonDerivedType(typeof(Dog), typeDiscriminator: "dog type")]
     [JsonDerivedType(typeof(Bird), typeDiscriminator: "1")]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Pet
     {
 
@@ -71,7 +71,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Cat : Pet
     {
 
@@ -80,7 +80,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Dog : Pet
     {
 
@@ -89,7 +89,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Bird : Pet
     {
 

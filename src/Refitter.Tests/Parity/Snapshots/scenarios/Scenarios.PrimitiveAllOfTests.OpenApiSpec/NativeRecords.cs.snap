@@ -50,7 +50,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record StatusUpdateBase
     {
         [JsonConstructor]
@@ -73,7 +73,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record StatusUpdateRequest : StatusUpdateBase
     {
         [JsonConstructor]
@@ -100,7 +100,7 @@ public StatusUpdateRequestPriority Priority { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Filters
     {
         [JsonConstructor]
@@ -123,7 +123,7 @@ public StatusUpdateRequestPriority Priority { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<StatusUpdateRequestPriority>))]
     public enum StatusUpdateRequestPriority
     {

@@ -66,7 +66,7 @@ namespace Refitter.Tests.UsePolymorphicSerialization
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class Metadata
     {
 
@@ -90,7 +90,7 @@ namespace Refitter.Tests.UsePolymorphicSerialization
     [JsonDerivedType(typeof(LoadingAddress), typeDiscriminator: "LoadingAddress")]
     [JsonDerivedType(typeof(UserComponent), typeDiscriminator: "UserComponent")]
     [JsonDerivedType(typeof(UserComponent2), typeDiscriminator: "UserComponent2")]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class SomeComponent : Component
     {
 
@@ -99,7 +99,7 @@ namespace Refitter.Tests.UsePolymorphicSerialization
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     [JsonConverter(typeof(JsonStringEnumConverter<SomeComponentState>))]
     public enum SomeComponentState
     {
@@ -118,7 +118,7 @@ namespace Refitter.Tests.UsePolymorphicSerialization
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class SomeComponentType : Component
     {
 
@@ -136,7 +136,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class Component
     {
 
@@ -148,7 +148,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class LoadingAddress : SomeComponent
     {
 
@@ -157,7 +157,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class Warehouse : SomeComponent
     {
 
@@ -166,7 +166,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class WarehouseResponse : SomeComponent
     {
 
@@ -175,7 +175,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class UserComponent : SomeComponent
     {
 
@@ -184,7 +184,7 @@ public SomeComponentState State { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class UserComponent2 : UserComponent
     {
 
@@ -194,7 +194,7 @@ public SomeComponentState State { get; set; }
     }
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class ProblemDetails
     {
 

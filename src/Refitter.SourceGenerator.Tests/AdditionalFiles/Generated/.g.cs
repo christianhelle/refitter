@@ -403,7 +403,7 @@ namespace Refitter.Tests.AdditionalFiles.NoFilename
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class Order
     {
 
@@ -439,7 +439,7 @@ public OrderStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class Customer
     {
 
@@ -463,7 +463,7 @@ public OrderStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class Address
     {
 
@@ -490,7 +490,7 @@ public OrderStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class Category
     {
 
@@ -511,7 +511,7 @@ public OrderStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class User
     {
 
@@ -553,7 +553,7 @@ public OrderStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class Tag
     {
 
@@ -574,7 +574,7 @@ public OrderStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class Pet
     {
 
@@ -612,7 +612,7 @@ public PetStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class ApiResponse
     {
 
@@ -636,7 +636,7 @@ public PetStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     [JsonConverter(typeof(JsonStringEnumConverter<Status>))]
     public enum Status
     {
@@ -652,7 +652,7 @@ public PetStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     [JsonConverter(typeof(JsonStringEnumConverter<OrderStatus>))]
     public enum OrderStatus
     {
@@ -668,7 +668,7 @@ public PetStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     [JsonConverter(typeof(JsonStringEnumConverter<PetStatus>))]
     public enum PetStatus
     {
@@ -684,7 +684,7 @@ public PetStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
     public partial class FileParameter
     {
         public FileParameter(System.IO.Stream data)

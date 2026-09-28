@@ -15,8 +15,9 @@ namespace Refitter.Core;
 /// </summary>
 internal sealed class ContractTemplateRenderer
 {
-    /// <summary>The toolchain version shown in the generated file header.</summary>
-    internal const string ToolchainVersion = "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))";
+    /// <summary>The Refitter version shown in the generated code attributes.</summary>
+    internal static readonly string ToolchainVersion =
+        typeof(ContractTemplateRenderer).Assembly.GetName().Version?.ToString() ?? string.Empty;
 
     private const string SettingsKey = "__settings";
     private const string TemplateKey = "__template";

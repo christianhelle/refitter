@@ -42,7 +42,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Metadata
     {
         [JsonConstructor]
@@ -73,7 +73,7 @@ namespace GeneratedCode
     [JsonInheritanceAttribute("Warehouse", typeof(Warehouse))]
     [JsonInheritanceAttribute("UserComponent", typeof(UserComponent))]
     [JsonInheritanceAttribute("UserComponent2", typeof(UserComponent2))]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record SomeComponent : Component
     {
         [JsonConstructor]
@@ -88,7 +88,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<SomeComponentState>))]
     public enum SomeComponentState
     {
@@ -107,7 +107,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record SomeComponentType : Component
     {
         [JsonConstructor]
@@ -134,7 +134,7 @@ public SomeComponentState State { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Component
     {
         [JsonConstructor]
@@ -152,7 +152,7 @@ public SomeComponentState State { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record LoadingAddress : SomeComponent
     {
         [JsonConstructor]
@@ -167,7 +167,7 @@ public SomeComponentState State { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Warehouse : SomeComponent
     {
         [JsonConstructor]
@@ -182,7 +182,7 @@ public SomeComponentState State { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record UserComponent : SomeComponent
     {
         [JsonConstructor]
@@ -197,7 +197,7 @@ public SomeComponentState State { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record UserComponent2 : UserComponent
     {
         [JsonConstructor]
@@ -212,7 +212,7 @@ public SomeComponentState State { get; init; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple = true)]
     internal class JsonInheritanceAttribute : System.Attribute
     {
@@ -227,7 +227,7 @@ public SomeComponentState State { get; init; }
         public System.Type Type { get; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
     {
         public string DiscriminatorName { get; }

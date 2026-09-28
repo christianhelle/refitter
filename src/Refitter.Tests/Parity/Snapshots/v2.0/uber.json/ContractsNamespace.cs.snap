@@ -92,7 +92,7 @@ namespace GeneratedCode.Contracts
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Product
     {
 
@@ -128,7 +128,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class PriceEstimate
     {
 
@@ -176,7 +176,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Profile
     {
 
@@ -212,7 +212,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Activity
     {
 
@@ -224,7 +224,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Activities
     {
 
@@ -251,7 +251,7 @@ namespace GeneratedCode.Contracts
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Error
     {
 

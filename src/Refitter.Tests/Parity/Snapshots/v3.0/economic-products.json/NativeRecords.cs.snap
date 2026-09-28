@@ -2159,7 +2159,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record AccrualSettings
     {
         [JsonConstructor]
@@ -2184,7 +2184,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record CreatedResult
     {
         [JsonConstructor]
@@ -2201,7 +2201,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Error
     {
         [JsonConstructor]
@@ -2232,7 +2232,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record PriceGroup
     {
         [JsonConstructor]
@@ -2269,7 +2269,7 @@ namespace GeneratedCode
     /// <summary>
     /// Array of objects along with a cursor.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record PriceGroupCursorResults
     {
         [JsonConstructor]
@@ -2293,7 +2293,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProblemDetails
     {
         [JsonConstructor]
@@ -2339,7 +2339,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Product
     {
         [JsonConstructor]
@@ -2449,7 +2449,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductCreatedResult
     {
         [JsonConstructor]
@@ -2470,7 +2470,7 @@ namespace GeneratedCode
     /// <summary>
     /// Array of objects along with a cursor.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductCursorResults
     {
         [JsonConstructor]
@@ -2494,7 +2494,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductGroup
     {
         [JsonConstructor]
@@ -2536,7 +2536,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductGroupCreatedResult
     {
         [JsonConstructor]
@@ -2557,7 +2557,7 @@ namespace GeneratedCode
     /// <summary>
     /// Array of objects along with a cursor.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductGroupCursorResults
     {
         [JsonConstructor]
@@ -2581,7 +2581,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductSalesPriceInCurrency
     {
         [JsonConstructor]
@@ -2621,7 +2621,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductSalesPriceInCurrencyCreatedResult
     {
         [JsonConstructor]
@@ -2642,7 +2642,7 @@ namespace GeneratedCode
     /// <summary>
     /// Array of objects along with a cursor.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductSalesPriceInCurrencyCursorResults
     {
         [JsonConstructor]
@@ -2666,7 +2666,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductSpecialPrice
     {
         [JsonConstructor]
@@ -2716,7 +2716,7 @@ namespace GeneratedCode
     /// <summary>
     /// Array of objects along with a cursor.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductSpecialPriceCursorResults
     {
         [JsonConstructor]
@@ -2740,7 +2740,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductSpecialPriceInCurrency
     {
         [JsonConstructor]
@@ -2773,7 +2773,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductSpecialPriceInCurrencyCreatedResult
     {
         [JsonConstructor]
@@ -2794,7 +2794,7 @@ namespace GeneratedCode
     /// <summary>
     /// Array of objects along with a cursor.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProductSpecialPriceInCurrencyCursorResults
     {
         [JsonConstructor]
@@ -2818,7 +2818,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ProjectSettings
     {
         [JsonConstructor]
@@ -2850,7 +2850,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record Zone
     {
         [JsonConstructor]
@@ -2883,7 +2883,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ZoneCreatedResult
     {
         [JsonConstructor]
@@ -2904,7 +2904,7 @@ namespace GeneratedCode
     /// <summary>
     /// Array of objects along with a cursor.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial record ZoneCursorResults
     {
         [JsonConstructor]

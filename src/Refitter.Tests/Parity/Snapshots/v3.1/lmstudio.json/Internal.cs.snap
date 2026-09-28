@@ -96,7 +96,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ChatRequest
     {
 
@@ -210,7 +210,7 @@ public ChatRequestReasoning Reasoning { get; set; }
     [JsonInheritanceConverter(typeof(ChatInputItem), "type")]
     [JsonInheritanceAttribute("message", typeof(TextInput))]
     [JsonInheritanceAttribute("image", typeof(ImageInput))]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ChatInputItem
     {
 
@@ -225,7 +225,7 @@ public ChatRequestReasoning Reasoning { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class TextInput : ChatInputItem
     {
 
@@ -245,7 +245,7 @@ public TextInputType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ImageInput : ChatInputItem
     {
 
@@ -265,7 +265,7 @@ public ImageInputType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class PluginIntegration
     {
 
@@ -300,7 +300,7 @@ public PluginIntegrationType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class EphemeralMcpIntegration
     {
 
@@ -348,7 +348,7 @@ public EphemeralMcpIntegrationType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ChatResponse
     {
 
@@ -393,7 +393,7 @@ public EphemeralMcpIntegrationType Type { get; set; }
     [JsonInheritanceAttribute("tool_call", typeof(ToolCallOutput))]
     [JsonInheritanceAttribute("reasoning", typeof(ReasoningOutput))]
     [JsonInheritanceAttribute("invalid_tool_call", typeof(InvalidToolCallOutput))]
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ChatOutputItem
     {
 
@@ -408,7 +408,7 @@ public EphemeralMcpIntegrationType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class MessageOutput : ChatOutputItem
     {
 
@@ -428,7 +428,7 @@ public MessageOutputType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ToolCallOutput : ChatOutputItem
     {
 
@@ -466,7 +466,7 @@ public ToolCallOutputType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ReasoningOutput : ChatOutputItem
     {
 
@@ -486,7 +486,7 @@ public ReasoningOutputType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class InvalidToolCallOutput : ChatOutputItem
     {
 
@@ -510,7 +510,7 @@ public InvalidToolCallOutputType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ProviderInfo
     {
 
@@ -544,7 +544,7 @@ public ProviderInfoType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ChatStats
     {
 
@@ -595,7 +595,7 @@ public ProviderInfoType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ListModelsResponse
     {
 
@@ -617,7 +617,7 @@ public ProviderInfoType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class ModelInfo
     {
 
@@ -724,7 +724,7 @@ public ModelInfoFormat? Format { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class LoadedInstance
     {
 
@@ -750,7 +750,7 @@ public ModelInfoFormat? Format { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class LoadedInstanceConfig
     {
 
@@ -801,7 +801,7 @@ public ModelInfoFormat? Format { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class LoadModelRequest
     {
 
@@ -859,7 +859,7 @@ public ModelInfoFormat? Format { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class LoadModelResponse
     {
 
@@ -907,7 +907,7 @@ public LoadModelResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class LlmLoadConfig
     {
 
@@ -952,7 +952,7 @@ public LoadModelResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class EmbeddingLoadConfig
     {
 
@@ -973,7 +973,7 @@ public LoadModelResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class UnloadModelRequest
     {
 
@@ -995,7 +995,7 @@ public LoadModelResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class UnloadModelResponse
     {
 
@@ -1017,7 +1017,7 @@ public LoadModelResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class DownloadModelRequest
     {
 
@@ -1045,7 +1045,7 @@ public LoadModelResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class DownloadModelResponse
     {
 
@@ -1091,7 +1091,7 @@ public DownloadModelResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class DownloadStatusResponse
     {
 
@@ -1156,7 +1156,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<ChatRequestReasoning>))]
     internal enum ChatRequestReasoning
     {
@@ -1178,7 +1178,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<TextInputType>))]
     internal enum TextInputType
     {
@@ -1188,7 +1188,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<ImageInputType>))]
     internal enum ImageInputType
     {
@@ -1198,7 +1198,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<PluginIntegrationType>))]
     internal enum PluginIntegrationType
     {
@@ -1208,7 +1208,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<EphemeralMcpIntegrationType>))]
     internal enum EphemeralMcpIntegrationType
     {
@@ -1218,7 +1218,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<MessageOutputType>))]
     internal enum MessageOutputType
     {
@@ -1228,7 +1228,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<ToolCallOutputType>))]
     internal enum ToolCallOutputType
     {
@@ -1238,7 +1238,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<ReasoningOutputType>))]
     internal enum ReasoningOutputType
     {
@@ -1248,7 +1248,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<InvalidToolCallOutputType>))]
     internal enum InvalidToolCallOutputType
     {
@@ -1258,7 +1258,7 @@ public DownloadStatusResponseStatus Status { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class Metadata
     {
 
@@ -1299,7 +1299,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<ProviderInfoType>))]
     internal enum ProviderInfoType
     {
@@ -1312,7 +1312,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<ModelInfoType>))]
     internal enum ModelInfoType
     {
@@ -1325,7 +1325,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class Quantization
     {
 
@@ -1352,7 +1352,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<ModelInfoFormat>))]
     internal enum ModelInfoFormat
     {
@@ -1365,7 +1365,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class Capabilities
     {
 
@@ -1398,7 +1398,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<LoadModelResponseType>))]
     internal enum LoadModelResponseType
     {
@@ -1411,7 +1411,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<LoadModelResponseStatus>))]
     internal enum LoadModelResponseStatus
     {
@@ -1421,7 +1421,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<DownloadModelResponseStatus>))]
     internal enum DownloadModelResponseStatus
     {
@@ -1443,7 +1443,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<DownloadStatusResponseStatus>))]
     internal enum DownloadStatusResponseStatus
     {
@@ -1462,7 +1462,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<MetadataType>))]
     internal enum MetadataType
     {
@@ -1475,7 +1475,7 @@ public MetadataType Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal partial class Reasoning
     {
 
@@ -1505,7 +1505,7 @@ public ReasoningDefault Default { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Allowed_options>))]
     internal enum Allowed_options
     {
@@ -1527,7 +1527,7 @@ public ReasoningDefault Default { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<ReasoningDefault>))]
     internal enum ReasoningDefault
     {
@@ -1549,7 +1549,7 @@ public ReasoningDefault Default { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple = true)]
     internal class JsonInheritanceAttribute : System.Attribute
     {
@@ -1564,7 +1564,7 @@ public ReasoningDefault Default { get; set; }
         public System.Type Type { get; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
     {
         public string DiscriminatorName { get; }

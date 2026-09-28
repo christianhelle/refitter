@@ -845,7 +845,7 @@ namespace GeneratedCode
 
     
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderCreateRequest
     {
 
@@ -935,7 +935,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderCreateResponse
     {
 
@@ -1010,7 +1010,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderModifyRequest
     {
 
@@ -1050,7 +1050,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderModifyResponse
     {
 
@@ -1161,7 +1161,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderDetailResponse
     {
 
@@ -1293,7 +1293,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderSearch_Response
     {
 
@@ -1344,7 +1344,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class PriceAndAvailabilityRequest
     {
 
@@ -1386,13 +1386,13 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class PriceAndAvailabilityResponse : System.Collections.ObjectModel.Collection<Anonymous>
     {
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ProductSearch_Response
     {
 
@@ -1440,7 +1440,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteSearchResponse
     {
 
@@ -1479,7 +1479,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteDetailsResponse
     {
 
@@ -1626,7 +1626,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AvailabilityAsyncNotificationRequest
     {
 
@@ -1668,7 +1668,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderStatusAsyncNotificationRequest
     {
 
@@ -1710,7 +1710,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class InvoiceSearchResponse
     {
 
@@ -1749,7 +1749,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class InvoiceDetailResponse
     {
 
@@ -1767,7 +1767,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class InvoiceDetails
     {
 
@@ -1788,7 +1788,7 @@ namespace GeneratedCode
     /// <summary>
     /// Address type object
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AddressType
     {
 
@@ -1845,7 +1845,7 @@ namespace GeneratedCode
     /// <summary>
     /// Product line items object under each invoice
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ProductLineType
     {
 
@@ -1921,7 +1921,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ErrorResponse
     {
 
@@ -1942,7 +1942,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for order create endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderCreateRequest2
     {
 
@@ -1963,7 +1963,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for order create endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderCreateResponse2
     {
 
@@ -1984,7 +1984,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for order details endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderDetailResponse2
     {
 
@@ -2005,7 +2005,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for order delete endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderCancelResponse
     {
 
@@ -2026,7 +2026,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for order search endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderSearchResponse
     {
 
@@ -2047,7 +2047,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response object model for the product search endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ProductSearchResponse
     {
 
@@ -2068,7 +2068,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request object model for the multi sku price and stock API endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class PriceAndAvailabilityRequest2
     {
 
@@ -2089,7 +2089,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response object model for the multi sku price and stock API endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class PriceAndAvailabilityResponse2
     {
 
@@ -2107,7 +2107,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class WarehouseListType
     {
 
@@ -2155,7 +2155,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for get quote list endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteListRequest
     {
 
@@ -2176,7 +2176,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for get quote list endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteListResponse
     {
 
@@ -2197,7 +2197,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for get quote details endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteDetailsRequest
     {
 
@@ -2218,7 +2218,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for quote details
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteDetails
     {
 
@@ -2236,7 +2236,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteProductList
     {
 
@@ -2299,7 +2299,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response object model for the product search endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ProductSearchResponse2
     {
 
@@ -2320,7 +2320,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request object model for the product search endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ProductSearchRequest
     {
 
@@ -2341,7 +2341,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response object model for the multi sku price and stock API endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class MultiSKUPriceAndStockResponse
     {
 
@@ -2362,7 +2362,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request object model for the multi sku price and stock API endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class MultiSKUPriceAndStockRequest
     {
 
@@ -2380,7 +2380,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class InvoiceDetailRequest
     {
 
@@ -2398,7 +2398,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class InvoiceDetailResponse2
     {
 
@@ -2419,7 +2419,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for order modify endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderModifyResponse2
     {
 
@@ -2440,7 +2440,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for order modify endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderModifyRequest2
     {
 
@@ -2461,7 +2461,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for order search endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderSearchResponse2
     {
 
@@ -2482,7 +2482,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for order search endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderSearchRequest
     {
 
@@ -2503,7 +2503,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for order delete endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderDeleteResponse
     {
 
@@ -2524,7 +2524,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for order delete endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderDeleteRequest
     {
 
@@ -2545,7 +2545,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for order details endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderDetailsResponse
     {
 
@@ -2566,7 +2566,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for order details endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderDetailRequest
     {
 
@@ -2587,7 +2587,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for order create endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderCreateresponse
     {
 
@@ -2608,7 +2608,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for order create endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderCreaterequest
     {
 
@@ -2626,7 +2626,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteProductList2
     {
 
@@ -2686,7 +2686,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteDetailsResponse2
     {
 
@@ -2707,7 +2707,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for get quote details endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteDetailsRequest2
     {
 
@@ -2728,7 +2728,7 @@ namespace GeneratedCode
     /// <summary>
     /// Response schema for get quote list endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteListResponse2
     {
 
@@ -2749,7 +2749,7 @@ namespace GeneratedCode
     /// <summary>
     /// Request schema for get quote list endpoint
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteListRequest2
     {
 
@@ -2767,7 +2767,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttribute
     {
 
@@ -2779,7 +2779,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class CarrierDetailB2B
     {
 
@@ -2809,7 +2809,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Contractinfo
     {
 
@@ -2833,7 +2833,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Error
     {
 
@@ -2851,7 +2851,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ErrorResponseDTO
     {
 
@@ -2860,7 +2860,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Fields
     {
 
@@ -2875,7 +2875,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class LicenseInfo
     {
 
@@ -2896,7 +2896,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class LineB2B
     {
 
@@ -2983,7 +2983,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Link
     {
 
@@ -2998,7 +2998,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class MiscellaneousChargeB2BDto
     {
 
@@ -3016,7 +3016,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderDetailB2B
     {
 
@@ -3091,7 +3091,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderDetailB2BAddressDto
     {
 
@@ -3130,7 +3130,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class SerialNumberB2B
     {
 
@@ -3139,7 +3139,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Servicecontractinfo
     {
 
@@ -3154,7 +3154,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipmentDetailB2B
     {
 
@@ -3184,7 +3184,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Subscriptions
     {
 
@@ -3208,7 +3208,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class TrackingDetailB2B
     {
 
@@ -3232,7 +3232,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Type>))]
     public enum Type
     {
@@ -3248,7 +3248,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<SimulateStatus>))]
     public enum SimulateStatus
     {
@@ -3267,7 +3267,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<SimulateStatus2>))]
     public enum SimulateStatus2
     {
@@ -3286,7 +3286,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<OrderStatus>))]
     public enum OrderStatus
     {
@@ -3308,7 +3308,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Orderstatus>))]
     public enum Orderstatus
     {
@@ -3330,7 +3330,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Simulate>))]
     public enum Simulate
     {
@@ -3349,7 +3349,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Anonymous
     {
 
@@ -3507,7 +3507,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ResellerInfo
     {
 
@@ -3594,7 +3594,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipToInfo
     {
 
@@ -3709,7 +3709,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class EndUserInfo
     {
 
@@ -3815,7 +3815,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines
     {
 
@@ -3875,7 +3875,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipmentDetails
     {
 
@@ -3940,7 +3940,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes
     {
 
@@ -4004,7 +4004,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipToInfo2
     {
 
@@ -4109,7 +4109,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class EndUserInfo2
     {
 
@@ -4214,7 +4214,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Orders
     {
 
@@ -4319,7 +4319,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipToInfo3
     {
 
@@ -4432,7 +4432,7 @@ namespace GeneratedCode
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines2
     {
 
@@ -4487,7 +4487,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes2
     {
 
@@ -4514,7 +4514,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipToInfo4
     {
 
@@ -4601,7 +4601,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines3
     {
 
@@ -4682,7 +4682,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RejectedLineItems
     {
 
@@ -4739,7 +4739,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes3
     {
 
@@ -4766,7 +4766,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class BillToInfo
     {
 
@@ -4859,7 +4859,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipToInfo5
     {
 
@@ -4952,7 +4952,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class EndUserInfo3
     {
 
@@ -5045,7 +5045,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines4
     {
 
@@ -5209,7 +5209,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class MiscellaneousCharges
     {
 
@@ -5248,7 +5248,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes4
     {
 
@@ -5275,7 +5275,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Orders2
     {
 
@@ -5350,7 +5350,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AvailabilityByWarehouse
     {
 
@@ -5377,7 +5377,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Products
     {
 
@@ -5425,7 +5425,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes5
     {
 
@@ -5452,7 +5452,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Catalog
     {
 
@@ -5578,7 +5578,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Quotes
     {
 
@@ -5653,7 +5653,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ResellerInfo2
     {
 
@@ -5692,7 +5692,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class EndUserInfo4
     {
 
@@ -5773,7 +5773,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Products2
     {
 
@@ -5869,7 +5869,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes6
     {
 
@@ -5899,7 +5899,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Resource
     {
 
@@ -5968,7 +5968,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Resource2
     {
 
@@ -6019,7 +6019,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Invoices
     {
 
@@ -6094,7 +6094,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse
     {
 
@@ -6115,7 +6115,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse2
     {
 
@@ -6136,7 +6136,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serialnumberdetails
     {
 
@@ -6157,7 +6157,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Trackingnumberdetails
     {
 
@@ -6175,7 +6175,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Productextendedspecs
     {
 
@@ -6196,7 +6196,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Errors
     {
 
@@ -6232,7 +6232,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordercreaterequest
     {
 
@@ -6254,7 +6254,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse3
     {
 
@@ -6281,7 +6281,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse4
     {
 
@@ -6302,7 +6302,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse5
     {
 
@@ -6320,7 +6320,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ServiceResponse
     {
 
@@ -6341,7 +6341,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse6
     {
 
@@ -6362,7 +6362,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Servicerequest
     {
 
@@ -6383,7 +6383,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse7
     {
 
@@ -6404,7 +6404,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteSearchRequest
     {
 
@@ -6425,7 +6425,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteSearchResponse2
     {
 
@@ -6452,7 +6452,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteProductsRequest
     {
 
@@ -6473,7 +6473,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteDetailResponse
     {
 
@@ -6509,7 +6509,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Price
     {
 
@@ -6536,7 +6536,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse8
     {
 
@@ -6557,7 +6557,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Servicerequest2
     {
 
@@ -6578,7 +6578,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse9
     {
 
@@ -6599,7 +6599,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Servicerequest3
     {
 
@@ -6620,7 +6620,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Servicerequest4
     {
 
@@ -6641,7 +6641,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse10
     {
 
@@ -6662,7 +6662,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse11
     {
 
@@ -6683,7 +6683,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Servicerequest5
     {
 
@@ -6704,7 +6704,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ServiceResponse2
     {
 
@@ -6725,7 +6725,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Servicerequest6
     {
 
@@ -6747,7 +6747,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse12
     {
 
@@ -6765,7 +6765,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Servicerequest7
     {
 
@@ -6787,7 +6787,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse13
     {
 
@@ -6808,7 +6808,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Servicerequest8
     {
 
@@ -6830,7 +6830,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serviceresponse14
     {
 
@@ -6851,7 +6851,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordercreaterequest2
     {
 
@@ -6873,7 +6873,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Price2
     {
 
@@ -6900,7 +6900,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteDetailResponse2
     {
 
@@ -6921,7 +6921,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteProductsRequest2
     {
 
@@ -6942,7 +6942,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteSearchResponse3
     {
 
@@ -6969,7 +6969,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteSearchRequest2
     {
 
@@ -6990,7 +6990,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Availability
     {
 
@@ -7020,7 +7020,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ReserveInventoryDetails
     {
 
@@ -7059,7 +7059,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Pricing
     {
 
@@ -7110,7 +7110,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Discounts
     {
 
@@ -7131,7 +7131,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes7
     {
 
@@ -7158,7 +7158,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class EndUserInfo5
     {
 
@@ -7273,7 +7273,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines5
     {
 
@@ -7378,7 +7378,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class MiscellaneousCharges2
     {
 
@@ -7417,7 +7417,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Links
     {
 
@@ -7450,7 +7450,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RejectedLineItems2
     {
 
@@ -7501,7 +7501,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes8
     {
 
@@ -7545,7 +7545,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Lines2AddUpdateDeleteLine>))]
     public enum Lines2AddUpdateDeleteLine
     {
@@ -7561,7 +7561,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipmentDetails2
     {
 
@@ -7594,7 +7594,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes9
     {
 
@@ -7624,7 +7624,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
     /// <summary>
     /// Shipping details for the line item.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipmentDetails3
     {
 
@@ -7704,7 +7704,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes10
     {
 
@@ -7734,7 +7734,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
     /// <summary>
     /// Link to Order Details for the line item.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Links2
     {
 
@@ -7767,7 +7767,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class SubOrders
     {
 
@@ -7806,7 +7806,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Links3
     {
 
@@ -7839,7 +7839,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes11
     {
 
@@ -7871,7 +7871,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
     /// <summary>
     /// HATEOAS links for the price and availability of the sku.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Links4
     {
 
@@ -7904,7 +7904,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Price3
     {
 
@@ -7943,7 +7943,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Links5
     {
 
@@ -7976,7 +7976,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines6
     {
 
@@ -8045,7 +8045,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Links6
     {
 
@@ -8078,7 +8078,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble
     {
 
@@ -8102,7 +8102,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Invoicedetailresponse
     {
 
@@ -8249,7 +8249,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble2
     {
 
@@ -8273,7 +8273,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Invoicedetailresponse2
     {
 
@@ -8420,7 +8420,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Fields2
     {
 
@@ -8453,7 +8453,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble
     {
 
@@ -8482,7 +8482,7 @@ public Lines2AddUpdateDeleteLine AddUpdateDeleteLine { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordercreatedetails
     {
 
@@ -8565,7 +8565,7 @@ public OrdercreatedetailsOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble3
     {
 
@@ -8589,7 +8589,7 @@ public OrdercreatedetailsOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordersummary
     {
 
@@ -8622,7 +8622,7 @@ public OrdercreatedetailsOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordercreateresponse
     {
 
@@ -8700,7 +8700,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble4
     {
 
@@ -8724,7 +8724,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Orderdetailresponse
     {
 
@@ -8867,7 +8867,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble5
     {
 
@@ -8891,7 +8891,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble6
     {
 
@@ -8914,7 +8914,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordersearchresponse
     {
 
@@ -8954,7 +8954,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble7
     {
 
@@ -8978,7 +8978,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Productsearchresponse
     {
 
@@ -9002,7 +9002,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble2
     {
 
@@ -9032,7 +9032,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Priceandstockrequest
     {
 
@@ -9068,7 +9068,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble8
     {
 
@@ -9101,7 +9101,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Priceandstockresponse
     {
 
@@ -9119,7 +9119,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RequestPreamble
     {
 
@@ -9156,7 +9156,7 @@ public OrdercreateresponseOrdertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RetrieveQuoteRequest
     {
 
@@ -9238,7 +9238,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ResponsePreamble
     {
 
@@ -9271,7 +9271,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteList
     {
 
@@ -9349,7 +9349,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble3
     {
 
@@ -9378,7 +9378,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RetrieveQuoteProductsRequest
     {
 
@@ -9405,7 +9405,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ResponsePreamble2
     {
 
@@ -9429,7 +9429,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RetrieveQuoteResponse
     {
 
@@ -9518,7 +9518,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Productsearchresponse2
     {
 
@@ -9542,7 +9542,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble4
     {
 
@@ -9568,7 +9568,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Productsearchrequest
     {
 
@@ -9586,7 +9586,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble9
     {
 
@@ -9619,7 +9619,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Priceandstockresponse2
     {
 
@@ -9637,7 +9637,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble5
     {
 
@@ -9670,7 +9670,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Priceandstockrequest2
     {
 
@@ -9706,7 +9706,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble6
     {
 
@@ -9729,7 +9729,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Invoicedetailrequest
     {
 
@@ -9748,7 +9748,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble10
     {
 
@@ -9772,7 +9772,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Invoicedetailresponse3
     {
 
@@ -9851,7 +9851,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble11
     {
 
@@ -9872,7 +9872,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordermodifyresponse
     {
 
@@ -9905,7 +9905,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble7
     {
 
@@ -9926,7 +9926,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordermodifyrequest
     {
 
@@ -9965,7 +9965,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble12
     {
 
@@ -9989,7 +9989,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Orderlookupresponse
     {
 
@@ -10010,7 +10010,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble8
     {
 
@@ -10033,7 +10033,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderLookupRequest
     {
 
@@ -10054,7 +10054,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble13
     {
 
@@ -10078,7 +10078,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble9
     {
 
@@ -10108,7 +10108,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderDeleteRequestDetails
     {
 
@@ -10165,7 +10165,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble14
     {
 
@@ -10189,7 +10189,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Orderdetailresponse2
     {
 
@@ -10332,7 +10332,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble10
     {
 
@@ -10355,7 +10355,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Orderdetailrequest
     {
 
@@ -10386,7 +10386,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsepreamble15
     {
 
@@ -10407,7 +10407,7 @@ public RetrieveQuoteRequestSorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordercreateresponse2
     {
 
@@ -10491,7 +10491,7 @@ public Ordercreateresponse2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble11
     {
 
@@ -10520,7 +10520,7 @@ public Ordercreateresponse2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Ordercreatedetails2
     {
 
@@ -10611,7 +10611,7 @@ public Ordercreatedetails2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ResponsePreamble3
     {
 
@@ -10635,7 +10635,7 @@ public Ordercreatedetails2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RetrieveQuoteResponse2
     {
 
@@ -10734,7 +10734,7 @@ public Ordercreatedetails2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Requestpreamble12
     {
 
@@ -10763,7 +10763,7 @@ public Ordercreatedetails2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RetrieveQuoteProductsRequest2
     {
 
@@ -10790,7 +10790,7 @@ public Ordercreatedetails2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ResponsePreamble4
     {
 
@@ -10823,7 +10823,7 @@ public Ordercreatedetails2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuoteList2
     {
 
@@ -10907,7 +10907,7 @@ public Ordercreatedetails2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RequestPreamble2
     {
 
@@ -10945,7 +10945,7 @@ public Ordercreatedetails2Ordertype Ordertype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class RetrieveQuoteRequest2
     {
 
@@ -11027,7 +11027,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AvailabilityByWarehouse2
     {
 
@@ -11072,7 +11072,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class SpecialPricing
     {
 
@@ -11131,7 +11131,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class QuantityDiscounts
     {
 
@@ -11176,7 +11176,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipmentDetails4
     {
 
@@ -11233,7 +11233,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AdditionalAttributes12
     {
 
@@ -11254,7 +11254,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class CarrierDetails
     {
 
@@ -11284,7 +11284,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Links7
     {
 
@@ -11317,7 +11317,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ShipmentDetails5
     {
 
@@ -11367,7 +11367,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class SerialNumberDetails
     {
 
@@ -11388,7 +11388,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Extendedspecs
     {
 
@@ -11409,7 +11409,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Miscfeeline
     {
 
@@ -11433,7 +11433,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Extendedspecs2
     {
 
@@ -11454,7 +11454,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Miscfeeline2
     {
 
@@ -11478,7 +11478,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<OrdercreatedetailsOrdertype>))]
     public enum OrdercreatedetailsOrdertype
     {
@@ -11491,7 +11491,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shiptoaddress
     {
 
@@ -11568,7 +11568,7 @@ public RetrieveQuoteRequest2Sorting Sorting { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines7
     {
 
@@ -11648,7 +11648,7 @@ public Lines7Linetype Linetype { get; set; }
     /// <summary>
     /// Attribute Name and Value: This field identifies if your order is a DIRECT SHIP order (license / warranty) or how you want your Backorders managed as well as other process options like placing your order on hold or adding a comment. 
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Extendedspecs3
     {
 
@@ -11669,7 +11669,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shiptoaddress2
     {
 
@@ -11711,7 +11711,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<OrdercreateresponseOrdertype>))]
     public enum OrdercreateresponseOrdertype
     {
@@ -11724,7 +11724,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines8
     {
 
@@ -11820,7 +11820,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Billtoaddress
     {
 
@@ -11865,7 +11865,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shiptoaddress3
     {
 
@@ -11910,7 +11910,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Enduserinfo
     {
 
@@ -11928,7 +11928,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines9
     {
 
@@ -12063,7 +12063,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Commentlines
     {
 
@@ -12084,7 +12084,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Miscfeeline3
     {
 
@@ -12111,7 +12111,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Extendedspecs4
     {
 
@@ -12138,7 +12138,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Orders3
     {
 
@@ -12185,7 +12185,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Partnumbers
     {
 
@@ -12230,7 +12230,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Item
     {
 
@@ -12296,7 +12296,7 @@ public Extendedspecs3Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Details
     {
 
@@ -12414,7 +12414,7 @@ public DetailsBackorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<RetrieveQuoteRequestSorting>))]
     public enum RetrieveQuoteRequestSorting
     {
@@ -12427,7 +12427,7 @@ public DetailsBackorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AccountInfo
     {
 
@@ -12451,7 +12451,7 @@ public DetailsBackorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ContactInfo
     {
 
@@ -12472,7 +12472,7 @@ public DetailsBackorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class VendorAttributes
     {
 
@@ -12499,7 +12499,7 @@ public DetailsBackorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class EndUser
     {
 
@@ -12547,7 +12547,7 @@ public DetailsBackorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Product
     {
 
@@ -12610,7 +12610,7 @@ public DetailsBackorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Searchcriteria
     {
 
@@ -12655,7 +12655,7 @@ public DetailsBackorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Details2
     {
 
@@ -12789,7 +12789,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Item2
     {
 
@@ -12837,7 +12837,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shipto
     {
 
@@ -12873,7 +12873,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Headerdata
     {
 
@@ -12894,7 +12894,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Linedata
     {
 
@@ -12930,7 +12930,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Responsedata
     {
 
@@ -12960,7 +12960,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class OrderNumber
     {
 
@@ -12992,7 +12992,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class CustomerOrderNumber
     {
 
@@ -13010,7 +13010,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Billtoaddress2
     {
 
@@ -13055,7 +13055,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shiptoaddress4
     {
 
@@ -13100,7 +13100,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Enduserinfo2
     {
 
@@ -13118,7 +13118,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines10
     {
 
@@ -13256,7 +13256,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Commentlines2
     {
 
@@ -13277,7 +13277,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Miscfeeline4
     {
 
@@ -13304,7 +13304,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Extendedspecs5
     {
 
@@ -13331,7 +13331,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Ordercreateresponse2Ordertype>))]
     public enum Ordercreateresponse2Ordertype
     {
@@ -13344,7 +13344,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shiptoaddress5
     {
 
@@ -13398,7 +13398,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines11
     {
 
@@ -13488,7 +13488,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Ordercreatedetails2Ordertype>))]
     public enum Ordercreatedetails2Ordertype
     {
@@ -13501,7 +13501,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shiptoaddress6
     {
 
@@ -13579,7 +13579,7 @@ public Details2Backorderflag Backorderflag { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Lines12
     {
 
@@ -13657,7 +13657,7 @@ public Lines12Linetype Linetype { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Extendedspecs6
     {
 
@@ -13678,7 +13678,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class AccountInfo2
     {
 
@@ -13702,7 +13702,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class ContactInfo2
     {
 
@@ -13723,7 +13723,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class VendorAttributes2
     {
 
@@ -13750,7 +13750,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class EndUser2
     {
 
@@ -13798,7 +13798,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<RetrieveQuoteRequest2Sorting>))]
     public enum RetrieveQuoteRequest2Sorting
     {
@@ -13814,7 +13814,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
     /// <summary>
     /// The tracking details for the shipment containing the line item.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class TrackingDetails
     {
 
@@ -13862,7 +13862,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class PackageDetails
     {
 
@@ -13895,7 +13895,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Lines7Linetype>))]
     public enum Lines7Linetype
     {
@@ -13908,7 +13908,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Enduser
     {
 
@@ -13959,7 +13959,7 @@ public Extendedspecs6Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Productextendedspecs2
     {
 
@@ -13980,7 +13980,7 @@ public Productextendedspecs2Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Extendedspecs3Attributename>))]
     public enum Extendedspecs3Attributename
     {
@@ -14023,7 +14023,7 @@ public Productextendedspecs2Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serialnumberdetails2
     {
 
@@ -14044,7 +14044,7 @@ public Productextendedspecs2Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shipmentdetails
     {
 
@@ -14146,7 +14146,7 @@ public Productextendedspecs2Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Productextendedspecs3
     {
 
@@ -14167,7 +14167,7 @@ public Productextendedspecs2Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Suborders
     {
 
@@ -14218,7 +14218,7 @@ public Productextendedspecs2Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Links8
     {
 
@@ -14251,7 +14251,7 @@ public Links8Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<DetailsItemstatus>))]
     public enum DetailsItemstatus
     {
@@ -14264,7 +14264,7 @@ public Links8Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<DetailsClass>))]
     public enum DetailsClass
     {
@@ -14304,7 +14304,7 @@ public Links8Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<DetailsSkustatus>))]
     public enum DetailsSkustatus
     {
@@ -14314,7 +14314,7 @@ public Links8Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<DetailsEnduserrequired>))]
     public enum DetailsEnduserrequired
     {
@@ -14327,7 +14327,7 @@ public Links8Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<DetailsBackorderflag>))]
     public enum DetailsBackorderflag
     {
@@ -14340,7 +14340,7 @@ public Links8Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Details2Class>))]
     public enum Details2Class
     {
@@ -14380,7 +14380,7 @@ public Links8Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Details2Enduserrequired>))]
     public enum Details2Enduserrequired
     {
@@ -14393,7 +14393,7 @@ public Links8Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Details2Backorderflag>))]
     public enum Details2Backorderflag
     {
@@ -14406,7 +14406,7 @@ public Links8Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Warehousedetails
     {
 
@@ -14451,7 +14451,7 @@ public WarehousedetailsWarehouseid Warehouseid { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shipment
     {
 
@@ -14481,7 +14481,7 @@ public WarehousedetailsWarehouseid Warehouseid { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Serialnumberdetails3
     {
 
@@ -14502,7 +14502,7 @@ public WarehousedetailsWarehouseid Warehouseid { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Shipmentdetails2
     {
 
@@ -14601,7 +14601,7 @@ public WarehousedetailsWarehouseid Warehouseid { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Productextendedspecs4
     {
 
@@ -14622,7 +14622,7 @@ public WarehousedetailsWarehouseid Warehouseid { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Lines12Linetype>))]
     public enum Lines12Linetype
     {
@@ -14635,7 +14635,7 @@ public WarehousedetailsWarehouseid Warehouseid { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Enduser2
     {
 
@@ -14686,7 +14686,7 @@ public WarehousedetailsWarehouseid Warehouseid { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Productextendedspecs5
     {
 
@@ -14707,7 +14707,7 @@ public Productextendedspecs5Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Extendedspecs6Attributename>))]
     public enum Extendedspecs6Attributename
     {
@@ -14753,7 +14753,7 @@ public Productextendedspecs5Attributename Attributename { get; set; }
     /// <summary>
     /// A list of serial numbers of the line items contained in the shipment.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class SerialNumbers
     {
 
@@ -14774,7 +14774,7 @@ public Productextendedspecs5Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Productextendedspecs2Attributename>))]
     public enum Productextendedspecs2Attributename
     {
@@ -14802,7 +14802,7 @@ public Productextendedspecs5Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Packagedetails
     {
 
@@ -14829,7 +14829,7 @@ public Productextendedspecs5Attributename Attributename { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Links9
     {
 
@@ -14862,7 +14862,7 @@ public Links9Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Links8Topic>))]
     public enum Links8Topic
     {
@@ -14875,7 +14875,7 @@ public Links9Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Links8Type>))]
     public enum Links8Type
     {
@@ -14891,7 +14891,7 @@ public Links9Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<WarehousedetailsWarehouseid>))]
     public enum WarehousedetailsWarehouseid
     {
@@ -14913,7 +14913,7 @@ public Links9Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     public partial class Packagedetails2
     {
 
@@ -14940,7 +14940,7 @@ public Links9Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Productextendedspecs5Attributename>))]
     public enum Productextendedspecs5Attributename
     {
@@ -14968,7 +14968,7 @@ public Links9Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Links9Topic>))]
     public enum Links9Topic
     {
@@ -14981,7 +14981,7 @@ public Links9Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     [JsonConverter(typeof(JsonStringEnumConverter<Links9Type>))]
     public enum Links9Type
     {
@@ -14997,7 +14997,7 @@ public Links9Type Type { get; set; }
 
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<version>")]
+    [System.CodeDom.Compiler.GeneratedCode("Refitter", "<version>")]
     internal class DateFormatConverter : JsonConverter<System.DateTimeOffset>
     {
         public override System.DateTimeOffset Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
