@@ -2,6 +2,7 @@
 
 using System.Text.RegularExpressions;
 using Refitter.Core.Validation.Model;
+using Refitter.Core.Validation.Reading;
 
 namespace Refitter.Core.Validation;
 
@@ -112,7 +113,7 @@ internal sealed class SpecRuleValidator
             Within("components", () => Walk(document.Components));
 
         if (document.ExternalDocs != null)
-            Within("externalDocs", () => Walk(document.ExternalDocs));
+            Within(OpenApiNames.ExternalDocs, () => Walk(document.ExternalDocs));
 
         if (document.Tags != null)
         {
@@ -242,7 +243,7 @@ internal sealed class SpecRuleValidator
 
         pathItemLoop.Push(pathItem);
         if (pathItem.Parameters != null)
-            Within("parameters", () => Walk(pathItem.Parameters));
+            Within(OpenApiNames.Parameters, () => Walk(pathItem.Parameters));
 
         if (pathItem.Operations != null)
         {
@@ -258,7 +259,7 @@ internal sealed class SpecRuleValidator
     private void Walk(SpecOperation operation)
     {
         if (operation.Parameters != null)
-            Within("parameters", () => Walk(operation.Parameters));
+            Within(OpenApiNames.Parameters, () => Walk(operation.Parameters));
 
         if (operation.RequestBody != null)
             Within("requestBody", () => Walk(operation.RequestBody));
@@ -289,7 +290,7 @@ internal sealed class SpecRuleValidator
             ErrorAt("in", FieldIsRequired("in", "parameter"));
 
         if (parameter.In == SpecParameterLocation.Path && !parameter.Required)
-            ErrorAt("required", "\"required\" must be true when parameter location is \"path\"");
+            ErrorAt(OpenApiNames.Required, "\"required\" must be true when parameter location is \"path\"");
 
         var encodedName = string.IsNullOrEmpty(parameter.Name) ? string.Empty : parameter.Name!.Replace("~", "~0").Replace("/", "~1");
         if (parameter.In == SpecParameterLocation.Path
@@ -300,10 +301,10 @@ internal sealed class SpecRuleValidator
         }
 
         if (parameter.Schema != null)
-            Within("schema", () => Walk(parameter.Schema));
+            Within(OpenApiNames.Schema, () => Walk(parameter.Schema));
 
         if (parameter.Content != null)
-            Within("content", () => Walk(parameter.Content));
+            Within(OpenApiNames.Content, () => Walk(parameter.Content));
     }
 
     private void Walk(SpecRequestBody? requestBody)
@@ -312,7 +313,7 @@ internal sealed class SpecRuleValidator
             return;
 
         if (requestBody.Content != null)
-            Within("content", () => Walk(requestBody.Content));
+            Within(OpenApiNames.Content, () => Walk(requestBody.Content));
     }
 
     private void Walk(SpecResponses responses)
@@ -341,10 +342,10 @@ internal sealed class SpecRuleValidator
             return;
 
         if (response.Description == null)
-            ErrorAt("description", FieldIsRequired("description", "response"));
+            ErrorAt(OpenApiNames.Description, FieldIsRequired(OpenApiNames.Description, "response"));
 
         if (response.Content != null)
-            Within("content", () => Walk(response.Content));
+            Within(OpenApiNames.Content, () => Walk(response.Content));
 
         WithinEach("links", response.Links, Walk);
         WithinEach("headers", response.Headers, Walk);
@@ -365,7 +366,7 @@ internal sealed class SpecRuleValidator
             return;
 
         if (mediaType.Schema != null)
-            Within("schema", () => Walk(mediaType.Schema));
+            Within(OpenApiNames.Schema, () => Walk(mediaType.Schema));
 
         if (mediaType.Encoding != null)
         {
@@ -395,10 +396,10 @@ internal sealed class SpecRuleValidator
             return;
 
         if (header.Content != null)
-            Within("content", () => Walk(header.Content));
+            Within(OpenApiNames.Content, () => Walk(header.Content));
 
         if (header.Schema != null)
-            Within("schema", () => Walk(header.Schema));
+            Within(OpenApiNames.Schema, () => Walk(header.Schema));
     }
 
     private void Walk(SpecLink? link)
@@ -426,8 +427,8 @@ internal sealed class SpecRuleValidator
     {
         ValidateKeys(components.Schemas?.Keys, "schemas");
         ValidateKeys(components.Responses?.Keys, "responses");
-        ValidateKeys(components.Parameters?.Keys, "parameters");
-        ValidateKeys(components.Examples?.Keys, "examples");
+        ValidateKeys(components.Parameters?.Keys, OpenApiNames.Parameters);
+        ValidateKeys(components.Examples?.Keys, OpenApiNames.Examples);
         ValidateKeys(components.RequestBodies?.Keys, "requestBodies");
         ValidateKeys(components.Headers?.Keys, "headers");
         ValidateKeys(components.SecuritySchemes?.Keys, "securitySchemes");
@@ -437,7 +438,7 @@ internal sealed class SpecRuleValidator
         WithinEach("schemas", components.Schemas, Walk);
         WithinEach("callbacks", components.Callbacks, Walk);
         WithinEach("pathItems", components.PathItems, Walk);
-        WithinEach("parameters", components.Parameters, Walk);
+        WithinEach(OpenApiNames.Parameters, components.Parameters, Walk);
         WithinEach("headers", components.Headers, Walk);
         WithinEach("links", components.Links, Walk);
         WithinEach("requestBodies", components.RequestBodies, Walk);
@@ -507,7 +508,7 @@ internal sealed class SpecRuleValidator
         }
 
         if (schema.ExternalDocs != null)
-            Within("externalDocs", () => Walk(schema.ExternalDocs));
+            Within(OpenApiNames.ExternalDocs, () => Walk(schema.ExternalDocs));
 
         schemaLoop.Pop();
     }

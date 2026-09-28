@@ -15,7 +15,7 @@ internal sealed class OpenApiV3Reader
     private static readonly IReadOnlyDictionary<string, SpecParameterLocation> ParameterLocations =
         new Dictionary<string, SpecParameterLocation>(StringComparer.OrdinalIgnoreCase)
         {
-            ["query"] = SpecParameterLocation.Query,
+            [OpenApiNames.Query] = SpecParameterLocation.Query,
             ["header"] = SpecParameterLocation.Header,
             ["path"] = SpecParameterLocation.Path,
             ["cookie"] = SpecParameterLocation.Cookie,
@@ -44,7 +44,7 @@ internal sealed class OpenApiV3Reader
 
     private static readonly HashSet<string> StandardHttpMethods = new(StringComparer.Ordinal)
     {
-        "get", "put", "post", "delete", "options", "head", "patch", "trace", "query",
+        "get", "put", "post", "delete", "options", "head", "patch", "trace", OpenApiNames.Query,
     };
 
     private readonly OpenApiSpecificationVersion version;
@@ -95,7 +95,7 @@ internal sealed class OpenApiV3Reader
                 if (tags.Count > 0)
                     o.Tags = tags;
             })
-            .Field("externalDocs", (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c))
+            .Field(OpenApiNames.ExternalDocs, (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c))
             .Field("security", (o, n, c) => o.Security = n.CreateList("OpenApiSecurityRequirement", LoadSecurityRequirement, c));
         if (is31)
         {
@@ -124,13 +124,13 @@ internal sealed class OpenApiV3Reader
         infoFields = new FieldMap<SpecInfo>()
             .Field("title", (o, n, _) => o.Title = n.GetScalarValue())
             .Field("version", (o, n, _) => o.Version = n.GetScalarValue())
-            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("termsOfService", (_, n, _) => ReadUri(n))
             .Field("contact", (o, n, c) => o.Contact = LoadContact(n, c))
             .Field("license", (o, n, c) => o.License = LoadLicense(n, c))
             .Extensions();
         if (is31)
-            infoFields.Field("summary", (_, n, _) => n.GetScalarValue());
+            infoFields.Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue());
 
         contactFields = new FieldMap<SpecContact>()
             .Field("name", (_, n, _) => n.GetScalarValue())
@@ -147,7 +147,7 @@ internal sealed class OpenApiV3Reader
 
         serverFields = new FieldMap<SpecServer>()
             .Field("url", (o, n, _) => o.Url = n.GetScalarValue())
-            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("variables", (o, n, c) => o.Variables = n.CreateMap("OpenApiServerVariable", LoadServerVariable, c));
         if (is32)
             serverFields.Field("name", (_, n, _) => n.GetScalarValue()).Extensions();
@@ -155,16 +155,16 @@ internal sealed class OpenApiV3Reader
             serverFields.Pattern(FieldMap<SpecServer>.IsExtension, (_, p, n, _) => ReadIfNamed(p, "x-oai-name", n));
 
         serverVariableFields = new FieldMap<SpecServerVariable>()
-            .Field("enum", (_, n, c) => n.CreateSimpleList("String", item => item.GetScalarValue(), c))
+            .Field("enum", (_, n, c) => n.CreateSimpleList(OpenApiNames.StringType, item => item.GetScalarValue(), c))
             .Field("default", (o, n, _) => o.Default = n.GetScalarValue())
-            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Extensions();
 
         componentsFields = new FieldMap<SpecComponents>()
-            .Field("schemas", (o, n, c) => o.Schemas = n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field("schemas", (o, n, c) => o.Schemas = n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
             .Field("responses", (o, n, c) => o.Responses = n.CreateMap("IOpenApiResponse", LoadResponse, c))
-            .Field("parameters", (o, n, c) => o.Parameters = n.CreateMap("IOpenApiParameter", LoadParameter, c))
-            .Field("examples", (o, n, c) => o.Examples = n.CreateMap("IOpenApiExample", LoadExample, c))
+            .Field(OpenApiNames.Parameters, (o, n, c) => o.Parameters = n.CreateMap("IOpenApiParameter", LoadParameter, c))
+            .Field(OpenApiNames.Examples, (o, n, c) => o.Examples = n.CreateMap(OpenApiNames.ExampleType, LoadExample, c))
             .Field("requestBodies", (o, n, c) => o.RequestBodies = n.CreateMap("IOpenApiRequestBody", LoadRequestBody, c))
             .Field("headers", (o, n, c) => o.Headers = n.CreateMap("IOpenApiHeader", LoadHeader, c))
             .Field("securitySchemes", (o, n, c) => o.SecuritySchemes = n.CreateMap("IOpenApiSecurityScheme", LoadSecurityScheme, c))
@@ -174,15 +174,15 @@ internal sealed class OpenApiV3Reader
         if (is31)
             componentsFields.Field("pathItems", (o, n, c) => o.PathItems = n.CreateMap("IOpenApiPathItem", LoadPathItem, c));
         if (is32)
-            componentsFields.Field("mediaTypes", (o, n, c) => o.MediaTypes = n.CreateMap("IOpenApiMediaType", LoadMediaType, c));
+            componentsFields.Field("mediaTypes", (o, n, c) => o.MediaTypes = n.CreateMap(OpenApiNames.MediaTypeType, LoadMediaType, c));
 
         pathsFields = new FieldMap<SpecPaths>()
             .Pattern(s => s.StartsWith("/", StringComparison.OrdinalIgnoreCase), (o, k, n, c) => o.Add(k, LoadPathItem(n, c)))
             .Extensions();
 
         pathItemFields = new FieldMap<SpecPathItem>()
-            .Field("summary", (_, n, _) => n.GetScalarValue())
-            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("get", (o, n, c) => o.AddOperation("get", LoadOperation(n, c)))
             .Field("put", (o, n, c) => o.AddOperation("put", LoadOperation(n, c)))
             .Field("post", (o, n, c) => o.AddOperation("post", LoadOperation(n, c)))
@@ -192,26 +192,26 @@ internal sealed class OpenApiV3Reader
             .Field("patch", (o, n, c) => o.AddOperation("patch", LoadOperation(n, c)))
             .Field("trace", (o, n, c) => o.AddOperation("trace", LoadOperation(n, c)))
             .Field("servers", (_, n, c) => n.CreateList("OpenApiServer", LoadServer, c))
-            .Field("parameters", (o, n, c) => o.Parameters = n.CreateList("IOpenApiParameter", LoadParameter, c))
+            .Field(OpenApiNames.Parameters, (o, n, c) => o.Parameters = n.CreateList("IOpenApiParameter", LoadParameter, c))
             .Extensions();
         if (is32)
         {
             pathItemFields
-                .Field("query", (o, n, c) => o.AddOperation("query", LoadOperation(n, c)))
+                .Field(OpenApiNames.Query, (o, n, c) => o.AddOperation(OpenApiNames.Query, LoadOperation(n, c)))
                 .Field("additionalOperations", LoadAdditionalOperations);
         }
 
         operationFields = new FieldMap<SpecOperation>()
             .Field("tags", (_, n, c) => n.CreateSimpleList("OpenApiTagReference", item => item.GetScalarValue(), c))
-            .Field("summary", (_, n, _) => n.GetScalarValue())
-            .Field("description", (_, n, _) => n.GetScalarValue())
-            .Field("externalDocs", (_, n, c) => LoadExternalDocs(n, c))
+            .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.ExternalDocs, (_, n, c) => LoadExternalDocs(n, c))
             .Field("operationId", (_, n, _) => n.GetScalarValue())
-            .Field("parameters", (o, n, c) => o.Parameters = n.CreateList("IOpenApiParameter", LoadParameter, c))
+            .Field(OpenApiNames.Parameters, (o, n, c) => o.Parameters = n.CreateList("IOpenApiParameter", LoadParameter, c))
             .Field("requestBody", (o, n, c) => o.RequestBody = LoadRequestBody(n, c))
             .Field("responses", (o, n, c) => o.Responses = LoadResponses(n, c))
             .Field("callbacks", (o, n, c) => o.Callbacks = n.CreateMap("IOpenApiCallback", LoadCallback, c))
-            .Field("deprecated", (_, n, _) => ReadBool(n))
+            .Field(OpenApiNames.Deprecated, (_, n, _) => ReadBool(n))
             .Field("security", (o, n, c) =>
             {
                 if (n is JsonArray)
@@ -227,48 +227,48 @@ internal sealed class OpenApiV3Reader
                 if (n.GetScalarValue().TryGetEnum(ParameterLocations, c, out var location))
                     o.In = location;
             })
-            .Field("description", (_, n, _) => n.GetScalarValue())
-            .Field("required", (o, n, _) =>
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Required, (o, n, _) =>
             {
                 var required = n.GetScalarValue();
                 if (required != null)
                     o.Required = bool.Parse(required);
             })
-            .Field("deprecated", (_, n, _) => ReadBool(n))
+            .Field(OpenApiNames.Deprecated, (_, n, _) => ReadBool(n))
             .Field("allowEmptyValue", (_, n, _) => ReadBool(n))
             .Field("allowReserved", (_, n, _) => ReadBool(n))
             .Field("style", (_, n, c) => n.GetScalarValue().TryGetEnum(ParameterStyles, c, out int _))
             .Field("explode", (_, n, _) => ReadBool(n))
-            .Field("schema", (o, n, c) => o.Schema = LoadSchema(n, c))
-            .Field("content", (o, n, c) => o.Content = n.CreateMap("IOpenApiMediaType", LoadMediaType, c))
-            .Field("examples", (o, n, c) => o.Examples = n.CreateMap("IOpenApiExample", LoadExample, c))
-            .Field("example", (_, _, _) => { })
+            .Field(OpenApiNames.Schema, (o, n, c) => o.Schema = LoadSchema(n, c))
+            .Field(OpenApiNames.Content, (o, n, c) => o.Content = n.CreateMap(OpenApiNames.MediaTypeType, LoadMediaType, c))
+            .Field(OpenApiNames.Examples, (o, n, c) => o.Examples = n.CreateMap(OpenApiNames.ExampleType, LoadExample, c))
+            .Field(OpenApiNames.Example, (_, _, _) => { })
             .Extensions();
 
         requestBodyFields = new FieldMap<SpecRequestBody>()
-            .Field("description", (_, n, _) => n.GetScalarValue())
-            .Field("content", (o, n, c) => o.Content = n.CreateMap("IOpenApiMediaType", LoadMediaType, c))
-            .Field("required", (_, n, _) => ReadBool(n))
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Content, (o, n, c) => o.Content = n.CreateMap(OpenApiNames.MediaTypeType, LoadMediaType, c))
+            .Field(OpenApiNames.Required, (_, n, _) => ReadBool(n))
             .Extensions();
 
         mediaTypeFields = new FieldMap<SpecMediaType>()
-            .Field("schema", (o, n, c) => o.Schema = LoadSchema(n, c))
-            .Field("examples", (o, n, c) => o.Examples = n.CreateMap("IOpenApiExample", LoadExample, c))
-            .Field("example", (_, _, _) => { })
-            .Field("encoding", (o, n, c) => o.Encoding = n.CreateMap("OpenApiEncoding", LoadEncoding, c));
+            .Field(OpenApiNames.Schema, (o, n, c) => o.Schema = LoadSchema(n, c))
+            .Field(OpenApiNames.Examples, (o, n, c) => o.Examples = n.CreateMap(OpenApiNames.ExampleType, LoadExample, c))
+            .Field(OpenApiNames.Example, (_, _, _) => { })
+            .Field("encoding", (o, n, c) => o.Encoding = n.CreateMap(OpenApiNames.EncodingType, LoadEncoding, c));
         if (is32)
         {
             mediaTypeFields
                 .Field("itemSchema", (_, n, c) => LoadSchema(n, c))
                 .Field("itemEncoding", (_, n, c) => LoadEncoding(n, c))
-                .Field("prefixEncoding", (_, n, c) => n.CreateList("OpenApiEncoding", LoadEncoding, c))
+                .Field("prefixEncoding", (_, n, c) => n.CreateList(OpenApiNames.EncodingType, LoadEncoding, c))
                 .Extensions();
         }
         else
         {
             mediaTypeFields
                 .Field("x-oai-itemEncoding", (_, n, c) => LoadEncoding(n, c))
-                .Field("x-oai-prefixEncoding", (_, n, c) => n.CreateList("OpenApiEncoding", LoadEncoding, c))
+                .Field("x-oai-prefixEncoding", (_, n, c) => n.CreateList(OpenApiNames.EncodingType, LoadEncoding, c))
                 .Pattern(FieldMap<SpecMediaType>.IsExtension, (_, p, n, c) =>
                 {
                     if (p.Equals("x-oai-itemSchema", StringComparison.OrdinalIgnoreCase))
@@ -286,9 +286,9 @@ internal sealed class OpenApiV3Reader
         if (is32)
         {
             encodingFields
-                .Field("encoding", (_, n, c) => n.CreateMap("OpenApiEncoding", LoadEncoding, c))
+                .Field("encoding", (_, n, c) => n.CreateMap(OpenApiNames.EncodingType, LoadEncoding, c))
                 .Field("itemEncoding", (_, n, c) => LoadEncoding(n, c))
-                .Field("prefixEncoding", (_, n, c) => n.CreateList("OpenApiEncoding", LoadEncoding, c));
+                .Field("prefixEncoding", (_, n, c) => n.CreateList(OpenApiNames.EncodingType, LoadEncoding, c));
         }
 
         responsesFields = new FieldMap<SpecResponses>()
@@ -296,35 +296,35 @@ internal sealed class OpenApiV3Reader
             .Extensions();
 
         responseFields = new FieldMap<SpecResponse>()
-            .Field("description", (o, n, _) => o.Description = n.GetScalarValue())
+            .Field(OpenApiNames.Description, (o, n, _) => o.Description = n.GetScalarValue())
             .Field("headers", (o, n, c) => o.Headers = n.CreateMap("IOpenApiHeader", LoadHeader, c))
-            .Field("content", (o, n, c) => o.Content = n.CreateMap("IOpenApiMediaType", LoadMediaType, c))
+            .Field(OpenApiNames.Content, (o, n, c) => o.Content = n.CreateMap(OpenApiNames.MediaTypeType, LoadMediaType, c))
             .Field("links", (o, n, c) => o.Links = n.CreateMap("IOpenApiLink", LoadLink, c));
         if (is32)
-            responseFields.Field("summary", (_, n, _) => n.GetScalarValue()).Extensions();
+            responseFields.Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue()).Extensions();
         else
             responseFields.Pattern(FieldMap<SpecResponse>.IsExtension, (_, p, n, _) => ReadIfNamed(p, "x-oai-summary", n));
 
         headerFields = new FieldMap<SpecHeader>()
-            .Field("description", (_, n, _) => n.GetScalarValue())
-            .Field("required", (_, n, _) => ReadBool(n))
-            .Field("deprecated", (_, n, _) => ReadBool(n))
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Required, (_, n, _) => ReadBool(n))
+            .Field(OpenApiNames.Deprecated, (_, n, _) => ReadBool(n))
             .Field("allowEmptyValue", (_, n, _) => ReadBool(n))
             .Field("allowReserved", (_, n, _) => ReadBool(n))
             .Field("style", (_, n, c) => n.GetScalarValue().TryGetEnum(ParameterStyles, c, out int _))
             .Field("explode", (_, n, _) => ReadBool(n))
-            .Field("schema", (o, n, c) => o.Schema = LoadSchema(n, c))
-            .Field("content", (o, n, c) => o.Content = n.CreateMap("IOpenApiMediaType", LoadMediaType, c))
-            .Field("examples", (o, n, c) => o.Examples = n.CreateMap("IOpenApiExample", LoadExample, c))
-            .Field("example", (o, n, _) => o.Example = n)
+            .Field(OpenApiNames.Schema, (o, n, c) => o.Schema = LoadSchema(n, c))
+            .Field(OpenApiNames.Content, (o, n, c) => o.Content = n.CreateMap(OpenApiNames.MediaTypeType, LoadMediaType, c))
+            .Field(OpenApiNames.Examples, (o, n, c) => o.Examples = n.CreateMap(OpenApiNames.ExampleType, LoadExample, c))
+            .Field(OpenApiNames.Example, (o, n, _) => o.Example = n)
             .Extensions();
 
         linkFields = new FieldMap<SpecLink>()
             .Field("operationRef", (_, n, _) => n.GetScalarValue())
             .Field("operationId", (_, n, _) => n.GetScalarValue())
-            .Field("parameters", (_, n, c) => n.CreateSimpleMap("RuntimeExpressionAnyWrapper", LoadRuntimeExpressionAnyWrapper, c))
+            .Field(OpenApiNames.Parameters, (_, n, c) => n.CreateSimpleMap("RuntimeExpressionAnyWrapper", LoadRuntimeExpressionAnyWrapper, c))
             .Field("requestBody", (_, n, _) => LoadRuntimeExpressionAnyWrapper(n))
-            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("server", (o, n, c) => o.Server = LoadServer(n, c))
             .Extensions();
 
@@ -337,8 +337,8 @@ internal sealed class OpenApiV3Reader
             .Extensions();
 
         exampleFields = new FieldMap<SpecExample>()
-            .Field("summary", (_, n, _) => n.GetScalarValue())
-            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("value", (_, _, _) => { })
             .Field("externalValue", (_, n, _) => n.GetScalarValue());
         if (is32)
@@ -401,7 +401,7 @@ internal sealed class OpenApiV3Reader
                 if (n.GetScalarValue().TryGetEnum(SecuritySchemeTypes, c, out var type))
                     o.Type = type;
             })
-            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
             .Field("in", (o, n, c) =>
             {
@@ -416,7 +416,7 @@ internal sealed class OpenApiV3Reader
         {
             securitySchemeFields
                 .Field("oauth2MetadataUrl", (_, n, _) => ReadUri(n))
-                .Field("deprecated", (_, n, _) => ReadBool(n))
+                .Field(OpenApiNames.Deprecated, (_, n, _) => ReadBool(n))
                 .Extensions();
         }
         else
@@ -450,7 +450,7 @@ internal sealed class OpenApiV3Reader
             .Field("authorizationUrl", (o, n, _) => o.AuthorizationUrl = ReadUri(n))
             .Field("tokenUrl", (o, n, _) => o.TokenUrl = ReadUri(n))
             .Field("refreshUrl", (_, n, _) => ReadUri(n))
-            .Field("scopes", (o, n, c) => o.Scopes = n.CreateSimpleMap("String", item => item.GetScalarValue(), c)
+            .Field("scopes", (o, n, c) => o.Scopes = n.CreateSimpleMap(OpenApiNames.StringType, item => item.GetScalarValue(), c)
                 .Where(scope => scope.Value != null)
                 .ToDictionary(scope => scope.Key, scope => scope.Value!, StringComparer.Ordinal));
         if (is32)
@@ -468,12 +468,12 @@ internal sealed class OpenApiV3Reader
 
         tagFields = new FieldMap<SpecTag>()
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
-            .Field("description", (_, n, _) => n.GetScalarValue())
-            .Field("externalDocs", (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c));
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.ExternalDocs, (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c));
         if (is32)
         {
             tagFields
-                .Field("summary", (_, n, _) => n.GetScalarValue())
+                .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
                 .Field("parent", (_, n, _) => n.GetScalarValue())
                 .Field("kind", (_, n, _) => n.GetScalarValue())
                 .Extensions();
@@ -492,7 +492,7 @@ internal sealed class OpenApiV3Reader
         }
 
         externalDocsFields = new FieldMap<SpecExternalDocs>()
-            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("url", (o, n, _) => o.Url = ReadUri(n))
             .Extensions();
     }
@@ -524,16 +524,16 @@ internal sealed class OpenApiV3Reader
             .Field("uniqueItems", (_, n, _) => ReadBool(n))
             .Field("maxProperties", (_, n, _) => ReadInt(n))
             .Field("minProperties", (_, n, _) => ReadInt(n))
-            .Field("required", (o, n, c) => o.Required = new HashSet<string>(
-                n.CreateSimpleList("String", item => item.GetScalarValue(), c).OfType<string>(),
+            .Field(OpenApiNames.Required, (o, n, c) => o.Required = new HashSet<string>(
+                n.CreateSimpleList(OpenApiNames.StringType, item => item.GetScalarValue(), c).OfType<string>(),
                 StringComparer.Ordinal))
             .Field("enum", (_, n, c) => n.CreateListOfAny(c))
-            .Field("allOf", (o, n, c) => o.AllOf = n.CreateList("IOpenApiSchema", LoadSchema, c))
-            .Field("oneOf", (o, n, c) => o.OneOf = n.CreateList("IOpenApiSchema", LoadSchema, c))
-            .Field("anyOf", (o, n, c) => o.AnyOf = n.CreateList("IOpenApiSchema", LoadSchema, c))
+            .Field("allOf", (o, n, c) => o.AllOf = n.CreateList(OpenApiNames.SchemaType, LoadSchema, c))
+            .Field("oneOf", (o, n, c) => o.OneOf = n.CreateList(OpenApiNames.SchemaType, LoadSchema, c))
+            .Field("anyOf", (o, n, c) => o.AnyOf = n.CreateList(OpenApiNames.SchemaType, LoadSchema, c))
             .Field("not", (o, n, c) => o.Not = LoadSchema(n, c))
             .Field("items", (o, n, c) => o.Items = LoadSchema(n, c))
-            .Field("properties", (o, n, c) => o.Properties = n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field("properties", (o, n, c) => o.Properties = n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
             .Field("additionalProperties", (o, n, c) =>
             {
                 if (n is JsonValue)
@@ -541,16 +541,16 @@ internal sealed class OpenApiV3Reader
                 else
                     o.AdditionalProperties = LoadSchema(n, c);
             })
-            .Field("description", (_, n, _) => n.GetScalarValue())
+            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("format", (_, n, _) => n.GetScalarValue())
             .Field("default", (_, _, _) => { })
             .Field("discriminator", (o, n, c) => o.Discriminator = LoadDiscriminator(n, c))
             .Field("readOnly", (_, n, _) => ReadBool(n))
             .Field("writeOnly", (_, n, _) => ReadBool(n))
             .Field("xml", (_, n, c) => LoadXml(n, c))
-            .Field("externalDocs", (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c))
-            .Field("example", (_, _, _) => { })
-            .Field("deprecated", (_, n, _) => ReadBool(n))
+            .Field(OpenApiNames.ExternalDocs, (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c))
+            .Field(OpenApiNames.Example, (_, _, _) => { })
+            .Field(OpenApiNames.Deprecated, (_, n, _) => ReadBool(n))
             .Extensions();
 
         if (!is31)
@@ -560,7 +560,7 @@ internal sealed class OpenApiV3Reader
                 .Field("exclusiveMinimum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
                 .Field("type", (_, n, _) => n.GetScalarValue().ToJsonSchemaType())
                 .Field("nullable", (_, n, _) => bool.TryParse(n.GetScalarValue(), out _))
-                .Field("x-jsonschema-patternProperties", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+                .Field("x-jsonschema-patternProperties", (_, n, c) => n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
                 .Field("x-jsonschema-unevaluatedProperties", (_, n, c) => ReadBoolOrSchema(n, c))
                 .Field("x-jsonschema-$anchor", (_, n, _) => n.GetScalarValue())
                 .Field("x-jsonschema-contentEncoding", (_, n, _) => n.GetScalarValue())
@@ -570,7 +570,7 @@ internal sealed class OpenApiV3Reader
                 .Field("x-jsonschema-maxContains", (_, n, _) => ReadUnsignedInt(n))
                 .Field("x-jsonschema-minContains", (_, n, _) => ReadUnsignedInt(n))
                 .Field("x-jsonschema-propertyNames", (_, n, c) => LoadSchema(n, c))
-                .Field("x-jsonschema-dependentSchemas", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+                .Field("x-jsonschema-dependentSchemas", (_, n, c) => n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
                 .Field("x-jsonschema-if", (_, n, c) => LoadSchema(n, c))
                 .Field("x-jsonschema-then", (_, n, c) => LoadSchema(n, c))
                 .Field("x-jsonschema-else", (_, n, c) => LoadSchema(n, c));
@@ -583,7 +583,7 @@ internal sealed class OpenApiV3Reader
             .Field("$vocabulary", (_, n, c) => n.CreateSimpleMap("Nullable`1", ReadNullableBool, c))
             .Field("$dynamicRef", (_, n, _) => n.GetScalarValue())
             .Field("$dynamicAnchor", (_, n, _) => n.GetScalarValue())
-            .Field("$defs", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field("$defs", (_, n, c) => n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
             .Field("$anchor", (_, n, _) => n.GetScalarValue())
             .Field("exclusiveMaximum", (_, n, _) => n.GetScalarValue())
             .Field("exclusiveMinimum", (_, n, _) => n.GetScalarValue())
@@ -602,13 +602,13 @@ internal sealed class OpenApiV3Reader
                     return;
                 }
 
-                foreach (var type in n.CreateSimpleList("String", item => item.GetScalarValue(), c).Where(type => type != null))
+                foreach (var type in n.CreateSimpleList(OpenApiNames.StringType, item => item.GetScalarValue(), c).Where(type => type != null))
                 {
                     type!.ToJsonSchemaType();
                 }
             })
             .Field("const", (_, n, _) => n.GetScalarValue())
-            .Field("patternProperties", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field("patternProperties", (_, n, c) => n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
             .Field("propertyNames", (_, n, c) => LoadSchema(n, c))
             .Field("nullable", (_, n, _) =>
             {
@@ -616,9 +616,9 @@ internal sealed class OpenApiV3Reader
                 if (nullable != null)
                     ScalarChecks.CheckBoolean(nullable);
             })
-            .Field("examples", (_, n, c) => n.CreateListOfAny(c))
-            .Field("dependentRequired", (_, n, c) => n.CreateArrayMap("String", item => item.GetScalarValue(), c))
-            .Field("dependentSchemas", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
+            .Field(OpenApiNames.Examples, (_, n, c) => n.CreateListOfAny(c))
+            .Field("dependentRequired", (_, n, c) => n.CreateArrayMap(OpenApiNames.StringType, item => item.GetScalarValue(), c))
+            .Field("dependentSchemas", (_, n, c) => n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
             .Field("if", (_, n, c) => LoadSchema(n, c))
             .Field("then", (_, n, c) => LoadSchema(n, c))
             .Field("else", (_, n, c) => LoadSchema(n, c));
@@ -728,7 +728,7 @@ internal sealed class OpenApiV3Reader
 
     private SpecMediaType LoadMediaType(JsonNode node, ParsingContext context)
     {
-        var jsonObject = node.CheckMapNode("content", context);
+        var jsonObject = node.CheckMapNode(OpenApiNames.Content, context);
         if (version >= OpenApiSpecificationVersion.OpenApi3_2)
         {
             var reference = jsonObject.GetReferencePointer();
@@ -805,7 +805,7 @@ internal sealed class OpenApiV3Reader
 
     private SpecExample LoadExample(JsonNode node, ParsingContext context)
     {
-        var jsonObject = node.CheckMapNode("example", context);
+        var jsonObject = node.CheckMapNode(OpenApiNames.Example, context);
         var reference = jsonObject.GetReferencePointer();
         if (reference != null)
             return new SpecExample { Reference = GetReference(reference) };
@@ -824,7 +824,7 @@ internal sealed class OpenApiV3Reader
             return allowed ? new SpecSchema() : new SpecSchema { Not = new SpecSchema() };
         }
 
-        var jsonObject = node.CheckMapNode("schema", context);
+        var jsonObject = node.CheckMapNode(OpenApiNames.Schema, context);
         var reference = jsonObject.GetReferencePointer();
         if (version >= OpenApiSpecificationVersion.OpenApi3_1 && jsonObject.TryGetPropertyValue("$id", out var id))
             id?.GetScalarValue();
@@ -892,7 +892,7 @@ internal sealed class OpenApiV3Reader
         foreach (var scheme in node.CheckMapNode("security", context))
         {
             requirement.Add(SpecReferences.Create(scheme.Key, null));
-            scheme.Value.CreateSimpleList("String", item => item.GetScalarValue(), context);
+            scheme.Value.CreateSimpleList(OpenApiNames.StringType, item => item.GetScalarValue(), context);
         }
 
         return requirement;
@@ -908,7 +908,7 @@ internal sealed class OpenApiV3Reader
     private SpecExternalDocs LoadExternalDocs(JsonNode node, ParsingContext context)
     {
         var externalDocs = new SpecExternalDocs();
-        node.CheckMapNode("externalDocs", context).ParseMap(externalDocs, externalDocsFields, context);
+        node.CheckMapNode(OpenApiNames.ExternalDocs, context).ParseMap(externalDocs, externalDocsFields, context);
         return externalDocs;
     }
 
