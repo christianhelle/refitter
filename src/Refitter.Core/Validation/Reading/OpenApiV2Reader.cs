@@ -21,6 +21,8 @@ internal sealed class OpenApiV2Reader
     private const string ResponseSchemaKey = "responseSchema";
     private const string ResponseProducesSetKey = "responseProducesSet";
     private const string ExamplesKey = "examples";
+    private const string FlowKey = "flow";
+    private const string FlowValueKey = "flowValue";
 
     private static readonly IReadOnlyDictionary<string, SpecParameterLocation> ParameterLocations =
         new Dictionary<string, SpecParameterLocation>(StringComparer.OrdinalIgnoreCase)
@@ -48,9 +50,6 @@ internal sealed class OpenApiV2Reader
     private readonly FieldMap<SpecSecurityScheme> securitySchemeFields;
     private readonly FieldMap<SpecTag> tagFields;
     private readonly FieldMap<SpecExternalDocs> externalDocsFields;
-
-    private string? flowValue;
-    private SpecOAuthFlow? flow;
 
     public OpenApiV2Reader()
     {
@@ -204,7 +203,7 @@ internal sealed class OpenApiV2Reader
                 if (readOnly != null)
                 {
                     GetOrCreateSchema(o);
-                    bool.Parse(readOnly);
+                    ScalarChecks.CheckBoolean(readOnly);
                 }
             })
             .Field("default", (o, _, _) => GetOrCreateSchema(o))
@@ -262,13 +261,13 @@ internal sealed class OpenApiV2Reader
             .Field("exclusiveMaximum", (o, n, _) =>
             {
                 GetOrCreateSchema(o);
-                bool.Parse(n.GetScalarValue()!);
+                ScalarChecks.CheckBoolean(n.GetScalarValue()!);
             })
             .Field("minimum", (o, n, _) => ReadSchemaText(o, n))
             .Field("exclusiveMinimum", (o, n, _) =>
             {
                 GetOrCreateSchema(o);
-                bool.Parse(n.GetScalarValue()!);
+                ScalarChecks.CheckBoolean(n.GetScalarValue()!);
             })
             .Field("maxLength", (o, n, _) => ReadSchemaInt(o, n))
             .Field("minLength", (o, n, _) => ReadSchemaInt(o, n))
@@ -285,7 +284,7 @@ internal sealed class OpenApiV2Reader
                 if (uniqueItems != null)
                 {
                     GetOrCreateSchema(o);
-                    bool.Parse(uniqueItems);
+                    ScalarChecks.CheckBoolean(uniqueItems);
                 }
             })
             .Field("multipleOf", (o, n, _) =>
@@ -294,7 +293,7 @@ internal sealed class OpenApiV2Reader
                 if (multipleOf != null)
                 {
                     GetOrCreateSchema(o);
-                    decimal.Parse(multipleOf, CultureInfo.InvariantCulture);
+                    ScalarChecks.CheckDecimal(multipleOf, CultureInfo.InvariantCulture);
                 }
             })
             .Field("enum", (o, n, c) =>
@@ -310,12 +309,12 @@ internal sealed class OpenApiV2Reader
             {
                 var multipleOf = n.GetScalarValue();
                 if (multipleOf != null)
-                    decimal.Parse(multipleOf, NumberStyles.Float, CultureInfo.InvariantCulture);
+                    ScalarChecks.CheckDecimal(multipleOf, NumberStyles.Float, CultureInfo.InvariantCulture);
             })
             .Field("maximum", (_, n, _) => n.GetScalarValue())
-            .Field("exclusiveMaximum", (_, n, _) => bool.Parse(n.GetScalarValue()!))
+            .Field("exclusiveMaximum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
             .Field("minimum", (_, n, _) => n.GetScalarValue())
-            .Field("exclusiveMinimum", (_, n, _) => bool.Parse(n.GetScalarValue()!))
+            .Field("exclusiveMinimum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
             .Field("maxLength", (_, n, _) => ReadInt(n))
             .Field("minLength", (_, n, _) => ReadInt(n))
             .Field("pattern", (_, n, _) => n.GetScalarValue())
@@ -392,28 +391,23 @@ internal sealed class OpenApiV2Reader
                 if (n.GetScalarValue().TryGetEnum(ParameterLocations, c, out var location))
                     o.In = location;
             })
-            .Field("flow", (_, n, _) => flowValue = n.GetScalarValue())
-            .Field("authorizationUrl", (_, n, _) =>
+            .Field("flow", (o, n, c) => c.SetTempStorage(FlowValueKey, n.GetScalarValue(), o))
+            .Field("authorizationUrl", (o, n, c) =>
             {
                 var url = n.GetScalarValue();
-                if (flow != null && url != null)
-                    flow.AuthorizationUrl = new Uri(url, UriKind.RelativeOrAbsolute);
+                if (url != null)
+                    c.GetFromTempStorage<SpecOAuthFlow>(FlowKey, o)!.AuthorizationUrl = new Uri(url, UriKind.RelativeOrAbsolute);
             })
-            .Field("tokenUrl", (_, n, _) =>
+            .Field("tokenUrl", (o, n, c) =>
             {
                 var url = n.GetScalarValue();
-                if (flow != null && url != null)
-                    flow.TokenUrl = new Uri(url, UriKind.RelativeOrAbsolute);
+                if (url != null)
+                    c.GetFromTempStorage<SpecOAuthFlow>(FlowKey, o)!.TokenUrl = new Uri(url, UriKind.RelativeOrAbsolute);
             })
-            .Field("scopes", (_, n, c) =>
-            {
-                if (flow != null)
-                {
-                    flow.Scopes = n.CreateSimpleMap("String", item => item.GetScalarValue(), c)
-                        .Where(scope => scope.Value != null)
-                        .ToDictionary(scope => scope.Key, scope => scope.Value!, StringComparer.Ordinal);
-                }
-            })
+            .Field("scopes", (o, n, c) => c.GetFromTempStorage<SpecOAuthFlow>(FlowKey, o)!.Scopes = n
+                .CreateSimpleMap("String", item => item.GetScalarValue(), c)
+                .Where(scope => scope.Value != null)
+                .ToDictionary(scope => scope.Key, scope => scope.Value!, StringComparer.Ordinal))
             .Extensions();
 
         tagFields = new FieldMap<SpecTag>()
@@ -544,9 +538,10 @@ internal sealed class OpenApiV2Reader
         var produces = context.GetFromTempStorage<List<string?>>(OperationProducesKey);
         if ((produces != null || jsonObject.ContainsKey("produces")) && operation.Responses != null)
         {
-            foreach (var response in operation.Responses.Values.Where(response => response?.Reference == null))
+            foreach (var response in operation.Responses.Values)
             {
-                ProcessProduces(response!, context);
+                if (response is { Reference: null })
+                    ProcessProduces(response, context);
             }
         }
 
@@ -696,7 +691,7 @@ internal sealed class OpenApiV2Reader
         if (value != null)
         {
             GetOrCreateSchema(parameter);
-            int.Parse(value, CultureInfo.InvariantCulture);
+            ScalarChecks.CheckInt32(value, CultureInfo.InvariantCulture);
         }
     }
 
@@ -706,7 +701,7 @@ internal sealed class OpenApiV2Reader
         if (value != null)
         {
             GetOrCreateSchema(header);
-            int.Parse(value, CultureInfo.InvariantCulture);
+            ScalarChecks.CheckInt32(value, CultureInfo.InvariantCulture);
         }
     }
 
@@ -787,9 +782,10 @@ internal sealed class OpenApiV2Reader
         if (responses == null)
             return;
 
-        foreach (var response in responses.Where(response => response != null && response.Reference == null))
+        foreach (var response in responses)
         {
-            ProcessProduces(response!, context);
+            if (response is { Reference: null })
+                ProcessProduces(response, context);
         }
     }
 
@@ -839,11 +835,11 @@ internal sealed class OpenApiV2Reader
 
     private SpecSecurityScheme LoadSecurityScheme(JsonNode node, ParsingContext context)
     {
-        flowValue = null;
-        flow = new SpecOAuthFlow();
         var securityScheme = new SpecSecurityScheme();
+        var flow = new SpecOAuthFlow();
+        context.SetTempStorage(FlowKey, flow, securityScheme);
         node.CheckMapNode("securityScheme", context).ParseMap(securityScheme, securitySchemeFields, context);
-        securityScheme.Flows = flowValue switch
+        securityScheme.Flows = context.GetFromTempStorage<string>(FlowValueKey, securityScheme) switch
         {
             "implicit" => new SpecOAuthFlows { Implicit = flow },
             "password" => new SpecOAuthFlows { Password = flow },
@@ -996,13 +992,13 @@ internal sealed class OpenApiV2Reader
     {
         var value = node.GetScalarValue();
         if (value != null)
-            bool.Parse(value);
+            ScalarChecks.CheckBoolean(value);
     }
 
     private static void ReadInt(JsonNode node)
     {
         var value = node.GetScalarValue();
         if (value != null)
-            int.Parse(value, CultureInfo.InvariantCulture);
+            ScalarChecks.CheckInt32(value, CultureInfo.InvariantCulture);
     }
 }

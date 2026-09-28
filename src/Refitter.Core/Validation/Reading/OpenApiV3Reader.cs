@@ -510,7 +510,7 @@ internal sealed class OpenApiV3Reader
             {
                 var multipleOf = n.GetScalarValue();
                 if (multipleOf != null)
-                    decimal.Parse(multipleOf, NumberStyles.Float, CultureInfo.InvariantCulture);
+                    ScalarChecks.CheckDecimal(multipleOf, NumberStyles.Float, CultureInfo.InvariantCulture);
             })
             .Field("maximum", (_, n, _) => n.GetScalarValue())
             .Field("minimum", (_, n, _) => n.GetScalarValue())
@@ -554,8 +554,8 @@ internal sealed class OpenApiV3Reader
         if (!is31)
         {
             return fields
-                .Field("exclusiveMaximum", (_, n, _) => bool.Parse(n.GetScalarValue()!))
-                .Field("exclusiveMinimum", (_, n, _) => bool.Parse(n.GetScalarValue()!))
+                .Field("exclusiveMaximum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
+                .Field("exclusiveMinimum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
                 .Field("type", (_, n, _) => n.GetScalarValue()?.ToJsonSchemaType())
                 .Field("nullable", (_, n, _) => bool.TryParse(n.GetScalarValue(), out _))
                 .Field("x-jsonschema-patternProperties", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
@@ -612,7 +612,7 @@ internal sealed class OpenApiV3Reader
             {
                 var nullable = n.GetScalarValue();
                 if (nullable != null)
-                    bool.Parse(nullable);
+                    ScalarChecks.CheckBoolean(nullable);
             })
             .Field("examples", (_, n, c) => n.CreateListOfAny(c))
             .Field("dependentRequired", (_, n, c) => n.CreateArrayMap("String", item => item.GetScalarValue(), c))
@@ -1007,7 +1007,7 @@ internal sealed class OpenApiV3Reader
     {
         var value = node.GetScalarValue();
         if (value != null)
-            bool.Parse(value);
+            ScalarChecks.CheckBoolean(value);
     }
 
     private static bool? ReadNullableBool(JsonNode node)
@@ -1020,13 +1020,13 @@ internal sealed class OpenApiV3Reader
     {
         var value = node.GetScalarValue();
         if (value != null)
-            int.Parse(value, CultureInfo.InvariantCulture);
+            ScalarChecks.CheckInt32(value, CultureInfo.InvariantCulture);
     }
 
     private static void ReadUnsignedInt(JsonNode node)
     {
         var value = node.GetScalarValue();
         if (value != null)
-            uint.Parse(value, CultureInfo.InvariantCulture);
+            ScalarChecks.CheckUInt32(value, CultureInfo.InvariantCulture);
     }
 }
