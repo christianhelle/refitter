@@ -128,38 +128,41 @@ internal class ReturnTypeGenerator(
                 continue;
 
             var response = apiResponse.ActualResponse;
-
-            if (response.Content.Any())
+            if (TryGetStreamingContentSchema(response, out schema) ||
+                TryGetStreamingProducesSchema(operation, response, out schema))
             {
-                foreach (var contentEntry in response.Content)
-                {
-                    if (!IsStreamingContentType(contentEntry.Key))
-                        continue;
-
-                    schema = contentEntry.Value?.Schema;
-                    if (IsPrimitiveSchema(schema))
-                        continue;
-
-                    return true;
-                }
-            }
-
-            // Swagger 2.0 has no per-media-type schema, so the produces list is the only
-            // signal. A document-level produces list applies to every operation, so require
-            // all of them to be streaming - otherwise a single streaming entry alongside
-            // application/json would turn every operation in the document into a stream.
-            if (IsStreamingOnly(operation.ActualProduces))
-            {
-                schema = response.Schema;
-                if (IsPrimitiveSchema(schema))
-                    continue;
-
                 return true;
             }
         }
 
         schema = null;
         return false;
+    }
+
+    private static bool TryGetStreamingContentSchema(ApiResponse response, out ApiSchema? schema)
+    {
+        foreach (var contentEntry in response.Content)
+        {
+            if (!IsStreamingContentType(contentEntry.Key))
+                continue;
+
+            schema = contentEntry.Value?.Schema;
+            if (!IsPrimitiveSchema(schema))
+                return true;
+        }
+
+        schema = null;
+        return false;
+    }
+
+    private static bool TryGetStreamingProducesSchema(ApiOperation operation, ApiResponse response, out ApiSchema? schema)
+    {
+        // Swagger 2.0 has no per-media-type schema, so the produces list is the only
+        // signal. A document-level produces list applies to every operation, so require
+        // all of them to be streaming - otherwise a single streaming entry alongside
+        // application/json would turn every operation in the document into a stream.
+        schema = response.Schema;
+        return IsStreamingOnly(operation.ActualProduces) && !IsPrimitiveSchema(schema);
     }
 
     private static bool IsStreamingOnly(IEnumerable<string> produces)
