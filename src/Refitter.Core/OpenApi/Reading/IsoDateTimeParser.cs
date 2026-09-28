@@ -104,7 +104,7 @@ internal static class IsoDateTimeParser
             return false;
         }
 
-        var utc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(milliseconds);
+        var utc = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).UtcDateTime;
         value = match.Groups["offset"].Success ? utc.ToLocalTime() : utc;
         return true;
     }
