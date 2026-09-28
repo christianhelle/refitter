@@ -140,9 +140,11 @@ internal sealed class UniqueContractPropertyNameGenerator(
             }
 
             var uniqueName = candidate;
-            for (var suffix = 2; !usedNames.Add(uniqueName); suffix++)
+            var suffix = 2;
+            while (!usedNames.Add(uniqueName))
             {
                 uniqueName = candidate + suffix;
+                suffix++;
             }
 
             names[property] = uniqueName;
@@ -238,9 +240,11 @@ internal sealed class UniqueContractEnumNameGenerator : IContractEnumNameGenerat
 
             var candidate = defaultGenerator.Generate(i, GetOriginalName(schema, i, value), value, schema);
             var uniqueName = candidate;
-            for (var suffix = 2; !usedNames.Add(uniqueName); suffix++)
+            var suffix = 2;
+            while (!usedNames.Add(uniqueName))
             {
                 uniqueName = candidate + suffix;
+                suffix++;
             }
 
             names[i] = uniqueName;
