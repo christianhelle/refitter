@@ -199,7 +199,14 @@ internal sealed class ClassTemplateModel
 /// <summary>The model of a property in the class template.</summary>
 internal sealed class PropertyModel
 {
-    private static readonly HashSet<string?> RangeFormats = new() { "int32", "float", "double", "int64", "uint64", "decimal" };
+    private const string Int32Format = "int32";
+    private const string Int64Format = "int64";
+    private const string DoubleFormat = "double";
+    private const string DecimalFormat = "decimal";
+    private const string DoubleType = "double";
+    private const string DecimalType = "decimal";
+
+    private static readonly HashSet<string?> RangeFormats = new() { Int32Format, "float", DoubleFormat, Int64Format, "uint64", DecimalFormat };
 
     private readonly ClassTemplateModel classTemplateModel;
     private readonly ApiSchemaProperty property;
@@ -293,9 +300,9 @@ internal sealed class PropertyModel
         (property.ActualTypeSchema.Type.IsNumber() || property.ActualTypeSchema.Type.IsInteger()) &&
         (property.ActualSchema.Maximum.HasValue || property.ActualSchema.Minimum.HasValue);
 
-    private bool IsDecimalRange => GetSchemaFormat(property.ActualSchema) == "decimal";
+    private bool IsDecimalRange => GetSchemaFormat(property.ActualSchema) == DecimalFormat;
 
-    public string? RangeType => IsDecimalRange ? "decimal" : null;
+    public string? RangeType => IsDecimalRange ? DecimalType : null;
 
     public string RangeMinimumValue
     {
@@ -308,7 +315,7 @@ internal sealed class PropertyModel
             var minimum = actualSchema.Minimum;
             if (minimum.HasValue && actualSchema.IsExclusiveMinimum)
             {
-                if (schemaFormat is "int32" or "int64")
+                if (schemaFormat is Int32Format or Int64Format)
                     minimum += 1m;
                 else if (actualSchema.MultipleOf.HasValue)
                     minimum += actualSchema.MultipleOf;
@@ -334,7 +341,7 @@ internal sealed class PropertyModel
             var maximum = actualSchema.Maximum;
             if (maximum.HasValue && actualSchema.IsExclusiveMaximum)
             {
-                if (schemaFormat is "int32" or "int64")
+                if (schemaFormat is Int32Format or Int64Format)
                     maximum -= 1m;
                 else if (actualSchema.MultipleOf.HasValue)
                     maximum -= actualSchema.MultipleOf;
@@ -417,41 +424,41 @@ internal sealed class PropertyModel
     private string? GetSchemaFormat(ApiSchema schema)
     {
         if (Type is "long" or "long?")
-            return "int64";
+            return Int64Format;
 
         if (schema.Format == null)
         {
             switch (schema.Type)
             {
                 case ApiObjectTypes.Integer:
-                    return "int32";
+                    return Int32Format;
                 case ApiObjectTypes.Number:
-                    return "double";
+                    return DoubleFormat;
             }
         }
 
         return schema.Format;
     }
 
-    private static string GetRangeFormat(string? format) => RangeFormats.Contains(format) ? format! : "double";
+    private static string GetRangeFormat(string? format) => RangeFormats.Contains(format) ? format! : DoubleFormat;
 
     private static string GetRangeType(string? format) =>
         format switch
         {
-            "int32" => "int",
+            Int32Format => "int",
             "float" => "float",
-            "double" => "double",
-            "int64" => "long",
+            DoubleFormat => DoubleType,
+            Int64Format => "long",
             "uint64" => "ulong",
-            "decimal" => "decimal",
-            _ => "double",
+            DecimalFormat => DecimalType,
+            _ => DoubleType,
         };
 
     private static decimal EnsureBounds(string? format, decimal value) =>
         format switch
         {
-            "int32" => Clamp(value, int.MinValue, int.MaxValue),
-            "int64" => Clamp(value, long.MinValue, long.MaxValue),
+            Int32Format => Clamp(value, int.MinValue, int.MaxValue),
+            Int64Format => Clamp(value, long.MinValue, long.MaxValue),
             "uint64" => Clamp(value, 0m, ulong.MaxValue),
             _ => value,
         };

@@ -6,6 +6,8 @@ namespace Refitter.Core;
 /// </summary>
 internal sealed class ContractTypeResolver
 {
+    private const string StringType = "string";
+
     private readonly Dictionary<ApiSchema, string> generatedTypeNames = new();
     private readonly List<KeyValuePair<ApiSchema, string>> registrationOrder = new();
     private readonly HashSet<string> reservedTypeNames = new(StringComparer.Ordinal);
@@ -157,20 +159,20 @@ internal sealed class ContractTypeResolver
         switch (schema.Format)
         {
             case "date":
-                return !isNullable || Settings.DateType?.ToLowerInvariant() == "string"
+                return !isNullable || Settings.DateType?.ToLowerInvariant() == StringType
                     ? Settings.DateType + suffix
                     : Settings.DateType + "?";
             case "date-time":
-                return !isNullable || Settings.DateTimeType?.ToLowerInvariant() == "string"
+                return !isNullable || Settings.DateTimeType?.ToLowerInvariant() == StringType
                     ? Settings.DateTimeType + suffix
                     : Settings.DateTimeType + "?";
             case "time":
-                return !isNullable || Settings.TimeType?.ToLowerInvariant() == "string"
+                return !isNullable || Settings.TimeType?.ToLowerInvariant() == StringType
                     ? Settings.TimeType + suffix
                     : Settings.TimeType + "?";
             case "duration":
             case "time-span":
-                return !isNullable || Settings.TimeSpanType?.ToLowerInvariant() == "string"
+                return !isNullable || Settings.TimeSpanType?.ToLowerInvariant() == StringType
                     ? Settings.TimeSpanType + suffix
                     : Settings.TimeSpanType + "?";
             case "uri":
@@ -182,7 +184,7 @@ internal sealed class ContractTypeResolver
             case "byte":
                 return "byte[]" + suffix;
             default:
-                return "string" + suffix;
+                return StringType + suffix;
         }
     }
 
@@ -248,7 +250,7 @@ internal sealed class ContractTypeResolver
     private string ResolveDictionary(ApiSchema schema)
     {
         var valueType = ResolveDictionaryValueType(schema, "object");
-        var keyType = ResolveDictionaryKeyType(schema, "string");
+        var keyType = ResolveDictionaryKeyType(schema, StringType);
         return Settings.DictionaryType + "<" + keyType + ", " + valueType + ">";
     }
 

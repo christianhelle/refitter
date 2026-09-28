@@ -403,7 +403,7 @@ internal sealed class ApiReferenceResolver
                     "schemas" => components.Schemas,
                     "requestBodies" => components.RequestBodies,
                     "responses" => components.Responses,
-                    "parameters" => components.Parameters,
+                    OpenApiKeywords.Parameters => components.Parameters,
                     "headers" => components.Headers,
                     "securitySchemes" => components.SecuritySchemes,
                     _ => null,
@@ -412,11 +412,11 @@ internal sealed class ApiReferenceResolver
                 if (pathItem.TryGetValue(segment, out var operation))
                     return operation;
 
-                return segment == "parameters" ? pathItem.Parameters : GetExtensionData(pathItem.ExtensionData, segment);
+                return segment == OpenApiKeywords.Parameters ? pathItem.Parameters : GetExtensionData(pathItem.ExtensionData, segment);
             case ApiOperation apiOperation:
                 return segment switch
                 {
-                    "parameters" => apiOperation.Parameters,
+                    OpenApiKeywords.Parameters => apiOperation.Parameters,
                     "requestBody" => apiOperation.RequestBody,
                     "responses" => apiOperation.Responses,
                     _ => GetExtensionData(apiOperation.ExtensionData, segment),
@@ -472,7 +472,7 @@ internal sealed class ApiReferenceResolver
                 return apiDocument.Components;
             case "definitions":
                 return apiDocument.Definitions;
-            case "parameters":
+            case OpenApiKeywords.Parameters:
                 return apiDocument.Parameters;
             case "responses":
                 return apiDocument.Responses;

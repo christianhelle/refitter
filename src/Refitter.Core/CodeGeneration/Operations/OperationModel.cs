@@ -147,8 +147,8 @@ internal sealed class OperationModel
         (operation.ActualRequestBody?.Content.ContainsKey("application/x-www-form-urlencoded") ?? false);
 
     public bool ConsumesJson =>
-        operation.ActualConsumes.Contains("application/json") ||
-        (operation.ActualRequestBody?.Content.ContainsKey("application/json") ?? false);
+        operation.ActualConsumes.Contains(ContentTypeConstants.Json) ||
+        (operation.ActualRequestBody?.Content.ContainsKey(ContentTypeConstants.Json) ?? false);
 
     public string? Summary => ConversionUtilities.TrimWhiteSpaces(operation.Summary);
 
@@ -175,11 +175,11 @@ internal sealed class OperationModel
         get
         {
             var consumes = operation.ActualConsumes;
-            if (consumes.Contains("application/json"))
-                return "application/json";
+            if (consumes.Contains(ContentTypeConstants.Json))
+                return ContentTypeConstants.Json;
 
             var contentType = consumes.FirstOrDefault() ?? operation.ActualRequestBody?.Content.Keys.FirstOrDefault();
-            return contentType?.Replace("\"", "\\\"") ?? "application/json";
+            return contentType?.Replace("\"", "\\\"") ?? ContentTypeConstants.Json;
         }
     }
 
@@ -188,11 +188,11 @@ internal sealed class OperationModel
         get
         {
             var produces = operation.ActualProduces;
-            if (produces.Contains("application/json"))
-                return "application/json";
+            if (produces.Contains(ContentTypeConstants.Json))
+                return ContentTypeConstants.Json;
 
             var contentType = produces.FirstOrDefault() ?? SuccessResponse?.Produces;
-            return contentType?.Replace("\"", "\\\"") ?? "application/json";
+            return contentType?.Replace("\"", "\\\"") ?? ContentTypeConstants.Json;
         }
     }
 
@@ -355,6 +355,8 @@ internal sealed class ExceptionDescriptionModel(string type, string description)
 /// <summary>The C# view of an operation parameter.</summary>
 internal sealed class OperationParameterModel
 {
+    private const string StringType = "string";
+
     private readonly ApiParameter parameter;
     private readonly IList<ApiParameter> allParameters;
     private readonly ContractGenerator generator;
@@ -427,9 +429,9 @@ internal sealed class OperationParameterModel
 
     public bool HasBinaryBodyWithMultipleMimeTypes => parameter.HasBinaryBodyWithMultipleMimeTypes;
 
-    public bool IsDate => Schema.Format == "date" && generator.GetTypeName(Schema, IsNullable, null) != "string";
+    public bool IsDate => Schema.Format == "date" && generator.GetTypeName(Schema, IsNullable, null) != StringType;
 
-    public bool IsDateTime => Schema.Format == "date-time" && generator.GetTypeName(Schema, IsNullable, null) != "string";
+    public bool IsDateTime => Schema.Format == "date-time" && generator.GetTypeName(Schema, IsNullable, null) != StringType;
 
     public bool IsDateOrDateTime => IsDate || IsDateTime;
 
@@ -450,12 +452,12 @@ internal sealed class OperationParameterModel
     public bool IsDateTimeArray =>
         IsArray &&
         Schema.Item?.ActualSchema.Format == "date-time" &&
-        generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != "string";
+        generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != StringType;
 
     public bool IsDateArray =>
         IsArray &&
         Schema.Item?.ActualSchema.Format == "date" &&
-        generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != "string";
+        generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != StringType;
 
     public bool IsObject => Schema.ActualSchema.Type == ApiObjectTypes.Object;
 
@@ -524,7 +526,7 @@ internal sealed class OperationResponseModel
         ActualResponseSchema.Format is "date" or "date-time" &&
         generator.GetTypeName(ActualResponseSchema, IsNullable, "Response") != "string";
 
-    public bool IsPlainText => !response.Content.ContainsKey("application/json") && response.Content.ContainsKey("text/plain");
+    public bool IsPlainText => !response.Content.ContainsKey(ContentTypeConstants.Json) && response.Content.ContainsKey("text/plain");
 
     public bool IsFile => IsSuccess && response.IsBinary(operation);
 
@@ -557,8 +559,8 @@ internal sealed class OperationResponseModel
             if (response.Content.ContainsKey("*/*"))
                 return "*/*";
 
-            if (response.Content.ContainsKey("application/json"))
-                return "application/json";
+            if (response.Content.ContainsKey(ContentTypeConstants.Json))
+                return ContentTypeConstants.Json;
 
             return response.Content.FirstOrDefault().Key;
         }

@@ -56,7 +56,7 @@ internal sealed class ApiDocumentWriter
                 writer.WritePropertyName("info");
                 writer.WriteStartObject();
                 WriteString(writer, "title", document.Info.Title);
-                WriteString(writer, "description", document.Info.Description);
+                WriteString(writer, OpenApiKeywords.Description, document.Info.Description);
                 WriteString(writer, "version", document.Info.Version);
                 writer.WriteEndObject();
             }
@@ -80,7 +80,7 @@ internal sealed class ApiDocumentWriter
             if (isSwagger2)
             {
                 WriteSchemaDictionary(writer, "definitions", document.Definitions);
-                WriteDictionary(writer, "parameters", document.Parameters, WriteParameter);
+                WriteDictionary(writer, OpenApiKeywords.Parameters, document.Parameters, WriteParameter);
                 WriteDictionary(writer, "responses", document.Responses, WriteResponse);
                 WriteDictionary(writer, "securityDefinitions", document.SecurityDefinitions, WriteSecurityScheme);
             }
@@ -91,7 +91,7 @@ internal sealed class ApiDocumentWriter
                 WriteSchemaDictionary(writer, "schemas", document.Components.Schemas);
                 WriteDictionary(writer, "requestBodies", document.Components.RequestBodies, WriteRequestBody);
                 WriteDictionary(writer, "responses", document.Components.Responses, WriteResponse);
-                WriteDictionary(writer, "parameters", document.Components.Parameters, WriteParameter);
+                WriteDictionary(writer, OpenApiKeywords.Parameters, document.Components.Parameters, WriteParameter);
                 WriteDictionary(writer, "headers", document.Components.Headers, WriteParameter);
                 WriteDictionary(writer, "securitySchemes", document.Components.SecuritySchemes, WriteSecurityScheme);
                 writer.WriteEndObject();
@@ -105,7 +105,7 @@ internal sealed class ApiDocumentWriter
             {
                 writer.WriteStartObject();
                 WriteString(writer, "name", tag.Name);
-                WriteString(writer, "description", tag.Description);
+                WriteString(writer, OpenApiKeywords.Description, tag.Description);
                 writer.WriteEndObject();
             }
 
@@ -121,11 +121,11 @@ internal sealed class ApiDocumentWriter
     {
         writer.WriteStartObject();
         WriteString(writer, "summary", pathItem.Summary);
-        WriteString(writer, "description", pathItem.Description);
+        WriteString(writer, OpenApiKeywords.Description, pathItem.Description);
         WriteExtensionData(writer, pathItem.ExtensionData);
         if (pathItem.Parameters.Count > 0)
         {
-            writer.WritePropertyName("parameters");
+            writer.WritePropertyName(OpenApiKeywords.Parameters);
             writer.WriteStartArray();
             foreach (var parameter in pathItem.Parameters)
                 WriteParameter(writer, parameter);
@@ -146,7 +146,7 @@ internal sealed class ApiDocumentWriter
         writer.WriteStartObject();
         WriteStringList(writer, "tags", operation.Tags);
         WriteString(writer, "summary", operation.Summary);
-        WriteString(writer, "description", operation.Description);
+        WriteString(writer, OpenApiKeywords.Description, operation.Description);
         WriteString(writer, "operationId", operation.OperationId);
         if (isSwagger2)
         {
@@ -159,7 +159,7 @@ internal sealed class ApiDocumentWriter
         var parameters = isSwagger2
             ? operation.Parameters.ToList()
             : operation.Parameters.Where(p => p.Kind != ApiParameterKind.Body).ToList();
-        writer.WritePropertyName("parameters");
+        writer.WritePropertyName(OpenApiKeywords.Parameters);
         writer.WriteStartArray();
         foreach (var parameter in parameters)
             WriteParameter(writer, parameter);
@@ -200,7 +200,7 @@ internal sealed class ApiDocumentWriter
         }
 
         WriteString(writer, "x-name", requestBody.Name);
-        WriteString(writer, "description", requestBody.Description);
+        WriteString(writer, OpenApiKeywords.Description, requestBody.Description);
         if (requestBody.Content.Count > 0)
         {
             writer.WritePropertyName("content");
@@ -249,7 +249,7 @@ internal sealed class ApiDocumentWriter
             writer.WriteString("$ref", GetReferencePath(response.Reference.ActualResponse));
         }
 
-        writer.WriteString("description", response.Description ?? string.Empty);
+        writer.WriteString(OpenApiKeywords.Description, response.Description ?? string.Empty);
         if (response.Headers.Count > 0)
         {
             writer.WritePropertyName("headers");
@@ -318,9 +318,9 @@ internal sealed class ApiDocumentWriter
             ApiSecuritySchemeType.OAuth2 => "oauth2",
             ApiSecuritySchemeType.Http => "http",
             ApiSecuritySchemeType.OpenIdConnect => "openIdConnect",
-            _ => "undefined",
+            _ => OpenApiKeywords.Undefined,
         });
-        WriteString(writer, "description", securityScheme.Description);
+        WriteString(writer, OpenApiKeywords.Description, securityScheme.Description);
         WriteString(writer, "name", securityScheme.Name);
         if (securityScheme.In != ApiSecurityApiKeyLocation.Undefined)
             writer.WriteString("in", securityScheme.In.ToString().ToLowerInvariant());
@@ -414,7 +414,7 @@ internal sealed class ApiDocumentWriter
                 writer.WriteNumber("x-position", parameter.Position.Value);
         }
 
-        WriteString(writer, "description", schema.Description);
+        WriteString(writer, OpenApiKeywords.Description, schema.Description);
         WriteString(writer, "format", schema.Format);
         if (schema.Default != null)
         {
@@ -764,7 +764,7 @@ internal sealed class ApiDocumentWriter
             case ApiParameterKind.Cookie:
                 return "cookie";
             default:
-                return "undefined";
+                return OpenApiKeywords.Undefined;
         }
     }
 
@@ -787,7 +787,7 @@ internal sealed class ApiDocumentWriter
             case ApiParameterStyle.DeepObject:
                 return "deepObject";
             default:
-                return "undefined";
+                return OpenApiKeywords.Undefined;
         }
     }
 }

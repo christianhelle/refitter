@@ -60,7 +60,7 @@ internal sealed class ApiJsonReader
                 case "definitions" when isSwagger2:
                     ReadSchemaDictionary(value, document.Components.Schemas);
                     break;
-                case "parameters" when isSwagger2:
+                case OpenApiKeywords.Parameters when isSwagger2:
                     ReadDictionary(value, document.Components.Parameters, ReadParameter);
                     break;
                 case "responses" when isSwagger2:
@@ -120,7 +120,7 @@ internal sealed class ApiJsonReader
                     info.Title = ReadString(property.Value);
                     hasTitle = true;
                     break;
-                case "description":
+                case OpenApiKeywords.Description:
                     info.Description = ReadString(property.Value);
                     break;
                 case "version":
@@ -157,7 +157,7 @@ internal sealed class ApiJsonReader
                 case "responses":
                     ReadDictionary(property.Value, components.Responses, ReadComponentResponse(components.Document));
                     break;
-                case "parameters":
+                case OpenApiKeywords.Parameters:
                     ReadDictionary(property.Value, components.Parameters, ReadParameter);
                     break;
                 case "headers":
@@ -228,10 +228,10 @@ internal sealed class ApiJsonReader
                 case "summary":
                     pathItem.Summary = ReadString(property.Value);
                     continue;
-                case "description":
+                case OpenApiKeywords.Description:
                     pathItem.Description = ReadString(property.Value);
                     continue;
-                case "parameters":
+                case OpenApiKeywords.Parameters:
                     pathItem.Parameters = ReadList(property.Value, ReadParameter);
                     continue;
                 case "servers":
@@ -275,7 +275,7 @@ internal sealed class ApiJsonReader
                 case "summary":
                     operation.Summary = ReadString(value);
                     break;
-                case "description":
+                case OpenApiKeywords.Description:
                     operation.Description = ReadString(value);
                     break;
                 case "operationId":
@@ -287,7 +287,7 @@ internal sealed class ApiJsonReader
                 case "produces" when isSwagger2:
                     operation.Produces = ReadStringList(value);
                     break;
-                case "parameters":
+                case OpenApiKeywords.Parameters:
                     if (value.ValueKind == JsonValueKind.Array)
                     {
                         foreach (var item in value.EnumerateArray())
@@ -354,7 +354,7 @@ internal sealed class ApiJsonReader
                 case "x-name":
                     requestBody.Name = ReadString(value);
                     break;
-                case "description":
+                case OpenApiKeywords.Description:
                     requestBody.Description = ReadString(value);
                     break;
                 case "content":
@@ -414,7 +414,7 @@ internal sealed class ApiJsonReader
                 case "$ref":
                     response.ReferencePath = ReadString(value);
                     break;
-                case "description":
+                case OpenApiKeywords.Description:
                     response.Description = ReadString(value);
                     break;
                 case "headers":
@@ -474,7 +474,7 @@ internal sealed class ApiJsonReader
                     securityScheme.Type = ReadEnum(
                         value,
                         ApiSecuritySchemeType.Undefined,
-                        ("undefined", ApiSecuritySchemeType.Undefined),
+                        (OpenApiKeywords.Undefined, ApiSecuritySchemeType.Undefined),
                         ("basic", ApiSecuritySchemeType.Basic),
                         ("apiKey", ApiSecuritySchemeType.ApiKey),
                         ("oauth2", ApiSecuritySchemeType.OAuth2),
@@ -482,7 +482,7 @@ internal sealed class ApiJsonReader
                         ("openIdConnect", ApiSecuritySchemeType.OpenIdConnect));
                     hasType = true;
                     break;
-                case "description":
+                case OpenApiKeywords.Description:
                     securityScheme.Description = ReadString(value);
                     break;
                 case "name":
@@ -559,7 +559,7 @@ internal sealed class ApiJsonReader
                     case "name":
                         tag.Name = ReadString(property.Value);
                         break;
-                    case "description":
+                    case OpenApiKeywords.Description:
                         tag.Description = ReadString(property.Value);
                         break;
                 }
@@ -618,7 +618,7 @@ internal sealed class ApiJsonReader
                 case "title":
                     schema.Title = ReadString(value);
                     break;
-                case "description":
+                case OpenApiKeywords.Description:
                     schema.Description = ReadString(value);
                     break;
                 case "format":
@@ -804,7 +804,7 @@ internal sealed class ApiJsonReader
                 parameter.Kind = ReadEnum(
                     value,
                     ApiParameterKind.Undefined,
-                    ("undefined", ApiParameterKind.Undefined),
+                    (OpenApiKeywords.Undefined, ApiParameterKind.Undefined),
                     ("body", ApiParameterKind.Body),
                     ("query", ApiParameterKind.Query),
                     ("path", ApiParameterKind.Path),
@@ -817,7 +817,7 @@ internal sealed class ApiJsonReader
                 parameter.Style = ReadEnum(
                     value,
                     ApiParameterStyle.Undefined,
-                    ("undefined", ApiParameterStyle.Undefined),
+                    (OpenApiKeywords.Undefined, ApiParameterStyle.Undefined),
                     ("simple", ApiParameterStyle.Simple),
                     ("label", ApiParameterStyle.Label),
                     ("matrix", ApiParameterStyle.Matrix),
@@ -835,14 +835,14 @@ internal sealed class ApiJsonReader
             case "allowEmptyValue":
                 parameter.AllowEmptyValue = ReadBoolean(value);
                 return true;
-            case "description":
+            case OpenApiKeywords.Description:
                 parameter.Description = ReadString(value);
                 return true;
             case "collectionFormat":
                 parameter.CollectionFormat = ReadEnum(
                     value,
                     ApiParameterCollectionFormat.Undefined,
-                    ("undefined", ApiParameterCollectionFormat.Undefined),
+                    (OpenApiKeywords.Undefined, ApiParameterCollectionFormat.Undefined),
                     ("csv", ApiParameterCollectionFormat.Csv),
                     ("ssv", ApiParameterCollectionFormat.Ssv),
                     ("tsv", ApiParameterCollectionFormat.Tsv),
