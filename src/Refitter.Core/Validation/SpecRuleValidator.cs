@@ -156,15 +156,6 @@ internal sealed class SpecRuleValidator
         }
     }
 
-    private static bool IsEmailAddress(string input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return false;
-
-        var parts = input.Split('@');
-        return parts.Length == 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]);
-    }
-
     private void Walk(SpecServer server)
     {
         if (server.Url == null)
@@ -220,20 +211,6 @@ internal sealed class SpecRuleValidator
         {
             Within(pathItem.Key, () => Walk(pathItem.Value));
         }
-    }
-
-    private static string GetPathSignature(string path)
-    {
-        for (var start = path.IndexOf('{'); start > -1; start = path.IndexOf('{', start + 2))
-        {
-            var end = path.IndexOf('}', start);
-            if (end < 0)
-                return path;
-
-            path = path.Substring(0, start + 1) + path.Substring(end);
-        }
-
-        return path;
     }
 
     private void Walk(SpecPathItem? pathItem)
@@ -321,12 +298,11 @@ internal sealed class SpecRuleValidator
         if (responses.Count == 0)
             Error("Responses must contain at least one response");
 
-        foreach (var key in responses.Keys)
+        var invalidKeys = responses.Keys
+            .Where(key => !"default".Equals(key, StringComparison.OrdinalIgnoreCase) && !StatusCode.IsMatch(key));
+        foreach (var key in invalidKeys)
         {
-            if (!"default".Equals(key, StringComparison.OrdinalIgnoreCase) && !StatusCode.IsMatch(key))
-            {
-                ErrorAt(key, "Responses key must be 'default', an HTTP status code, or one of the following strings representing a range of HTTP status codes: '1XX', '2XX', '3XX', '4XX', '5XX' (case insensitive)");
-            }
+            ErrorAt(key, "Responses key must be 'default', an HTTP status code, or one of the following strings representing a range of HTTP status codes: '1XX', '2XX', '3XX', '4XX', '5XX' (case insensitive)");
         }
 
         foreach (var response in responses)
@@ -446,18 +422,6 @@ internal sealed class SpecRuleValidator
         WithinEach("mediaTypes", components.MediaTypes, Walk);
     }
 
-    private void ValidateKeys(IEnumerable<string>? keys, string component)
-    {
-        if (keys == null)
-            return;
-
-        foreach (var key in keys)
-        {
-            if (!ComponentKey.IsMatch(key))
-                Error($"The key '{key}' in '{component}' of components MUST match the regular expression '{ComponentKey}'.");
-        }
-    }
-
     private void Walk(SpecSchema? schema)
     {
         if (schema == null)
@@ -473,12 +437,18 @@ internal sealed class SpecRuleValidator
             return;
 
         schemaLoop.Push(schema);
+        ValidateSchema(schema);
+        WalkSchemaChildren(schema);
+        schemaLoop.Pop();
+    }
 
+    private void ValidateSchema(SpecSchema schema)
+    {
         if (schema.Properties != null)
         {
-            foreach (var property in schema.Properties.Where(property => property.Value == null))
+            foreach (var name in schema.Properties.Where(property => property.Value == null).Select(property => property.Key))
             {
-                ErrorAt(property.Key, $"Schema  property {property.Key} is null.");
+                ErrorAt(name, $"Schema  property {name} is null.");
             }
         }
 
@@ -487,7 +457,10 @@ internal sealed class SpecRuleValidator
         {
             ErrorAt("discriminator", $"Schema  must contain property specified in the discriminator {discriminator} in the required field list.");
         }
+    }
 
+    private void WalkSchemaChildren(SpecSchema schema)
+    {
         if (schema.Items != null)
             Within("items", () => Walk(schema.Items));
 
@@ -509,8 +482,6 @@ internal sealed class SpecRuleValidator
 
         if (schema.ExternalDocs != null)
             Within(OpenApiNames.ExternalDocs, () => Walk(schema.ExternalDocs));
-
-        schemaLoop.Pop();
     }
 
     private void WalkSchemas(string segment, List<SpecSchema>? schemas)
@@ -591,6 +562,40 @@ internal sealed class SpecRuleValidator
             Enter("$ref");
             warnings.Add(new ValidationIssue(PathString, warning));
             Exit();
+        }
+    }
+
+    private static bool IsEmailAddress(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return false;
+
+        var parts = input.Split('@');
+        return parts.Length == 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]);
+    }
+
+    private static string GetPathSignature(string path)
+    {
+        for (var start = path.IndexOf('{'); start > -1; start = path.IndexOf('{', start + 2))
+        {
+            var end = path.IndexOf('}', start);
+            if (end < 0)
+                return path;
+
+            path = path.Substring(0, start + 1) + path.Substring(end);
+        }
+
+        return path;
+    }
+
+    private void ValidateKeys(IEnumerable<string>? keys, string component)
+    {
+        if (keys == null)
+            return;
+
+        foreach (var key in keys.Where(key => !ComponentKey.IsMatch(key)))
+        {
+            Error($"The key '{key}' in '{component}' of components MUST match the regular expression '{ComponentKey}'.");
         }
     }
 }
