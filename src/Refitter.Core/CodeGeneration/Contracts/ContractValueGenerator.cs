@@ -31,35 +31,46 @@ internal sealed class ContractValueGenerator(ContractGeneratorSettings settings)
         if (defaultValue != null)
             return defaultValue;
 
-        if (schema.Default != null && useSchemaDefault)
-        {
-            if (TypesWithStringConstructor.Contains(targetType))
-                return "new " + targetType + "(" + GetDefaultAsStringLiteral(schema) + ")";
-
-            if (targetType is "System.DateTime" or "System.DateTime?")
-                return "System.DateTime.Parse(" + GetDefaultAsStringLiteral(schema) + ")";
-        }
+        var parsedDefaultValue = schema.Default != null && useSchemaDefault ? GetParsedDefaultValue(schema, targetType) : null;
+        if (parsedDefaultValue != null)
+            return parsedDefaultValue;
 
         var isOptionalProperty = schema is ApiSchemaProperty { IsRequired: false };
         var actualSchema = schema.ActualSchema;
         if (!allowsNull && !isOptionalProperty && (actualSchema.Type.IsArray() || actualSchema.Type.IsObject()))
-        {
-            if (!string.IsNullOrEmpty(settings.DictionaryInstanceType) &&
-                targetType.StartsWith(settings.DictionaryType + "<", StringComparison.Ordinal))
-            {
-                targetType = settings.DictionaryInstanceType + targetType.Substring(settings.DictionaryType.Length);
-            }
-
-            if (!string.IsNullOrEmpty(settings.ArrayInstanceType) &&
-                targetType.StartsWith(settings.ArrayType + "<", StringComparison.Ordinal))
-            {
-                targetType = settings.ArrayInstanceType + targetType.Substring(settings.ArrayType.Length);
-            }
-
-            return actualSchema.IsAbstract ? null : "new " + targetType + "()";
-        }
+            return actualSchema.IsAbstract ? null : "new " + GetInstanceType(targetType) + "()";
 
         return null;
+    }
+
+    /// <summary>The default of a type that is created from the default as a string, or null for other types.</summary>
+    private static string? GetParsedDefaultValue(ApiSchema schema, string targetType)
+    {
+        if (TypesWithStringConstructor.Contains(targetType))
+            return "new " + targetType + "(" + GetDefaultAsStringLiteral(schema) + ")";
+
+        if (targetType is "System.DateTime" or "System.DateTime?")
+            return "System.DateTime.Parse(" + GetDefaultAsStringLiteral(schema) + ")";
+
+        return null;
+    }
+
+    /// <summary>The type to create for a dictionary or array property, which can differ from the declared type.</summary>
+    private string GetInstanceType(string targetType)
+    {
+        if (!string.IsNullOrEmpty(settings.DictionaryInstanceType) &&
+            targetType.StartsWith(settings.DictionaryType + "<", StringComparison.Ordinal))
+        {
+            targetType = settings.DictionaryInstanceType + targetType.Substring(settings.DictionaryType.Length);
+        }
+
+        if (!string.IsNullOrEmpty(settings.ArrayInstanceType) &&
+            targetType.StartsWith(settings.ArrayType + "<", StringComparison.Ordinal))
+        {
+            targetType = settings.ArrayInstanceType + targetType.Substring(settings.ArrayType.Length);
+        }
+
+        return targetType;
     }
 
     public static string GetNumericValue(ApiObjectTypes type, object value, string? format)

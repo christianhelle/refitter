@@ -494,57 +494,59 @@ internal sealed class EnumTemplateModel(string typeName, ApiSchema schema, Contr
 
     public bool HasExtendedValueRange => schema.Format == "int64";
 
-    public IEnumerable<EnumerationItemModel> Enums
+    public IEnumerable<EnumerationItemModel> Enums => CreateEnums();
+
+    private List<EnumerationItemModel> CreateEnums()
     {
-        get
+        var items = new List<EnumerationItemModel>();
+        for (var i = 0; i < schema.Enumeration.Count; i++)
         {
-            var items = new List<EnumerationItemModel>();
-            for (var i = 0; i < schema.Enumeration.Count; i++)
-            {
-                var value = schema.Enumeration[i];
-                if (value == null)
-                    continue;
+            var value = schema.Enumeration[i];
+            if (value == null)
+                continue;
 
-                var description = schema.EnumerationDescriptions.Count > i ? schema.EnumerationDescriptions[i] : null;
-                if (schema.Type.IsInteger())
-                {
-                    var name = schema.EnumerationNames.Count > i ? schema.EnumerationNames[i] : "_" + value;
-                    if (schema.IsFlagEnumerable && TryGetInt64(value, out var valueInt64))
-                    {
-                        items.Add(new EnumerationItemModel(
-                            settings.EnumNameGenerator.Generate(i, name, value, schema),
-                            name,
-                            value.ToString()!,
-                            description,
-                            valueInt64.ToString(CultureInfo.InvariantCulture),
-                            valueInt64.ToString(CultureInfo.InvariantCulture)));
-                    }
-                    else
-                    {
-                        items.Add(new EnumerationItemModel(
-                            settings.EnumNameGenerator.Generate(i, name, value, schema),
-                            name,
-                            value.ToString()!,
-                            description,
-                            value.ToString(),
-                            (1 << i).ToString(CultureInfo.InvariantCulture)));
-                    }
-                }
-                else
-                {
-                    var name = schema.EnumerationNames.Count > i ? schema.EnumerationNames[i] : value.ToString()!;
-                    items.Add(new EnumerationItemModel(
-                        settings.EnumNameGenerator.Generate(i, name, value, schema),
-                        name,
-                        value.ToString()!,
-                        description,
-                        i.ToString(CultureInfo.InvariantCulture),
-                        (1 << i).ToString(CultureInfo.InvariantCulture)));
-                }
-            }
-
-            return items;
+            var description = schema.EnumerationDescriptions.Count > i ? schema.EnumerationDescriptions[i] : null;
+            items.Add(schema.Type.IsInteger()
+                ? CreateIntegerItem(i, value, description)
+                : CreateStringItem(i, value, description));
         }
+
+        return items;
+    }
+
+    private EnumerationItemModel CreateIntegerItem(int index, object value, string? description)
+    {
+        var name = schema.EnumerationNames.Count > index ? schema.EnumerationNames[index] : "_" + value;
+        if (schema.IsFlagEnumerable && TryGetInt64(value, out var valueInt64))
+        {
+            return new EnumerationItemModel(
+                settings.EnumNameGenerator.Generate(index, name, value, schema),
+                name,
+                value.ToString()!,
+                description,
+                valueInt64.ToString(CultureInfo.InvariantCulture),
+                valueInt64.ToString(CultureInfo.InvariantCulture));
+        }
+
+        return new EnumerationItemModel(
+            settings.EnumNameGenerator.Generate(index, name, value, schema),
+            name,
+            value.ToString()!,
+            description,
+            value.ToString(),
+            (1 << index).ToString(CultureInfo.InvariantCulture));
+    }
+
+    private EnumerationItemModel CreateStringItem(int index, object value, string? description)
+    {
+        var name = schema.EnumerationNames.Count > index ? schema.EnumerationNames[index] : value.ToString()!;
+        return new EnumerationItemModel(
+            settings.EnumNameGenerator.Generate(index, name, value, schema),
+            name,
+            value.ToString()!,
+            description,
+            index.ToString(CultureInfo.InvariantCulture),
+            (1 << index).ToString(CultureInfo.InvariantCulture));
     }
 
     private static bool TryGetInt64(object value, out long valueInt64)

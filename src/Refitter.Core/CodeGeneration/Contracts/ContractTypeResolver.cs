@@ -43,34 +43,54 @@ internal sealed class ContractTypeResolver
             return "System.Exception";
 
         var markAsNullableReference = Settings.GenerateNullableReferenceTypes && isNullable;
-
-        if (schema.ActualTypeSchema.IsAnyType &&
-            schema.ActualDiscriminator == null &&
-            schema.InheritedSchema == null &&
-            schema.AllOf.Count == 0 &&
-            !generatedTypeNames.ContainsKey(schema) &&
-            !schema.HasReference)
-        {
+        if (IsUntypedAnyType(schema))
             return markAsNullableReference ? Settings.AnyType + "?" : Settings.AnyType;
-        }
 
-        var type = schema.ActualTypeSchema.Type;
-        if (type == ApiObjectTypes.None && schema.ActualTypeSchema.IsEnumeration)
-        {
-            type = schema.ActualTypeSchema.Enumeration.All(v => v is int)
-                ? ApiObjectTypes.Integer
-                : ApiObjectTypes.String;
-        }
+        var type = GetValueType(schema.ActualTypeSchema);
+        return ResolveValueType(schema.ActualTypeSchema, type, isNullable) ??
+               ResolveReferenceType(schema, type, isNullable, markAsNullableReference, typeNameHint);
+    }
 
+    /// <summary>Whether a schema allows any value and is not a type of its own.</summary>
+    private bool IsUntypedAnyType(ApiSchema schema) =>
+        schema.ActualTypeSchema.IsAnyType &&
+        schema.ActualDiscriminator == null &&
+        schema.InheritedSchema == null &&
+        schema.AllOf.Count == 0 &&
+        !generatedTypeNames.ContainsKey(schema) &&
+        !schema.HasReference;
+
+    /// <summary>The type of a schema, where an untyped enumeration of integers is an integer and any other a string.</summary>
+    private static ApiObjectTypes GetValueType(ApiSchema actualTypeSchema)
+    {
+        if (actualTypeSchema.Type != ApiObjectTypes.None || !actualTypeSchema.IsEnumeration)
+            return actualTypeSchema.Type;
+
+        return actualTypeSchema.Enumeration.All(v => v is int) ? ApiObjectTypes.Integer : ApiObjectTypes.String;
+    }
+
+    /// <summary>The C# type of numbers, integers and booleans, or null for other types.</summary>
+    private string? ResolveValueType(ApiSchema actualTypeSchema, ApiObjectTypes type, bool isNullable)
+    {
         if (type.IsNumber())
-            return ResolveNumber(schema.ActualTypeSchema, isNullable);
+            return ResolveNumber(actualTypeSchema, isNullable);
 
-        if (type.IsInteger() && !schema.ActualTypeSchema.IsEnumeration)
-            return ResolveInteger(schema.ActualTypeSchema, isNullable);
+        if (type.IsInteger() && !actualTypeSchema.IsEnumeration)
+            return ResolveInteger(actualTypeSchema, isNullable);
 
         if (type.IsBoolean())
             return isNullable ? "bool?" : "bool";
 
+        return null;
+    }
+
+    private string ResolveReferenceType(
+        ApiSchema schema,
+        ApiObjectTypes type,
+        bool isNullable,
+        bool markAsNullableReference,
+        string? typeNameHint)
+    {
         var nullableReferenceSuffix = markAsNullableReference ? "?" : string.Empty;
         if (schema.IsBinary)
             return "byte[]" + nullableReferenceSuffix;
@@ -159,22 +179,14 @@ internal sealed class ContractTypeResolver
         switch (schema.Format)
         {
             case "date":
-                return !isNullable || Settings.DateType?.ToLowerInvariant() == StringType
-                    ? Settings.DateType + suffix
-                    : Settings.DateType + "?";
+                return ResolveDateOrTime(Settings.DateType, isNullable, suffix);
             case "date-time":
-                return !isNullable || Settings.DateTimeType?.ToLowerInvariant() == StringType
-                    ? Settings.DateTimeType + suffix
-                    : Settings.DateTimeType + "?";
+                return ResolveDateOrTime(Settings.DateTimeType, isNullable, suffix);
             case "time":
-                return !isNullable || Settings.TimeType?.ToLowerInvariant() == StringType
-                    ? Settings.TimeType + suffix
-                    : Settings.TimeType + "?";
+                return ResolveDateOrTime(Settings.TimeType, isNullable, suffix);
             case "duration":
             case "time-span":
-                return !isNullable || Settings.TimeSpanType?.ToLowerInvariant() == StringType
-                    ? Settings.TimeSpanType + suffix
-                    : Settings.TimeSpanType + "?";
+                return ResolveDateOrTime(Settings.TimeSpanType, isNullable, suffix);
             case "uri":
                 return "System.Uri" + suffix;
             case "guid":
@@ -187,6 +199,12 @@ internal sealed class ContractTypeResolver
                 return StringType + suffix;
         }
     }
+
+    /// <summary>A configured date or time type, which is a value type unless it is configured as a string.</summary>
+    private static string ResolveDateOrTime(string? typeName, bool isNullable, string suffix) =>
+        !isNullable || typeName?.ToLowerInvariant() == StringType
+            ? typeName + suffix
+            : typeName + "?";
 
     private static string ResolveInteger(ApiSchema schema, bool isNullable)
     {
