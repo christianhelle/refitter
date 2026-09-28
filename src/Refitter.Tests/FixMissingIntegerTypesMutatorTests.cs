@@ -35,7 +35,7 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["formattedId"]
             .ActualSchema;
 
-        schema.Type.Should().Be(ApiObjectType.Integer);
+        schema.Type.Should().Be(ApiObjectTypes.Integer);
     }
 
     [Test]
@@ -66,7 +66,7 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["bigId"]
             .ActualSchema;
 
-        schema.Type.Should().Be(ApiObjectType.Integer);
+        schema.Type.Should().Be(ApiObjectTypes.Integer);
     }
 
     [Test]
@@ -97,7 +97,7 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["price"]
             .ActualSchema;
 
-        schema.Type.Should().Be(ApiObjectType.Number);
+        schema.Type.Should().Be(ApiObjectTypes.Number);
     }
 
     [Test]
@@ -128,7 +128,7 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["score"]
             .ActualSchema;
 
-        schema.Type.Should().Be(ApiObjectType.Number);
+        schema.Type.Should().Be(ApiObjectTypes.Number);
     }
 
     [Test]
@@ -159,7 +159,7 @@ public class FixMissingIntegerTypesMutatorTests
             .ActualSchema.Properties["count"]
             .ActualSchema;
 
-        schema.Type.Should().Be(ApiObjectType.Integer);
+        schema.Type.Should().Be(ApiObjectTypes.Integer);
     }
 
     [Test]

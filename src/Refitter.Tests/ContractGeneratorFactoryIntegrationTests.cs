@@ -104,7 +104,7 @@ public class ContractGeneratorFactoryIntegrationTests
 
         var props = document.Components!.Schemas["TestModel"].ActualSchema.Properties;
 
-        props["missingType"].ActualSchema.Type.Should().Be(ApiObjectType.Integer);
+        props["missingType"].ActualSchema.Type.Should().Be(ApiObjectTypes.Integer);
         props["integerNoFormat"].ActualSchema.Format.Should().Be("int64");
     }
 

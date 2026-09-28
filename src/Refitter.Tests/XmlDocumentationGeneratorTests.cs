@@ -368,7 +368,7 @@ public class XmlDocumentationGeneratorTests
                 ["200"] = new ApiResponse
                 {
                     Description = "Ошибка ответа",
-                    Schema = new ApiSchema { Type = ApiObjectType.String }
+                    Schema = new ApiSchema { Type = ApiObjectTypes.String }
                 }
             },
             Produces = ["application/json"]

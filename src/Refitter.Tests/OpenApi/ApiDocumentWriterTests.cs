@@ -68,12 +68,12 @@ public class ApiDocumentWriterTests
         var query = operation.Parameters.Single(p => p.Name == "q");
         query.Style.Should().Be(ApiParameterStyle.Matrix);
         query.Position.Should().Be(2);
-        query.CustomSchema!.Type.Should().Be(ApiObjectType.String);
+        query.CustomSchema!.Type.Should().Be(ApiObjectTypes.String);
         operation.Parameters.Single(p => p.Name == "l").Style.Should().Be(ApiParameterStyle.Label);
         operation.Parameters.Single(p => p.Name == "m").Kind.Should().Be(ApiParameterKind.ModelBinding);
         operation.RequestBody!.Position.Should().Be(1);
         operation.Responses["200"].Description.Should().BeEmpty();
-        operation.Responses["200"].Headers["X-Rate"].ActualSchema.Type.Should().Be(ApiObjectType.Integer);
+        operation.Responses["200"].Headers["X-Rate"].ActualSchema.Type.Should().Be(ApiObjectTypes.Integer);
 
         var pet = copy.Definitions["Pet"];
         pet.MaxProperties.Should().Be(5);
@@ -83,13 +83,13 @@ public class ApiDocumentWriterTests
         pet.DiscriminatorObject!.Mapping["cat"].ActualSchema.Should().BeSameAs(copy.Definitions["Cat"]);
         pet.Properties["flags"].IsFlagEnumerable.Should().BeTrue();
         pet.Properties["flags"].EnumerationDescriptions.Should().Equal("one", null);
-        pet.Properties["map"].DictionaryKey!.Type.Should().Be(ApiObjectType.String);
-        pet.Properties["tuple"].AdditionalItemsSchema!.Type.Should().Be(ApiObjectType.Integer);
+        pet.Properties["map"].DictionaryKey!.Type.Should().Be(ApiObjectTypes.String);
+        pet.Properties["tuple"].AdditionalItemsSchema!.Type.Should().Be(ApiObjectTypes.Integer);
         pet.Properties["closed"].AllowAdditionalItems.Should().BeFalse();
         pet.Properties["secret"].IsWriteOnly.Should().BeTrue();
         pet.PatternProperties.Keys.Should().Equal("^x-");
         pet.Definitions.Keys.Should().Equal("Inner");
-        operation.Responses["201"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectType.Array);
+        operation.Responses["201"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectTypes.Array);
         copy.Components.SecuritySchemes["oidc"].Type.Should().Be(ApiSecuritySchemeType.OpenIdConnect);
         copy.Components.SecuritySchemes["basic"].Scheme.Should().Be("basic");
     }
@@ -133,7 +133,7 @@ public class ApiDocumentWriterTests
         var copy = ApiDocumentWriter.Clone(document);
 
         var operation = copy.Paths["/a"]["get"];
-        operation.Parameters[0].CustomSchema!.Type.Should().Be(ApiObjectType.String);
+        operation.Parameters[0].CustomSchema!.Type.Should().Be(ApiObjectTypes.String);
         operation.Responses["200"].ActualResponse.Schema!.ActualSchema.Should().BeSameAs(copy.Definitions["Pet"]);
         operation.Responses["201"].IsNullableRaw.Should().BeTrue();
         var pet = copy.Definitions["Pet"];
@@ -149,7 +149,7 @@ public class ApiDocumentWriterTests
     public void Writes_Discriminator_Mappings_That_Were_Not_Resolved()
     {
         var document = Load("""{ "openapi": "3.0.1", "info": { "title": "T", "version": "1" }, "paths": {} }""");
-        var schema = new ApiSchema { Type = ApiObjectType.Object, DiscriminatorObject = new ApiDiscriminator { PropertyName = "kind" } };
+        var schema = new ApiSchema { Type = ApiObjectTypes.Object, DiscriminatorObject = new ApiDiscriminator { PropertyName = "kind" } };
         schema.DiscriminatorObject.Mapping["a"] = new ApiSchema { ReferencePath = "#/components/schemas/A" };
         schema.DiscriminatorObject.Mapping["b"] = new ApiSchema();
         document.Definitions["Base"] = schema;
@@ -241,7 +241,7 @@ public class ApiDocumentWriterTests
         operation.UpdateBodyParameter();
         operation.Parameters.Should().BeEmpty();
 
-        operation.Parameters.Add(new ApiParameter { Kind = ApiParameterKind.Body, Schema = new ApiSchema { Type = ApiObjectType.String, Format = "binary" } });
+        operation.Parameters.Add(new ApiParameter { Kind = ApiParameterKind.Body, Schema = new ApiSchema { Type = ApiObjectTypes.String, Format = "binary" } });
         operation.RequestBody!.Content.Keys.Should().Equal("application/octet-stream");
     }
 

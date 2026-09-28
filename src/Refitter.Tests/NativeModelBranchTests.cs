@@ -56,11 +56,11 @@ public class NativeModelBranchTests
     {
         var parameter = new ApiParameter
         {
-            Reference = new ApiSchema { Type = ApiObjectType.Integer },
-            Schema = new ApiSchema { Type = ApiObjectType.String },
+            Reference = new ApiSchema { Type = ApiObjectTypes.Integer },
+            Schema = new ApiSchema { Type = ApiObjectTypes.String },
         };
 
-        parameter.ActualSchema.Type.Should().Be(ApiObjectType.String);
+        parameter.ActualSchema.Type.Should().Be(ApiObjectTypes.String);
     }
 
     private static ContractGenerator CreateGenerator()
@@ -81,10 +81,10 @@ public class NativeModelBranchTests
         generator.Settings.DateTimeType = null!;
         generator.Settings.TimeType = null!;
         generator.Settings.TimeSpanType = null!;
-        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectType.String, Format = "date" }, true, null).Should().Be("?");
-        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectType.String, Format = "date-time" }, true, null).Should().Be("?");
-        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectType.String, Format = "time" }, true, null).Should().Be("?");
-        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectType.String, Format = "time-span" }, true, null).Should().Be("?");
+        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectTypes.String, Format = "date" }, true, null).Should().Be("?");
+        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectTypes.String, Format = "date-time" }, true, null).Should().Be("?");
+        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectTypes.String, Format = "time" }, true, null).Should().Be("?");
+        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectTypes.String, Format = "time-span" }, true, null).Should().Be("?");
     }
 
     [Test]
@@ -92,17 +92,17 @@ public class NativeModelBranchTests
     {
         var resolver = CreateGenerator().Resolver;
 
-        resolver.Resolve(new ApiSchema { Type = ApiObjectType.Integer, Format = "byte" }, false, null).Should().Be("byte");
-        resolver.Resolve(new ApiSchema { Type = ApiObjectType.Integer, Format = "long" }, true, null).Should().Be("long?");
-        resolver.Resolve(new ApiSchema { Type = ApiObjectType.Integer, Minimum = -5_000_000_000 }, true, null).Should().Be("long?");
+        resolver.Resolve(new ApiSchema { Type = ApiObjectTypes.Integer, Format = "byte" }, false, null).Should().Be("byte");
+        resolver.Resolve(new ApiSchema { Type = ApiObjectTypes.Integer, Format = "long" }, true, null).Should().Be("long?");
+        resolver.Resolve(new ApiSchema { Type = ApiObjectTypes.Integer, Minimum = -5_000_000_000 }, true, null).Should().Be("long?");
 
-        var pattern = new ApiSchema { Type = ApiObjectType.Object, AllowAdditionalProperties = false };
-        pattern.PatternProperties["^a"] = new ApiSchemaProperty { Type = ApiObjectType.Integer };
+        var pattern = new ApiSchema { Type = ApiObjectTypes.Object, AllowAdditionalProperties = false };
+        pattern.PatternProperties["^a"] = new ApiSchemaProperty { Type = ApiObjectTypes.Integer };
         resolver.Resolve(pattern, false, null).Should().EndWith("<string, int>");
 
-        var mixed = new ApiSchema { Type = ApiObjectType.Object, AllowAdditionalProperties = false };
-        mixed.PatternProperties["^a"] = new ApiSchemaProperty { Type = ApiObjectType.Integer };
-        mixed.PatternProperties["^b"] = new ApiSchemaProperty { Type = ApiObjectType.String };
+        var mixed = new ApiSchema { Type = ApiObjectTypes.Object, AllowAdditionalProperties = false };
+        mixed.PatternProperties["^a"] = new ApiSchemaProperty { Type = ApiObjectTypes.Integer };
+        mixed.PatternProperties["^b"] = new ApiSchemaProperty { Type = ApiObjectTypes.String };
         resolver.Resolve(mixed, false, null).Should().EndWith("<string, object>");
     }
 
@@ -110,15 +110,15 @@ public class NativeModelBranchTests
     public void Registers_Referenced_Schemas_Under_Their_Definition_Names()
     {
         var resolver = CreateGenerator().Resolver;
-        var target = new ApiSchema { Type = ApiObjectType.Object };
-        target.Properties["a"] = new ApiSchemaProperty { Type = ApiObjectType.String };
-        var dictionary = new ApiSchema { Type = ApiObjectType.Object, AdditionalPropertiesSchema = new ApiSchema { Type = ApiObjectType.String } };
+        var target = new ApiSchema { Type = ApiObjectTypes.Object };
+        target.Properties["a"] = new ApiSchemaProperty { Type = ApiObjectTypes.String };
+        var dictionary = new ApiSchema { Type = ApiObjectTypes.Object, AdditionalPropertiesSchema = new ApiSchema { Type = ApiObjectTypes.String } };
 
         resolver.RegisterSchemaDefinitions(new Dictionary<string, ApiSchema>
         {
             ["Alias"] = new ApiSchema { Reference = target },
             ["Map"] = dictionary,
-            ["Any"] = new ApiSchema { Type = ApiObjectType.Object },
+            ["Any"] = new ApiSchema { Type = ApiObjectTypes.Object },
         });
 
         resolver.Types.Select(t => t.Value).Should().Equal("Alias", "Map", "Any");
@@ -166,8 +166,8 @@ public class NativeModelBranchTests
     [Test]
     public void Skips_Inheritance_Discriminators_When_Naming_Properties()
     {
-        var baseSchema = new ApiSchema { Type = ApiObjectType.Object, Discriminator = "kind" };
-        baseSchema.Properties["kind"] = new ApiSchemaProperty { Type = ApiObjectType.String };
+        var baseSchema = new ApiSchema { Type = ApiObjectTypes.Object, Discriminator = "kind" };
+        baseSchema.Properties["kind"] = new ApiSchemaProperty { Type = ApiObjectTypes.String };
         var generator = new UniqueContractPropertyNameGenerator(new ContractPropertyNameGenerator(), _ => null);
 
         generator.Generate(baseSchema.Properties["kind"]).Should().Be("Kind");
@@ -242,21 +242,21 @@ public class NativeModelBranchTests
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
         var int64 = new RefitGeneratorSettings { CodeGeneratorSettings = new CodeGeneratorSettings { IntegerType = IntegerType.Int64 } };
 
-        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectType.Integer }, settings).Should().Be("int");
-        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectType.Integer, Format = "int32" }, settings).Should().Be("int");
-        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectType.Integer }, int64).Should().Be("long");
-        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectType.Boolean, IsNullableRaw = true }, settings).Should().Be("bool?");
-        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectType.Array, Item = new ApiSchema { Type = ApiObjectType.Number } }, settings).Should().Be("double[]");
-        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectType.Array }, settings).Should().Be("object[]");
+        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectTypes.Integer }, settings).Should().Be("int");
+        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectTypes.Integer, Format = "int32" }, settings).Should().Be("int");
+        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectTypes.Integer }, int64).Should().Be("long");
+        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectTypes.Boolean, IsNullableRaw = true }, settings).Should().Be("bool?");
+        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectTypes.Array, Item = new ApiSchema { Type = ApiObjectTypes.Number } }, settings).Should().Be("double[]");
+        ParameterTypeResolver.GetCSharpType(new ApiSchema { Type = ApiObjectTypes.Array }, settings).Should().Be("object[]");
     }
 
     [Test]
     public void Canonical_Json_Sorts_And_Normalizes_Values()
     {
         var comparer = new DocumentEquivalenceComparer();
-        var schema = new ApiSchema { Type = ApiObjectType.Object, IsNullableRaw = true };
-        schema.AllOf.Add(new ApiSchema { Type = ApiObjectType.String });
-        schema.AllOf.Add(new ApiSchema { Type = ApiObjectType.Integer });
+        var schema = new ApiSchema { Type = ApiObjectTypes.Object, IsNullableRaw = true };
+        schema.AllOf.Add(new ApiSchema { Type = ApiObjectTypes.String });
+        schema.AllOf.Add(new ApiSchema { Type = ApiObjectTypes.Integer });
 
         comparer.CreateCanonicalSchemaJson(schema, new HashSet<ApiSchema>()).Should().Contain("\"nullable\":true");
 

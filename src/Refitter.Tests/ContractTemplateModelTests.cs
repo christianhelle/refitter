@@ -199,7 +199,7 @@ public class ContractTemplateModelTests
     public void Enum_Model_Describes_Values()
     {
         var (generator, _) = Create();
-        var schema = new ApiSchema { Type = ApiObjectType.Integer, IsFlagEnumerable = true };
+        var schema = new ApiSchema { Type = ApiObjectTypes.Integer, IsFlagEnumerable = true };
         schema.ExtensionData = new Dictionary<string, object?> { ["x-custom"] = true };
         foreach (var value in new object[] { (byte)1, (sbyte)2, (short)4, (ushort)8, 16, 32u, 64L, 128ul, 256f, 512d, "x" })
             schema.Enumeration.Add(value);
@@ -211,7 +211,7 @@ public class ContractTemplateModelTests
         items.Select(i => i.InternalValue).Should().Equal("1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "x");
         items[0].OriginalName.Should().Be("_1");
 
-        var named = new ApiSchema { Type = ApiObjectType.String };
+        var named = new ApiSchema { Type = ApiObjectTypes.String };
         named.Enumeration.Add("a");
         named.EnumerationNames.Add("Alpha");
         new EnumTemplateModel("Named", named, generator.Settings).Enums.Single().OriginalName.Should().Be("Alpha");

@@ -987,13 +987,13 @@ internal sealed class ApiJsonReader
         }
     }
 
-    private static ApiObjectType ReadType(JsonElement value) =>
+    private static ApiObjectTypes ReadType(JsonElement value) =>
         value.ValueKind switch
         {
             JsonValueKind.Array => value.EnumerateArray()
-                .Aggregate(ApiObjectType.None, (type, item) => type | ApiObjectTypeExtensions.Parse(ToScalarString(item))),
+                .Aggregate(ApiObjectTypes.None, (type, item) => type | ApiObjectTypeExtensions.Parse(ToScalarString(item))),
             JsonValueKind.String => ApiObjectTypeExtensions.Parse(value.GetString()),
-            _ => ApiObjectType.None,
+            _ => ApiObjectTypes.None,
         };
 
     private static List<string> ReadRequired(JsonElement value)

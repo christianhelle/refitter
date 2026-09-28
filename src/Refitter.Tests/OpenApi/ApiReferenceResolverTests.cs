@@ -163,7 +163,7 @@ public class ApiReferenceResolverTests
             """);
 
         var responses = document.Paths["/a"]["get"].Responses;
-        responses["201"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectType.Integer);
+        responses["201"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectTypes.Integer);
         responses["202"].Content["application/json"].Schema!.ActualSchema.Format.Should().Be("shape");
     }
 
@@ -339,10 +339,10 @@ public class ApiReferenceResolverTests
 
         var operation = document.Paths["/a"]["get"];
         operation.Parameters[0].ActualParameter.Name.Should().Be("id");
-        operation.RequestBody!.ActualRequestBody.Content["application/json"].Schema!.Type.Should().Be(ApiObjectType.Integer);
+        operation.RequestBody!.ActualRequestBody.Content["application/json"].Schema!.Type.Should().Be(ApiObjectTypes.Integer);
         operation.Responses["200"].Content["application/json"].Schema!.ActualSchema.Format.Should().Be("name");
-        operation.Responses["201"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectType.Number);
-        operation.Responses["202"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectType.Boolean);
+        operation.Responses["201"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectTypes.Number);
+        operation.Responses["202"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectTypes.Boolean);
         document.Paths["/b"].ActualPathItem.Keys.Should().Equal("post");
     }
 
@@ -398,9 +398,9 @@ public class ApiReferenceResolverTests
         var responses = document.Paths["/a"]["get"].Responses;
         var pet = responses["200"].Content["application/json"].Schema!.ActualSchema;
         pet.Should().BeSameAs(responses["201"].Content["application/json"].Schema!.ActualSchema);
-        pet.Properties["owner"].ActualSchema.Type.Should().Be(ApiObjectType.Object);
-        pet.Properties["tags"].Item!.ActualSchema.Type.Should().Be(ApiObjectType.String);
-        responses["202"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectType.Boolean);
+        pet.Properties["owner"].ActualSchema.Type.Should().Be(ApiObjectTypes.Object);
+        pet.Properties["tags"].Item!.ActualSchema.Type.Should().Be(ApiObjectTypes.String);
+        responses["202"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectTypes.Boolean);
         var whole = responses["203"].Content["application/json"].Schema!.ActualSchema;
         whole.Format.Should().Be("int64");
         whole.DocumentPath.Should().EndWith("whole.yaml");
@@ -466,8 +466,8 @@ public class ApiReferenceResolverTests
             urls);
 
         var responses = document.Paths["/a"]["get"].Responses;
-        responses["200"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectType.Object);
-        responses["201"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectType.String);
+        responses["200"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectTypes.Object);
+        responses["201"].Content["application/json"].Schema!.ActualSchema.Type.Should().Be(ApiObjectTypes.String);
     }
 
     [Test]

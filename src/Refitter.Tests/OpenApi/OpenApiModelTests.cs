@@ -92,25 +92,25 @@ public class OpenApiModelTests
     public void Inherited_Schema_Prefers_References_Then_Objects_Then_The_First_Schema()
     {
         var withObject = new ApiSchema();
-        var objectSchema = new ApiSchema { Type = ApiObjectType.Object };
-        withObject.AllOf.Add(new ApiSchema { Type = ApiObjectType.String });
+        var objectSchema = new ApiSchema { Type = ApiObjectTypes.Object };
+        withObject.AllOf.Add(new ApiSchema { Type = ApiObjectTypes.String });
         withObject.AllOf.Add(objectSchema);
         withObject.InheritedSchema.Should().BeSameAs(objectSchema);
 
         var withoutObject = new ApiSchema();
-        var first = new ApiSchema { Type = ApiObjectType.String };
+        var first = new ApiSchema { Type = ApiObjectTypes.String };
         withoutObject.AllOf.Add(first);
-        withoutObject.AllOf.Add(new ApiSchema { Type = ApiObjectType.Integer });
+        withoutObject.AllOf.Add(new ApiSchema { Type = ApiObjectTypes.Integer });
         withoutObject.InheritedSchema.Should().BeSameAs(first);
     }
 
     [Test]
     public void Discriminators_Are_Found_On_Types_And_Base_Types()
     {
-        var baseSchema = new ApiSchema { Type = ApiObjectType.Object, Discriminator = "kind" };
-        var derived = new ApiSchema { Type = ApiObjectType.Object };
+        var baseSchema = new ApiSchema { Type = ApiObjectTypes.Object, Discriminator = "kind" };
+        var derived = new ApiSchema { Type = ApiObjectTypes.Object };
         derived.AllOf.Add(new ApiSchema { Reference = baseSchema });
-        derived.AllOf.Add(new ApiSchema { Type = ApiObjectType.Object });
+        derived.AllOf.Add(new ApiSchema { Type = ApiObjectTypes.Object });
         derived.ResponsibleDiscriminatorObject.Should().BeSameAs(baseSchema.DiscriminatorObject);
 
         var alias = new ApiSchema { Reference = baseSchema };
@@ -120,10 +120,10 @@ public class OpenApiModelTests
     [Test]
     public void Actual_Properties_Must_Be_Unique()
     {
-        var schema = new ApiSchema { Type = ApiObjectType.Object };
+        var schema = new ApiSchema { Type = ApiObjectTypes.Object };
         schema.Properties["name"] = new ApiSchemaProperty();
-        var baseSchema = new ApiSchema { Type = ApiObjectType.Object };
-        var mixin = new ApiSchema { Type = ApiObjectType.Object };
+        var baseSchema = new ApiSchema { Type = ApiObjectTypes.Object };
+        var mixin = new ApiSchema { Type = ApiObjectTypes.Object };
         mixin.Properties["name"] = new ApiSchemaProperty();
         schema.AllOf.Add(new ApiSchema { Reference = baseSchema });
         schema.AllOf.Add(mixin);
@@ -136,21 +136,21 @@ public class OpenApiModelTests
     [Test]
     public void Nullability_Considers_Enums_And_Extension_Data()
     {
-        var enumeration = new ApiSchema { Type = ApiObjectType.String };
+        var enumeration = new ApiSchema { Type = ApiObjectTypes.String };
         enumeration.Enumeration.Add("a");
         enumeration.Enumeration.Add(null);
         enumeration.IsNullable(ApiSchemaType.OpenApi3).Should().BeTrue();
 
-        var extension = new ApiSchema { Type = ApiObjectType.String, ExtensionData = new() { ["nullable"] = "true" } };
+        var extension = new ApiSchema { Type = ApiObjectTypes.String, ExtensionData = new() { ["nullable"] = "true" } };
         extension.IsNullable(ApiSchemaType.OpenApi3).Should().BeTrue();
 
-        var invalid = new ApiSchema { Type = ApiObjectType.String, ExtensionData = new() { ["nullable"] = "maybe" } };
+        var invalid = new ApiSchema { Type = ApiObjectTypes.String, ExtensionData = new() { ["nullable"] = "maybe" } };
         invalid.IsNullable(ApiSchemaType.OpenApi3).Should().BeFalse();
 
-        var empty = new ApiSchema { Type = ApiObjectType.String, ExtensionData = new() { ["nullable"] = null } };
+        var empty = new ApiSchema { Type = ApiObjectTypes.String, ExtensionData = new() { ["nullable"] = null } };
         empty.IsNullable(ApiSchemaType.OpenApi3).Should().BeFalse();
 
-        var other = new ApiSchema { Type = ApiObjectType.String, ExtensionData = new() { ["x-other"] = true } };
+        var other = new ApiSchema { Type = ApiObjectTypes.String, ExtensionData = new() { ["x-other"] = true } };
         other.IsNullable(ApiSchemaType.OpenApi3).Should().BeFalse();
     }
 
@@ -169,7 +169,7 @@ public class OpenApiModelTests
     [Test]
     public void Actual_Schema_Follows_A_Single_Referenced_AnyOf()
     {
-        var target = new ApiSchema { Type = ApiObjectType.Object };
+        var target = new ApiSchema { Type = ApiObjectTypes.Object };
         var schema = new ApiSchema();
         schema.AnyOf.Add(new ApiSchema { Reference = target });
 
@@ -194,17 +194,17 @@ public class OpenApiModelTests
     [Test]
     public void Parameters_Referencing_Parameters_Use_Their_Schema()
     {
-        var target = new ApiParameter { Schema = new ApiSchema { Type = ApiObjectType.Integer } };
+        var target = new ApiParameter { Schema = new ApiSchema { Type = ApiObjectTypes.Integer } };
         var parameter = new ApiParameter { Reference = target };
 
-        parameter.ActualSchema.Type.Should().Be(ApiObjectType.Integer);
+        parameter.ActualSchema.Type.Should().Be(ApiObjectTypes.Integer);
     }
 
     [Test]
     public void Parameters_Prefer_Their_Schema_Then_Their_Custom_Schema()
     {
-        var schema = new ApiSchema { Type = ApiObjectType.Integer };
-        var customSchema = new ApiSchema { Type = ApiObjectType.Boolean };
+        var schema = new ApiSchema { Type = ApiObjectTypes.Integer };
+        var customSchema = new ApiSchema { Type = ApiObjectTypes.Boolean };
 
         new ApiParameter { Schema = schema, CustomSchema = customSchema }.ActualSchema.Should().BeSameAs(schema);
         new ApiParameter { CustomSchema = customSchema }.ActualSchema.Should().BeSameAs(customSchema);
@@ -240,7 +240,7 @@ public class OpenApiModelTests
 
         operation.RequestBody.Description = "D";
         operation.RequestBody.Position = 1;
-        operation.RequestBody.Content["text/plain"] = new ApiMediaType { Schema = new ApiSchema { Type = ApiObjectType.String } };
+        operation.RequestBody.Content["text/plain"] = new ApiMediaType { Schema = new ApiSchema { Type = ApiObjectTypes.String } };
         operation.RequestBody.Content["text/plain"].Example = "e";
         operation.Parameters.Single(p => p.Kind == ApiParameterKind.Body).Description.Should().Be("D");
         ((IEnumerable)operation.RequestBody.Content).Cast<object>().Should().HaveCount(2);

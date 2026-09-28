@@ -86,7 +86,7 @@ internal class ReturnTypeGenerator(
                 if (IsFileContentType(contentEntry.Key))
                 {
                     var schema = contentEntry.Value?.Schema;
-                    if (schema?.Format == "binary" || schema?.Type == ApiObjectType.File)
+                    if (schema?.Format == "binary" || schema?.Type == ApiObjectTypes.File)
                         return true;
                 }
             }
@@ -192,16 +192,16 @@ internal class ReturnTypeGenerator(
             return false;
 
         ApiSchema actual = schema.ActualTypeSchema ?? schema;
-        ApiObjectType type = actual.Type & ~ApiObjectType.Null;
-        return type is ApiObjectType.String
-            or ApiObjectType.Number
-            or ApiObjectType.Integer
-            or ApiObjectType.Boolean;
+        ApiObjectTypes type = actual.Type & ~ApiObjectTypes.Null;
+        return type is ApiObjectTypes.String
+            or ApiObjectTypes.Number
+            or ApiObjectTypes.Integer
+            or ApiObjectTypes.Boolean;
     }
 
     private string GetStreamingReturnType(ApiSchema? schema)
     {
-        ApiSchema? itemSchema = schema?.Type == ApiObjectType.Array
+        ApiSchema? itemSchema = schema?.Type == ApiObjectTypes.Array
             ? schema.Item
             : schema;
         string itemTypeName = itemSchema is null
@@ -235,7 +235,7 @@ internal class ReturnTypeGenerator(
         var typeName = generator.GetTypeName(schema, false, null);
 
         if (!string.IsNullOrWhiteSpace(codeGeneration.CodeGeneratorSettings?.ArrayType) &&
-            schema?.Type == ApiObjectType.Array)
+            schema?.Type == ApiObjectTypes.Array)
         {
             typeName = typeName
                 .Replace("ICollection", codeGeneration.CodeGeneratorSettings!.ArrayType)

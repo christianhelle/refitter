@@ -7,15 +7,15 @@ internal sealed class FixMissingIntegerTypesMutator : IDocumentMutator
 
     private static void Fix(ApiSchema schema)
     {
-        if ((schema.Type == ApiObjectType.None || schema.Type == ApiObjectType.Null) && !string.IsNullOrEmpty(schema.Format))
+        if ((schema.Type == ApiObjectTypes.None || schema.Type == ApiObjectTypes.Null) && !string.IsNullOrEmpty(schema.Format))
         {
             if (schema.Format is "int32" or "int64")
             {
-                schema.Type = ApiObjectType.Integer;
+                schema.Type = ApiObjectTypes.Integer;
             }
             else if (schema.Format is "float" or "double")
             {
-                schema.Type = ApiObjectType.Number;
+                schema.Type = ApiObjectTypes.Number;
             }
         }
     }

@@ -134,7 +134,7 @@ internal class ApiSchema
 
     public ApiSchema? ParentSchema => Parent as ApiSchema;
 
-    public ApiObjectType Type { get; set; }
+    public ApiObjectTypes Type { get; set; }
 
     public ApiSchema? Reference
     {
@@ -149,7 +149,7 @@ internal class ApiSchema
 
             if (value != null)
             {
-                Type = ApiObjectType.None;
+                Type = ApiObjectTypes.None;
             }
         }
     }
@@ -275,7 +275,7 @@ internal class ApiSchema
         (AdditionalPropertiesSchema != null || PatternProperties.Count > 0);
 
     public bool IsAnyType =>
-        (Type.IsObject() || Type == ApiObjectType.None) &&
+        (Type.IsObject() || Type == ApiObjectTypes.None) &&
         Reference == null &&
         AllOf.Count == 0 &&
         AnyOf.Count == 0 &&
@@ -290,7 +290,7 @@ internal class ApiSchema
         Reference != null || HasAllOfSchemaReference || HasOneOfSchemaReference || HasAnyOfSchemaReference;
 
     public bool HasAllOfSchemaReference =>
-        Type == ApiObjectType.None &&
+        Type == ApiObjectTypes.None &&
         AnyOf.Count == 0 &&
         OneOf.Count == 0 &&
         Properties.Count == 0 &&
@@ -302,7 +302,7 @@ internal class ApiSchema
         AllOf.Any(s => s.HasReference);
 
     public bool HasOneOfSchemaReference =>
-        Type == ApiObjectType.None &&
+        Type == ApiObjectTypes.None &&
         AnyOf.Count == 0 &&
         AllOf.Count == 0 &&
         Properties.Count == 0 &&
@@ -314,7 +314,7 @@ internal class ApiSchema
         OneOf.Any(s => s.HasReference);
 
     public bool HasAnyOfSchemaReference =>
-        Type == ApiObjectType.None &&
+        Type == ApiObjectTypes.None &&
         AllOf.Count == 0 &&
         OneOf.Count == 0 &&
         Properties.Count == 0 &&
@@ -448,7 +448,7 @@ internal class ApiSchema
         if (Type.IsNull())
             return true;
 
-        if (Type == ApiObjectType.None || Type.IsNull())
+        if (Type == ApiObjectTypes.None || Type.IsNull())
         {
             foreach (var schema in OneOf)
             {

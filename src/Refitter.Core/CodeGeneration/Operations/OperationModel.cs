@@ -267,7 +267,7 @@ internal sealed class OperationModel
         if (parameter.IsBinaryBodyParameter)
             return parameter.HasBinaryBodyWithMultipleMimeTypes ? "FileParameter" : "System.IO.Stream";
 
-        if (actualSchema.Type == ApiObjectType.Array && actualSchema.Item?.IsBinary == true)
+        if (actualSchema.Type == ApiObjectTypes.Array && actualSchema.Item?.IsBinary == true)
             return "System.Collections.Generic.IEnumerable<FileParameter>";
 
         if (actualSchema.IsBinary)
@@ -288,9 +288,9 @@ internal sealed class OperationModel
         if (parameter.IsXmlBodyParameter)
             return "string";
 
-        if (parameter.CollectionFormat == ApiParameterCollectionFormat.Multi && (schema.Type & ApiObjectType.Array) == 0)
+        if (parameter.CollectionFormat == ApiParameterCollectionFormat.Multi && (schema.Type & ApiObjectTypes.Array) == 0)
         {
-            schema = new ApiSchema { Type = ApiObjectType.Array, Item = schema };
+            schema = new ApiSchema { Type = ApiObjectTypes.Array, Item = schema };
         }
 
         var typeNameHint = !schema.HasTypeNameTitle
@@ -319,7 +319,7 @@ internal sealed class OperationModel
                     Kind = ApiParameterKind.FormData,
                     Schema = p.Value,
                     Description = p.Value.Description,
-                    CollectionFormat = (p.Value.Type & ApiObjectType.Array) != ApiObjectType.None && p.Value.Item != null
+                    CollectionFormat = (p.Value.Type & ApiObjectTypes.Array) != ApiObjectTypes.None && p.Value.Item != null
                         ? ApiParameterCollectionFormat.Multi
                         : ApiParameterCollectionFormat.Undefined,
                     Position = count + 100 + i,
@@ -433,7 +433,7 @@ internal sealed class OperationParameterModel
 
     public bool IsDateOrDateTime => IsDate || IsDateTime;
 
-    public bool IsArray => Schema.Type.HasFlag(ApiObjectType.Array) || parameter.CollectionFormat == ApiParameterCollectionFormat.Multi;
+    public bool IsArray => Schema.Type.HasFlag(ApiObjectTypes.Array) || parameter.CollectionFormat == ApiParameterCollectionFormat.Multi;
 
     public bool IsExplodedArray =>
         IsArray &&
@@ -441,7 +441,7 @@ internal sealed class OperationParameterModel
             ? parameter.CollectionFormat == ApiParameterCollectionFormat.Multi
             : Explode ?? Kind is ApiParameterKind.Query or ApiParameterKind.Cookie);
 
-    public bool IsStringArray => IsArray && Schema.Item?.ActualSchema.Type.HasFlag(ApiObjectType.String) == true;
+    public bool IsStringArray => IsArray && Schema.Item?.ActualSchema.Type.HasFlag(ApiObjectTypes.String) == true;
 
     public bool IsFile => Schema.IsBinary || (IsArray && Schema.Item?.IsBinary == true);
 
@@ -457,7 +457,7 @@ internal sealed class OperationParameterModel
         Schema.Item?.ActualSchema.Format == "date" &&
         generator.GetTypeName(Schema.Item.ActualSchema, IsNullable, null) != "string";
 
-    public bool IsObject => Schema.ActualSchema.Type == ApiObjectType.Object;
+    public bool IsObject => Schema.ActualSchema.Type == ApiObjectTypes.Object;
 
     public bool IsQuery => Kind == ApiParameterKind.Query;
 
@@ -476,7 +476,7 @@ internal sealed class ParameterPropertyModel(string key, ApiSchemaProperty prope
 
     public string Name { get; } = name;
 
-    public bool IsCollection => property.Type == ApiObjectType.Array;
+    public bool IsCollection => property.Type == ApiObjectTypes.Array;
 }
 
 /// <summary>The C# view of an operation response.</summary>

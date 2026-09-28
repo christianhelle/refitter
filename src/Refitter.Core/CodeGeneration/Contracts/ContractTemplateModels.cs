@@ -423,9 +423,9 @@ internal sealed class PropertyModel
         {
             switch (schema.Type)
             {
-                case ApiObjectType.Integer:
+                case ApiObjectTypes.Integer:
                     return "int32";
-                case ApiObjectType.Number:
+                case ApiObjectTypes.Number:
                     return "double";
             }
         }
@@ -475,7 +475,7 @@ internal sealed class EnumTemplateModel(string typeName, ApiSchema schema, Contr
 
     public IDictionary<string, object?>? ExtensionData => schema.ExtensionData;
 
-    public bool IsStringEnum => schema.Type != ApiObjectType.Integer;
+    public bool IsStringEnum => schema.Type != ApiObjectTypes.Integer;
 
     public string TypeAccessModifier => settings.TypeAccessModifier;
 

@@ -956,15 +956,15 @@ paths:
     {
         var schema = new ApiSchema
         {
-            Type = ApiObjectType.Object,
+            Type = ApiObjectTypes.Object,
             AllowAdditionalProperties = false,
             AdditionalPropertiesSchema = new ApiSchema
             {
-                Type = ApiObjectType.String
+                Type = ApiObjectTypes.String
             },
             Item = new ApiSchema
             {
-                Type = ApiObjectType.Integer
+                Type = ApiObjectTypes.Integer
             },
             ExtensionData = new Dictionary<string, object?>
             {
@@ -978,11 +978,11 @@ paths:
         schema.RequiredProperties.Add("name");
         schema.Properties["name"] = new ApiSchemaProperty
         {
-            Type = ApiObjectType.String
+            Type = ApiObjectTypes.String
         };
-        schema.AllOf.Add(new ApiSchema { Type = ApiObjectType.String });
-        schema.OneOf.Add(new ApiSchema { Type = ApiObjectType.Integer });
-        schema.AnyOf.Add(new ApiSchema { Type = ApiObjectType.Boolean });
+        schema.AllOf.Add(new ApiSchema { Type = ApiObjectTypes.String });
+        schema.OneOf.Add(new ApiSchema { Type = ApiObjectTypes.Integer });
+        schema.AnyOf.Add(new ApiSchema { Type = ApiObjectTypes.Boolean });
         schema.Enumeration.Add("active");
         schema.Enumeration.Add(null);
 
@@ -1018,7 +1018,7 @@ paths:
         {
             Reference = new ApiSchema
             {
-                Type = ApiObjectType.String
+                Type = ApiObjectTypes.String
             }
         };
 
@@ -1032,7 +1032,7 @@ paths:
     {
         var referencedSchema = new ApiSchema
         {
-            Type = ApiObjectType.Object
+            Type = ApiObjectTypes.Object
         };
         var schema = new ApiSchema
         {
@@ -1051,7 +1051,7 @@ paths:
     {
         var referencedSchema = new ApiSchema
         {
-            Type = ApiObjectType.Object
+            Type = ApiObjectTypes.Object
         };
         var schema = new ApiSchema
         {
@@ -1068,7 +1068,7 @@ paths:
     {
         var schema = new ApiSchema
         {
-            Type = ApiObjectType.Object
+            Type = ApiObjectTypes.Object
         };
 
         var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<ApiSchema> { schema });
@@ -1142,7 +1142,7 @@ paths:
     {
         var rootSchema = new ApiSchema
         {
-            Type = ApiObjectType.Object
+            Type = ApiObjectTypes.Object
         };
         var referencedChildSchema = ParseSchema("""
             {
@@ -1163,7 +1163,7 @@ paths:
 
         var existingDefinition = new ApiSchema
         {
-            Type = ApiObjectType.Integer
+            Type = ApiObjectTypes.Integer
         };
         var definitions = new Dictionary<string, ApiSchema>
         {
@@ -1180,7 +1180,7 @@ paths:
     {
         var rootSchema = new ApiSchema
         {
-            Type = ApiObjectType.Object
+            Type = ApiObjectTypes.Object
         };
         var referencedChildSchema = ParseSchema("""
             {
@@ -1212,7 +1212,7 @@ paths:
     {
         var schema = new ApiSchema
         {
-            Type = ApiObjectType.Object,
+            Type = ApiObjectTypes.Object,
             ExtensionData = new Dictionary<string, object?>
             {
                 ["x-null"] = null,
@@ -1235,11 +1235,11 @@ paths:
     {
         var rootSchema = new ApiSchema
         {
-            Type = ApiObjectType.Array
+            Type = ApiObjectTypes.Array
         };
         var referencedItemSchema = new ApiSchema
         {
-            Type = ApiObjectType.String
+            Type = ApiObjectTypes.String
         };
         var namedItemSchema = new ApiSchemaProperty
         {

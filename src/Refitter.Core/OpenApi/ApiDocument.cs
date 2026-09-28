@@ -140,7 +140,7 @@ internal sealed class ApiDocument
 
     private static bool IsSuccessArrayResponse(string code, ApiResponse response) =>
         HttpUtilities.IsSuccessStatusCode(code) &&
-        response.Schema?.ActualSchema.Type == ApiObjectType.Array;
+        response.Schema?.ActualSchema.Type == ApiObjectTypes.Array;
 
     private static string GetOperationNameFromPath(ApiOperationDescription operation)
     {

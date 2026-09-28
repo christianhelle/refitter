@@ -75,12 +75,12 @@ internal static class ParameterTypeResolver
     {
         var type = propertySchema.Type switch
         {
-            ApiObjectType.String => "string",
-            ApiObjectType.Integer => GetIntegerTypeName(propertySchema, settings),
-            ApiObjectType.Number => "double",
-            ApiObjectType.Boolean => "bool",
-            ApiObjectType.Array => GetArrayType(propertySchema, settings),
-            ApiObjectType.Object => "object",
+            ApiObjectTypes.String => "string",
+            ApiObjectTypes.Integer => GetIntegerTypeName(propertySchema, settings),
+            ApiObjectTypes.Number => "double",
+            ApiObjectTypes.Boolean => "bool",
+            ApiObjectTypes.Array => GetArrayType(propertySchema, settings),
+            ApiObjectTypes.Object => "object",
             _ => "object"
         };
 

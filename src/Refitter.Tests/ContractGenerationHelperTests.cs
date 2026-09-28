@@ -41,7 +41,7 @@ public class ContractGenerationHelperTests
     [Test]
     public void Resolves_Nullable_String_Dates_As_Strings()
     {
-        var schema = new ApiSchema { Type = ApiObjectType.String, Format = "date" };
+        var schema = new ApiSchema { Type = ApiObjectTypes.String, Format = "date" };
 
         Resolve(schema, isNullable: true, s => s.DateType = "string").Should().Be("string");
     }
@@ -49,7 +49,7 @@ public class ContractGenerationHelperTests
     [Test]
     public void Resolves_Nullable_Durations_From_The_Configured_Type()
     {
-        var schema = new ApiSchema { Type = ApiObjectType.String, Format = "duration" };
+        var schema = new ApiSchema { Type = ApiObjectTypes.String, Format = "duration" };
 
         Resolve(schema, isNullable: true, s => s.TimeSpanType = "string").Should().Be("string");
         Resolve(schema, isNullable: true, s => s.TimeSpanType = null!).Should().Be("?");
@@ -58,8 +58,8 @@ public class ContractGenerationHelperTests
     [Test]
     public void Resolves_Integers_Outside_The_Int_Range_As_Longs()
     {
-        Resolve(new ApiSchema { Type = ApiObjectType.Integer, Maximum = 5_000_000_000 }).Should().Be("long");
-        Resolve(new ApiSchema { Type = ApiObjectType.Integer, Minimum = 1, Maximum = 10 }).Should().Be("int");
+        Resolve(new ApiSchema { Type = ApiObjectTypes.Integer, Maximum = 5_000_000_000 }).Should().Be("long");
+        Resolve(new ApiSchema { Type = ApiObjectTypes.Integer, Minimum = 1, Maximum = 10 }).Should().Be("int");
     }
 
     [Test]
@@ -68,19 +68,19 @@ public class ContractGenerationHelperTests
         var generator = CreateGenerator();
         generator.Settings.NumberDecimalType = " ";
 
-        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectType.Number, Format = "decimal" }, false, null)
+        generator.Resolver.Resolve(new ApiSchema { Type = ApiObjectTypes.Number, Format = "decimal" }, false, null)
             .Should().Be("double");
     }
 
     [Test]
     public void Resolves_Tuples_And_Untyped_Arrays()
     {
-        var tuple = new ApiSchema { Type = ApiObjectType.Array };
-        tuple.Items.Add(new ApiSchema { Type = ApiObjectType.String });
-        tuple.Items.Add(new ApiSchema { Type = ApiObjectType.Boolean });
+        var tuple = new ApiSchema { Type = ApiObjectTypes.Array };
+        tuple.Items.Add(new ApiSchema { Type = ApiObjectTypes.String });
+        tuple.Items.Add(new ApiSchema { Type = ApiObjectTypes.Boolean });
 
         Resolve(tuple).Should().Be("System.Tuple<string, bool>");
-        Resolve(new ApiSchema { Type = ApiObjectType.Array }).Should().Be("System.Collections.Generic.ICollection<object>");
+        Resolve(new ApiSchema { Type = ApiObjectTypes.Array }).Should().Be("System.Collections.Generic.ICollection<object>");
     }
 
     [Test]
@@ -88,11 +88,11 @@ public class ContractGenerationHelperTests
     {
         var dictionary = new ApiSchema
         {
-            Type = ApiObjectType.Object,
+            Type = ApiObjectTypes.Object,
             AllowAdditionalProperties = false,
-            DictionaryKey = new ApiSchema { Type = ApiObjectType.Integer },
+            DictionaryKey = new ApiSchema { Type = ApiObjectTypes.Integer },
         };
-        dictionary.AdditionalPropertiesSchema = new ApiSchema { Type = ApiObjectType.String };
+        dictionary.AdditionalPropertiesSchema = new ApiSchema { Type = ApiObjectTypes.String };
 
         Resolve(dictionary).Should().Be("System.Collections.Generic.IDictionary<int, string>");
     }
@@ -111,14 +111,14 @@ public class ContractGenerationHelperTests
     public void Registers_Only_Definitions_That_Are_Types()
     {
         var resolver = CreateGenerator().Resolver;
-        var type = new ApiSchema { Type = ApiObjectType.Object };
-        type.Properties["a"] = new ApiSchemaProperty { Type = ApiObjectType.String };
+        var type = new ApiSchema { Type = ApiObjectTypes.Object };
+        type.Properties["a"] = new ApiSchemaProperty { Type = ApiObjectTypes.String };
 
         resolver.RegisterSchemaDefinitions(null);
         resolver.RegisterSchemaDefinitions(new Dictionary<string, ApiSchema>
         {
             ["Type"] = type,
-            ["Text"] = new ApiSchema { Type = ApiObjectType.String },
+            ["Text"] = new ApiSchema { Type = ApiObjectTypes.String },
         });
 
         resolver.IsRegistered(type).Should().BeTrue();
@@ -179,21 +179,21 @@ public class ContractGenerationHelperTests
         var values = generator.Settings.ValueGenerator;
         var resolver = generator.Resolver;
 
-        var date = new ApiSchema { Type = ApiObjectType.String, Format = "date-time", Default = "2024-01-02" };
+        var date = new ApiSchema { Type = ApiObjectTypes.String, Format = "date-time", Default = "2024-01-02" };
         values.GetDefaultValue(date, false, "System.DateTime", null, true, resolver).Should().Be("System.DateTime.Parse(\"2024-01-02\")");
 
-        var array = new ApiSchema { Type = ApiObjectType.Array };
+        var array = new ApiSchema { Type = ApiObjectTypes.Array };
         values.GetDefaultValue(array, false, "System.Collections.Generic.ICollection<string>", null, true, resolver)
             .Should().Be("new System.Collections.ObjectModel.Collection<string>()");
 
-        var dictionary = new ApiSchema { Type = ApiObjectType.Object };
+        var dictionary = new ApiSchema { Type = ApiObjectTypes.Object };
         values.GetDefaultValue(dictionary, false, "System.Collections.Generic.IDictionary<string, object>", null, true, resolver)
             .Should().Be("new System.Collections.Generic.Dictionary<string, object>()");
 
-        var abstractSchema = new ApiSchema { Type = ApiObjectType.Object, IsAbstract = true };
+        var abstractSchema = new ApiSchema { Type = ApiObjectTypes.Object, IsAbstract = true };
         values.GetDefaultValue(abstractSchema, false, "Base", null, true, resolver).Should().BeNull();
 
-        var enumeration = new ApiSchema { Type = ApiObjectType.String, Default = "b" };
+        var enumeration = new ApiSchema { Type = ApiObjectTypes.String, Default = "b" };
         enumeration.Enumeration.Add("a");
         enumeration.Enumeration.Add("b");
         enumeration.EnumerationNames.Add("Alpha");
@@ -207,7 +207,7 @@ public class ContractGenerationHelperTests
     [Arguments("decimal", "1M")]
     public void Generates_Numeric_Literals(string format, string expected)
     {
-        ContractValueGenerator.GetNumericValue(ApiObjectType.Number, 1L, format).Should().Be(expected);
+        ContractValueGenerator.GetNumericValue(ApiObjectTypes.Number, 1L, format).Should().Be(expected);
     }
 
     [Test]

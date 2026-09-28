@@ -38,7 +38,7 @@ public class UniqueEnumNameGeneratorTests
     [Test]
     public void Uses_Enumeration_Names_And_Integer_Value_Names()
     {
-        var schema = new ApiSchema { Type = ApiObjectType.Integer };
+        var schema = new ApiSchema { Type = ApiObjectTypes.Integer };
         schema.Enumeration.Add(1);
         schema.Enumeration.Add(2);
         schema.Enumeration.Add(3);
@@ -73,7 +73,7 @@ public class UniqueEnumNameGeneratorTests
 
     private static ApiSchema CreateStringEnum(params string?[] values)
     {
-        var schema = new ApiSchema { Type = ApiObjectType.String };
+        var schema = new ApiSchema { Type = ApiObjectTypes.String };
         foreach (var value in values)
         {
             schema.Enumeration.Add(value);

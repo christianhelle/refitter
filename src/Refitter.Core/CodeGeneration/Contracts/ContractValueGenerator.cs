@@ -62,7 +62,7 @@ internal sealed class ContractValueGenerator(ContractGeneratorSettings settings)
         return null;
     }
 
-    public static string GetNumericValue(ApiObjectType type, object value, string? format)
+    public static string GetNumericValue(ApiObjectTypes type, object value, string? format)
     {
         switch (format)
         {
@@ -113,7 +113,7 @@ internal sealed class ContractValueGenerator(ContractGeneratorSettings settings)
             return null;
 
         var actualSchema = schema is ApiSchemaProperty property ? property.ActualTypeSchema : schema.ActualSchema;
-        if (actualSchema.IsEnumeration && !actualSchema.Type.IsObject() && actualSchema.Type != ApiObjectType.None)
+        if (actualSchema.IsEnumeration && !actualSchema.Type.IsObject() && actualSchema.Type != ApiObjectTypes.None)
             return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
 
         if (schema.Type.IsString() && (schema.Format == null || !UnsupportedFormatStrings.Contains(schema.Format)))

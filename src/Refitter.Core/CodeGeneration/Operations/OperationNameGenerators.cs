@@ -45,7 +45,7 @@ internal class MultipleClientsFromOperationIdApiOperationNameGenerator : IApiOpe
         if (hasOperationWithSameName &&
             operationName.StartsWith("get", StringComparison.InvariantCultureIgnoreCase) &&
             operation.ActualResponses.TryGetValue("200", out var response) &&
-            response.Schema?.ActualSchema.Type.HasFlag(ApiObjectType.Array) == true)
+            response.Schema?.ActualSchema.Type.HasFlag(ApiObjectTypes.Array) == true)
         {
             return "GetAll" + operationName.Substring(3);
         }

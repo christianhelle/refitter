@@ -53,11 +53,11 @@ internal sealed class ContractTypeResolver
         }
 
         var type = schema.ActualTypeSchema.Type;
-        if (type == ApiObjectType.None && schema.ActualTypeSchema.IsEnumeration)
+        if (type == ApiObjectTypes.None && schema.ActualTypeSchema.IsEnumeration)
         {
             type = schema.ActualTypeSchema.Enumeration.All(v => v is int)
-                ? ApiObjectType.Integer
-                : ApiObjectType.String;
+                ? ApiObjectTypes.Integer
+                : ApiObjectTypes.String;
         }
 
         if (type.IsNumber())
@@ -142,7 +142,7 @@ internal sealed class ContractTypeResolver
 
         if (!schema.IsTuple && !schema.IsDictionary && !schema.IsArray)
         {
-            if (!schema.IsEnumeration && schema.Type != ApiObjectType.None)
+            if (!schema.IsEnumeration && schema.Type != ApiObjectTypes.None)
                 return schema.Type.IsObject();
 
             return true;
@@ -201,7 +201,7 @@ internal sealed class ContractTypeResolver
         }
 
         if (string.IsNullOrEmpty(schema.Format) &&
-            schema.Type == ApiObjectType.Integer &&
+            schema.Type == ApiObjectTypes.Integer &&
             (schema.Minimum < int.MinValue || schema.Minimum > int.MaxValue ||
              schema.Maximum < int.MinValue || schema.Maximum > int.MaxValue))
         {

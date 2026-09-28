@@ -37,7 +37,7 @@ public class FlattenPrimitiveAllOfMutatorTests
         var parent = document.Components!.Schemas["TestModel"]
             .ActualSchema.Properties["parent"].ActualSchema;
 
-        parent.Type.Should().Be(ApiObjectType.String);
+        parent.Type.Should().Be(ApiObjectTypes.String);
         parent.AllOf.Should().BeEmpty();
         parent.Description.Should().Be("the parent id");
     }
@@ -115,7 +115,7 @@ public class FlattenPrimitiveAllOfMutatorTests
         var priority = document.Components!.Schemas["TestModel"]
             .ActualSchema.Properties["priority"].ActualSchema;
 
-        priority.Type.Should().Be(ApiObjectType.String);
+        priority.Type.Should().Be(ApiObjectTypes.String);
         priority.AllOf.Should().BeEmpty();
         priority.IsEnumeration.Should().BeTrue();
         priority.Enumeration.Should().BeEquivalentTo(new[] { "low", "medium", "high" });
@@ -152,7 +152,7 @@ public class FlattenPrimitiveAllOfMutatorTests
         var id = document.Components!.Schemas["TestModel"]
             .ActualSchema.Properties["id"].ActualSchema;
 
-        id.Type.Should().Be(ApiObjectType.String);
+        id.Type.Should().Be(ApiObjectTypes.String);
         id.AllOf.Should().BeEmpty();
     }
 
@@ -183,7 +183,7 @@ public class FlattenPrimitiveAllOfMutatorTests
         new FlattenPrimitiveAllOfMutator().Mutate(document);
 
         var actual = document.Components!.Schemas["TestModel"].ActualSchema;
-        actual.Type.Should().Be(ApiObjectType.Object);
+        actual.Type.Should().Be(ApiObjectTypes.Object);
         actual.Properties.Should().ContainKey("name");
     }
 

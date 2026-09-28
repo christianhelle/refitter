@@ -15,8 +15,8 @@ internal sealed class OneOfDiscriminatorToAllOfMutator : IDocumentMutator
             if (unionSchemas.Length == 0)
                 continue;
 
-            if (schema.Type is ApiObjectType.None or ApiObjectType.Null)
-                schema.Type = ApiObjectType.Object;
+            if (schema.Type is ApiObjectTypes.None or ApiObjectTypes.Null)
+                schema.Type = ApiObjectTypes.Object;
 
             foreach (var subSchemaReference in unionSchemas)
             {

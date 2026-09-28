@@ -490,7 +490,7 @@ internal sealed class ApiDocumentWriter
         {
             // Swagger 2.0 schemas only allow additional properties when they say so, written as an empty schema object
             if (schema.AllowAdditionalProperties &&
-                (schema.Type.IsObject() || schema.Type == ApiObjectType.None) &&
+                (schema.Type.IsObject() || schema.Type == ApiObjectTypes.None) &&
                 !schema.HasReference &&
                 schema.AllOf.Count == 0 &&
                 parameter == null)
@@ -646,7 +646,7 @@ internal sealed class ApiDocumentWriter
         writer.WriteEndArray();
     }
 
-    private static void WriteType(Utf8JsonWriter writer, ApiObjectType type)
+    private static void WriteType(Utf8JsonWriter writer, ApiObjectTypes type)
     {
         var types = ApiObjectTypeExtensions.AllTypes.Where(t => type.HasFlag(t)).ToList();
         if (types.Count == 1)

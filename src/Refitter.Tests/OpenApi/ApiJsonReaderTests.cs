@@ -120,7 +120,7 @@ public class ApiJsonReaderTests
         document.Components.RequestBodies["Body"].Parent.Should().BeSameAs(document);
         document.Components.Responses["Error"].Parent.Should().BeSameAs(document);
         document.Components.Parameters["Id"].Name.Should().Be("id");
-        document.Components.Headers["Rate"].Schema!.Type.Should().Be(ApiObjectType.Integer);
+        document.Components.Headers["Rate"].Schema!.Type.Should().Be(ApiObjectTypes.Integer);
         document.Components.SecuritySchemes["Bearer"].BearerFormat.Should().Be("JWT");
         document.Components.SecuritySchemes["Oidc"].OpenIdConnectUrl.Should().Be("https://example.com");
         document.ExtensionData.Should().ContainKey("consumes");
@@ -312,7 +312,7 @@ public class ApiJsonReaderTests
         response.Description.Should().Be("D");
         response.Headers.Keys.Should().Equal("X-Rate");
         response.IsNullableRaw.Should().BeTrue();
-        response.Schema!.Type.Should().Be(ApiObjectType.String);
+        response.Schema!.Type.Should().Be(ApiObjectTypes.String);
         response.Examples.Should().NotBeNull();
         response.ExtensionData.Should().ContainKey("content").And.NotContainKey("x-expectedSchemas");
         ReadResponse("""{ "schema": null }""", ApiSchemaType.Swagger2).Schema.Should().BeNull();
@@ -332,7 +332,7 @@ public class ApiJsonReaderTests
             """);
 
         response.Headers.Should().BeEmpty();
-        response.Content["application/json"].Schema!.Type.Should().Be(ApiObjectType.Integer);
+        response.Content["application/json"].Schema!.Type.Should().Be(ApiObjectTypes.Integer);
         response.IsNullableRaw.Should().BeNull();
         response.ExtensionData.Should().ContainKeys("x-nullable", "schema").And.NotContainKey("links");
         ReadResponse("""{ "content": [] }""").Content.Should().BeEmpty();
@@ -435,8 +435,8 @@ public class ApiJsonReaderTests
         schema.IsNullableRaw.Should().BeTrue();
         schema.Example.Should().Be("e");
         schema.IsFlagEnumerable.Should().BeTrue();
-        schema.DictionaryKey!.Type.Should().Be(ApiObjectType.String);
-        schema.Not!.Type.Should().Be(ApiObjectType.Null);
+        schema.DictionaryKey!.Type.Should().Be(ApiObjectTypes.String);
+        schema.Not!.Type.Should().Be(ApiObjectTypes.Null);
         schema.PatternProperties.Keys.Should().Equal("^x");
         schema.Definitions.Keys.Should().Equal("Inner");
         schema.EnumerationNames.Should().Equal("A");
@@ -470,7 +470,7 @@ public class ApiJsonReaderTests
         schema.Properties.Should().BeEmpty();
         schema.PatternProperties.Should().BeEmpty();
         schema.Enumeration.Should().BeEmpty();
-        schema.Type.Should().Be(ApiObjectType.None);
+        schema.Type.Should().Be(ApiObjectTypes.None);
         schema.RequiredProperties.Should().BeEmpty();
         schema.AllOf.Should().BeEmpty();
         schema.AllowAdditionalProperties.Should().BeTrue();
@@ -509,7 +509,7 @@ public class ApiJsonReaderTests
         ReadSchema("""{ "additionalItems": false }""").AllowAdditionalItems.Should().BeFalse();
         ReadSchema("""{ "additionalItems": true }""").AllowAdditionalItems.Should().BeTrue();
         ReadSchema("""{ "additionalItems": "false" }""").AllowAdditionalItems.Should().BeFalse();
-        ReadSchema("""{ "additionalItems": { "type": "string" } }""").AdditionalItemsSchema!.Type.Should().Be(ApiObjectType.String);
+        ReadSchema("""{ "additionalItems": { "type": "string" } }""").AdditionalItemsSchema!.Type.Should().Be(ApiObjectTypes.String);
         ReadSchema("""{ "additionalProperties": "true" }""").AllowAdditionalProperties.Should().BeTrue();
     }
 
@@ -527,8 +527,8 @@ public class ApiJsonReaderTests
     [Test]
     public void Reads_Types_Given_As_Lists()
     {
-        ReadSchema("""{ "type": ["string", "null"] }""").Type.Should().Be(ApiObjectType.String | ApiObjectType.Null);
-        ReadSchema("""{ "type": ["integer", 1] }""").Type.Should().Be(ApiObjectType.Integer);
+        ReadSchema("""{ "type": ["string", "null"] }""").Type.Should().Be(ApiObjectTypes.String | ApiObjectTypes.Null);
+        ReadSchema("""{ "type": ["integer", 1] }""").Type.Should().Be(ApiObjectTypes.Integer);
     }
 
     [Test]
@@ -643,8 +643,8 @@ public class ApiJsonReaderTests
         parameter.AllowEmptyValue.Should().BeTrue();
         parameter.Description.Should().Be("D");
         parameter.CollectionFormat.Should().Be(ApiParameterCollectionFormat.Multi);
-        parameter.Schema!.Type.Should().Be(ApiObjectType.Array);
-        parameter.CustomSchema!.Type.Should().Be(ApiObjectType.String);
+        parameter.Schema!.Type.Should().Be(ApiObjectTypes.Array);
+        parameter.CustomSchema!.Type.Should().Be(ApiObjectTypes.String);
         parameter.Position.Should().Be(3);
         parameter.Title.Should().Be("T");
         parameter.ExtensionData.Should().BeNull();
