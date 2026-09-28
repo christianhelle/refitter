@@ -23,36 +23,15 @@ internal class InterfaceGenerator
         ContractGenerator generator,
         IApiOperationNameGenerator operationNameGenerator,
         XmlDocumentationGenerator docGenerator)
-        : this(
-            settings,
-            document,
-            generator,
-            operationNameGenerator,
-            docGenerator,
-            new ReturnTypeGenerator(settings, generator),
-            new MethodAttributeGenerator(settings, document),
-            new MethodSignatureGenerator(settings))
-    {
-    }
-
-    private InterfaceGenerator(
-        RefitGeneratorSettings settings,
-        ApiDocument document,
-        ContractGenerator generator,
-        IApiOperationNameGenerator operationNameGenerator,
-        XmlDocumentationGenerator docGenerator,
-        IReturnTypeGenerator returnTypeGenerator,
-        IMethodAttributeGenerator methodAttributeGenerator,
-        IMethodSignatureGenerator methodSignatureGenerator)
     {
         this.settings = settings;
         this.document = document;
         this.generator = generator;
         this.operationNameGenerator = operationNameGenerator;
         this.docGenerator = docGenerator;
-        this.returnTypeGenerator = returnTypeGenerator;
-        this.methodAttributeGenerator = methodAttributeGenerator;
-        this.methodSignatureGenerator = methodSignatureGenerator;
+        returnTypeGenerator = new ReturnTypeGenerator(settings, generator);
+        methodAttributeGenerator = new MethodAttributeGenerator(settings, document);
+        methodSignatureGenerator = new MethodSignatureGenerator(settings);
     }
 
     public IEnumerable<GeneratedCode> Generate(IInterfacePartitioning partitioning)
