@@ -8,11 +8,8 @@ internal static class SchemaWalker
         var visited = new HashSet<ApiSchema>();
         var schemasToProcess = new Stack<ApiSchema>();
 
-        foreach (var schema in EnumerateDocumentSchemaRoots(document))
-        {
-            if (schema != null)
-                schemasToProcess.Push(schema);
-        }
+        foreach (var schema in EnumerateDocumentSchemaRoots(document).OfType<ApiSchema>())
+            schemasToProcess.Push(schema);
 
         while (schemasToProcess.Count > 0)
         {
@@ -22,11 +19,8 @@ internal static class SchemaWalker
 
             visitor(actualSchema);
 
-            foreach (var childSchema in EnumerateTraversableSchemas(actualSchema))
-            {
-                if (childSchema != null)
-                    schemasToProcess.Push(childSchema);
-            }
+            foreach (var childSchema in EnumerateTraversableSchemas(actualSchema).OfType<ApiSchema>())
+                schemasToProcess.Push(childSchema);
         }
     }
 

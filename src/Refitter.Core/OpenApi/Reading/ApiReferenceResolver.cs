@@ -132,11 +132,8 @@ internal sealed class ApiReferenceResolver
                 append: true);
         }
 
-        foreach (var mediaType in requestBody.Content.Values.ToArray())
-        {
-            if (mediaType.Schema != null)
-                VisitSchema(mediaType.Schema, visited, root, documentPath);
-        }
+        foreach (var schema in requestBody.Content.Values.ToArray().Select(mediaType => mediaType.Schema).OfType<ApiSchema>())
+            VisitSchema(schema, visited, root, documentPath);
     }
 
     private void VisitResponse(ApiResponse response, HashSet<object> visited, object root, string? documentPath)
@@ -156,11 +153,8 @@ internal sealed class ApiReferenceResolver
             VisitSchema(header, visited, root, documentPath);
         }
 
-        foreach (var mediaType in response.Content.Values.ToArray())
-        {
-            if (mediaType.Schema != null)
-                VisitSchema(mediaType.Schema, visited, root, documentPath);
-        }
+        foreach (var schema in response.Content.Values.ToArray().Select(mediaType => mediaType.Schema).OfType<ApiSchema>())
+            VisitSchema(schema, visited, root, documentPath);
     }
 
     private void VisitSchema(ApiSchema schema, HashSet<object> visited, object root, string? documentPath)

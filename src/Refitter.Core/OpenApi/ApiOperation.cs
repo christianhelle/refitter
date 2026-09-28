@@ -173,27 +173,15 @@ internal sealed class ApiOperation
             .Select(g => g.First());
     }
 
-    public IEnumerable<KeyValuePair<string, ApiResponse>> GetActualResponses(Func<string, ApiResponse, bool> predicate)
-    {
-        foreach (var response in Responses)
-        {
-            if (predicate(response.Key, response.Value.ActualResponse))
-                yield return new KeyValuePair<string, ApiResponse>(response.Key, response.Value.ActualResponse);
-        }
-    }
+    public IEnumerable<KeyValuePair<string, ApiResponse>> GetActualResponses(Func<string, ApiResponse, bool> predicate) =>
+        Responses
+            .Select(response => new KeyValuePair<string, ApiResponse>(response.Key, response.Value.ActualResponse))
+            .Where(response => predicate(response.Key, response.Value));
 
     public bool HasActualResponse(Func<string, ApiResponse, bool> predicate) => GetActualResponse(predicate) != null;
 
-    public ApiResponse? GetActualResponse(Func<string, ApiResponse, bool> predicate)
-    {
-        foreach (var response in Responses)
-        {
-            if (predicate(response.Key, response.Value.ActualResponse))
-                return response.Value.ActualResponse;
-        }
-
-        return null;
-    }
+    public ApiResponse? GetActualResponse(Func<string, ApiResponse, bool> predicate) =>
+        GetActualResponses(predicate).Select(response => response.Value).FirstOrDefault();
 
     public KeyValuePair<string?, ApiResponse?> GetSuccessResponse()
     {

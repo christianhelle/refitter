@@ -27,20 +27,12 @@ internal class MultipleClientsFromOperationIdApiOperationNameGenerator : IApiOpe
         var clientName = GetClientName(operation);
         var operationName = GetOperationName(operation);
 
-        var hasOperationWithSameName = false;
-        foreach (var pathItem in document.Paths)
-        {
-            foreach (var other in pathItem.Value.ActualPathItem)
-            {
-                if (other.Value != operation &&
-                    GetOperationName(other.Value) == operationName &&
-                    GetClientName(other.Value) == clientName)
-                {
-                    hasOperationWithSameName = true;
-                    break;
-                }
-            }
-        }
+        var hasOperationWithSameName = document.Paths
+            .SelectMany(pathItem => pathItem.Value.ActualPathItem.Select(other => other.Value))
+            .Any(other =>
+                other != operation &&
+                GetOperationName(other) == operationName &&
+                GetClientName(other) == clientName);
 
         if (hasOperationWithSameName &&
             operationName.StartsWith("get", StringComparison.InvariantCultureIgnoreCase) &&
@@ -246,15 +238,8 @@ internal sealed class RefitterOperationNameGenerator : IApiOperationNameGenerato
     private bool HasDuplicateOperationNames(ApiDocument document)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var path in document.Paths)
-        {
-            foreach (var operation in path.Value)
-            {
-                if (!seen.Add(GetOperationName(document, path.Key, operation.Key, operation.Value)))
-                    return true;
-            }
-        }
-
-        return false;
+        return document.Paths
+            .SelectMany(path => path.Value, (path, operation) => GetOperationName(document, path.Key, operation.Key, operation.Value))
+            .Any(name => !seen.Add(name));
     }
 }

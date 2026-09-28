@@ -98,13 +98,8 @@ internal sealed class ApiDocument
             if (arrayResponses.Count() == group.Count())
                 continue;
 
-            foreach (var operation in group)
-            {
-                if (operation.Operation.HasActualResponse(IsSuccessArrayResponse))
-                {
-                    operation.Operation.OperationId += "All";
-                }
-            }
+            foreach (var operation in arrayResponses)
+                operation.Operation.OperationId += "All";
         }
 
         foreach (var group in operations.GroupBy(o => o.Operation.OperationId))

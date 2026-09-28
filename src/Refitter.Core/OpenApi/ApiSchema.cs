@@ -399,13 +399,9 @@ internal class ApiSchema
             if (Properties.Count > 0)
                 return true;
 
-            foreach (var schema in AllOf)
-            {
-                if (schema.ActualSchema != InheritedSchema && schema.ActualSchema.HasActualProperties)
-                    return true;
-            }
-
-            return false;
+            return AllOf
+                .Select(schema => schema.ActualSchema)
+                .Any(schema => schema != InheritedSchema && schema.HasActualProperties);
         }
     }
 
@@ -448,14 +444,8 @@ internal class ApiSchema
         if (Type.IsNull())
             return true;
 
-        if (Type == ApiObjectTypes.None || Type.IsNull())
-        {
-            foreach (var schema in OneOf)
-            {
-                if (schema.IsNullable(schemaType))
-                    return true;
-            }
-        }
+        if ((Type == ApiObjectTypes.None || Type.IsNull()) && OneOf.Any(schema => schema.IsNullable(schemaType)))
+            return true;
 
         var actualSchema = ActualSchema;
         if (actualSchema != this && actualSchema.IsNullable(schemaType))

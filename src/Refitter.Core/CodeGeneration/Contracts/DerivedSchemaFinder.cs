@@ -98,11 +98,8 @@ internal sealed class DerivedSchemaFinder
         if (requestBody.Reference != null)
             VisitRequestBody(requestBody.Reference);
 
-        foreach (var mediaType in requestBody.Content.ToList())
-        {
-            if (mediaType.Value.Schema != null)
-                VisitSchema(mediaType.Value.Schema, "schema");
-        }
+        foreach (var schema in requestBody.Content.ToList().Select(mediaType => mediaType.Value.Schema).OfType<ApiSchema>())
+            VisitSchema(schema, "schema");
     }
 
     private void VisitResponse(ApiResponse response)
@@ -124,11 +121,8 @@ internal sealed class DerivedSchemaFinder
 
         if (!isSwagger2)
         {
-            foreach (var mediaType in response.Content.ToList())
-            {
-                if (mediaType.Value.Schema != null)
-                    VisitSchema(mediaType.Value.Schema, "schema");
-            }
+            foreach (var schema in response.Content.ToList().Select(mediaType => mediaType.Value.Schema).OfType<ApiSchema>())
+                VisitSchema(schema, "schema");
         }
     }
 
