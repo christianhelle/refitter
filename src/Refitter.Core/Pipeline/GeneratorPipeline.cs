@@ -38,8 +38,8 @@ internal sealed class GeneratorPipeline
             .Select(c => c.TypeName)
             .Where(name => !string.IsNullOrEmpty(name))
             .ToArray();
-        var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
-            ? document.Info!.Title!.Sanitize()
+        var title = settings.Naming.UseOpenApiTitle && !NullCheck.IsNullOrWhiteSpace(document.Info?.Title)
+            ? document.Info.Title.Sanitize()
             : settings.Naming.InterfaceName;
         var dependencyInjectionCode = settings.ApizrSettings != null
             ? ApizrRegistrationGenerator.Generate(settings, interfaceNames, title)

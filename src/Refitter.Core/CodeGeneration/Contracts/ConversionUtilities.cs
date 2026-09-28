@@ -33,10 +33,10 @@ internal static class ConversionUtilities
 
     private static string ConvertToCamelCase(string? input, bool firstCharacterMustBeAlpha, CamelCaseMode mode)
     {
-        if (string.IsNullOrEmpty(input))
+        if (NullCheck.IsNullOrEmpty(input))
             return string.Empty;
 
-        if (input!.IndexOfAny(CamelCaseCleanupChars) != -1)
+        if (input.IndexOfAny(CamelCaseCleanupChars) != -1)
             input = input.Replace(' ', '_').Replace('/', '_');
 
         return input.IndexOf('-') == -1

@@ -114,10 +114,10 @@ internal sealed class DocumentEquivalenceComparer
     internal static string? GetDefinitionName(ApiSchema schema)
     {
         var referencePath = schema.ReferencePath;
-        if (string.IsNullOrWhiteSpace(referencePath))
+        if (NullCheck.IsNullOrWhiteSpace(referencePath))
             return null;
 
-        var separatorIndex = referencePath!.LastIndexOf('/');
+        var separatorIndex = referencePath.LastIndexOf('/');
         return separatorIndex >= 0 && separatorIndex < referencePath.Length - 1
             ? Uri.UnescapeDataString(referencePath.Substring(separatorIndex + 1))
             : null;

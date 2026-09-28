@@ -237,12 +237,12 @@ internal class ReturnTypeGenerator(
         var schema = GetPreferredResponseSchema(operation.Responses[code].ActualResponse);
         var typeName = generator.GetTypeName(schema, false, null);
 
-        if (!string.IsNullOrWhiteSpace(codeGeneration.CodeGeneratorSettings?.ArrayType) &&
+        if (!NullCheck.IsNullOrWhiteSpace(codeGeneration.CodeGeneratorSettings?.ArrayType) &&
             schema?.Type == ApiObjectTypes.Array)
         {
             typeName = typeName
-                .Replace("ICollection", codeGeneration.CodeGeneratorSettings!.ArrayType)
-                .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings!.ArrayType);
+                .Replace("ICollection", codeGeneration.CodeGeneratorSettings.ArrayType)
+                .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings.ArrayType);
         }
 
         return typeName;

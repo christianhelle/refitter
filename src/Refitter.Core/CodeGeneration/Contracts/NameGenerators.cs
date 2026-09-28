@@ -166,7 +166,7 @@ internal class DefaultContractEnumNameGenerator : IContractEnumNameGenerator
 
     public virtual string Generate(int index, string? name, object? value, ApiSchema schema)
     {
-        if (string.IsNullOrEmpty(name))
+        if (NullCheck.IsNullOrEmpty(name))
             return "Empty";
 
         switch (name)
@@ -194,7 +194,7 @@ internal class DefaultContractEnumNameGenerator : IContractEnumNameGenerator
                 break;
         }
 
-        if (name!.StartsWith("-", StringComparison.Ordinal))
+        if (name.StartsWith("-", StringComparison.Ordinal))
             name = "Minus" + name.Substring(1);
 
         if (name.StartsWith("+", StringComparison.Ordinal))
@@ -284,10 +284,10 @@ internal sealed class DefaultOperationParameterNameGenerator : IOperationParamet
     private static string GetVariableName(ApiParameter parameter)
     {
         var name = !string.IsNullOrEmpty(parameter.OriginalName) ? parameter.OriginalName : parameter.Name;
-        if (string.IsNullOrEmpty(name))
+        if (NullCheck.IsNullOrEmpty(name))
             return "unnamed";
 
-        if (name!.IndexOfAny(ParameterNameCleanupChars) != -1)
+        if (name.IndexOfAny(ParameterNameCleanupChars) != -1)
         {
             name = name
                 .Replace("-", "_")

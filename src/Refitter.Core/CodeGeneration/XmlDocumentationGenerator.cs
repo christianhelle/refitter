@@ -55,8 +55,8 @@ internal class XmlDocumentationGenerator
 
         var summary = endpoint.Summary;
         var operationId = endpoint.OperationId;
-        var fallbackSummary = !string.IsNullOrWhiteSpace(operationId)
-            ? $"Operations for {EscapeSymbols(operationId!)}."
+        var fallbackSummary = !NullCheck.IsNullOrWhiteSpace(operationId)
+            ? $"Operations for {EscapeSymbols(operationId)}."
             : "Operations for endpoint.";
         this.AppendInterfaceSummary(summary, fallbackSummary, code);
     }
@@ -72,9 +72,9 @@ internal class XmlDocumentationGenerator
             return;
 
         var title = document.Info?.Title;
-        if (!string.IsNullOrEmpty(title))
+        if (!NullCheck.IsNullOrEmpty(title))
         {
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title!), code, indent: Separator);
+            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title), code, indent: Separator);
         }
     }
 
@@ -101,11 +101,11 @@ internal class XmlDocumentationGenerator
         if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
 
-        if (!string.IsNullOrWhiteSpace(method.Summary))
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(method.Summary!), code);
+        if (!NullCheck.IsNullOrWhiteSpace(method.Summary))
+            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(method.Summary), code);
 
-        if (!string.IsNullOrWhiteSpace(method.Description))
-            this.AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description!), code);
+        if (!NullCheck.IsNullOrWhiteSpace(method.Description))
+            this.AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
 
         foreach (var (name, type, alias) in GetEmittedParameters(parameters))
         {
@@ -129,9 +129,9 @@ internal class XmlDocumentationGenerator
             {
                 // Document the result with a fallback description.
                 var description = method.ResultDescription;
-                description = string.IsNullOrWhiteSpace(description)
+                description = NullCheck.IsNullOrWhiteSpace(description)
                     ? "A <see cref=\"Task\"/> representing the result of the request."
-                    : SanitizeResponseDescription(description!);
+                    : SanitizeResponseDescription(description);
 
                 this.AppendXmlCommentBlock("returns", description, code);
             }
@@ -201,9 +201,9 @@ internal class XmlDocumentationGenerator
     private void AppendInterfaceSummary(string? preferredSummary, string fallbackSummary, StringBuilder code)
     {
         var summary = fallbackSummary;
-        if (!string.IsNullOrWhiteSpace(preferredSummary))
+        if (!NullCheck.IsNullOrWhiteSpace(preferredSummary))
         {
-            summary = EscapeSymbols(preferredSummary!);
+            summary = EscapeSymbols(preferredSummary);
         }
 
         this.AppendXmlCommentBlock(SummaryTag, summary, code, indent: Separator);

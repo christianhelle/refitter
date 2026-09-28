@@ -185,7 +185,7 @@ internal sealed class ClassTemplateModel
             if (mapping.Value != null)
                 Discriminator = mapping.Key;
             else
-                Discriminator = !string.IsNullOrEmpty(typeName) ? typeName! : ClassName;
+                Discriminator = !NullCheck.IsNullOrEmpty(typeName) ? typeName : ClassName;
         }
 
         public string Discriminator { get; }

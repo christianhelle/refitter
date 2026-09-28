@@ -46,9 +46,9 @@ internal static class DynamicQuerystringParameterBuilder
             }
 
             propertiesCodeBuilder.AppendLine();
-            if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(operationParameter.Description))
+            if (settings.GenerateXmlDocCodeComments && !NullCheck.IsNullOrWhiteSpace(operationParameter.Description))
             {
-                var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(operationParameter.Description!);
+                var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(operationParameter.Description);
                 AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
             }
 

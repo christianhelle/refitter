@@ -548,9 +548,9 @@ internal sealed class OperationResponseModel
     }
 
     public string ExceptionDescription =>
-        string.IsNullOrEmpty(response.Description)
+        NullCheck.IsNullOrEmpty(response.Description)
             ? "A server side error occurred."
-            : ConversionUtilities.ConvertToStringLiteral(response.Description!);
+            : ConversionUtilities.ConvertToStringLiteral(response.Description);
 
     public string? Produces
     {

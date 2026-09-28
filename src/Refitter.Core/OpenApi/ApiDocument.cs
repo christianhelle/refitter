@@ -73,21 +73,21 @@ internal sealed class ApiDocument
         duplicatedOperationIds.Clear();
         foreach (var operation in operations)
         {
-            if (string.IsNullOrEmpty(operation.Operation.OperationId))
+            var operationId = operation.Operation.OperationId;
+            if (NullCheck.IsNullOrEmpty(operationId))
             {
-                operation.Operation.OperationId = GetOperationNameFromPath(operation);
+                operationId = GetOperationNameFromPath(operation);
+                operation.Operation.OperationId = operationId;
             }
 
-            if (!operationIds.Add(operation.Operation.OperationId!))
-            {
-                duplicatedOperationIds.Add(operation.Operation.OperationId!);
-            }
+            if (!operationIds.Add(operationId))
+                duplicatedOperationIds.Add(operationId);
         }
 
         if (duplicatedOperationIds.Count == 0)
             return;
 
-        operations = operations.Where(o => duplicatedOperationIds.Contains(o.Operation.OperationId!)).ToList();
+        operations = operations.Where(o => o.Operation.OperationId is { } id && duplicatedOperationIds.Contains(id)).ToList();
 
         AppendAllToArrayOperations(operations);
         AppendMethods(operations);
@@ -152,7 +152,7 @@ internal sealed class ApiDocument
     {
         var segments = operation.Path.Trim('/').Split('/');
         var lastSegment = segments.LastOrDefault(s => !s.Contains('{'));
-        return !string.IsNullOrEmpty(lastSegment) ? lastSegment! : "Anonymous";
+        return !NullCheck.IsNullOrEmpty(lastSegment) ? lastSegment : "Anonymous";
     }
 }
 

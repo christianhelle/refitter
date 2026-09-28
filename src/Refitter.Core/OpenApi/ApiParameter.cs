@@ -302,7 +302,7 @@ internal sealed class ApiRequestBody
         }
     }
 
-    public string ActualName => !string.IsNullOrEmpty(Name) ? Name! : "body";
+    public string ActualName => !NullCheck.IsNullOrEmpty(Name) ? Name : "body";
 }
 
 /// <summary>The media types of a request body, which keeps the operation's body parameter in sync.</summary>

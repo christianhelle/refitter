@@ -24,9 +24,9 @@ internal class SchemaTypeNameGenerator : ISchemaTypeNameGenerator
 
     public virtual string Generate(ApiSchema schema, string? typeNameHint, IEnumerable<string> reservedTypeNames)
     {
-        if (string.IsNullOrEmpty(typeNameHint) && !string.IsNullOrEmpty(schema.DocumentPath))
+        if (string.IsNullOrEmpty(typeNameHint) && !NullCheck.IsNullOrEmpty(schema.DocumentPath))
         {
-            var segments = schema.DocumentPath!.Replace("\\", "/").Split('/');
+            var segments = schema.DocumentPath.Replace("\\", "/").Split('/');
             typeNameHint = segments[segments.Length - 1];
         }
 
