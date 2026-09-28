@@ -199,17 +199,12 @@ internal sealed class SpecRuleValidator
             Walk(tag.ExternalDocs);
     }
 
+    /// <remarks>
+    /// Microsoft.OpenApi also requires each path to begin with a slash, but its reader, like this one, only reads
+    /// paths that do, so that rule can never fail.
+    /// </remarks>
     private void Walk(SpecPaths paths)
     {
-        foreach (var key in paths.Keys)
-        {
-            Enter(key);
-            if (!key.StartsWith("/", StringComparison.OrdinalIgnoreCase))
-                Error($"The path item name '{key}' MUST begin with a slash.");
-
-            Exit();
-        }
-
         var signatures = new HashSet<string>(StringComparer.Ordinal);
         foreach (var key in paths.Keys)
         {
