@@ -5,7 +5,9 @@ namespace Refitter.Core.Validation;
 /// </summary>
 /// <param name="Pointer">The JSON pointer to the offending element, when known.</param>
 /// <param name="Message">The description of the issue.</param>
+#pragma warning disable S1186 // Positional record constructor is compiler-generated
 public sealed record ValidationIssue(string? Pointer, string Message)
+#pragma warning restore S1186
 {
     /// <summary>
     /// Returns the message, followed by the pointer in brackets when there is one.
