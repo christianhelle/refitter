@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections;
 
 namespace Refitter.Core;

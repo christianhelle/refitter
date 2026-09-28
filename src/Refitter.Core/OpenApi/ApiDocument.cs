@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Refitter.Core;
 
 /// <summary>An OpenAPI (3.x) or Swagger (2.0) document.</summary>
