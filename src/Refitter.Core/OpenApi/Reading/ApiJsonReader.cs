@@ -777,13 +777,8 @@ internal sealed class ApiJsonReader
                 case "oneOf":
                     ReadSchemaList(value, schema.OneOf);
                     break;
-                case "nullable":
-                case "x-nullable":
-                case "deprecated":
-                case "x-deprecated":
-                case "example":
-                case "x-example":
                 default:
+                    // Includes nullable, deprecated and example (and their x- forms), which are read from the extension data
                     AddExtensionData(schema.ExtensionData ??= new(), member);
                     break;
             }
