@@ -24,12 +24,9 @@ internal sealed class SpecStatistics
 
     private void Walk(SpecDocument document)
     {
-        if (document.Paths != null)
+        foreach (var pathItem in document.Paths.Values)
         {
-            foreach (var pathItem in document.Paths.Values)
-            {
-                Walk(pathItem);
-            }
+            Walk(pathItem);
         }
 
         WalkAll(document.Webhooks, Walk);
@@ -73,11 +70,8 @@ internal sealed class SpecStatistics
         stats.OperationCount++;
         WalkAll(operation.Parameters, Walk);
         Walk(operation.RequestBody);
-        if (operation.Responses != null)
-        {
-            stats.ResponseCount += operation.Responses.Count;
-            WalkAll(operation.Responses, Walk);
-        }
+        stats.ResponseCount += operation.Responses.Count;
+        WalkAll(operation.Responses, Walk);
 
         WalkAll(operation.Callbacks, Walk);
     }

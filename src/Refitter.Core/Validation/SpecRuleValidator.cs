@@ -88,11 +88,7 @@ internal sealed class SpecRuleValidator
 
     private void Walk(SpecDocument document)
     {
-        if (document.Info == null)
-            ErrorAt("info", FieldIsRequired("info", "document"));
-
-        if (document.Info != null)
-            Within("info", () => Walk(document.Info));
+        Within("info", () => Walk(document.Info));
 
         if (document.Servers != null)
         {
@@ -106,8 +102,7 @@ internal sealed class SpecRuleValidator
             });
         }
 
-        if (document.Paths != null)
-            Within("paths", () => Walk(document.Paths));
+        Within("paths", () => Walk(document.Paths));
 
         WithinEach("webhooks", document.Webhooks, Walk);
 
@@ -271,8 +266,7 @@ internal sealed class SpecRuleValidator
         if (operation.RequestBody != null)
             Within("requestBody", () => Walk(operation.RequestBody));
 
-        if (operation.Responses != null)
-            Within("responses", () => Walk(operation.Responses));
+        Within("responses", () => Walk(operation.Responses));
 
         WithinEach("callbacks", operation.Callbacks, Walk);
     }

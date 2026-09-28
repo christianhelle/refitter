@@ -556,7 +556,7 @@ internal sealed class OpenApiV3Reader
             return fields
                 .Field("exclusiveMaximum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
                 .Field("exclusiveMinimum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
-                .Field("type", (_, n, _) => n.GetScalarValue()?.ToJsonSchemaType())
+                .Field("type", (_, n, _) => n.GetScalarValue().ToJsonSchemaType())
                 .Field("nullable", (_, n, _) => bool.TryParse(n.GetScalarValue(), out _))
                 .Field("x-jsonschema-patternProperties", (_, n, c) => n.CreateMap("IOpenApiSchema", LoadSchema, c))
                 .Field("x-jsonschema-unevaluatedProperties", (_, n, c) => ReadBoolOrSchema(n, c))
@@ -596,7 +596,7 @@ internal sealed class OpenApiV3Reader
             {
                 if (n is JsonValue)
                 {
-                    n.GetScalarValue()?.ToJsonSchemaType();
+                    n.GetScalarValue().ToJsonSchemaType();
                     return;
                 }
 
@@ -853,7 +853,7 @@ internal sealed class OpenApiV3Reader
     }
 
     private SpecSchema LoadMapping(JsonNode node) =>
-        new() { Reference = GetReference(node.GetScalarValue() ?? throw new InvalidOperationException("Could not get a pointer reference")) };
+        new() { Reference = GetReference(node.GetScalarValue()) };
 
     private void LoadXml(JsonNode node, ParsingContext context) =>
         node.CheckMapNode("xml", context).ParseMap(new object(), xmlFields, context);
@@ -1004,11 +1004,8 @@ internal sealed class OpenApiV3Reader
             node.GetScalarValue();
     }
 
-    private static Uri? ReadUri(JsonNode node)
-    {
-        var value = node.GetScalarValue();
-        return value != null ? new Uri(value, UriKind.RelativeOrAbsolute) : null;
-    }
+    private static Uri ReadUri(JsonNode node) =>
+        new(node.GetScalarValue(), UriKind.RelativeOrAbsolute);
 
     private static void ReadBool(JsonNode node)
     {
@@ -1017,11 +1014,8 @@ internal sealed class OpenApiV3Reader
             ScalarChecks.CheckBoolean(value);
     }
 
-    private static bool? ReadNullableBool(JsonNode node)
-    {
-        var value = node.GetScalarValue();
-        return value == null ? null : bool.Parse(value);
-    }
+    private static bool? ReadNullableBool(JsonNode node) =>
+        bool.Parse(node.GetScalarValue());
 
     private static void ReadInt(JsonNode node)
     {

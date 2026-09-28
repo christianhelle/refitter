@@ -118,12 +118,11 @@ internal sealed class ParsingContext(ValidationDiagnostics diagnostics)
         var version = Find(jsonNode, "openapi");
         if (version == null)
         {
-            return Find(jsonNode, "swagger")?.GetScalarValue()?.Replace("\"", string.Empty)
+            return Find(jsonNode, "swagger")?.GetScalarValue().Replace("\"", string.Empty)
                    ?? throw new SpecificationException("Version node not found.");
         }
 
-        return version.GetScalarValue()?.Replace("\"", string.Empty)
-               ?? throw new SpecificationException("Version node not found.");
+        return version.GetScalarValue().Replace("\"", string.Empty);
     }
 
     /// <summary>

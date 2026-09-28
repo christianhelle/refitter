@@ -36,7 +36,7 @@ internal sealed class SpecOperation
     /// <summary>
     /// Starts empty, like in Microsoft.OpenApi, so an operation without responses breaks a validation rule.
     /// </summary>
-    public SpecResponses? Responses { get; set; } = new();
+    public SpecResponses Responses { get; set; } = new();
 
     public Dictionary<string, SpecCallback?>? Callbacks { get; set; }
 

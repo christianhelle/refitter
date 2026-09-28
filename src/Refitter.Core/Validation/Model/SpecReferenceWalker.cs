@@ -49,12 +49,9 @@ internal sealed class SpecReferenceWalker
 
     private void WalkDocument(SpecDocument document)
     {
-        if (document.Paths != null)
+        foreach (var pathItem in document.Paths.Values)
         {
-            foreach (var pathItem in document.Paths.Values)
-            {
-                Walk(pathItem);
-            }
+            Walk(pathItem);
         }
 
         WalkAll(document.Webhooks, Walk);

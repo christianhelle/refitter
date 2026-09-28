@@ -141,12 +141,12 @@ internal sealed class ExternalReferenceMerger
     /// </summary>
     private static bool ContainsExternalReferences(SpecDocument document, SpecComponents? registered)
     {
-        return document.Paths?.Values.Any(pathItem =>
+        return document.Paths.Values.Any(pathItem =>
         {
             var resolvedPathItem = SpecReferences.Resolve(pathItem, c => c.PathItems, registered);
             return (resolvedPathItem?.Parameters?.Any(IsExternalParameter) ?? false)
                    || (resolvedPathItem?.Operations?.Values.Any(IsExternalOperation) ?? false);
-        }) ?? false;
+        });
 
         bool IsExternalParameter(SpecParameter parameter)
         {
@@ -167,12 +167,12 @@ internal sealed class ExternalReferenceMerger
             if (requestBody?.Content?.Any(content => IsExternal(content.Value!.Schema)) == true)
                 return true;
 
-            return operation.Responses?.Any(response =>
+            return operation.Responses.Any(response =>
             {
                 var resolved = SpecReferences.Resolve(response.Value, c => c.Responses, registered);
                 return resolved?.Content?.Any(content => content.Value != null && IsExternal(content.Value.Schema)) == true
                        || resolved?.Headers?.Any(header => header.Value != null && IsExternal(SpecReferences.Resolve(header.Value, c => c.Headers, registered)?.Schema)) == true;
-            }) ?? false;
+            });
         }
 
         static bool IsExternal(SpecReferenceable? element) => element?.Reference?.ExternalResource != null;

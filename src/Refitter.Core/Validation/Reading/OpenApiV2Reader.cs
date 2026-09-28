@@ -327,7 +327,7 @@ internal sealed class OpenApiV2Reader
                 n.CreateSimpleList("String", item => item.GetScalarValue(), c).OfType<string>(),
                 StringComparer.Ordinal))
             .Field("enum", (_, n, c) => n.CreateListOfAny(c))
-            .Field("type", (_, n, _) => n.GetScalarValue()?.ToJsonSchemaType())
+            .Field("type", (_, n, _) => n.GetScalarValue().ToJsonSchemaType())
             .Field("allOf", (o, n, c) => o.AllOf = n.CreateList("IOpenApiSchema", LoadSchema, c))
             .Field("items", (o, n, c) => o.Items = LoadSchema(n, c))
             .Field("properties", (o, n, c) => o.Properties = n.CreateMap("IOpenApiSchema", LoadSchema, c))
@@ -427,14 +427,11 @@ internal sealed class OpenApiV2Reader
         var document = new SpecDocument();
         jsonNode.CheckMapNode("OpenAPI", context).ParseMap(document, documentFields, context);
 
-        if (document.Paths != null)
-        {
-            ProcessResponsesMediaTypes(
-                document.Paths.Values
-                    .SelectMany(pathItem => pathItem?.Operations?.Values ?? Enumerable.Empty<SpecOperation>())
-                    .SelectMany(operation => operation.Responses?.Values ?? Enumerable.Empty<SpecResponse?>()),
-                context);
-        }
+        ProcessResponsesMediaTypes(
+            document.Paths.Values
+                .SelectMany(pathItem => pathItem?.Operations?.Values ?? Enumerable.Empty<SpecOperation>())
+                .SelectMany(operation => operation.Responses.Values),
+            context);
 
         ProcessResponsesMediaTypes(document.Components?.Responses?.Values, context);
         document.Servers ??= [];
@@ -536,7 +533,7 @@ internal sealed class OpenApiV2Reader
         }
 
         var produces = context.GetFromTempStorage<List<string?>>(OperationProducesKey);
-        if ((produces != null || jsonObject.ContainsKey("produces")) && operation.Responses != null)
+        if ((produces != null || jsonObject.ContainsKey("produces")))
         {
             foreach (var response in operation.Responses.Values)
             {
@@ -976,7 +973,7 @@ internal sealed class OpenApiV2Reader
     private static void FixRequestBodyReferences(SpecDocument document)
     {
         var requestBodies = document.Components?.RequestBodies;
-        if (requestBodies == null || requestBodies.Count == 0 || document.Paths == null)
+        if (requestBodies == null || requestBodies.Count == 0)
             return;
 
         foreach (var operation in document.Paths.Values
@@ -992,11 +989,8 @@ internal sealed class OpenApiV2Reader
         }
     }
 
-    private static Uri? ReadUri(JsonNode node)
-    {
-        var value = node.GetScalarValue();
-        return value != null ? new Uri(value, UriKind.RelativeOrAbsolute) : null;
-    }
+    private static Uri ReadUri(JsonNode node) =>
+        new(node.GetScalarValue(), UriKind.RelativeOrAbsolute);
 
     private static void ReadBool(JsonNode node)
     {

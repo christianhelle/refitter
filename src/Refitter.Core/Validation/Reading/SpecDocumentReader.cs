@@ -23,7 +23,7 @@ internal static class SpecDocumentReader
         {
             try
             {
-                jsonNode = JsonNode.Parse(content) ?? throw new InvalidOperationException("failed to parse input stream, input");
+                jsonNode = JsonNode.Parse(content)!;
             }
             catch (JsonException exception)
             {

@@ -6,11 +6,11 @@ namespace Refitter.Core.Validation.Model;
 /// </summary>
 internal sealed class SpecDocument
 {
-    public SpecInfo? Info { get; set; } = new();
+    public SpecInfo Info { get; set; } = new();
 
     public List<SpecServer>? Servers { get; set; }
 
-    public SpecPaths? Paths { get; set; } = new();
+    public SpecPaths Paths { get; set; } = new();
 
     public Dictionary<string, SpecPathItem?>? Webhooks { get; set; }
 

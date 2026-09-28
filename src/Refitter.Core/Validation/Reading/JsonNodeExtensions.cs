@@ -13,12 +13,13 @@ internal static class JsonNodeExtensions
     /// Returns the value as a string: numbers keep their text and booleans become <c>True</c> or <c>False</c>.
     /// </summary>
     /// <exception cref="SpecificationException">Thrown when the node is an object or an array.</exception>
-    public static string? GetScalarValue(this JsonNode? node)
+    public static string GetScalarValue(this JsonNode? node)
     {
         if (node is not JsonValue value)
             throw new SpecificationException("Expected scalar value.");
 
-        return Convert.ToString(value.GetValue<object>(), CultureInfo.InvariantCulture);
+        // Values are strings, numbers or booleans, which never convert to null
+        return Convert.ToString(value.GetValue<object>(), CultureInfo.InvariantCulture)!;
     }
 
     public static string? GetReferencePointer(this JsonObject jsonObject) =>

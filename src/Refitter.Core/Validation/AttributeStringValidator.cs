@@ -23,9 +23,6 @@ internal static class AttributeStringValidator
 
         ValidateSecuritySchemes(document, registered, diagnostics);
 
-        if (document.Paths == null)
-            return;
-
         // Accept/Content-Type headers are only emitted from content map keys for OpenAPI 3.0+,
         // so only reject unsafe content-type keys for those documents to avoid Swagger 2.0 false positives.
         var validateContentTypes = diagnostics.SpecificationVersion != OpenApiSpecificationVersion.OpenApi2_0;
@@ -104,9 +101,6 @@ internal static class AttributeStringValidator
                 AddContentTypeErrorIfUnsafe(contentType, diagnostics);
             }
         }
-
-        if (operation.Responses == null)
-            return;
 
         foreach (var reference in operation.Responses.Values)
         {
