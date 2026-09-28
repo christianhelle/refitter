@@ -68,36 +68,18 @@ internal class SchemaCleaner
 
     private (IReadOnlyCollection<ApiSchema>, HashSet<string>) FindUsedJsonSchema(ApiDocument doc)
     {
+        var schemaIdLookup = CreateSchemaIdLookup();
         var toProcess = new Stack<ApiSchema>();
-        var schemaIdLookup = new Dictionary<ApiSchema, List<string>>();
-        foreach (var kvp in document.Components.Schemas)
-        {
-            var actualSchema = kvp.Value.ActualSchema;
-            if (!schemaIdLookup.TryGetValue(actualSchema, out var aliases))
-            {
-                aliases = [];
-                schemaIdLookup[actualSchema] = aliases;
-            }
-
-            aliases.Add(kvp.Key);
-        }
 
         foreach (var kvp in doc.Components.Schemas)
         {
             var schema = kvp.Key;
             if (keepSchemaRegexes.Any(x => x.IsMatch(schema)))
-            {
                 TryPush(kvp.Value, toProcess);
-            }
         }
 
-        foreach (var pathItem in doc.Paths.Select(kvp => kvp.Value))
-        {
-            foreach (ApiSchema? schema in GetSchemaForPath(pathItem))
-            {
-                TryPush(schema, toProcess);
-            }
-        }
+        foreach (var schema in doc.Paths.Select(kvp => kvp.Value).SelectMany(GetSchemaForPath))
+            TryPush(schema, toProcess);
 
         var seenIds = new HashSet<string>();
         var seen = new HashSet<ApiSchema>();
@@ -127,41 +109,52 @@ internal class SchemaCleaner
         return (seen, seenIds);
     }
 
+    /// <summary>The names of the schemas of the document, by schema (a schema can have several names).</summary>
+    private Dictionary<ApiSchema, List<string>> CreateSchemaIdLookup()
+    {
+        var schemaIdLookup = new Dictionary<ApiSchema, List<string>>();
+        foreach (var kvp in document.Components.Schemas)
+        {
+            var actualSchema = kvp.Value.ActualSchema;
+            if (!schemaIdLookup.TryGetValue(actualSchema, out var aliases))
+            {
+                aliases = [];
+                schemaIdLookup[actualSchema] = aliases;
+            }
+
+            aliases.Add(kvp.Key);
+        }
+
+        return schemaIdLookup;
+    }
+
     private static IEnumerable<ApiSchema?> GetSchemaForPath(ApiPathItem pathItem)
     {
         foreach (var p in pathItem.Parameters)
-        {
             yield return p;
+
+        foreach (var schema in pathItem.Values.SelectMany(GetSchemaForOperation))
+            yield return schema;
+    }
+
+    private static IEnumerable<ApiSchema?> GetSchemaForOperation(ApiOperation op)
+    {
+        if (op.RequestBody != null)
+        {
+            foreach (var content in op.RequestBody.Content.Select(kvpBody => kvpBody.Value))
+                yield return content.Schema;
         }
 
-        foreach (var op in pathItem.Values)
+        foreach (var p in op.GetActualParameters())
+            yield return p;
+
+        foreach (var resp in op.ActualResponses.Select(x => x.Value))
         {
-            if (op.RequestBody != null)
-            {
-                var body = op.RequestBody;
-                foreach (var content in body.Content.Select(kvpBody => kvpBody.Value))
-                {
-                    yield return content.Schema;
-                }
-            }
+            foreach (var header in resp.Headers.Select(x => x.Value))
+                yield return header;
 
-            foreach (var p in op.GetActualParameters())
-            {
-                yield return p;
-            }
-
-            foreach (var resp in op.ActualResponses.Select(x => x.Value))
-            {
-                foreach (var header in resp.Headers.Select(x => x.Value))
-                {
-                    yield return header;
-                }
-
-                foreach (var mediaType in resp.Content.Select(x => x.Value))
-                {
-                    yield return mediaType.Schema;
-                }
-            }
+            foreach (var mediaType in resp.Content.Select(x => x.Value))
+                yield return mediaType.Schema;
         }
     }
 

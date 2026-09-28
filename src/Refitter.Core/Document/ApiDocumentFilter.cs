@@ -29,29 +29,27 @@ internal static class ApiDocumentFilter
             .ToArray();
 
         foreach (var path in clonedPaths)
-        {
-            if (path.Value == null)
-                continue;
-
-            var methods = path.Value
-                .Where(pair => pair.Value != null)
-                .ToArray();
-
-            foreach (var method in methods)
-            {
-                if (method.Value == null)
-                    continue;
-
-                var exclude = method.Value.Tags?.Exists(includeTags.Contains) != true;
-                if (exclude)
-                    path.Value.Remove(method.Key);
-
-                if (path.Value.Count == 0)
-                    result.Paths.Remove(path.Key);
-            }
-        }
+            RemoveOperationsWithoutTags(result, path.Key, path.Value, includeTags);
 
         return result;
+    }
+
+    /// <summary>Removes the operations of a path that have none of the tags, and the path when it has none left.</summary>
+    private static void RemoveOperationsWithoutTags(ApiDocument document, string path, ApiPathItem pathItem, string[] includeTags)
+    {
+        var methods = pathItem
+            .Where(pair => pair.Value != null)
+            .ToArray();
+
+        foreach (var method in methods)
+        {
+            var exclude = method.Value.Tags?.Exists(includeTags.Contains) != true;
+            if (exclude)
+                pathItem.Remove(method.Key);
+
+            if (pathItem.Count == 0)
+                document.Paths.Remove(path);
+        }
     }
 
     /// <summary>

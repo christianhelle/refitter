@@ -29,57 +29,59 @@ internal sealed class DocumentMerger : IDocumentMerger
         var tagNames = new HashSet<string>(baseDocument.Tags.Select(t => t.Name!), StringComparer.Ordinal);
 
         for (var i = 1; i < documents.Length; i++)
-        {
-            var document = documents[i];
-            foreach (var path in document.Paths)
-            {
-                MergeIfMissingOrThrowOnConflict(
-                    baseDocument.Paths,
-                    path.Key,
-                    path.Value,
-                    "path",
-                    (key, value) => baseDocument.AddPath(key, value));
-            }
-
-            // The schemas and the definitions are the same, so this checks every schema twice, like before
-            foreach (var schema in document.Components.Schemas)
-            {
-                MergeIfMissingOrThrowOnConflict(
-                    baseDocument.Components.Schemas,
-                    schema.Key,
-                    schema.Value,
-                    "schema",
-                    (key, value) => baseDocument.Components.Schemas[key] = value);
-            }
-
-            foreach (var definition in document.Definitions)
-            {
-                MergeIfMissingOrThrowOnConflict(
-                    baseDocument.Definitions,
-                    definition.Key,
-                    definition.Value,
-                    "definition",
-                    (key, value) => baseDocument.Definitions[key] = value);
-            }
-
-            foreach (var securityDefinition in document.SecurityDefinitions)
-            {
-                MergeIfMissingOrThrowOnConflict(
-                    baseDocument.SecurityDefinitions,
-                    securityDefinition.Key,
-                    securityDefinition.Value,
-                    "security scheme",
-                    (key, value) => baseDocument.SecurityDefinitions[key] = value);
-            }
-
-            foreach (var tag in document.Tags)
-            {
-                if (tagNames.Add(tag.Name!))
-                    baseDocument.Tags.Add(tag);
-            }
-        }
+            MergeInto(baseDocument, documents[i], tagNames);
 
         return baseDocument;
+    }
+
+    private void MergeInto(ApiDocument baseDocument, ApiDocument document, HashSet<string> tagNames)
+    {
+        foreach (var path in document.Paths)
+        {
+            MergeIfMissingOrThrowOnConflict(
+                baseDocument.Paths,
+                path.Key,
+                path.Value,
+                "path",
+                (key, value) => baseDocument.AddPath(key, value));
+        }
+
+        // The schemas and the definitions are the same, so this checks every schema twice, like before
+        foreach (var schema in document.Components.Schemas)
+        {
+            MergeIfMissingOrThrowOnConflict(
+                baseDocument.Components.Schemas,
+                schema.Key,
+                schema.Value,
+                "schema",
+                (key, value) => baseDocument.Components.Schemas[key] = value);
+        }
+
+        foreach (var definition in document.Definitions)
+        {
+            MergeIfMissingOrThrowOnConflict(
+                baseDocument.Definitions,
+                definition.Key,
+                definition.Value,
+                "definition",
+                (key, value) => baseDocument.Definitions[key] = value);
+        }
+
+        foreach (var securityDefinition in document.SecurityDefinitions)
+        {
+            MergeIfMissingOrThrowOnConflict(
+                baseDocument.SecurityDefinitions,
+                securityDefinition.Key,
+                securityDefinition.Value,
+                "security scheme",
+                (key, value) => baseDocument.SecurityDefinitions[key] = value);
+        }
+
+        foreach (var tag in document.Tags)
+        {
+            if (tagNames.Add(tag.Name!))
+                baseDocument.Tags.Add(tag);
+        }
     }
 
     private void MergeIfMissingOrThrowOnConflict<TValue>(
