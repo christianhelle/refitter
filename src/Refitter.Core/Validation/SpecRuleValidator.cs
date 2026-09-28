@@ -348,24 +348,6 @@ internal sealed class SpecRuleValidator
             Within("encoding", () => WalkEncodings(mediaType.Encoding));
     }
 
-    private void WalkEncodings(Dictionary<string, SpecEncoding?> encodings)
-    {
-        foreach (var encoding in encodings)
-        {
-            if (encoding.Value?.Headers is not { } headers)
-                continue;
-
-            Within(encoding.Key, () =>
-            {
-                foreach (var header in headers)
-                {
-                    if (header.Value != null)
-                        Within(header.Key, () => Walk(header.Value));
-                }
-            });
-        }
-    }
-
     private void Walk(SpecHeader? header)
     {
         if (header is not { Reference: null })
@@ -482,6 +464,24 @@ internal sealed class SpecRuleValidator
 
         if (schema.ExternalDocs != null)
             Within(OpenApiNames.ExternalDocs, () => Walk(schema.ExternalDocs));
+    }
+
+    private void WalkEncodings(Dictionary<string, SpecEncoding?> encodings)
+    {
+        foreach (var encoding in encodings)
+        {
+            if (encoding.Value?.Headers is not { } headers)
+                continue;
+
+            Within(encoding.Key, () =>
+            {
+                foreach (var header in headers)
+                {
+                    if (header.Value != null)
+                        Within(header.Key, () => Walk(header.Value));
+                }
+            });
+        }
     }
 
     private void WalkSchemas(string segment, List<SpecSchema>? schemas)
