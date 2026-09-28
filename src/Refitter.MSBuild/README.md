@@ -202,7 +202,7 @@ The following is an example `.refitter` file
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
     ],
-    "customTemplateDirectory": "./path/to/directory/" // Optional. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+    "customTemplateDirectory": "./path/to/directory/" // Optional. Deprecated, will be removed in the next major version.
   }
 }
 ```
@@ -256,7 +256,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
 - `includeInheritanceHierarchy`: Set to `true` to keep all possible type-instances of inheritance/union types. If this is `false` only directly referenced types will be kept. This works in conjunction with `trimUnusedSchema`. Default is `false`
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
-- `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
+- `operationNameGenerator`: The strategy used to name operations and to group them into interfaces. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
 - `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization. Default is `false`
@@ -276,7 +276,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `withOptionalMediation` - Tells if Apizr should handle optional request mediation (extended only)
   - `withMappingProvider` - Set the mapping provider to be used
   - `withFileTransfer` - Tells if Apizr should handle file transfer
-- `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
+- `codeGeneratorSettings` - Setting this allows customization of the generated types and contracts
   - `requiredPropertiesMustBeDefined` - Default is true,
   - `generateDataAnnotations` - Default is true,
   - `anyType` - Default is `object`,

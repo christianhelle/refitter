@@ -764,7 +764,7 @@ docker run --rm -v $(pwd):/src christianhelle/refitter ./openapi.json --settings
 
 #### Issue: Custom template directory not accessible
 
-**Problem:** Custom NSwag templates can't be found.
+**Problem:** Custom templates can't be found.
 
 > **Note:** `--custom-template-directory` is deprecated and will be removed in the next major version.
 

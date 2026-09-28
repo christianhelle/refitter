@@ -93,7 +93,7 @@ OPTIONS:
         --no-banner                                              Don't show donation banner
         --skip-default-additional-properties                     Set to true to skip default additional properties
         --allow-remote-refs                                      Resolve remote (http/https) $ref references inside the document. Disabled by default to prevent generation-time SSRF
-        --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
+        --operation-name-generator              Default          The strategy used to name operations and to group them into interfaces.
                                                                  May be one of:
                                                                  - Default
                                                                  - MultipleClientsFromOperationId
@@ -113,7 +113,7 @@ OPTIONS:
         --use-dynamic-querystring-parameters                     Enable wrapping multiple query parameters into a single complex one. Default is no wrapping.
                                                                  See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information
         --use-polymorphic-serialization                          Use System.Text.Json polymorphic serialization.
-                                                                 Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
+                                                                 Replaces JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
                                                                  To have the native support of inheritance (de)serialization and fallback to base types when
                                                                  payloads with (yet) unknown types are offered by newer versions of an API
                                                                  See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
@@ -269,7 +269,7 @@ The following is an example `.refitter` file
       "ExcludedTypeFoo",
       "ExcludedTypeBar"
     ],
-    "customTemplateDirectory": "./path/to/directory/" // Optional. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+    "customTemplateDirectory": "./path/to/directory/" // Optional. Deprecated, will be removed in the next major version.
   }
 }
 ```
@@ -322,7 +322,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
 - `includeInheritanceHierarchy`: Set to `true` to keep all possible type-instances of inheritance/union types. If this is `false` only directly referenced types will be kept. This works in conjunction with `trimUnusedSchema`. Default is `false`
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
-- `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
+- `operationNameGenerator`: The strategy used to name operations and to group them into interfaces. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
 - `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization.
@@ -341,7 +341,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `withOptionalMediation` - Tells if Apizr should handle optional request mediation (extended only)
   - `withMappingProvider` - Set the mapping provider to be used
   - `withFileTransfer` - Tells if Apizr should handle file transfer
-- `codeGeneratorSettings` - Setting this allows customization of the NSwag generated types and contracts
+- `codeGeneratorSettings` - Setting this allows customization of the generated types and contracts
   - `requiredPropertiesMustBeDefined` - Default is true,
   - `generateDataAnnotations` - Default is true,
   - `anyType` - Default is `object`,
@@ -382,7 +382,7 @@ To generate code from an OpenAPI specifications file, run the following:
 refitter [path to OpenAPI spec file] --namespace "[Your.Namespace.Of.Choice.GeneratedCode]"
 ```
 
-This will generate a file called `Output.cs` which contains the Refit interface and contract classes generated using [NSwag](https://github.com/RicoSuter/NSwag)
+This will generate a file called `Output.cs` which contains the Refit interface and contract classes
 
 # Using the generated code
 
