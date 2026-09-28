@@ -200,15 +200,12 @@ internal sealed class ContractTypeResolver
                 return isNullable ? "ulong?" : "ulong";
         }
 
-        if ((schema.Minimum.HasValue || schema.Maximum.HasValue) &&
-            string.IsNullOrEmpty(schema.Format) &&
-            schema.Type == ApiObjectType.Integer)
+        if (string.IsNullOrEmpty(schema.Format) &&
+            schema.Type == ApiObjectType.Integer &&
+            (schema.Minimum < int.MinValue || schema.Minimum > int.MaxValue ||
+             schema.Maximum < int.MinValue || schema.Maximum > int.MaxValue))
         {
-            if (schema.Minimum < int.MinValue || schema.Minimum > int.MaxValue ||
-                schema.Maximum < int.MinValue || schema.Maximum > int.MaxValue)
-            {
-                return isNullable ? "long?" : "long";
-            }
+            return isNullable ? "long?" : "long";
         }
 
         return isNullable ? "int?" : "int";

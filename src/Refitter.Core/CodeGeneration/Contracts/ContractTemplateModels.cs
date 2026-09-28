@@ -176,9 +176,10 @@ internal sealed class ClassTemplateModel
             var mapping = discriminator.Mapping.SingleOrDefault(m => m.Value.ActualTypeSchema == schema.ActualTypeSchema);
             ClassName = resolver.GetOrGenerateTypeName(schema, typeName);
             IsAbstract = schema.ActualTypeSchema.IsAbstract;
-            Discriminator = mapping.Value != null
-                ? mapping.Key
-                : !string.IsNullOrEmpty(typeName) ? typeName! : ClassName;
+            if (mapping.Value != null)
+                Discriminator = mapping.Key;
+            else
+                Discriminator = !string.IsNullOrEmpty(typeName) ? typeName! : ClassName;
         }
 
         public string Discriminator { get; }
@@ -450,7 +451,7 @@ internal sealed class PropertyModel
         };
 
     private static decimal Clamp(decimal value, decimal min, decimal max) =>
-        value < min ? min : value > max ? max : value;
+        Math.Max(min, Math.Min(max, value));
 }
 
 /// <summary>The model of the enum template.</summary>
@@ -651,13 +652,24 @@ internal sealed class ContractFileTemplateModel(
 
             var operations = document.GetOperations().ToList();
             return operations.Any(o => o.Operation.ActualParameters.Any(p => p.ActualTypeSchema.IsBinary)) ||
-                   operations.Any(o => o.Operation.ActualRequestBody?.Content.Any(c =>
-                       c.Value.Schema?.IsBinary == true ||
-                       (c.Value.Schema?.ActualSchema.ActualProperties.Any(p =>
-                           p.Value.IsBinary ||
-                           p.Value.Item?.IsBinary == true ||
-                           p.Value.Items.Any(i => i.IsBinary)) ?? false)) == true);
+                   operations.Any(o => HasBinaryContent(o.Operation.ActualRequestBody));
         }
+    }
+
+    private static bool HasBinaryContent(ApiRequestBody? requestBody) =>
+        requestBody != null && requestBody.Content.Any(c => IsBinaryContent(c.Value));
+
+    private static bool IsBinaryContent(ApiMediaType content)
+    {
+        var schema = content.Schema;
+        if (schema == null)
+            return false;
+
+        return schema.IsBinary ||
+               schema.ActualSchema.ActualProperties.Any(p =>
+                   p.Value.IsBinary ||
+                   (p.Value.Item != null && p.Value.Item.IsBinary) ||
+                   p.Value.Items.Any(i => i.IsBinary));
     }
 
     public bool GenerateFileResponseClass =>

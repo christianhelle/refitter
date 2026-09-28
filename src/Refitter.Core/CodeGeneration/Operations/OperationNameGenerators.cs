@@ -136,7 +136,7 @@ internal sealed class MultipleClientsFromPathSegmentsApiOperationNameGenerator :
         path.Split('/').Where(p => !p.Contains('{') && !string.IsNullOrWhiteSpace(p)).Reverse().FirstOrDefault() ?? "Index";
 
     internal static string CapitalizeFirst(string name) =>
-        string.IsNullOrEmpty(name) ? string.Empty : char.ToUpperInvariant(name[0]) + (name.Length > 1 ? name.Substring(1) : string.Empty);
+        string.IsNullOrEmpty(name) ? string.Empty : char.ToUpperInvariant(name[0]) + name.Substring(1);
 }
 
 /// <summary>A single client, operation names from the operation ID.</summary>

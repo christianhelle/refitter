@@ -224,9 +224,9 @@ internal sealed class OperationModel
     public bool HasResult => UnwrappedResultType != "void";
 
     public string? UnwrappedResultDefaultValue =>
-        HasResult
-            ? "default(" + UnwrappedResultType + ")" + (settings.GenerateNullableReferenceTypes ? "!" : string.Empty)
-            : null;
+        HasResult ? "default(" + UnwrappedResultType + ")" + NullForgivingSuffix : null;
+
+    private string NullForgivingSuffix => settings.GenerateNullableReferenceTypes ? "!" : string.Empty;
 
     public string? ResultDescription
     {
