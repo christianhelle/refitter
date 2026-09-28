@@ -50,7 +50,8 @@ Follow-ups after parity:
 
 - `CustomTemplateDirectory` is kept and no longer deprecated. It still works, because the ported templates are
   rendered with template models equivalent to NJsonSchema's, and it no longer produces a "Deprecated Setting"
-  warning. `codeGeneratorSettings.customTemplateDirectory` stays deprecated, because it never had any effect.
+  warning. `codeGeneratorSettings.customTemplateDirectory`, which never had any effect, is removed as its
+  deprecation announced; settings files that still contain it load and ignore it.
 - Done after parity was reached: the "Generated using the NSwag toolchain" header comment is removed, and the
   generated contracts say `GeneratedCode("Refitter", "<Refitter version>")` like the interfaces do. Settings,
   docs and tests no longer refer to NSwag; `THIRD-PARTY-NOTICES.md` keeps the license notices for the ported code.

@@ -189,11 +189,6 @@
         "dateTimeFormat": {
           "description": "Gets or sets the date-time string format to use",
           "type": "string"
-        },
-        "customTemplateDirectory": {
-          "description": "Deprecated and has no effect; use customTemplateDirectory at the root of the settings instead.",
-          "type": "string",
-          "deprecated": true
         }
       }
     },

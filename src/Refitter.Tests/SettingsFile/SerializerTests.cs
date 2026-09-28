@@ -38,6 +38,16 @@ public class SerializerTests
     }
 
     [Test]
+    public void Deserialize_Ignores_The_Removed_CodeGeneratorSettings_CustomTemplateDirectory()
+    {
+        var settings = Serializer.Deserialize<RefitGeneratorSettings>(
+            """{ "codeGeneratorSettings": { "customTemplateDirectory": "./templates", "dateType": "System.DateOnly" } }""");
+
+        settings.CodeGeneratorSettings!.DateType.Should().Be("System.DateOnly");
+        settings.CustomTemplateDirectory.Should().BeNull();
+    }
+
+    [Test]
     public void Deserialize_Is_Case_Insensitive()
     {
         var settings = CreateTestSettings();

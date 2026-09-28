@@ -286,14 +286,6 @@ public class CodeGeneratorSettings
     public bool InlineJsonConverters { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a directory path which contains Liquid templates for the generated contracts. If null or empty,
-    /// uses the built-in templates.
-    /// </summary>
-    [Description("Deprecated and has no effect; use customTemplateDirectory at the root of the settings instead.")]
-    [Obsolete("This setting has no effect. Custom Liquid templates are configured with RefitGeneratorSettings.CustomTemplateDirectory.")]
-    public string? CustomTemplateDirectory { get; set; }
-
-    /// <summary>
     /// Gets or sets the JSON library version to use (applies only to System.Text.Json, default: 8.0).
     /// When set to 9.0 or higher, enums will use [JsonStringEnum] attributes with member name support,
     /// enabling .NET 9+ JsonStringEnumMemberName support for custom enum value names.
