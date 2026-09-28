@@ -53,7 +53,7 @@ internal static class IsoDateTimeParser
         if (is24Hour)
             hour = 0;
 
-        var dateTime = new DateTime(year, month, day, hour, minute, second);
+        var dateTime = new DateTime(year, month, day, hour, minute, second, DateTimeKind.Unspecified);
         var fraction = match.Groups["fraction"];
         if (fraction.Success)
         {
