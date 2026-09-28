@@ -15,7 +15,6 @@ internal class ApiSchema
     private static readonly Regex TypeNameTitleRegex = new("^[a-zA-Z0-9_]*$", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 
     private ApiSchema? reference;
-    private ApiObjectType type;
     private ApiSchema? item;
     private ApiSchema? additionalItemsSchema;
     private bool allowAdditionalItems = true;
@@ -133,11 +132,7 @@ internal class ApiSchema
 
     public ApiSchema? ParentSchema => Parent as ApiSchema;
 
-    public ApiObjectType Type
-    {
-        get => type;
-        set => type = value;
-    }
+    public ApiObjectType Type { get; set; }
 
     public ApiSchema? Reference
     {
@@ -152,7 +147,7 @@ internal class ApiSchema
 
             if (value != null)
             {
-                type = ApiObjectType.None;
+                Type = ApiObjectType.None;
             }
         }
     }
