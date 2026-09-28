@@ -168,7 +168,7 @@ internal sealed class ExternalReferenceMerger
                 return true;
 
             var requestBody = SpecReferences.Resolve(operation.RequestBody, c => c.RequestBodies, registered);
-            if (requestBody?.Content?.Any(content => IsExternal(content.Value!.Schema)) is true)
+            if (requestBody?.Content is { } contents && contents.Any(content => IsExternal(content.Value!.Schema)))
                 return true;
 
             return operation.Responses.Any(response =>
