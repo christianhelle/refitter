@@ -7,7 +7,8 @@ internal static class DependencyInjectionGenerator
 {
     public static string Generate(
         RefitGeneratorSettings settings,
-        string[] interfaceNames)
+        string[] interfaceNames,
+        string? newLine = null)
     {
         var iocSettings = settings.DependencyInjectionSettings;
         if (iocSettings is null || !interfaceNames.Any())
@@ -17,12 +18,7 @@ internal static class DependencyInjectionGenerator
         const string indent = "    ";
         var xmlDocComments = settings.GenerateXmlDocCodeComments;
 
-        var newLine = Environment.NewLine;
-        string Normalize(string value)
-        {
-            var normalized = value.Replace("\r\n", "\n").Replace("\r", "\n");
-            return newLine == "\n" ? normalized : normalized.Replace("\n", newLine);
-        }
+        newLine ??= Environment.NewLine;
 
         var baseUrlParam = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? $"        /// <param name=\"baseUrl\">The base URL for the API clients.</param>{newLine}        "
@@ -50,7 +46,7 @@ internal static class DependencyInjectionGenerator
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
             : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
 
-        var usings = Normalize(
+        var usings = NormalizeLineEndings(
             iocSettings.TransientErrorHandler switch
             {
                 TransientErrorHandler.Polly
@@ -78,12 +74,13 @@ internal static class DependencyInjectionGenerator
                         using Microsoft.Extensions.DependencyInjection;
                         using Refit;
                         """
-            });
+            },
+            newLine);
 
         code.AppendLine();
         code.AppendLine();
         code.AppendLine(
-            Normalize(
+            NormalizeLineEndings(
                 $$""""
                   #nullable enable
                   namespace {{settings.Namespace}}
@@ -99,18 +96,20 @@ internal static class DependencyInjectionGenerator
                       {
                           {{methodDeclaration}}
                           {
-                  """"));
+                  """",
+                newLine));
         foreach (var interfaceName in interfaceNames)
         {
             var clientBuilderName = $"clientBuilder{interfaceName}";
             code.Append(
-                Normalize(
+                NormalizeLineEndings(
                     $$"""
                                   var {{clientBuilderName}} = services
                                       .AddRefitClient<{{interfaceName}}>(settings)
                                       {{(iocSettings.UseWindowsAuthentication ? ".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })" : "")}}
                                       {{configureRefitClient}}
-                      """));
+                      """,
+                    newLine));
 
             foreach (string httpMessageHandler in iocSettings.HttpMessageHandlers)
             {
@@ -126,7 +125,7 @@ internal static class DependencyInjectionGenerator
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 code.AppendLine();
                 code.AppendLine(
-                    Normalize(
+                    NormalizeLineEndings(
                         $$"""
                                       {{clientBuilderName}}
                                           .AddPolicyHandler(
@@ -136,14 +135,15 @@ internal static class DependencyInjectionGenerator
                                                       Backoff.DecorrelatedJitterBackoffV2(
                                                           TimeSpan.FromSeconds({{durationString}}),
                                                           {{iocSettings.MaxRetryCount}})));
-                          """));
+                          """,
+                        newLine));
             }
             else if (iocSettings.TransientErrorHandler == TransientErrorHandler.HttpResilience)
             {
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 code.AppendLine();
                 code.AppendLine(
-                    Normalize(
+                    NormalizeLineEndings(
                         $$"""
                                       {{clientBuilderName}}
                                           .AddStandardResilienceHandler(config =>
@@ -155,7 +155,8 @@ internal static class DependencyInjectionGenerator
                                                   Delay = TimeSpan.FromSeconds({{durationString}})
                                               };
                                           });
-                          """));
+                          """,
+                        newLine));
             }
 
             code.AppendLine();
@@ -173,5 +174,11 @@ internal static class DependencyInjectionGenerator
         code.AppendLine("}");
         code.AppendLine();
         return code.ToString();
+    }
+
+    internal static string NormalizeLineEndings(string value, string newLine)
+    {
+        var normalized = value.Replace("\r\n", "\n").Replace("\r", "\n");
+        return newLine == "\n" ? normalized : normalized.Replace("\n", newLine);
     }
 }
