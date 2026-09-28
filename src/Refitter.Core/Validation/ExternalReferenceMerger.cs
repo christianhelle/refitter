@@ -55,6 +55,7 @@ internal sealed class ExternalReferenceMerger
         }
     }
 
+#pragma warning disable S2325 // Loads documents through the instance cache, so it cannot be static
     private void ResolveExternal(SpecReferenceSite site, ComponentCache cache)
     {
         var externalResource = site.Reference.ExternalResource;
@@ -72,6 +73,7 @@ internal sealed class ExternalReferenceMerger
             site.Update(new SpecReference(id, null));
         }
     }
+#pragma warning restore S2325
 
     private void FindMissing(SpecDocument document, SpecReferenceSite site, ComponentCache cache)
     {
@@ -166,7 +168,7 @@ internal sealed class ExternalReferenceMerger
                 return true;
 
             var requestBody = SpecReferences.Resolve(operation.RequestBody, c => c.RequestBodies, registered);
-            if (requestBody?.Content?.Any(content => IsExternal(content.Value!.Schema)) == true)
+            if (requestBody?.Content?.Any(content => IsExternal(content.Value!.Schema)) is true)
                 return true;
 
             return operation.Responses.Any(response =>
