@@ -45,7 +45,7 @@ internal static class RuntimeExpressions
     }
 
     private static readonly System.Text.RegularExpressions.Regex ContainedExpression =
-        new("{(?<exp>\\$[^}]*)");
+        new("{(?<exp>\\$[^}]*)", System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromSeconds(1));
 
     private static void ValidateSource(string expression)
     {
