@@ -1,0 +1,12 @@
+== file
+version: OpenApi3_1
+statistics: path items 3, operations 3, parameters 0, request bodies 0, responses 3, links 0, callbacks 0, schemas 18, headers 0
+== url
+version: OpenApi3_1
+error: #/components/schemas/Pet/discriminator | Schema  must contain property specified in the discriminator kind in the required field list.
+warning: #/paths/~1pets/get/responses/200/content/application~1xml/schema/properties/sibling/$ref | The schema reference '#/paths/~1pets' does not point to an existing schema.
+warning: #/paths/~1pets/get/responses/200/content/application~1xml/schema/properties/unrelated/$ref | The schema reference '#/paths/~1pets/get/responses/200/content/application~1xml/schema/$defs/Missing' does not point to an existing schema.
+warning: #/components/schemas/Pet/properties/badIndex/$ref | The schema reference '#/components/schemas/Pet/properties/choice/anyOf/x' does not point to an existing schema.
+warning: #/components/schemas/Pet/properties/outOfRange/$ref | The schema reference '#/components/schemas/Pet/properties/choice/oneOf/5' does not point to an existing schema.
+warning: #/components/schemas/Pet/properties/refItems/$ref | The schema reference '#/components/schemas/Pet/properties/refList/items' does not point to an existing schema.
+statistics: path items 3, operations 3, parameters 0, request bodies 0, responses 3, links 0, callbacks 0, schemas 18, headers 0

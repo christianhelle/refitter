@@ -1,0 +1,7 @@
+== file
+version: OpenApi3_0
+statistics: path items 3, operations 3, parameters 1, request bodies 1, responses 3, links 2, callbacks 2, schemas 13, headers 3
+== url
+version: OpenApi3_0
+error: #/components/schemas/Dog/discriminator | Schema  must contain property specified in the discriminator kind in the required field list.
+statistics: path items 3, operations 3, parameters 1, request bodies 1, responses 3, links 2, callbacks 2, schemas 13, headers 3

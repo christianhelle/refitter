@@ -1,0 +1,240 @@
+swagger: '2.0'
+info:
+  title: Every Swagger 2.0 field
+  description: All fields
+  termsOfService: https://example.com/terms
+  version: 1.0.0
+  contact:
+    name: Someone
+    url: https://example.com
+    email: someone@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  x-info: extension
+host: example.com
+basePath: /api
+schemes: [https]
+consumes: [application/json]
+produces: [application/json]
+security:
+  - petstore_auth: [read]
+x-root: extension
+tags:
+  - name: pets
+    description: Pets
+    externalDocs:
+      description: More
+      url: https://example.com/pets
+externalDocs:
+  description: Docs
+  url: https://example.com/docs
+paths:
+  x-paths: extension
+  /pets:
+    x-path: extension
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Pet'
+    get:
+      responses:
+        '200':
+          description: OK
+    post:
+      responses:
+        '200':
+          description: OK
+    put:
+      responses:
+        '200':
+          description: OK
+    patch:
+      responses:
+        '200':
+          description: OK
+    options:
+      responses:
+        '200':
+          description: OK
+    head:
+      responses:
+        '200':
+          description: OK
+  /pets/{id}/photo:
+    parameters:
+      - name: file
+        in: formData
+        type: file
+      - name: caption
+        in: formData
+        type: string
+        required: true
+    post:
+      responses:
+        '204':
+          description: No content
+    get:
+      responses:
+        '200':
+          description: OK
+  /pets/{id}:
+    delete:
+      tags: [pets]
+      summary: Delete
+      description: Deletes a pet
+      operationId: deletePet
+      deprecated: false
+      externalDocs:
+        url: https://example.com/delete
+      x-operation: extension
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uuid
+          description: The id
+          deprecated: false
+          allowEmptyValue: false
+          pattern: '^[a-f0-9-]+$'
+          minLength: 36
+          maxLength: 36
+          readOnly: true
+          default: abc
+          minimum: 1
+          maximum: 10
+          enum: [a, b]
+          x-examples:
+            first:
+              summary: First
+              description: The first
+              value: a
+              externalValue: https://example.com/a
+          x-parameter: extension
+        - name: X-Request-Id
+          in: header
+          type: array
+          items:
+            type: string
+          collectionFormat: pipes
+      security:
+        - petstore_auth: [write]
+        - api_key: []
+      responses:
+        x-responses: extension
+        '204':
+          description: No content
+          x-response: extension
+          x-examples:
+            first:
+              value: {}
+          headers:
+            X-Rate:
+              description: Rate
+              type: integer
+              format: int32
+              default: 1
+              maximum: 10
+              exclusiveMaximum: false
+              minimum: 1
+              exclusiveMinimum: false
+              maxLength: 5
+              minLength: 1
+              pattern: '^[0-9]+$'
+              maxItems: 3
+              minItems: 1
+              uniqueItems: true
+              multipleOf: 1
+              enum: [1, 2]
+              x-header: extension
+            X-Tags:
+              type: array
+              items:
+                type: string
+              collectionFormat: csv
+definitions:
+  Pet:
+    title: Pet
+    description: A pet
+    type: object
+    required: [name]
+    discriminator: kind
+    maxProperties: 10
+    minProperties: 1
+    additionalProperties: true
+    readOnly: false
+    example:
+      name: Rex
+    externalDocs:
+      url: https://example.com/pet
+    xml:
+      name: pet
+      namespace: https://example.com/schema
+      prefix: p
+      attribute: false
+      wrapped: false
+    x-jsonschema-patternProperties:
+      '^x-':
+        type: string
+    properties:
+      kind:
+        type: string
+      name:
+        type: string
+        minLength: 1
+        maxLength: 50
+        pattern: '^[A-Za-z]+$'
+      age:
+        type: integer
+        format: int32
+        minimum: 0
+        exclusiveMinimum: false
+        maximum: 30
+        exclusiveMaximum: true
+        multipleOf: 1
+        default: 1
+      tags:
+        type: array
+        minItems: 0
+        maxItems: 10
+        uniqueItems: true
+        items:
+          type: string
+          enum: [a, b]
+      extra:
+        allOf:
+          - $ref: '#/definitions/Tag'
+        additionalProperties:
+          type: string
+  Tag:
+    type: object
+securityDefinitions:
+  petstore_auth:
+    type: oauth2
+    flow: password
+    tokenUrl: https://example.com/token
+    description: OAuth
+    scopes:
+      read: Read
+      write: Write
+    x-security: extension
+  client:
+    type: oauth2
+    flow: application
+    tokenUrl: https://example.com/token
+    scopes: {}
+  code:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: https://example.com/auth
+    tokenUrl: https://example.com/token
+    scopes: {}
+  api_key:
+    type: apiKey
+    name: api_key
+    in: query
+  basic:
+    type: basic

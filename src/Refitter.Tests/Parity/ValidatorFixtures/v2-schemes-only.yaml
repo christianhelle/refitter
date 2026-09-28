@@ -1,0 +1,6 @@
+swagger: '2.0'
+info:
+  title: Schemes without a host
+  version: 1.0.0
+schemes: [https]
+paths: {}

@@ -1,0 +1,4 @@
+== file
+exception: UriFormatException: Invalid URI: The format of the URI could not be determined.
+== url
+exception: ReferenceResolutionException: Remote '$ref' "parameters/limit.yaml" in "<url>" was blocked. Remote reference resolution is disabled by default; pass --allow-remote-refs (or set allowRemoteReferences: true) to enable it.

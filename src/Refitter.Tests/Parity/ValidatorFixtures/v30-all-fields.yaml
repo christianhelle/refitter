@@ -1,0 +1,282 @@
+openapi: 3.0.3
+x-oai-$self: https://example.com/openapi.yaml
+info:
+  title: Every OpenAPI 3.0 field
+  description: All fields
+  termsOfService: https://example.com/terms
+  version: 1.0.0
+  contact:
+    name: Someone
+    url: https://example.com
+    email: someone@example.com
+    x-contact: extension
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: https://{region}.example.com
+    description: Regional
+    x-oai-name: production
+    x-server: extension
+    variables:
+      region:
+        default: eu
+        enum: [eu, us]
+        description: Region
+tags:
+  - name: pets
+    description: Pets
+    x-oas-summary: Pets summary
+    x-oas-parent: animals
+    x-oas-kind: nav
+    x-tag: extension
+    externalDocs:
+      url: https://example.com/pets
+externalDocs:
+  description: Docs
+  url: https://example.com/docs
+security:
+  - oauth: [read]
+paths:
+  /pets/{id}:
+    summary: A pet
+    description: One pet
+    servers:
+      - url: https://pets.example.com
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The id
+        deprecated: false
+        allowEmptyValue: false
+        allowReserved: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: abc
+        examples:
+          first:
+            $ref: '#/components/examples/Pet'
+          second:
+            summary: Second
+            description: The second
+            value: def
+            externalValue: https://example.com/def
+            x-oai-dataValue: def
+            x-oai-serializedValue: def
+            x-example: extension
+    put:
+      tags: [pets]
+      summary: Update
+      description: Updates a pet
+      operationId: updatePet
+      deprecated: false
+      externalDocs:
+        url: https://example.com/update
+      servers:
+        - url: https://update.example.com
+      security:
+        - apiKey: []
+      requestBody:
+        description: The pet
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+            encoding:
+              photo:
+                contentType: image/png
+                style: form
+                explode: true
+                allowReserved: false
+                headers:
+                  X-Photo:
+                    description: Photo header
+                    required: true
+                    deprecated: false
+                    allowEmptyValue: false
+                    allowReserved: false
+                    style: simple
+                    explode: false
+                    example: a
+                    examples:
+                      first:
+                        value: a
+                    schema:
+                      type: string
+                  X-Photo-Content:
+                    content:
+                      text/plain:
+                        schema:
+                          type: string
+                  X-Shared:
+                    $ref: '#/components/headers/Shared'
+            x-oai-itemSchema:
+              type: object
+            x-oai-itemEncoding:
+              contentType: application/json
+            x-oai-prefixEncoding:
+              - contentType: text/plain
+            x-media: extension
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+            example:
+              name: Rex
+            examples:
+              first:
+                $ref: '#/components/examples/Pet'
+      responses:
+        '200':
+          description: OK
+          x-oai-summary: Updated
+          x-response: extension
+          headers:
+            X-Rate:
+              $ref: '#/components/headers/Shared'
+          links:
+            self:
+              operationRef: '#/paths/~1pets~1{id}/put'
+              description: Self
+              parameters:
+                url: $url
+                method: $method
+                status: $statusCode
+                header: $request.header.X-Id
+                path: $request.path.id
+                query: $request.query.q
+                body: $request.body
+                pointer: '$response.body#/id'
+                literal: plain
+              requestBody: $request.body
+              server:
+                url: https://links.example.com
+            shared:
+              $ref: '#/components/links/Shared'
+      callbacks:
+        onUpdate:
+          '{$request.body#/callbackUrl}':
+            summary: Callback
+            post:
+              responses:
+                '200':
+                  description: OK
+        shared:
+          $ref: '#/components/callbacks/Shared'
+components:
+  schemas:
+    Pet:
+      type: object
+      required: [kind]
+      maxProperties: 10
+      minProperties: 1
+      nullable: true
+      readOnly: false
+      writeOnly: false
+      deprecated: false
+      externalDocs:
+        url: https://example.com/pet
+      xml:
+        name: pet
+        namespace: https://example.com/schema
+        prefix: p
+        attribute: false
+        wrapped: false
+      discriminator:
+        propertyName: kind
+        mapping:
+          dog: '#/components/schemas/Dog'
+      properties:
+        kind:
+          type: string
+        age:
+          type: integer
+          exclusiveMaximum: true
+          exclusiveMinimum: false
+          maximum: 30
+          minimum: 0
+        extended:
+          x-jsonschema-patternProperties:
+            '^x-':
+              type: string
+          x-jsonschema-unevaluatedProperties:
+            type: string
+          x-jsonschema-$anchor: extended
+          x-jsonschema-contentEncoding: base64
+          x-jsonschema-contentMediaType: image/png
+          x-jsonschema-contentSchema:
+            type: string
+          x-jsonschema-contains:
+            type: string
+          x-jsonschema-maxContains: 3
+          x-jsonschema-minContains: 1
+          x-jsonschema-propertyNames:
+            pattern: '^[a-z]+$'
+          x-jsonschema-dependentSchemas:
+            kind:
+              type: object
+          x-jsonschema-if:
+            type: object
+          x-jsonschema-then:
+            type: object
+          x-jsonschema-else:
+            type: object
+    Dog:
+      discriminator:
+        propertyName: kind
+      allOf:
+        - $ref: '#/components/schemas/Animal'
+    Animal:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+  examples:
+    Pet:
+      value:
+        kind: dog
+  headers:
+    Shared:
+      schema:
+        type: string
+  links:
+    Shared:
+      operationId: updatePet
+  callbacks:
+    Shared:
+      '{$request.body#/callbackUrl}':
+        post:
+          responses:
+            '200':
+              description: OK
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: X-Key
+      in: header
+    shared:
+      $ref: '#/components/securitySchemes/apiKey'
+    oidc:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
+      x-oai-deprecated: true
+    oauth:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: https://example.com/token
+          refreshUrl: https://example.com/refresh
+          scopes:
+            read: Read
+        x-oai-deviceAuthorization:
+          tokenUrl: https://example.com/token
+          x-oai-deviceAuthorizationUrl: https://example.com/device
+          scopes: {}

@@ -1,0 +1,100 @@
+openapi: 3.1.0
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+info:
+  title: Every OpenAPI 3.1 field
+  summary: All fields
+  version: 1.0.0
+  license:
+    name: MIT
+    identifier: MIT
+webhooks:
+  newPet:
+    post:
+      responses:
+        '200':
+          description: OK
+paths:
+  /pets:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $id: https://example.com/schemas/pets
+                $ref: '#/components/schemas/Pet'
+            application/xml:
+              schema:
+                type: object
+                properties:
+                  sibling:
+                    $ref: '#/paths/~1pets'
+                  unrelated:
+                    $ref: '#/$defs/Missing'
+components:
+  pathItems:
+    Shared:
+      get:
+        responses:
+          '200':
+            description: OK
+  schemas:
+    Pet:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      $id: https://example.com/schemas/pet
+      $anchor: pet
+      $dynamicAnchor: pet
+      type: object
+      nullable: true
+      discriminator:
+        propertyName: kind
+        x-oas-default-mapping: '#/components/schemas/Pet'
+      contentSchema:
+        type: string
+      dependentSchemas:
+        kind:
+          type: object
+      unevaluatedProperties:
+        type: string
+      properties:
+        kind:
+          type: string
+        dynamic:
+          $dynamicRef: '#pet'
+        never:
+          type: array
+          items: false
+        always:
+          not: true
+        items:
+          $ref: '#/components/schemas/Pet/properties/list/items'
+        list:
+          type: array
+          items:
+            type: string
+        additional:
+          $ref: '#/components/schemas/Pet/properties/map/additionalProperties'
+        map:
+          type: object
+          additionalProperties:
+            type: string
+        first:
+          $ref: '#/components/schemas/Pet/properties/choice/allOf/0'
+        badIndex:
+          $ref: '#/components/schemas/Pet/properties/choice/anyOf/x'
+        outOfRange:
+          $ref: '#/components/schemas/Pet/properties/choice/oneOf/5'
+        choice:
+          allOf:
+            - type: string
+          anyOf:
+            - type: string
+          oneOf:
+            - type: string
+        refItems:
+          $ref: '#/components/schemas/Pet/properties/refList/items'
+        refList:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pet'
