@@ -1,0 +1,8 @@
+== file
+version: OpenApi3_0
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 2, links 0, callbacks 0, schemas 2, headers 0
+== url
+version: OpenApi3_0
+warning: #/paths/~1pets/get/responses/200/content/application~1json/schema/$ref | The schema reference '#/components/schemas/Missing' does not point to an existing schema.
+warning: #/components/schemas/Pet/properties/vet/$ref | The schema reference '#/components/schemas/Vet' does not point to an existing schema.
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 2, links 0, callbacks 0, schemas 2, headers 0

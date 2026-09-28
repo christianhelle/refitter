@@ -1,0 +1,57 @@
+swagger: '2.0'
+info:
+  title: Path parameters after the operations
+  version: 1.0.0
+consumes: [application/json, application/xml]
+paths:
+  /pets:
+    get:
+      responses:
+        '200':
+          description: OK
+    post:
+      responses:
+        '200':
+          description: OK
+    put:
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+      responses:
+        '200':
+          description: OK
+    patch:
+      responses:
+        '200':
+          description: OK
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+  /pets/{id}/photo:
+    get:
+      responses:
+        '200':
+          description: OK
+    post:
+      consumes: [multipart/form-data]
+      responses:
+        '200':
+          description: OK
+    put:
+      responses:
+        '200':
+          description: OK
+    parameters:
+      - name: file
+        in: formData
+        type: file
+      - name: caption
+        in: formData
+        type: string

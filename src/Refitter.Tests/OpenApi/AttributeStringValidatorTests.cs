@@ -1,8 +1,6 @@
-using System.Net.Http;
 using AwesomeAssertions;
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Reader;
 using Refitter.Core.Validation;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.OpenApi;
 
@@ -24,166 +22,157 @@ public class AttributeStringValidatorTests
     }
 
     [Test]
-    public void Validate_Should_Return_When_Document_Is_Null()
+    public async Task Validate_Should_Reject_Unsafe_Header_Names_Of_ApiKey_Security_Schemes()
     {
-        OpenApiDiagnostic diagnostic = new();
+        var result = await ValidateAsync(
+            """
+            openapi: 3.0.1
+            info:
+              title: Security schemes
+              version: 1.0.0
+            paths: {}
+            components:
+              securitySchemes:
+                notAMap: scheme
+                unsafeHeader:
+                  type: apiKey
+                  in: header
+                  name: X"Api
+                safeHeader:
+                  type: apiKey
+                  in: header
+                  name: X-Api-Key
+                unsafeQuery:
+                  type: apiKey
+                  in: query
+                  name: X"Api
+            """);
 
-        AttributeStringValidator.Validate(null, diagnostic);
-
-        diagnostic.Errors.Should().BeEmpty();
+        result.Diagnostics.Errors.Should().ContainSingle();
+        result.Diagnostics.Errors[0].Pointer.Should().Be("unsafeHeader");
+        result.Diagnostics.Errors[0].Message.Should().Contain("Security scheme 'unsafeHeader'");
     }
 
     [Test]
-    public void Validate_Should_Validate_SecurityScheme_And_Return_When_Paths_Are_Null()
+    public async Task Validate_Should_Reject_Unsafe_Paths_And_Header_Parameter_Names()
     {
-        OpenApiDiagnostic diagnostic = new();
-        OpenApiDocument document = new()
-        {
-            Components = new OpenApiComponents
-            {
-                SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>
-                {
-                    ["nullScheme"] = null!,
-                    ["unsafeHeader"] = new OpenApiSecurityScheme
-                    {
-                        Type = SecuritySchemeType.ApiKey,
-                        In = ParameterLocation.Header,
-                        Name = "X\"Api"
-                    },
-                    ["safeHeader"] = new OpenApiSecurityScheme
-                    {
-                        Type = SecuritySchemeType.ApiKey,
-                        In = ParameterLocation.Header,
-                        Name = "X-Api-Key"
-                    },
-                    ["unsafeQuery"] = new OpenApiSecurityScheme
-                    {
-                        Type = SecuritySchemeType.ApiKey,
-                        In = ParameterLocation.Query,
-                        Name = "X\"Api"
-                    }
-                }
-            },
-            Paths = null!
-        };
+        var result = await ValidateAsync(
+            """
+            openapi: 3.0.1
+            info:
+              title: Paths and headers
+              version: 1.0.0
+            paths:
+              /unsafe"path:
+                get:
+                  responses:
+                    '200':
+                      description: OK
+              /safe:
+                get:
+                  parameters:
+                    - name: X"Bad
+                      in: header
+                      schema:
+                        type: string
+                    - name: X-Good
+                      in: header
+                      schema:
+                        type: string
+                    - name: X"Ignored
+                      in: query
+                      schema:
+                        type: string
+                  responses:
+                    '200':
+                      description: OK
+            """);
 
-        AttributeStringValidator.Validate(document, diagnostic);
-
-        diagnostic.Errors.Should().HaveCount(1);
-        diagnostic.Errors[0].Pointer.Should().Be("unsafeHeader");
-        diagnostic.Errors[0].Message.Should().Contain("Security scheme 'unsafeHeader'");
+        result.Diagnostics.Errors.Select(error => error.Pointer)
+            .Should().BeEquivalentTo(["/unsafe\"path", "X\"Bad"]);
     }
 
     [Test]
-    public void Validate_Should_Report_Path_And_Header_Errors_And_Skip_Null_Branches()
+    public async Task Validate_Should_Reject_Unsafe_Content_Types_In_OpenApi_3()
     {
-        OpenApiDiagnostic diagnostic = new();
-        OpenApiDocument document = new()
-        {
-            Paths = new OpenApiPaths
-            {
-                ["/nullpath"] = null!,
-                ["unsafe\"path"] = new OpenApiPathItem
-                {
-                    Operations = null!
-                },
-                ["/safe"] = new OpenApiPathItem
-                {
-                    Operations = new Dictionary<HttpMethod, OpenApiOperation>
-                    {
-                        [HttpMethod.Get] = new OpenApiOperation
-                        {
-                            Parameters = null!
-                        },
-                        [HttpMethod.Post] = null!,
-                        [HttpMethod.Put] = new OpenApiOperation
-                        {
-                            Parameters = new List<IOpenApiParameter>
-                            {
-                                new OpenApiParameter
-                                {
-                                    In = ParameterLocation.Header,
-                                    Name = "X\"Bad"
-                                },
-                                new OpenApiParameter
-                                {
-                                    In = ParameterLocation.Header,
-                                    Name = "X-Good"
-                                },
-                                new OpenApiParameter
-                                {
-                                    In = ParameterLocation.Query,
-                                    Name = "X\"Ignored"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        };
+        var result = await ValidateAsync(
+            """
+            openapi: 3.0.1
+            info:
+              title: Content types
+              version: 1.0.0
+            paths:
+              /api:
+                post:
+                  requestBody:
+                    content:
+                      application/json: {}
+                      'application/json")] x': {}
+                  responses:
+                    '200':
+                      description: OK
+                      content:
+                        'text/plain"': {}
+                    '204':
+                      description: No content
+            """);
 
-        AttributeStringValidator.Validate(document, diagnostic);
-
-        diagnostic.Errors.Should().HaveCount(2);
-        diagnostic.Errors.Select(x => x.Pointer).Should().Contain(new[] { "unsafe\"path", "X\"Bad" });
+        result.Diagnostics.Errors.Select(error => error.Message).Should().OnlyContain(message => message.Contains("Content type"));
+        result.Diagnostics.Errors.Select(error => error.Pointer)
+            .Should().BeEquivalentTo(["application/json\")] x", "text/plain\""]);
     }
 
     [Test]
-    public void Validate_Should_Report_ContentType_Errors_For_OpenApi3()
+    public async Task Validate_Should_Not_Reject_Content_Types_In_Swagger_2()
     {
-        OpenApiDiagnostic diagnostic = new() { SpecificationVersion = OpenApiSpecVersion.OpenApi3_0 };
-        OpenApiDocument document = BuildContentTypeDocument();
+        var result = await ValidateAsync(
+            """
+            swagger: '2.0'
+            info:
+              title: Content types
+              version: 1.0.0
+            paths:
+              /api:
+                post:
+                  consumes:
+                    - 'application/json")] x'
+                  produces:
+                    - 'text/plain"'
+                  parameters:
+                    - name: body
+                      in: body
+                      schema:
+                        type: object
+                  responses:
+                    '200':
+                      description: OK
+                      schema:
+                        type: string
+            """);
 
-        AttributeStringValidator.Validate(document, diagnostic);
-
-        diagnostic.Errors.Should().HaveCount(2);
-        diagnostic.Errors.Select(x => x.Message).Should().OnlyContain(m => m.Contains("Content type"));
-        diagnostic.Errors.Select(x => x.Pointer).Should().Contain(new[] { "application/json\")] x", "text/plain\"" });
+        result.Diagnostics.Errors.Should().BeEmpty();
     }
 
     [Test]
-    public void Validate_Should_Not_Report_ContentType_Errors_For_OpenApi2()
+    public async Task Validate_Should_Accept_An_Operation_Without_Responses()
     {
-        OpenApiDiagnostic diagnostic = new() { SpecificationVersion = OpenApiSpecVersion.OpenApi2_0 };
-        OpenApiDocument document = BuildContentTypeDocument();
+        var result = await ValidateAsync(
+            """
+            openapi: 3.0.1
+            info:
+              title: No responses
+              version: 1.0.0
+            paths:
+              /safe:
+                post:
+                  requestBody:
+                    content:
+                      application/json: {}
+            """);
 
-        AttributeStringValidator.Validate(document, diagnostic);
-
-        diagnostic.Errors.Should().BeEmpty();
+        result.Diagnostics.Errors.Should().BeEmpty();
     }
 
-    private static OpenApiDocument BuildContentTypeDocument() => new()
-    {
-        Paths = new OpenApiPaths
-        {
-            ["/api"] = new OpenApiPathItem
-            {
-                Operations = new Dictionary<HttpMethod, OpenApiOperation>
-                {
-                    [HttpMethod.Post] = new OpenApiOperation
-                    {
-                        RequestBody = new OpenApiRequestBody
-                        {
-                            Content = new Dictionary<string, IOpenApiMediaType>
-                            {
-                                ["application/json"] = new OpenApiMediaType(),
-                                ["application/json\")] x"] = new OpenApiMediaType()
-                            }
-                        },
-                        Responses = new OpenApiResponses
-                        {
-                            ["200"] = new OpenApiResponse
-                            {
-                                Content = new Dictionary<string, IOpenApiMediaType>
-                                {
-                                    ["text/plain\""] = new OpenApiMediaType()
-                                }
-                            },
-                            ["204"] = null!
-                        }
-                    }
-                }
-            }
-        }
-    };
+    private static async Task<OpenApiValidationResult> ValidateAsync(string spec) =>
+        await OpenApiValidator.Validate(await SwaggerFileHelper.CreateSwaggerFile(spec));
 }

@@ -1,0 +1,12 @@
+swagger: '2.0'
+info:
+  title: Wrong node types
+  version: 1.0.0
+consumes: application/json
+paths:
+  /pets:
+    get:
+      parameters:
+        name: not-a-list
+      responses: not-a-map
+definitions: not-a-map

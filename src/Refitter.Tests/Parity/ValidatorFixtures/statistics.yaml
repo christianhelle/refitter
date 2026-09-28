@@ -1,0 +1,132 @@
+openapi: 3.0.1
+info:
+  title: Statistics
+  version: 1.0.0
+paths:
+  /pets:
+    parameters:
+      - $ref: '#/components/parameters/Limit'
+    get:
+      parameters:
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Rate:
+              schema:
+                type: integer
+            X-Total:
+              $ref: '#/components/headers/Total'
+          links:
+            self:
+              operationId: getPets
+            next:
+              $ref: '#/components/links/Next'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Pets'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/Pet'
+      callbacks:
+        onCreated:
+          '{$request.body#/callbackUrl}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+              responses:
+                '200':
+                  description: OK
+        onDeleted:
+          $ref: '#/components/callbacks/Deleted'
+      responses:
+        '201':
+          description: Created
+  /pets/{id}:
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Pet'
+                - type: object
+                  properties:
+                    tag:
+                      type: string
+      responses:
+        '204':
+          description: No content
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        name:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pet'
+    Pets:
+      type: array
+      items:
+        $ref: '#/components/schemas/Pet'
+    Error:
+      type: object
+      additionalProperties:
+        type: string
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+  headers:
+    Total:
+      schema:
+        type: integer
+  links:
+    Next:
+      operationId: getPets
+  requestBodies:
+    Pet:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pet'
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  callbacks:
+    Deleted:
+      '{$request.body#/callbackUrl}':
+        post:
+          responses:
+            '200':
+              description: OK

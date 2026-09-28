@@ -1,0 +1,7 @@
+== file
+version: OpenApi3_1
+statistics: path items 0, operations 0, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 4, headers 0
+== url
+version: OpenApi3_1
+warning: #/components/schemas/Pet/properties/throughReference/$ref | The schema reference '#/components/schemas/Pet/properties/refMap/additionalProperties' does not point to an existing schema.
+statistics: path items 0, operations 0, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 4, headers 0

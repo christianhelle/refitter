@@ -1,0 +1,9 @@
+== file
+version: OpenApi3_2
+error: #/components/schemas/Pet/xml/nodeType | Enum value sideways is not recognized.
+statistics: path items 1, operations 3, parameters 0, request bodies 0, responses 3, links 0, callbacks 0, schemas 3, headers 0
+== url
+version: OpenApi3_2
+error: #/components/schemas/Pet/xml/nodeType | Enum value sideways is not recognized.
+error: #/components/schemas/Pet/discriminator | Schema  must contain property specified in the discriminator kind in the required field list.
+statistics: path items 1, operations 3, parameters 0, request bodies 0, responses 3, links 0, callbacks 0, schemas 3, headers 0

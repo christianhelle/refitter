@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using Microsoft.OpenApi.Reader;
 using Refitter.Core;
 using Refitter.Core.Validation;
 
@@ -425,8 +424,8 @@ public class RefitterRunnerTests
                 GenerateClients = true,
             };
 
-            var diagnostic = new OpenApiDiagnostic();
-            diagnostic.Errors.Add(new Microsoft.OpenApi.OpenApiError("test", "Something went wrong"));
+            var diagnostic = new ValidationDiagnostics();
+            diagnostic.Errors.Add(new ValidationIssue("test", "Something went wrong"));
             var validationResult = new OpenApiValidationResult(diagnostic, new OpenApiStats());
             var validator = new MockValidator(validationResult);
 
@@ -462,8 +461,8 @@ public class RefitterRunnerTests
                 GenerateClients = true,
             };
 
-            var diagnostic = new OpenApiDiagnostic();
-            diagnostic.Warnings.Add(new Microsoft.OpenApi.OpenApiError("test", "Something looks odd"));
+            var diagnostic = new ValidationDiagnostics();
+            diagnostic.Warnings.Add(new ValidationIssue("test", "Something looks odd"));
             var validationResult = new OpenApiValidationResult(diagnostic, new OpenApiStats());
             var validator = new MockValidator(validationResult);
 
@@ -538,7 +537,7 @@ public class RefitterRunnerTests
         public MockValidator(OpenApiValidationResult? result = null)
         {
             _result = result ?? new OpenApiValidationResult(
-                new OpenApiDiagnostic(),
+                new ValidationDiagnostics(),
                 new OpenApiStats());
         }
 

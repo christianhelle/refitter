@@ -1,0 +1,8 @@
+== file
+version: OpenApi3_0
+error: /p")] Task<string> Dummy(); } } file class Evil { [System.Runtime.CompilerServices.ModuleInitializer] internal static void Init(){ } } namespace N2 { public partial interface I2 { [Get("/q | Path '/p")] Task<string> Dummy(); } } file class Evil { [System.Runtime.CompilerServices.ModuleInitializer] internal static void Init(){ } } namespace N2 { public partial interface I2 { [Get("/q' contains illegal characters (quotes, backslashes, or control characters) and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass.
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 0, headers 0
+== url
+version: OpenApi3_0
+error: /p")] Task<string> Dummy(); } } file class Evil { [System.Runtime.CompilerServices.ModuleInitializer] internal static void Init(){ } } namespace N2 { public partial interface I2 { [Get("/q | Path '/p")] Task<string> Dummy(); } } file class Evil { [System.Runtime.CompilerServices.ModuleInitializer] internal static void Init(){ } } namespace N2 { public partial interface I2 { [Get("/q' contains illegal characters (quotes, backslashes, or control characters) and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass.
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 0, headers 0

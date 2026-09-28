@@ -1,4 +1,3 @@
-using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
 using Spectre.Console;
@@ -114,7 +113,7 @@ internal sealed class RichGenerationReporter : IGenerationReporter
         AnsiConsole.WriteLine();
     }
 
-    public void ReportValidationDiagnostic(OpenApiError error, bool isError)
+    public void ReportValidationDiagnostic(ValidationIssue error, bool isError)
     {
         var color = isError ? "red" : "yellow";
         var label = isError ? "Error" : "Warning";

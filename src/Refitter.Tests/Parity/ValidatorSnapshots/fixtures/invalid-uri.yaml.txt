@@ -1,0 +1,4 @@
+== file
+exception: UriFormatException: Invalid URI: The hostname could not be parsed.
+== url
+exception: UriFormatException: Invalid URI: The hostname could not be parsed.

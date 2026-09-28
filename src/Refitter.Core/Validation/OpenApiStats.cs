@@ -1,11 +1,9 @@
-using Microsoft.OpenApi;
-
 namespace Refitter.Core.Validation;
 
 /// <summary>
-/// Walks an OpenAPI document and collects counts of its elements.
+/// The counts of the elements found in an OpenAPI document.
 /// </summary>
-public class OpenApiStats : OpenApiVisitorBase
+public class OpenApiStats
 {
     /// <summary>
     /// Gets or sets the number of parameters found.
@@ -51,78 +49,6 @@ public class OpenApiStats : OpenApiVisitorBase
     /// Gets or sets the number of callbacks found.
     /// </summary>
     public int CallbackCount { get; set; } = 0;
-
-    /// <summary>
-    /// Increments <see cref="ParameterCount"/>.
-    /// </summary>
-    public override void Visit(IOpenApiParameter parameter)
-    {
-        ParameterCount++;
-    }
-
-    /// <summary>
-    /// Increments <see cref="SchemaCount"/>.
-    /// </summary>
-    public override void Visit(IOpenApiSchema schema)
-    {
-        SchemaCount++;
-    }
-
-    /// <summary>
-    /// Adds the number of headers to <see cref="HeaderCount"/>.
-    /// </summary>
-    public override void Visit(IDictionary<string, IOpenApiHeader> headers)
-    {
-        HeaderCount += headers.Count;
-    }
-
-    /// <summary>
-    /// Increments <see cref="PathItemCount"/>.
-    /// </summary>
-    public override void Visit(IOpenApiPathItem pathItem)
-    {
-        PathItemCount++;
-    }
-
-    /// <summary>
-    /// Increments <see cref="RequestBodyCount"/>.
-    /// </summary>
-    public override void Visit(IOpenApiRequestBody requestBody)
-    {
-        RequestBodyCount++;
-    }
-
-    /// <summary>
-    /// Adds the number of responses to <see cref="ResponseCount"/>.
-    /// </summary>
-    public override void Visit(OpenApiResponses response)
-    {
-        ResponseCount += response.Count;
-    }
-
-    /// <summary>
-    /// Increments <see cref="OperationCount"/>.
-    /// </summary>
-    public override void Visit(OpenApiOperation operation)
-    {
-        OperationCount++;
-    }
-
-    /// <summary>
-    /// Increments <see cref="LinkCount"/>.
-    /// </summary>
-    public override void Visit(IOpenApiLink link)
-    {
-        LinkCount++;
-    }
-
-    /// <summary>
-    /// Increments <see cref="CallbackCount"/>.
-    /// </summary>
-    public override void Visit(IOpenApiCallback callback)
-    {
-        CallbackCount++;
-    }
 
     /// <summary>
     /// Returns a formatted string with all element counts.

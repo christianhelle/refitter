@@ -1,0 +1,49 @@
+openapi: 3.0.1
+info:
+  title: Components
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    Filter:
+      type: object
+    Dog:
+      type: object
+    Owner:
+      type: object
+  requestBodies:
+    Pet:
+      content:
+        application/json:
+          schema:
+            type: object
+  headers:
+    Rate:
+      schema:
+        type: integer
+  links:
+    Self:
+      operationId: createPet
+  examples:
+    Pet:
+      value: {}
+  callbacks:
+    Created:
+      '{$request.body#/url}':
+        post:
+          requestBody:
+            $ref: '#/components/requestBodies/Pet'
+          responses:
+            '200':
+              description: OK
+              headers:
+                X-Rate:
+                  $ref: '#/components/headers/Rate'
+              links:
+                self:
+                  $ref: '#/components/links/Self'
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: X-Key
+      in: header

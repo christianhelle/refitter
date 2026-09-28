@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
 
@@ -88,7 +87,7 @@ public class SimpleGenerationReporterTests
         await new SimpleGenerationReporter().ValidateWithProgressAsync(async () =>
         {
             called = true;
-            return await Task.FromResult(new OpenApiValidationResult(new Microsoft.OpenApi.Reader.OpenApiDiagnostic(), new OpenApiStats()));
+            return await Task.FromResult(new OpenApiValidationResult(new ValidationDiagnostics(), new OpenApiStats()));
         });
 
         called.Should().BeTrue();
@@ -106,7 +105,7 @@ public class SimpleGenerationReporterTests
     public void ReportValidationDiagnostic_Error_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportValidationDiagnostic(
-            new OpenApiError("field", "Something went wrong"),
+            new ValidationIssue("field", "Something went wrong"),
             isError: true);
 
         act.Should().NotThrow();
@@ -116,7 +115,7 @@ public class SimpleGenerationReporterTests
     public void ReportValidationDiagnostic_Warning_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportValidationDiagnostic(
-            new OpenApiError("field", "A warning"),
+            new ValidationIssue("field", "A warning"),
             isError: false);
 
         act.Should().NotThrow();
@@ -126,7 +125,7 @@ public class SimpleGenerationReporterTests
     public void ReportValidationStatistics_Does_Not_Throw()
     {
         var result = new OpenApiValidationResult(
-            new Microsoft.OpenApi.Reader.OpenApiDiagnostic(),
+            new ValidationDiagnostics(),
             new OpenApiStats());
 
         var act = () => new SimpleGenerationReporter().ReportValidationStatistics(result);

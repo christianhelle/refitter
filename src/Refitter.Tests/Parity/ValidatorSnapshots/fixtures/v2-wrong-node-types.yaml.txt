@@ -1,0 +1,15 @@
+== file
+version: OpenApi2_0
+error: #/consumes | Expected list while parsing String
+error: #/paths/~1pets/get/parameters | Expected list while parsing IOpenApiParameter
+error: #/paths/~1pets/get/responses | Responses must be a map/object
+error: #/definitions | Expected map while parsing IOpenApiSchema
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 0, headers 0
+== url
+version: OpenApi2_0
+error: #/consumes | Expected list while parsing String
+error: #/paths/~1pets/get/parameters | Expected list while parsing IOpenApiParameter
+error: #/paths/~1pets/get/responses | Responses must be a map/object
+error: #/definitions | Expected map while parsing IOpenApiSchema
+error: #/paths/~1pets/get/responses | Responses must contain at least one response
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 0, headers 0

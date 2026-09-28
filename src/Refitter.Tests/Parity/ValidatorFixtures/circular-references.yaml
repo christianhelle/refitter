@@ -1,0 +1,40 @@
+openapi: 3.0.1
+info:
+  title: Circular references
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/A'
+components:
+  schemas:
+    A:
+      $ref: '#/components/schemas/B'
+    B:
+      $ref: '#/components/schemas/A'
+    Self:
+      type: object
+      properties:
+        child:
+          $ref: '#/components/schemas/Self'
+    Base:
+      type: object
+      properties:
+        kind:
+          type: string
+    Derived:
+      discriminator:
+        propertyName: kind
+      oneOf:
+        - $ref: '#/components/schemas/Base'
+    DerivedMissing:
+      discriminator:
+        propertyName: kind
+      anyOf:
+        - $ref: '#/components/schemas/Missing'

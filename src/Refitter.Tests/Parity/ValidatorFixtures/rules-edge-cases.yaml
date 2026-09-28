@@ -1,0 +1,43 @@
+openapi: 3.0.1
+info:
+  title: Rule edge cases
+  version: 1.0.0
+  contact:
+    email: ''
+paths:
+  /pets:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                externalDocs:
+                  description: No url
+                discriminator:
+                  propertyName: kind
+                allOf:
+                  - type: object
+                    properties:
+                      name:
+                        type: string
+                    required: [name]
+              encoding:
+                name:
+                  headers:
+                    X-Name:
+                      content:
+                        text/plain:
+                          schema:
+                            type: string
+                    X-Missing:
+                      schema:
+                        $ref: '#/components/schemas/Missing'
+          headers:
+            X-Content:
+              content:
+                application/json:
+                  schema:
+                    type: object

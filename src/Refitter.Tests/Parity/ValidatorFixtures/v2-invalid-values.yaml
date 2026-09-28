@@ -1,0 +1,51 @@
+swagger: '2.0'
+info:
+  title: Invalid values
+  version: 1.0.0
+  license: not-a-map
+host: example.com:8080
+schemes: [https]
+paths:
+  /pets:
+    $ref: '#/paths/other'
+    get:
+      tags: [pets, '']
+      parameters:
+        - name: filter
+          in: query
+          type: strng
+          collectionFormat: csv
+        - name: id
+          in: path
+          required: true
+          type: string
+          collectionFormat: multi
+          exclusiveMaximum: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Rate:
+              type: integer
+              collectionFormat: ssv
+definitions:
+  Pet:
+    type: object
+    x-nullable: true
+    discriminator: kind
+    required: [kind]
+    properties:
+      kind:
+        type: string
+      bad:
+        oneOf:
+          - type: string
+securityDefinitions:
+  oauth:
+    type: oauth2
+    flow: implicit
+    authorizationUrl: https://example.com/auth
+    scopes:
+      read: Read
+      nested:
+        not: scalar

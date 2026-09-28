@@ -1,0 +1,26 @@
+== file
+version: OpenApi3_0
+error:  | bogusRoot is not a valid property at #/
+error:  | bogusInfo is not a valid property at #/info
+error:  | bogusPathItem is not a valid property at #/paths/~1pets
+error:  | bogusOperation is not a valid property at #/paths/~1pets/get
+error:  | bogusParameter is not a valid property at #/paths/~1pets/get/parameters
+error:  | bogusSchema is not a valid property at #/paths/~1pets/get/parameters/schema
+error:  | bogusResponse is not a valid property at #/paths/~1pets/get/responses/200
+error:  | bogusComponents is not a valid property at #/components
+error:  | unknownKeyword is not a valid property at #/components/schemas/Pet/properties/name
+warning:  | $schema is not a valid property at #/
+statistics: path items 1, operations 1, parameters 1, request bodies 0, responses 1, links 0, callbacks 0, schemas 3, headers 0
+== url
+version: OpenApi3_0
+error:  | bogusRoot is not a valid property at #/
+error:  | bogusInfo is not a valid property at #/info
+error:  | bogusPathItem is not a valid property at #/paths/~1pets
+error:  | bogusOperation is not a valid property at #/paths/~1pets/get
+error:  | bogusParameter is not a valid property at #/paths/~1pets/get/parameters
+error:  | bogusSchema is not a valid property at #/paths/~1pets/get/parameters/schema
+error:  | bogusResponse is not a valid property at #/paths/~1pets/get/responses/200
+error:  | bogusComponents is not a valid property at #/components
+error:  | unknownKeyword is not a valid property at #/components/schemas/Pet/properties/name
+warning:  | $schema is not a valid property at #/
+statistics: path items 1, operations 1, parameters 1, request bodies 0, responses 1, links 0, callbacks 0, schemas 3, headers 0

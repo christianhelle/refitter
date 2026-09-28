@@ -1,0 +1,25 @@
+== file
+version: OpenApi3_0
+error: #/security | Expected list while parsing String
+error: #/paths/~1pets/get/parameters/schema/type | Invalid schema type identifier: strng
+error: #/paths/~1pets/get/parameters/schema/enum | Cannot create a list from this type of node.
+error:  | Expected a value while parsing at #/paths/~1pets/get/parameters/schema/required.
+error: #/paths/~1pets/get/responses/200/links/byId/parameters | The runtime expression '$bogus' has invalid format.
+error: #/paths/~1pets/get/responses/200/links/byId/requestBody | Expected scalar value.
+error: #/paths/~1pets/get/callbacks/onEvent/$bogus | The runtime expression '$bogus' has invalid format.
+error:  | x-extension is not a valid property at #/components/schemas/Pet/discriminator
+statistics: path items 2, operations 2, parameters 1, request bodies 0, responses 2, links 2, callbacks 1, schemas 3, headers 0
+== url
+version: OpenApi3_0
+error: #/security | Expected list while parsing String
+error: #/paths/~1pets/get/parameters/schema/type | Invalid schema type identifier: strng
+error: #/paths/~1pets/get/parameters/schema/enum | Cannot create a list from this type of node.
+error:  | Expected a value while parsing at #/paths/~1pets/get/parameters/schema/required.
+error: #/paths/~1pets/get/responses/200/links/byId/parameters | The runtime expression '$bogus' has invalid format.
+error: #/paths/~1pets/get/responses/200/links/byId/requestBody | Expected scalar value.
+error: #/paths/~1pets/get/callbacks/onEvent/$bogus | The runtime expression '$bogus' has invalid format.
+error:  | x-extension is not a valid property at #/components/schemas/Pet/discriminator
+error: #/paths/~1pets/get/responses/200/links/server/server/url | The field 'url' in 'server' object is REQUIRED.
+error: #/components/schemas/Pet/size | Schema  property size is null.
+warning: #/components/schemas/Pet/discriminator/mapping/dog/$ref | The schema reference '#/components/schemas/Dog' does not point to an existing schema.
+statistics: path items 2, operations 2, parameters 1, request bodies 0, responses 2, links 2, callbacks 1, schemas 3, headers 0

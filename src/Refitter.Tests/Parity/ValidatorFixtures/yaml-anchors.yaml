@@ -1,0 +1,21 @@
+openapi: 3.0.1
+info:
+  title: YAML anchors and merge keys
+  version: 1.0.0
+paths:
+  /pets:
+    get: &operation
+      responses:
+        '200': &ok
+          description: OK
+    post:
+      <<: *operation
+      summary: Merged
+    put:
+      responses:
+        '200': *ok
+components:
+  schemas:
+    Pet: &pet
+      type: object
+    Dog: *pet

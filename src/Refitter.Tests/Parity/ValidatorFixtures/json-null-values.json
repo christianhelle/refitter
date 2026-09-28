@@ -1,0 +1,39 @@
+{
+  "openapi": "3.2.0",
+  "info": { "title": "Null values", "version": "1.0.0", "contact": "not a map" },
+  "paths": {
+    "/pets": {
+      "additionalOperations": { "COPY": null },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": null, "type": "object" },
+                "encoding": {
+                  "name": {
+                    "encoding": { "nested": { "contentType": "text/plain" } },
+                    "itemEncoding": { "contentType": "text/plain" },
+                    "prefixEncoding": [ { "contentType": "text/plain" } ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Pet": {
+        "type": "object",
+        "dependentRequired": { "name": [ "tag" ] },
+        "properties": {
+          "self": { "$ref": "pet.json" }
+        }
+      }
+    }
+  }
+}

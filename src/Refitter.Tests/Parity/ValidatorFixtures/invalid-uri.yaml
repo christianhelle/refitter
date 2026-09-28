@@ -1,0 +1,7 @@
+openapi: 3.0.1
+info:
+  title: Invalid URI
+  version: 1.0.0
+externalDocs:
+  url: 'http://[bad'
+paths: {}

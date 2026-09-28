@@ -1,0 +1,10 @@
+{
+  "components": {
+    "responses": {
+      "Error": {
+        "description": "Error",
+        "content": { "application/json": { "schema": { "type": "object" } } }
+      }
+    }
+  }
+}

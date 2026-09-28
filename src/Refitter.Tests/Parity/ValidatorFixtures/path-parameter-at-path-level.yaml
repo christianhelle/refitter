@@ -1,0 +1,31 @@
+openapi: 3.0.1
+info:
+  title: Path level parameters
+  version: 1.0.0
+paths:
+  /pets/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: missing
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: OK
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string

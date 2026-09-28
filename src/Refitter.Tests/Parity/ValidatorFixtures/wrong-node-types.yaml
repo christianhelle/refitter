@@ -1,0 +1,24 @@
+openapi: 3.0.1
+info: just a string
+tags:
+  name: not-a-list
+servers: not-a-list
+paths:
+  /pets:
+    get:
+      parameters:
+        name: not-a-list
+      tags: pets
+      responses: not-a-map
+  /owners: not-a-map
+  /vets:
+    get:
+      responses:
+        '200': not-a-map
+components:
+  schemas:
+    Pet:
+      type: object
+      required: name
+      properties: not-a-map
+    Owner: not-a-map

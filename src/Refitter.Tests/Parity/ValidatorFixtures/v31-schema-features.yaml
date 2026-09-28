@@ -1,0 +1,62 @@
+openapi: 3.1.0
+info:
+  title: JSON Schema features
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+                description: sibling description
+components:
+  schemas:
+    Anything: true
+    Nothing: false
+    Pet:
+      type: [object, 'null']
+      $comment: pets
+      $vocabulary:
+        https://example.com/vocab: true
+      $defs:
+        Name:
+          type: string
+      const: fixed
+      examples: not-a-list
+      dependentRequired:
+        name: [tag]
+        tag: not-a-list
+      properties:
+        name:
+          $ref: '#/$defs/Name'
+        nested:
+          $ref: '#/components/schemas/Pet/properties/name'
+        missingNested:
+          $ref: '#/components/schemas/Pet/properties/missing'
+        kind:
+          type: [strng]
+        prefixed:
+          type: array
+          prefixItems:
+            - type: string
+      if:
+        properties:
+          kind:
+            const: dog
+      then:
+        required: [name]
+      else: true
+      unevaluatedProperties: false
+      patternProperties:
+        '^x-':
+          type: string
+      propertyNames:
+        pattern: '^[a-z]+$'
+      contains:
+        type: string
+      minContains: 1
+      maxContains: 2

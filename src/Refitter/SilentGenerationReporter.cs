@@ -1,4 +1,3 @@
-using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
 
@@ -56,7 +55,7 @@ internal sealed class SilentGenerationReporter : IGenerationReporter
     {
     }
 
-    public void ReportValidationDiagnostic(OpenApiError error, bool isError)
+    public void ReportValidationDiagnostic(ValidationIssue error, bool isError)
     {
     }
 

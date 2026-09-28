@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.OpenApi.Reader;
 
 namespace Refitter.Core.Validation;
 
@@ -12,7 +11,7 @@ namespace Refitter.Core.Validation;
 #pragma warning disable S1186 // Positional record constructor is compiler-generated
 public record OpenApiValidationResult(
 #pragma warning restore S1186
-    OpenApiDiagnostic Diagnostics,
+    ValidationDiagnostics Diagnostics,
     OpenApiStats Statistics)
 {
     /// <summary>

@@ -1,0 +1,16 @@
+swagger: '2.0'
+info:
+  title: A header with tab separated values
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Values:
+              type: array
+              items:
+                type: string
+              collectionFormat: tsv

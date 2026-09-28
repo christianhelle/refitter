@@ -1,0 +1,10 @@
+openapi: 3.1.0
+info:
+  title: A negative unsigned integer
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    Pet:
+      type: array
+      maxContains: -1

@@ -1,0 +1,4 @@
+== file
+exception: IndexOutOfRangeException: Index was outside the bounds of the array.
+== url
+exception: ReferenceResolutionException: Remote '$ref' "__REF__" in "<url>" was blocked. Remote reference resolution is disabled by default; pass --allow-remote-refs (or set allowRemoteReferences: true) to enable it.

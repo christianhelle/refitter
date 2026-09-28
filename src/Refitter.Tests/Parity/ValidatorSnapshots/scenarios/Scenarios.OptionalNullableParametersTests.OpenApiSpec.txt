@@ -1,0 +1,12 @@
+== file
+version: OpenApi3_0
+error:  | nullable is not a valid property at #/paths/~1job~1{Id}/post/parameters
+error:  | optional is not a valid property at #/paths/~1job~1{Id}/post/parameters
+statistics: path items 1, operations 1, parameters 4, request bodies 0, responses 1, links 0, callbacks 0, schemas 4, headers 0
+== url
+version: OpenApi3_0
+error:  | nullable is not a valid property at #/paths/~1job~1{Id}/post/parameters
+error:  | optional is not a valid property at #/paths/~1job~1{Id}/post/parameters
+error: #/info/title | The field 'title' in 'info' object is REQUIRED.
+error: #/info/version | The field 'version' in 'info' object is REQUIRED.
+statistics: path items 1, operations 1, parameters 4, request bodies 0, responses 1, links 0, callbacks 0, schemas 4, headers 0

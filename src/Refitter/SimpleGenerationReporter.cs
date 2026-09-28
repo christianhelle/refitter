@@ -1,4 +1,3 @@
-using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
 
@@ -71,7 +70,7 @@ internal sealed class SimpleGenerationReporter : IGenerationReporter
         Console.WriteLine();
     }
 
-    public void ReportValidationDiagnostic(OpenApiError error, bool isError)
+    public void ReportValidationDiagnostic(ValidationIssue error, bool isError)
     {
         var label = isError ? "Error" : "Warning";
         Console.WriteLine($"{label}:{Crlf}{error}{Crlf}");

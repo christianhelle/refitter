@@ -1,0 +1,7 @@
+== file
+version: OpenApi3_0
+statistics: path items 4, operations 4, parameters 0, request bodies 0, responses 4, links 0, callbacks 0, schemas 10, headers 0
+== url
+version: OpenApi3_0
+error: #/components | The key 'Page[User]' in 'schemas' of components MUST match the regular expression '^[a-zA-Z0-9\.\-_]+$'.
+statistics: path items 4, operations 4, parameters 0, request bodies 0, responses 4, links 0, callbacks 0, schemas 10, headers 0

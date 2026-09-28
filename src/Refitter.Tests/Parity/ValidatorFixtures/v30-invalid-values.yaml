@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: Invalid values
+  version: 1.0.0
+security:
+  - apiKey: not-a-list
+paths:
+  /pets:
+    get:
+      operationId: getPets
+      parameters:
+        - name: filter
+          in: query
+          schema:
+            type: strng
+            enum: not-a-list
+            required:
+              - name
+              - nested: object
+            additionalProperties: false
+            x-nullable: true
+            nullable: maybe
+      responses:
+        '200':
+          description: OK
+          links:
+            byId:
+              operationId: getPet
+              parameters:
+                id: $response.body#/id
+                bad: $bogus
+                object:
+                  not: scalar
+              requestBody:
+                not: scalar
+            server:
+              operationId: getPet
+              server:
+                description: No url
+      callbacks:
+        onEvent:
+          '{$request.body#/url}':
+            post:
+              responses:
+                '200':
+                  description: OK
+          '$bogus':
+            post:
+              responses:
+                '200':
+                  description: OK
+components:
+  schemas:
+    Pet:
+      type: object
+      discriminator:
+        propertyName: kind
+        mapping:
+          dog: '#/components/schemas/Dog'
+          cat: Cat
+        x-extension: not allowed in 3.0
+      required: [kind]
+      properties:
+        kind:
+          type: string
+        size: not-a-schema
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: X-Key
+      in: header

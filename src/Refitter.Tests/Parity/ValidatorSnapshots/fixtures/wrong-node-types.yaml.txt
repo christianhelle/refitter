@@ -1,0 +1,30 @@
+== file
+version: OpenApi3_0
+error: #/info | Info must be a map/object
+error: #/tags | Expected list while parsing OpenApiTag
+error: #/servers | Expected list while parsing OpenApiServer
+error: #/paths/~1pets/get/parameters | Expected list while parsing IOpenApiParameter
+error: #/paths/~1pets/get/tags | Expected list while parsing OpenApiTagReference
+error: #/paths/~1pets/get/responses | Responses must be a map/object
+error: #/paths/~1owners | PathItem must be a map/object
+error: #/paths/~1vets/get/responses/200 | response must be a map/object
+error: #/components/schemas/Pet/required | Expected list while parsing String
+error: #/components/schemas/Pet/properties | Expected map while parsing IOpenApiSchema
+statistics: path items 2, operations 2, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 1, headers 0
+== url
+version: OpenApi3_0
+error: #/info | Info must be a map/object
+error: #/tags | Expected list while parsing OpenApiTag
+error: #/servers | Expected list while parsing OpenApiServer
+error: #/paths/~1pets/get/parameters | Expected list while parsing IOpenApiParameter
+error: #/paths/~1pets/get/tags | Expected list while parsing OpenApiTagReference
+error: #/paths/~1pets/get/responses | Responses must be a map/object
+error: #/paths/~1owners | PathItem must be a map/object
+error: #/paths/~1vets/get/responses/200 | response must be a map/object
+error: #/components/schemas/Pet/required | Expected list while parsing String
+error: #/components/schemas/Pet/properties | Expected map while parsing IOpenApiSchema
+error: #/info/title | The field 'title' in 'info' object is REQUIRED.
+error: #/info/version | The field 'version' in 'info' object is REQUIRED.
+error: #/paths/~1pets/get/responses | Responses must contain at least one response
+error: #/paths/~1vets/get/responses | Responses must contain at least one response
+statistics: path items 2, operations 2, parameters 0, request bodies 0, responses 0, links 0, callbacks 0, schemas 1, headers 0

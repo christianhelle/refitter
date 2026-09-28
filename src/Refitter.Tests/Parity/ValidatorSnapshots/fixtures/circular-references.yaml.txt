@@ -1,0 +1,10 @@
+== file
+version: OpenApi3_0
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 5, headers 0
+== url
+version: OpenApi3_0
+warning: #/paths/~1pets/get/responses/200/content/application~1json/schema/$ref | Circular reference detected while resolving reference: #/components/schemas/B
+warning: #/components/schemas/A/$ref | Circular reference detected while resolving reference: #/components/schemas/B
+warning: #/components/schemas/B/$ref | Circular reference detected while resolving reference: #/components/schemas/A
+warning: #/components/schemas/DerivedMissing/anyOf/0/$ref | The schema reference '#/components/schemas/Missing' does not point to an existing schema.
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 5, headers 0

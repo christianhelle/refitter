@@ -20,7 +20,6 @@
     <PackageReference Include="Fluid.Core" Version="2.30.0" PrivateAssets="all" />
     <PackageReference Include="H.Generators.Extensions" Version="1.24.2" PrivateAssets="all" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" PrivateAssets="all" />
-    <PackageReference Include="OasReader" Version="3.7.0.20" PrivateAssets="all" />
     <PackageReference Include="Refit" Version="16.2.0" PrivateAssets="all" />
   </ItemGroup>
 
@@ -47,6 +46,8 @@
     <Compile Include="../Refitter.Core/Settings/*.cs" />
     <Compile Include="../Refitter.Core/Utilities/*.cs" />
     <Compile Include="../Refitter.Core/Validation/*.cs" />
+    <Compile Include="../Refitter.Core/Validation/Model/*.cs" />
+    <Compile Include="../Refitter.Core/Validation/Reading/*.cs" />
     <EmbeddedResource Include="../Refitter.Core/CodeGeneration/Contracts/Templates/*.liquid" LogicalName="Refitter.Core.Templates.%(Filename)%(Extension)" />
   </ItemGroup>
 

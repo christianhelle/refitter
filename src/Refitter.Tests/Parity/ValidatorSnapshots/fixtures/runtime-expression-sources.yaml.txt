@@ -1,0 +1,10 @@
+== file
+version: OpenApi3_0
+error: #/paths/~1pets/get/responses/200/links/unknownSource/parameters | The source expression 'bogus' has invalid format.
+error: #/paths/~1pets/get/responses/200/links/emptySource/parameters | The source expression '' has invalid format.
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 2, callbacks 0, schemas 0, headers 0
+== url
+version: OpenApi3_0
+error: #/paths/~1pets/get/responses/200/links/unknownSource/parameters | The source expression 'bogus' has invalid format.
+error: #/paths/~1pets/get/responses/200/links/emptySource/parameters | The source expression '' has invalid format.
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 2, callbacks 0, schemas 0, headers 0

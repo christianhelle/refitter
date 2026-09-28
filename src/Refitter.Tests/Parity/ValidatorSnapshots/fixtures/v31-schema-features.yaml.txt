@@ -1,0 +1,15 @@
+== file
+version: OpenApi3_1
+error: #/components/schemas/Pet/examples | Cannot create a list from this type of node.
+error: #/components/schemas/Pet/dependentRequired/tag | Expected array while parsing String
+error: #/components/schemas/Pet/properties/kind/type | Invalid schema type identifier: strng
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 3, headers 0
+== url
+version: OpenApi3_1
+error: #/components/schemas/Pet/examples | Cannot create a list from this type of node.
+error: #/components/schemas/Pet/dependentRequired/tag | Expected array while parsing String
+error: #/components/schemas/Pet/properties/kind/type | Invalid schema type identifier: strng
+warning: #/components/schemas/Pet/properties/name/$ref | The schema reference '#/components/schemas/Pet/$defs/Name' does not point to an existing schema.
+warning: #/components/schemas/Pet/properties/nested/$ref | The schema reference '#/components/schemas/Pet/properties/name' does not point to an existing schema.
+warning: #/components/schemas/Pet/properties/missingNested/$ref | The schema reference '#/components/schemas/Pet/properties/missing' does not point to an existing schema.
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 3, headers 0

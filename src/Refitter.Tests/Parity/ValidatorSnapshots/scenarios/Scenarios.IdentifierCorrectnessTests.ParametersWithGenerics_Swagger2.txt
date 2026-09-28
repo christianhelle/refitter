@@ -1,0 +1,8 @@
+== file
+version: OpenApi2_0
+error:  | additionalProperties is not a valid property at #/paths/~1filter/get/parameters
+statistics: path items 1, operations 1, parameters 2, request bodies 0, responses 1, links 0, callbacks 0, schemas 2, headers 0
+== url
+version: OpenApi2_0
+error:  | additionalProperties is not a valid property at #/paths/~1filter/get/parameters
+statistics: path items 1, operations 1, parameters 2, request bodies 0, responses 1, links 0, callbacks 0, schemas 2, headers 0

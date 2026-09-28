@@ -1,4 +1,3 @@
-using Microsoft.OpenApi;
 using Refitter.Core;
 using Refitter.Core.Validation;
 
@@ -35,7 +34,7 @@ public interface IGenerationReporter
 
     void ReportValidationFailed();
 
-    void ReportValidationDiagnostic(OpenApiError error, bool isError);
+    void ReportValidationDiagnostic(ValidationIssue error, bool isError);
 
     void ReportValidationStatistics(OpenApiValidationResult validationResult);
 

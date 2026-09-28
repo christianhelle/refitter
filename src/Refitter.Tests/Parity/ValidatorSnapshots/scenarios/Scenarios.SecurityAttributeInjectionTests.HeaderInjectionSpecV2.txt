@@ -1,0 +1,8 @@
+== file
+version: OpenApi2_0
+error: X")] string a); } file class H {} public partial interface J { [Header("Y | Header parameter name 'X")] string a); } file class H {} public partial interface J { [Header("Y' contains illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass.
+statistics: path items 1, operations 1, parameters 1, request bodies 0, responses 1, links 0, callbacks 0, schemas 1, headers 0
+== url
+version: OpenApi2_0
+error: X")] string a); } file class H {} public partial interface J { [Header("Y | Header parameter name 'X")] string a); } file class H {} public partial interface J { [Header("Y' contains illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass.
+statistics: path items 1, operations 1, parameters 1, request bodies 0, responses 1, links 0, callbacks 0, schemas 1, headers 0

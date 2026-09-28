@@ -1,0 +1,59 @@
+openapi: 3.0.1
+info:
+  title: Merges every kind of component
+  version: 1.0.0
+security:
+  - apiKey: []
+paths:
+  /pets:
+    parameters:
+      - name: filter
+        in: query
+        content:
+          application/json:
+            schema:
+              $ref: 'components.yaml#/components/schemas/Filter'
+    post:
+      requestBody:
+        $ref: 'components.yaml#/components/requestBodies/Pet'
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Rate:
+              $ref: 'components.yaml#/components/headers/Rate'
+          links:
+            self:
+              $ref: 'components.yaml#/components/links/Self'
+          content:
+            application/json:
+              schema:
+                type: object
+                discriminator:
+                  propertyName: kind
+                  mapping:
+                    dog: 'components.yaml#/components/schemas/Dog'
+              examples:
+                first:
+                  $ref: 'components.yaml#/components/examples/Pet'
+              encoding:
+                kind:
+                  headers:
+                    X-Kind:
+                      $ref: 'components.yaml#/components/headers/Rate'
+      callbacks:
+        onCreated:
+          $ref: 'components.yaml#/components/callbacks/Created'
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'empty-document.yaml#/components/schemas/Pet'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Owner'

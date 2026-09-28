@@ -1,0 +1,17 @@
+openapi: 3.0.1
+info:
+  title: A callback expression without a name
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      responses:
+        '200':
+          description: OK
+      callbacks:
+        onEvent:
+          '{$request.query.}':
+            post:
+              responses:
+                '200':
+                  description: OK

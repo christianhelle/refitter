@@ -1,0 +1,8 @@
+== file
+version: OpenApi2_0
+error: apiKey | Security scheme 'apiKey' has header name 'X")] string a); } file class H {} public partial interface J { [Header("Y' containing illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass.
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 0, headers 0
+== url
+version: OpenApi2_0
+error: apiKey | Security scheme 'apiKey' has header name 'X")] string a); } file class H {} public partial interface J { [Header("Y' containing illegal characters and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass.
+statistics: path items 1, operations 1, parameters 0, request bodies 0, responses 1, links 0, callbacks 0, schemas 0, headers 0
