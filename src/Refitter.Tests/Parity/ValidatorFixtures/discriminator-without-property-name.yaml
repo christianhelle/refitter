@@ -1,0 +1,14 @@
+openapi: 3.0.1
+info:
+  title: A discriminator without a property name
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    Pet:
+      type: object
+      discriminator:
+        mapping:
+          dog: '#/components/schemas/Dog'
+    Dog:
+      type: object

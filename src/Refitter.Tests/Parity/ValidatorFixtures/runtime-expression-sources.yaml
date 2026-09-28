@@ -1,0 +1,20 @@
+openapi: 3.0.1
+info:
+  title: Invalid runtime expression sources
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      operationId: getPets
+      responses:
+        '200':
+          description: OK
+          links:
+            unknownSource:
+              operationId: getPets
+              parameters:
+                id: $request.bogus
+            emptySource:
+              operationId: getPets
+              parameters:
+                id: '$request.'

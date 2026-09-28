@@ -1,0 +1,9 @@
+openapi: 3.2.0
+info:
+  title: Components
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    Filter:
+      type: object

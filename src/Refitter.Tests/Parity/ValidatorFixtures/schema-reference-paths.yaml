@@ -1,0 +1,21 @@
+openapi: 3.1.0
+info:
+  title: Schema reference paths
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        firstOfAny:
+          $ref: '#/components/schemas/Pet/properties/choice/anyOf/0'
+        throughReference:
+          $ref: '#/components/schemas/Pet/properties/refMap/additionalProperties'
+        choice:
+          anyOf:
+            - type: string
+        refMap:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Pet'

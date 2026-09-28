@@ -1,0 +1,15 @@
+openapi: 3.0.1
+info:
+  title: An external document that cannot be read
+  version: 1.0.0
+paths:
+  /pets:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'broken.yaml#/components/schemas/Pet'
+      responses:
+        '200':
+          description: OK

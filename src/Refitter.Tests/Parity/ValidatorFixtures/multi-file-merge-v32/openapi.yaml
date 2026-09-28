@@ -1,0 +1,37 @@
+openapi: 3.2.0
+info:
+  title: Merges through path item and media type references
+  version: 1.0.0
+paths:
+  /pets:
+    $ref: '#/components/pathItems/Pets'
+  /owners:
+    parameters:
+      - name: filter
+        in: query
+        schema:
+          $ref: 'components.yaml#/components/schemas/Filter'
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/Owners'
+            multipart/form-data:
+              schema:
+                type: object
+              encoding:
+                photo:
+                  contentType: image/png
+components:
+  pathItems:
+    Pets:
+      get:
+        responses:
+          '200':
+            description: OK
+  mediaTypes:
+    Owners:
+      schema:
+        type: array

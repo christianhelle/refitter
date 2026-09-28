@@ -1,0 +1,15 @@
+openapi: 3.0.1
+info:
+  title: A runtime expression with an empty header name
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      operationId: getPets
+      responses:
+        '200':
+          description: OK
+          links:
+            emptyHeader:
+              operationId: getPets
+              requestBody: '$request.header.'

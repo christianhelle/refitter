@@ -1,0 +1,4 @@
+== file
+exception: NotSupportedException: Specified method is not supported.
+== url
+exception: NotSupportedException: Specified method is not supported.
