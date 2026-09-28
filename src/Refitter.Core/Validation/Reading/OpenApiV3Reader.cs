@@ -83,7 +83,39 @@ internal sealed class OpenApiV3Reader
         var is31 = version >= OpenApiSpecificationVersion.OpenApi3_1;
         var is32 = version >= OpenApiSpecificationVersion.OpenApi3_2;
 
-        documentFields = new FieldMap<SpecDocument>()
+        documentFields = CreateDocumentFields(is31, is32);
+        infoFields = CreateInfoFields(is31);
+        contactFields = CreateContactFields();
+        licenseFields = CreateLicenseFields(is31);
+        serverFields = CreateServerFields(is32);
+        serverVariableFields = CreateServerVariableFields();
+        componentsFields = CreateComponentsFields(is31, is32);
+        pathsFields = CreatePathsFields();
+        pathItemFields = CreatePathItemFields(is32);
+        operationFields = CreateOperationFields();
+        parameterFields = CreateParameterFields();
+        requestBodyFields = CreateRequestBodyFields();
+        mediaTypeFields = CreateMediaTypeFields(is32);
+        encodingFields = CreateEncodingFields(is32);
+        responsesFields = CreateResponsesFields();
+        responseFields = CreateResponseFields(is32);
+        headerFields = CreateHeaderFields();
+        linkFields = CreateLinkFields();
+        callbackFields = CreateCallbackFields();
+        exampleFields = CreateExampleFields(is32);
+        schemaFields = CreateSchemaFields(is31);
+        discriminatorFields = CreateDiscriminatorFields(is31, is32);
+        xmlFields = CreateXmlFields(is32);
+        securitySchemeFields = CreateSecuritySchemeFields(is32);
+        oAuthFlowsFields = CreateOAuthFlowsFields(is32);
+        oAuthFlowFields = CreateOAuthFlowFields(is32);
+        tagFields = CreateTagFields(is32);
+        externalDocsFields = CreateExternalDocsFields();
+    }
+
+    private FieldMap<SpecDocument> CreateDocumentFields(bool is31, bool is32)
+    {
+        var fields = new FieldMap<SpecDocument>()
             .Field("openapi", (_, _, _) => { })
             .Field("info", (o, n, c) => o.Info = LoadInfo(n, c))
             .Field("servers", (o, n, c) => o.Servers = n.CreateList("OpenApiServer", LoadServer, c))
@@ -99,18 +131,18 @@ internal sealed class OpenApiV3Reader
             .Field("security", (o, n, c) => o.Security = n.CreateList("OpenApiSecurityRequirement", LoadSecurityRequirement, c));
         if (is31)
         {
-            documentFields
+            fields
                 .Field("jsonSchemaDialect", (_, n, _) => n.GetScalarValue())
                 .Field("webhooks", (o, n, c) => o.Webhooks = n.CreateMap("IOpenApiPathItem", LoadPathItem, c));
         }
 
         if (is32)
         {
-            documentFields.Field("$self", (_, n, _) => n.GetScalarValue()).Extensions();
+            fields.Field("$self", (_, n, _) => n.GetScalarValue()).Extensions();
         }
         else
         {
-            documentFields.Pattern(FieldMap<SpecDocument>.IsExtension, (_, p, n, _) =>
+            fields.Pattern(FieldMap<SpecDocument>.IsExtension, (_, p, n, _) =>
             {
                 if (!p.Equals("x-oai-$self", StringComparison.OrdinalIgnoreCase))
                     return;
@@ -121,7 +153,12 @@ internal sealed class OpenApiV3Reader
             });
         }
 
-        infoFields = new FieldMap<SpecInfo>()
+        return fields;
+    }
+
+    private FieldMap<SpecInfo> CreateInfoFields(bool is31)
+    {
+        var fields = new FieldMap<SpecInfo>()
             .Field("title", (o, n, _) => o.Title = n.GetScalarValue())
             .Field("version", (o, n, _) => o.Version = n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
@@ -130,37 +167,62 @@ internal sealed class OpenApiV3Reader
             .Field("license", (o, n, c) => o.License = LoadLicense(n, c))
             .Extensions();
         if (is31)
-            infoFields.Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue());
+            fields.Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue());
 
-        contactFields = new FieldMap<SpecContact>()
+        return fields;
+    }
+
+    private static FieldMap<SpecContact> CreateContactFields()
+    {
+        var fields = new FieldMap<SpecContact>()
             .Field("name", (_, n, _) => n.GetScalarValue())
             .Field("email", (o, n, _) => o.Email = n.GetScalarValue())
             .Field("url", (_, n, _) => ReadUri(n))
             .Extensions();
 
-        licenseFields = new FieldMap<SpecLicense>()
+        return fields;
+    }
+
+    private static FieldMap<SpecLicense> CreateLicenseFields(bool is31)
+    {
+        var fields = new FieldMap<SpecLicense>()
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
             .Field("url", (_, n, _) => ReadUri(n))
             .Extensions();
         if (is31)
-            licenseFields.Field("identifier", (_, n, _) => n.GetScalarValue());
+            fields.Field("identifier", (_, n, _) => n.GetScalarValue());
 
-        serverFields = new FieldMap<SpecServer>()
+        return fields;
+    }
+
+    private FieldMap<SpecServer> CreateServerFields(bool is32)
+    {
+        var fields = new FieldMap<SpecServer>()
             .Field("url", (o, n, _) => o.Url = n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("variables", (o, n, c) => o.Variables = n.CreateMap("OpenApiServerVariable", LoadServerVariable, c));
         if (is32)
-            serverFields.Field("name", (_, n, _) => n.GetScalarValue()).Extensions();
+            fields.Field("name", (_, n, _) => n.GetScalarValue()).Extensions();
         else
-            serverFields.Pattern(FieldMap<SpecServer>.IsExtension, (_, p, n, _) => ReadIfNamed(p, "x-oai-name", n));
+            fields.Pattern(FieldMap<SpecServer>.IsExtension, (_, p, n, _) => ReadIfNamed(p, "x-oai-name", n));
 
-        serverVariableFields = new FieldMap<SpecServerVariable>()
+        return fields;
+    }
+
+    private static FieldMap<SpecServerVariable> CreateServerVariableFields()
+    {
+        var fields = new FieldMap<SpecServerVariable>()
             .Field("enum", (_, n, c) => n.CreateSimpleList(OpenApiNames.StringType, item => item.GetScalarValue(), c))
             .Field("default", (o, n, _) => o.Default = n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Extensions();
 
-        componentsFields = new FieldMap<SpecComponents>()
+        return fields;
+    }
+
+    private FieldMap<SpecComponents> CreateComponentsFields(bool is31, bool is32)
+    {
+        var fields = new FieldMap<SpecComponents>()
             .Field("schemas", (o, n, c) => o.Schemas = n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
             .Field("responses", (o, n, c) => o.Responses = n.CreateMap("IOpenApiResponse", LoadResponse, c))
             .Field(OpenApiNames.Parameters, (o, n, c) => o.Parameters = n.CreateMap("IOpenApiParameter", LoadParameter, c))
@@ -172,15 +234,25 @@ internal sealed class OpenApiV3Reader
             .Field("callbacks", (o, n, c) => o.Callbacks = n.CreateMap("IOpenApiCallback", LoadCallback, c))
             .Extensions();
         if (is31)
-            componentsFields.Field("pathItems", (o, n, c) => o.PathItems = n.CreateMap("IOpenApiPathItem", LoadPathItem, c));
+            fields.Field("pathItems", (o, n, c) => o.PathItems = n.CreateMap("IOpenApiPathItem", LoadPathItem, c));
         if (is32)
-            componentsFields.Field("mediaTypes", (o, n, c) => o.MediaTypes = n.CreateMap(OpenApiNames.MediaTypeType, LoadMediaType, c));
+            fields.Field("mediaTypes", (o, n, c) => o.MediaTypes = n.CreateMap(OpenApiNames.MediaTypeType, LoadMediaType, c));
 
-        pathsFields = new FieldMap<SpecPaths>()
+        return fields;
+    }
+
+    private FieldMap<SpecPaths> CreatePathsFields()
+    {
+        var fields = new FieldMap<SpecPaths>()
             .Pattern(s => s.StartsWith("/", StringComparison.OrdinalIgnoreCase), (o, k, n, c) => o.Add(k, LoadPathItem(n, c)))
             .Extensions();
 
-        pathItemFields = new FieldMap<SpecPathItem>()
+        return fields;
+    }
+
+    private FieldMap<SpecPathItem> CreatePathItemFields(bool is32)
+    {
+        var fields = new FieldMap<SpecPathItem>()
             .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("get", (o, n, c) => o.AddOperation("get", LoadOperation(n, c)))
@@ -196,12 +268,17 @@ internal sealed class OpenApiV3Reader
             .Extensions();
         if (is32)
         {
-            pathItemFields
+            fields
                 .Field(OpenApiNames.Query, (o, n, c) => o.AddOperation(OpenApiNames.Query, LoadOperation(n, c)))
                 .Field("additionalOperations", LoadAdditionalOperations);
         }
 
-        operationFields = new FieldMap<SpecOperation>()
+        return fields;
+    }
+
+    private FieldMap<SpecOperation> CreateOperationFields()
+    {
+        var fields = new FieldMap<SpecOperation>()
             .Field("tags", (_, n, c) => n.CreateSimpleList("OpenApiTagReference", item => item.GetScalarValue(), c))
             .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
@@ -220,7 +297,12 @@ internal sealed class OpenApiV3Reader
             .Field("servers", (_, n, c) => n.CreateList("OpenApiServer", LoadServer, c))
             .Extensions();
 
-        parameterFields = new FieldMap<SpecParameter>()
+        return fields;
+    }
+
+    private FieldMap<SpecParameter> CreateParameterFields()
+    {
+        var fields = new FieldMap<SpecParameter>()
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
             .Field("in", (o, n, c) =>
             {
@@ -245,20 +327,30 @@ internal sealed class OpenApiV3Reader
             .Field(OpenApiNames.Example, (_, _, _) => { })
             .Extensions();
 
-        requestBodyFields = new FieldMap<SpecRequestBody>()
+        return fields;
+    }
+
+    private FieldMap<SpecRequestBody> CreateRequestBodyFields()
+    {
+        var fields = new FieldMap<SpecRequestBody>()
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field(OpenApiNames.Content, (o, n, c) => o.Content = n.CreateMap(OpenApiNames.MediaTypeType, LoadMediaType, c))
             .Field(OpenApiNames.Required, (_, n, _) => ReadBool(n))
             .Extensions();
 
-        mediaTypeFields = new FieldMap<SpecMediaType>()
+        return fields;
+    }
+
+    private FieldMap<SpecMediaType> CreateMediaTypeFields(bool is32)
+    {
+        var fields = new FieldMap<SpecMediaType>()
             .Field(OpenApiNames.Schema, (o, n, c) => o.Schema = LoadSchema(n, c))
             .Field(OpenApiNames.Examples, (o, n, c) => o.Examples = n.CreateMap(OpenApiNames.ExampleType, LoadExample, c))
             .Field(OpenApiNames.Example, (_, _, _) => { })
             .Field("encoding", (o, n, c) => o.Encoding = n.CreateMap(OpenApiNames.EncodingType, LoadEncoding, c));
         if (is32)
         {
-            mediaTypeFields
+            fields
                 .Field("itemSchema", (_, n, c) => LoadSchema(n, c))
                 .Field("itemEncoding", (_, n, c) => LoadEncoding(n, c))
                 .Field("prefixEncoding", (_, n, c) => n.CreateList(OpenApiNames.EncodingType, LoadEncoding, c))
@@ -266,7 +358,7 @@ internal sealed class OpenApiV3Reader
         }
         else
         {
-            mediaTypeFields
+            fields
                 .Field("x-oai-itemEncoding", (_, n, c) => LoadEncoding(n, c))
                 .Field("x-oai-prefixEncoding", (_, n, c) => n.CreateList(OpenApiNames.EncodingType, LoadEncoding, c))
                 .Pattern(FieldMap<SpecMediaType>.IsExtension, (_, p, n, c) =>
@@ -276,7 +368,12 @@ internal sealed class OpenApiV3Reader
                 });
         }
 
-        encodingFields = new FieldMap<SpecEncoding>()
+        return fields;
+    }
+
+    private FieldMap<SpecEncoding> CreateEncodingFields(bool is32)
+    {
+        var fields = new FieldMap<SpecEncoding>()
             .Field("contentType", (_, n, _) => n.GetScalarValue())
             .Field("headers", (o, n, c) => o.Headers = n.CreateMap("IOpenApiHeader", LoadHeader, c))
             .Field("style", (_, n, c) => n.GetScalarValue().TryGetEnum(ParameterStyles, c, out int _))
@@ -285,27 +382,42 @@ internal sealed class OpenApiV3Reader
             .Extensions();
         if (is32)
         {
-            encodingFields
+            fields
                 .Field("encoding", (_, n, c) => n.CreateMap(OpenApiNames.EncodingType, LoadEncoding, c))
                 .Field("itemEncoding", (_, n, c) => LoadEncoding(n, c))
                 .Field("prefixEncoding", (_, n, c) => n.CreateList(OpenApiNames.EncodingType, LoadEncoding, c));
         }
 
-        responsesFields = new FieldMap<SpecResponses>()
+        return fields;
+    }
+
+    private FieldMap<SpecResponses> CreateResponsesFields()
+    {
+        var fields = new FieldMap<SpecResponses>()
             .Pattern(s => !FieldMap<SpecResponses>.IsExtension(s), (o, p, n, c) => o.Add(p, LoadResponse(n, c)))
             .Extensions();
 
-        responseFields = new FieldMap<SpecResponse>()
+        return fields;
+    }
+
+    private FieldMap<SpecResponse> CreateResponseFields(bool is32)
+    {
+        var fields = new FieldMap<SpecResponse>()
             .Field(OpenApiNames.Description, (o, n, _) => o.Description = n.GetScalarValue())
             .Field("headers", (o, n, c) => o.Headers = n.CreateMap("IOpenApiHeader", LoadHeader, c))
             .Field(OpenApiNames.Content, (o, n, c) => o.Content = n.CreateMap(OpenApiNames.MediaTypeType, LoadMediaType, c))
             .Field("links", (o, n, c) => o.Links = n.CreateMap("IOpenApiLink", LoadLink, c));
         if (is32)
-            responseFields.Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue()).Extensions();
+            fields.Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue()).Extensions();
         else
-            responseFields.Pattern(FieldMap<SpecResponse>.IsExtension, (_, p, n, _) => ReadIfNamed(p, "x-oai-summary", n));
+            fields.Pattern(FieldMap<SpecResponse>.IsExtension, (_, p, n, _) => ReadIfNamed(p, "x-oai-summary", n));
 
-        headerFields = new FieldMap<SpecHeader>()
+        return fields;
+    }
+
+    private FieldMap<SpecHeader> CreateHeaderFields()
+    {
+        var fields = new FieldMap<SpecHeader>()
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field(OpenApiNames.Required, (_, n, _) => ReadBool(n))
             .Field(OpenApiNames.Deprecated, (_, n, _) => ReadBool(n))
@@ -319,7 +431,12 @@ internal sealed class OpenApiV3Reader
             .Field(OpenApiNames.Example, (o, n, _) => o.Example = n)
             .Extensions();
 
-        linkFields = new FieldMap<SpecLink>()
+        return fields;
+    }
+
+    private FieldMap<SpecLink> CreateLinkFields()
+    {
+        var fields = new FieldMap<SpecLink>()
             .Field("operationRef", (_, n, _) => n.GetScalarValue())
             .Field("operationId", (_, n, _) => n.GetScalarValue())
             .Field(OpenApiNames.Parameters, (_, n, c) => n.CreateSimpleMap("RuntimeExpressionAnyWrapper", LoadRuntimeExpressionAnyWrapper, c))
@@ -328,7 +445,12 @@ internal sealed class OpenApiV3Reader
             .Field("server", (o, n, c) => o.Server = LoadServer(n, c))
             .Extensions();
 
-        callbackFields = new FieldMap<SpecCallback>()
+        return fields;
+    }
+
+    private FieldMap<SpecCallback> CreateCallbackFields()
+    {
+        var fields = new FieldMap<SpecCallback>()
             .Pattern(s => !FieldMap<SpecCallback>.IsExtension(s), (o, p, n, c) =>
             {
                 RuntimeExpressions.Validate(p);
@@ -336,45 +458,58 @@ internal sealed class OpenApiV3Reader
             })
             .Extensions();
 
-        exampleFields = new FieldMap<SpecExample>()
+        return fields;
+    }
+
+    private static FieldMap<SpecExample> CreateExampleFields(bool is32)
+    {
+        var fields = new FieldMap<SpecExample>()
             .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("value", (_, _, _) => { })
             .Field("externalValue", (_, n, _) => n.GetScalarValue());
         if (is32)
         {
-            exampleFields
+            fields
                 .Field("dataValue", (_, _, _) => { })
                 .Field("serializedValue", (_, n, _) => n.GetScalarValue())
                 .Extensions();
         }
         else
         {
-            exampleFields
+            fields
                 .Pattern(s => s.Equals("x-oai-dataValue", StringComparison.OrdinalIgnoreCase), (_, _, _, _) => { })
                 .Pattern(s => s.Equals("x-oai-serializedValue", StringComparison.OrdinalIgnoreCase), (_, _, n, _) => n.GetScalarValue())
                 .Extensions();
         }
 
-        schemaFields = CreateSchemaFields(is31);
+        return fields;
+    }
 
-        discriminatorFields = new FieldMap<SpecDiscriminator>()
+    private FieldMap<SpecDiscriminator> CreateDiscriminatorFields(bool is31, bool is32)
+    {
+        var fields = new FieldMap<SpecDiscriminator>()
             .Field("propertyName", (o, n, _) => o.PropertyName = n.GetScalarValue())
             .Field("mapping", (o, n, c) => o.Mapping = n.CreateSimpleMap("OpenApiSchemaReference", LoadMapping, c));
         if (is32)
         {
-            discriminatorFields.Field("defaultMapping", (_, n, _) => LoadMapping(n)).Extensions();
+            fields.Field("defaultMapping", (_, n, _) => LoadMapping(n)).Extensions();
         }
         else if (is31)
         {
-            discriminatorFields.Pattern(FieldMap<SpecDiscriminator>.IsExtension, (_, p, n, _) =>
+            fields.Pattern(FieldMap<SpecDiscriminator>.IsExtension, (_, p, n, _) =>
             {
                 if (p.Equals("x-oas-default-mapping", StringComparison.OrdinalIgnoreCase))
                     LoadMapping(n);
             });
         }
 
-        xmlFields = new FieldMap<object>()
+        return fields;
+    }
+
+    private static FieldMap<object> CreateXmlFields(bool is32)
+    {
+        var fields = new FieldMap<object>()
             .Field("name", (_, n, _) => n.GetScalarValue())
             .Field("namespace", (_, n, _) =>
             {
@@ -386,16 +521,21 @@ internal sealed class OpenApiV3Reader
             .Extensions();
         if (is32)
         {
-            xmlFields.Field("nodeType", (_, n, c) => n.GetScalarValue().TryGetEnum(XmlNodeTypes, c, out int _));
+            fields.Field("nodeType", (_, n, c) => n.GetScalarValue().TryGetEnum(XmlNodeTypes, c, out int _));
         }
         else
         {
-            xmlFields
+            fields
                 .Field("attribute", (_, n, _) => ReadBool(n))
                 .Field("wrapped", (_, n, _) => ReadBool(n));
         }
 
-        securitySchemeFields = new FieldMap<SpecSecurityScheme>()
+        return fields;
+    }
+
+    private FieldMap<SpecSecurityScheme> CreateSecuritySchemeFields(bool is32)
+    {
+        var fields = new FieldMap<SpecSecurityScheme>()
             .Field("type", (o, n, c) =>
             {
                 if (n.GetScalarValue().TryGetEnum(SecuritySchemeTypes, c, out var type))
@@ -414,39 +554,49 @@ internal sealed class OpenApiV3Reader
             .Field("flows", (o, n, c) => o.Flows = LoadOAuthFlows(n, c));
         if (is32)
         {
-            securitySchemeFields
+            fields
                 .Field("oauth2MetadataUrl", (_, n, _) => ReadUri(n))
                 .Field(OpenApiNames.Deprecated, (_, n, _) => ReadBool(n))
                 .Extensions();
         }
         else
         {
-            securitySchemeFields.Pattern(FieldMap<SpecSecurityScheme>.IsExtension, (_, p, n, _) =>
+            fields.Pattern(FieldMap<SpecSecurityScheme>.IsExtension, (_, p, n, _) =>
             {
                 if (p.Equals("x-oai-deprecated", StringComparison.OrdinalIgnoreCase))
                     ReadBool(n);
             });
         }
 
-        oAuthFlowsFields = new FieldMap<SpecOAuthFlows>()
+        return fields;
+    }
+
+    private FieldMap<SpecOAuthFlows> CreateOAuthFlowsFields(bool is32)
+    {
+        var fields = new FieldMap<SpecOAuthFlows>()
             .Field("implicit", (o, n, c) => o.Implicit = LoadOAuthFlow(n, c))
             .Field("password", (o, n, c) => o.Password = LoadOAuthFlow(n, c))
             .Field("clientCredentials", (o, n, c) => o.ClientCredentials = LoadOAuthFlow(n, c))
             .Field("authorizationCode", (o, n, c) => o.AuthorizationCode = LoadOAuthFlow(n, c));
         if (is32)
         {
-            oAuthFlowsFields.Field("deviceAuthorization", (o, n, c) => o.DeviceAuthorization = LoadOAuthFlow(n, c)).Extensions();
+            fields.Field("deviceAuthorization", (o, n, c) => o.DeviceAuthorization = LoadOAuthFlow(n, c)).Extensions();
         }
         else
         {
-            oAuthFlowsFields
+            fields
                 .Pattern(
                     s => s.Equals("x-oai-deviceAuthorization", StringComparison.OrdinalIgnoreCase),
                     (o, _, n, c) => o.DeviceAuthorization = LoadOAuthFlow(n, c))
                 .Extensions();
         }
 
-        oAuthFlowFields = new FieldMap<SpecOAuthFlow>()
+        return fields;
+    }
+
+    private static FieldMap<SpecOAuthFlow> CreateOAuthFlowFields(bool is32)
+    {
+        var fields = new FieldMap<SpecOAuthFlow>()
             .Field("authorizationUrl", (o, n, _) => o.AuthorizationUrl = ReadUri(n))
             .Field("tokenUrl", (o, n, _) => o.TokenUrl = ReadUri(n))
             .Field("refreshUrl", (_, n, _) => ReadUri(n))
@@ -455,24 +605,29 @@ internal sealed class OpenApiV3Reader
                 .ToDictionary(scope => scope.Key, scope => scope.Value!, StringComparer.Ordinal));
         if (is32)
         {
-            oAuthFlowFields.Field("deviceAuthorizationUrl", (_, n, _) => ReadUri(n)).Extensions();
+            fields.Field("deviceAuthorizationUrl", (_, n, _) => ReadUri(n)).Extensions();
         }
         else
         {
-            oAuthFlowFields.Pattern(FieldMap<SpecOAuthFlow>.IsExtension, (_, p, n, _) =>
+            fields.Pattern(FieldMap<SpecOAuthFlow>.IsExtension, (_, p, n, _) =>
             {
                 if (p.Equals("x-oai-deviceAuthorizationUrl", StringComparison.OrdinalIgnoreCase))
                     ReadUri(n);
             });
         }
 
-        tagFields = new FieldMap<SpecTag>()
+        return fields;
+    }
+
+    private FieldMap<SpecTag> CreateTagFields(bool is32)
+    {
+        var fields = new FieldMap<SpecTag>()
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field(OpenApiNames.ExternalDocs, (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c));
         if (is32)
         {
-            tagFields
+            fields
                 .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
                 .Field("parent", (_, n, _) => n.GetScalarValue())
                 .Field("kind", (_, n, _) => n.GetScalarValue())
@@ -480,7 +635,7 @@ internal sealed class OpenApiV3Reader
         }
         else
         {
-            tagFields.Pattern(FieldMap<SpecTag>.IsExtension, (_, p, n, _) =>
+            fields.Pattern(FieldMap<SpecTag>.IsExtension, (_, p, n, _) =>
             {
                 if (p.Equals("x-oas-summary", StringComparison.OrdinalIgnoreCase)
                     || p.Equals("x-oas-parent", StringComparison.OrdinalIgnoreCase)
@@ -491,10 +646,17 @@ internal sealed class OpenApiV3Reader
             });
         }
 
-        externalDocsFields = new FieldMap<SpecExternalDocs>()
+        return fields;
+    }
+
+    private static FieldMap<SpecExternalDocs> CreateExternalDocsFields()
+    {
+        var fields = new FieldMap<SpecExternalDocs>()
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("url", (o, n, _) => o.Url = ReadUri(n))
             .Extensions();
+
+        return fields;
     }
 
     public SpecDocument LoadDocument(JsonNode jsonNode, ParsingContext context)
