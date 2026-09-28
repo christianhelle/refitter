@@ -15,8 +15,8 @@ internal static class SchemaReferences
     /// </summary>
     public static string ReferenceV3(SpecReference reference)
     {
-        if (!string.IsNullOrEmpty(reference.JsonPointer))
-            return reference.JsonPointer!;
+        if (reference.JsonPointer is { Length: > 0 } jsonPointer)
+            return jsonPointer;
 
         var id = reference.Id;
         if (id.StartsWith("http://", StringComparison.OrdinalIgnoreCase)

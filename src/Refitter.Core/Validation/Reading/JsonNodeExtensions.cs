@@ -45,8 +45,7 @@ internal static class JsonNodeExtensions
 
         return list.OfType<JsonObject>()
             .Select(item => map(item, context))
-            .Where(item => item != null)
-            .Select(item => item!)
+            .OfType<T>()
             .ToList();
     }
 
