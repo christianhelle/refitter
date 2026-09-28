@@ -44,7 +44,7 @@ internal sealed class ContractGeneratorFactory
             Namespace = naming.ContractsNamespace ?? naming.Namespace,
             JsonPolymorphicSerializationStyle = codeGeneration.UsePolymorphicSerialization
                 ? ContractPolymorphicSerializationStyle.SystemTextJson
-                : ContractPolymorphicSerializationStyle.NJsonSchema,
+                : ContractPolymorphicSerializationStyle.JsonInheritanceConverter,
             TypeAccessModifier = codeGeneration.TypeAccessibility.ToString().ToLowerInvariant(),
 #pragma warning disable CS0618 // Honored until custom templates are removed
             TemplateDirectory = codeGeneration.CustomTemplateDirectory,

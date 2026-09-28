@@ -10,7 +10,7 @@ internal enum ContractClassStyle
 
 internal enum ContractPolymorphicSerializationStyle
 {
-    NJsonSchema,
+    JsonInheritanceConverter,
     SystemTextJson,
 }
 
@@ -68,7 +68,7 @@ internal sealed class ContractGeneratorSettings
     public decimal JsonLibraryVersion { get; set; } = 8.0m;
 
     public ContractPolymorphicSerializationStyle JsonPolymorphicSerializationStyle { get; set; } =
-        ContractPolymorphicSerializationStyle.NJsonSchema;
+        ContractPolymorphicSerializationStyle.JsonInheritanceConverter;
 
     public string TypeAccessModifier { get; set; } = "public";
 
