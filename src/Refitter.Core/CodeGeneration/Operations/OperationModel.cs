@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Diagnostics.CodeAnalysis;
 namespace Refitter.Core;
 
 /// <summary>
@@ -7,6 +8,10 @@ namespace Refitter.Core;
 /// Creating it resolves (and so names) the types of the parameters. The members are also the ones the client
 /// templates have always used, see <see cref="ContractGenerator"/>. See THIRD-PARTY-NOTICES.md.
 /// </summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class OperationModel
 {
     private static readonly HashSet<string> ReservedKeywords = new(StringComparer.Ordinal)

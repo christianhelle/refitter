@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Refitter.Core;
 
 /// <summary>
@@ -5,6 +7,10 @@ namespace Refitter.Core;
 /// resolves the response types of the operations in the order the contract type names have always depended on.
 /// See <see cref="ContractGenerator"/> and THIRD-PARTY-NOTICES.md.
 /// </summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class ClientTemplateModel(
     string controllerClassName,
     IEnumerable<OperationModel> operations,
