@@ -488,7 +488,7 @@ internal sealed class ApiDocumentWriter
         }
         else if (isSwagger2)
         {
-            // Swagger 2.0 schemas only allow additional properties when they say so, which is written as {}
+            // Swagger 2.0 schemas only allow additional properties when they say so, written as an empty schema object
             if (schema.AllowAdditionalProperties &&
                 (schema.Type.IsObject() || schema.Type == ApiObjectType.None) &&
                 !schema.HasReference &&
