@@ -481,7 +481,7 @@ public class ParameterExtractorDeepCoverageTests
     [Test]
     public async Task FormatNumericValue_Uint_Has_U_Suffix()
     {
-        // NSwag maps integer/uint32 to int (not uint), so no U suffix is generated
+        // Refitter maps integer/uint32 to int (not uint), so no U suffix is generated
         string generatedCode = await GenerateCode(OpenApiSpecWithUintDefault);
         generatedCode.Should().Contain("4294967295");
         generatedCode.Should().Contain("int? uintValue = 4294967295");
@@ -496,7 +496,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("double? doubleValue = 3.5");
         generatedCode.Should().Contain("100L");
         generatedCode.Should().Contain("200UL");
-        // NSwag maps integer/uint32 to int, so no U suffix
+        // Refitter maps integer/uint32 to int, so no U suffix
         generatedCode.Should().Contain("uintValue = 300");
     }
 
@@ -717,7 +717,7 @@ public class ParameterExtractorDeepCoverageTests
     public async Task GetCSharpType_Array_Type()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllParameterTypes);
-        // NSwag generates IEnumerable<T> for array query parameters
+        // Refitter generates IEnumerable<T> for array query parameters
         generatedCode.Should().Contain("IEnumerable<string>");
         generatedCode.Should().Contain("arrayParam");
     }
@@ -726,7 +726,7 @@ public class ParameterExtractorDeepCoverageTests
     public async Task GetCSharpType_Object_Type()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllParameterTypes);
-        // NSwag maps object query parameters to string
+        // Refitter maps object query parameters to string
         generatedCode.Should().Contain("string objectParam");
     }
 
@@ -780,7 +780,7 @@ public class ParameterExtractorDeepCoverageTests
     [Test]
     public async Task NullablePattern_Matches_Escaped_CSharp_Identifier()
     {
-        // NSwag prefixes reserved C# keywords with @ (e.g. "class" → "@class")
+        // Refitter prefixes reserved C# keywords with @ (e.g. "class" → "@class")
         // The nullable regex must match "@class" not just plain identifiers.
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecWithKeywordParameterName);
         var settings = new RefitGeneratorSettings
@@ -799,7 +799,7 @@ public class ParameterExtractorDeepCoverageTests
     public async Task GetCSharpType_Array_Of_Integers()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithArrayOfIntegers);
-        // NSwag generates IEnumerable<T> for array query parameters
+        // Refitter generates IEnumerable<T> for array query parameters
         generatedCode.Should().Contain("IEnumerable<int>");
         generatedCode.Should().Contain("intArray");
     }
@@ -808,7 +808,7 @@ public class ParameterExtractorDeepCoverageTests
     public async Task GetCSharpType_Array_Of_Booleans()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithArrayOfBooleans);
-        // NSwag generates IEnumerable<T> for array query parameters
+        // Refitter generates IEnumerable<T> for array query parameters
         generatedCode.Should().Contain("IEnumerable<bool>");
         generatedCode.Should().Contain("boolArray");
     }
@@ -1022,7 +1022,7 @@ public class ParameterExtractorDeepCoverageTests
     public async Task GetArrayType_Null_Item_Returns_Object_Array()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithArrayNoItems);
-        // NSwag generates IEnumerable<object> for array query parameters without items
+        // Refitter generates IEnumerable<object> for array query parameters without items
         generatedCode.Should().Contain("IEnumerable<object>");
         generatedCode.Should().Contain("arrayWithoutItems");
     }

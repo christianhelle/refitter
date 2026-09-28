@@ -1,3 +1,5 @@
+// Covers obsolete settings until they are removed
+#pragma warning disable CS0618
 using AwesomeAssertions;
 using Refitter.Core;
 
@@ -32,9 +34,17 @@ public class SerializerTests
         Serializer
             .Deserialize<RefitGeneratorSettings>(json)
             .Should()
-            .BeEquivalentTo(settings, options => options
-                .Excluding(s => s.ParameterNameGenerator)
-                .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
+            .BeEquivalentTo(settings);
+    }
+
+    [Test]
+    public void Deserialize_Ignores_The_Removed_CodeGeneratorSettings_CustomTemplateDirectory()
+    {
+        var settings = Serializer.Deserialize<RefitGeneratorSettings>(
+            """{ "codeGeneratorSettings": { "customTemplateDirectory": "./templates", "dateType": "System.DateOnly" } }""");
+
+        settings.CodeGeneratorSettings!.DateType.Should().Be("System.DateOnly");
+        settings.CustomTemplateDirectory.Should().BeNull();
     }
 
     [Test]
@@ -53,9 +63,7 @@ public class SerializerTests
         Serializer
             .Deserialize<RefitGeneratorSettings>(json)
             .Should()
-            .BeEquivalentTo(settings, options => options
-                .Excluding(s => s.ParameterNameGenerator)
-                .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
+            .BeEquivalentTo(settings);
     }
 
     [Test]
@@ -68,9 +76,7 @@ public class SerializerTests
         Serializer
             .Deserialize<RefitGeneratorSettings>(json)
             .Should()
-            .BeEquivalentTo(settings, options => options
-                .Excluding(s => s.ParameterNameGenerator)
-                .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
+            .BeEquivalentTo(settings);
     }
 
     [Test]

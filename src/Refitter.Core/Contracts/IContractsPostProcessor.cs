@@ -1,8 +1,7 @@
-using NSwag;
 
 namespace Refitter.Core;
 
 internal interface IContractsPostProcessor
 {
-    string Process(OpenApiDocument document, RefitGeneratorSettings settings, string contracts);
+    string Process(ApiDocument document, RefitGeneratorSettings settings, string contracts);
 }

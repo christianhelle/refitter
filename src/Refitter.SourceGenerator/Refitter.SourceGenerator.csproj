@@ -17,9 +17,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Fluid.Core" Version="2.30.0" PrivateAssets="all" />
     <PackageReference Include="H.Generators.Extensions" Version="1.24.2" PrivateAssets="all" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.7.1" PrivateAssets="all" />
-    <PackageReference Include="NSwag.Core.Yaml" Version="14.7.1" PrivateAssets="all" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" PrivateAssets="all" />
     <PackageReference Include="OasReader" Version="3.7.0.20" PrivateAssets="all" />
     <PackageReference Include="Refit" Version="16.2.0" PrivateAssets="all" />
   </ItemGroup>
@@ -31,10 +31,15 @@
     <Compile Include="../Refitter.Core/Abstractions/*.cs" />
     <Compile Include="../Refitter.Core/Apizr/*.cs" />
     <Compile Include="../Refitter.Core/CodeGeneration/*.cs" />
+    <Compile Include="../Refitter.Core/CodeGeneration/Contracts/*.cs" />
+    <Compile Include="../Refitter.Core/CodeGeneration/Operations/*.cs" />
     <Compile Include="../Refitter.Core/Contracts/*.cs" />
     <Compile Include="../Refitter.Core/Document/*.cs" />
     <Compile Include="../Refitter.Core/Generation/*.cs" />
     <Compile Include="../Refitter.Core/Mutators/*.cs" />
+    <Compile Include="../Refitter.Core/OpenApi/*.cs" />
+    <Compile Include="../Refitter.Core/OpenApi/Reading/*.cs" />
+    <Compile Include="../Refitter.Core/OpenApi/Writing/*.cs" />
     <Compile Include="../Refitter.Core/ParameterExtraction/*.cs" />
     <Compile Include="../Refitter.Core/Partitioning/*.cs" />
     <Compile Include="../Refitter.Core/Pipeline/*.cs" />
@@ -42,6 +47,7 @@
     <Compile Include="../Refitter.Core/Settings/*.cs" />
     <Compile Include="../Refitter.Core/Utilities/*.cs" />
     <Compile Include="../Refitter.Core/Validation/*.cs" />
+    <EmbeddedResource Include="../Refitter.Core/CodeGeneration/Contracts/Templates/*.liquid" LogicalName="Refitter.Core.Templates.%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

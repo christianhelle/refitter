@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using NSwag;
 using Refitter.Core;
 using TUnit.Core;
 
@@ -31,9 +30,9 @@ public class MethodSignatureGeneratorTests
                       description: Success
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodSignatureGenerator(settings);
 
         var operation = document.Paths["/test/{id}"]["get"];
@@ -66,9 +65,9 @@ public class MethodSignatureGeneratorTests
                       description: Success
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodSignatureGenerator(settings);
 
         var operation = document.Paths["/test"]["get"];
@@ -104,9 +103,9 @@ public class MethodSignatureGeneratorTests
                       description: Created
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodSignatureGenerator(settings);
 
         var operation = document.Paths["/test"]["post"];
@@ -133,9 +132,9 @@ public class MethodSignatureGeneratorTests
                       description: Success
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings { UseCancellationTokens = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodSignatureGenerator(settings);
 
         var operation = document.Paths["/test"]["get"];
@@ -171,9 +170,9 @@ public class MethodSignatureGeneratorTests
                       description: Success
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings { UseDynamicQuerystringParameters = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodSignatureGenerator(settings);
 
         var operation = document.Paths["/test"]["get"];
@@ -200,12 +199,12 @@ public class MethodSignatureGeneratorTests
                       description: Success
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings
         {
             ApizrSettings = new ApizrSettings { WithRequestOptions = true }
         };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodSignatureGenerator(settings);
 
         var operation = document.Paths["/test"]["get"];
@@ -238,9 +237,9 @@ public class MethodSignatureGeneratorTests
                       description: Success
             """;
 
-        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var document = ApiDocumentLoader.Load(spec, null, isYaml: true);
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var generator = new ContractGeneratorFactory(settings, document).Create();
         var sut = new MethodSignatureGenerator(settings);
 
         var operation = document.Paths["/test"]["get"];

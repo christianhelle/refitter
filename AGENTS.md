@@ -24,6 +24,8 @@ dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-b
 dotnet test --solution src/Refitter.slnx -c Release
 ```
 
+**Parity snapshots:** `[Category("Parity")]` tests in `src/Refitter.Tests/Parity` compare generated code for every spec in `test/OpenAPI` against checked-in `*.cs.snap` files. Any change to generated output fails them; if the change is intended, rerun them with `REFITTER_UPDATE_SNAPSHOTS=1` and commit the snapshot diff alongside the change. See `docs/nswag-removal-plan.md`.
+
 **Convention:** Only `[Category("Integration")]` is explicitly declared — tests that call `BuildHelper.BuildCSharp()` which spawns `dotnet build`. All other tests are unmarked and treated as unit tests by default.
 
 **Source Generator tests require a pre-build step.** Before running `dotnet test` on `Refitter.SourceGenerator.Tests`, the CI does:
@@ -40,7 +42,7 @@ Run these first if source generator tests fail with missing generated types.
 
 | Project | TFM | Role |
 |---|---|---|
-| `Refitter.Core` | `netstandard2.0` | Core generation logic (NSwag-based) |
+| `Refitter.Core` | `netstandard2.0` | Core generation logic (own OpenAPI model and Liquid templates) |
 | `Refitter` | `net8.0;net9.0;net10.0` | CLI tool (`PackAsTool`, container support) |
 | `Refitter.MSBuild` | `netstandard2.0` | MSBuild task; references `Refitter.Core` directly (in-process); no CLI binary dependency |
 | `Refitter.SourceGenerator` | `netstandard2.0` | Roslyn source generator; emits code in-memory via `AddSource()` (not to disk since v2.0.0) |

@@ -1,18 +1,16 @@
-using NSwag;
-
 namespace Refitter.Core;
 
-internal sealed class DisableAdditionalPropertiesMutator(bool generateDefaultAdditionalProperties)
-    : IOpenApiDocumentMutator
+/// <summary>Disallows additional properties on all named schemas (when default additional properties are off).</summary>
+internal sealed class DisableAdditionalPropertiesMutator(bool generateDefaultAdditionalProperties) : IDocumentMutator
 {
-    public void Mutate(OpenApiDocument document)
+    public void Mutate(ApiDocument document)
     {
         if (generateDefaultAdditionalProperties)
             return;
 
-        foreach (var kvp in document.Components.Schemas)
+        foreach (var schema in document.Components.Schemas.Values)
         {
-            kvp.Value.ActualSchema.AllowAdditionalProperties = false;
+            schema.ActualSchema.AllowAdditionalProperties = false;
         }
     }
 }

@@ -1,7 +1,5 @@
 using System.Text;
 using AwesomeAssertions;
-using NJsonSchema;
-using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
 
 namespace Refitter.Tests.Parameters;
@@ -14,7 +12,7 @@ public class ParameterExtractorPrivateCoverageTests
     {
         var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
             string.Empty,
-            new List<CSharpParameterModel>());
+            new List<OperationParameterModel>());
 
         result.Should().Be("default");
     }
@@ -115,19 +113,19 @@ public class ParameterExtractorPrivateCoverageTests
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
 
         var numberType = ParameterTypeResolver.GetCSharpType(
-            new JsonSchema { Type = JsonObjectType.Number },
+            new ApiSchema { Type = ApiObjectTypes.Number },
             settings);
 
         var objectType = ParameterTypeResolver.GetCSharpType(
-            new JsonSchema { Type = JsonObjectType.Object },
+            new ApiSchema { Type = ApiObjectTypes.Object },
             settings);
 
         var unknownType = ParameterTypeResolver.GetCSharpType(
-            new JsonSchema { Type = JsonObjectType.None },
+            new ApiSchema { Type = ApiObjectTypes.None },
             settings);
 
         var nullableStringType = ParameterTypeResolver.GetCSharpType(
-            new JsonSchema { Type = JsonObjectType.String, IsNullableRaw = true },
+            new ApiSchema { Type = ApiObjectTypes.String, IsNullableRaw = true },
             settings);
 
         numberType.Should().Be("double");
@@ -142,11 +140,11 @@ public class ParameterExtractorPrivateCoverageTests
         var settings = new RefitGeneratorSettings();
 
         var int64Type = ParameterTypeResolver.GetIntegerTypeName(
-            new JsonSchema { Format = "int64" },
+            new ApiSchema { Format = "int64" },
             settings);
 
         var int32Type = ParameterTypeResolver.GetIntegerTypeName(
-            new JsonSchema { Format = "int32" },
+            new ApiSchema { Format = "int32" },
             settings);
 
         int64Type.Should().Be("long");
@@ -157,7 +155,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetArrayType_Returns_Object_Array_When_Item_Is_Missing()
     {
         var result = ParameterTypeResolver.GetArrayType(
-            new JsonSchema { Type = JsonObjectType.Array },
+            new ApiSchema { Type = ApiObjectTypes.Array },
             new RefitGeneratorSettings());
 
         result.Should().Be("object[]");
@@ -173,7 +171,7 @@ public class ParameterExtractorPrivateCoverageTests
     [Test]
     public void ReOrderNullableParameters_Delegates_To_OptionalParameterReorderer()
     {
-        var parameterModels = new List<CSharpParameterModel>();
+        var parameterModels = new List<OperationParameterModel>();
         var result = OptionalParameterReorderer.Reorder(
             new List<string> { "string a", "int? b = default" },
             new RefitGeneratorSettings(),
@@ -203,7 +201,7 @@ public class ParameterExtractorPrivateCoverageTests
     {
         var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
             "int paramName",
-            new List<CSharpParameterModel>());
+            new List<OperationParameterModel>());
 
         result.Should().Be("default");
     }

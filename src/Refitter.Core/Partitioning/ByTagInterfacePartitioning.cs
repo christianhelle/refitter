@@ -1,5 +1,4 @@
 using System.Text;
-using NSwag;
 
 namespace Refitter.Core;
 
@@ -8,7 +7,7 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
     private readonly RefitGeneratorSettings settings;
     private readonly string ungroupedTitle;
 
-    public ByTagInterfacePartitioning(RefitGeneratorSettings settings, OpenApiDocument document)
+    public ByTagInterfacePartitioning(RefitGeneratorSettings settings, ApiDocument document)
     {
         this.settings = settings;
         ungroupedTitle = settings.Naming.UseOpenApiTitle
@@ -61,7 +60,7 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
     public bool IsSingleInterface => false;
 
     public void AppendInterfaceDocumentation(
-        OpenApiDocument document,
+        ApiDocument document,
         XmlDocumentationGenerator docGenerator,
         string groupKey,
         OpenApiOperationInfo representativeOperation,

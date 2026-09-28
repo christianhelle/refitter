@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using NJsonSchema;
-using NSwag;
 using Refitter.Core;
 
 namespace Refitter.Tests;
@@ -10,7 +8,7 @@ public class SchemaTraversalTests
     [Test]
     public async Task SchemaWalker_Visits_Schemas_Reached_Through_Definitions()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -26,18 +24,18 @@ public class SchemaTraversalTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
-        var visited = new List<JsonSchema>();
+        var visited = new List<ApiSchema>();
         SchemaWalker.TraverseDocumentSchemas(document, visited.Add);
 
-        visited.Select(s => s.Type).Should().Contain(JsonObjectType.String);
+        visited.Select(s => s.Type).Should().Contain(ApiObjectTypes.String);
     }
 
     [Test]
     public async Task SchemaWalker_Visits_Schemas_Reached_Through_Tuple_Items()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -48,13 +46,13 @@ public class SchemaTraversalTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         // Tuple validation is not expressible in OpenAPI 3.0, so build the item schemas directly
-        var tupleItem = new JsonSchema { Type = JsonObjectType.String };
+        var tupleItem = new ApiSchema { Type = ApiObjectTypes.String };
         document.Components.Schemas["Root"].Items.Add(tupleItem);
 
-        var visited = new List<JsonSchema>();
+        var visited = new List<ApiSchema>();
         SchemaWalker.TraverseDocumentSchemas(document, visited.Add);
 
         visited.Should().Contain(tupleItem);
@@ -63,7 +61,7 @@ public class SchemaTraversalTests
     [Test]
     public async Task SchemaWalker_Visits_Schemas_Reached_Through_Path_Parameters()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -79,18 +77,18 @@ public class SchemaTraversalTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
-        var visited = new List<JsonSchema>();
+        var visited = new List<ApiSchema>();
         SchemaWalker.TraverseDocumentSchemas(document, visited.Add);
 
-        visited.Select(s => s.Type).Should().Contain(JsonObjectType.Boolean);
+        visited.Select(s => s.Type).Should().Contain(ApiObjectTypes.Boolean);
     }
 
     [Test]
     public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Additional_Properties()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -122,7 +120,7 @@ public class SchemaTraversalTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new SchemaCleaner(document, []).RemoveUnreferencedSchema();
 
@@ -134,7 +132,7 @@ public class SchemaTraversalTests
     [Test]
     public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Dictionary_Key()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -163,7 +161,7 @@ public class SchemaTraversalTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         // x-dictionaryKey has no OpenAPI 3.0 representation, so wire it up directly
         document.Components.Schemas["Root"].DictionaryKey = document.Components.Schemas["Key"];
@@ -178,7 +176,7 @@ public class SchemaTraversalTests
     [Test]
     public async Task SchemaCleaner_Ignores_Response_Content_Without_Schema()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -203,9 +201,9 @@ public class SchemaTraversalTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
-        document.Operations
+        document.GetOperations()
             .Single()
             .Operation.ActualResponses["200"]
             .Content["application/json"]
@@ -220,7 +218,7 @@ public class SchemaTraversalTests
     [Test]
     public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Path_Item_Parameters()
     {
-        var document = await OpenApiDocument.FromJsonAsync("""
+        var document = ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -242,7 +240,7 @@ public class SchemaTraversalTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false);
 
         new SchemaCleaner(document, []).RemoveUnreferencedSchema();
 
@@ -257,7 +255,7 @@ public class SchemaTraversalTests
 
         // Tuple validation is not expressible in OpenAPI 3.0, so wire up the item schema directly
         document.Components.Schemas["Root"].Items.Add(
-            new JsonSchema { Reference = document.Components.Schemas["Value"] });
+            new ApiSchema { Reference = document.Components.Schemas["Value"] });
 
         new SchemaCleaner(document, []).RemoveUnreferencedSchema();
 
@@ -271,7 +269,7 @@ public class SchemaTraversalTests
         var document = await CreateDocumentWithReferencedRootAsync();
 
         document.Components.Schemas["Root"].Definitions["Nested"] =
-            new JsonSchema { Reference = document.Components.Schemas["Value"] };
+            new ApiSchema { Reference = document.Components.Schemas["Value"] };
 
         new SchemaCleaner(document, []).RemoveUnreferencedSchema();
 
@@ -279,8 +277,8 @@ public class SchemaTraversalTests
         document.Components.Schemas.Should().NotContainKey("Unused");
     }
 
-    private static Task<OpenApiDocument> CreateDocumentWithReferencedRootAsync() =>
-        OpenApiDocument.FromJsonAsync("""
+    private static Task<ApiDocument> CreateDocumentWithReferencedRootAsync() =>
+        Task.FromResult(ApiDocumentLoader.Load("""
             {
               "openapi": "3.0.1",
               "info": { "title": "Test", "version": "1.0" },
@@ -309,5 +307,5 @@ public class SchemaTraversalTests
                 }
               }
             }
-            """);
+            """, null, isYaml: false));
 }

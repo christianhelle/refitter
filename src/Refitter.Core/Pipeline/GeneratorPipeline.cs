@@ -1,27 +1,31 @@
+#nullable enable
+
 using System.Text;
-using NSwag;
 
 namespace Refitter.Core;
 
 internal sealed class GeneratorPipeline
 {
     private readonly InterfaceGenerator interfaceGenerator;
+    private readonly IApiOperationNameGenerator operationNameGenerator;
     private readonly IReadOnlyList<IContractsPostProcessor> contractsPostProcessors;
 
     internal GeneratorPipeline(
         InterfaceGenerator interfaceGenerator,
+        IApiOperationNameGenerator operationNameGenerator,
         IEnumerable<IContractsPostProcessor> contractsPostProcessors)
     {
         this.interfaceGenerator = interfaceGenerator;
+        this.operationNameGenerator = operationNameGenerator;
         this.contractsPostProcessors = contractsPostProcessors.ToArray();
     }
 
     public GenerationResult Run(
-        OpenApiDocument document,
+        ApiDocument document,
         RefitGeneratorSettings settings,
-        CustomCSharpClientGenerator generator)
+        ContractGenerator generator)
     {
-        var contracts = generator.GenerateFile();
+        var contracts = generator.GenerateFile(operationNameGenerator);
         foreach (var postProcessor in contractsPostProcessors)
             contracts = postProcessor.Process(document, settings, contracts);
 
@@ -34,8 +38,8 @@ internal sealed class GeneratorPipeline
             .Select(c => c.TypeName)
             .Where(name => !string.IsNullOrEmpty(name))
             .ToArray();
-        var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
-            ? document.Info!.Title.Sanitize()
+        var title = settings.Naming.UseOpenApiTitle && !NullCheck.IsNullOrWhiteSpace(document.Info?.Title)
+            ? document.Info.Title.Sanitize()
             : settings.Naming.InterfaceName;
         var dependencyInjectionCode = settings.ApizrSettings != null
             ? ApizrRegistrationGenerator.Generate(settings, interfaceNames, title)
@@ -45,7 +49,7 @@ internal sealed class GeneratorPipeline
     }
 
     private static IInterfacePartitioning GetInterfacePartitioning(
-        OpenApiDocument document,
+        ApiDocument document,
         RefitGeneratorSettings settings)
     {
         return settings.MultipleInterfaces switch
@@ -57,7 +61,7 @@ internal sealed class GeneratorPipeline
     }
 
     private static string GenerateJsonSerializerContext(
-        OpenApiDocument document,
+        ApiDocument document,
         RefitGeneratorSettings settings,
         string contracts) =>
         settings is { GenerateJsonSerializerContext: true, GenerateContracts: true }
@@ -65,7 +69,7 @@ internal sealed class GeneratorPipeline
             : string.Empty;
 
     private static IReadOnlyCollection<GeneratedCode> GenerateClient(
-        OpenApiDocument document,
+        ApiDocument document,
         RefitGeneratorSettings settings,
         InterfaceGenerator interfaceGenerator)
     {

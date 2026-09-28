@@ -14,7 +14,7 @@ public class OpenApiDocumentFactoryTests
     public async Task Create_From_Uri_Returns_NotNull(string url)
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
-        (await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath))
+        (await ApiDocumentFactory.CreateAsync(settings.OpenApiPath))
             .Should()
             .NotBeNull();
     }
@@ -25,17 +25,31 @@ public class OpenApiDocumentFactoryTests
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
         await using var server = new LocalHttpServer(openApiSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(server.Url);
+        var document = await ApiDocumentFactory.CreateAsync(server.Url);
 
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
-        document.Info.Title.Should().NotBeNullOrWhiteSpace();
+        document.Info!.Title.Should().NotBeNullOrWhiteSpace();
+        document.DocumentPath.Should().Be(server.Url);
+    }
+
+    [Test]
+    public async Task Create_From_Remote_Json_Throws_For_Error_Responses()
+    {
+        var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
+        await using var server = new LocalHttpServer(openApiSpec, statusCode: 404, statusText: "Not Found");
+
+        var act = () => ApiDocumentFactory.CreateAsync(server.Url);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Failed to download OpenAPI document*")
+            .WithInnerException(typeof(HttpRequestException));
     }
 
     [Test]
     public async Task Create_From_Remote_Json_Throws_When_Download_Fails()
     {
-        var act = () => OpenApiDocumentFactory.CreateAsync("http://127.0.0.1:1/openapi.json");
+        var act = () => ApiDocumentFactory.CreateAsync("http://127.0.0.1:1/openapi.json");
 
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*Failed to download OpenAPI document*");
@@ -86,7 +100,7 @@ public class OpenApiDocumentFactoryTests
 }";
         var localPath = await TestFile.CreateSwaggerFile(localSpec, "local.json");
 
-        var document = await OpenApiDocumentFactory.CreateAsync(new[] { localPath, server.Url });
+        var document = await ApiDocumentFactory.CreateAsync(new[] { localPath, server.Url });
 
         document.Should().NotBeNull();
         document.Paths.Should().ContainKey("/local");
@@ -117,7 +131,7 @@ public class OpenApiDocumentFactoryTests
 }";
         var localPath = await TestFile.CreateSwaggerFile(localSpec, "local.json");
 
-        var act = () => OpenApiDocumentFactory.CreateAsync(new[] { localPath, "http://127.0.0.1:1/openapi.json" });
+        var act = () => ApiDocumentFactory.CreateAsync(new[] { localPath, "http://127.0.0.1:1/openapi.json" });
 
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*Failed to download OpenAPI document*");
@@ -129,7 +143,7 @@ public class OpenApiDocumentFactoryTests
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
         var swaggerFile = await TestFile.CreateSwaggerFile(openApiSpec, "petstore.json");
 
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile, CancellationToken.None);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile, CancellationToken.None);
 
         document.Should().NotBeNull();
     }
@@ -140,7 +154,7 @@ public class OpenApiDocumentFactoryTests
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
         var swaggerFile = await TestFile.CreateSwaggerFile(openApiSpec, "petstore.json");
 
-        var document = await OpenApiDocumentFactory.CreateAsync(new[] { swaggerFile });
+        var document = await ApiDocumentFactory.CreateAsync(new[] { swaggerFile });
 
         document.Should().NotBeNull();
     }
@@ -154,7 +168,7 @@ public class OpenApiDocumentFactoryTests
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
-        (await OpenApiDocumentFactory.CreateAsync(settings.OpenApiPath))
+        (await ApiDocumentFactory.CreateAsync(settings.OpenApiPath))
             .Should()
             .NotBeNull();
     }
@@ -168,11 +182,11 @@ public class OpenApiDocumentFactoryTests
     public async Task Create_From_File_Detects_Format_Correctly(SampleOpenSpecifications version, string filename)
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
-        document.Info.Title.Should().NotBeNullOrEmpty();
+        document.Info!.Title.Should().NotBeNullOrEmpty();
     }
 
     [Test]
@@ -204,10 +218,10 @@ public class OpenApiDocumentFactoryTests
   }
 }";
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("Test API");
+        document.Info!.Title.Should().Be("Test API");
     }
 
     [Test]
@@ -228,10 +242,10 @@ paths:
               schema:
                 type: object";
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.yaml");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("Test API");
+        document.Info!.Title.Should().Be("Test API");
     }
 
     [Test]
@@ -239,7 +253,7 @@ paths:
     [Arguments("http://petstore.swagger.io/v2/swagger.json")]
     public async Task Create_From_Http_Url_Returns_NotNull(string url)
     {
-        var document = await OpenApiDocumentFactory.CreateAsync(url);
+        var document = await ApiDocumentFactory.CreateAsync(url);
         document.Should().NotBeNull();
     }
 
@@ -261,7 +275,7 @@ paths:
   }
 }";
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "minimal.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
     }
@@ -269,14 +283,14 @@ paths:
     [Test]
     public async Task IsHttp_Detects_Http_Protocol()
     {
-        var document = await OpenApiDocumentFactory.CreateAsync("http://petstore.swagger.io/v2/swagger.json");
+        var document = await ApiDocumentFactory.CreateAsync("http://petstore.swagger.io/v2/swagger.json");
         document.Should().NotBeNull();
     }
 
     [Test]
     public async Task IsHttp_Detects_Https_Protocol()
     {
-        var document = await OpenApiDocumentFactory.CreateAsync("https://petstore.swagger.io/v2/swagger.json");
+        var document = await ApiDocumentFactory.CreateAsync("https://petstore.swagger.io/v2/swagger.json");
         document.Should().NotBeNull();
     }
 
@@ -284,12 +298,12 @@ paths:
     [Arguments("https://petstore.swagger.io/v2/swagger.yaml")]
     public async Task Create_From_Yaml_Url_Returns_NotNull(string url)
     {
-        var document = await OpenApiDocumentFactory.CreateAsync(url);
+        var document = await ApiDocumentFactory.CreateAsync(url);
         document.Should().NotBeNull();
     }
 
     [Test]
-    public async Task Create_From_Invalid_File_Falls_Back_To_NSwag()
+    public async Task Create_From_Invalid_File_Falls_Back_To_Reading_The_File()
     {
         var spec = @"{
   ""openapi"": ""3.0.0"",
@@ -310,19 +324,19 @@ paths:
   }
 }";
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "fallback.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("Fallback Test");
+        document.Info!.Title.Should().Be("Fallback Test");
     }
 
     [Test]
-    public async Task Create_From_Json_File_Without_External_References_Uses_NSwag()
+    public async Task Create_From_Json_File_Without_External_References_Loads_The_File()
     {
         var spec = @"{
   ""openapi"": ""3.0.0"",
   ""info"": {
-    ""title"": ""Direct NSwag Test"",
+    ""title"": ""Direct Load Test"",
     ""version"": ""1.0.0""
   },
   ""paths"": {
@@ -352,18 +366,18 @@ paths:
   }
 }";
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "no-external-refs.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("Direct NSwag Test");
+        document.Info!.Title.Should().Be("Direct Load Test");
     }
 
     [Test]
-    public async Task Create_From_Yaml_File_Without_External_References_Uses_NSwag()
+    public async Task Create_From_Yaml_File_Without_External_References_Loads_The_File()
     {
         var spec = @"openapi: 3.0.0
 info:
-  title: YAML NSwag Test
+  title: YAML Load Test
   version: 1.0.0
 paths:
   /users:
@@ -383,10 +397,10 @@ paths:
                     name:
                       type: string";
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "no-external-refs.yaml");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("YAML NSwag Test");
+        document.Info!.Title.Should().Be("YAML Load Test");
     }
 
     [Test]
@@ -442,10 +456,10 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(schemasFile, schemasSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await ApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("External Ref API 3.4");
+        document.Info!.Title.Should().Be("External Ref API 3.4");
     }
 
     [Test]
@@ -501,10 +515,10 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await ApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("External Ref Test");
+        document.Info!.Title.Should().Be("External Ref Test");
     }
 
     [Test]
@@ -546,10 +560,10 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await ApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("YAML External Ref Test");
+        document.Info!.Title.Should().Be("YAML External Ref Test");
     }
 
     [Test]
@@ -603,7 +617,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await ApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
         // When info is missing entirely, PopulateMissingRequiredFields should create it
@@ -618,7 +632,7 @@ paths:
 
         if (File.Exists(botPathsFile))
         {
-            var document = await OpenApiDocumentFactory.CreateAsync(botPathsFile);
+            var document = await ApiDocumentFactory.CreateAsync(botPathsFile);
 
             document.Should().NotBeNull();
             document.Info.Should().NotBeNull();
@@ -696,10 +710,10 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(sharedFile, sharedSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await ApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("External Ref API");
+        document.Info!.Title.Should().Be("External Ref API");
         document.Paths.Should().ContainKey("/users/{id}");
     }
 
@@ -757,10 +771,10 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(sharedFile, sharedSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await ApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
-        document.Info.Title.Should().Be("YAML External Ref API");
+        document.Info!.Title.Should().Be("YAML External Ref API");
         document.Paths.Should().ContainKey("/users/{id}");
     }
 
@@ -769,7 +783,7 @@ paths:
     {
         await using var server = new LocalHttpServer(LargeNumericBoundsSpecs.Json);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(server.Url);
+        var document = await ApiDocumentFactory.CreateAsync(server.Url);
 
         LargeNumericBoundsSpecs.GetMaximum(document).Should().Be(decimal.MaxValue);
         LargeNumericBoundsSpecs.GetMinimum(document).Should().Be(decimal.MinValue);

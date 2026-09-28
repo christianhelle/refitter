@@ -1,7 +1,6 @@
 using AwesomeAssertions;
-using Newtonsoft.Json.Linq;
-using NJsonSchema;
-using NSwag;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Refitter.Core;
 using Refitter.Tests.Resources;
 using Refitter.Tests.TestUtilities;
@@ -53,7 +52,7 @@ paths:
         var file1 = await TestFile.CreateSwaggerFile(specWithTags, "with-tags.yaml");
         var file2 = await TestFile.CreateSwaggerFile(specWithoutTags, "without-tags.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await ApiDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();
@@ -107,7 +106,7 @@ paths:
         var file1 = await TestFile.CreateSwaggerFile(spec1, "api1.yaml");
         var file2 = await TestFile.CreateSwaggerFile(spec2, "api2.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await ApiDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();
@@ -160,7 +159,7 @@ paths:
         var file1 = await TestFile.CreateSwaggerFile(spec1, "api1-shared.yaml");
         var file2 = await TestFile.CreateSwaggerFile(spec2, "api2-shared.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await ApiDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();
@@ -206,7 +205,7 @@ paths:
         var file1 = await TestFile.CreateSwaggerFile(specWithoutTags, "no-tags.yaml");
         var file2 = await TestFile.CreateSwaggerFile(specWithTags, "with-tags.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await ApiDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();
@@ -266,7 +265,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await ApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
@@ -326,7 +325,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await ApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
@@ -386,7 +385,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
+        var document = await ApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
         document.Info.Should().NotBeNull();
@@ -448,7 +447,7 @@ paths:
         var file2 = await TestFile.CreateSwaggerFile(spec2, "api2.yaml");
         var file3 = await TestFile.CreateSwaggerFile(spec3, "api3.yaml");
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2, file3 });
+        var merged = await ApiDocumentFactory.CreateAsync(new[] { file1, file2, file3 });
 
         merged.Should().NotBeNull();
         merged.Tags.Should().NotBeNull();
@@ -513,8 +512,8 @@ paths:
                       type: string
             """;
 
-        var baseDocument = await OpenApiYamlDocument.FromYamlAsync(baseSpec);
-        var secondDocument = await OpenApiYamlDocument.FromYamlAsync(secondSpec);
+        var baseDocument = ApiDocumentLoader.Load(baseSpec, null, isYaml: true);
+        var secondDocument = ApiDocumentLoader.Load(secondSpec, null, isYaml: true);
 
         var merged = InvokeMerge(baseDocument, secondDocument);
 
@@ -703,8 +702,8 @@ paths:
                       type: string
             """;
 
-        var baseDocument = await OpenApiYamlDocument.FromYamlAsync(baseSpec);
-        var secondDocument = await OpenApiYamlDocument.FromYamlAsync(secondSpec);
+        var baseDocument = ApiDocumentLoader.Load(baseSpec, null, isYaml: true);
+        var secondDocument = ApiDocumentLoader.Load(secondSpec, null, isYaml: true);
 
         var act = () => InvokeMerge(baseDocument, secondDocument);
 
@@ -955,17 +954,17 @@ paths:
     [Test]
     public void CreateCanonicalSchemaToken_Emits_Complex_Schema_Shape_Without_Nulls()
     {
-        var schema = new JsonSchema
+        var schema = new ApiSchema
         {
-            Type = JsonObjectType.Object,
+            Type = ApiObjectTypes.Object,
             AllowAdditionalProperties = false,
-            AdditionalPropertiesSchema = new JsonSchema
+            AdditionalPropertiesSchema = new ApiSchema
             {
-                Type = JsonObjectType.String
+                Type = ApiObjectTypes.String
             },
-            Item = new JsonSchema
+            Item = new ApiSchema
             {
-                Type = JsonObjectType.Integer
+                Type = ApiObjectTypes.Integer
             },
             ExtensionData = new Dictionary<string, object?>
             {
@@ -977,111 +976,111 @@ paths:
             }
         };
         schema.RequiredProperties.Add("name");
-        schema.Properties["name"] = new JsonSchemaProperty
+        schema.Properties["name"] = new ApiSchemaProperty
         {
-            Type = JsonObjectType.String
+            Type = ApiObjectTypes.String
         };
-        schema.AllOf.Add(new JsonSchema { Type = JsonObjectType.String });
-        schema.OneOf.Add(new JsonSchema { Type = JsonObjectType.Integer });
-        schema.AnyOf.Add(new JsonSchema { Type = JsonObjectType.Boolean });
+        schema.AllOf.Add(new ApiSchema { Type = ApiObjectTypes.String });
+        schema.OneOf.Add(new ApiSchema { Type = ApiObjectTypes.Integer });
+        schema.AnyOf.Add(new ApiSchema { Type = ApiObjectTypes.Boolean });
         schema.Enumeration.Add("active");
         schema.Enumeration.Add(null);
 
-        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<JsonSchema>());
+        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<ApiSchema>());
 
-        token.Should().BeOfType<JObject>();
-        var json = (JObject)token;
+        token.Should().BeOfType<JsonObject>();
+        var json = (JsonObject)token;
         json.Should().ContainKey("type");
-        json["type"]!.Value<string>().Should().Be("Object");
+        json["type"]!.GetValue<string>().Should().Be("Object");
         json.Should().ContainKey("allowAdditionalProperties");
-        json["allowAdditionalProperties"]!.Type.Should().Be(JTokenType.Boolean);
+        json["allowAdditionalProperties"]!.GetValueKind().Should().BeOneOf(JsonValueKind.True, JsonValueKind.False);
         json.Should().ContainKey("additionalProperties");
-        json["additionalProperties"]!["type"]!.Value<string>().Should().Be("String");
+        json["additionalProperties"]!["type"]!.GetValue<string>().Should().Be("String");
         json.Should().ContainKey("items");
-        json["items"]!["type"]!.Value<string>().Should().Be("Integer");
+        json["items"]!["type"]!.GetValue<string>().Should().Be("Integer");
         json.Should().ContainKey("allOf");
         json.Should().ContainKey("oneOf");
         json.Should().ContainKey("anyOf");
         json.Should().ContainKey("required");
-        json["required"]!.Should().BeOfType<JArray>().Which.Select(value => value!.Value<string>()).Should().ContainSingle().Which.Should().Be("name");
+        json["required"]!.Should().BeOfType<JsonArray>().Which.Select(value => value!.GetValue<string>()).Should().ContainSingle().Which.Should().Be("name");
         json.Should().ContainKey("properties");
-        json["properties"]!["name"]!["type"]!.Value<string>().Should().Be("String");
+        json["properties"]!["name"]!["type"]!.GetValue<string>().Should().Be("String");
         json.Should().ContainKey("enum");
-        json["enum"]!.Should().BeOfType<JArray>().Which.Should().HaveCount(2);
+        json["enum"]!.Should().BeOfType<JsonArray>().Which.Should().HaveCount(2);
         json.Should().ContainKey("extensions");
-        json["extensions"]!["x-meta"]!["alpha"]!.Value<int>().Should().Be(1);
+        json["extensions"]!["x-meta"]!["alpha"]!.GetValue<int>().Should().Be(1);
     }
 
     [Test]
     public void CreateCanonicalJsonToken_Falls_Back_To_Schema_Canonicalization_For_ReferenceSchema()
     {
-        var schema = new JsonSchema
+        var schema = new ApiSchema
         {
-            Reference = new JsonSchema
+            Reference = new ApiSchema
             {
-                Type = JsonObjectType.String
+                Type = ApiObjectTypes.String
             }
         };
 
         var token = InvokeCreateCanonicalJsonToken(schema);
 
-        token["type"]!.Value<string>().Should().Be("String");
+        token["type"]!.GetValue<string>().Should().Be("String");
     }
 
     [Test]
     public void CreateCanonicalSchemaToken_For_Visited_Reference_Uses_Placeholder()
     {
-        var referencedSchema = new JsonSchema
+        var referencedSchema = new ApiSchema
         {
-            Type = JsonObjectType.Object
+            Type = ApiObjectTypes.Object
         };
-        var schema = new JsonSchema
+        var schema = new ApiSchema
         {
             Reference = referencedSchema
         };
 
-        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<JsonSchema> { referencedSchema });
+        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<ApiSchema> { referencedSchema });
 
-        token.Should().BeOfType<JObject>();
-        ((JObject)token).Properties().Should().ContainSingle();
-        token["$ref"]!.Value<string>().Should().Be("#");
+        token.Should().BeOfType<JsonObject>();
+        ((JsonObject)token).Should().ContainSingle();
+        token["$ref"]!.GetValue<string>().Should().Be("#");
     }
 
     [Test]
     public void CreateCanonicalSchemaToken_For_Unvisited_Reference_Canonicalizes_Referenced_Schema()
     {
-        var referencedSchema = new JsonSchema
+        var referencedSchema = new ApiSchema
         {
-            Type = JsonObjectType.Object
+            Type = ApiObjectTypes.Object
         };
-        var schema = new JsonSchema
+        var schema = new ApiSchema
         {
             Reference = referencedSchema
         };
 
-        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<JsonSchema>());
+        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<ApiSchema>());
 
-        token["type"]!.Value<string>().Should().Be("Object");
+        token["type"]!.GetValue<string>().Should().Be("Object");
     }
 
     [Test]
     public void CreateCanonicalSchemaToken_When_ActualSchema_Is_Already_Visited_Uses_Placeholder()
     {
-        var schema = new JsonSchema
+        var schema = new ApiSchema
         {
-            Type = JsonObjectType.Object
+            Type = ApiObjectTypes.Object
         };
 
-        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<JsonSchema> { schema });
+        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<ApiSchema> { schema });
 
-        token["$ref"]!.Value<string>().Should().Be("#");
+        token["$ref"]!.GetValue<string>().Should().Be("#");
     }
 
     [Test]
     public void GetDefinitionName_Decodes_Url_Encoded_Names()
     {
-        var schema = new JsonSchema();
-        ((NJsonSchema.References.IJsonReferenceBase)schema).ReferencePath = "#/definitions/Problem%20Details";
+        var schema = new ApiSchema();
+        schema.ReferencePath = "#/definitions/Problem%20Details";
 
         InvokeGetDefinitionName(schema).Should().Be("Problem Details");
     }
@@ -1089,8 +1088,8 @@ paths:
     [Test]
     public void GetDefinitionName_Without_Path_Separator_Returns_Null()
     {
-        var schema = new JsonSchema();
-        ((NJsonSchema.References.IJsonReferenceBase)schema).ReferencePath = "ProblemDetails";
+        var schema = new ApiSchema();
+        schema.ReferencePath = "ProblemDetails";
 
         InvokeGetDefinitionName(schema).Should().BeNull();
     }
@@ -1139,32 +1138,13 @@ paths:
     }
 
     [Test]
-    public void RemoveNullProperties_Removes_Only_Null_Values()
-    {
-        var json = new JObject
-        {
-            ["type"] = "object",
-            ["format"] = JValue.CreateNull(),
-            ["description"] = JValue.CreateNull(),
-            ["properties"] = new JObject()
-        };
-
-        var normalized = InvokeRemoveNullProperties(json);
-
-        normalized.Should().BeSameAs(json);
-        normalized.Should().ContainKey("type");
-        normalized.Should().ContainKey("properties");
-        normalized.Should().NotContainKeys("format", "description");
-    }
-
-    [Test]
     public async Task AddReferencedSchemas_Does_Not_Overwrite_Existing_Named_Schema()
     {
-        var rootSchema = new JsonSchema
+        var rootSchema = new ApiSchema
         {
-            Type = JsonObjectType.Object
+            Type = ApiObjectTypes.Object
         };
-        var referencedChildSchema = await JsonSchema.FromJsonAsync("""
+        var referencedChildSchema = ParseSchema("""
             {
               "type": "object",
               "properties": {
@@ -1174,18 +1154,18 @@ paths:
               }
             }
             """);
-        var referencedChild = new JsonSchemaProperty
+        var referencedChild = new ApiSchemaProperty
         {
             Reference = referencedChildSchema
         };
-        ((NJsonSchema.References.IJsonReferenceBase)referencedChild).ReferencePath = "#/definitions/NamedChild";
+        referencedChild.ReferencePath = "#/definitions/NamedChild";
         rootSchema.Properties["child"] = referencedChild;
 
-        var existingDefinition = new JsonSchema
+        var existingDefinition = new ApiSchema
         {
-            Type = JsonObjectType.Integer
+            Type = ApiObjectTypes.Integer
         };
-        var definitions = new Dictionary<string, JsonSchema>
+        var definitions = new Dictionary<string, ApiSchema>
         {
             ["NamedChild"] = existingDefinition
         };
@@ -1198,11 +1178,11 @@ paths:
     [Test]
     public async Task AddReferencedSchemas_Adds_Named_Property_Schema_To_Empty_Definitions()
     {
-        var rootSchema = new JsonSchema
+        var rootSchema = new ApiSchema
         {
-            Type = JsonObjectType.Object
+            Type = ApiObjectTypes.Object
         };
-        var referencedChildSchema = await JsonSchema.FromJsonAsync("""
+        var referencedChildSchema = ParseSchema("""
             {
               "type": "object",
               "properties": {
@@ -1212,14 +1192,14 @@ paths:
               }
             }
             """);
-        var referencedChild = new JsonSchemaProperty
+        var referencedChild = new ApiSchemaProperty
         {
             Reference = referencedChildSchema
         };
-        ((NJsonSchema.References.IJsonReferenceBase)referencedChild).ReferencePath = "#/definitions/NamedChild";
+        referencedChild.ReferencePath = "#/definitions/NamedChild";
         rootSchema.Properties["child"] = referencedChild;
 
-        var definitions = new Dictionary<string, JsonSchema>();
+        var definitions = new Dictionary<string, ApiSchema>();
 
         InvokeAddReferencedSchemas(definitions, rootSchema);
 
@@ -1230,9 +1210,9 @@ paths:
     [Test]
     public void CreateCanonicalSchemaToken_Preserves_Null_And_NonNull_Extension_Values()
     {
-        var schema = new JsonSchema
+        var schema = new ApiSchema
         {
-            Type = JsonObjectType.Object,
+            Type = ApiObjectTypes.Object,
             ExtensionData = new Dictionary<string, object?>
             {
                 ["x-null"] = null,
@@ -1243,31 +1223,32 @@ paths:
             }
         };
 
-        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<JsonSchema>());
+        var token = InvokeCreateCanonicalSchemaToken(schema, new HashSet<ApiSchema>());
 
-        token["extensions"]!["x-null"]!.Type.Should().Be(JTokenType.Null);
-        token["extensions"]!["x-meta"]!["beta"]!.Value<int>().Should().Be(2);
+        token["extensions"]!.AsObject().Should().ContainKey("x-null");
+        token["extensions"]!["x-null"].Should().BeNull();
+        token["extensions"]!["x-meta"]!["beta"]!.GetValue<int>().Should().Be(2);
     }
 
     [Test]
     public void AddReferencedSchemas_Adds_Named_Item_Schemas_From_Items_Collection()
     {
-        var rootSchema = new JsonSchema
+        var rootSchema = new ApiSchema
         {
-            Type = JsonObjectType.Array
+            Type = ApiObjectTypes.Array
         };
-        var referencedItemSchema = new JsonSchema
+        var referencedItemSchema = new ApiSchema
         {
-            Type = JsonObjectType.String
+            Type = ApiObjectTypes.String
         };
-        var namedItemSchema = new JsonSchemaProperty
+        var namedItemSchema = new ApiSchemaProperty
         {
             Reference = referencedItemSchema
         };
-        ((NJsonSchema.References.IJsonReferenceBase)namedItemSchema).ReferencePath = "#/definitions/NamedItem";
+        namedItemSchema.ReferencePath = "#/definitions/NamedItem";
         rootSchema.Items.Add(namedItemSchema);
 
-        var definitions = new Dictionary<string, JsonSchema>();
+        var definitions = new Dictionary<string, ApiSchema>();
 
         InvokeAddReferencedSchemas(definitions, rootSchema);
 
@@ -1329,7 +1310,7 @@ paths:
               }
             }
             """);
-        var clonedDocument = await OpenApiDocument.FromJsonAsync(parsedDocument.ToJson());
+        var clonedDocument = ApiDocumentLoader.Load(ApiDocumentWriter.Write(parsedDocument), null, isYaml: false);
 
         parsedDocument.Tags.Should().NotBeNull();
         parsedDocument.Tags.Should().BeEmpty();
@@ -1343,7 +1324,7 @@ paths:
     public async Task ParseAndCloneDocument_RoundTrips_SchemaType_And_Collections(SampleOpenSpecifications version)
     {
         var parsedDocument = await ParseJsonDocument(EmbeddedResources.GetSwaggerPetstore(version));
-        var clonedDocument = await OpenApiDocument.FromJsonAsync(parsedDocument.ToJson());
+        var clonedDocument = ApiDocumentLoader.Load(ApiDocumentWriter.Write(parsedDocument), null, isYaml: false);
 
         clonedDocument.SchemaType.Should().Be(parsedDocument.SchemaType);
         clonedDocument.Paths.Keys.Should().BeEquivalentTo(parsedDocument.Paths.Keys);
@@ -1401,8 +1382,8 @@ paths:
 
         var merged = InvokeMerge(baseDocument, secondDocument);
 
-        merged.SchemaType.Should().Be(SchemaType.OpenApi3);
-        JObject.Parse(merged.ToJson())["openapi"]!.Value<string>().Should().Be("3.0.0");
+        merged.SchemaType.Should().Be(ApiSchemaType.OpenApi3);
+        JsonNode.Parse(ApiDocumentWriter.Write(merged))!["openapi"]!.GetValue<string>().Should().Be("3.0.0");
     }
 
     [Test]
@@ -1453,12 +1434,18 @@ paths:
 
         var merged = InvokeMerge(baseDocument, secondDocument);
 
-        merged.SchemaType.Should().Be(SchemaType.Swagger2);
-        JObject.Parse(merged.ToJson())["swagger"]!.Value<string>().Should().Be("2.0");
+        merged.SchemaType.Should().Be(ApiSchemaType.Swagger2);
+        JsonNode.Parse(ApiDocumentWriter.Write(merged))!["swagger"]!.GetValue<string>().Should().Be("2.0");
     }
 
-    private static Task<OpenApiDocument> ParseJsonDocument(string json)
-        => OpenApiDocument.FromJsonAsync(json);
+    private static Task<ApiDocument> ParseJsonDocument(string json)
+        => Task.FromResult(ApiDocumentLoader.Load(json, null, isYaml: false));
+
+    private static ApiSchema ParseSchema(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        return new ApiJsonReader(ApiSchemaType.JsonSchema).ReadSchema(document.RootElement);
+    }
 
     [Test]
     public void Merge_Throws_On_Null_Documents()
@@ -1476,29 +1463,26 @@ paths:
         act.Should().Throw<ArgumentException>();
     }
 
-    private static OpenApiDocument InvokeMerge(params OpenApiDocument[] documents)
+    private static ApiDocument InvokeMerge(params ApiDocument[] documents)
         => Merger.Merge(documents);
 
     private static bool InvokeAreEquivalent<TValue>(TValue existingValue, TValue incomingValue)
         => Comparer.AreEquivalent(existingValue, incomingValue);
 
-    private static JToken InvokeCreateCanonicalSchemaToken(JsonSchema schema, ISet<JsonSchema> visited)
-        => Comparer.CreateCanonicalSchemaToken(schema, visited);
+    private static JsonNode InvokeCreateCanonicalSchemaToken(ApiSchema schema, ISet<ApiSchema> visited)
+        => JsonNode.Parse(Comparer.CreateCanonicalSchemaJson(schema, visited))!;
 
-    private static JToken InvokeCreateCanonicalJsonToken(object value)
-        => Comparer.CreateCanonicalJsonToken(value);
+    private static JsonNode InvokeCreateCanonicalJsonToken(object value)
+        => JsonNode.Parse(Comparer.CreateCanonicalJson(value))!;
 
-    private static void InvokeAddReferencedSchemas(IDictionary<string, JsonSchema> definitions, JsonSchema schema)
-        => Comparer.AddReferencedSchemas(definitions, schema);
+    private static void InvokeAddReferencedSchemas(IDictionary<string, ApiSchema> definitions, ApiSchema schema)
+        => DocumentEquivalenceComparer.AddReferencedSchemas(definitions, schema);
 
-    private static string? InvokeGetDefinitionName(JsonSchema schema)
-        => Comparer.GetDefinitionName(schema);
+    private static string? InvokeGetDefinitionName(ApiSchema schema)
+        => DocumentEquivalenceComparer.GetDefinitionName(schema);
 
     private static string InvokeCreateOpenApiJson(object value)
         => Comparer.CreateOpenApiJson(value);
-
-    private static JObject InvokeRemoveNullProperties(JObject json)
-        => Comparer.RemoveNullProperties(json);
 
     private sealed class SelfReferencingValue
     {

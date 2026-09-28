@@ -1,28 +1,26 @@
-using OpenApiDocument = NSwag.OpenApiDocument;
-
 namespace Refitter.Core;
 
 internal sealed class FileDocumentStrategy : IDocumentLoadingStrategy
 {
-    public async Task<OpenApiDocument?> TryLoadAsync(
+    public Task<ApiDocument?> TryLoadAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
         if (PathUtilities.IsHttp(path))
-            return null;
+            return Task.FromResult<ApiDocument?>(null);
 
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            return await OpenApiDocumentParser.FromFileAsync(path, cancellationToken).ConfigureAwait(false);
+            return Task.FromResult<ApiDocument?>(ApiDocumentLoader.LoadFile(path));
         }
         catch (Exception ex)
         {
             if (ex is OperationCanceledException or TaskCanceledException)
                 throw;
 
-            return null;
+            return Task.FromResult<ApiDocument?>(null);
         }
     }
 }

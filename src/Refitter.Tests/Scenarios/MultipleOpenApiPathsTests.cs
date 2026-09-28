@@ -160,7 +160,7 @@ components:
     {
         var (file1, file2) = await CreateTestSpecFiles();
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await ApiDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Should().NotBeNull();
         merged.Paths.Should().ContainKey("/pets");
@@ -172,9 +172,9 @@ components:
     {
         var (file1, file2) = await CreateTestSpecFiles();
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await ApiDocumentFactory.CreateAsync(new[] { file1, file2 });
 
-        merged.Info.Title.Should().Be("Petstore V1");
+        merged.Info!.Title.Should().Be("Petstore V1");
     }
 
     [Test]
@@ -182,7 +182,7 @@ components:
     {
         var (file1, _) = await CreateTestSpecFiles();
 
-        var act = async () => await OpenApiDocumentFactory.CreateAsync(new[] { file1, file1 });
+        var act = async () => await ApiDocumentFactory.CreateAsync(new[] { file1, file1 });
 
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*duplicate path '/pets'*");
@@ -193,7 +193,7 @@ components:
     {
         var (file1, file2) = await CreateTestSpecFiles();
 
-        var merged = await OpenApiDocumentFactory.CreateAsync(new[] { file1, file2 });
+        var merged = await ApiDocumentFactory.CreateAsync(new[] { file1, file2 });
 
         merged.Components.Schemas.Should().ContainKey("PetV1");
         merged.Components.Schemas.Should().ContainKey("PetV2");
@@ -202,7 +202,7 @@ components:
     [Test]
     public async Task OpenApiDocumentFactory_Throws_For_Empty_Paths()
     {
-        var act = async () => await OpenApiDocumentFactory.CreateAsync(Array.Empty<string>());
+        var act = async () => await ApiDocumentFactory.CreateAsync(Array.Empty<string>());
         await act.Should().ThrowAsync<ArgumentException>();
     }
 

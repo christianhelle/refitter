@@ -48,7 +48,7 @@
       }
     },
     "CodeGeneratorSettings": {
-      "description": "The settings describing how to generate types using NSwag.",
+      "description": "The settings describing how to generate contract types.",
       "type": "object",
       "properties": {
         "requiredPropertiesMustBeDefined": {
@@ -188,10 +188,6 @@
         },
         "dateTimeFormat": {
           "description": "Gets or sets the date-time string format to use",
-          "type": "string"
-        },
-        "customTemplateDirectory": {
-          "description": "Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates",
           "type": "string"
         }
       }
@@ -461,7 +457,7 @@
       "type": "boolean"
     },
     "operationNameGenerator": {
-      "description": "The NSwag IOperationNameGenerator implementation to use.",
+      "description": "The strategy used to name operations and to group them into interfaces.",
       "type": "string",
       "enum": [
         "Default",
@@ -498,7 +494,7 @@
       "type": "boolean"
     },
     "usePolymorphicSerialization": {
-      "description": "Use System.Text.Json polymorphic serialization. Default is false.\r\nReplace NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.\r\nTo have the native support of inheritance (de)serialization and fallback to base types when\r\npayloads with (yet) unknown types are offered by newer versions of an API\r\nSee https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information",
+      "description": "Use System.Text.Json polymorphic serialization. Default is false.\r\nReplace JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.\r\nTo have the native support of inheritance (de)serialization and fallback to base types when\r\npayloads with (yet) unknown types are offered by newer versions of an API\r\nSee https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information",
       "type": "boolean"
     },
     "contractTypeSuffix": {
@@ -511,7 +507,7 @@
       "enum": [ "Multi", "Csv", "Ssv", "Tsv", "Pipes" ]
     },
     "customTemplateDirectory": {
-      "description": "Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates",
+      "description": "Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.",
       "type": [ "string", "null" ]
     },
     "silent": {

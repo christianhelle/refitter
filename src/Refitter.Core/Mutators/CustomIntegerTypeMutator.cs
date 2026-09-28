@@ -1,25 +1,17 @@
-using NJsonSchema;
-using NSwag;
-
 namespace Refitter.Core;
 
-internal sealed class CustomIntegerTypeMutator(IntegerType customIntegerType)
-    : IOpenApiDocumentMutator
+/// <summary>Uses 64-bit integers for integers without a format (when the integer type is Int64).</summary>
+internal sealed class CustomIntegerTypeMutator(IntegerType customIntegerType) : IDocumentMutator
 {
-    public void Mutate(OpenApiDocument document)
+    public void Mutate(ApiDocument document)
     {
         if (customIntegerType == IntegerType.Int32)
             return;
 
-        SchemaWalker.TraverseDocumentSchemas(document, FixSchemaIntegerFormat);
-    }
-
-    private static void FixSchemaIntegerFormat(JsonSchema schema)
-    {
-        if (schema.Type == JsonObjectType.Integer &&
-            string.IsNullOrEmpty(schema.Format))
+        SchemaWalker.TraverseDocumentSchemas(document, schema =>
         {
-            schema.Format = "int64";
-        }
+            if (schema.Type == ApiObjectTypes.Integer && string.IsNullOrEmpty(schema.Format))
+                schema.Format = "int64";
+        });
     }
 }

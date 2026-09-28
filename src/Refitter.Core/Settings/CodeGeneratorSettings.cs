@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Text.Json.Serialization;
-using NJsonSchema.CodeGeneration;
 
 namespace Refitter.Core;
 
@@ -259,11 +258,12 @@ public class CodeGeneratorSettings
     public string? DateTimeFormat { get; set; }
 
     /// <summary>
-    /// Gets or sets a custom <see cref="IPropertyNameGenerator"/>.
+    /// Gets or sets a custom <see cref="IPropertyNameProvider"/> that names the properties of generated contracts.
+    /// Takes precedence over <see cref="RefitGeneratorSettings.PropertyNamingPolicy"/>.
     /// </summary>
-    [Description("Gets or sets a custom IPropertyNameGenerator.")]
+    [Description("Gets or sets a custom IPropertyNameProvider.")]
     [JsonIgnore]
-    public IPropertyNameGenerator? PropertyNameGenerator { get; set; }
+    public IPropertyNameProvider? PropertyNameProvider { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to inline JsonConverter attributes for enum types (default: true).
@@ -284,13 +284,6 @@ public class CodeGeneratorSettings
         "When set to false, no [JsonConverter] is emitted."
     )]
     public bool InlineJsonConverters { get; set; } = true;
-
-    /// <summary>
-    /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
-    /// templates.
-    /// </summary>
-    [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
-    public string? CustomTemplateDirectory { get; set; }
 
     /// <summary>
     /// Gets or sets the JSON library version to use (applies only to System.Text.Json, default: 8.0).

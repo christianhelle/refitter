@@ -16,7 +16,7 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         var initialCount = document.Components.Schemas.Count;
 
@@ -33,7 +33,7 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         var cleaner = new SchemaCleaner(document, []);
         cleaner.RemoveUnreferencedSchema();
@@ -50,7 +50,7 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         var cleaner = new SchemaCleaner(document, [pattern]);
         cleaner.RemoveUnreferencedSchema();
@@ -67,7 +67,7 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         var cleaner = new SchemaCleaner(document, [])
         {
@@ -85,7 +85,7 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         var cleaner = new SchemaCleaner(document, [".*"]);
 
@@ -99,7 +99,7 @@ public class SchemaCleanerTests
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "test.json");
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         var cleaner = new SchemaCleaner(document, [])
         {
@@ -148,7 +148,7 @@ public class SchemaCleanerTests
 
         try
         {
-            var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+            var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
             ReferenceEquals(document.Components.Schemas["AliasItem"], document.Components.Schemas["ActualItem"])
                 .Should()
                 .BeTrue();
@@ -246,7 +246,7 @@ public class SchemaCleanerTests
   }
 }";
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         var cleaner = new SchemaCleaner(document, [])
         {
@@ -331,7 +331,7 @@ public class SchemaCleanerTests
   }
 }";
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         var animalSchema = document.Components.Schemas["Animal"];
         var initialMappingCount = animalSchema.DiscriminatorObject?.Mapping.Count ?? 0;
@@ -398,7 +398,7 @@ public class SchemaCleanerTests
   }
 }";
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
-        var document = await OpenApiDocumentFactory.CreateAsync(swaggerFile);
+        var document = await ApiDocumentFactory.CreateAsync(swaggerFile);
 
         var cleaner = new SchemaCleaner(document, []);
         cleaner.RemoveUnreferencedSchema();

@@ -1,5 +1,4 @@
 using System.Text;
-using NSwag.CodeGeneration.Models;
 
 namespace Refitter.Core;
 
@@ -74,7 +73,7 @@ internal static class ParameterNaming
         return identifier;
     }
 
-    public static string GetVariableName(ParameterModelBase parameterModel)
+    public static string GetVariableName(OperationParameterModel parameterModel)
     {
         return IdentifierUtils.ToCompilableIdentifier(parameterModel.VariableName);
     }

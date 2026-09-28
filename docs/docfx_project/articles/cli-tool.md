@@ -97,7 +97,7 @@ OPTIONS:
                                                                  - Ssv (space separated values)
                                                                  - Tsv (tab separated values)
                                                                  - Pipes (pipe separated values)
-        --operation-name-generator              Default          The NSwag IOperationNameGenerator implementation to use.
+        --operation-name-generator              Default          The strategy used to name operations and to group them into interfaces.
                                                                  May be one of:
                                                                  - Default
                                                                  - MultipleClientsFromOperationId
@@ -117,7 +117,7 @@ OPTIONS:
         --use-dynamic-querystring-parameters                     Enable wrapping multiple query parameters into a single complex one. Default is no wrapping.
                                                                  See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information
         --use-polymorphic-serialization                          Use System.Text.Json polymorphic serialization.
-                                                                 Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
+                                                                 Replaces JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
                                                                  To have the native support of inheritance (de)serialization and fallback to base types when
                                                                  payloads with (yet) unknown types are offered by newer versions of an API
                                                                  See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
@@ -125,7 +125,7 @@ OPTIONS:
         --no-inline-json-converters                              Don't inline JsonConverter attributes for enum properties. When disabled, enum properties will not have [JsonConverter(typeof(JsonStringEnumConverter))] attributes
         --integer-type                           int             The .NET type to use for OpenAPI integer types without a format specifier. Common values: 'int' (default), 'long'
         --json-library-version                                     JSON library version for System.Text.Json (default: 8.0). When set to 9.0 or higher, enables .NET 9+ JsonStringEnumMemberName support for custom enum value names. Cannot be used with a settings file that also specifies a non-default value
-        --custom-template-directory                              Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>
+        --custom-template-directory                              Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.
         --telemetry-source                                       Report the telemetry source of this invocation. Used internally by the MSBuild integration.
         --telemetry-file-count                                   Report the total number of settings files in the current workload. Used internally by the MSBuild integration.
         --telemetry-runtime                                      Report the bundled runtime selected for this invocation. Used internally by the MSBuild integration.
@@ -157,7 +157,7 @@ To generate code from an OpenAPI specifications file, run the following:
 refitter [path to OpenAPI spec file] --namespace "[Your.Namespace.Of.Choice.GeneratedCode]"
 ```
 
-This will generate a file called `Output.cs` which contains the Refit interface and contract classes generated using [NSwag](https://github.com/RicoSuter/NSwag)
+This will generate a file called `Output.cs` which contains the Refit interface and contract classes
 
 The settings file uses the [.refitter file format](refitter-file-format.md)
 

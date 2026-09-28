@@ -102,7 +102,7 @@ paths:
         string generatedCode = await GenerateCode(SwaggerV2Spec, SwaggerV2Components);
 
         generatedCode.Should().Contain("class User");
-        // Swagger 2.0 has no notion of a non-nullable value type here, so NSwag emits int?
+        // Swagger 2.0 has no notion of a non-nullable value type here, so Refitter emits int?
         generatedCode.Should().Contain("public int? Id { get; set; }");
         generatedCode.Should().Contain("public string Name { get; set; }");
     }

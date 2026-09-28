@@ -283,6 +283,35 @@ public class RefitterRunnerTests
     }
 
     [Test]
+    public async Task RunAsync_Should_Not_Warn_About_CustomTemplateDirectory()
+    {
+        var workspace = CreateTempDirectory();
+        try
+        {
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = CreateOpenApiSpec(workspace),
+                Namespace = "TestNamespace",
+                CustomTemplateDirectory = workspace,
+            };
+
+            var result = await new RefitterRunner().RunAsync(
+                settings,
+                writer: null,
+                validator: null,
+                cancellationToken: default);
+
+            result.ExitCode.Should().Be(0);
+            result.Warnings.Should().NotContain(w => w.Description.Contains("'customTemplateDirectory'"));
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    [Test]
     public async Task RunAsync_Should_Detect_Both_Warnings()
     {
         var workspace = CreateTempDirectory();

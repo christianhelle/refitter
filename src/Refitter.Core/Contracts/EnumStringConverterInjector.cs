@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using NSwag;
 
 namespace Refitter.Core;
 
@@ -15,7 +14,7 @@ internal sealed class EnumStringConverterInjector : IContractsPostProcessor
         RegexOptions.Compiled | RegexOptions.Multiline,
         TimeSpan.FromSeconds(1));
 
-    public string Process(OpenApiDocument document, RefitGeneratorSettings settings, string contracts)
+    public string Process(ApiDocument document, RefitGeneratorSettings settings, string contracts)
     {
         if (settings.CodeGeneratorSettings is not { InlineJsonConverters: false })
         {

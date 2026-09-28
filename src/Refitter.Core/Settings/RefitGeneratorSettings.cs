@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using NSwag.CodeGeneration;
+
 
 namespace Refitter.Core;
 
@@ -285,9 +285,9 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public DependencyInjectionSettings? DependencyInjectionSettings { get; set; }
 
     /// <summary>
-    /// Gets or sets the settings describing how to generate types using NSwag
+    /// Gets or sets the settings describing how to generate contract types
     /// </summary>
-    [Description("The settings describing how to generate types using NSwag.")]
+    [Description("The settings describing how to generate contract types.")]
     public CodeGeneratorSettings? CodeGeneratorSettings { get; set; }
 
     /// <summary>
@@ -329,9 +329,9 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public bool IncludeInheritanceHierarchy { get; set; }
 
     /// <summary>
-    /// The NSwag IOperationNameGenerator implementation to use
+    /// The strategy used to name operations and to group them into interfaces
     /// </summary>
-    [Description("The NSwag IOperationNameGenerator implementation to use.")]
+    [Description("The strategy used to name operations and to group them into interfaces.")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public OperationNameGeneratorTypes OperationNameGenerator { get; set; }
 
@@ -388,7 +388,7 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     /// <summary>
     /// Set to <c>true</c> to use System.Text.Json polymorphic serialization. Default is <c>false</c>
     /// Gets a value indicating whether to use System.Text.Json polymorphic serialization
-    /// Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
+    /// Replaces JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
     /// To have the native support of inheritance (de)serialization and fallback to base types when
     /// payloads with (yet) unknown types are offered by newer versions of an API
     /// See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
@@ -396,7 +396,7 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     [Description(
         """
         Use System.Text.Json polymorphic serialization. Default is false.
-        Replace NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
+        Replace JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
         To have the native support of inheritance (de)serialization and fallback to base types when
         payloads with (yet) unknown types are offered by newer versions of an API
         See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism for more information
@@ -405,10 +405,10 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public bool UsePolymorphicSerialization { get; set; }
 
     /// <summary>
-    /// Gets or sets the parameter name generator for customizing parameter names.
+    /// Gets or sets a custom <see cref="IParameterNameProvider"/> that names the parameters of generated interface methods.
     /// </summary>
     [JsonIgnore]
-    public IParameterNameGenerator? ParameterNameGenerator { get; set; }
+    public IParameterNameProvider? ParameterNameProvider { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate Security Schema Authentication headers.
@@ -426,10 +426,10 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public CollectionFormat CollectionFormat { get; set; } = CollectionFormat.Multi;
 
     /// <summary>
-    /// Gets or sets a directory path which contains liquid templates for NSwag. If null or empty, uses default
-    /// templates.
+    /// Gets or sets a directory path which contains Liquid templates for the generated contracts. If null or empty,
+    /// uses the built-in templates.
     /// </summary>
-    [Description("Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See https://github.com/RicoSuter/NSwag/wiki/Templates")]
+    [Description("Custom directory with Liquid templates for the generated contracts. Default is null which uses the built-in templates.")]
     public string? CustomTemplateDirectory { get; set; }
 
     /// <summary>

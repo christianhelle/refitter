@@ -313,11 +313,11 @@ public class BlockerRegressions
     [Test]
     public async Task Issue1053_Schema_Names_As_Keywords_Are_Properly_Escaped()
     {
-        // Repro: Schema named "class" is capitalized by NSwag to "Class" (not a keyword)
-        // Schema named "event" is capitalized by NSwag to "Event" (not a keyword)
+        // Repro: Schema named "class" is capitalized by Refitter to "Class" (not a keyword)
+        // Schema named "event" is capitalized by Refitter to "Event" (not a keyword)
         var generatedCode = await GenerateCode(OpenApiSpecWithKeywordsAndTitle);
 
-        // NSwag capitalizes schema names, so "class" becomes "Class" which doesn't need escaping
+        // Refitter capitalizes schema names, so "class" becomes "Class" which doesn't need escaping
         // But parameter names with keywords should still be escaped
         generatedCode.Should().Contain("partial class Class");
         generatedCode.Should().Contain("partial class Event");

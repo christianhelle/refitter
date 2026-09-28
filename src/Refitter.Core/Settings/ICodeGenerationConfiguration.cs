@@ -1,4 +1,3 @@
-using NSwag.CodeGeneration;
 
 namespace Refitter.Core;
 
@@ -8,7 +7,7 @@ namespace Refitter.Core;
 public interface ICodeGenerationConfiguration
 {
     /// <summary>
-    /// Gets the NSwag code generator settings.
+    /// Gets the settings describing how to generate contract types.
     /// </summary>
     CodeGeneratorSettings? CodeGeneratorSettings { get; }
 
@@ -63,14 +62,14 @@ public interface ICodeGenerationConfiguration
     bool ImmutableRecords { get; }
 
     /// <summary>
-    /// Gets the custom template directory for NSwag code generation.
+    /// Gets the custom directory with Liquid templates for the generated contracts.
     /// </summary>
     string? CustomTemplateDirectory { get; }
 
     /// <summary>
-    /// Gets the parameter name generator.
+    /// Gets the parameter name provider.
     /// </summary>
-    IParameterNameGenerator? ParameterNameGenerator { get; }
+    IParameterNameProvider? ParameterNameProvider { get; }
 
     /// <summary>
     /// Gets a value indicating whether to use polymorphic serialization.

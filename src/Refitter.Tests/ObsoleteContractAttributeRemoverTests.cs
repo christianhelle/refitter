@@ -11,7 +11,7 @@ public class ObsoleteContractAttributeRemoverTests
             /// <summary>
             /// Used by the interface
             /// </summary>
-            [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0")]
+            [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
             [System.Obsolete("use E")]
             public partial class Used
             {
@@ -20,12 +20,12 @@ public class ObsoleteContractAttributeRemoverTests
             }
 
             [System.Obsolete]
-            [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0")]
+            [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
             public partial record UsedRecord
             {
             }
 
-            [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0")]
+            [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
             [System.Obsolete]
             public partial class Unused
             {
@@ -49,7 +49,7 @@ public class ObsoleteContractAttributeRemoverTests
         result.Should().NotContain("[System.Obsolete(\"use E\")]");
         result.Should().Contain(
             """
-                [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0")]
+                [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
                 public partial class Used
             """);
         result.Should().Contain(
@@ -66,7 +66,7 @@ public class ObsoleteContractAttributeRemoverTests
         result.Should().Contain(
             """
 
-                [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0")]
+                [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.0.0.0")]
                 public partial record UsedRecord
             """);
     }
@@ -157,6 +157,6 @@ public class ObsoleteContractAttributeRemoverTests
 
         result.Should().NotContain("[System.Obsolete(\"use E\")]");
         result.Should().Contain("[System.Obsolete]\r\n    public partial class Unused");
-        result.Should().Contain("\"14.7.1.0\")]\r\n    public partial class Used\r\n");
+        result.Should().Contain("\"1.0.0.0\")]\r\n    public partial class Used\r\n");
     }
 }

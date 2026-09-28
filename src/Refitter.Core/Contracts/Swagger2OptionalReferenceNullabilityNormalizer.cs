@@ -1,16 +1,14 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NJsonSchema;
-using NSwag;
 
 namespace Refitter.Core;
 
 internal sealed class Swagger2OptionalReferenceNullabilityNormalizer : IContractsPostProcessor
 {
-    public string Process(OpenApiDocument document, RefitGeneratorSettings settings, string contracts)
+    public string Process(ApiDocument document, RefitGeneratorSettings settings, string contracts)
     {
-        if (document.SchemaType != SchemaType.Swagger2 ||
+        if (document.SchemaType != ApiSchemaType.Swagger2 ||
             settings.CodeGeneratorSettings?.GenerateNullableReferenceTypes != true ||
             settings.CodeGeneratorSettings.GenerateOptionalPropertiesAsNullable)
         {

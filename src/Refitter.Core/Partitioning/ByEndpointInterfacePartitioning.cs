@@ -1,5 +1,4 @@
 using System.Text;
-using NSwag;
 
 namespace Refitter.Core;
 
@@ -29,7 +28,7 @@ internal class ByEndpointInterfacePartitioning(
     public bool IsSingleInterface => false;
 
     public void AppendInterfaceDocumentation(
-        OpenApiDocument document,
+        ApiDocument document,
         XmlDocumentationGenerator docGenerator,
         string groupKey,
         OpenApiOperationInfo representativeOperation,

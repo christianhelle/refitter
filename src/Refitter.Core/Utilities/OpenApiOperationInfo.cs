@@ -1,5 +1,4 @@
-using NSwag;
 
 namespace Refitter.Core;
 
-internal record OpenApiOperationInfo(string Path, string Verb, OpenApiOperation Operation);
+internal record OpenApiOperationInfo(string Path, string Verb, ApiOperation Operation);

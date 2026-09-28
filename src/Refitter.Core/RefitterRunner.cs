@@ -151,7 +151,7 @@ public class RefitterRunner
         List<RunnerDiagnostic> diagnostics)
     {
         if (settings.IncludePathMatches.Length > 0 &&
-            generator.OpenApiDocument.Paths.Count == 0)
+            generator.DocumentInfo.Paths.Count == 0)
         {
             diagnostics.Add(new RunnerDiagnostic(
                 $"All paths were filtered out by include path patterns: [{string.Join(", ", settings.IncludePathMatches)}]",

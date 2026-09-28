@@ -23,7 +23,7 @@ public class FileDocumentStrategyTests
         var result = await strategy.TryLoadAsync(swaggerFile);
 
         result.Should().NotBeNull();
-        result!.Info.Title.Should().NotBeNullOrEmpty();
+        result!.Info!.Title.Should().NotBeNullOrEmpty();
     }
 
     [Test]
@@ -116,7 +116,7 @@ public class FileDocumentStrategyTests
         var result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
-        var schema = result!.Paths["/m"]["get"].ActualResponses["200"].Content["application/json"].Schema.ActualSchema;
+        var schema = result!.Paths["/m"]["get"].ActualResponses["200"].Content["application/json"].Schema!.ActualSchema;
         schema.Properties["value"].Maximum.Should().Be(decimal.MaxValue);
         schema.Properties["value"].Minimum.Should().Be(decimal.MinValue);
 

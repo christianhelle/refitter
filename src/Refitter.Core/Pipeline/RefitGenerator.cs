@@ -1,21 +1,28 @@
-using NSwag;
-
 namespace Refitter.Core;
 
 /// <summary>
 /// Generates Refit clients and interfaces based on an OpenAPI specification.
 /// </summary>
-public class RefitGenerator(
-    RefitGeneratorSettings settings,
-    OpenApiDocument document)
+public class RefitGenerator
 {
-    private static readonly RefitCodeGenerator CodeGenerator = new();
+
+    private readonly RefitGeneratorSettings settings;
+    private readonly ApiDocument document;
+    private ApiDocumentInfo? documentInfo;
+
+    private RefitGenerator(ApiDocument document, RefitGeneratorSettings settings)
+    {
+        this.settings = settings;
+        this.document = document;
+    }
 
     /// <summary>
-    /// OpenAPI specifications used to generate Refit clients and interfaces.
-    /// This is the filtered/cleaned document after pipeline processing.
+    /// Describes the OpenAPI document used to generate Refit clients and interfaces,
+    /// after filtering and schema trimming.
     /// </summary>
-    public OpenApiDocument OpenApiDocument => document;
+    public ApiDocumentInfo DocumentInfo => documentInfo ??= new ApiDocumentInfo(document);
+
+    internal ApiDocument Document => document;
 
     /// <summary>
     /// Creates a new instance of the <see cref="RefitGenerator"/> class asynchronously
@@ -28,24 +35,23 @@ public class RefitGenerator(
         if (settings == null) throw new ArgumentNullException(nameof(settings));
 
         var openApiDocument = await GetOpenApiDocument(settings, cancellationToken).ConfigureAwait(false);
-        var processed = RefitDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
-        processed = RefitDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
-        processed = await CleanSchemaAsync(
-                processed,
-                settings.TrimUnusedSchema,
-                settings.KeepSchemaPatterns,
-                settings.IncludeInheritanceHierarchy)
-            .ConfigureAwait(false);
+        var processed = ApiDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
+        processed = ApiDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
+        processed = CleanSchema(
+            processed,
+            settings.TrimUnusedSchema,
+            settings.KeepSchemaPatterns,
+            settings.IncludeInheritanceHierarchy);
 
-        return new(settings, processed);
+        return new(processed, settings);
     }
 
-    private static async Task<OpenApiDocument> GetOpenApiDocument(
+    private static async Task<ApiDocument> GetOpenApiDocument(
         RefitGeneratorSettings settings,
         CancellationToken cancellationToken = default)
     {
         if (settings.OpenApiPaths is { Length: > 0 })
-            return await OpenApiDocumentFactory
+            return await ApiDocumentFactory
                 .CreateAsync(settings.OpenApiPaths, settings.AllowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -56,13 +62,13 @@ public class RefitGenerator(
                 nameof(settings));
         }
 
-        return await OpenApiDocumentFactory
+        return await ApiDocumentFactory
             .CreateAsync(settings.OpenApiPath!, settings.AllowRemoteReferences, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    private static async Task<OpenApiDocument> CleanSchemaAsync(
-        OpenApiDocument document,
+    private static ApiDocument CleanSchema(
+        ApiDocument document,
         bool removeUnusedSchema,
         string[] keepSchemaPatterns,
         bool includeInheritanceHierarchy)
@@ -72,7 +78,7 @@ public class RefitGenerator(
         if (!removeUnusedSchema)
             return document;
 
-        var result = await CloneDocumentAsync(document).ConfigureAwait(false);
+        var result = ApiDocumentWriter.Clone(document);
         var cleaner = new SchemaCleaner(result, keepSchemaPatterns)
         {
             IncludeInheritanceHierarchy = includeInheritanceHierarchy
@@ -82,19 +88,16 @@ public class RefitGenerator(
         return result;
     }
 
-    private static async Task<OpenApiDocument> CloneDocumentAsync(OpenApiDocument document)
-        => await OpenApiDocument.FromJsonAsync(document.ToJson()).ConfigureAwait(false);
-
     /// <summary>
     /// Generates Refit clients and interfaces based on an OpenAPI specification
     /// and returns the generated code as a string.
     /// </summary>
     /// <returns>The generated code as a string.</returns>
-    public string Generate() => CodeGenerator.Generate(document, settings);
+    public string Generate() => RefitCodeGenerator.Generate(document, settings);
 
     /// <summary>
     /// Generates multiple files containing Refit interfaces and contracts.
     /// </summary>
     /// <returns>A GeneratorOutput containing all generated code files.</returns>
-    public GeneratorOutput GenerateMultipleFiles() => CodeGenerator.GenerateMultipleFiles(document, settings);
+    public GeneratorOutput GenerateMultipleFiles() => RefitCodeGenerator.GenerateMultipleFiles(document, settings);
 }

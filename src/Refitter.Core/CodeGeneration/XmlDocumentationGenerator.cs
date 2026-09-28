@@ -1,16 +1,16 @@
+#nullable enable
+
 using System.Globalization;
 using System.Text;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NSwag;
-using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
 /// <summary>
 /// Generator class for creating XML documentation.
 /// </summary>
-public class XmlDocumentationGenerator
+internal class XmlDocumentationGenerator
 {
     private readonly ICodeGenerationConfiguration codeGeneration;
     private const string Separator = "    ";
@@ -32,12 +32,12 @@ public class XmlDocumentationGenerator
     /// <param name="document">The parent document of the controller.</param>
     /// <param name="tag">The controller tag that the endpoints were grouped by.</param>
     /// <param name="code">The builder to append the documentation to.</param>
-    public void AppendInterfaceDocumentationByTag(OpenApiDocument document, string tag, StringBuilder code)
+    public void AppendInterfaceDocumentationByTag(ApiDocument document, string tag, StringBuilder code)
     {
         if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
 
-        var controllerTag = document.Tags?.FirstOrDefault(t => t.Name.SanitizeControllerTag() == tag);
+        var controllerTag = document.Tags?.FirstOrDefault(t => t.Name!.SanitizeControllerTag() == tag);
         var controllerDescription = controllerTag?.Description;
         var fallbackSummary = $"Operations for {EscapeSymbols(tag)}.";
         this.AppendInterfaceSummary(controllerDescription, fallbackSummary, code);
@@ -48,15 +48,15 @@ public class XmlDocumentationGenerator
     /// </summary>
     /// <param name="endpoint">The OpenAPI definition of the endpoint.</param>
     /// <param name="code">The builder to append the documentation to.</param>
-    public void AppendInterfaceDocumentationByEndpoint(OpenApiOperation endpoint, StringBuilder code)
+    public void AppendInterfaceDocumentationByEndpoint(ApiOperation endpoint, StringBuilder code)
     {
         if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
 
         var summary = endpoint.Summary;
         var operationId = endpoint.OperationId;
-        var fallbackSummary = !string.IsNullOrWhiteSpace(operationId)
-            ? $"Operations for {EscapeSymbols(operationId!)}."
+        var fallbackSummary = !NullCheck.IsNullOrWhiteSpace(operationId)
+            ? $"Operations for {EscapeSymbols(operationId)}."
             : "Operations for endpoint.";
         this.AppendInterfaceSummary(summary, fallbackSummary, code);
     }
@@ -66,22 +66,22 @@ public class XmlDocumentationGenerator
     /// </summary>
     /// <param name="document">The OpenAPI definition of the document.</param>
     /// <param name="code">The builder to append the documentation to.</param>
-    public void AppendSingleInterfaceDocumentation(OpenApiDocument document, StringBuilder code)
+    public void AppendSingleInterfaceDocumentation(ApiDocument document, StringBuilder code)
     {
         if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
 
         var title = document.Info?.Title;
-        if (!string.IsNullOrEmpty(title))
+        if (!NullCheck.IsNullOrEmpty(title))
         {
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title!), code, indent: Separator);
+            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title), code, indent: Separator);
         }
     }
 
     /// <summary>
     /// Appends XML docs for the given method to the given code builder.
     /// </summary>
-    /// <param name="method">The NSwag model of the method's OpenAPI definition.</param>
+    /// <param name="method">The model of the method's OpenAPI definition.</param>
     /// <param name="parameters">
     /// The parameters the method is emitted with. The param tags are written for exactly these,
     /// so they always match the signature.
@@ -92,7 +92,7 @@ public class XmlDocumentationGenerator
     /// The type of the dynamic querystring wrapper parameter, when the method may have one.
     /// </param>
     public void AppendMethodDocumentation(
-        CSharpOperationModel method,
+        OperationModel method,
         IReadOnlyList<string> parameters,
         bool hasApiResponse,
         StringBuilder code,
@@ -101,10 +101,10 @@ public class XmlDocumentationGenerator
         if (!codeGeneration.GenerateXmlDocCodeComments)
             return;
 
-        if (!string.IsNullOrWhiteSpace(method.Summary))
+        if (!NullCheck.IsNullOrWhiteSpace(method.Summary))
             this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(method.Summary), code);
 
-        if (!string.IsNullOrWhiteSpace(method.Description))
+        if (!NullCheck.IsNullOrWhiteSpace(method.Description))
             this.AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
 
         foreach (var (name, type, alias) in GetEmittedParameters(parameters))
@@ -129,7 +129,7 @@ public class XmlDocumentationGenerator
             {
                 // Document the result with a fallback description.
                 var description = method.ResultDescription;
-                description = string.IsNullOrWhiteSpace(description)
+                description = NullCheck.IsNullOrWhiteSpace(description)
                     ? "A <see cref=\"Task\"/> representing the result of the request."
                     : SanitizeResponseDescription(description);
 
@@ -201,9 +201,9 @@ public class XmlDocumentationGenerator
     private void AppendInterfaceSummary(string? preferredSummary, string fallbackSummary, StringBuilder code)
     {
         var summary = fallbackSummary;
-        if (!string.IsNullOrWhiteSpace(preferredSummary))
+        if (!NullCheck.IsNullOrWhiteSpace(preferredSummary))
         {
-            summary = EscapeSymbols(preferredSummary!);
+            summary = EscapeSymbols(preferredSummary);
         }
 
         this.AppendXmlCommentBlock(SummaryTag, summary, code, indent: Separator);
@@ -216,7 +216,7 @@ public class XmlDocumentationGenerator
     /// </summary>
     /// <param name="responses">The responses to the document.</param>
     /// <returns>A string detailing the error codes and their description.</returns>
-    private string BuildErrorDescription(IEnumerable<CSharpResponseModel> responses)
+    private string BuildErrorDescription(IEnumerable<OperationResponseModel> responses)
     {
         return this.BuildResponseDescription(
             "Thrown when the request returns a non-success status code",
@@ -229,7 +229,7 @@ public class XmlDocumentationGenerator
     /// </summary>
     /// <param name="responses">The responses to the document.</param>
     /// <returns>A string detailing the response codes and their description.</returns>
-    private string BuildApiResponseDescription(IEnumerable<CSharpResponseModel> responses)
+    private string BuildApiResponseDescription(IEnumerable<OperationResponseModel> responses)
     {
         return this.BuildResponseDescription(
             "A <see cref=\"Task\"/> representing the <see cref=\"IApiResponse\"/> instance containing the result",
@@ -242,7 +242,7 @@ public class XmlDocumentationGenerator
     /// <param name="text">The text to prepend to the responses.</param>
     /// <param name="responses">The responses to the document.</param>
     /// <returns>A string containing the given text and response descriptions.</returns>
-    private string BuildResponseDescription(string text, IEnumerable<CSharpResponseModel> responses)
+    private string BuildResponseDescription(string text, IEnumerable<OperationResponseModel> responses)
     {
         var description = new StringBuilder(text);
         var responseList = responses.ToList();
@@ -307,7 +307,7 @@ public class XmlDocumentationGenerator
             .FirstOrDefault();
 
     private static string GetParameterDescription(
-        CSharpOperationModel method,
+        OperationModel method,
         string name,
         string type,
         string? alias,
@@ -329,12 +329,12 @@ public class XmlDocumentationGenerator
             method.Parameters.FirstOrDefault(p => GetVariableNames(p).Contains(name));
 
         return operationParameter?.HasDescription == true
-            ? SanitizeResponseDescription(operationParameter.Description)
+            ? SanitizeResponseDescription(operationParameter.Description!)
             : $"{name} parameter";
     }
 
     // The names the parameter extractors can emit for an operation parameter
-    private static IEnumerable<string> GetVariableNames(CSharpParameterModel parameter) =>
+    private static IEnumerable<string> GetVariableNames(OperationParameterModel parameter) =>
         new[]
             {
                 ParameterNaming.GetVariableName(parameter),

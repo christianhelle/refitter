@@ -75,7 +75,7 @@ public class OpenApiReaderDocumentStrategyTests
         var result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
-        result!.Info.Title.Should().Be("External Ref Test");
+        result!.Info!.Title.Should().Be("External Ref Test");
 
         Directory.Delete(folder, true);
     }
@@ -120,7 +120,7 @@ paths:
         var result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
-        result!.Info.Title.Should().Be("YAML External Ref Test");
+        result!.Info!.Title.Should().Be("YAML External Ref Test");
 
         Directory.Delete(folder, true);
     }
@@ -172,16 +172,16 @@ paths:
         await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
 
         OpenApiReaderDocumentStrategy strategy = new();
-        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
+        ApiDocument? result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
 
         // Microsoft.OpenApi normalizes the spec version to the latest patch of the
         // detected version, so "3.0.4" proves the document came out of the round trip
-        // rather than out of the NSwag fallback, which would report the original "3.0.0".
+        // rather than out of the file fallback, which would report the original "3.0.0".
         result!.OpenApi.Should().Be("3.0.4");
 
-        // The external component is only reachable if NSwag was given the document path.
+        // The external component is only reachable if the loader was given the document path.
         result.Components.Schemas.Should().ContainKey("User");
         result.Components.Schemas["User"].Properties.Should().ContainKey("id");
         result.Components.Schemas["User"].Properties.Should().ContainKey("name");
@@ -225,7 +225,7 @@ paths:
         await File.WriteAllTextAsync(Path.Combine(folder, "components.yaml"), componentsSpec);
 
         OpenApiReaderDocumentStrategy strategy = new();
-        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
+        ApiDocument? result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
         result!.OpenApi.Should().Be("3.0.4");
@@ -242,7 +242,7 @@ paths:
         string folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
-        // No "info" block at all. The NSwag fallback leaves Info null for this
+        // No "info" block at all. The file fallback leaves Info null for this
         // document, so a populated Info can only come from the round trip.
         string mainSpec = @"{
   ""openapi"": ""3.0.0"",
@@ -278,12 +278,12 @@ paths:
         await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
 
         OpenApiReaderDocumentStrategy strategy = new();
-        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
+        ApiDocument? result = await strategy.TryLoadAsync(mainFile);
 
         result.Should().NotBeNull();
         result!.Info.Should().NotBeNull();
-        result.Info.Title.Should().Be("no-info");
-        result.Info.Version.Should().NotBeNullOrEmpty();
+        result.Info!.Title.Should().Be("no-info");
+        result.Info!.Version.Should().NotBeNullOrEmpty();
         result.Components.Schemas.Should().ContainKey("User");
 
         Directory.Delete(folder, true);
@@ -304,7 +304,7 @@ paths:
     [Test]
     public async Task Returns_Null_When_Remote_Document_Cannot_Be_Read()
     {
-        // Port 1 refuses the connection, so the reader fails and the NSwag fallback
+        // Port 1 refuses the connection, so the reader fails and the file fallback
         // declines to retry remote documents
         var strategy = new OpenApiReaderDocumentStrategy();
         var result = await strategy.TryLoadAsync("http://127.0.0.1:1/openapi.json");
