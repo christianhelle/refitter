@@ -2,6 +2,18 @@
 
 Refitter.Core contains code and templates adapted from the following projects.
 
+## Microsoft.OpenApi and OasReader
+
+Refitter validated OpenAPI documents with [Microsoft.OpenApi](https://github.com/Microsoft/OpenAPI.NET) and
+read multi-file documents for validation with [OasReader](https://github.com/christianhelle/oasreader) until it
+replaced them with its own validator. To keep the validation results the same, the reading, validation rules,
+walking and reference resolution logic of Microsoft.OpenApi, and the multi-file merging logic of OasReader, were
+adapted into Refitter.Core (`src/Refitter.Core/Validation`).
+
+Copyright © Microsoft Corporation (Microsoft.OpenApi); Copyright © Christian Resma Helle (OasReader)
+
+Both projects are licensed under the MIT License, whose text is included below.
+
 ## NJsonSchema and NSwag
 
 Refitter generated its contracts with [NJsonSchema](https://github.com/RicoSuter/NJsonSchema) and
