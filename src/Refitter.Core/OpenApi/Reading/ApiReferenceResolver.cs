@@ -132,8 +132,7 @@ internal sealed class ApiReferenceResolver
                 append: true);
         }
 
-        foreach (var schema in requestBody.Content.Values.ToArray().Select(mediaType => mediaType.Schema).OfType<ApiSchema>())
-            VisitSchema(schema, visited, root, documentPath);
+        VisitSchemas(requestBody.Content.Values.Select(mediaType => mediaType.Schema).OfType<ApiSchema>().ToList(), visited, root, documentPath);
     }
 
     private void VisitResponse(ApiResponse response, HashSet<object> visited, object root, string? documentPath)
@@ -148,13 +147,9 @@ internal sealed class ApiReferenceResolver
                 append: true);
         }
 
-        foreach (var header in response.Headers.Values.ToArray())
-        {
-            VisitSchema(header, visited, root, documentPath);
-        }
+        VisitSchemas(response.Headers.Values.ToArray(), visited, root, documentPath);
 
-        foreach (var schema in response.Content.Values.ToArray().Select(mediaType => mediaType.Schema).OfType<ApiSchema>())
-            VisitSchema(schema, visited, root, documentPath);
+        VisitSchemas(response.Content.Values.Select(mediaType => mediaType.Schema).OfType<ApiSchema>().ToList(), visited, root, documentPath);
     }
 
     private void VisitSchema(ApiSchema schema, HashSet<object> visited, object root, string? documentPath)
@@ -168,56 +163,41 @@ internal sealed class ApiReferenceResolver
             schema.Reference = (ApiSchema)ResolveReference(root, documentPath, schema.ReferencePath, target, append: true);
         }
 
-        if (schema.AdditionalItemsSchema != null)
-            VisitSchema(schema.AdditionalItemsSchema, visited, root, documentPath);
-
-        if (schema.AdditionalPropertiesSchema != null)
-            VisitSchema(schema.AdditionalPropertiesSchema, visited, root, documentPath);
-
-        if (schema.Item != null)
-            VisitSchema(schema.Item, visited, root, documentPath);
-
-        foreach (var item in schema.Items.ToArray())
-            VisitSchema(item, visited, root, documentPath);
-
-        foreach (var item in schema.AllOf.ToArray())
-            VisitSchema(item, visited, root, documentPath);
-
-        foreach (var item in schema.AnyOf.ToArray())
-            VisitSchema(item, visited, root, documentPath);
-
-        foreach (var item in schema.OneOf.ToArray())
-            VisitSchema(item, visited, root, documentPath);
-
-        if (schema.Not != null)
-            VisitSchema(schema.Not, visited, root, documentPath);
-
-        if (schema.DictionaryKey != null)
-            VisitSchema(schema.DictionaryKey, visited, root, documentPath);
+        // Each collection is copied when it is reached, because visiting a schema can resolve references
+        VisitOptionalSchema(schema.AdditionalItemsSchema, visited, root, documentPath);
+        VisitOptionalSchema(schema.AdditionalPropertiesSchema, visited, root, documentPath);
+        VisitOptionalSchema(schema.Item, visited, root, documentPath);
+        VisitSchemas(schema.Items.ToArray(), visited, root, documentPath);
+        VisitSchemas(schema.AllOf.ToArray(), visited, root, documentPath);
+        VisitSchemas(schema.AnyOf.ToArray(), visited, root, documentPath);
+        VisitSchemas(schema.OneOf.ToArray(), visited, root, documentPath);
+        VisitOptionalSchema(schema.Not, visited, root, documentPath);
+        VisitOptionalSchema(schema.DictionaryKey, visited, root, documentPath);
 
         if (schema.DiscriminatorObject != null)
-        {
-            foreach (var mapping in schema.DiscriminatorObject.Mapping.Values.ToArray())
-                VisitSchema(mapping, visited, root, documentPath);
-        }
+            VisitSchemas(schema.DiscriminatorObject.Mapping.Values.ToArray(), visited, root, documentPath);
 
-        foreach (var property in schema.Properties.Values.ToArray())
-            VisitSchema(property, visited, root, documentPath);
-
-        foreach (var property in schema.PatternProperties.Values.ToArray())
-            VisitSchema(property, visited, root, documentPath);
-
-        foreach (var definition in schema.Definitions.Values.ToArray())
-            VisitSchema(definition, visited, root, documentPath);
+        VisitSchemas(schema.Properties.Values.ToArray(), visited, root, documentPath);
+        VisitSchemas(schema.PatternProperties.Values.ToArray(), visited, root, documentPath);
+        VisitSchemas(schema.Definitions.Values.ToArray(), visited, root, documentPath);
 
         if (schema is ApiParameter parameter)
         {
-            if (parameter.Schema != null)
-                VisitSchema(parameter.Schema, visited, root, documentPath);
-
-            if (parameter.CustomSchema != null)
-                VisitSchema(parameter.CustomSchema, visited, root, documentPath);
+            VisitOptionalSchema(parameter.Schema, visited, root, documentPath);
+            VisitOptionalSchema(parameter.CustomSchema, visited, root, documentPath);
         }
+    }
+
+    private void VisitOptionalSchema(ApiSchema? schema, HashSet<object> visited, object root, string? documentPath)
+    {
+        if (schema != null)
+            VisitSchema(schema, visited, root, documentPath);
+    }
+
+    private void VisitSchemas(IEnumerable<ApiSchema> schemas, HashSet<object> visited, object root, string? documentPath)
+    {
+        foreach (var schema in schemas)
+            VisitSchema(schema, visited, root, documentPath);
     }
 
     private object ResolveReference(object root, string? documentPath, string referencePath, ReferenceTarget target, bool append)
@@ -235,30 +215,7 @@ internal sealed class ApiReferenceResolver
                 : resolved;
         }
 
-        string location;
-        if (referencePath.StartsWith("http://", StringComparison.Ordinal) ||
-            referencePath.StartsWith("https://", StringComparison.Ordinal))
-        {
-            location = referencePath;
-        }
-        else if (documentPath != null &&
-                 (documentPath.StartsWith("http://", StringComparison.Ordinal) ||
-                  documentPath.StartsWith("https://", StringComparison.Ordinal)))
-        {
-            location = new Uri(new Uri(documentPath), referencePath).ToString();
-        }
-        else if (documentPath != null)
-        {
-            var parts = Regex.Split(referencePath, "(?=#)", RegexOptions.None, TimeSpan.FromSeconds(1));
-            location = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(documentPath) ?? string.Empty, parts[0])) +
-                       (parts.Length > 1 ? parts[1] : string.Empty);
-        }
-        else
-        {
-            throw new NotSupportedException(
-                "Could not resolve the JSON path '" + referencePath + "' because no document path is available.");
-        }
-
+        var location = GetExternalLocation(documentPath, referencePath);
         try
         {
             var resolved = ResolveExternalReference(location, target);
@@ -278,6 +235,30 @@ internal sealed class ApiReferenceResolver
                 exception);
         }
     }
+
+    /// <summary>The URL or full file path (with any JSON pointer) of a reference to another document.</summary>
+    private static string GetExternalLocation(string? documentPath, string referencePath)
+    {
+        if (IsHttp(referencePath))
+            return referencePath;
+
+        if (documentPath != null && IsHttp(documentPath))
+            return new Uri(new Uri(documentPath), referencePath).ToString();
+
+        if (documentPath == null)
+        {
+            throw new NotSupportedException(
+                "Could not resolve the JSON path '" + referencePath + "' because no document path is available.");
+        }
+
+        var parts = Regex.Split(referencePath, "(?=#)", RegexOptions.None, TimeSpan.FromSeconds(1));
+        return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(documentPath) ?? string.Empty, parts[0])) +
+               (parts.Length > 1 ? parts[1] : string.Empty);
+    }
+
+    private static bool IsHttp(string path) =>
+        path.StartsWith("http://", StringComparison.Ordinal) ||
+        path.StartsWith("https://", StringComparison.Ordinal);
 
     /// <summary>Reads a JSON object that was kept as-is (e.g. extension data) as the referenced kind of object.</summary>
     private object ReadRawObject(RawJsonObject rawObject, ReferenceTarget target)
@@ -393,74 +374,84 @@ internal sealed class ApiReferenceResolver
         if (extensionData != null)
             return extensionData;
 
-        switch (node)
+        return node switch
         {
-            case ApiDocument apiDocument:
-                return GetDocumentChild(apiDocument, segment);
-            case ApiComponents components:
-                return segment switch
-                {
-                    "schemas" => components.Schemas,
-                    "requestBodies" => components.RequestBodies,
-                    "responses" => components.Responses,
-                    OpenApiKeywords.Parameters => components.Parameters,
-                    "headers" => components.Headers,
-                    "securitySchemes" => components.SecuritySchemes,
-                    _ => null,
-                };
-            case ApiPathItem pathItem:
-                if (pathItem.TryGetValue(segment, out var operation))
-                    return operation;
-
-                return segment == OpenApiKeywords.Parameters ? pathItem.Parameters : GetExtensionData(pathItem.ExtensionData, segment);
-            case ApiOperation apiOperation:
-                return segment switch
-                {
-                    OpenApiKeywords.Parameters => apiOperation.Parameters,
-                    "requestBody" => apiOperation.RequestBody,
-                    "responses" => apiOperation.Responses,
-                    _ => GetExtensionData(apiOperation.ExtensionData, segment),
-                };
-            case ApiRequestBody requestBody:
-                return segment == "content" ? requestBody.Content : null;
-            case ApiRequestBodyContent content:
-                return content.TryGetValue(segment, out var requestMediaType) ? requestMediaType : null;
-            case ApiMediaType mediaType:
-                return segment == "schema" ? mediaType.Schema : null;
-            case ApiResponse response:
-                return segment switch
-                {
-                    "content" => response.Content,
-                    "schema" => response.Schema,
-                    "headers" => response.Headers,
-                    _ => GetExtensionData(response.ExtensionData, segment),
-                };
-            case ApiDiscriminator discriminator:
-                return segment == "mapping" ? discriminator.Mapping : null;
-            case ApiSchema schema:
-                return GetSchemaChild(schema, segment);
-            case RawJsonObject rawObject:
-                return rawObject.TryGetValue(segment, out var rawValue) ? rawValue : null;
-            case RawJsonArray rawArray:
-                return int.TryParse(segment, out var rawIndex) && rawIndex < rawArray.Items.Count ? rawArray.Items[rawIndex] : null;
-            case ApiSchemaDictionary schemaDictionary:
-                return schemaDictionary.TryGetValue(segment, out var namedSchema) ? namedSchema : null;
-            case ApiSchemaPropertyDictionary propertyDictionary:
-                return propertyDictionary.TryGetValue(segment, out var property) ? property : null;
-            case System.Collections.IDictionary dictionary:
-                return dictionary.Contains(segment) ? dictionary[segment] : null;
-            case System.Collections.IEnumerable enumerable:
-                if (int.TryParse(segment, out var index))
-                {
-                    var items = enumerable.Cast<object>().ToArray();
-                    return items.Length > index ? items[index] : null;
-                }
-
-                return null;
-            default:
-                return null;
-        }
+            ApiDocument apiDocument => GetDocumentChild(apiDocument, segment),
+            ApiComponents components => GetComponentsChild(components, segment),
+            ApiPathItem pathItem => GetPathItemChild(pathItem, segment),
+            ApiOperation apiOperation => GetOperationChild(apiOperation, segment),
+            ApiResponse response => GetResponseChild(response, segment),
+            ApiSchema schema => GetSchemaChild(schema, segment),
+            _ => GetPartChild(node, segment),
+        };
     }
+
+    private static object? GetComponentsChild(ApiComponents components, string segment) =>
+        segment switch
+        {
+            "schemas" => components.Schemas,
+            "requestBodies" => components.RequestBodies,
+            "responses" => components.Responses,
+            OpenApiKeywords.Parameters => components.Parameters,
+            "headers" => components.Headers,
+            "securitySchemes" => components.SecuritySchemes,
+            _ => null,
+        };
+
+    private static object? GetPathItemChild(ApiPathItem pathItem, string segment)
+    {
+        if (pathItem.TryGetValue(segment, out var operation))
+            return operation;
+
+        return segment == OpenApiKeywords.Parameters ? pathItem.Parameters : GetExtensionData(pathItem.ExtensionData, segment);
+    }
+
+    private static object? GetOperationChild(ApiOperation apiOperation, string segment) =>
+        segment switch
+        {
+            OpenApiKeywords.Parameters => apiOperation.Parameters,
+            "requestBody" => apiOperation.RequestBody,
+            "responses" => apiOperation.Responses,
+            _ => GetExtensionData(apiOperation.ExtensionData, segment),
+        };
+
+    private static object? GetResponseChild(ApiResponse response, string segment) =>
+        segment switch
+        {
+            "content" => response.Content,
+            "schema" => response.Schema,
+            "headers" => response.Headers,
+            _ => GetExtensionData(response.ExtensionData, segment),
+        };
+
+    /// <summary>The child of the smaller parts of a document, or of a collection.</summary>
+    private static object? GetPartChild(object node, string segment) =>
+        node switch
+        {
+            ApiRequestBody requestBody => segment == "content" ? requestBody.Content : null,
+            ApiRequestBodyContent content => content.TryGetValue(segment, out var mediaType) ? mediaType : null,
+            ApiMediaType mediaType => segment == "schema" ? mediaType.Schema : null,
+            ApiDiscriminator discriminator => segment == "mapping" ? discriminator.Mapping : null,
+            _ => GetCollectionChild(node, segment),
+        };
+
+    private static object? GetCollectionChild(object node, string segment) =>
+        node switch
+        {
+            RawJsonObject rawObject => rawObject.TryGetValue(segment, out var rawValue) ? rawValue : null,
+            RawJsonArray rawArray => GetItem(rawArray.Items, segment),
+            ApiSchemaDictionary schemaDictionary => GetValue(schemaDictionary, segment),
+            ApiSchemaPropertyDictionary propertyDictionary => GetValue(propertyDictionary, segment),
+            System.Collections.IDictionary dictionary => dictionary.Contains(segment) ? dictionary[segment] : null,
+            System.Collections.IEnumerable enumerable => GetItem(enumerable.Cast<object?>().ToArray(), segment),
+            _ => null,
+        };
+
+    private static object? GetValue<T>(IDictionary<string, T> dictionary, string segment) =>
+        dictionary.TryGetValue(segment, out var value) ? value : null;
+
+    private static object? GetItem(IList<object?> items, string segment) =>
+        int.TryParse(segment, out var index) && index < items.Count ? items[index] : null;
 
     private static object? GetDocumentChild(ApiDocument apiDocument, string segment)
     {
@@ -491,37 +482,29 @@ internal sealed class ApiReferenceResolver
         if (extensionData != null)
             return extensionData;
 
-        if (schema is ApiParameter parameter)
-        {
-            switch (segment)
-            {
-                case "schema":
-                    return parameter.Schema;
-                case "x-schema":
-                    return parameter.CustomSchema;
-            }
-        }
+        if (schema is ApiParameter parameter && segment is "schema" or "x-schema")
+            return segment == "schema" ? parameter.Schema : parameter.CustomSchema;
 
         switch (segment)
         {
             case "properties":
-                return schema.Properties.Count > 0 ? schema.Properties : null;
+                return NonEmpty(schema.Properties);
             case "patternProperties":
-                return schema.PatternProperties.Count > 0 ? schema.PatternProperties : null;
+                return NonEmpty(schema.PatternProperties);
             case "definitions":
-                return schema.Definitions.Count > 0 ? schema.Definitions : null;
+                return NonEmpty(schema.Definitions);
             case "items":
-                return (object?)schema.Item ?? (schema.Items.Count > 0 ? schema.Items : null);
+                return (object?)schema.Item ?? NonEmpty(schema.Items);
             case "additionalProperties":
                 return schema.AdditionalPropertiesSchema;
             case "additionalItems":
                 return schema.AdditionalItemsSchema;
             case "allOf":
-                return schema.AllOf.Count > 0 ? schema.AllOf : null;
+                return NonEmpty(schema.AllOf);
             case "anyOf":
-                return schema.AnyOf.Count > 0 ? schema.AnyOf : null;
+                return NonEmpty(schema.AnyOf);
             case "oneOf":
-                return schema.OneOf.Count > 0 ? schema.OneOf : null;
+                return NonEmpty(schema.OneOf);
             case "not":
                 return schema.Not;
             case "x-dictionaryKey":
@@ -539,6 +522,8 @@ internal sealed class ApiReferenceResolver
         var segments = path.Split(PathSeparators);
         return segments[segments.Length - 1].Split('.')[0];
     }
+
+    private static object? NonEmpty<T>(ICollection<T> collection) => collection.Count > 0 ? collection : null;
 
     private static object? GetExtensionData(Dictionary<string, object?>? extensionData, string segment) =>
         extensionData != null && extensionData.TryGetValue(segment, out var value) ? value : null;
@@ -651,44 +636,27 @@ internal sealed class ApiReferenceResolver
         return resolved;
     }
 
-    private static IEnumerable<ApiSchema> GetChildSchemas(ApiSchema schema)
-    {
-        if (schema.AdditionalItemsSchema != null)
-            yield return schema.AdditionalItemsSchema;
-        if (schema.AdditionalPropertiesSchema != null)
-            yield return schema.AdditionalPropertiesSchema;
-        if (schema.Item != null)
-            yield return schema.Item;
-        foreach (var item in schema.Items)
-            yield return item;
-        foreach (var item in schema.AllOf)
-            yield return item;
-        foreach (var item in schema.AnyOf)
-            yield return item;
-        foreach (var item in schema.OneOf)
-            yield return item;
-        if (schema.Not != null)
-            yield return schema.Not;
-        if (schema.DictionaryKey != null)
-            yield return schema.DictionaryKey;
-        if (schema.DiscriminatorObject != null)
-        {
-            foreach (var mapping in schema.DiscriminatorObject.Mapping.Values)
-                yield return mapping;
-        }
+    private static IEnumerable<ApiSchema> GetChildSchemas(ApiSchema schema) =>
+        EnumerateChildSchemas(schema).OfType<ApiSchema>();
 
-        foreach (var property in schema.Properties.Values)
-            yield return property;
-        foreach (var property in schema.PatternProperties.Values)
+    private static IEnumerable<ApiSchema?> EnumerateChildSchemas(ApiSchema schema)
+    {
+        yield return schema.AdditionalItemsSchema;
+        yield return schema.AdditionalPropertiesSchema;
+        yield return schema.Item;
+        foreach (var item in schema.Items.Concat(schema.AllOf).Concat(schema.AnyOf).Concat(schema.OneOf))
+            yield return item;
+        yield return schema.Not;
+        yield return schema.DictionaryKey;
+        foreach (var mapping in schema.DiscriminatorObject?.Mapping.Values ?? Enumerable.Empty<ApiSchema>())
+            yield return mapping;
+        foreach (var property in schema.Properties.Values.Concat<ApiSchema>(schema.PatternProperties.Values))
             yield return property;
         foreach (var definition in schema.Definitions.Values)
             yield return definition;
-        if (schema is ApiParameter parameter)
-        {
-            if (parameter.Schema != null)
-                yield return parameter.Schema;
-            if (parameter.CustomSchema != null)
-                yield return parameter.CustomSchema;
-        }
+
+        var parameter = schema as ApiParameter;
+        yield return parameter?.Schema;
+        yield return parameter?.CustomSchema;
     }
 }
