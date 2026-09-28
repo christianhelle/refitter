@@ -269,7 +269,7 @@ internal sealed class SpecRuleValidator
         if (parameter.In == SpecParameterLocation.Path && !parameter.Required)
             ErrorAt(OpenApiNames.Required, "\"required\" must be true when parameter location is \"path\"");
 
-        var encodedName = string.IsNullOrEmpty(parameter.Name) ? string.Empty : parameter.Name!.Replace("~", "~0").Replace("/", "~1");
+        var encodedName = parameter.Name is not { Length: > 0 } name ? string.Empty : name.Replace("~", "~0").Replace("/", "~1");
         if (parameter.In == SpecParameterLocation.Path
             && !PathString.Contains("{" + encodedName + "}")
             && !PathString.Contains("#/components"))
@@ -345,22 +345,22 @@ internal sealed class SpecRuleValidator
             Within(OpenApiNames.Schema, () => Walk(mediaType.Schema));
 
         if (mediaType.Encoding != null)
-        {
-            Within("encoding", () =>
-            {
-                foreach (var encoding in mediaType.Encoding)
-                {
-                    if (encoding.Value?.Headers == null)
-                        continue;
+            Within("encoding", () => WalkEncodings(mediaType.Encoding));
+    }
 
-                    Within(encoding.Key, () =>
-                    {
-                        foreach (var header in encoding.Value.Headers)
-                        {
-                            if (header.Value != null)
-                                Within(header.Key, () => Walk(header.Value));
-                        }
-                    });
+    private void WalkEncodings(Dictionary<string, SpecEncoding?> encodings)
+    {
+        foreach (var encoding in encodings)
+        {
+            if (encoding.Value?.Headers is not { } headers)
+                continue;
+
+            Within(encoding.Key, () =>
+            {
+                foreach (var header in headers)
+                {
+                    if (header.Value != null)
+                        Within(header.Key, () => Walk(header.Value));
                 }
             });
         }
