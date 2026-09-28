@@ -13,6 +13,8 @@ namespace Refitter.Core;
 /// </remarks>
 internal sealed class ApiReferenceResolver
 {
+    private static readonly char[] PathSeparators = ['/', '\\'];
+
     private readonly ApiDocument document;
     private readonly Func<string, string> loadUrl;
     private readonly Dictionary<string, ExternalDocument> externalDocuments = new(StringComparer.Ordinal);
@@ -268,7 +270,7 @@ internal sealed class ApiReferenceResolver
             var resolved = ResolveExternalReference(location, target);
             if (append && resolved is ApiSchema schema && !document.Definitions.Values.Contains(schema))
             {
-                var typeNameHint = referencePath.Split('/', '\\').Last().Split('.').First();
+                var typeNameHint = GetTypeNameHint(referencePath);
                 var key = typeNameGenerator.Generate(schema, typeNameHint, document.Definitions.Keys);
                 document.Definitions[key] = schema;
             }
@@ -537,6 +539,13 @@ internal sealed class ApiReferenceResolver
         }
     }
 
+    /// <summary>The last segment of a path or pointer, without its file extension.</summary>
+    private static string GetTypeNameHint(string path)
+    {
+        var segments = path.Split(PathSeparators);
+        return segments[segments.Length - 1].Split('.')[0];
+    }
+
     private static object? GetExtensionData(Dictionary<string, object?>? extensionData, string segment) =>
         extensionData != null && extensionData.TryGetValue(segment, out var value) ? value : null;
 
@@ -640,7 +649,7 @@ internal sealed class ApiReferenceResolver
         var resolved = (ApiSchema)root.Document.Resolve(pointer, target, root.Resolver);
         if (!document.Definitions.Values.Contains(resolved))
         {
-            var typeNameHint = pointer.Split('/', '\\').Last().Split('.').First();
+            var typeNameHint = GetTypeNameHint(pointer);
             var key = typeNameGenerator.Generate(resolved, typeNameHint, document.Definitions.Keys);
             document.Definitions[key] = resolved;
         }

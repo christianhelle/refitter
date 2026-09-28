@@ -365,7 +365,7 @@ internal class ApiSchema
             if (withObjectType != null)
                 return withObjectType.ActualSchema;
 
-            return AllOf.FirstOrDefault()?.ActualSchema;
+            return AllOf[0].ActualSchema;
         }
     }
 

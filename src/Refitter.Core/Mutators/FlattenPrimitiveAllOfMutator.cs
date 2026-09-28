@@ -21,7 +21,7 @@ internal sealed class FlattenPrimitiveAllOfMutator : IDocumentMutator
             return;
         }
 
-        var inner = schema.AllOf.First().ActualSchema;
+        var inner = schema.AllOf[0].ActualSchema;
         if (!IsPrimitive(inner.Type))
             return;
 
