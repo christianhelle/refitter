@@ -20,12 +20,14 @@ internal static class DependencyInjectionGenerator
 
         newLine ??= Environment.NewLine;
 
+        void AppendGeneratedLine(string value = "") => code.Append(value).Append(newLine);
+
         var baseUrlParam = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? $"        /// <param name=\"baseUrl\">The base URL for the API clients.</param>{newLine}        "
             : string.Empty;
 
         var methodDocs = xmlDocComments
-            ? Normalize(
+            ? NormalizeLineEndings(
                 $"""
                  /// <summary>
                          /// Configures the Refit clients for dependency injection.
@@ -35,7 +37,8 @@ internal static class DependencyInjectionGenerator
                          /// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
                          /// <returns>The configured service collection.</returns>
                  {indent}{indent}
-                 """)
+                 """,
+                newLine)
             : "";
 
         var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
@@ -77,9 +80,9 @@ internal static class DependencyInjectionGenerator
             },
             newLine);
 
-        code.AppendLine();
-        code.AppendLine();
-        code.AppendLine(
+        AppendGeneratedLine();
+        AppendGeneratedLine();
+        AppendGeneratedLine(
             NormalizeLineEndings(
                 $$""""
                   #nullable enable
@@ -113,18 +116,18 @@ internal static class DependencyInjectionGenerator
 
             foreach (string httpMessageHandler in iocSettings.HttpMessageHandlers)
             {
-                code.AppendLine();
+                AppendGeneratedLine();
                 code.Append($"                .AddHttpMessageHandler<{httpMessageHandler}>()");
             }
 
             code.Append(";");
-            code.AppendLine();
+            AppendGeneratedLine();
 
             if (iocSettings.TransientErrorHandler == TransientErrorHandler.Polly)
             {
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
-                code.AppendLine();
-                code.AppendLine(
+                AppendGeneratedLine();
+                AppendGeneratedLine(
                     NormalizeLineEndings(
                         $$"""
                                       {{clientBuilderName}}
@@ -141,8 +144,8 @@ internal static class DependencyInjectionGenerator
             else if (iocSettings.TransientErrorHandler == TransientErrorHandler.HttpResilience)
             {
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
-                code.AppendLine();
-                code.AppendLine(
+                AppendGeneratedLine();
+                AppendGeneratedLine(
                     NormalizeLineEndings(
                         $$"""
                                       {{clientBuilderName}}
@@ -159,20 +162,20 @@ internal static class DependencyInjectionGenerator
                         newLine));
             }
 
-            code.AppendLine();
-            code.AppendLine($"            builder?.Invoke({clientBuilderName});");
-            code.AppendLine();
+            AppendGeneratedLine();
+            AppendGeneratedLine($"            builder?.Invoke({clientBuilderName});");
+            AppendGeneratedLine();
         }
 
 #pragma warning disable RS1035
-        code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
+        code.Remove(code.Length - newLine.Length, newLine.Length);
 #pragma warning restore RS1035
-        code.AppendLine();
-        code.AppendLine("            return services;");
-        code.AppendLine("        }");
-        code.AppendLine("    }");
-        code.AppendLine("}");
-        code.AppendLine();
+        AppendGeneratedLine();
+        AppendGeneratedLine("            return services;");
+        AppendGeneratedLine("        }");
+        AppendGeneratedLine("    }");
+        AppendGeneratedLine("}");
+        AppendGeneratedLine();
         return code.ToString();
     }
 
