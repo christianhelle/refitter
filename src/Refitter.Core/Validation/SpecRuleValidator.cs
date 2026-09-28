@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Text.RegularExpressions;
 using Refitter.Core.Validation.Model;
 

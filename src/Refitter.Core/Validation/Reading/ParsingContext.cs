@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Text;
 using System.Text.Json.Nodes;
 using Refitter.Core.Validation.Model;

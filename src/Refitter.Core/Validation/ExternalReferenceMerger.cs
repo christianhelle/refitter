@@ -1,3 +1,5 @@
+#nullable enable
+
 using Refitter.Core.Validation.Model;
 using Refitter.Core.Validation.Reading;
 
