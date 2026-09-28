@@ -72,8 +72,7 @@ internal static class SchemaReferences
             return null;
         }
 
-        var visited = new Stack<SpecSchema>();
-        return ResolveSubSchema(component, segments.Skip(3).ToArray(), visited);
+        return ResolveSubSchema(component, segments.Skip(3).ToArray());
     }
 
     private static bool IsSubComponent(string reference)
@@ -84,16 +83,12 @@ internal static class SchemaReferences
                && fragment.Split(['/'], StringSplitOptions.RemoveEmptyEntries).Length > 3;
     }
 
-    private static SpecSchema? ResolveSubSchema(SpecSchema schema, string[] path, Stack<SpecSchema> visited)
+    /// <summary>
+    /// Follows a path such as <c>properties/name</c> down from a component. The reader only builds trees, so
+    /// unlike Microsoft.OpenApi this needs no check for revisiting a schema.
+    /// </summary>
+    private static SpecSchema? ResolveSubSchema(SpecSchema schema, string[] path)
     {
-        if (visited.Contains(schema))
-        {
-            throw new InvalidOperationException(schema.Reference != null
-                ? "Circular reference detected while resolving schema: " + ReferenceV3(schema.Reference)
-                : "Circular reference detected while resolving schema");
-        }
-
-        visited.Push(schema);
         if (path.Length == 0)
             return schema;
 
@@ -103,14 +98,14 @@ internal static class SchemaReferences
         {
             case "properties":
                 if (schema.Properties != null && schema.Properties.TryGetValue(path[0], out var property) && property != null)
-                    return ResolveSubSchema(property, path.Skip(1).ToArray(), visited);
+                    return ResolveSubSchema(property, path.Skip(1).ToArray());
 
                 break;
             case "items":
-                return schema.Items is { Reference: null } items ? ResolveSubSchema(items, path, visited) : null;
+                return schema.Items is { Reference: null } items ? ResolveSubSchema(items, path) : null;
             case "additionalProperties":
                 return schema.AdditionalProperties is { Reference: null } additionalProperties
-                    ? ResolveSubSchema(additionalProperties, path, visited)
+                    ? ResolveSubSchema(additionalProperties, path)
                     : null;
             case "allOf":
             case "anyOf":
@@ -125,7 +120,7 @@ internal static class SchemaReferences
                     _ => schema.OneOf,
                 };
                 if (schemas != null && index < schemas.Count)
-                    return ResolveSubSchema(schemas[index], path.Skip(1).ToArray(), visited);
+                    return ResolveSubSchema(schemas[index], path.Skip(1).ToArray());
 
                 break;
         }
