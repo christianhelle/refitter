@@ -145,7 +145,7 @@ internal class SchemaCleaner
                 }
             }
 
-            foreach (var p in op.ActualParameters)
+            foreach (var p in op.GetActualParameters())
             {
                 yield return p;
             }

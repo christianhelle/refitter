@@ -48,7 +48,7 @@ internal static class SchemaWalker
                 if (operation == null)
                     continue;
 
-                foreach (var parameter in operation.ActualParameters)
+                foreach (var parameter in operation.GetActualParameters())
                     yield return parameter;
 
                 if (operation.RequestBody?.Content != null)

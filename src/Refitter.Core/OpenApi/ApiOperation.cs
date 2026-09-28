@@ -151,8 +151,6 @@ internal sealed class ApiOperation
 
     public List<ApiSecurityRequirement> ActualSecurity => Security ?? Parent!.Parent!.Security;
 
-    public IReadOnlyList<ApiParameter> ActualParameters => GetActualParameters().ToList();
-
     public IReadOnlyDictionary<string, ApiResponse> ActualResponses =>
         Responses.ToDictionary(r => r.Key, r => r.Value.ActualResponse);
 

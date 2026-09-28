@@ -127,10 +127,9 @@ internal sealed class ClassTemplateModel
 
     public bool IsTuple => schema.ActualTypeSchema.IsTuple;
 
-    public string[] TupleTypes =>
+    public IEnumerable<string> TupleTypes =>
         schema.ActualTypeSchema.Items
-            .Select(i => resolver.Resolve(i, i.IsNullable(settings.SchemaType), string.Empty))
-            .ToArray();
+            .Select(i => resolver.Resolve(i, i.IsNullable(settings.SchemaType), string.Empty));
 
     public bool HasInheritance => schema.InheritedTypeSchema != null;
 
@@ -674,7 +673,7 @@ internal sealed class ContractFileTemplateModel(
                 return false;
 
             var operations = document.GetOperations().ToList();
-            return operations.Any(o => o.Operation.ActualParameters.Any(p => p.ActualTypeSchema.IsBinary)) ||
+            return operations.Any(o => o.Operation.GetActualParameters().Any(p => p.ActualTypeSchema.IsBinary)) ||
                    operations.Any(o => HasBinaryContent(o.Operation.ActualRequestBody));
         }
     }
