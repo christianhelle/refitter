@@ -55,7 +55,27 @@ internal sealed class OpenApiV2Reader
 
     public OpenApiV2Reader()
     {
-        documentFields = new FieldMap<SpecDocument>()
+        documentFields = CreateDocumentFields();
+        infoFields = CreateInfoFields();
+        contactFields = CreateContactFields();
+        licenseFields = CreateLicenseFields();
+        pathsFields = CreatePathsFields();
+        pathItemFields = CreatePathItemFields();
+        operationFields = CreateOperationFields();
+        responsesFields = CreateResponsesFields();
+        parameterFields = CreateParameterFields();
+        responseFields = CreateResponseFields();
+        headerFields = CreateHeaderFields();
+        schemaFields = CreateSchemaFields();
+        xmlFields = CreateXmlFields();
+        securitySchemeFields = CreateSecuritySchemeFields();
+        tagFields = CreateTagFields();
+        externalDocsFields = CreateExternalDocsFields();
+    }
+
+    private FieldMap<SpecDocument> CreateDocumentFields()
+    {
+        var fields = new FieldMap<SpecDocument>()
             .Field("swagger", (_, _, _) => { })
             .Field("info", (o, n, c) => o.Info = LoadInfo(n, c))
             .Field("host", (_, n, c) => c.SetTempStorage("host", n.GetScalarValue()))
@@ -106,7 +126,12 @@ internal sealed class OpenApiV2Reader
             .Field(OpenApiNames.ExternalDocs, (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c))
             .Extensions();
 
-        infoFields = new FieldMap<SpecInfo>()
+        return fields;
+    }
+
+    private FieldMap<SpecInfo> CreateInfoFields()
+    {
+        var fields = new FieldMap<SpecInfo>()
             .Field("title", (o, n, _) => o.Title = n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("termsOfService", (_, n, _) => ReadUri(n))
@@ -115,22 +140,42 @@ internal sealed class OpenApiV2Reader
             .Field("version", (o, n, _) => o.Version = n.GetScalarValue())
             .Extensions();
 
-        contactFields = new FieldMap<SpecContact>()
+        return fields;
+    }
+
+    private static FieldMap<SpecContact> CreateContactFields()
+    {
+        var fields = new FieldMap<SpecContact>()
             .Field("name", (_, n, _) => n.GetScalarValue())
             .Field("url", (_, n, _) => ReadUri(n))
             .Field("email", (o, n, _) => o.Email = n.GetScalarValue())
             .Extensions();
 
-        licenseFields = new FieldMap<SpecLicense>()
+        return fields;
+    }
+
+    private static FieldMap<SpecLicense> CreateLicenseFields()
+    {
+        var fields = new FieldMap<SpecLicense>()
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
             .Field("url", (_, n, _) => ReadUri(n))
             .Extensions();
 
-        pathsFields = new FieldMap<SpecPaths>()
+        return fields;
+    }
+
+    private FieldMap<SpecPaths> CreatePathsFields()
+    {
+        var fields = new FieldMap<SpecPaths>()
             .Pattern(s => s.StartsWith("/", StringComparison.OrdinalIgnoreCase), (o, k, n, c) => o.Add(k, LoadPathItem(n, c)))
             .Extensions();
 
-        pathItemFields = new FieldMap<SpecPathItem>()
+        return fields;
+    }
+
+    private FieldMap<SpecPathItem> CreatePathItemFields()
+    {
+        var fields = new FieldMap<SpecPathItem>()
             .Field("get", (o, n, c) => o.AddOperation("get", LoadOperation(n, c)))
             .Field("put", (o, n, c) => o.AddOperation("put", LoadOperation(n, c)))
             .Field("post", (o, n, c) => o.AddOperation("post", LoadOperation(n, c)))
@@ -141,7 +186,12 @@ internal sealed class OpenApiV2Reader
             .Field(OpenApiNames.Parameters, LoadPathParameters)
             .Extensions();
 
-        operationFields = new FieldMap<SpecOperation>()
+        return fields;
+    }
+
+    private FieldMap<SpecOperation> CreateOperationFields()
+    {
+        var fields = new FieldMap<SpecOperation>()
             .Field("tags", (_, n, c) => n.CreateSimpleList("OpenApiTagReference", item => item.GetScalarValue(), c))
             .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
@@ -159,11 +209,21 @@ internal sealed class OpenApiV2Reader
             })
             .Extensions();
 
-        responsesFields = new FieldMap<SpecResponses>()
+        return fields;
+    }
+
+    private FieldMap<SpecResponses> CreateResponsesFields()
+    {
+        var fields = new FieldMap<SpecResponses>()
             .Pattern(s => !FieldMap<SpecResponses>.IsExtension(s), (o, p, n, c) => o.Add(p, LoadResponse(n, c)))
             .Extensions();
 
-        parameterFields = new FieldMap<SpecParameter>()
+        return fields;
+    }
+
+    private FieldMap<SpecParameter> CreateParameterFields()
+    {
+        var fields = new FieldMap<SpecParameter>()
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
             .Field("in", ProcessIn)
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
@@ -225,7 +285,12 @@ internal sealed class OpenApiV2Reader
                 s => FieldMap<SpecParameter>.IsExtension(s) && !s.Equals(OpenApiNames.XExamples, StringComparison.OrdinalIgnoreCase),
                 (_, _, _, _) => { });
 
-        responseFields = new FieldMap<SpecResponse>()
+        return fields;
+    }
+
+    private FieldMap<SpecResponse> CreateResponseFields()
+    {
+        var fields = new FieldMap<SpecResponse>()
             .Field(OpenApiNames.Description, (o, n, _) => o.Description = n.GetScalarValue())
             .Field("headers", (o, n, c) => o.Headers = n.CreateMap("IOpenApiHeader", LoadHeader, c))
             .Field(OpenApiNames.Examples, LoadExamples)
@@ -235,7 +300,12 @@ internal sealed class OpenApiV2Reader
                 s => FieldMap<SpecResponse>.IsExtension(s) && !s.Equals(OpenApiNames.XExamples, StringComparison.OrdinalIgnoreCase),
                 (_, _, _, _) => { });
 
-        headerFields = new FieldMap<SpecHeader>()
+        return fields;
+    }
+
+    private FieldMap<SpecHeader> CreateHeaderFields()
+    {
+        var fields = new FieldMap<SpecHeader>()
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("type", (o, n, _) =>
             {
@@ -305,7 +375,12 @@ internal sealed class OpenApiV2Reader
             })
             .Extensions();
 
-        schemaFields = new FieldMap<SpecSchema>()
+        return fields;
+    }
+
+    private FieldMap<SpecSchema> CreateSchemaFields()
+    {
+        var fields = new FieldMap<SpecSchema>()
             .Field("title", (_, n, _) => n.GetScalarValue())
             .Field("multipleOf", (_, n, _) =>
             {
@@ -351,7 +426,12 @@ internal sealed class OpenApiV2Reader
             .Field("x-jsonschema-patternProperties", (_, n, c) => n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
             .Extensions();
 
-        xmlFields = new FieldMap<object>()
+        return fields;
+    }
+
+    private static FieldMap<object> CreateXmlFields()
+    {
+        var fields = new FieldMap<object>()
             .Field("name", (_, n, _) => n.GetScalarValue())
             .Field("namespace", (_, n, _) =>
             {
@@ -366,7 +446,12 @@ internal sealed class OpenApiV2Reader
             .Field("wrapped", (_, n, _) => ReadBool(n))
             .Extensions();
 
-        securitySchemeFields = new FieldMap<SpecSecurityScheme>()
+        return fields;
+    }
+
+    private static FieldMap<SpecSecurityScheme> CreateSecuritySchemeFields()
+    {
+        var fields = new FieldMap<SpecSecurityScheme>()
             .Field("type", (o, n, c) =>
             {
                 var type = n.GetScalarValue();
@@ -412,16 +497,28 @@ internal sealed class OpenApiV2Reader
                 .ToDictionary(scope => scope.Key, scope => scope.Value!, StringComparer.Ordinal))
             .Extensions();
 
-        tagFields = new FieldMap<SpecTag>()
+        return fields;
+    }
+
+    private FieldMap<SpecTag> CreateTagFields()
+    {
+        var fields = new FieldMap<SpecTag>()
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field(OpenApiNames.ExternalDocs, (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c))
             .Extensions();
 
-        externalDocsFields = new FieldMap<SpecExternalDocs>()
+        return fields;
+    }
+
+    private static FieldMap<SpecExternalDocs> CreateExternalDocsFields()
+    {
+        var fields = new FieldMap<SpecExternalDocs>()
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("url", (o, n, _) => o.Url = ReadUri(n))
             .Extensions();
+
+        return fields;
     }
 
     public SpecDocument LoadDocument(JsonNode jsonNode, ParsingContext context)
