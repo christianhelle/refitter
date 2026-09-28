@@ -441,46 +441,42 @@ internal sealed class ApiResponse
 
     public bool IsBinary(ApiOperation operation)
     {
-        foreach (var response in operation.Responses)
-        {
-            var statusCode = response.Key;
-            var actualResponse = response.Value.ActualResponse;
-            if (actualResponse != this || statusCode == "204")
-                continue;
+        // The first response of the operation that is this one decides
+        var isResponseOfOperation = operation.Responses.Any(response =>
+            response.Value.ActualResponse == this && response.Key != "204");
 
-            if (ActualResponse.Content.Count > 0)
+        return isResponseOfOperation && IsBinaryResponse();
+    }
+
+    private bool IsBinaryResponse()
+    {
+        if (ActualResponse.Content.Count > 0 && HasBinaryContent())
+            return true;
+
+        var produces = (ActualResponse.Parent as ApiOperation)?.ActualProduces;
+        if (produces == null || produces.Count <= 0)
+            return false;
+
+        if (Schema?.ActualSchema.IsBinary == true)
+            return true;
+
+        if (Schema != null && !Schema.ActualSchema.IsAnyType && !Schema.ActualSchema.IsBinary)
+            return false;
+
+        return ProducesBinary(produces);
+    }
+
+    private bool HasBinaryContent()
+    {
+        if (ActualResponse.Content.All(c => c.Value.Schema?.ActualSchema.IsBinary ?? false))
+            return true;
+
+        return ActualResponse.Content.All(c =>
             {
-                if (ActualResponse.Content.All(c => c.Value.Schema?.ActualSchema.IsBinary ?? false))
-                    return true;
-
-                if (ActualResponse.Content.All(c =>
-                    {
-                        var schema = c.Value.Schema?.ActualSchema;
-                        return schema == null || schema.IsAnyType || schema.IsBinary;
-                    }) &&
-                    ProducesBinary(ActualResponse.Content.Keys))
-                {
-                    return true;
-                }
-            }
-
-            var produces = (ActualResponse.Parent as ApiOperation)?.ActualProduces;
-            if (produces == null || produces.Count <= 0)
-                break;
-
-            if (Schema?.ActualSchema.IsBinary == true)
-                return true;
-
-            if (Schema != null && !Schema.ActualSchema.IsAnyType && !Schema.ActualSchema.IsBinary)
-                break;
-
-            if (ProducesBinary(produces))
-                return true;
-
-            break;
-        }
-
-        return false;
+                var schema = c.Value.Schema?.ActualSchema;
+                return schema == null || schema.IsAnyType || schema.IsBinary;
+            }) &&
+            ProducesBinary(ActualResponse.Content.Keys);
     }
 
     public bool IsEmpty(ApiOperation operation) =>

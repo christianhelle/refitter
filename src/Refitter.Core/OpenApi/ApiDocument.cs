@@ -89,6 +89,15 @@ internal sealed class ApiDocument
 
         operations = operations.Where(o => duplicatedOperationIds.Contains(o.Operation.OperationId!)).ToList();
 
+        AppendAllToArrayOperations(operations);
+        AppendMethods(operations);
+        if (AppendCounterToFirstDuplicates(operations))
+            GenerateOperationIds(operations, operationIds, duplicatedOperationIds);
+    }
+
+    /// <summary>Tells duplicates apart by appending "All" to the ones that return arrays.</summary>
+    private static void AppendAllToArrayOperations(List<ApiOperationDescription> operations)
+    {
         foreach (var group in operations.GroupBy(o => o.Operation.OperationId))
         {
             if (group.Count() <= 1)
@@ -101,7 +110,11 @@ internal sealed class ApiDocument
             foreach (var operation in arrayResponses)
                 operation.Operation.OperationId += "All";
         }
+    }
 
+    /// <summary>Tells duplicates apart by appending their HTTP methods, when these differ.</summary>
+    private static void AppendMethods(List<ApiOperationDescription> operations)
+    {
         foreach (var group in operations.GroupBy(o => o.Operation.OperationId))
         {
             if (group.Count() <= 1)
@@ -111,26 +124,24 @@ internal sealed class ApiDocument
                 continue;
 
             foreach (var operation in group)
-            {
                 operation.Operation.OperationId += operation.Method.ToUpperInvariant();
-            }
         }
+    }
 
-        foreach (var group in operations.GroupBy(o => o.Operation.OperationId))
-        {
-            var list = group.ToList();
-            if (group.Count() <= 1)
-                continue;
+    /// <summary>Numbers the first group of remaining duplicates, and returns whether there was one.</summary>
+    private static bool AppendCounterToFirstDuplicates(List<ApiOperationDescription> operations)
+    {
+        var duplicates = operations
+            .GroupBy(o => o.Operation.OperationId)
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicates == null)
+            return false;
 
-            var counter = 2;
-            foreach (var operation in list.Skip(1))
-            {
-                operation.Operation.OperationId += counter++;
-            }
+        var counter = 2;
+        foreach (var operation in duplicates.Skip(1))
+            operation.Operation.OperationId += counter++;
 
-            GenerateOperationIds(operations, operationIds, duplicatedOperationIds);
-            break;
-        }
+        return true;
     }
 
     private static bool IsSuccessArrayResponse(string code, ApiResponse response) =>
