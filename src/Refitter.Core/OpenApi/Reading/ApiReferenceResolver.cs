@@ -231,7 +231,7 @@ internal sealed class ApiReferenceResolver
 
         if (referencePath.StartsWith("#/", StringComparison.Ordinal))
         {
-            var resolved = ResolvePointer(root, referencePath, target)
+            var resolved = ResolvePointer(root, referencePath)
                 ?? throw new InvalidOperationException("Could not resolve the path '" + referencePath + "'.");
 
             return resolved is RawJsonObject rawObject
@@ -339,7 +339,7 @@ internal sealed class ApiReferenceResolver
     }
 
     /// <summary>Resolves a JSON pointer against the objects of a document.</summary>
-    private static object? ResolvePointer(object root, string pointer, ReferenceTarget target)
+    private static object? ResolvePointer(object root, string pointer)
     {
         var segments = pointer
             .Split('/')
@@ -625,7 +625,7 @@ internal sealed class ApiReferenceResolver
             var target = schema is ApiParameter ? ReferenceTarget.Parameter : ReferenceTarget.Schema;
             var referencePath = schema.ReferencePath;
             schema.Reference = referencePath.StartsWith("#", StringComparison.Ordinal)
-                ? ResolveExternalLocal(root, location, referencePath, target)
+                ? ResolveExternalLocal(root, referencePath, target)
                 : (ApiSchema)ResolveReference(document, location, referencePath, target, append: true);
         }
 
@@ -635,7 +635,7 @@ internal sealed class ApiReferenceResolver
         }
     }
 
-    private ApiSchema ResolveExternalLocal(ExternalRoot root, string location, string pointer, ReferenceTarget target)
+    private ApiSchema ResolveExternalLocal(ExternalRoot root, string pointer, ReferenceTarget target)
     {
         var resolved = (ApiSchema)root.Document.Resolve(pointer, target, root.Resolver);
         if (!document.Definitions.Values.Contains(resolved))

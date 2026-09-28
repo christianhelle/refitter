@@ -576,7 +576,6 @@ internal sealed class ApiJsonReader
 
         var property = schema as ApiSchemaProperty;
         var parameter = schema as ApiParameter;
-        var isSwagger2 = schemaType == ApiSchemaType.Swagger2;
         var isOpenApi3 = schemaType == ApiSchemaType.OpenApi3;
         var isJsonSchema = schemaType == ApiSchemaType.JsonSchema;
 
