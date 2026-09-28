@@ -439,8 +439,15 @@ internal sealed class OpenApiV3Reader
         var fields = new FieldMap<SpecLink>()
             .Field("operationRef", (_, n, _) => n.GetScalarValue())
             .Field("operationId", (_, n, _) => n.GetScalarValue())
-            .Field(OpenApiNames.Parameters, (_, n, c) => n.CreateSimpleMap("RuntimeExpressionAnyWrapper", LoadRuntimeExpressionAnyWrapper, c))
-            .Field("requestBody", (_, n, _) => LoadRuntimeExpressionAnyWrapper(n))
+            .Field(OpenApiNames.Parameters, (_, n, c) => n.CreateSimpleMap(
+                "RuntimeExpressionAnyWrapper",
+                item =>
+                {
+                    CheckRuntimeExpressionAnyWrapper(item);
+                    return item;
+                },
+                c))
+            .Field("requestBody", (_, n, _) => CheckRuntimeExpressionAnyWrapper(n))
             .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
             .Field("server", (o, n, c) => o.Server = LoadServer(n, c))
             .Extensions();
@@ -903,12 +910,14 @@ internal sealed class OpenApiV3Reader
         return mediaType;
     }
 
+#pragma warning disable S3241 // The encodings are read into media types through a method group, which Sonar does not follow
     private SpecEncoding LoadEncoding(JsonNode node, ParsingContext context)
     {
         var encoding = new SpecEncoding();
         node.CheckMapNode("encoding", context).ParseMap(encoding, encodingFields, context);
         return encoding;
     }
+#pragma warning restore S3241
 
     private SpecResponses LoadResponses(JsonNode node, ParsingContext context)
     {
@@ -1016,8 +1025,10 @@ internal sealed class OpenApiV3Reader
         return discriminator;
     }
 
+#pragma warning disable S3241 // The mappings are read into discriminators through a method group, which Sonar does not follow
     private SpecSchema LoadMapping(JsonNode node) =>
         new() { Reference = GetReference(node.GetScalarValue()) };
+#pragma warning restore S3241
 
     private void LoadXml(JsonNode node, ParsingContext context) =>
         node.CheckMapNode("xml", context).ParseMap(new object(), xmlFields, context);
@@ -1145,13 +1156,14 @@ internal sealed class OpenApiV3Reader
         return distinct;
     }
 
-    private static string? LoadRuntimeExpressionAnyWrapper(JsonNode node)
+    /// <summary>
+    /// Checks a link parameter or request body, which is a runtime expression when it starts with <c>$</c>.
+    /// </summary>
+    private static void CheckRuntimeExpressionAnyWrapper(JsonNode node)
     {
         var value = node.GetScalarValue();
-        if (value != null && value.StartsWith("$", StringComparison.OrdinalIgnoreCase))
+        if (value.StartsWith("$", StringComparison.OrdinalIgnoreCase))
             RuntimeExpressions.Validate(value);
-
-        return value;
     }
 
     private void ReadBoolOrSchema(JsonNode node, ParsingContext context)
