@@ -6,6 +6,9 @@
 
 **Implemented enhancements:**
 
+- Remove the NSwag.Core.Yaml dependency [\#1310](https://github.com/christianhelle/refitter/issues/1310)
+- Remove the NSwag.CodeGeneration.CSharp dependency [\#1309](https://github.com/christianhelle/refitter/issues/1309)
+- Remove NSwag dependency [\#1308](https://github.com/christianhelle/refitter/pull/1308) ([christianhelle](https://github.com/christianhelle))
 - Delete temporary files created by unit tests [\#1306](https://github.com/christianhelle/refitter/pull/1306) ([christianhelle](https://github.com/christianhelle))
 - Rename duplicate parameter names in generated methods [\#1305](https://github.com/christianhelle/refitter/pull/1305) ([christianhelle](https://github.com/christianhelle))
 - Generate unique member names for colliding schema properties [\#1304](https://github.com/christianhelle/refitter/pull/1304) ([christianhelle](https://github.com/christianhelle))
