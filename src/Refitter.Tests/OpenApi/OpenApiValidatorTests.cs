@@ -132,6 +132,46 @@ public class OpenApiValidatorTests
     }
 
     [Test]
+    public async Task Validate_Should_Count_Components_Merged_From_Allowed_Remote_Documents()
+    {
+        await using var server = new LocalHttpServer(
+            """
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Remote", "version": "1.0.0" },
+              "paths": {},
+              "components": {
+                "schemas": {
+                  "Pet": { "type": "object", "properties": { "name": { "type": "string" } } }
+                }
+              }
+            }
+            """);
+        var openApiPath = await SwaggerFileHelper.CreateSwaggerFile(
+            $$"""
+            openapi: 3.0.1
+            info:
+              title: Local
+              version: 1.0.0
+            paths:
+              /pets:
+                get:
+                  responses:
+                    '200':
+                      description: OK
+                      content:
+                        application/json:
+                          schema:
+                            $ref: '{{server.Url}}#/components/schemas/Pet'
+            """);
+
+        var result = await OpenApiValidator.Validate(openApiPath, allowRemoteReferences: true);
+
+        result.Diagnostics.Errors.Should().BeEmpty();
+        result.Statistics.SchemaCount.Should().Be(2);
+    }
+
+    [Test]
     public async Task Validate_Should_Throw_InvalidOperationException_When_Remote_Server_Returns_An_Error()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
