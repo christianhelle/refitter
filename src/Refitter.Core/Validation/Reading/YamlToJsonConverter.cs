@@ -41,8 +41,7 @@ internal static class YamlToJsonConverter
         {
             YamlMappingNode mapping => ToJsonObject(mapping),
             YamlSequenceNode sequence => ToJsonArray(sequence),
-            YamlScalarNode scalar => ToJsonValue(scalar),
-            _ => throw new NotSupportedException("This yaml isn't convertible to JSON"),
+            _ => ToJsonValue((YamlScalarNode)yaml),
         };
 
     private static JsonObject ToJsonObject(YamlMappingNode yaml)
@@ -69,28 +68,20 @@ internal static class YamlToJsonConverter
 
     private static JsonValue ToJsonValue(YamlScalarNode yaml)
     {
-        switch (yaml.Style)
-        {
-            case ScalarStyle.Plain:
-                if (decimal.TryParse(yaml.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
-                    return JsonValue.Create(number);
+        // Quoted and block scalars are always strings
+        if (yaml.Style != ScalarStyle.Plain)
+            return JsonValue.Create(yaml.Value)!;
 
-                if (bool.TryParse(yaml.Value, out var boolean))
-                    return JsonValue.Create(boolean);
+        if (decimal.TryParse(yaml.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
+            return JsonValue.Create(number);
 
-                if (yaml.Value != null && NullRepresentations.Contains(yaml.Value))
-                    return (JsonValue)JsonNullSentinel.JsonNull.DeepClone();
+        if (bool.TryParse(yaml.Value, out var boolean))
+            return JsonValue.Create(boolean);
 
-                return JsonValue.Create(yaml.Value)!;
-            case ScalarStyle.Any:
-            case ScalarStyle.SingleQuoted:
-            case ScalarStyle.DoubleQuoted:
-            case ScalarStyle.Literal:
-            case ScalarStyle.Folded:
-                return JsonValue.Create(yaml.Value)!;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(yaml));
-        }
+        if (yaml.Value != null && NullRepresentations.Contains(yaml.Value))
+            return (JsonValue)JsonNullSentinel.JsonNull.DeepClone();
+
+        return JsonValue.Create(yaml.Value)!;
     }
 
     /// <summary>
