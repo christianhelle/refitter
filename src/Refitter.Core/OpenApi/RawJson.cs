@@ -102,6 +102,48 @@ internal static class RawJson
         return builder.ToString();
     }
 
+    private static void WriteObject(StringBuilder builder, RawJsonObject obj, int depth)
+    {
+        if (obj.Properties.Count == 0)
+        {
+            builder.Append("{}");
+            return;
+        }
+
+        builder.Append('{');
+        for (var i = 0; i < obj.Properties.Count; i++)
+        {
+            builder.Append(Environment.NewLine).Append(' ', (depth + 1) * 2);
+            WriteString(builder, obj.Properties[i].Key);
+            builder.Append(": ");
+            Write(builder, obj.Properties[i].Value, depth + 1);
+            if (i < obj.Properties.Count - 1)
+                builder.Append(',');
+        }
+
+        builder.Append(Environment.NewLine).Append(' ', depth * 2).Append('}');
+    }
+
+    private static void WriteArray(StringBuilder builder, RawJsonArray array, int depth)
+    {
+        if (array.Items.Count == 0)
+        {
+            builder.Append("[]");
+            return;
+        }
+
+        builder.Append('[');
+        for (var i = 0; i < array.Items.Count; i++)
+        {
+            builder.Append(Environment.NewLine).Append(' ', (depth + 1) * 2);
+            Write(builder, array.Items[i], depth + 1);
+            if (i < array.Items.Count - 1)
+                builder.Append(',');
+        }
+
+        builder.Append(Environment.NewLine).Append(' ', depth * 2).Append(']');
+    }
+
     private static void Write(StringBuilder builder, object? value, int depth)
     {
         switch (value)
@@ -110,42 +152,10 @@ internal static class RawJson
                 builder.Append("null");
                 break;
             case RawJsonObject obj:
-                if (obj.Properties.Count == 0)
-                {
-                    builder.Append("{}");
-                    break;
-                }
-
-                builder.Append('{');
-                for (var i = 0; i < obj.Properties.Count; i++)
-                {
-                    builder.Append(Environment.NewLine).Append(' ', (depth + 1) * 2);
-                    WriteString(builder, obj.Properties[i].Key);
-                    builder.Append(": ");
-                    Write(builder, obj.Properties[i].Value, depth + 1);
-                    if (i < obj.Properties.Count - 1)
-                        builder.Append(',');
-                }
-
-                builder.Append(Environment.NewLine).Append(' ', depth * 2).Append('}');
+                WriteObject(builder, obj, depth);
                 break;
             case RawJsonArray array:
-                if (array.Items.Count == 0)
-                {
-                    builder.Append("[]");
-                    break;
-                }
-
-                builder.Append('[');
-                for (var i = 0; i < array.Items.Count; i++)
-                {
-                    builder.Append(Environment.NewLine).Append(' ', (depth + 1) * 2);
-                    Write(builder, array.Items[i], depth + 1);
-                    if (i < array.Items.Count - 1)
-                        builder.Append(',');
-                }
-
-                builder.Append(Environment.NewLine).Append(' ', depth * 2).Append(']');
+                WriteArray(builder, array, depth);
                 break;
             case string text:
                 WriteString(builder, text);
