@@ -131,6 +131,40 @@ public class OpenApiValidatorTests
             .WithMessage("*Failed to download OpenAPI document*");
     }
 
+    /// <summary>
+    /// Microsoft.OpenApi overflowed the stack on such a cycle, crashing the process.
+    /// </summary>
+    [Test]
+    public async Task Validate_Should_Treat_A_Cycle_Of_Parameter_References_As_Unresolved()
+    {
+        var openApiPath = await SwaggerFileHelper.CreateSwaggerFile(
+            """
+            openapi: 3.0.1
+            info:
+              title: Parameter references in a cycle
+              version: 1.0.0
+            paths:
+              /pets:
+                get:
+                  parameters:
+                    - $ref: '#/components/parameters/A'
+                  responses:
+                    '200':
+                      description: OK
+            components:
+              parameters:
+                A:
+                  $ref: '#/components/parameters/B'
+                B:
+                  $ref: '#/components/parameters/A'
+            """);
+
+        var result = await OpenApiValidator.Validate(openApiPath);
+
+        result.Diagnostics.Errors.Should().BeEmpty();
+        result.Statistics.ParameterCount.Should().Be(0);
+    }
+
     [Test]
     public async Task Validate_Should_Count_Components_Merged_From_Allowed_Remote_Documents()
     {
