@@ -17,8 +17,10 @@ internal static class DependencyInjectionGenerator
         const string indent = "    ";
         var xmlDocComments = settings.GenerateXmlDocCodeComments;
 
+        var newLine = Environment.NewLine;
+
         var baseUrlParam = string.IsNullOrEmpty(iocSettings.BaseUrl)
-            ? "        /// <param name=\"baseUrl\">The base URL for the API clients.</param>\r\n        "
+            ? $"        /// <param name=\"baseUrl\">The base URL for the API clients.</param>{newLine}        "
             : string.Empty;
 
         var methodDocs = xmlDocComments
@@ -35,8 +37,8 @@ internal static class DependencyInjectionGenerator
             : "";
 
         var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
-            ? $"{methodDocs}public static IServiceCollection {iocSettings.ExtensionMethodName}(\r\n            this IServiceCollection services, \r\n            Uri baseUrl, \r\n            Action<IHttpClientBuilder>? builder = default, \r\n            RefitSettings? settings = default)"
-            : $"{methodDocs}public static IServiceCollection {iocSettings.ExtensionMethodName}(\r\n            this IServiceCollection services, \r\n            Action<IHttpClientBuilder>? builder = default, \r\n            RefitSettings? settings = default)";
+            ? $"{methodDocs}public static IServiceCollection {iocSettings.ExtensionMethodName}({newLine}            this IServiceCollection services, {newLine}            Uri baseUrl, {newLine}            Action<IHttpClientBuilder>? builder = default, {newLine}            RefitSettings? settings = default)"
+            : $"{methodDocs}public static IServiceCollection {iocSettings.ExtensionMethodName}({newLine}            this IServiceCollection services, {newLine}            Action<IHttpClientBuilder>? builder = default, {newLine}            RefitSettings? settings = default)";
 
         var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"

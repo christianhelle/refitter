@@ -31,7 +31,15 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().Contain("/// Configures the Refit clients for dependency injection.");
         code.Should().Contain("/// <param name=\"services\">The service collection to configure.</param>");
         code.Should().NotContain("/// <param name=\"baseUrl\">");
+        code.Should().Contain(
+            $$"""
+              public static IServiceCollection ConfigureRefitClients(
+                          this IServiceCollection services, 
+                          Action<IHttpClientBuilder>? builder = default, 
+                          RefitSettings? settings = default)
+              """.ReplaceLineEndings(Environment.NewLine));
         code.Should().Contain($".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{settings.DependencyInjectionSettings.BaseUrl}\"))");
+        code.ContainExpectedDependencyInjectionLineEndings();
     }
 
     [Test]
@@ -58,9 +66,21 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().Contain("/// <summary>");
         code.Should().Contain("/// Configures the Refit clients for dependency injection.");
         code.Should().Contain("/// <param name=\"services\">The service collection to configure.</param>");
-        code.Should().Contain("/// <param name=\"baseUrl\">The base URL for the API clients.</param>");
-        code.Should().Contain("Uri baseUrl");
+        code.Should().Contain(
+            $$"""
+              /// <param name="baseUrl">The base URL for the API clients.</param>
+                      /// <param name="builder">Optional action to configure the HTTP client builder.</param>
+              """.ReplaceLineEndings(Environment.NewLine));
+        code.Should().Contain(
+            """
+            public static IServiceCollection ConfigureRefitClients(
+                        this IServiceCollection services, 
+                        Uri baseUrl, 
+                        Action<IHttpClientBuilder>? builder = default, 
+                        RefitSettings? settings = default)
+            """.ReplaceLineEndings(Environment.NewLine));
         code.Should().Contain(".ConfigureHttpClient(c => c.BaseAddress = baseUrl)");
+        code.ContainExpectedDependencyInjectionLineEndings();
     }
 
     [Test]
@@ -285,5 +305,14 @@ public class DependencyInjectionGeneratorBranchTests
 
         code.Should().Contain("using System.Net.Http");
         code.Should().Contain(".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })");
+    }
+}
+
+internal static class DependencyInjectionGeneratorAssertions
+{
+    public static void ContainExpectedDependencyInjectionLineEndings(this string code)
+    {
+        if (Environment.NewLine == "\n")
+            code.Should().NotContain("\r\n");
     }
 }
