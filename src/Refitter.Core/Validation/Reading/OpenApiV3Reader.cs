@@ -3,6 +3,7 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
 using Refitter.Core.Validation.Model;
+using static Refitter.Core.Validation.Reading.CommonFields;
 
 namespace Refitter.Core.Validation.Reading;
 
@@ -50,7 +51,6 @@ internal sealed class OpenApiV3Reader
     private readonly OpenApiSpecificationVersion version;
     private readonly FieldMap<SpecDocument> documentFields;
     private readonly FieldMap<SpecInfo> infoFields;
-    private readonly FieldMap<SpecContact> contactFields;
     private readonly FieldMap<SpecLicense> licenseFields;
     private readonly FieldMap<SpecServer> serverFields;
     private readonly FieldMap<SpecServerVariable> serverVariableFields;
@@ -75,7 +75,6 @@ internal sealed class OpenApiV3Reader
     private readonly FieldMap<SpecOAuthFlows> oAuthFlowsFields;
     private readonly FieldMap<SpecOAuthFlow> oAuthFlowFields;
     private readonly FieldMap<SpecTag> tagFields;
-    private readonly FieldMap<SpecExternalDocs> externalDocsFields;
 
     public OpenApiV3Reader(OpenApiSpecificationVersion version)
     {
@@ -85,7 +84,6 @@ internal sealed class OpenApiV3Reader
 
         documentFields = CreateDocumentFields(is31, is32);
         infoFields = CreateInfoFields(is31);
-        contactFields = CreateContactFields();
         licenseFields = CreateLicenseFields(is31);
         serverFields = CreateServerFields(is32);
         serverVariableFields = CreateServerVariableFields();
@@ -110,7 +108,6 @@ internal sealed class OpenApiV3Reader
         oAuthFlowsFields = CreateOAuthFlowsFields(is32);
         oAuthFlowFields = CreateOAuthFlowFields(is32);
         tagFields = CreateTagFields(is32);
-        externalDocsFields = CreateExternalDocsFields();
     }
 
     private FieldMap<SpecDocument> CreateDocumentFields(bool is31, bool is32)
@@ -168,17 +165,6 @@ internal sealed class OpenApiV3Reader
             .Extensions();
         if (is31)
             fields.Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue());
-
-        return fields;
-    }
-
-    private static FieldMap<SpecContact> CreateContactFields()
-    {
-        var fields = new FieldMap<SpecContact>()
-            .Field("name", (_, n, _) => n.GetScalarValue())
-            .Field("email", (o, n, _) => o.Email = n.GetScalarValue())
-            .Field("url", (_, n, _) => ReadUri(n))
-            .Extensions();
 
         return fields;
     }
@@ -279,21 +265,11 @@ internal sealed class OpenApiV3Reader
     private FieldMap<SpecOperation> CreateOperationFields()
     {
         var fields = new FieldMap<SpecOperation>()
-            .Field("tags", (_, n, c) => n.CreateSimpleList("OpenApiTagReference", item => item.GetScalarValue(), c))
-            .Field(OpenApiNames.Summary, (_, n, _) => n.GetScalarValue())
-            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
-            .Field(OpenApiNames.ExternalDocs, (_, n, c) => LoadExternalDocs(n, c))
-            .Field("operationId", (_, n, _) => n.GetScalarValue())
+            .OperationFields()
             .Field(OpenApiNames.Parameters, (o, n, c) => o.Parameters = n.CreateList("IOpenApiParameter", LoadParameter, c))
             .Field("requestBody", (o, n, c) => o.RequestBody = LoadRequestBody(n, c))
             .Field("responses", (o, n, c) => o.Responses = LoadResponses(n, c))
             .Field("callbacks", (o, n, c) => o.Callbacks = n.CreateMap("IOpenApiCallback", LoadCallback, c))
-            .Field(OpenApiNames.Deprecated, (_, n, _) => ReadBool(n))
-            .Field("security", (o, n, c) =>
-            {
-                if (n is JsonArray)
-                    o.Security = n.CreateList("OpenApiSecurityRequirement", LoadSecurityRequirement, c);
-            })
             .Field("servers", (_, n, c) => n.CreateList("OpenApiServer", LoadServer, c))
             .Extensions();
 
@@ -656,16 +632,6 @@ internal sealed class OpenApiV3Reader
         return fields;
     }
 
-    private static FieldMap<SpecExternalDocs> CreateExternalDocsFields()
-    {
-        var fields = new FieldMap<SpecExternalDocs>()
-            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
-            .Field("url", (o, n, _) => o.Url = ReadUri(n))
-            .Extensions();
-
-        return fields;
-    }
-
     public SpecDocument LoadDocument(JsonNode jsonNode, ParsingContext context)
     {
         var document = new SpecDocument();
@@ -676,49 +642,12 @@ internal sealed class OpenApiV3Reader
     private FieldMap<SpecSchema> CreateSchemaFields(bool is31)
     {
         var fields = new FieldMap<SpecSchema>()
-            .Field("title", (_, n, _) => n.GetScalarValue())
-            .Field("multipleOf", (_, n, _) =>
-            {
-                var multipleOf = n.GetScalarValue();
-                if (multipleOf != null)
-                    ScalarChecks.CheckDecimal(multipleOf, NumberStyles.Float, CultureInfo.InvariantCulture);
-            })
-            .Field("maximum", (_, n, _) => n.GetScalarValue())
-            .Field("minimum", (_, n, _) => n.GetScalarValue())
-            .Field("maxLength", (_, n, _) => ReadInt(n))
-            .Field("minLength", (_, n, _) => ReadInt(n))
-            .Field("pattern", (_, n, _) => n.GetScalarValue())
-            .Field("maxItems", (_, n, _) => ReadInt(n))
-            .Field("minItems", (_, n, _) => ReadInt(n))
-            .Field("uniqueItems", (_, n, _) => ReadBool(n))
-            .Field("maxProperties", (_, n, _) => ReadInt(n))
-            .Field("minProperties", (_, n, _) => ReadInt(n))
-            .Field(OpenApiNames.Required, (o, n, c) => o.Required = new HashSet<string>(
-                n.CreateSimpleList(OpenApiNames.StringType, item => item.GetScalarValue(), c).OfType<string>(),
-                StringComparer.Ordinal))
-            .Field("enum", (_, n, c) => n.CreateListOfAny(c))
-            .Field("allOf", (o, n, c) => o.AllOf = n.CreateList(OpenApiNames.SchemaType, LoadSchema, c))
+            .SchemaFields(LoadSchema, LoadXml)
             .Field("oneOf", (o, n, c) => o.OneOf = n.CreateList(OpenApiNames.SchemaType, LoadSchema, c))
             .Field("anyOf", (o, n, c) => o.AnyOf = n.CreateList(OpenApiNames.SchemaType, LoadSchema, c))
             .Field("not", (o, n, c) => o.Not = LoadSchema(n, c))
-            .Field("items", (o, n, c) => o.Items = LoadSchema(n, c))
-            .Field("properties", (o, n, c) => o.Properties = n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
-            .Field("additionalProperties", (o, n, c) =>
-            {
-                if (n is JsonValue)
-                    ReadBool(n);
-                else
-                    o.AdditionalProperties = LoadSchema(n, c);
-            })
-            .Field(OpenApiNames.Description, (_, n, _) => n.GetScalarValue())
-            .Field("format", (_, n, _) => n.GetScalarValue())
-            .Field("default", (_, _, _) => { })
             .Field("discriminator", (o, n, c) => o.Discriminator = LoadDiscriminator(n, c))
-            .Field("readOnly", (_, n, _) => ReadBool(n))
             .Field("writeOnly", (_, n, _) => ReadBool(n))
-            .Field("xml", (_, n, c) => LoadXml(n, c))
-            .Field(OpenApiNames.ExternalDocs, (o, n, c) => o.ExternalDocs = LoadExternalDocs(n, c))
-            .Field(OpenApiNames.Example, (_, _, _) => { })
             .Field(OpenApiNames.Deprecated, (_, n, _) => ReadBool(n))
             .Extensions();
 
@@ -798,13 +727,6 @@ internal sealed class OpenApiV3Reader
         var info = new SpecInfo();
         node.CheckMapNode("Info", context).ParseMap(info, infoFields, context);
         return info;
-    }
-
-    private SpecContact LoadContact(JsonNode node, ParsingContext context)
-    {
-        var contact = new SpecContact();
-        (node as JsonObject).ParseMap(contact, contactFields, context);
-        return contact;
     }
 
     private SpecLicense LoadLicense(JsonNode node, ParsingContext context)
@@ -1059,30 +981,11 @@ internal sealed class OpenApiV3Reader
         return flow;
     }
 
-    private static SpecSecurityRequirement LoadSecurityRequirement(JsonNode node, ParsingContext context)
-    {
-        var requirement = new SpecSecurityRequirement();
-        foreach (var scheme in node.CheckMapNode("security", context))
-        {
-            requirement.Add(SpecReferences.Create(scheme.Key, null));
-            scheme.Value.CreateSimpleList(OpenApiNames.StringType, item => item.GetScalarValue(), context);
-        }
-
-        return requirement;
-    }
-
     private SpecTag LoadTag(JsonNode node, ParsingContext context)
     {
         var tag = new SpecTag();
         node.CheckMapNode("tag", context).ParseMap(tag, tagFields, context);
         return tag;
-    }
-
-    private SpecExternalDocs LoadExternalDocs(JsonNode node, ParsingContext context)
-    {
-        var externalDocs = new SpecExternalDocs();
-        node.CheckMapNode(OpenApiNames.ExternalDocs, context).ParseMap(externalDocs, externalDocsFields, context);
-        return externalDocs;
     }
 
     private SpecReference GetReference(string pointer)
@@ -1180,25 +1083,8 @@ internal sealed class OpenApiV3Reader
             node.GetScalarValue();
     }
 
-    private static Uri ReadUri(JsonNode node) =>
-        new(node.GetScalarValue(), UriKind.RelativeOrAbsolute);
-
-    private static void ReadBool(JsonNode node)
-    {
-        var value = node.GetScalarValue();
-        if (value != null)
-            ScalarChecks.CheckBoolean(value);
-    }
-
     private static bool? ReadNullableBool(JsonNode node) =>
         bool.Parse(node.GetScalarValue());
-
-    private static void ReadInt(JsonNode node)
-    {
-        var value = node.GetScalarValue();
-        if (value != null)
-            ScalarChecks.CheckInt32(value, CultureInfo.InvariantCulture);
-    }
 
     private static void ReadUnsignedInt(JsonNode node)
     {
