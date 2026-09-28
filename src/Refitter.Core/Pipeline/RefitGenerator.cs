@@ -5,7 +5,6 @@ namespace Refitter.Core;
 /// </summary>
 public class RefitGenerator
 {
-    private static readonly RefitCodeGenerator CodeGenerator = new();
 
     private readonly RefitGeneratorSettings settings;
     private readonly ApiDocument document;
@@ -94,11 +93,11 @@ public class RefitGenerator
     /// and returns the generated code as a string.
     /// </summary>
     /// <returns>The generated code as a string.</returns>
-    public string Generate() => CodeGenerator.Generate(document, settings);
+    public string Generate() => RefitCodeGenerator.Generate(document, settings);
 
     /// <summary>
     /// Generates multiple files containing Refit interfaces and contracts.
     /// </summary>
     /// <returns>A GeneratorOutput containing all generated code files.</returns>
-    public GeneratorOutput GenerateMultipleFiles() => CodeGenerator.GenerateMultipleFiles(document, settings);
+    public GeneratorOutput GenerateMultipleFiles() => RefitCodeGenerator.GenerateMultipleFiles(document, settings);
 }

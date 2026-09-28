@@ -189,12 +189,9 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
-        var settings = new RefitGeneratorSettings();
-        var generator = new ContractGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
-        var result = sut.IsFileStreamResponse(operation);
+        var result = ReturnTypeGenerator.IsFileStreamResponse(operation);
 
         result.Should().BeTrue();
     }
@@ -229,12 +226,9 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
-        var settings = new RefitGeneratorSettings();
-        var generator = new ContractGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
-        var result = sut.IsFileStreamResponse(operation);
+        var result = ReturnTypeGenerator.IsFileStreamResponse(operation);
 
         result.Should().BeFalse();
     }
@@ -1371,11 +1365,8 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = ApiDocumentLoader.Load(spec, null, isYaml: false);
-        var settings = new RefitGeneratorSettings();
-        var generator = new ContractGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
 
-        sut.IsFileStreamResponse(document.Paths["/download"]["get"]).Should().BeTrue();
+        ReturnTypeGenerator.IsFileStreamResponse(document.Paths["/download"]["get"]).Should().BeTrue();
     }
 
     [Test]

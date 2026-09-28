@@ -207,7 +207,7 @@ public class ContractGenerationHelperTests
     [Arguments("decimal", "1M")]
     public void Generates_Numeric_Literals(string format, string expected)
     {
-        CreateGenerator().Settings.ValueGenerator.GetNumericValue(ApiObjectType.Number, 1L, format).Should().Be(expected);
+        ContractValueGenerator.GetNumericValue(ApiObjectType.Number, 1L, format).Should().Be(expected);
     }
 
     [Test]

@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Refitter.Core;
@@ -8,6 +9,10 @@ namespace Refitter.Core;
 // way (and order) the generated code has always been based on. See THIRD-PARTY-NOTICES.md.
 
 /// <summary>The model of the class template.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class ClassTemplateModel
 {
     private readonly ContractTypeResolver resolver;
@@ -314,7 +319,7 @@ internal sealed class PropertyModel
                 return ContractValueGenerator.ConvertNumberToString(minimum ?? decimal.MinValue);
 
             return minimum.HasValue
-                ? settings.ValueGenerator.GetNumericValue(actualSchema.Type, EnsureBounds(schemaFormat, minimum.Value), rangeFormat)
+                ? ContractValueGenerator.GetNumericValue(actualSchema.Type, EnsureBounds(schemaFormat, minimum.Value), rangeFormat)
                 : rangeType + ".MinValue";
         }
     }
@@ -340,7 +345,7 @@ internal sealed class PropertyModel
                 return ContractValueGenerator.ConvertNumberToString(maximum ?? decimal.MaxValue);
 
             return maximum.HasValue
-                ? settings.ValueGenerator.GetNumericValue(actualSchema.Type, EnsureBounds(schemaFormat, maximum.Value), rangeFormat)
+                ? ContractValueGenerator.GetNumericValue(actualSchema.Type, EnsureBounds(schemaFormat, maximum.Value), rangeFormat)
                 : rangeType + ".MaxValue";
         }
     }
@@ -457,6 +462,10 @@ internal sealed class PropertyModel
 }
 
 /// <summary>The model of the enum template.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class EnumTemplateModel(string typeName, ApiSchema schema, ContractGeneratorSettings settings)
 {
     public string Name { get; } = typeName;
@@ -601,6 +610,10 @@ internal sealed class EnumerationItemModel(
 }
 
 /// <summary>The model of the JSON inheritance converter and attribute templates.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class JsonInheritanceConverterTemplateModel(ContractGeneratorSettings settings)
 {
     public bool UseSystemTextJson => true;
@@ -610,6 +623,10 @@ internal sealed class JsonInheritanceConverterTemplateModel(ContractGeneratorSet
 }
 
 /// <summary>The model of the date format converter template.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class DateFormatConverterTemplateModel(ContractGeneratorSettings settings)
 {
     public bool GenerateDateFormatConverterClass => !settings.ExcludedTypeNames.Contains("DateFormatConverter");
@@ -620,6 +637,10 @@ internal sealed class DateFormatConverterTemplateModel(ContractGeneratorSettings
 }
 
 /// <summary>The model of the file template that contains all contracts.</summary>
+[SuppressMessage(
+    "Minor Code Smell",
+    "S2325:Methods and properties that don't access instance data should be static",
+    Justification = "The Liquid templates, including custom templates, can only read instance members")]
 internal sealed class ContractFileTemplateModel(
     string classes,
     ApiDocument document,

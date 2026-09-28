@@ -86,7 +86,7 @@ internal sealed class DocumentEquivalenceComparer
     /// <summary>
     /// Adds a schema and the schemas it (transitively) references to the definitions, named after their reference.
     /// </summary>
-    internal void AddReferencedSchemas(IDictionary<string, ApiSchema> definitions, ApiSchema schema)
+    internal static void AddReferencedSchemas(IDictionary<string, ApiSchema> definitions, ApiSchema schema)
     {
         var visited = new HashSet<ApiSchema>();
         var schemasToProcess = new Stack<ApiSchema>();

@@ -62,7 +62,7 @@ internal sealed class ContractValueGenerator(ContractGeneratorSettings settings)
         return null;
     }
 
-    public string GetNumericValue(ApiObjectType type, object value, string? format)
+    public static string GetNumericValue(ApiObjectType type, object value, string? format)
     {
         switch (format)
         {

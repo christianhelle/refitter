@@ -1476,7 +1476,7 @@ paths:
         => JsonNode.Parse(Comparer.CreateCanonicalJson(value))!;
 
     private static void InvokeAddReferencedSchemas(IDictionary<string, ApiSchema> definitions, ApiSchema schema)
-        => Comparer.AddReferencedSchemas(definitions, schema);
+        => DocumentEquivalenceComparer.AddReferencedSchemas(definitions, schema);
 
     private static string? InvokeGetDefinitionName(ApiSchema schema)
         => DocumentEquivalenceComparer.GetDefinitionName(schema);
