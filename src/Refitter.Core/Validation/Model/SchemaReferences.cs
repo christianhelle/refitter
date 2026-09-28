@@ -35,12 +35,15 @@ internal static class SchemaReferences
     /// <exception cref="InvalidOperationException">Thrown when the references form a cycle.</exception>
     public static SpecSchema? ResolveRecursive(SpecReference reference, SpecComponents? registered)
     {
-        var visited = new HashSet<SpecReference>(ReferenceComparer.Instance);
+        // References are tracked by identity, like the reference objects Microsoft.OpenApi tracks
+        var visited = new List<SpecReference>();
         var current = reference;
         while (true)
         {
-            if (!visited.Add(current))
+            if (visited.Exists(seen => ReferenceEquals(seen, current)))
                 throw new InvalidOperationException("Circular reference detected while resolving reference: " + ReferenceV3(current));
+
+            visited.Add(current);
 
             var target = Resolve(current, registered);
             if (target?.Reference == null)
@@ -129,17 +132,5 @@ internal static class SchemaReferences
             return null;
 
         return ResolveSubSchema(schemas[index], path.Skip(1).ToArray());
-    }
-
-    /// <summary>
-    /// Compares references by identity, like the reference objects Microsoft.OpenApi tracks.
-    /// </summary>
-    private sealed class ReferenceComparer : IEqualityComparer<SpecReference>
-    {
-        public static readonly ReferenceComparer Instance = new();
-
-        public bool Equals(SpecReference? x, SpecReference? y) => ReferenceEquals(x, y);
-
-        public int GetHashCode(SpecReference obj) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
     }
 }
