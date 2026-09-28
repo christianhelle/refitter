@@ -504,11 +504,11 @@ internal sealed class OpenApiV2Reader
 
     private static void SetRequestBodyWhereMissing(SpecPathItem pathItem, SpecRequestBody requestBody)
     {
-        foreach (var operation in pathItem.Operations!.Where(operation => operation.Value.RequestBody == null))
-        {
-            if (operation.Key is "post" or "put" or "patch")
-                operation.Value.RequestBody = requestBody;
-        }
+        var operations = pathItem.Operations!
+            .Where(operation => operation.Key is "post" or "put" or "patch" && operation.Value.RequestBody == null)
+            .Select(operation => operation.Value);
+        foreach (var operation in operations)
+            operation.RequestBody = requestBody;
     }
 
     private SpecOperation LoadOperation(JsonNode node, ParsingContext context)
@@ -535,13 +535,10 @@ internal sealed class OpenApiV2Reader
         }
 
         var produces = context.GetFromTempStorage<List<string?>>(OperationProducesKey);
-        if ((produces != null || jsonObject.ContainsKey("produces")))
+        if (produces != null || jsonObject.ContainsKey("produces"))
         {
-            foreach (var response in operation.Responses.Values)
-            {
-                if (response is { Reference: null })
-                    ProcessProduces(response, context);
-            }
+            foreach (var response in operation.Responses.Values.OfType<SpecResponse>().Where(response => response.Reference == null))
+                ProcessProduces(response, context);
         }
 
         context.SetTempStorage(OperationProducesKey, null);
@@ -561,12 +558,12 @@ internal sealed class OpenApiV2Reader
         {
             Schema = new SpecSchema
             {
-                // Microsoft.OpenApi copies each parameter schema, and fails on a parameter without one
+                // Microsoft.OpenApi copies each parameter schema, and fails on a parameter without one, as copying null does
                 Properties = formParameters
                     .Where(parameter => parameter.Name != null)
-                    .ToDictionary(
+                    .ToDictionary<SpecParameter, string, SpecSchema?>(
                         parameter => parameter.Name!,
-                        parameter => (SpecSchema?)CopySchema(parameter.Schema ?? throw new NullReferenceException()),
+                        parameter => CopySchema(parameter.Schema!),
                         StringComparer.Ordinal),
                 Required = new HashSet<string>(
                     formParameters.Where(parameter => parameter.Required && parameter.Name != null).Select(parameter => parameter.Name!),
@@ -579,7 +576,7 @@ internal sealed class OpenApiV2Reader
                        ?? ["application/x-www-form-urlencoded"];
         return new SpecRequestBody
         {
-            Content = consumes.ToDictionary(contentType => contentType!, _ => (SpecMediaType?)mediaType, StringComparer.Ordinal),
+            Content = consumes.ToDictionary<string?, string, SpecMediaType?>(contentType => contentType!, _ => mediaType, StringComparer.Ordinal),
         };
     }
 
@@ -590,9 +587,9 @@ internal sealed class OpenApiV2Reader
                        ?? ["application/json"];
         return new SpecRequestBody
         {
-            Content = consumes.ToDictionary(
+            Content = consumes.ToDictionary<string?, string, SpecMediaType?>(
                 contentType => contentType!,
-                _ => (SpecMediaType?)new SpecMediaType { Schema = bodyParameter.Schema },
+                _ => new SpecMediaType { Schema = bodyParameter.Schema },
                 StringComparer.Ordinal),
         };
     }
@@ -750,12 +747,12 @@ internal sealed class OpenApiV2Reader
 
     private static void LoadExamples(SpecResponse response, JsonNode node, ParsingContext context)
     {
-        foreach (var example in node.CheckMapNode(OpenApiNames.Examples, context))
+        foreach (var contentType in node.CheckMapNode(OpenApiNames.Examples, context).Select(example => example.Key))
         {
             response.Content ??= new Dictionary<string, SpecMediaType?>(StringComparer.Ordinal);
-            if (!response.Content.TryGetValue(example.Key, out var mediaType) || mediaType == null)
+            if (!response.Content.TryGetValue(contentType, out var mediaType) || mediaType == null)
             {
-                response.Content.Add(example.Key, new SpecMediaType
+                response.Content.Add(contentType, new SpecMediaType
                 {
                     Schema = context.GetFromTempStorage<SpecSchema>(ResponseSchemaKey, response),
                 });
@@ -791,11 +788,8 @@ internal sealed class OpenApiV2Reader
         if (responses == null)
             return;
 
-        foreach (var response in responses)
-        {
-            if (response is { Reference: null })
-                ProcessProduces(response, context);
-        }
+        foreach (var response in responses.OfType<SpecResponse>().Where(response => response.Reference == null))
+            ProcessProduces(response, context);
     }
 
     private static void ProcessProduces(SpecResponse response, ParsingContext context)
