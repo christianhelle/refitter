@@ -884,7 +884,7 @@ internal sealed class OpenApiV3Reader
         return flow;
     }
 
-    private SpecSecurityRequirement LoadSecurityRequirement(JsonNode node, ParsingContext context)
+    private static SpecSecurityRequirement LoadSecurityRequirement(JsonNode node, ParsingContext context)
     {
         var requirement = new SpecSecurityRequirement();
         foreach (var scheme in node.CheckMapNode("security", context))
@@ -969,9 +969,16 @@ internal sealed class OpenApiV3Reader
     {
         var names = new HashSet<string>(StringComparer.Ordinal);
         var hasUnnamed = false;
-        return tags
-            .Where(tag => tag.Name == null ? !hasUnnamed && (hasUnnamed = true) : names.Add(tag.Name))
-            .ToList();
+        var distinct = new List<SpecTag>();
+        foreach (var tag in tags)
+        {
+            var isFirst = tag.Name == null ? !hasUnnamed : names.Add(tag.Name);
+            hasUnnamed |= tag.Name == null;
+            if (isFirst)
+                distinct.Add(tag);
+        }
+
+        return distinct;
     }
 
     private static string? LoadRuntimeExpressionAnyWrapper(JsonNode node)

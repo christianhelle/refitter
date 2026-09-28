@@ -563,10 +563,12 @@ internal sealed class SpecRuleValidator
     {
         var child = children[0];
         var resolved = SpecReferences.Resolve(child, c => c.Schemas, registered);
-        if (resolved?.Properties != null && !resolved.Properties.ContainsKey(discriminator))
+        if (resolved?.Properties != null
+            && !resolved.Properties.ContainsKey(discriminator)
+            && resolved.Required != null
+            && !resolved.Required.Contains(discriminator))
         {
-            if (resolved.Required != null && !resolved.Required.Contains(discriminator))
-                return ValidateChildSchemaAgainstDiscriminator(resolved, discriminator);
+            return ValidateChildSchemaAgainstDiscriminator(resolved, discriminator);
         }
 
         return true;

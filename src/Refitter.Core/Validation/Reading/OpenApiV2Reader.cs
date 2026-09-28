@@ -354,7 +354,7 @@ internal sealed class OpenApiV2Reader
             .Field("namespace", (_, n, _) =>
             {
                 var xmlNamespace = n.GetScalarValue();
-                if (Uri.IsWellFormedUriString(xmlNamespace, UriKind.Absolute) && xmlNamespace != null)
+                if (Uri.IsWellFormedUriString(xmlNamespace, UriKind.Absolute))
                     return;
 
                 throw new SpecificationReaderException("Xml Namespace requires absolute URL. '" + n.GetScalarValue() + "' is not valid.");
@@ -667,11 +667,21 @@ internal sealed class OpenApiV2Reader
         return parameter;
     }
 
-    private static SpecSchema GetOrCreateSchema(SpecParameter parameter) =>
-        parameter.Schema is { Reference: null } schema ? schema : parameter.Schema = new SpecSchema();
+    private static SpecSchema GetOrCreateSchema(SpecParameter parameter)
+    {
+        if (parameter.Schema is not { Reference: null })
+            parameter.Schema = new SpecSchema();
 
-    private static SpecSchema GetOrCreateSchema(SpecHeader header) =>
-        header.Schema is { Reference: null } schema ? schema : header.Schema = new SpecSchema();
+        return parameter.Schema;
+    }
+
+    private static SpecSchema GetOrCreateSchema(SpecHeader header)
+    {
+        if (header.Schema is not { Reference: null })
+            header.Schema = new SpecSchema();
+
+        return header.Schema;
+    }
 
     private static void ReadSchemaText(SpecParameter parameter, JsonNode node)
     {
@@ -957,7 +967,7 @@ internal sealed class OpenApiV2Reader
 
     private static bool IsHostValid(string host) =>
         !host.Contains(Uri.SchemeDelimiter)
-        && Uri.CheckHostName(host.Split(':').First()) != UriHostNameType.Unknown;
+        && Uri.CheckHostName(host.Split(':')[0]) != UriHostNameType.Unknown;
 
     /// <summary>
     /// Replaces a reference to a body parameter, which became a request body component, with a reference to

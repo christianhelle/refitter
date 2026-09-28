@@ -66,7 +66,10 @@ internal sealed class ParsingContext(ValidationDiagnostics diagnostics)
     /// </summary>
     public T? GetFromTempStorage<T>(string key, object? scope = null)
     {
-        var storage = scope == null ? tempStorage : scopedTempStorage.TryGetValue(scope, out var scoped) ? scoped : null;
+        Dictionary<string, object>? storage = tempStorage;
+        if (scope != null)
+            storage = scopedTempStorage.TryGetValue(scope, out var scoped) ? scoped : null;
+
         return storage != null && storage.TryGetValue(key, out var value) ? (T)value : default;
     }
 
