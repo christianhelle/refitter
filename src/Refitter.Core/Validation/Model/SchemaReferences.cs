@@ -108,24 +108,25 @@ internal static class SchemaReferences
                     ? ResolveSubSchema(additionalProperties, path)
                     : null;
             case "allOf":
+                return ResolveListItem(schema.AllOf, path);
             case "anyOf":
+                return ResolveListItem(schema.AnyOf, path);
             case "oneOf":
-                if (!int.TryParse(path[0], out var index))
-                    return null;
-
-                var schemas = segment switch
-                {
-                    "allOf" => schema.AllOf,
-                    "anyOf" => schema.AnyOf,
-                    _ => schema.OneOf,
-                };
-                if (schemas != null && index < schemas.Count)
-                    return ResolveSubSchema(schemas[index], path.Skip(1).ToArray());
-
-                break;
+                return ResolveListItem(schema.OneOf, path);
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Follows a path that starts with an index into <c>allOf</c>, <c>anyOf</c> or <c>oneOf</c>.
+    /// </summary>
+    private static SpecSchema? ResolveListItem(List<SpecSchema>? schemas, string[] path)
+    {
+        if (!int.TryParse(path[0], out var index) || schemas == null || index >= schemas.Count)
+            return null;
+
+        return ResolveSubSchema(schemas[index], path.Skip(1).ToArray());
     }
 
     /// <summary>
