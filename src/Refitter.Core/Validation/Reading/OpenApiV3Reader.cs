@@ -602,7 +602,7 @@ internal sealed class OpenApiV3Reader
         return fields;
     }
 
-    private FieldMap<SpecTag> CreateTagFields(bool is32)
+    private static FieldMap<SpecTag> CreateTagFields(bool is32)
     {
         var fields = new FieldMap<SpecTag>()
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
@@ -654,8 +654,8 @@ internal sealed class OpenApiV3Reader
         if (!is31)
         {
             return fields
-                .Field("exclusiveMaximum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
-                .Field("exclusiveMinimum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
+                .Field("exclusiveMaximum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()))
+                .Field("exclusiveMinimum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()))
                 .Field("type", (_, n, _) => n.GetScalarValue().ToJsonSchemaType())
                 .Field("nullable", (_, n, _) => bool.TryParse(n.GetScalarValue(), out _))
                 .Field("x-jsonschema-patternProperties", (_, n, c) => n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
@@ -702,7 +702,7 @@ internal sealed class OpenApiV3Reader
 
                 foreach (var type in n.CreateSimpleList(OpenApiNames.StringType, item => item.GetScalarValue(), c).Where(type => type != null))
                 {
-                    type!.ToJsonSchemaType();
+                    type.ToJsonSchemaType();
                 }
             })
             .Field("const", (_, n, _) => n.GetScalarValue())

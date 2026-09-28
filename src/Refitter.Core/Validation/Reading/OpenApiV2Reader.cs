@@ -309,13 +309,13 @@ internal sealed class OpenApiV2Reader
             .Field("exclusiveMaximum", (o, n, _) =>
             {
                 GetOrCreateSchema(o);
-                ScalarChecks.CheckBoolean(n.GetScalarValue()!);
+                ScalarChecks.CheckBoolean(n.GetScalarValue());
             })
             .Field("minimum", (o, n, _) => ReadSchemaText(o, n))
             .Field("exclusiveMinimum", (o, n, _) =>
             {
                 GetOrCreateSchema(o);
-                ScalarChecks.CheckBoolean(n.GetScalarValue()!);
+                ScalarChecks.CheckBoolean(n.GetScalarValue());
             })
             .Field("maxLength", (o, n, _) => ReadSchemaInt(o, n))
             .Field("minLength", (o, n, _) => ReadSchemaInt(o, n))
@@ -358,8 +358,8 @@ internal sealed class OpenApiV2Reader
     {
         var fields = new FieldMap<SpecSchema>()
             .SchemaFields(LoadSchema, LoadXml)
-            .Field("exclusiveMaximum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
-            .Field("exclusiveMinimum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()!))
+            .Field("exclusiveMaximum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()))
+            .Field("exclusiveMinimum", (_, n, _) => ScalarChecks.CheckBoolean(n.GetScalarValue()))
             .Field("type", (_, n, _) => n.GetScalarValue().ToJsonSchemaType())
             .Field("discriminator", (o, n, _) => o.Discriminator = new SpecDiscriminator { PropertyName = n.GetScalarValue() })
             .Field("x-jsonschema-patternProperties", (_, n, c) => n.CreateMap(OpenApiNames.SchemaType, LoadSchema, c))
@@ -439,7 +439,7 @@ internal sealed class OpenApiV2Reader
         return fields;
     }
 
-    private FieldMap<SpecTag> CreateTagFields()
+    private static FieldMap<SpecTag> CreateTagFields()
     {
         var fields = new FieldMap<SpecTag>()
             .Field("name", (o, n, _) => o.Name = n.GetScalarValue())
@@ -908,7 +908,7 @@ internal sealed class OpenApiV2Reader
         if (string.IsNullOrEmpty(host) && string.IsNullOrEmpty(basePath) && (schemes == null || schemes.Count == 0) && baseUrl == null)
             return;
 
-        if (!string.IsNullOrEmpty(host) && !IsHostValid(host!))
+        if (host is { Length: > 0 } && !IsHostValid(host))
         {
             context.Diagnostics.Errors.Add(new ValidationIssue(context.GetLocation(), "Invalid host"));
             return;
@@ -977,11 +977,11 @@ internal sealed class OpenApiV2Reader
         {
             var bodyReference = operation.Parameters?.FirstOrDefault(parameter =>
                 parameter.Reference != null && requestBodies.ContainsKey(parameter.Reference.Id));
-            if (bodyReference == null)
+            if (bodyReference is not { Reference: { } reference })
                 continue;
 
             operation.Parameters!.Remove(bodyReference);
-            operation.RequestBody = new SpecRequestBody { Reference = SpecReferences.Create(bodyReference.Reference!.Id, null) };
+            operation.RequestBody = new SpecRequestBody { Reference = SpecReferences.Create(reference.Id, null) };
         }
     }
 }
