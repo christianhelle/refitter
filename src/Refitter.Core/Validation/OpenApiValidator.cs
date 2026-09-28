@@ -33,10 +33,16 @@ public static class OpenApiValidator
             string text;
             try
             {
-                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+                // Downloads like the generator does, so a compressed document validates and an error page does not
+                using var handler = new HttpClientHandler
+                {
+                    AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate,
+                };
+                using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
                 using var httpResponse = await client.SendAsync(
                     new HttpRequestMessage(HttpMethod.Get, openApiFile),
                     cancellationToken).ConfigureAwait(false);
+                httpResponse.EnsureSuccessStatusCode();
                 text = await httpResponse.Content
                     .ReadAsStringWithCancellationAsync(cancellationToken)
                     .ConfigureAwait(false);

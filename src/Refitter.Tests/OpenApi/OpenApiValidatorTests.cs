@@ -130,4 +130,16 @@ public class OpenApiValidatorTests
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*Failed to download OpenAPI document*");
     }
+
+    [Test]
+    public async Task Validate_Should_Throw_InvalidOperationException_When_Remote_Server_Returns_An_Error()
+    {
+        var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
+        await using var server = new LocalHttpServer(openApiSpec, statusCode: 404, statusText: "Not Found");
+
+        var act = () => OpenApiValidator.Validate(server.Url);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Failed to download OpenAPI document*");
+    }
 }
