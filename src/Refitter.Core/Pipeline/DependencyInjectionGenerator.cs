@@ -18,22 +18,28 @@ internal static class DependencyInjectionGenerator
         var xmlDocComments = settings.GenerateXmlDocCodeComments;
 
         var newLine = Environment.NewLine;
+        string Normalize(string value)
+        {
+            var normalized = value.Replace("\r\n", "\n").Replace("\r", "\n");
+            return newLine == "\n" ? normalized : normalized.Replace("\n", newLine);
+        }
 
         var baseUrlParam = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? $"        /// <param name=\"baseUrl\">The base URL for the API clients.</param>{newLine}        "
             : string.Empty;
 
         var methodDocs = xmlDocComments
-            ? $"""
-               /// <summary>
-                       /// Configures the Refit clients for dependency injection.
-                       /// </summary>
-                       /// <param name="services">The service collection to configure.</param>
-               {baseUrlParam}/// <param name="builder">Optional action to configure the HTTP client builder.</param>
-                       /// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
-                       /// <returns>The configured service collection.</returns>
-               {indent}{indent}
-               """
+            ? Normalize(
+                $"""
+                 /// <summary>
+                         /// Configures the Refit clients for dependency injection.
+                         /// </summary>
+                         /// <param name="services">The service collection to configure.</param>
+                 {baseUrlParam}/// <param name="builder">Optional action to configure the HTTP client builder.</param>
+                         /// <param name="settings">Optional Refit settings to customize serialization and other behaviors.</param>
+                         /// <returns>The configured service collection.</returns>
+                 {indent}{indent}
+                 """)
             : "";
 
         var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
@@ -44,64 +50,67 @@ internal static class DependencyInjectionGenerator
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
             : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
 
-        var usings = iocSettings.TransientErrorHandler switch
-        {
-            TransientErrorHandler.Polly
-                => """
-                    using System;
+        var usings = Normalize(
+            iocSettings.TransientErrorHandler switch
+            {
+                TransientErrorHandler.Polly
+                    => """
+                        using System;
+                            using System.Net.Http;
+                            using Microsoft.Extensions.DependencyInjection;
+                            using Polly;
+                            using Polly.Contrib.WaitAndRetry;
+                            using Polly.Extensions.Http;
+                            using Refit;
+                        """,
+                TransientErrorHandler.HttpResilience
+                    => """
+                        using System;
+                            using System.Net.Http;
+                            using Microsoft.Extensions.DependencyInjection;
+                            using Microsoft.Extensions.Http.Resilience;
+                            using Refit;
+                        """,
+                _
+                    => """
+                        using System;
                         using System.Net.Http;
                         using Microsoft.Extensions.DependencyInjection;
-                        using Polly;
-                        using Polly.Contrib.WaitAndRetry;
-                        using Polly.Extensions.Http;
                         using Refit;
-                    """,
-            TransientErrorHandler.HttpResilience
-                => """
-                    using System;
-                        using System.Net.Http;
-                        using Microsoft.Extensions.DependencyInjection;
-                        using Microsoft.Extensions.Http.Resilience;
-                        using Refit;
-                    """,
-            _
-                => """
-                    using System;
-                    using System.Net.Http;
-                    using Microsoft.Extensions.DependencyInjection;
-                    using Refit;
-                    """
-        };
+                        """
+            });
 
         code.AppendLine();
         code.AppendLine();
         code.AppendLine(
-            $$""""
-              #nullable enable
-              namespace {{settings.Namespace}}
-              {
-                  {{usings}}
-              {{(xmlDocComments ? """
-
-                  /// <summary>
-                  /// Extension methods for configuring Refit clients in the service collection.
-                  /// </summary>
-              """ : "")}}
-                  public static partial class IServiceCollectionExtensions
+            Normalize(
+                $$""""
+                  #nullable enable
+                  namespace {{settings.Namespace}}
                   {
-                      {{methodDeclaration}}
+                      {{usings}}
+                  {{(xmlDocComments ? """
+
+                      /// <summary>
+                      /// Extension methods for configuring Refit clients in the service collection.
+                      /// </summary>
+                  """ : "")}}
+                      public static partial class IServiceCollectionExtensions
                       {
-              """");
+                          {{methodDeclaration}}
+                          {
+                  """"));
         foreach (var interfaceName in interfaceNames)
         {
             var clientBuilderName = $"clientBuilder{interfaceName}";
             code.Append(
-                $$"""
-                              var {{clientBuilderName}} = services
-                                  .AddRefitClient<{{interfaceName}}>(settings)
-                                  {{(iocSettings.UseWindowsAuthentication ? ".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })" : "")}}
-                                  {{configureRefitClient}}
-                  """);
+                Normalize(
+                    $$"""
+                                  var {{clientBuilderName}} = services
+                                      .AddRefitClient<{{interfaceName}}>(settings)
+                                      {{(iocSettings.UseWindowsAuthentication ? ".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })" : "")}}
+                                      {{configureRefitClient}}
+                      """));
 
             foreach (string httpMessageHandler in iocSettings.HttpMessageHandlers)
             {
@@ -117,34 +126,36 @@ internal static class DependencyInjectionGenerator
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 code.AppendLine();
                 code.AppendLine(
-                    $$"""
-                                  {{clientBuilderName}}
-                                      .AddPolicyHandler(
-                                          HttpPolicyExtensions
-                                              .HandleTransientHttpError()
-                                              .WaitAndRetryAsync(
-                                                  Backoff.DecorrelatedJitterBackoffV2(
-                                                      TimeSpan.FromSeconds({{durationString}}),
-                                                      {{iocSettings.MaxRetryCount}})));
-                      """);
+                    Normalize(
+                        $$"""
+                                      {{clientBuilderName}}
+                                          .AddPolicyHandler(
+                                              HttpPolicyExtensions
+                                                  .HandleTransientHttpError()
+                                                  .WaitAndRetryAsync(
+                                                      Backoff.DecorrelatedJitterBackoffV2(
+                                                          TimeSpan.FromSeconds({{durationString}}),
+                                                          {{iocSettings.MaxRetryCount}})));
+                          """));
             }
             else if (iocSettings.TransientErrorHandler == TransientErrorHandler.HttpResilience)
             {
                 var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 code.AppendLine();
                 code.AppendLine(
-                    $$"""
-                                  {{clientBuilderName}}
-                                      .AddStandardResilienceHandler(config =>
-                                      {
-                                          config.Retry = new HttpRetryStrategyOptions
+                    Normalize(
+                        $$"""
+                                      {{clientBuilderName}}
+                                          .AddStandardResilienceHandler(config =>
                                           {
-                                              UseJitter = true,
-                                              MaxRetryAttempts = {{iocSettings.MaxRetryCount}},
-                                              Delay = TimeSpan.FromSeconds({{durationString}})
-                                          };
-                                      });
-                      """);
+                                              config.Retry = new HttpRetryStrategyOptions
+                                              {
+                                                  UseJitter = true,
+                                                  MaxRetryAttempts = {{iocSettings.MaxRetryCount}},
+                                                  Delay = TimeSpan.FromSeconds({{durationString}})
+                                              };
+                                          });
+                          """));
             }
 
             code.AppendLine();

@@ -313,6 +313,11 @@ internal static class DependencyInjectionGeneratorAssertions
     public static void ContainExpectedDependencyInjectionLineEndings(this string code)
     {
         if (Environment.NewLine == "\n")
+        {
             code.Should().NotContain("\r\n");
+            return;
+        }
+
+        code.Replace("\r\n", string.Empty).Should().NotContain("\n");
     }
 }
