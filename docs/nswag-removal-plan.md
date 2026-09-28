@@ -50,10 +50,9 @@ Still open:
 
 - `CustomTemplateDirectory` still works, because the ported templates are rendered with template models
   equivalent to NJsonSchema's. It is still marked deprecated; keep it and remove the deprecation, or remove it.
-- The generated code still says `GeneratedCode("NJsonSchema"/"NSwag", "14.7.1.0 ...")`
-  (`ContractTemplateRenderer.ToolchainVersion` and the templates), to keep the output identical.
-  Changing it is a one-line, explicitly accepted snapshot difference. The "Generated using the NSwag toolchain"
-  header comment has been removed.
+- Done after parity was reached: the "Generated using the NSwag toolchain" header comment is removed, and the
+  generated contracts say `GeneratedCode("Refitter", "<Refitter version>")` like the interfaces do. Settings,
+  docs and tests no longer refer to NSwag; `THIRD-PARTY-NOTICES.md` keeps the license notices for the ported code.
 
 ## Where NSwag was used
 
