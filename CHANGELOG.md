@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.0...HEAD)
+
+**Implemented enhancements:**
+
+- Fix the line endings of generated code [\#1323](https://github.com/christianhelle/refitter/pull/1323) ([paule96](https://github.com/paule96))
+
 ## [2.3.0](https://github.com/christianhelle/refitter/tree/2.3.0) (2026-09-28)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.1...2.3.0)
