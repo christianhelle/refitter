@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.0...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.118...HEAD)
+
+**Merged pull requests:**
+
+- Update dependency TUnit to 1.71.0 [\#1322](https://github.com/christianhelle/refitter/pull/1322) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [2.3.1-preview.118](https://github.com/christianhelle/refitter/tree/2.3.1-preview.118) (2026-09-29)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.0...2.3.1-preview.118)
 
 **Implemented enhancements:**
 
