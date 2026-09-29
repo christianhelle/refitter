@@ -1,13 +1,32 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [2.3.0](https://github.com/christianhelle/refitter/tree/2.3.0) (2026-09-28)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.1...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.2.1...2.3.0)
 
 **Implemented enhancements:**
 
 - Delete temporary files created by unit tests [\#1306](https://github.com/christianhelle/refitter/pull/1306) ([christianhelle](https://github.com/christianhelle))
+- Rename duplicate parameter names in generated methods [\#1305](https://github.com/christianhelle/refitter/pull/1305) ([christianhelle](https://github.com/christianhelle))
+- Generate unique member names for colliding schema properties [\#1304](https://github.com/christianhelle/refitter/pull/1304) ([christianhelle](https://github.com/christianhelle))
+- Include allOf member properties in multipart parameters [\#1303](https://github.com/christianhelle/refitter/pull/1303) ([christianhelle](https://github.com/christianhelle))
+- Generate XML param docs that match the emitted method parameters [\#1302](https://github.com/christianhelle/refitter/pull/1302) ([christianhelle](https://github.com/christianhelle))
+- Give ByEndpoint interfaces unique names when operationIds are missing [\#1301](https://github.com/christianhelle/refitter/pull/1301) ([christianhelle](https://github.com/christianhelle))
+- Rename interfaces that collide with contract type names [\#1300](https://github.com/christianhelle/refitter/pull/1300) ([christianhelle](https://github.com/christianhelle))
+- Generate unique enum member names for values differing only by case [\#1299](https://github.com/christianhelle/refitter/pull/1299) ([christianhelle](https://github.com/christianhelle))
+- Support OpenAPI 3.1 components/pathItems references [\#1298](https://github.com/christianhelle/refitter/pull/1298) ([christianhelle](https://github.com/christianhelle))
+- Send array header parameters as comma-separated values [\#1297](https://github.com/christianhelle/refitter/pull/1297) ([christianhelle](https://github.com/christianhelle))
+- Honor OpenAPI 3 query parameter style and explode [\#1296](https://github.com/christianhelle/refitter/pull/1296) ([christianhelle](https://github.com/christianhelle))
+- Send form-urlencoded request bodies as form posts [\#1295](https://github.com/christianhelle/refitter/pull/1295) ([christianhelle](https://github.com/christianhelle))
+- Build deprecated schemas used by operations with warnings as errors [\#1294](https://github.com/christianhelle/refitter/pull/1294) ([christianhelle](https://github.com/christianhelle))
+- Load specs with numeric bounds beyond decimal.MaxValue [\#1293](https://github.com/christianhelle/refitter/pull/1293) ([christianhelle](https://github.com/christianhelle))
+- Fix void operations when a schema is named Task [\#1292](https://github.com/christianhelle/refitter/pull/1292) ([christianhelle](https://github.com/christianhelle))
+- Import System.Net.Http when interfaces return HttpResponseMessage [\#1290](https://github.com/christianhelle/refitter/pull/1290) ([christianhelle](https://github.com/christianhelle))
+- Remove non-identifier characters when sanitizing names [\#1289](https://github.com/christianhelle/refitter/pull/1289) ([christianhelle](https://github.com/christianhelle))
+- Skip TRACE operations that Refit cannot express [\#1288](https://github.com/christianhelle/refitter/pull/1288) ([christianhelle](https://github.com/christianhelle))
+- Emit each Apizr registration using directive once [\#1287](https://github.com/christianhelle/refitter/pull/1287) ([christianhelle](https://github.com/christianhelle))
 - Move MSBuild build dependency into the solution [\#1283](https://github.com/christianhelle/refitter/pull/1283) ([christianhelle](https://github.com/christianhelle))
+- Add OpenAPI edge case regression tests and fix BuildHelper no-op builds [\#1279](https://github.com/christianhelle/refitter/pull/1279) ([christianhelle](https://github.com/christianhelle))
 - Remove dead and unused code [\#1257](https://github.com/christianhelle/refitter/pull/1257) ([christianhelle](https://github.com/christianhelle))
 - Check cancellation before fetching remote OpenAPI documents [\#1255](https://github.com/christianhelle/refitter/pull/1255) ([christianhelle](https://github.com/christianhelle))
 - Pass the document path to NSwag when round-tripping multi-file specs [\#1254](https://github.com/christianhelle/refitter/pull/1254) ([christianhelle](https://github.com/christianhelle))
@@ -36,28 +55,9 @@
 
 **Merged pull requests:**
 
-- Rename duplicate parameter names in generated methods [\#1305](https://github.com/christianhelle/refitter/pull/1305) ([christianhelle](https://github.com/christianhelle))
-- Generate unique member names for colliding schema properties [\#1304](https://github.com/christianhelle/refitter/pull/1304) ([christianhelle](https://github.com/christianhelle))
-- Include allOf member properties in multipart parameters [\#1303](https://github.com/christianhelle/refitter/pull/1303) ([christianhelle](https://github.com/christianhelle))
-- Generate XML param docs that match the emitted method parameters [\#1302](https://github.com/christianhelle/refitter/pull/1302) ([christianhelle](https://github.com/christianhelle))
-- Give ByEndpoint interfaces unique names when operationIds are missing [\#1301](https://github.com/christianhelle/refitter/pull/1301) ([christianhelle](https://github.com/christianhelle))
-- Rename interfaces that collide with contract type names [\#1300](https://github.com/christianhelle/refitter/pull/1300) ([christianhelle](https://github.com/christianhelle))
-- Generate unique enum member names for values differing only by case [\#1299](https://github.com/christianhelle/refitter/pull/1299) ([christianhelle](https://github.com/christianhelle))
-- Support OpenAPI 3.1 components/pathItems references [\#1298](https://github.com/christianhelle/refitter/pull/1298) ([christianhelle](https://github.com/christianhelle))
-- Send array header parameters as comma-separated values [\#1297](https://github.com/christianhelle/refitter/pull/1297) ([christianhelle](https://github.com/christianhelle))
-- Honor OpenAPI 3 query parameter style and explode [\#1296](https://github.com/christianhelle/refitter/pull/1296) ([christianhelle](https://github.com/christianhelle))
-- Send form-urlencoded request bodies as form posts [\#1295](https://github.com/christianhelle/refitter/pull/1295) ([christianhelle](https://github.com/christianhelle))
-- Build deprecated schemas used by operations with warnings as errors [\#1294](https://github.com/christianhelle/refitter/pull/1294) ([christianhelle](https://github.com/christianhelle))
-- Load specs with numeric bounds beyond decimal.MaxValue [\#1293](https://github.com/christianhelle/refitter/pull/1293) ([christianhelle](https://github.com/christianhelle))
-- Fix void operations when a schema is named Task [\#1292](https://github.com/christianhelle/refitter/pull/1292) ([christianhelle](https://github.com/christianhelle))
-- Import System.Net.Http when interfaces return HttpResponseMessage [\#1290](https://github.com/christianhelle/refitter/pull/1290) ([christianhelle](https://github.com/christianhelle))
-- Remove non-identifier characters when sanitizing names [\#1289](https://github.com/christianhelle/refitter/pull/1289) ([christianhelle](https://github.com/christianhelle))
-- Skip TRACE operations that Refit cannot express [\#1288](https://github.com/christianhelle/refitter/pull/1288) ([christianhelle](https://github.com/christianhelle))
-- Emit each Apizr registration using directive once [\#1287](https://github.com/christianhelle/refitter/pull/1287) ([christianhelle](https://github.com/christianhelle))
 - Update refit monorepo to 16.2.0 [\#1285](https://github.com/christianhelle/refitter/pull/1285) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Newtonsoft.Json.Schema to 4.0.2 [\#1284](https://github.com/christianhelle/refitter/pull/1284) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.69.16 [\#1282](https://github.com/christianhelle/refitter/pull/1282) ([renovate[bot]](https://github.com/apps/renovate))
-- Add OpenAPI edge case regression tests and fix BuildHelper no-op builds [\#1279](https://github.com/christianhelle/refitter/pull/1279) ([christianhelle](https://github.com/christianhelle))
 - Update NuGet packages [\#1261](https://github.com/christianhelle/refitter/pull/1261) ([christianhelle](https://github.com/christianhelle))
 - Document .NET 10 system requirements [\#1260](https://github.com/christianhelle/refitter/pull/1260) ([Copilot](https://github.com/apps/copilot-swe-agent))
 - Update dependency TUnit to 1.69.0 [\#1256](https://github.com/christianhelle/refitter/pull/1256) ([renovate[bot]](https://github.com/apps/renovate))
@@ -184,21 +184,11 @@
 
 ## [2.1.0](https://github.com/christianhelle/refitter/tree/2.1.0) (2026-07-05)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...2.1.0)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/prds...2.1.0)
 
 **Implemented enhancements:**
 
 - Add option for Windows Authentication support to generated ConfigureRefitClients\(\) [\#1170](https://github.com/christianhelle/refitter/issues/1170)
-- Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1122](https://github.com/christianhelle/refitter/issues/1122)
-- Deepen RefitterGenerateTask: Replace AsyncLocal test hooks with real seams [\#1121](https://github.com/christianhelle/refitter/issues/1121)
-- Fix RefitterSourceGenerator: Remove blocking I/O and async-over-sync in source generator [\#1120](https://github.com/christianhelle/refitter/issues/1120)
-- Inline shallow utility modules: CustomCSharpClientGenerator, FileWriter, Serializer, etc. [\#1119](https://github.com/christianhelle/refitter/issues/1119)
-- Architecture Deepening: Refitter Core Code Generation Modules [\#1118](https://github.com/christianhelle/refitter/issues/1118)
-- Deepen GenerateCommand: Extract GenerationOrchestrator from thick CLI command [\#1117](https://github.com/christianhelle/refitter/issues/1117)
-- Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
-- Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
-- Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
-- Refitter.MSBuild RefitterAutoScan false property [\#1094](https://github.com/christianhelle/refitter/issues/1094)
 - Update multiple dependencies to latest versions [\#1183](https://github.com/christianhelle/refitter/pull/1183) ([christianhelle](https://github.com/christianhelle))
 - Upgrade oasreader to v3.7.0.20 [\#1182](https://github.com/christianhelle/refitter/pull/1182) ([christianhelle](https://github.com/christianhelle))
 - Verify compatibility with Refit v13.1.0 [\#1181](https://github.com/christianhelle/refitter/pull/1181) ([christianhelle](https://github.com/christianhelle))
@@ -231,9 +221,6 @@
 **Fixed bugs:**
 
 - Using the --multiple-files argument generates Contracts.cs under a folder called Output.cs [\#1169](https://github.com/christianhelle/refitter/issues/1169)
-- Build Error CS1591 Missing XML comment for publicly visible type or member [\#1109](https://github.com/christianhelle/refitter/issues/1109)
-- Broken generation for an api named "Public" [\#1102](https://github.com/christianhelle/refitter/issues/1102)
-- Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
 - Asana API "cannot derive from sealed type" [\#359](https://github.com/christianhelle/refitter/issues/359)
 - Fix Source Generator not emitting any files [\#1143](https://github.com/christianhelle/refitter/pull/1143) ([christianhelle](https://github.com/christianhelle))
 
@@ -276,17 +263,61 @@
 - Update dependency TUnit to 1.45.29 [\#1086](https://github.com/christianhelle/refitter/pull/1086) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency Microsoft.CodeAnalysis.CSharp to v5 [\#1066](https://github.com/christianhelle/refitter/pull/1066) ([renovate[bot]](https://github.com/apps/renovate))
 
-## [2.0.0](https://github.com/christianhelle/refitter/tree/2.0.0) (2026-05-01)
+## [archive/prds](https://github.com/christianhelle/refitter/tree/archive/prds) (2026-06-15)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.3...2.0.0)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/failing-smoke-tests...archive/prds)
 
 **Implemented enhancements:**
 
-- Support custom format-mappings via Key-Value configuration [\#438](https://github.com/christianhelle/refitter/issues/438)
+- Deepen InterfaceGenerator: Replace triplicated method generation with single deep module + partitioning strategy [\#1122](https://github.com/christianhelle/refitter/issues/1122)
+- Deepen RefitterGenerateTask: Replace AsyncLocal test hooks with real seams [\#1121](https://github.com/christianhelle/refitter/issues/1121)
+- Fix RefitterSourceGenerator: Remove blocking I/O and async-over-sync in source generator [\#1120](https://github.com/christianhelle/refitter/issues/1120)
+- Inline shallow utility modules: CustomCSharpClientGenerator, FileWriter, Serializer, etc. [\#1119](https://github.com/christianhelle/refitter/issues/1119)
+- Architecture Deepening: Refitter Core Code Generation Modules [\#1118](https://github.com/christianhelle/refitter/issues/1118)
+- Deepen GenerateCommand: Extract GenerationOrchestrator from thick CLI command [\#1117](https://github.com/christianhelle/refitter/issues/1117)
+- Deepen RefitGenerator: Extract Generator Pipeline from god-object orchestration [\#1116](https://github.com/christianhelle/refitter/issues/1116)
+- Deepen ParameterExtractor: Split 622-line shallow module into parameter-type extractors [\#1115](https://github.com/christianhelle/refitter/issues/1115)
+
+## [archive/failing-smoke-tests](https://github.com/christianhelle/refitter/tree/archive/failing-smoke-tests) (2026-06-12)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/refit-11-fixed-with-copilot...archive/failing-smoke-tests)
+
+**Fixed bugs:**
+
+- Build Error CS1591 Missing XML comment for publicly visible type or member [\#1109](https://github.com/christianhelle/refitter/issues/1109)
+
+## [archive/refit-11-fixed-with-copilot](https://github.com/christianhelle/refitter/tree/archive/refit-11-fixed-with-copilot) (2026-06-06)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/issue-1088...archive/refit-11-fixed-with-copilot)
+
+**Implemented enhancements:**
+
+- Allow setting JsonLibraryVersion [\#1105](https://github.com/christianhelle/refitter/issues/1105)
+- Refitter.MSBuild RefitterAutoScan false property [\#1094](https://github.com/christianhelle/refitter/issues/1094)
+
+**Fixed bugs:**
+
+- Broken generation for an api named "Public" [\#1102](https://github.com/christianhelle/refitter/issues/1102)
+
+## [archive/issue-1088](https://github.com/christianhelle/refitter/tree/archive/issue-1088) (2026-05-05)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/v2.0.0-audit...archive/issue-1088)
+
+**Fixed bugs:**
+
+- Multi-spec merge fails on equivalent duplicate schemas [\#1075](https://github.com/christianhelle/refitter/issues/1075)
+
+## [archive/v2.0.0-audit](https://github.com/christianhelle/refitter/tree/archive/v2.0.0-audit) (2026-05-01)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.0.0...archive/v2.0.0-audit)
+
+## [2.0.0](https://github.com/christianhelle/refitter/tree/2.0.0) (2026-05-01)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/stackoverflow-exception...2.0.0)
+
+**Implemented enhancements:**
+
 - AnyType + BodySerializationMethod [\#423](https://github.com/christianhelle/refitter/issues/423)
-- Generate the client from multiple versions [\#350](https://github.com/christianhelle/refitter/issues/350)
-- Config parameter to add suffix to contract types [\#193](https://github.com/christianhelle/refitter/issues/193)
-- Add SourceGenerator support to the standalone tool [\#179](https://github.com/christianhelle/refitter/issues/179)
 - Sanitize malformed schema type names without renaming clean schemas [\#1085](https://github.com/christianhelle/refitter/pull/1085) ([christianhelle](https://github.com/christianhelle))
 - Tighten warning handling across Refitter builds [\#1079](https://github.com/christianhelle/refitter/pull/1079) ([christianhelle](https://github.com/christianhelle))
 - Handle equivalent duplicate schemas in multi-spec merge [\#1076](https://github.com/christianhelle/refitter/pull/1076) ([christianhelle](https://github.com/christianhelle))
@@ -375,21 +406,6 @@
 - OpenApi client generate fails with System.ArgumentException: An item with the same key has already been added [\#991](https://github.com/christianhelle/refitter/issues/991)
 - StackOverflowException in recursive schema traversal [\#973](https://github.com/christianhelle/refitter/issues/973)
 - how to keep contract Property Name as original name without Serialization ? [\#967](https://github.com/christianhelle/refitter/issues/967)
-- Non-ASCII response descriptions become \uXXXX in XML comments [\#944](https://github.com/christianhelle/refitter/issues/944)
-- Resolve SonarCloud Code Quality Issues [\#931](https://github.com/christianhelle/refitter/issues/931)
-- format: int32 quirk =\> Serializes to "object" when open api spec contains pattern [\#867](https://github.com/christianhelle/refitter/issues/867)
-- Failing CLI example with confusing error message [\#847](https://github.com/christianhelle/refitter/issues/847)
-- .refitter - "mutipleInterfaces": "ByTag" increments number at the end of Method Name globally instead of being related to its interface [\#672](https://github.com/christianhelle/refitter/issues/672)
-- Build errors when combined with `Microsoft.Extensions.ApiDescription.Server` [\#635](https://github.com/christianhelle/refitter/issues/635)
-- Nullable Strings not being marked correctly [\#580](https://github.com/christianhelle/refitter/issues/580)
-- Refitter failed to write generated code: System.IO.IOException: The process cannot access the file 'Generated.cs' because it is being used by another process. [\#520](https://github.com/christianhelle/refitter/issues/520)
-- Code Generator adds numeric suffix to Interface method name when not needed [\#361](https://github.com/christianhelle/refitter/issues/361)
-- Source generator does not work in .Net 8 [\#310](https://github.com/christianhelle/refitter/issues/310)
-- Hyphens with JsonStringEnumConverter results in `JSON value could not be converted` [\#300](https://github.com/christianhelle/refitter/issues/300)
-- The client parameter type's names occur wrong when multipart is include. [\#231](https://github.com/christianhelle/refitter/issues/231)
-- Multipart endpoint \[FromForm\] decorated argument is missing from signature [\#222](https://github.com/christianhelle/refitter/issues/222)
-- The using of StringEnumConverter end up generating unserializable data when different NamingPolicy is needed [\#178](https://github.com/christianhelle/refitter/issues/178)
-- Base type not generated for types specified by oneOf in the schema [\#175](https://github.com/christianhelle/refitter/issues/175)
 
 **Closed issues:**
 
@@ -472,6 +488,61 @@
 - Update dependency ruby to v4.0.1 [\#866](https://github.com/christianhelle/refitter/pull/866) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dependency TUnit to 1.13.60 [\#865](https://github.com/christianhelle/refitter/pull/865) ([renovate[bot]](https://github.com/apps/renovate))
 - Update dotnet monorepo [\#835](https://github.com/christianhelle/refitter/pull/835) ([renovate[bot]](https://github.com/apps/renovate))
+
+## [archive/stackoverflow-exception](https://github.com/christianhelle/refitter/tree/archive/stackoverflow-exception) (2026-03-27)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/deps...archive/stackoverflow-exception)
+
+## [archive/deps](https://github.com/christianhelle/refitter/tree/archive/deps) (2026-03-25)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/fix/source-generator-addource...archive/deps)
+
+**Implemented enhancements:**
+
+- Support custom format-mappings via Key-Value configuration [\#438](https://github.com/christianhelle/refitter/issues/438)
+- Config parameter to add suffix to contract types [\#193](https://github.com/christianhelle/refitter/issues/193)
+- Add SourceGenerator support to the standalone tool [\#179](https://github.com/christianhelle/refitter/issues/179)
+
+**Fixed bugs:**
+
+- Non-ASCII response descriptions become \uXXXX in XML comments [\#944](https://github.com/christianhelle/refitter/issues/944)
+- Resolve SonarCloud Code Quality Issues [\#931](https://github.com/christianhelle/refitter/issues/931)
+- .refitter - "mutipleInterfaces": "ByTag" increments number at the end of Method Name globally instead of being related to its interface [\#672](https://github.com/christianhelle/refitter/issues/672)
+- Build errors when combined with `Microsoft.Extensions.ApiDescription.Server` [\#635](https://github.com/christianhelle/refitter/issues/635)
+- Nullable Strings not being marked correctly [\#580](https://github.com/christianhelle/refitter/issues/580)
+- Refitter failed to write generated code: System.IO.IOException: The process cannot access the file 'Generated.cs' because it is being used by another process. [\#520](https://github.com/christianhelle/refitter/issues/520)
+- Code Generator adds numeric suffix to Interface method name when not needed [\#361](https://github.com/christianhelle/refitter/issues/361)
+- Source generator does not work in .Net 8 [\#310](https://github.com/christianhelle/refitter/issues/310)
+- Hyphens with JsonStringEnumConverter results in `JSON value could not be converted` [\#300](https://github.com/christianhelle/refitter/issues/300)
+- The client parameter type's names occur wrong when multipart is include. [\#231](https://github.com/christianhelle/refitter/issues/231)
+- Multipart endpoint \[FromForm\] decorated argument is missing from signature [\#222](https://github.com/christianhelle/refitter/issues/222)
+- The using of StringEnumConverter end up generating unserializable data when different NamingPolicy is needed [\#178](https://github.com/christianhelle/refitter/issues/178)
+- Base type not generated for types specified by oneOf in the schema [\#175](https://github.com/christianhelle/refitter/issues/175)
+
+## [archive/fix/source-generator-addource](https://github.com/christianhelle/refitter/tree/archive/fix/source-generator-addource) (2026-03-03)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/fix/interface-method-naming-scope...archive/fix/source-generator-addource)
+
+## [archive/fix/interface-method-naming-scope](https://github.com/christianhelle/refitter/tree/archive/fix/interface-method-naming-scope) (2026-03-03)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/fix/nullable-string-handling...archive/fix/interface-method-naming-scope)
+
+## [archive/fix/nullable-string-handling](https://github.com/christianhelle/refitter/tree/archive/fix/nullable-string-handling) (2026-03-03)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/archive/fix/multipart-form-data...archive/fix/nullable-string-handling)
+
+## [archive/fix/multipart-form-data](https://github.com/christianhelle/refitter/tree/archive/fix/multipart-form-data) (2026-03-03)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/1.7.3...archive/fix/multipart-form-data)
+
+**Implemented enhancements:**
+
+- Generate the client from multiple versions [\#350](https://github.com/christianhelle/refitter/issues/350)
+
+**Fixed bugs:**
+
+- format: int32 quirk =\> Serializes to "object" when open api spec contains pattern [\#867](https://github.com/christianhelle/refitter/issues/867)
+- Failing CLI example with confusing error message [\#847](https://github.com/christianhelle/refitter/issues/847)
 
 ## [1.7.3](https://github.com/christianhelle/refitter/tree/1.7.3) (2026-01-24)
 
