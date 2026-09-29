@@ -7,7 +7,9 @@ namespace Refitter.Tests.DependencyInjection;
 public class DependencyInjectionGeneratorBranchTests
 {
     [Test]
-    public void Can_Generate_With_BaseUrl_And_XmlDocComments()
+    [Arguments("\n")]
+    [Arguments("\r\n")]
+    public void Can_Generate_With_BaseUrl_And_XmlDocComments(string newLine)
     {
         var settings = new RefitGeneratorSettings
         {
@@ -25,17 +27,28 @@ public class DependencyInjectionGeneratorBranchTests
 
         string code = DependencyInjectionGenerator.Generate(
             settings,
-            new[] { "IPetApi" });
+            new[] { "IPetApi" },
+            newLine);
 
         code.Should().Contain("/// <summary>");
         code.Should().Contain("/// Configures the Refit clients for dependency injection.");
         code.Should().Contain("/// <param name=\"services\">The service collection to configure.</param>");
         code.Should().NotContain("/// <param name=\"baseUrl\">");
+        code.Should().Contain(
+            $$"""
+              public static IServiceCollection ConfigureRefitClients(
+                          this IServiceCollection services, 
+                          Action<IHttpClientBuilder>? builder = default, 
+                          RefitSettings? settings = default)
+              """.ReplaceLineEndings(newLine));
         code.Should().Contain($".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{settings.DependencyInjectionSettings.BaseUrl}\"))");
+        code.ContainExpectedDependencyInjectionLineEndings(newLine);
     }
 
     [Test]
-    public void Can_Generate_Without_BaseUrl_And_With_XmlDocComments()
+    [Arguments("\n")]
+    [Arguments("\r\n")]
+    public void Can_Generate_Without_BaseUrl_And_With_XmlDocComments(string newLine)
     {
         var settings = new RefitGeneratorSettings
         {
@@ -53,14 +66,40 @@ public class DependencyInjectionGeneratorBranchTests
 
         string code = DependencyInjectionGenerator.Generate(
             settings,
-            new[] { "IPetApi" });
+            new[] { "IPetApi" },
+            newLine);
 
         code.Should().Contain("/// <summary>");
         code.Should().Contain("/// Configures the Refit clients for dependency injection.");
         code.Should().Contain("/// <param name=\"services\">The service collection to configure.</param>");
-        code.Should().Contain("/// <param name=\"baseUrl\">The base URL for the API clients.</param>");
-        code.Should().Contain("Uri baseUrl");
+        code.Should().Contain(
+            $$"""
+              /// <param name="baseUrl">The base URL for the API clients.</param>
+                      /// <param name="builder">Optional action to configure the HTTP client builder.</param>
+              """.ReplaceLineEndings(newLine));
+        code.Should().Contain(
+            """
+            public static IServiceCollection ConfigureRefitClients(
+                        this IServiceCollection services, 
+                        Uri baseUrl, 
+                        Action<IHttpClientBuilder>? builder = default, 
+                        RefitSettings? settings = default)
+            """.ReplaceLineEndings(newLine));
         code.Should().Contain(".ConfigureHttpClient(c => c.BaseAddress = baseUrl)");
+        code.ContainExpectedDependencyInjectionLineEndings(newLine);
+    }
+
+    [Test]
+    [Arguments("\n")]
+    [Arguments("\r\n")]
+    public void NormalizeLineEndings_Uses_Requested_Newline(string newLine)
+    {
+        const string input = "first line\r\nsecond line\nthird line\rfourth line";
+
+        string normalized = DependencyInjectionGenerator.NormalizeLineEndings(input, newLine);
+
+        normalized.Should().Be($"first line{newLine}second line{newLine}third line{newLine}fourth line");
+        normalized.ContainExpectedDependencyInjectionLineEndings(newLine);
     }
 
     [Test]
@@ -285,5 +324,15 @@ public class DependencyInjectionGeneratorBranchTests
 
         code.Should().Contain("using System.Net.Http");
         code.Should().Contain(".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })");
+    }
+}
+
+internal static class DependencyInjectionGeneratorAssertions
+{
+    public static void ContainExpectedDependencyInjectionLineEndings(this string code, string expectedNewLine)
+    {
+       string remainder = code.Replace(expectedNewLine, string.Empty);
+       remainder.Should().NotContain("\r");
+       remainder.Should().NotContain("\n");
     }
 }
