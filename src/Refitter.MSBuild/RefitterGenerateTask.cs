@@ -79,6 +79,8 @@ public class RefitterGenerateTask : MSBuildTask
 
     public string IncludePatterns { get; set; }
 
+    public string JsonLibraryVersion { get; set; }
+
     [Output]
     public ITaskItem[] GeneratedFiles { get; set; }
 
@@ -183,6 +185,10 @@ public class RefitterGenerateTask : MSBuildTask
         if (SkipValidation)
         {
             args += " --skip-validation";
+        }
+        if (!string.IsNullOrWhiteSpace(JsonLibraryVersion))
+        {
+            args += $" --json-library-version {JsonLibraryVersion}";
         }
 
         TryLogCommandLine($"Starting dotnet {args}");

@@ -659,6 +659,44 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void Execute_Should_Pass_JsonLibraryVersion_To_Refitter()
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            string generatedFile = CreateGeneratedFile(workspace);
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+
+            string? arguments = null;
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                arguments = startInfo.Arguments;
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            RefitterGenerateTask task = CreateTask(workspace);
+            task.JsonLibraryVersion = "9.0";
+
+            bool result = task.Execute();
+
+            result.Should().BeTrue();
+            arguments.Should().Contain("--json-library-version 9.0");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
     public void Execute_Should_Pass_Telemetry_Source_Args_To_Refitter()
     {
         string workspace = CreateWorkspace();
