@@ -4,6 +4,11 @@
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.118...HEAD)
 
+**Implemented enhancements:**
+
+- Refitter.MSBuild: pass JsonLibraryVersion from an MSBuild property [\#1327](https://github.com/christianhelle/refitter/issues/1327)
+- Add RefitterJsonLibraryVersion MSBuild property [\#1328](https://github.com/christianhelle/refitter/pull/1328) ([christianhelle](https://github.com/christianhelle))
+
 **Merged pull requests:**
 
 - Update dependency TUnit to 1.71.0 [\#1322](https://github.com/christianhelle/refitter/pull/1322) ([renovate[bot]](https://github.com/apps/renovate))
