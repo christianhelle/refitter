@@ -40,6 +40,16 @@ public class OutputRootFileWriterTests
     }
 
     [Test]
+    public void Rebase_Should_Escape_Literal_Segments_That_Start_With_Escape_Character()
+    {
+        var path = Path.Combine(BaseDirectory, "_parent", "__", "Contracts.cs");
+
+        var result = OutputRootFileWriter.Rebase(path, BaseDirectory, OutputRoot);
+
+        result.Should().Be(Path.Combine(OutputRoot, "__parent", "___", "Contracts.cs"));
+    }
+
+    [Test]
     public void Rebase_Should_Resolve_Relative_Paths_Against_Current_Directory()
     {
         var baseDirectory = Directory.GetCurrentDirectory();

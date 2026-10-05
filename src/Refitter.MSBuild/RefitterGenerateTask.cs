@@ -8,8 +8,9 @@ namespace Refitter.MSBuild;
 public class RefitterGenerateTask : MSBuildTask
 {
     internal const string GeneratedFileMarker = "GeneratedFile: ";
-    // Must match OutputRootFileWriter.ParentDirectorySegment in the Refitter CLI
-    internal const string ParentDirectorySegment = "__";
+    // Must match OutputRootFileWriter.ParentDirectorySegment and EscapeCharacter in the Refitter CLI
+    internal const string ParentDirectorySegment = "_parent";
+    internal const char EscapeCharacter = '_';
     private static readonly AsyncLocal<Func<List<string>>?> InstalledDotnetRuntimesProviderOverride = new();
     private static readonly AsyncLocal<Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult>?> ProcessRunnerOverride = new();
     private static readonly AsyncLocal<int?> ProcessTimeoutMillisecondsOverride = new();
@@ -511,11 +512,18 @@ public class RefitterGenerateTask : MSBuildTask
     {
         var segments = GetRelativePath(fileOutputRoot, generatedFile)
             .Split([Path.DirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries)
-            .Select(segment => segment == ParentDirectorySegment ? ".." : segment)
+            .Select(DecodeSegment)
             .ToArray();
 
         return Path.GetFullPath(Path.Combine(settingsFileDirectory, string.Join(Path.DirectorySeparatorChar.ToString(), segments)));
     }
+
+    private static string DecodeSegment(string segment) =>
+        segment == ParentDirectorySegment
+            ? ".."
+            : segment[0] == EscapeCharacter
+                ? segment.Substring(1)
+                : segment;
 
     internal static string? ParseGeneratedFilePath(string? outputLine)
     {

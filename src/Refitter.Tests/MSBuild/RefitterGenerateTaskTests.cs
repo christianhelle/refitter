@@ -798,6 +798,22 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    [Arguments("_parent", "..")]
+    [Arguments("__parent", "_parent")]
+    [Arguments("__", "_")]
+    [Arguments("___", "__")]
+    [Arguments("Generated", "Generated")]
+    public void GetSupersededFilePath_Should_Decode_Segments(string encodedSegment, string decodedSegment)
+    {
+        string settingsDirectory = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "apis"));
+        string fileOutputRoot = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "obj", "Refitter", "apis", "petstore"));
+        string generatedFile = Path.Combine(fileOutputRoot, encodedSegment, "Contracts.cs");
+
+        RefitterGenerateTask.GetSupersededFilePath(generatedFile, fileOutputRoot, settingsDirectory)
+            .Should().Be(Path.GetFullPath(Path.Combine(settingsDirectory, decodedSegment, "Contracts.cs")));
+    }
+
+    [Test]
     public void GetSupersededFilePath_Should_Map_Parent_Directory_Segments_Back()
     {
         string settingsDirectory = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "apis"));

@@ -12,8 +12,15 @@ public sealed class OutputRootFileWriter : IFileWriter
 {
     /// <summary>
     /// Replaces <c>..</c> segments so rebased files can never escape the output root.
+    /// Literal segments starting with <see cref="EscapeCharacter"/> get one more, so an
+    /// encoded <c>..</c> can never be confused with a real directory name.
     /// </summary>
-    public const string ParentDirectorySegment = "__";
+    public const string ParentDirectorySegment = "_parent";
+
+    /// <summary>
+    /// Prefix that marks encoded segments.
+    /// </summary>
+    public const char EscapeCharacter = '_';
 
     private readonly IFileWriter inner;
     private readonly string baseDirectory;
@@ -55,9 +62,16 @@ public sealed class OutputRootFileWriter : IFileWriter
         var segments = relativePath
             .Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries)
             .Where(segment => segment != ".")
-            .Select(segment => segment == ".." ? ParentDirectorySegment : segment)
+            .Select(EncodeSegment)
             .ToArray();
 
         return Path.Combine([Path.GetFullPath(outputRoot), .. segments]);
     }
+
+    private static string EncodeSegment(string segment) =>
+        segment == ".."
+            ? ParentDirectorySegment
+            : segment[0] == EscapeCharacter
+                ? EscapeCharacter + segment
+                : segment;
 }
