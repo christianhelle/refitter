@@ -68,10 +68,11 @@ public sealed class OutputRootFileWriter : IFileWriter
         return Path.Combine([Path.GetFullPath(outputRoot), .. segments]);
     }
 
-    private static string EncodeSegment(string segment) =>
-        segment == ".."
-            ? ParentDirectorySegment
-            : segment[0] == EscapeCharacter
-                ? EscapeCharacter + segment
-                : segment;
+    private static string EncodeSegment(string segment)
+    {
+        if (segment == "..")
+            return ParentDirectorySegment;
+
+        return segment[0] == EscapeCharacter ? EscapeCharacter + segment : segment;
+    }
 }

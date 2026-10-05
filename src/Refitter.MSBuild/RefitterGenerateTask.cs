@@ -518,12 +518,15 @@ public class RefitterGenerateTask : MSBuildTask
         return Path.GetFullPath(Path.Combine(settingsFileDirectory, string.Join(Path.DirectorySeparatorChar.ToString(), segments)));
     }
 
-    private static string DecodeSegment(string segment) =>
-        segment == ParentDirectorySegment
-            ? ".."
-            : segment[0] == EscapeCharacter
-                ? segment.Substring(1)
-                : segment;
+    private static string DecodeSegment(string segment)
+    {
+        if (segment == ParentDirectorySegment)
+        {
+            return "..";
+        }
+
+        return segment[0] == EscapeCharacter ? segment.Substring(1) : segment;
+    }
 
     internal static string? ParseGeneratedFilePath(string? outputLine)
     {
