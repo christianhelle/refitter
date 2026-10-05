@@ -80,6 +80,9 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             refitGeneratorSettings = SettingsMapper.Map(settings);
         }
 
+        if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
+            SettingsMapper.ApplyCliOverrides(settings, refitGeneratorSettings);
+
         IGenerationReporter reporter = CreateReporter(settings, refitGeneratorSettings);
 
         var orchestrator = new GenerationOrchestrator();
