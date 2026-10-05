@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using Microsoft.Build.Framework;
 using MSBuildTask = Microsoft.Build.Utilities.Task;
@@ -81,6 +82,8 @@ public class RefitterGenerateTask : MSBuildTask
     public bool SkipValidation { get; set; }
 
     public string IncludePatterns { get; set; }
+
+    public string JsonLibraryVersion { get; set; }
 
     /// <summary>
     /// When set, generated files are written under this directory (one subdirectory per
@@ -193,6 +196,19 @@ public class RefitterGenerateTask : MSBuildTask
             return new();
         }
 
+        decimal? jsonLibraryVersion = null;
+        if (!string.IsNullOrWhiteSpace(JsonLibraryVersion))
+        {
+            if (!decimal.TryParse(JsonLibraryVersion, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite, CultureInfo.InvariantCulture, out var parsedVersion))
+            {
+                failed = true;
+                TryLogError($"Invalid JsonLibraryVersion '{JsonLibraryVersion}'. Expected a version number such as 9.0");
+                return new();
+            }
+
+            jsonLibraryVersion = parsedVersion;
+        }
+
         var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
         args += $" --telemetry-source msbuild --telemetry-file-count {totalFileCount}";
         string? runtimeTfm = GetRuntimeTfm(refitterDll!);
@@ -211,6 +227,10 @@ public class RefitterGenerateTask : MSBuildTask
         if (fileOutputRoot is not null)
         {
             args += $" --output-root \"{fileOutputRoot}\"";
+        }
+        if (jsonLibraryVersion is not null)
+        {
+            args += $" --json-library-version {jsonLibraryVersion.Value.ToString(CultureInfo.InvariantCulture)}";
         }
 
         TryLogCommandLine($"Starting dotnet {args}");

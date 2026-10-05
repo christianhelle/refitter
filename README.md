@@ -547,6 +547,16 @@ To limit MSBuild generation to specific `.refitter` files, set `RefitterIncludeP
 
 `RefitterIncludePatterns` uses exact matching only against the file name, project-relative path, or full path. It does not do substring matching or wildcard matching, so `petstore` will not match `petstore.refitter`.
 
+To keep `jsonLibraryVersion` in sync with the target framework of the consuming project, set `RefitterJsonLibraryVersion`. It is passed to Refitter as `--json-library-version`:
+
+```xml
+<PropertyGroup>
+  <RefitterJsonLibraryVersion>$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)'))</RefitterJsonLibraryVersion>
+</PropertyGroup>
+```
+
+`RefitterJsonLibraryVersion` must be a version number such as `9.0`. If the `.refitter` file sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, that value takes precedence over a default (`8.0`) property value. Generation fails only when both the property and the `.refitter` file specify non-default values, so use only one source. Because `8.0` is the default, an explicit `"jsonLibraryVersion": 8.0` in the `.refitter` file is treated the same as not setting it, and is overridden by `RefitterJsonLibraryVersion`. In multi-targeted projects (`TargetFrameworks`), each target framework generates and compiles its own copy of the code (see [Multi-targeted projects](#multi-targeted-projects)), so the value can follow `$(TargetFramework)`.
+
 ### Multi-targeted projects
 
 A project that lists two or more frameworks in `<TargetFrameworks>` (for example `net8.0;net9.0`) has one inner build per framework, and MSBuild runs them in parallel. To keep them from writing the same files at the same time, each inner build writes generated code to its own intermediate output folder instead of the `outputFolder` from the `.refitter` file:

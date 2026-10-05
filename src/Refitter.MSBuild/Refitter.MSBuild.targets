@@ -20,6 +20,7 @@
                               DisableLogging="$(RefitterNoLogging)"
                               SkipValidation="$(RefitterSkipValidation)"
                               IncludePatterns="$(RefitterIncludePatterns)"
+                              JsonLibraryVersion="$(RefitterJsonLibraryVersion)"
                               OutputRoot="$(_RefitterOutputRoot)">
             <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
             <Output TaskParameter="SupersededFiles" ItemName="RefitterSupersededFiles" />

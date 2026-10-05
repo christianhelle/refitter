@@ -74,6 +74,7 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
                           DisableLogging="$(RefitterNoLogging)"
                           SkipValidation="$(RefitterSkipValidation)"
                           IncludePatterns="$(RefitterIncludePatterns)"
+                          JsonLibraryVersion="$(RefitterJsonLibraryVersion)"
                           OutputRoot="$(_RefitterOutputRoot)">
         <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
         <Output TaskParameter="SupersededFiles" ItemName="RefitterSupersededFiles" />
@@ -101,6 +102,16 @@ By default, telemetry collection is enabled, and to opt-out of it you must speci
 ```
 
 When `RefitterAutoScan` is `false`, run `dotnet build -t:RefitterGenerate` whenever you want MSBuild to regenerate code from `.refitter` files without re-enabling generation on every normal build. After that explicit generation step, regular `dotnet build` invocations can reuse the generated `.cs` files without re-running the Refitter task.
+
+To keep `jsonLibraryVersion` in sync with the target framework of the consuming project, set `RefitterJsonLibraryVersion`. It is passed to Refitter as `--json-library-version`:
+
+```xml
+<PropertyGroup>
+  <RefitterJsonLibraryVersion>$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)'))</RefitterJsonLibraryVersion>
+</PropertyGroup>
+```
+
+`RefitterJsonLibraryVersion` must be a version number such as `9.0`. If the `.refitter` file sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, that value takes precedence over a default (`8.0`) property value. Generation fails only when both the property and the `.refitter` file specify non-default values, so use only one source. Because `8.0` is the default, an explicit `"jsonLibraryVersion": 8.0` in the `.refitter` file is treated the same as not setting it, and is overridden by `RefitterJsonLibraryVersion`. In multi-targeted projects (`TargetFrameworks`), each target framework generates and compiles its own copy of the code (see [Multi-targeted projects](#multi-targeted-projects)), so the value can follow `$(TargetFramework)`.
 
 #### Multi-targeted projects
 

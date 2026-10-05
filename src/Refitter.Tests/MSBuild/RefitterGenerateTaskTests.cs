@@ -659,6 +659,121 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void Execute_Should_Pass_JsonLibraryVersion_To_Refitter()
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            string generatedFile = CreateGeneratedFile(workspace);
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+
+            string? arguments = null;
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                arguments = startInfo.Arguments;
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            RefitterGenerateTask task = CreateTask(workspace);
+            task.JsonLibraryVersion = "9.0";
+
+            bool result = task.Execute();
+
+            result.Should().BeTrue();
+            arguments.Should().Contain("--json-library-version 9.0");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Not_Pass_JsonLibraryVersion_When_Not_Set()
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            string generatedFile = CreateGeneratedFile(workspace);
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+
+            string? arguments = null;
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                arguments = startInfo.Arguments;
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            RefitterGenerateTask task = CreateTask(workspace);
+
+            bool result = task.Execute();
+
+            result.Should().BeTrue();
+            arguments.Should().NotContain("--json-library-version");
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    [Arguments("abc")]
+    [Arguments("8,0")]
+    public void Execute_Should_Fail_When_JsonLibraryVersion_Is_Invalid(string jsonLibraryVersion)
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+
+            bool processStarted = false;
+            RefitterGenerateTask.ProcessRunner = (_, _, _) =>
+            {
+                processStarted = true;
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            RecordingBuildEngine buildEngine = new();
+            RefitterGenerateTask task = CreateTask(workspace, buildEngine);
+            task.JsonLibraryVersion = jsonLibraryVersion;
+
+            bool result = task.Execute();
+
+            result.Should().BeFalse();
+            processStarted.Should().BeFalse();
+            buildEngine.Errors.Should().Contain(e => e.Contains($"Invalid JsonLibraryVersion '{jsonLibraryVersion}'"));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
     public void Execute_Should_Pass_Telemetry_Source_Args_To_Refitter()
     {
         string workspace = CreateWorkspace();
