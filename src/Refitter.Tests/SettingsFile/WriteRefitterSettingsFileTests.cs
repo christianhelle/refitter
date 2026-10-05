@@ -321,4 +321,38 @@ public class WriteRefitterSettingsFileTests
                 Directory.Delete(tempDir, true);
         }
     }
+
+    [Test]
+    public async Task WriteRefitterSettingsFile_Writes_Under_Output_Root_When_Specified()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        try
+        {
+            var outputDir = Path.Combine(tempDir, "output");
+            var outputRoot = Path.Combine(tempDir, "root");
+            var settings = new Refitter.Settings
+            {
+                OutputPath = Path.Combine(outputDir, "MyClient.cs"),
+                OutputRoot = outputRoot,
+                SimpleOutput = true
+            };
+
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPath = "test.json",
+                Namespace = "TestNamespace"
+            };
+
+            await GenerateCommand.WriteRefitterSettingsFile(settings, refitSettings);
+
+            Directory.Exists(outputDir).Should().BeFalse();
+            Directory.GetFiles(outputRoot, ".refitter", SearchOption.AllDirectories).Should().ContainSingle();
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+                Directory.Delete(tempDir, true);
+        }
+    }
 }
