@@ -240,6 +240,20 @@ public class GenerateCommandTests
     }
 
     [Test]
+    public void ApplyCliOverrides_Should_Override_Default_JsonLibraryVersion_From_Settings_File()
+    {
+        var settings = new Settings { JsonLibraryVersion = 10.0m };
+        var refitSettings = new RefitGeneratorSettings
+        {
+            CodeGeneratorSettings = new CodeGeneratorSettings { JsonLibraryVersion = 8.0m }
+        };
+
+        SettingsMapper.ApplyCliOverrides(settings, refitSettings);
+
+        refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(10.0m);
+    }
+
+    [Test]
     public void Command_Should_Have_Protected_Validate_Method()
     {
         var command = new GenerateCommand();
