@@ -547,6 +547,30 @@ To limit MSBuild generation to specific `.refitter` files, set `RefitterIncludeP
 
 `RefitterIncludePatterns` uses exact matching only against the file name, project-relative path, or full path. It does not do substring matching or wildcard matching, so `petstore` will not match `petstore.refitter`.
 
+### Multi-targeted projects
+
+A project that lists two or more frameworks in `<TargetFrameworks>` (for example `net8.0;net9.0`) has one inner build per framework, and MSBuild runs them in parallel. To keep them from writing the same files at the same time, each inner build writes generated code to its own intermediate output folder instead of the `outputFolder` from the `.refitter` file:
+
+```text
+obj/<Configuration>/<TargetFramework>/Refitter/<.refitter path without extension>/<outputFolder>/<outputFilename>
+```
+
+For example, `petstore.refitter` with `"outputFolder": "./Generated"` and `"outputFilename": "Petstore.cs"` produces `obj/Debug/net8.0/Refitter/petstore/Generated/Petstore.cs` and `obj/Debug/net9.0/Refitter/petstore/Generated/Petstore.cs`. Each inner build compiles only its own copy, so the generated code can differ per target framework. `dotnet clean` deletes these files.
+
+Copies of the generated files left in `outputFolder` by an older version of Refitter.MSBuild are excluded from compilation, so they don't cause duplicate type errors. You can delete them.
+
+Projects with a single `<TargetFramework>` are not affected and still write to `outputFolder`. So does `dotnet build -t:RefitterGenerate`, which runs in the outer build where no target framework is set.
+
+To write to `outputFolder` in a multi-targeted project as well, set:
+
+```xml
+<PropertyGroup>
+  <RefitterOutputPerTargetFramework>false</RefitterOutputPerTargetFramework>
+</PropertyGroup>
+```
+
+Only do this if every target framework generates the same code. The inner builds can then write the same files at the same time. Setting it to `true` in a single-target project writes generated code to `obj` as well.
+
 ### Example
 
 Create a `.refitter` file in your project:

@@ -19,15 +19,25 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
 <UsingTask TaskName="RefitterGenerateTask"
            AssemblyFile="$(MSBuildThisFileDirectory)Refitter.MSBuild.dll"
            Condition="Exists('$(MSBuildThisFileDirectory)Refitter.MSBuild.dll')" />
+<PropertyGroup Condition="'$(RefitterOutputPerTargetFramework)' == '' and '$(TargetFramework)' != '' and $(TargetFrameworks.Contains(';'))">
+    <RefitterOutputPerTargetFramework>true</RefitterOutputPerTargetFramework>
+</PropertyGroup>
 <Target Name="RefitterGenerate">
+    <PropertyGroup>
+        <_RefitterOutputRoot Condition="'$(RefitterOutputPerTargetFramework)' == 'true'">$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)', 'Refitter'))</_RefitterOutputRoot>
+    </PropertyGroup>
     <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                           DisableLogging="$(RefitterNoLogging)"
                           SkipValidation="$(RefitterSkipValidation)"
-                          IncludePatterns="$(RefitterIncludePatterns)">
+                          IncludePatterns="$(RefitterIncludePatterns)"
+                          OutputRoot="$(_RefitterOutputRoot)">
         <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
+        <Output TaskParameter="SupersededFiles" ItemName="RefitterSupersededFiles" />
     </RefitterGenerateTask>
     <ItemGroup>
+        <Compile Remove="@(RefitterSupersededFiles)" MatchOnMetadata="FullPath" MatchOnMetadataOptions="PathLike" />
         <Compile Include="@(RefitterGeneratedFiles)" />
+        <FileWrites Include="@(RefitterGeneratedFiles)" Condition="'$(_RefitterOutputRoot)' != ''" />
     </ItemGroup>
 </Target>
 <Target Name="_RefitterGenerateOnBuild"
@@ -67,6 +77,30 @@ To disable automatic scanning during normal builds, but still allow explicit gen
 ```
 
 Then run `dotnet build -t:RefitterGenerate` whenever you want Refitter to scan the project and regenerate code on demand. After that explicit generation step, regular `dotnet build` invocations can reuse the generated `.cs` files without re-running the Refitter task.
+
+## Multi-targeted projects
+
+A project that lists two or more frameworks in `<TargetFrameworks>` (for example `net8.0;net9.0`) has one inner build per framework, and MSBuild runs them in parallel. To keep them from writing the same files at the same time, each inner build writes generated code to its own intermediate output folder instead of the `outputFolder` from the `.refitter` file:
+
+```text
+obj/<Configuration>/<TargetFramework>/Refitter/<.refitter path without extension>/<outputFolder>/<outputFilename>
+```
+
+For example, `petstore.refitter` with `"outputFolder": "./Generated"` and `"outputFilename": "Petstore.cs"` produces `obj/Debug/net8.0/Refitter/petstore/Generated/Petstore.cs` and `obj/Debug/net9.0/Refitter/petstore/Generated/Petstore.cs`. Each inner build compiles only its own copy, so the generated code can differ per target framework. `dotnet clean` deletes these files.
+
+Copies of the generated files left in `outputFolder` by an older version of Refitter.MSBuild are excluded from compilation, so they don't cause duplicate type errors. You can delete them.
+
+Projects with a single `<TargetFramework>` are not affected and still write to `outputFolder`. So does `dotnet build -t:RefitterGenerate`, which runs in the outer build where no target framework is set.
+
+To write to `outputFolder` in a multi-targeted project as well, set:
+
+```xml
+<PropertyGroup>
+  <RefitterOutputPerTargetFramework>false</RefitterOutputPerTargetFramework>
+</PropertyGroup>
+```
+
+Only do this if every target framework generates the same code. The inner builds can then write the same files at the same time. Setting it to `true` in a single-target project writes generated code to `obj` as well.
 
 ## Example
 
