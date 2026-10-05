@@ -8,6 +8,8 @@ namespace Refitter.MSBuild;
 public class RefitterGenerateTask : MSBuildTask
 {
     internal const string GeneratedFileMarker = "GeneratedFile: ";
+    // Must match OutputRootFileWriter.ParentDirectorySegment in the Refitter CLI
+    internal const string ParentDirectorySegment = "__";
     private static readonly AsyncLocal<Func<List<string>>?> InstalledDotnetRuntimesProviderOverride = new();
     private static readonly AsyncLocal<Func<ProcessStartInfo, Action<string?>, Action<string?>, ProcessExecutionResult>?> ProcessRunnerOverride = new();
     private static readonly AsyncLocal<int?> ProcessTimeoutMillisecondsOverride = new();
@@ -79,8 +81,21 @@ public class RefitterGenerateTask : MSBuildTask
 
     public string IncludePatterns { get; set; }
 
+    /// <summary>
+    /// When set, generated files are written under this directory (one subdirectory per
+    /// .refitter file) instead of the locations configured in the .refitter files.
+    /// </summary>
+    public string OutputRoot { get; set; }
+
     [Output]
     public ITaskItem[] GeneratedFiles { get; set; }
+
+    /// <summary>
+    /// The locations the generated files would have been written to without <see cref="OutputRoot"/>.
+    /// Stale copies at these locations must be excluded from compilation.
+    /// </summary>
+    [Output]
+    public ITaskItem[] SupersededFiles { get; set; }
 
     internal static void ResetTestHooks()
     {
@@ -106,12 +121,14 @@ public class RefitterGenerateTask : MSBuildTask
         TryLogCommandLine($"Found {files.Length} .refitter files...");
 
         var generatedFiles = new List<string>();
+        var supersededFiles = new List<string>();
         var hasErrors = false;
 
         foreach (var file in files)
         {
             TryLogCommandLine($"Processing {file}");
-            var generated = TryExecuteRefitter(file, files.Length, out var failed);
+            var fileOutputRoot = GetFileOutputRoot(OutputRoot, ProjectFileDirectory, file);
+            var generated = TryExecuteRefitter(file, files.Length, fileOutputRoot, out var failed);
             if (failed)
             {
                 hasErrors = true;
@@ -120,20 +137,26 @@ public class RefitterGenerateTask : MSBuildTask
             else if (generated != null)
             {
                 generatedFiles.AddRange(generated);
+                if (fileOutputRoot is not null)
+                {
+                    supersededFiles.AddRange(
+                        generated.Select(path => GetSupersededFilePath(path, fileOutputRoot, Path.GetDirectoryName(file)!)));
+                }
             }
         }
 
         GeneratedFiles = generatedFiles.Select(f => new Microsoft.Build.Utilities.TaskItem(f)).ToArray<ITaskItem>();
+        SupersededFiles = supersededFiles.Select(f => new Microsoft.Build.Utilities.TaskItem(f)).ToArray<ITaskItem>();
         TryLogCommandLine($"Generated {GeneratedFiles.Length} files");
 
         return !hasErrors;
     }
 
-    private List<string>? TryExecuteRefitter(string file, int totalFileCount, out bool failed)
+    private List<string>? TryExecuteRefitter(string file, int totalFileCount, string? fileOutputRoot, out bool failed)
     {
         try
         {
-            return StartProcess(file, totalFileCount, out failed);
+            return StartProcess(file, totalFileCount, fileOutputRoot, out failed);
         }
         catch (Exception e)
         {
@@ -143,7 +166,7 @@ public class RefitterGenerateTask : MSBuildTask
         }
     }
 
-    private List<string> StartProcess(string file, int totalFileCount, out bool failed)
+    private List<string> StartProcess(string file, int totalFileCount, string? fileOutputRoot, out bool failed)
     {
         failed = false;
         var assembly = Assembly.GetExecutingAssembly();
@@ -183,6 +206,10 @@ public class RefitterGenerateTask : MSBuildTask
         if (SkipValidation)
         {
             args += " --skip-validation";
+        }
+        if (fileOutputRoot is not null)
+        {
+            args += $" --output-root \"{fileOutputRoot}\"";
         }
 
         TryLogCommandLine($"Starting dotnet {args}");
@@ -451,6 +478,43 @@ public class RefitterGenerateTask : MSBuildTask
                 relativePath.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
                 fullPath.Equals(pattern, StringComparison.OrdinalIgnoreCase));
         }).ToArray();
+    }
+
+    /// <summary>
+    /// Gets the directory that generated files for <paramref name="settingsFile"/> are written to,
+    /// or <c>null</c> when <paramref name="outputRoot"/> is not set. Each .refitter file gets its
+    /// own subdirectory, named after its project-relative path, so files never collide.
+    /// </summary>
+    internal static string? GetFileOutputRoot(string? outputRoot, string projectFileDirectory, string settingsFile)
+    {
+        if (string.IsNullOrWhiteSpace(outputRoot))
+        {
+            return null;
+        }
+
+        var relativeSettingsFile = string.IsNullOrWhiteSpace(projectFileDirectory)
+            ? Path.GetFileName(settingsFile)
+            : GetRelativePath(projectFileDirectory, settingsFile);
+
+        var fileOutputRoot = Path.GetFullPath(
+            Path.Combine(outputRoot!, Path.ChangeExtension(relativeSettingsFile, null)!));
+
+        // A trailing separator would escape the closing quote on the command line
+        return fileOutputRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+    }
+
+    /// <summary>
+    /// Maps a file generated under <paramref name="fileOutputRoot"/> back to the path the
+    /// Refitter CLI would have written it to without <c>--output-root</c>.
+    /// </summary>
+    internal static string GetSupersededFilePath(string generatedFile, string fileOutputRoot, string settingsFileDirectory)
+    {
+        var segments = GetRelativePath(fileOutputRoot, generatedFile)
+            .Split([Path.DirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries)
+            .Select(segment => segment == ParentDirectorySegment ? ".." : segment)
+            .ToArray();
+
+        return Path.GetFullPath(Path.Combine(settingsFileDirectory, string.Join(Path.DirectorySeparatorChar.ToString(), segments)));
     }
 
     internal static string? ParseGeneratedFilePath(string? outputLine)
