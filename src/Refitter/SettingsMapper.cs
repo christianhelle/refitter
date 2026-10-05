@@ -53,6 +53,9 @@ internal static class SettingsMapper
             return;
 
         refitGeneratorSettings.CodeGeneratorSettings ??= new CodeGeneratorSettings();
+        if (refitGeneratorSettings.CodeGeneratorSettings.JsonLibraryVersion != 8.0m)
+            return;
+
         refitGeneratorSettings.CodeGeneratorSettings.JsonLibraryVersion = jsonLibraryVersion;
     }
 }
