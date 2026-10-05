@@ -788,6 +788,15 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void GetFileOutputRoot_Should_Use_File_Name_When_Project_Directory_Is_Blank()
+    {
+        string outputRoot = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "obj", "Refitter"));
+
+        RefitterGenerateTask.GetFileOutputRoot(outputRoot, string.Empty, Path.Combine(Path.GetTempPath(), "apis", "petstore.refitter"))
+            .Should().Be(Path.Combine(outputRoot, "petstore"));
+    }
+
+    [Test]
     public void GetFileOutputRoot_Should_Not_End_With_Directory_Separator()
     {
         string projectDirectory = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project"));
