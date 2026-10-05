@@ -554,7 +554,7 @@ To keep `jsonLibraryVersion` in sync with the target framework of the consuming 
 </PropertyGroup>
 ```
 
-`RefitterJsonLibraryVersion` must be a version number such as `9.0`. Generation fails if the `.refitter` file also sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, so use only one source.
+`RefitterJsonLibraryVersion` must be a version number such as `9.0`. If the `.refitter` file sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, that value takes precedence over a default (`8.0`) property value. Generation fails only when both the property and the `.refitter` file specify non-default values, so use only one source.
 
 ### Example
 
