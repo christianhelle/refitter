@@ -268,6 +268,17 @@ public class GenerateCommandTests
     }
 
     [Test]
+    public void ApplyCliOverrides_Should_Leave_Settings_Untouched_When_CLI_JsonLibraryVersion_Not_Set()
+    {
+        var settings = new Settings { JsonLibraryVersion = null };
+        var refitSettings = new RefitGeneratorSettings { CodeGeneratorSettings = null };
+
+        SettingsMapper.ApplyCliOverrides(settings, refitSettings);
+
+        refitSettings.CodeGeneratorSettings.Should().BeNull();
+    }
+
+    [Test]
     public void Command_Should_Have_Protected_Validate_Method()
     {
         var command = new GenerateCommand();
