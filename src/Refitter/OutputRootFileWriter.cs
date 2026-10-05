@@ -53,11 +53,10 @@ public sealed class OutputRootFileWriter : IFileWriter
     public static string Rebase(string path, string baseDirectory, string outputRoot)
     {
         var relativePath = Path.GetRelativePath(Path.GetFullPath(baseDirectory), Path.GetFullPath(path));
-        if (Path.IsPathRooted(relativePath))
-        {
-            // Different drive or volume: keep the path below its root
-            relativePath = relativePath.Substring(Path.GetPathRoot(relativePath)!.Length);
-        }
+
+        // A path on a different drive or volume stays rooted; keep only the part below its root
+        // (GetPathRoot returns an empty string for relative paths)
+        relativePath = relativePath.Substring(Path.GetPathRoot(relativePath)!.Length);
 
         var segments = relativePath
             .Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries)
