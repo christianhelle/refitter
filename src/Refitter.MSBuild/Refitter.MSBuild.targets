@@ -4,15 +4,31 @@
         <RefitterAutoScan Condition="'$(RefitterAutoScan)' == ''">true</RefitterAutoScan>
     </PropertyGroup>
 
+    <!--
+        Inner builds of a multi-targeted project run in parallel. Give each target framework
+        its own output directory so they never write the same files.
+    -->
+    <PropertyGroup Condition="'$(RefitterOutputPerTargetFramework)' == '' and '$(TargetFramework)' != '' and $(TargetFrameworks.Contains(';'))">
+        <RefitterOutputPerTargetFramework>true</RefitterOutputPerTargetFramework>
+    </PropertyGroup>
+
     <Target Name="RefitterGenerate">
+        <PropertyGroup>
+            <_RefitterOutputRoot Condition="'$(RefitterOutputPerTargetFramework)' == 'true'">$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)', 'Refitter'))</_RefitterOutputRoot>
+        </PropertyGroup>
         <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                               DisableLogging="$(RefitterNoLogging)"
                               SkipValidation="$(RefitterSkipValidation)"
-                              IncludePatterns="$(RefitterIncludePatterns)">
+                              IncludePatterns="$(RefitterIncludePatterns)"
+                              OutputRoot="$(_RefitterOutputRoot)">
             <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
+            <Output TaskParameter="SupersededFiles" ItemName="RefitterSupersededFiles" />
         </RefitterGenerateTask>
+        <!-- Exclude stale copies left in the configured outputFolder by earlier builds -->
         <ItemGroup>
+            <Compile Remove="@(RefitterSupersededFiles)" MatchOnMetadata="FullPath" MatchOnMetadataOptions="PathLike" />
             <Compile Include="@(RefitterGeneratedFiles)" />
+            <FileWrites Include="@(RefitterGeneratedFiles)" Condition="'$(_RefitterOutputRoot)' != ''" />
         </ItemGroup>
     </Target>
 
