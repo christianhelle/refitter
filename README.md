@@ -554,7 +554,7 @@ To keep `jsonLibraryVersion` in sync with the target framework of the consuming 
 </PropertyGroup>
 ```
 
-`RefitterJsonLibraryVersion` must be a version number such as `9.0`. If the `.refitter` file sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, that value takes precedence over a default (`8.0`) property value. Generation fails only when both the property and the `.refitter` file specify non-default values, so use only one source. For multi-targeted projects (`TargetFrameworks`), every target framework writes to the same generated files, so don't derive the value from `$(TargetFramework)`. Set a fixed value that matches the lowest target framework instead, for example `<RefitterJsonLibraryVersion>8.0</RefitterJsonLibraryVersion>` for `net8.0;net9.0`.
+`RefitterJsonLibraryVersion` must be a version number such as `9.0`. If the `.refitter` file sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, that value takes precedence over a default (`8.0`) property value. Generation fails only when both the property and the `.refitter` file specify non-default values, so use only one source. Because `8.0` is the default, an explicit `"jsonLibraryVersion": 8.0` in the `.refitter` file is treated the same as not setting it, and is overridden by `RefitterJsonLibraryVersion`. For multi-targeted projects (`TargetFrameworks`), every target framework writes to the same generated files, so don't derive the value from `$(TargetFramework)`. Set a fixed value that matches the lowest target framework instead, for example `<RefitterJsonLibraryVersion>8.0</RefitterJsonLibraryVersion>` for `net8.0;net9.0`.
 
 ### Example
 
