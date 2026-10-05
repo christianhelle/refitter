@@ -46,4 +46,13 @@ internal static class SettingsMapper
 
         return result;
     }
+
+    public static void ApplyCliOverrides(Settings settings, RefitGeneratorSettings refitGeneratorSettings)
+    {
+        if (settings.JsonLibraryVersion is not { } jsonLibraryVersion)
+            return;
+
+        refitGeneratorSettings.CodeGeneratorSettings ??= new CodeGeneratorSettings();
+        refitGeneratorSettings.CodeGeneratorSettings.JsonLibraryVersion = jsonLibraryVersion;
+    }
 }
