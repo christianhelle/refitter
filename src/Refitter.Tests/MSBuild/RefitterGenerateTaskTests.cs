@@ -734,6 +734,44 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void Execute_Should_Fail_When_JsonLibraryVersion_Is_Invalid()
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 9.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net9.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+
+            bool processStarted = false;
+            RefitterGenerateTask.ProcessRunner = (_, _, _) =>
+            {
+                processStarted = true;
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            RecordingBuildEngine buildEngine = new();
+            RefitterGenerateTask task = CreateTask(workspace, buildEngine);
+            task.JsonLibraryVersion = "abc";
+
+            bool result = task.Execute();
+
+            result.Should().BeFalse();
+            processStarted.Should().BeFalse();
+            buildEngine.Errors.Should().Contain(e => e.Contains("Invalid JsonLibraryVersion 'abc'"));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
     public void Execute_Should_Pass_Telemetry_Source_Args_To_Refitter()
     {
         string workspace = CreateWorkspace();
