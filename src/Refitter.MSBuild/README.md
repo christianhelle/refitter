@@ -23,7 +23,8 @@ The MSBuild package includes a custom `.target` file which executes the `Refitte
     <RefitterGenerateTask ProjectFileDirectory="$(MSBuildProjectDirectory)"
                           DisableLogging="$(RefitterNoLogging)"
                           SkipValidation="$(RefitterSkipValidation)"
-                          IncludePatterns="$(RefitterIncludePatterns)">
+                          IncludePatterns="$(RefitterIncludePatterns)"
+                          JsonLibraryVersion="$(RefitterJsonLibraryVersion)">
         <Output TaskParameter="GeneratedFiles" ItemName="RefitterGeneratedFiles" />
     </RefitterGenerateTask>
     <ItemGroup>
@@ -67,6 +68,16 @@ To disable automatic scanning during normal builds, but still allow explicit gen
 ```
 
 Then run `dotnet build -t:RefitterGenerate` whenever you want Refitter to scan the project and regenerate code on demand. After that explicit generation step, regular `dotnet build` invocations can reuse the generated `.cs` files without re-running the Refitter task.
+
+To keep `jsonLibraryVersion` in sync with the target framework of the consuming project, set `RefitterJsonLibraryVersion`. It is passed to Refitter as `--json-library-version`:
+
+```xml
+<PropertyGroup>
+  <RefitterJsonLibraryVersion>$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)'))</RefitterJsonLibraryVersion>
+</PropertyGroup>
+```
+
+`RefitterJsonLibraryVersion` must be a version number such as `9.0`. Generation fails if the `.refitter` file also sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, so use only one source.
 
 ## Example
 

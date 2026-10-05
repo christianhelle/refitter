@@ -546,6 +546,16 @@ To limit MSBuild generation to specific `.refitter` files, set `RefitterIncludeP
 
 `RefitterIncludePatterns` uses exact matching only against the file name, project-relative path, or full path. It does not do substring matching or wildcard matching, so `petstore` will not match `petstore.refitter`.
 
+To keep `jsonLibraryVersion` in sync with the target framework of the consuming project, set `RefitterJsonLibraryVersion`. It is passed to Refitter as `--json-library-version`:
+
+```xml
+<PropertyGroup>
+  <RefitterJsonLibraryVersion>$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)'))</RefitterJsonLibraryVersion>
+</PropertyGroup>
+```
+
+`RefitterJsonLibraryVersion` must be a version number such as `9.0`. Generation fails if the `.refitter` file also sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, so use only one source.
+
 ### Example
 
 Create a `.refitter` file in your project:
