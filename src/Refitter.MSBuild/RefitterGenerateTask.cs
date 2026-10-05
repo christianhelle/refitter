@@ -175,7 +175,7 @@ public class RefitterGenerateTask : MSBuildTask
         decimal? jsonLibraryVersion = null;
         if (!string.IsNullOrWhiteSpace(JsonLibraryVersion))
         {
-            if (!decimal.TryParse(JsonLibraryVersion, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsedVersion))
+            if (!decimal.TryParse(JsonLibraryVersion, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite, CultureInfo.InvariantCulture, out var parsedVersion))
             {
                 failed = true;
                 TryLogError($"Invalid JsonLibraryVersion '{JsonLibraryVersion}'. Expected a version number such as 9.0");

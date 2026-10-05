@@ -734,7 +734,9 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
-    public void Execute_Should_Fail_When_JsonLibraryVersion_Is_Invalid()
+    [Arguments("abc")]
+    [Arguments("8,0")]
+    public void Execute_Should_Fail_When_JsonLibraryVersion_Is_Invalid(string jsonLibraryVersion)
     {
         string workspace = CreateWorkspace();
 
@@ -756,13 +758,13 @@ public class RefitterGenerateTaskTests
 
             RecordingBuildEngine buildEngine = new();
             RefitterGenerateTask task = CreateTask(workspace, buildEngine);
-            task.JsonLibraryVersion = "abc";
+            task.JsonLibraryVersion = jsonLibraryVersion;
 
             bool result = task.Execute();
 
             result.Should().BeFalse();
             processStarted.Should().BeFalse();
-            buildEngine.Errors.Should().Contain(e => e.Contains("Invalid JsonLibraryVersion 'abc'"));
+            buildEngine.Errors.Should().Contain(e => e.Contains($"Invalid JsonLibraryVersion '{jsonLibraryVersion}'"));
         }
         finally
         {
