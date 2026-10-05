@@ -106,7 +106,7 @@ public sealed class GenerationOrchestrator
             ? Directory.GetCurrentDirectory()
             : Path.GetDirectoryName(Path.GetFullPath(cliSettings.SettingsFilePath))!;
 
-        return new OutputRootFileWriter(writer, baseDirectory, cliSettings.OutputRoot!);
+        return new OutputRootFileWriter(writer, baseDirectory, cliSettings.OutputRoot);
     }
 
     internal static void ReportValidationDiagnostics(

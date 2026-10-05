@@ -140,7 +140,7 @@ public class RefitterGenerateTask : MSBuildTask
                 if (fileOutputRoot is not null)
                 {
                     supersededFiles.AddRange(
-                        generated.Select(path => GetSupersededFilePath(path, fileOutputRoot, Path.GetDirectoryName(file)!)));
+                        generated.Select(path => GetSupersededFilePath(path, fileOutputRoot, Path.GetDirectoryName(file))));
                 }
             }
         }
@@ -497,7 +497,7 @@ public class RefitterGenerateTask : MSBuildTask
             : GetRelativePath(projectFileDirectory, settingsFile);
 
         var fileOutputRoot = Path.GetFullPath(
-            Path.Combine(outputRoot!, Path.ChangeExtension(relativeSettingsFile, null)!));
+            Path.Combine(outputRoot, Path.ChangeExtension(relativeSettingsFile, null)));
 
         // A trailing separator would escape the closing quote on the command line
         return fileOutputRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
