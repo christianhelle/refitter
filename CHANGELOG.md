@@ -1,25 +1,18 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [2.3.1-preview.119](https://github.com/christianhelle/refitter/tree/2.3.1-preview.119) (2026-10-05)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.118...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.0...2.3.1-preview.119)
 
 **Implemented enhancements:**
 
 - Refitter.MSBuild: pass JsonLibraryVersion from an MSBuild property [\#1327](https://github.com/christianhelle/refitter/issues/1327)
 - Add RefitterJsonLibraryVersion MSBuild property [\#1328](https://github.com/christianhelle/refitter/pull/1328) ([christianhelle](https://github.com/christianhelle))
+- Fix the line endings of generated code [\#1323](https://github.com/christianhelle/refitter/pull/1323) ([paule96](https://github.com/paule96))
 
 **Merged pull requests:**
 
 - Update dependency TUnit to 1.71.0 [\#1322](https://github.com/christianhelle/refitter/pull/1322) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [2.3.1-preview.118](https://github.com/christianhelle/refitter/tree/2.3.1-preview.118) (2026-09-29)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.0...2.3.1-preview.118)
-
-**Implemented enhancements:**
-
-- Fix the line endings of generated code [\#1323](https://github.com/christianhelle/refitter/pull/1323) ([paule96](https://github.com/paule96))
 
 ## [2.3.0](https://github.com/christianhelle/refitter/tree/2.3.0) (2026-09-28)
 
