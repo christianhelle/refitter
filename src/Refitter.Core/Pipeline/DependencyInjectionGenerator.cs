@@ -104,11 +104,14 @@ internal static class DependencyInjectionGenerator
         foreach (var interfaceName in interfaceNames)
         {
             var clientBuilderName = $"clientBuilder{interfaceName}";
+            var registrationMethod = settings.DependencyInjectionSettings?.UseAotRefit ?? false
+                ? "AddGeneratedRefitClient"
+                : "AddRefitClient";
             code.Append(
                 NormalizeLineEndings(
                     $$"""
                                   var {{clientBuilderName}} = services
-                                      .AddRefitClient<{{interfaceName}}>(settings)
+                                      .{{registrationMethod}}<{{interfaceName}}>(settings)
                                       {{(iocSettings.UseWindowsAuthentication ? ".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })" : "")}}
                                       {{configureRefitClient}}
                       """,

@@ -117,6 +117,15 @@ public class MultipleFilesWithDependencyInjectionTests
     }
 
     [Test]
+    public async Task Generated_Code_Uses_Aot_Registration()
+    {
+        var generatedFiles = await GenerateCode(true);
+        var combinedCode = string.Join("\n\n", generatedFiles.Select(f => f.Content));
+        combinedCode.Should().Contain("AddGeneratedRefitClient");
+        combinedCode.Should().Contain("IServiceCollection");
+    }
+
+    [Test]
     public async Task Generates_Multiple_Files()
     {
         var generatedFiles = await GenerateCode();
@@ -133,7 +142,7 @@ public class MultipleFilesWithDependencyInjectionTests
         fileNames.Should().Contain(x => x.EndsWith(".cs") && !x.Contains("Contracts"));
     }
 
-    private static async Task<IReadOnlyList<GeneratedCode>> GenerateCode()
+    private static async Task<IReadOnlyList<GeneratedCode>> GenerateCode(bool useAotRefit = false)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         try
@@ -148,7 +157,8 @@ public class MultipleFilesWithDependencyInjectionTests
                     HttpMessageHandlers = [],
                     TransientErrorHandler = TransientErrorHandler.None,
                     MaxRetryCount = 3,
-                    FirstBackoffRetryInSeconds = 0.5
+                    FirstBackoffRetryInSeconds = 0.5,
+                    UseAotRefit = useAotRefit
                 }
             };
             var generator = await RefitGenerator.CreateAsync(settings);

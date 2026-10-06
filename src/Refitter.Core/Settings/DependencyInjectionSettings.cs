@@ -118,4 +118,10 @@ public class DependencyInjectionSettings
             """
     )]
     public string ExtensionMethodName { get; set; } = DefaultExtensionMethodName;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether AddGeneratedRefitClient or AddRefitClient should be used.
+    /// </summary>
+    [Description("Uses AddGeneratedRefitClient instead of AddRefitClient. Learn more: https://www.reactiveui.net/documentation/refit/aot/. Default is false.")]
+    public bool UseAotRefit { get; set; }
 }
