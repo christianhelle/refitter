@@ -101,12 +101,12 @@ internal static class DependencyInjectionGenerator
                           {
                   """",
                 newLine));
+        var registrationMethod = iocSettings.UseGeneratedRefitClient
+            ? "AddRefitGeneratedClient"
+            : "AddRefitClient";
         foreach (var interfaceName in interfaceNames)
         {
             var clientBuilderName = $"clientBuilder{interfaceName}";
-            var registrationMethod = settings.DependencyInjectionSettings?.UseGeneratedRefitClient ?? false
-                ? "AddGeneratedRefitClient"
-                : "AddRefitClient";
             code.Append(
                 NormalizeLineEndings(
                     $$"""
