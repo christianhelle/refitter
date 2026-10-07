@@ -104,7 +104,7 @@ internal static class DependencyInjectionGenerator
         foreach (var interfaceName in interfaceNames)
         {
             var clientBuilderName = $"clientBuilder{interfaceName}";
-            var registrationMethod = settings.DependencyInjectionSettings?.UseAotRefit ?? false
+            var registrationMethod = settings.DependencyInjectionSettings?.UseGeneratedRefitClient ?? false
                 ? "AddGeneratedRefitClient"
                 : "AddRefitClient";
             code.Append(

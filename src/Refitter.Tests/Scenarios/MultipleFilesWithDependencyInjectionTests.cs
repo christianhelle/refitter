@@ -158,7 +158,7 @@ public class MultipleFilesWithDependencyInjectionTests
                     TransientErrorHandler = TransientErrorHandler.None,
                     MaxRetryCount = 3,
                     FirstBackoffRetryInSeconds = 0.5,
-                    UseAotRefit = useAotRefit
+                    UseGeneratedRefitClient = useAotRefit
                 }
             };
             var generator = await RefitGenerator.CreateAsync(settings);
