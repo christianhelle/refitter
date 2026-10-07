@@ -325,6 +325,82 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().Contain("using System.Net.Http");
         code.Should().Contain(".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })");
     }
+
+    [Test]
+    public void Uses_AddRefitClient_By_Default()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://petstore3.swagger.io/api/v3",
+                TransientErrorHandler = TransientErrorHandler.None
+            }
+        };
+
+        string code = DependencyInjectionGenerator.Generate(
+            settings,
+            new[] { "IPetApi", "IStoreApi" });
+
+        code.Should().Contain(".AddRefitClient<IPetApi>(settings)");
+        code.Should().Contain(".AddRefitClient<IStoreApi>(settings)");
+        code.Should().NotContain("AddRefitGeneratedClient");
+    }
+
+    [Test]
+    public void Uses_AddRefitGeneratedClient_When_UseGeneratedRefitClient_Is_Enabled()
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://petstore3.swagger.io/api/v3",
+                TransientErrorHandler = TransientErrorHandler.None,
+                UseGeneratedRefitClient = true
+            }
+        };
+
+        string code = DependencyInjectionGenerator.Generate(
+            settings,
+            new[] { "IPetApi", "IStoreApi" });
+
+        code.Should().Contain(".AddRefitGeneratedClient<IPetApi>(settings)");
+        code.Should().Contain(".AddRefitGeneratedClient<IStoreApi>(settings)");
+        code.Should().NotContain("AddRefitClient<");
+    }
+
+    [Test]
+    [Arguments(TransientErrorHandler.None)]
+    [Arguments(TransientErrorHandler.Polly)]
+    [Arguments(TransientErrorHandler.HttpResilience)]
+    public void UseGeneratedRefitClient_Keeps_Chained_Builder_Configuration(TransientErrorHandler transientErrorHandler)
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://petstore3.swagger.io/api/v3",
+                HttpMessageHandlers = new[] { "AuthorizationMessageHandler" },
+                TransientErrorHandler = transientErrorHandler,
+                UseWindowsAuthentication = true,
+                UseGeneratedRefitClient = true
+            }
+        };
+
+        string code = DependencyInjectionGenerator.Generate(
+            settings,
+            new[] { "IPetApi" });
+
+        code.Should().Contain(".AddRefitGeneratedClient<IPetApi>(settings)");
+        code.Should().NotContain("AddRefitClient<");
+        code.Should().Contain(".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })");
+        code.Should().Contain(".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"https://petstore3.swagger.io/api/v3\"))");
+        code.Should().Contain(".AddHttpMessageHandler<AuthorizationMessageHandler>()");
+        if (transientErrorHandler == TransientErrorHandler.Polly)
+            code.Should().Contain(".AddPolicyHandler(");
+        if (transientErrorHandler == TransientErrorHandler.HttpResilience)
+            code.Should().Contain(".AddStandardResilienceHandler(");
+    }
 }
 
 internal static class DependencyInjectionGeneratorAssertions
