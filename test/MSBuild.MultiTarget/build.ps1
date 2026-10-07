@@ -40,31 +40,48 @@ if ($LASTEXITCODE -ne 0) {
 }
 dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
 # nuget.config adds this folder as a package source next to nuget.org
-dotnet add package Refitter.MSBuild --version 1.0.0
-if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
+# The package reference and the consumer below exist only while the checks run, and are
+# removed again in finally, so a plain `dotnet build` of this folder always works
+try {
+    dotnet add package Refitter.MSBuild --version 1.0.0
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+
+    # Fails to compile unless the generated interface is part of every inner build
+    Set-Content ClientConsumer.cs @"
+using Refitter.MSBuild.MultiTarget.Petstore;
+
+namespace Refitter.MSBuild.MultiTarget;
+
+public class ClientConsumer(ISwaggerPetstore client)
+{
+    public ISwaggerPetstore Client { get; } = client;
 }
+"@
 
-Write-Host ""
-Write-Host "=== Multi-targeting Checks ===" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "=== Multi-targeting Checks ===" -ForegroundColor Cyan
 
-Assert-Build "fresh"
-Assert-PerTargetFrameworkOutput
+    Assert-Build "fresh"
+    Assert-PerTargetFrameworkOutput
 
-if (Test-Path "Generated") {
-    Write-Host "ERROR: Unexpected Generated folder in project directory" -ForegroundColor Red
-    exit 1
+    if (Test-Path "Generated") {
+        Write-Host "ERROR: Unexpected Generated folder in project directory" -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "PASS: Nothing generated into outputFolder" -ForegroundColor Green
+
+    # A copy left in outputFolder by an older Refitter.MSBuild must not cause duplicate types
+    New-Item -ItemType Directory Generated | Out-Null
+    Copy-Item "obj/Debug/net8.0/Refitter/petstore/Generated/Petstore.cs" "Generated/Petstore.cs"
+    Assert-Build "stale copy in outputFolder"
+
+    Write-Host "=== All Multi-targeting Checks Complete ===" -ForegroundColor Cyan
+    Write-Host ""
 }
-Write-Host "PASS: Nothing generated into outputFolder" -ForegroundColor Green
-
-# A copy left in outputFolder by an older Refitter.MSBuild must not cause duplicate types
-New-Item -ItemType Directory Generated | Out-Null
-Copy-Item "obj/Debug/net8.0/Refitter/petstore/Generated/Petstore.cs" "Generated/Petstore.cs"
-Assert-Build "stale copy in outputFolder"
-
-Write-Host "=== All Multi-targeting Checks Complete ===" -ForegroundColor Cyan
-Write-Host ""
-
-dotnet remove package Refitter.MSBuild
-Remove-Item Generated -Force -Recurse -ErrorAction SilentlyContinue
-Remove-Item Refitter.MSBuild.*.nupkg -Force
+finally {
+    dotnet remove package Refitter.MSBuild | Out-Null
+    Remove-Item ClientConsumer.cs, Generated -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item Refitter.MSBuild.*.nupkg -Force -ErrorAction SilentlyContinue
+}
