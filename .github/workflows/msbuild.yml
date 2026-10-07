@@ -11,6 +11,7 @@ on:
       - 'src/Refitter.MSBuild/README.md'
       - 'docs/docfx_project/articles/msbuild.md'
       - 'test/MSBuild/**'
+      - 'test/MSBuild.MultiTarget/**'
 
 permissions:
   contents: read
@@ -28,6 +29,10 @@ jobs:
       uses: actions/checkout@v7
     - name: 🛠️ Build
       working-directory: test/MSBuild
+      shell: pwsh
+      run: ./build.ps1
+    - name: 🎯 Verify multi-targeting
+      working-directory: test/MSBuild.MultiTarget
       shell: pwsh
       run: ./build.ps1
     - name: 🗳️ Upload

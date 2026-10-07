@@ -102,6 +102,14 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         CancellationToken cancellationToken = default)
     {
         var settingsFilePath = DetermineSettingsFilePath(settings);
+        if (!string.IsNullOrWhiteSpace(settings.OutputRoot))
+        {
+            settingsFilePath = OutputRootFileWriter.Rebase(
+                settingsFilePath,
+                Directory.GetCurrentDirectory(),
+                settings.OutputRoot);
+        }
+
         var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
 
         if (!string.IsNullOrWhiteSpace(settingsDirectory) && !Directory.Exists(settingsDirectory))
