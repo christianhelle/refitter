@@ -245,7 +245,7 @@
           "type": "string"
         },
         "useGeneratedRefitClient": {
-          "description": "Uses the source-generated AddRefitGeneratedClient registration instead of the reflection-based AddRefitClient. Requires Refit 13.0.0 or newer. Ignored when Apizr registration is generated. Default is false.",
+          "description": "Uses the source-generated AddRefitGeneratedClient registration instead of the reflection-based AddRefitClient. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Ignored when Apizr registration is generated. Default is false.",
           "type": "boolean"
         }
       }
