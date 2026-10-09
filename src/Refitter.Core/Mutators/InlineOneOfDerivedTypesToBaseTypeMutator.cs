@@ -28,8 +28,11 @@ internal sealed class InlineOneOfDerivedTypesToBaseTypeMutator : IOpenApiDocumen
         if (schema.DiscriminatorObject != null)
             return;
 
-        JsonSchema[] unionSchemas = schema.OneOf.Concat(schema.AnyOf).ToArray();
-        if (unionSchemas.Length < 2)
+        if (schema.OneOf.Count != 0 && schema.AnyOf.Count != 0)
+            return;
+
+        ICollection<JsonSchema> unionSchemas = schema.OneOf.Count != 0 ? schema.OneOf : schema.AnyOf;
+        if (unionSchemas.Count < 2)
             return;
 
         JsonSchema? baseSchema = null;
