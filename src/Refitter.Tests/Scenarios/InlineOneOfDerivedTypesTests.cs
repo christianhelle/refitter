@@ -191,6 +191,21 @@ components:
     }
 
     [Test]
+    public async Task Does_Not_Use_Base_Type_When_It_Is_Not_The_Generated_Parent()
+    {
+        string normalizedSpec = OpenApiSpec.Replace("\r\n", "\n");
+        string specWithMixinFirst = normalizedSpec.Replace(
+            "    NewQuestion:\n      allOf:\n",
+            "    Auditable:\n      type: object\n      properties:\n        createdBy:\n          type: string\n" +
+            "    NewQuestion:\n      allOf:\n        - $ref: '#/components/schemas/Auditable'\n");
+        specWithMixinFirst.Should().NotBe(normalizedSpec);
+
+        string generatedCode = await GenerateCode(specWithMixinFirst);
+        generatedCode.Should().Contain("NewQuestion : Auditable");
+        generatedCode.Should().NotContain("ICollection<QuestionnaireQuestion> Questions");
+    }
+
+    [Test]
     public async Task Does_Not_Use_Base_Type_When_Not_All_OneOf_Types_Derive_From_It()
     {
         string specWithUnrelatedType = OpenApiSpec.Replace(
