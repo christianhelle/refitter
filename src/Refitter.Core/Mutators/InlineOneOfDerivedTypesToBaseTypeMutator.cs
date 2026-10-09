@@ -20,27 +20,42 @@ internal sealed class InlineOneOfDerivedTypesToBaseTypeMutator : IOpenApiDocumen
 {
     public void Mutate(OpenApiDocument document)
     {
-        SchemaWalker.TraverseDocumentSchemas(document, ReplaceWithBaseType);
+        HashSet<JsonSchema> replacedSchemas = new HashSet<JsonSchema>();
+        SchemaWalker.TraverseDocumentSchemas(document, schema =>
+        {
+            if (ReplaceWithBaseType(schema))
+                replacedSchemas.Add(schema);
+        });
+
+        // A named union now aliases the base schema; drop its key so the
+        // generated base type keeps the base schema's name
+        string[] replacedSchemaNames = document.Components.Schemas
+            .Where(kvp => replacedSchemas.Contains(kvp.Value))
+            .Select(kvp => kvp.Key)
+            .ToArray();
+
+        foreach (string name in replacedSchemaNames)
+            document.Components.Schemas.Remove(name);
     }
 
-    private static void ReplaceWithBaseType(JsonSchema schema)
+    private static bool ReplaceWithBaseType(JsonSchema schema)
     {
         if (schema.DiscriminatorObject != null)
-            return;
+            return false;
 
         if (schema.OneOf.Count != 0 && schema.AnyOf.Count != 0)
-            return;
+            return false;
 
         ICollection<JsonSchema> unionSchemas = schema.OneOf.Count != 0 ? schema.OneOf : schema.AnyOf;
         if (unionSchemas.Count < 2)
-            return;
+            return false;
 
         JsonSchema? baseSchema = null;
         foreach (JsonSchema unionSchema in unionSchemas)
         {
             JsonSchema? candidate = FindDiscriminatedBaseSchema(unionSchema);
             if (candidate == null || (baseSchema != null && baseSchema != candidate))
-                return;
+                return false;
 
             baseSchema = candidate;
         }
@@ -48,6 +63,7 @@ internal sealed class InlineOneOfDerivedTypesToBaseTypeMutator : IOpenApiDocumen
         schema.OneOf.Clear();
         schema.AnyOf.Clear();
         schema.Reference = baseSchema;
+        return true;
     }
 
     private static JsonSchema? FindDiscriminatedBaseSchema(JsonSchema unionSchema)
