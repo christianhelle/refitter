@@ -104,6 +104,18 @@ components:
     }
 
     [Test]
+    public async Task Does_Not_Use_Base_Type_When_Schema_Has_Both_OneOf_And_AnyOf()
+    {
+        string specWithMixedUnion = OpenApiSpec.Replace(
+            "              - $ref: '#/components/schemas/ExistingQuestion'",
+            "            anyOf:\n              - $ref: '#/components/schemas/ExistingQuestion'");
+        specWithMixedUnion.Should().NotBe(OpenApiSpec);
+
+        string generatedCode = await GenerateCode(specWithMixedUnion);
+        generatedCode.Should().NotContain("ICollection<QuestionnaireQuestion> Questions");
+    }
+
+    [Test]
     public async Task Does_Not_Use_Base_Type_When_Not_All_OneOf_Types_Derive_From_It()
     {
         string specWithUnrelatedType = OpenApiSpec.Replace(
