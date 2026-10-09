@@ -70,6 +70,43 @@ components:
         generatedCode.Should().Contain("ICollection<QuestionnaireQuestion> Questions");
     }
 
+    [Test]
+    public async Task Generates_Base_Type_Regardless_Of_OneOf_Order()
+    {
+        string reversedSpec = OpenApiSpec
+            .Replace("- $ref: '#/components/schemas/NewQuestion'", "- $ref: '#/components/schemas/Placeholder'")
+            .Replace("- $ref: '#/components/schemas/ExistingQuestion'", "- $ref: '#/components/schemas/NewQuestion'")
+            .Replace("- $ref: '#/components/schemas/Placeholder'", "- $ref: '#/components/schemas/ExistingQuestion'");
+        reversedSpec.Should().NotBe(OpenApiSpec);
+
+        string generatedCode = await GenerateCode(reversedSpec);
+        generatedCode.Should().Contain("ICollection<QuestionnaireQuestion> Questions");
+    }
+
+    [Test]
+    public async Task Generates_JsonDerivedType_Attributes_On_Base_Type()
+    {
+        string generatedCode = await GenerateCode(usePolymorphicSerialization: true);
+        generatedCode.Should().Contain("[JsonDerivedType(typeof(NewQuestion), typeDiscriminator: \"new\")]");
+        generatedCode.Should().Contain("[JsonDerivedType(typeof(ExistingQuestion), typeDiscriminator: \"existing\")]");
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code()
+    {
+        string generatedCode = await GenerateCode();
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_With_Polymorphic_Serialization()
+    {
+        string generatedCode = await GenerateCode(usePolymorphicSerialization: true);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
     private static async Task<string> GenerateCode(string spec = OpenApiSpec, bool usePolymorphicSerialization = false)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(spec);
