@@ -5,7 +5,7 @@ namespace Refitter.Core;
 
 /// <summary>
 /// Replaces a <c>oneOf</c>/<c>anyOf</c> whose members all derive (via <c>allOf</c>)
-/// from the same discriminated base schema with a reference to that base schema.
+/// from, or are, the same discriminated base schema with a reference to that base schema.
 /// </summary>
 /// <remarks>
 /// Specifications such as those produced by Swashbuckle with
@@ -51,6 +51,9 @@ internal sealed class InlineOneOfDerivedTypesToBaseTypeMutator : IOpenApiDocumen
     {
         if (!unionSchema.HasReference)
             return null;
+
+        if (unionSchema.ActualSchema.DiscriminatorObject != null)
+            return unionSchema.ActualSchema;
 
         return unionSchema.ActualSchema.AllOf
             .Where(a => a.HasReference && a.ActualSchema.DiscriminatorObject != null)
