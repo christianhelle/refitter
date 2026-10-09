@@ -92,6 +92,18 @@ components:
     }
 
     [Test]
+    public async Task Generates_Base_Type_When_OneOf_Includes_Base_Type()
+    {
+        string specWithBaseType = OpenApiSpec.Replace(
+            "- $ref: '#/components/schemas/ExistingQuestion'",
+            "- $ref: '#/components/schemas/QuestionnaireQuestion'");
+        specWithBaseType.Should().NotBe(OpenApiSpec);
+
+        string generatedCode = await GenerateCode(specWithBaseType);
+        generatedCode.Should().Contain("ICollection<QuestionnaireQuestion> Questions");
+    }
+
+    [Test]
     public async Task Does_Not_Use_Base_Type_When_Not_All_OneOf_Types_Derive_From_It()
     {
         string specWithUnrelatedType = OpenApiSpec.Replace(
