@@ -41,6 +41,7 @@ internal class CSharpClientGeneratorFactory
         new DisableAdditionalPropertiesMutator(schema.GenerateDefaultAdditionalProperties),
         new FlattenPrimitiveAllOfMutator(),
         new OneOfDiscriminatorToAllOfMutator(),
+        new InlineOneOfDerivedTypesToBaseTypeMutator(),
         new FixMissingIntegerTypesMutator(),
         new CustomIntegerTypeMutator(codeGeneration.CodeGeneratorSettings?.IntegerType ?? IntegerType.Int32),
     ];
