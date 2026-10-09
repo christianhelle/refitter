@@ -74,9 +74,8 @@ internal sealed class InlineOneOfDerivedTypesToBaseTypeMutator : IOpenApiDocumen
         if (unionSchema.ActualSchema.DiscriminatorObject != null)
             return unionSchema.ActualSchema;
 
-        return unionSchema.ActualSchema.AllOf
-            .Where(a => a.HasReference && a.ActualSchema.DiscriminatorObject != null)
-            .Select(a => a.ActualSchema)
-            .FirstOrDefault();
+        // Only the base that NJsonSchema generates as the C# parent class qualifies
+        JsonSchema? inheritedSchema = unionSchema.ActualSchema.InheritedSchema;
+        return inheritedSchema?.DiscriminatorObject != null ? inheritedSchema : null;
     }
 }
