@@ -63,11 +63,86 @@ components:
               type: integer
 ";
 
+    private const string NamedUnionOpenApiSpec = @"
+openapi: 3.0.1
+info:
+  title: Test
+  version: v1
+paths:
+  /api/questionnaires:
+    get:
+      operationId: GetQuestionnaire
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Questionnaire'
+components:
+  schemas:
+    Questionnaire:
+      type: object
+      properties:
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionnaireQuestionUnion'
+    QuestionnaireQuestionUnion:
+      oneOf:
+        - $ref: '#/components/schemas/NewQuestion'
+        - $ref: '#/components/schemas/ExistingQuestion'
+    QuestionnaireQuestion:
+      required:
+        - $type
+      type: object
+      properties:
+        $type:
+          type: string
+      discriminator:
+        propertyName: $type
+        mapping:
+          new: '#/components/schemas/NewQuestion'
+          existing: '#/components/schemas/ExistingQuestion'
+    NewQuestion:
+      allOf:
+        - $ref: '#/components/schemas/QuestionnaireQuestion'
+        - type: object
+          properties:
+            text:
+              type: string
+    ExistingQuestion:
+      allOf:
+        - $ref: '#/components/schemas/QuestionnaireQuestion'
+        - type: object
+          properties:
+            id:
+              type: integer
+";
+
     [Test]
     public async Task Generates_Base_Type_For_Inline_OneOf_Collection()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("ICollection<QuestionnaireQuestion> Questions");
+    }
+
+    [Test]
+    public async Task Generates_Base_Type_For_Named_OneOf_Component_Collection()
+    {
+        string generatedCode = await GenerateCode(NamedUnionOpenApiSpec);
+        generatedCode.Should().Contain("ICollection<QuestionnaireQuestion> Questions");
+        generatedCode.Should().Contain("NewQuestion : QuestionnaireQuestion");
+        generatedCode.Should().Contain("ExistingQuestion : QuestionnaireQuestion");
+        generatedCode.Should().NotContain("QuestionnaireQuestionUnion");
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_For_Named_OneOf_Component()
+    {
+        string generatedCode = await GenerateCode(NamedUnionOpenApiSpec, usePolymorphicSerialization: true);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
     [Test]
