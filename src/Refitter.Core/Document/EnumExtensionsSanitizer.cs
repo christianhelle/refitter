@@ -70,32 +70,35 @@ internal static class EnumExtensionsSanitizer
 
         var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
-        {
-            var isName = NameKeywords.Contains(property.Name);
-            if ((!isName && !DescriptionKeywords.Contains(property.Name)) || property.Value is not JObject valuesByKey)
-                continue;
-
-            // An entry of a named map (a schema, response, parameter, ...) that happens to be named like the extension
-            if (property.Parent!.Parent is JProperty { Name: var mapName } && NamedMapKeywords.Contains(mapName))
-                continue;
-
-            if (property.Parent["enum"] is JArray enumValues)
-            {
-                // Keep the array parallel to enum. Values without a description get an empty one, and values
-                // without a name get the enum value, so the member is named as if no names were given
-                property.Value = new JArray(enumValues.Select(value =>
-                    FindEntry(valuesByKey, value) ?? (isName ? GetKey(value) : string.Empty)));
-            }
-            else
-            {
-                // Nothing to line the entries up with, and leaving the object would fail the load
-                property.Remove();
-            }
-
-            converted = true;
-        }
+            converted |= TryConvert(property);
 
         return converted ? document.ToString(Formatting.None) : json;
+    }
+
+    private static bool TryConvert(JProperty property)
+    {
+        var isName = NameKeywords.Contains(property.Name);
+        if ((!isName && !DescriptionKeywords.Contains(property.Name)) || property.Value is not JObject valuesByKey)
+            return false;
+
+        // An entry of a named map (a schema, response, parameter, ...) that happens to be named like the extension
+        if (property.Parent!.Parent is JProperty { Name: var mapName } && NamedMapKeywords.Contains(mapName))
+            return false;
+
+        if (property.Parent["enum"] is JArray enumValues)
+        {
+            // Keep the array parallel to enum. Values without a description get an empty one, and values
+            // without a name get the enum value, so the member is named as if no names were given
+            property.Value = new JArray(enumValues.Select(value =>
+                FindEntry(valuesByKey, value) ?? (isName ? GetKey(value) : string.Empty)));
+        }
+        else
+        {
+            // Nothing to line the entries up with, and leaving the object would fail the load
+            property.Remove();
+        }
+
+        return true;
     }
 
     // Numbers are read as decimals so that re-serializing keeps them exact. Only a document with a number
