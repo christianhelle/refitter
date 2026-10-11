@@ -24,6 +24,25 @@ public class EnumDescriptionsSanitizerTests
     }
 
     [Test]
+    public void Keeps_Other_Values_When_Converting()
+    {
+        const string json = """
+            {
+              "properties": {
+                "status": { "enum": ["a"], "x-enumDescriptions": { "a": "A" } },
+                "since": { "type": "string", "format": "date-time", "default": "2020-01-01T00:00:00+02:00" },
+                "ratio": { "type": "number", "default": 0.1 }
+              }
+            }
+            """;
+
+        var result = EnumDescriptionsSanitizer.Sanitize(json);
+
+        result.Should().Contain("\"default\":\"2020-01-01T00:00:00+02:00\"");
+        result.Should().Contain("\"default\":0.1");
+    }
+
+    [Test]
     [Arguments("""{ "enum": ["a", "b"], "x-enumDescriptions": ["A", "B"] }""")]
     [Arguments("""{ "type": "string", "enum": ["a", "b"] }""")]
     [Arguments("""{ "description": "x-enumDescriptions: { \"a\": \"A\" }" }""")]

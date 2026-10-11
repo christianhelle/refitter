@@ -25,7 +25,13 @@ internal static class EnumDescriptionsSanitizer
         if (!CandidateRegex.IsMatch(json))
             return json;
 
-        if (JToken.Parse(json) is not JContainer document)
+        using var reader = new JsonTextReader(new StringReader(json))
+        {
+            DateParseHandling = DateParseHandling.None,
+            FloatParseHandling = FloatParseHandling.Double,
+        };
+
+        if (JToken.ReadFrom(reader) is not JContainer document)
             return json;
 
         var converted = false;
