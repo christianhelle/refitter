@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -64,14 +65,7 @@ internal static class EnumExtensionsSanitizer
         if (!CandidateRegex.IsMatch(json))
             return json;
 
-        using var reader = new JsonTextReader(new StringReader(json))
-        {
-            DateParseHandling = DateParseHandling.None,
-            FloatParseHandling = FloatParseHandling.Double,
-        };
-
-        // The candidate scan only matches a property name, so the root is an object or array
-        var document = (JContainer)JToken.ReadFrom(reader);
+        var document = Parse(json);
 
         var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
@@ -89,7 +83,7 @@ internal static class EnumExtensionsSanitizer
                 // Keep the array parallel to enum. Values without a description get an empty one, and values
                 // without a name get the enum value, so the member is named as if no names were given
                 property.Value = new JArray(enumValues.Select(value =>
-                    valuesByKey[GetKey(value)] ?? (isName ? GetKey(value) : string.Empty)));
+                    FindEntry(valuesByKey, value) ?? (isName ? GetKey(value) : string.Empty)));
             }
             else
             {
@@ -101,6 +95,47 @@ internal static class EnumExtensionsSanitizer
         }
 
         return converted ? document.ToString(Formatting.None) : json;
+    }
+
+    // Numbers are read as decimals so that re-serializing keeps them exact. Only a document with a number
+    // outside the decimal range falls back to doubles, the way NumericBoundsSanitizer reads documents.
+    private static JContainer Parse(string json)
+    {
+        try
+        {
+            return Parse(json, FloatParseHandling.Decimal);
+        }
+        catch (JsonReaderException)
+        {
+            return Parse(json, FloatParseHandling.Double);
+        }
+    }
+
+    private static JContainer Parse(string json, FloatParseHandling floatParseHandling)
+    {
+        using var reader = new JsonTextReader(new StringReader(json))
+        {
+            DateParseHandling = DateParseHandling.None,
+            FloatParseHandling = floatParseHandling,
+        };
+
+        // The candidate scan only matches a property name, so the root is an object or array
+        return (JContainer)JToken.ReadFrom(reader);
+    }
+
+    private static JToken? FindEntry(JObject valuesByKey, JToken value)
+    {
+        var entry = valuesByKey[GetKey(value)];
+        if (entry is not null || value.Type is not (JTokenType.Integer or JTokenType.Float))
+            return entry;
+
+        // Keys can spell a number differently from the enum value, like 1e2 for 100 or 2.50 for 2.5
+        var number = Convert.ToDouble(((JValue)value).Value, CultureInfo.InvariantCulture);
+        return valuesByKey.Properties()
+            .FirstOrDefault(key =>
+                double.TryParse(key.Name, NumberStyles.Float, CultureInfo.InvariantCulture, out var keyNumber) &&
+                keyNumber.Equals(number))
+            ?.Value;
     }
 
     // Object keys are always strings, so other enum values (1, true, null) are matched by their JSON text

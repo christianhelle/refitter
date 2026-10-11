@@ -121,6 +121,50 @@ public class EnumExtensionsSanitizerTests
     }
 
     [Test]
+    [Arguments("""[1e2, 2.50]""", """{ "100": "Hundred", "2.5": "Half" }""")]
+    [Arguments("""[100, 2.5]""", """{ "1e2": "Hundred", "2.50": "Half" }""")]
+    [Arguments("""[1e2, 2.50]""", """{ "1e2": "Hundred", "2.50": "Half" }""")]
+    public void Matches_Numeric_Enum_Values_Written_Differently(string enumValues, string descriptions)
+    {
+        var json = $$"""{ "enum": {{enumValues}}, "x-enumDescriptions": {{descriptions}} }""";
+
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
+
+        result["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal("Hundred", "Half");
+    }
+
+    [Test]
+    public void Keeps_High_Precision_Numbers_When_Converting()
+    {
+        const string json = """
+            {
+              "properties": {
+                "status": { "enum": ["a"], "x-enumDescriptions": { "a": "A" } },
+                "amount": { "type": "number", "default": 0.1000000000000000055, "example": 12345678901234567.89 }
+              }
+            }
+            """;
+
+        var result = EnumExtensionsSanitizer.Sanitize(json);
+
+        result.Should().Contain("\"default\":0.1000000000000000055");
+        result.Should().Contain("\"example\":12345678901234567.89");
+    }
+
+    [Test]
+    public void Converts_Documents_With_Numbers_Outside_Decimal_Range()
+    {
+        const string json = """
+            { "enum": ["a"], "x-enumDescriptions": { "a": "A" }, "example": 1e300 }
+            """;
+
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
+
+        result["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal("A");
+        result["example"]!.Value<double>().Should().Be(1e300);
+    }
+
+    [Test]
     public void Keeps_Other_Values_When_Converting()
     {
         const string json = """
