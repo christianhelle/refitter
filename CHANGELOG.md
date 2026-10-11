@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.119...HEAD)
+
+**Implemented enhancements:**
+
+- Add support for AddRefitGeneratedClient [\#1330](https://github.com/christianhelle/refitter/issues/1330)
+- Add useGeneratedRefitClient to register clients with AddRefitGeneratedClient [\#1334](https://github.com/christianhelle/refitter/pull/1334) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Polymorphic collection generated as first oneOf type instead of base type [\#1333](https://github.com/christianhelle/refitter/issues/1333)
+
 ## [2.3.1-preview.119](https://github.com/christianhelle/refitter/tree/2.3.1-preview.119) (2026-10-05)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.0...2.3.1-preview.119)
