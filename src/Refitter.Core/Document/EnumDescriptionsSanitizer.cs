@@ -43,7 +43,7 @@ internal static class EnumDescriptionsSanitizer
             if (property.Parent?["enum"] is JArray enumValues)
             {
                 // Keep the array parallel to enum: values without a description get an empty one
-                property.Value = new JArray(enumValues.Select(value => descriptions[(string)value!] ?? string.Empty));
+                property.Value = new JArray(enumValues.Select(value => descriptions[GetKey(value)] ?? string.Empty));
             }
             else
             {
@@ -56,4 +56,8 @@ internal static class EnumDescriptionsSanitizer
 
         return converted ? document.ToString(Formatting.None) : json;
     }
+
+    // Object keys are always strings, so other enum values (1, true, null) are matched by their JSON text
+    private static string GetKey(JToken value) =>
+        value.Type == JTokenType.String ? (string)value! : value.ToString(Formatting.None);
 }

@@ -24,6 +24,23 @@ public class EnumDescriptionsSanitizerTests
     }
 
     [Test]
+    [Arguments("""[1, 2]""", """{ "2": "Two", "1": "One" }""", "One", "Two")]
+    [Arguments("""[true, false]""", """{ "false": "No", "true": "Yes" }""", "Yes", "No")]
+    [Arguments("""["a", null]""", """{ "a": "A", "null": "None" }""", "A", "None")]
+    public void Matches_Non_String_Enum_Values_By_Their_Json_Text(
+        string enumValues,
+        string descriptions,
+        string first,
+        string second)
+    {
+        var json = $$"""{ "enum": {{enumValues}}, "x-enumDescriptions": {{descriptions}} }""";
+
+        var result = JObject.Parse(EnumDescriptionsSanitizer.Sanitize(json));
+
+        result["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal(first, second);
+    }
+
+    [Test]
     public void Uses_Empty_Description_For_Enum_Values_Without_One()
     {
         const string json = """
