@@ -39,6 +39,19 @@ public class EnumExtensionsSanitizerTests
     }
 
     [Test]
+    [Arguments("x-enumNames")]
+    [Arguments("x-enum-names")]
+    [Arguments("x-enum-varnames")]
+    public void Uses_Enum_Value_As_Name_For_Enum_Values_Without_One(string keyword)
+    {
+        var json = $$"""{ "enum": [0, "b", null], "{{keyword}}": { "0": "Zero" } }""";
+
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
+
+        result[keyword]!.ToObject<string[]>().Should().Equal("Zero", "b", "null");
+    }
+
+    [Test]
     [Arguments("""[1, 2]""", """{ "2": "Two", "1": "One" }""", "One", "Two")]
     [Arguments("""[true, false]""", """{ "false": "No", "true": "Yes" }""", "Yes", "No")]
     [Arguments("""["a", null]""", """{ "a": "A", "null": "None" }""", "A", "None")]

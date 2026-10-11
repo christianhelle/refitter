@@ -64,6 +64,20 @@ public class ObjectEnumNamesTests
 
     [Test]
     [Category("Integration")]
+    public async Task Can_Build_Generated_Code_When_Some_Values_Have_No_Name()
+    {
+        var spec = OpenApiSpec.Replace("\"x-enumNames\": { \"1\": \"Done\", \"0\": \"Pending\" }", "\"x-enumNames\": { \"0\": \"Pending\" }");
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);
+        var sut = await RefitGenerator.CreateAsync(new RefitGeneratorSettings { OpenApiPath = swaggerFile });
+        var generatedCode = sut.Generate();
+
+        generatedCode.Should().Contain("Pending = 0");
+        generatedCode.Should().Contain("_1 = 1");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
     [Arguments("x-enumNames")]
     [Arguments("x-enum-names")]
     [Arguments("x-enum-varnames")]

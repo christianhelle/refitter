@@ -14,10 +14,14 @@ namespace Refitter.Core;
 /// </summary>
 internal static class EnumExtensionsSanitizer
 {
-    private static readonly HashSet<string> Keywords = new(StringComparer.Ordinal)
+    private static readonly HashSet<string> DescriptionKeywords = new(StringComparer.Ordinal)
     {
         "x-enumDescriptions",
         "x-enum-descriptions",
+    };
+
+    private static readonly HashSet<string> NameKeywords = new(StringComparer.Ordinal)
+    {
         "x-enumNames",
         "x-enum-names",
         "x-enum-varnames",
@@ -47,13 +51,16 @@ internal static class EnumExtensionsSanitizer
         var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
         {
-            if (!Keywords.Contains(property.Name) || property.Value is not JObject valuesByKey)
+            var isName = NameKeywords.Contains(property.Name);
+            if ((!isName && !DescriptionKeywords.Contains(property.Name)) || property.Value is not JObject valuesByKey)
                 continue;
 
             if (property.Parent?["enum"] is JArray enumValues)
             {
-                // Keep the array parallel to enum: values without an entry get an empty one
-                property.Value = new JArray(enumValues.Select(value => valuesByKey[GetKey(value)] ?? string.Empty));
+                // Keep the array parallel to enum. Values without a description get an empty one, and values
+                // without a name get the enum value, so the member is named as if no names were given
+                property.Value = new JArray(enumValues.Select(value =>
+                    valuesByKey[GetKey(value)] ?? (isName ? GetKey(value) : string.Empty)));
             }
             else
             {
