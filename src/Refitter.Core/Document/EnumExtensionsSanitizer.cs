@@ -54,8 +54,8 @@ internal static class EnumExtensionsSanitizer
             FloatParseHandling = FloatParseHandling.Double,
         };
 
-        if (JToken.ReadFrom(reader) is not JContainer document)
-            return json;
+        // The candidate scan only matches a property name, so the root is an object or array
+        var document = (JContainer)JToken.ReadFrom(reader);
 
         var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
@@ -68,7 +68,7 @@ internal static class EnumExtensionsSanitizer
             if (property.Parent!.Parent is JProperty { Name: var mapName } && SchemaMapKeywords.Contains(mapName))
                 continue;
 
-            if (property.Parent?["enum"] is JArray enumValues)
+            if (property.Parent["enum"] is JArray enumValues)
             {
                 // Keep the array parallel to enum. Values without a description get an empty one, and values
                 // without a name get the enum value, so the member is named as if no names were given
