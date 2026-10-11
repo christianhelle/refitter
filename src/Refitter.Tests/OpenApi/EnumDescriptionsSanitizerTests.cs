@@ -36,6 +36,17 @@ public class EnumDescriptionsSanitizerTests
     }
 
     [Test]
+    [Arguments("""{ "type": "string", "x-enumDescriptions": { "a": "A" } }""")]
+    [Arguments("""{ "type": "string", "enum": "a", "x-enumDescriptions": { "a": "A" } }""")]
+    public void Removes_Object_Without_Enum_Array(string json)
+    {
+        var result = JObject.Parse(EnumDescriptionsSanitizer.Sanitize(json));
+
+        result.ContainsKey("x-enumDescriptions").Should().BeFalse();
+        result["type"]!.Value<string>().Should().Be("string");
+    }
+
+    [Test]
     public void Keeps_Other_Values_When_Converting()
     {
         const string json = """

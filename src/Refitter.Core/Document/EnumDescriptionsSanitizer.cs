@@ -37,14 +37,21 @@ internal static class EnumDescriptionsSanitizer
         var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
         {
-            if (property.Name == EnumDescriptionsKeyword &&
-                property.Value is JObject descriptions &&
-                property.Parent?["enum"] is JArray enumValues)
+            if (property.Name != EnumDescriptionsKeyword || property.Value is not JObject descriptions)
+                continue;
+
+            if (property.Parent?["enum"] is JArray enumValues)
             {
                 // Keep the array parallel to enum: values without a description get an empty one
                 property.Value = new JArray(enumValues.Select(value => descriptions[(string)value!] ?? string.Empty));
-                converted = true;
             }
+            else
+            {
+                // Nothing to line the descriptions up with, and leaving the object would fail the load
+                property.Remove();
+            }
+
+            converted = true;
         }
 
         return converted ? document.ToString(Formatting.None) : json;
