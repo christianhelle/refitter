@@ -146,6 +146,21 @@ public class EnumExtensionsSanitizerTests
     }
 
     [Test]
+    public void Does_Not_Match_Distinct_Numbers_That_Round_To_The_Same_Double()
+    {
+        const string json = """
+            {
+              "enum": [9007199254740992, 9007199254740993],
+              "x-enumNames": { "9.007199254740992e15": "First", "9.007199254740993e15": "Second" }
+            }
+            """;
+
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
+
+        result["x-enumNames"]!.ToObject<string[]>().Should().Equal("First", "Second");
+    }
+
+    [Test]
     [Arguments("responses")]
     [Arguments("properties")]
     [Arguments("schemas")]
