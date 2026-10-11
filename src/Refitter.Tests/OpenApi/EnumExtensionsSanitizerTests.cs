@@ -134,6 +134,18 @@ public class EnumExtensionsSanitizerTests
     }
 
     [Test]
+    public void Ignores_Non_Numeric_Keys_When_Matching_Numeric_Enum_Values()
+    {
+        const string json = """
+            { "enum": [1, 2.5], "x-enumDescriptions": { "other": "Other", "1e0": "One" } }
+            """;
+
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
+
+        result["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal("One", "");
+    }
+
+    [Test]
     public void Keeps_High_Precision_Numbers_When_Converting()
     {
         const string json = """
