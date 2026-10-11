@@ -81,6 +81,41 @@ public class ObjectEnumDescriptionsTests
     }
 
     [Test]
+    public async Task Keeps_Response_Component_Named_Like_Extension()
+    {
+        const string spec = """
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Repro", "version": "v1" },
+              "paths": {
+                "/status": {
+                  "get": {
+                    "operationId": "GetStatus",
+                    "responses": { "200": { "$ref": "#/components/responses/x-enumDescriptions" } }
+                  }
+                }
+              },
+              "components": {
+                "responses": {
+                  "x-enumDescriptions": {
+                    "description": "OK",
+                    "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Status" } } }
+                  }
+                },
+                "schemas": {
+                  "Status": { "type": "object", "properties": { "name": { "type": "string" } } }
+                }
+              }
+            }
+            """;
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);
+
+        var generatedCode = await GenerateCode(swaggerFile);
+
+        generatedCode.Should().Contain("Task<Status> GetStatus(");
+    }
+
+    [Test]
     public async Task Can_Generate_Code_From_Yaml()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiYamlSpec);

@@ -27,13 +27,29 @@ internal static class EnumExtensionsSanitizer
         "x-enum-varnames",
     };
 
-    private static readonly HashSet<string> SchemaMapKeywords = new(StringComparer.Ordinal)
+    // OpenAPI and JSON Schema maps whose keys are user-chosen names
+    private static readonly HashSet<string> NamedMapKeywords = new(StringComparer.Ordinal)
     {
         "properties",
         "patternProperties",
+        "dependentSchemas",
         "definitions",
-        "schemas",
         "$defs",
+        "schemas",
+        "responses",
+        "parameters",
+        "examples",
+        "requestBodies",
+        "headers",
+        "securitySchemes",
+        "securityDefinitions",
+        "links",
+        "callbacks",
+        "pathItems",
+        "webhooks",
+        "content",
+        "encoding",
+        "variables",
     };
 
     // A cheap text scan that finds candidate objects, so that documents without them
@@ -64,8 +80,8 @@ internal static class EnumExtensionsSanitizer
             if ((!isName && !DescriptionKeywords.Contains(property.Name)) || property.Value is not JObject valuesByKey)
                 continue;
 
-            // Keys of these maps are user-chosen names, so this is a schema that happens to be named like the extension
-            if (property.Parent!.Parent is JProperty { Name: var mapName } && SchemaMapKeywords.Contains(mapName))
+            // An entry of a named map (a schema, response, parameter, ...) that happens to be named like the extension
+            if (property.Parent!.Parent is JProperty { Name: var mapName } && NamedMapKeywords.Contains(mapName))
                 continue;
 
             if (property.Parent["enum"] is JArray enumValues)

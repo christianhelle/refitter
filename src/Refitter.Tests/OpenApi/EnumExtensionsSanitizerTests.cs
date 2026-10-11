@@ -98,6 +98,21 @@ public class EnumExtensionsSanitizerTests
     [Arguments("x-enumNames", "schemas")]
     [Arguments("x-enumNames", "definitions")]
     [Arguments("x-enumNames", "$defs")]
+    [Arguments("x-enumNames", "dependentSchemas")]
+    [Arguments("x-enumDescriptions", "responses")]
+    [Arguments("x-enumDescriptions", "parameters")]
+    [Arguments("x-enumDescriptions", "examples")]
+    [Arguments("x-enumDescriptions", "requestBodies")]
+    [Arguments("x-enumDescriptions", "headers")]
+    [Arguments("x-enumDescriptions", "securitySchemes")]
+    [Arguments("x-enumDescriptions", "securityDefinitions")]
+    [Arguments("x-enumDescriptions", "links")]
+    [Arguments("x-enumDescriptions", "callbacks")]
+    [Arguments("x-enumDescriptions", "pathItems")]
+    [Arguments("x-enumDescriptions", "webhooks")]
+    [Arguments("x-enumDescriptions", "content")]
+    [Arguments("x-enumDescriptions", "encoding")]
+    [Arguments("x-enumDescriptions", "variables")]
     public void Does_Not_Change_Schemas_Named_Like_Extensions(string keyword, string map)
     {
         var json = $$"""{ "type": "object", "{{map}}": { "{{keyword}}": { "type": "string" } } }""";
