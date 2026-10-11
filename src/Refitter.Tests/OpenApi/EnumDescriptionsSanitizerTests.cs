@@ -22,4 +22,14 @@ public class EnumDescriptionsSanitizerTests
         result["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal("Not started yet.", "Finished.");
         result["enum"]!.ToObject<string[]>().Should().Equal("pending", "done");
     }
+
+    [Test]
+    [Arguments("""{ "enum": ["a", "b"], "x-enumDescriptions": ["A", "B"] }""")]
+    [Arguments("""{ "type": "string", "enum": ["a", "b"] }""")]
+    [Arguments("""{ "description": "x-enumDescriptions: { \"a\": \"A\" }" }""")]
+    [Arguments("openapi: 3.0.1")]
+    public void Returns_Same_Instance_When_Nothing_To_Convert(string content)
+    {
+        EnumDescriptionsSanitizer.Sanitize(content).Should().BeSameAs(content);
+    }
 }

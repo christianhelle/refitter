@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,11 +13,22 @@ internal static class EnumDescriptionsSanitizer
 {
     private const string EnumDescriptionsKeyword = "x-enumDescriptions";
 
+    // A cheap text scan that finds candidate objects, so that documents without them
+    // are returned untouched instead of being parsed and re-serialized.
+    private static readonly Regex CandidateRegex = new(
+        @"""x-enumDescriptions""\s*:\s*\{",
+        RegexOptions.Compiled,
+        TimeSpan.FromSeconds(5));
+
     public static string Sanitize(string json)
     {
+        if (!CandidateRegex.IsMatch(json))
+            return json;
+
         if (JToken.Parse(json) is not JContainer document)
             return json;
 
+        var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
         {
             if (property.Name == EnumDescriptionsKeyword &&
@@ -24,9 +36,10 @@ internal static class EnumDescriptionsSanitizer
                 property.Parent?["enum"] is JArray enumValues)
             {
                 property.Value = new JArray(enumValues.Select(value => descriptions[(string)value!]));
+                converted = true;
             }
         }
 
-        return document.ToString(Formatting.None);
+        return converted ? document.ToString(Formatting.None) : json;
     }
 }
