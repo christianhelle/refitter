@@ -6,7 +6,9 @@
 
 **Implemented enhancements:**
 
+- Object-valued x-enumDescriptions fails the whole document load [\#1336](https://github.com/christianhelle/refitter/issues/1336)
 - Add support for AddRefitGeneratedClient [\#1330](https://github.com/christianhelle/refitter/issues/1330)
+- Handle object-valued enum extensions such as x-enumDescriptions [\#1337](https://github.com/christianhelle/refitter/pull/1337) ([christianhelle](https://github.com/christianhelle))
 - Add useGeneratedRefitClient to register clients with AddRefitGeneratedClient [\#1334](https://github.com/christianhelle/refitter/pull/1334) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
