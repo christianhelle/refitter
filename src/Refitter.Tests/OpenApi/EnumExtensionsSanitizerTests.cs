@@ -92,6 +92,20 @@ public class EnumExtensionsSanitizerTests
     }
 
     [Test]
+    [Arguments("x-enumDescriptions", "properties")]
+    [Arguments("x-enumNames", "properties")]
+    [Arguments("x-enum-varnames", "patternProperties")]
+    [Arguments("x-enumNames", "schemas")]
+    [Arguments("x-enumNames", "definitions")]
+    [Arguments("x-enumNames", "$defs")]
+    public void Does_Not_Change_Schemas_Named_Like_Extensions(string keyword, string map)
+    {
+        var json = $$"""{ "type": "object", "{{map}}": { "{{keyword}}": { "type": "string" } } }""";
+
+        EnumExtensionsSanitizer.Sanitize(json).Should().BeSameAs(json);
+    }
+
+    [Test]
     public void Keeps_Other_Values_When_Converting()
     {
         const string json = """

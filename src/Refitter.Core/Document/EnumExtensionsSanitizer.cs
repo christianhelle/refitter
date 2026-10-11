@@ -27,6 +27,15 @@ internal static class EnumExtensionsSanitizer
         "x-enum-varnames",
     };
 
+    private static readonly HashSet<string> SchemaMapKeywords = new(StringComparer.Ordinal)
+    {
+        "properties",
+        "patternProperties",
+        "definitions",
+        "schemas",
+        "$defs",
+    };
+
     // A cheap text scan that finds candidate objects, so that documents without them
     // are returned untouched instead of being parsed and re-serialized.
     private static readonly Regex CandidateRegex = new(
@@ -53,6 +62,10 @@ internal static class EnumExtensionsSanitizer
         {
             var isName = NameKeywords.Contains(property.Name);
             if ((!isName && !DescriptionKeywords.Contains(property.Name)) || property.Value is not JObject valuesByKey)
+                continue;
+
+            // Keys of these maps are user-chosen names, so this is a schema that happens to be named like the extension
+            if (property.Parent!.Parent is JProperty { Name: var mapName } && SchemaMapKeywords.Contains(mapName))
                 continue;
 
             if (property.Parent?["enum"] is JArray enumValues)
