@@ -4,7 +4,7 @@ using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;
 
-public class EnumDescriptionsSanitizerTests
+public class EnumExtensionsSanitizerTests
 {
     [Test]
     [Arguments("x-enumDescriptions")]
@@ -19,7 +19,7 @@ public class EnumDescriptionsSanitizerTests
             }
             """;
 
-        var result = JObject.Parse(EnumDescriptionsSanitizer.Sanitize(json));
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
 
         result[keyword]!.ToObject<string[]>().Should().Equal("Not started yet.", "Finished.");
         result["enum"]!.ToObject<string[]>().Should().Equal("pending", "done");
@@ -37,7 +37,7 @@ public class EnumDescriptionsSanitizerTests
     {
         var json = $$"""{ "enum": {{enumValues}}, "x-enumDescriptions": {{descriptions}} }""";
 
-        var result = JObject.Parse(EnumDescriptionsSanitizer.Sanitize(json));
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
 
         result["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal(first, second);
     }
@@ -49,7 +49,7 @@ public class EnumDescriptionsSanitizerTests
             { "enum": ["a", "b", "c"], "x-enumDescriptions": { "b": "B", "unknown": "U" } }
             """;
 
-        var result = JObject.Parse(EnumDescriptionsSanitizer.Sanitize(json));
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
 
         result["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal("", "B", "");
     }
@@ -59,7 +59,7 @@ public class EnumDescriptionsSanitizerTests
     [Arguments("""{ "type": "string", "enum": "a", "x-enumDescriptions": { "a": "A" } }""")]
     public void Removes_Object_Without_Enum_Array(string json)
     {
-        var result = JObject.Parse(EnumDescriptionsSanitizer.Sanitize(json));
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
 
         result.ContainsKey("x-enumDescriptions").Should().BeFalse();
         result["type"]!.Value<string>().Should().Be("string");
@@ -78,7 +78,7 @@ public class EnumDescriptionsSanitizerTests
             }
             """;
 
-        var result = EnumDescriptionsSanitizer.Sanitize(json);
+        var result = EnumExtensionsSanitizer.Sanitize(json);
 
         result.Should().Contain("\"default\":\"2020-01-01T00:00:00+02:00\"");
         result.Should().Contain("\"default\":0.1");
@@ -91,6 +91,6 @@ public class EnumDescriptionsSanitizerTests
     [Arguments("openapi: 3.0.1")]
     public void Returns_Same_Instance_When_Nothing_To_Convert(string content)
     {
-        EnumDescriptionsSanitizer.Sanitize(content).Should().BeSameAs(content);
+        EnumExtensionsSanitizer.Sanitize(content).Should().BeSameAs(content);
     }
 }

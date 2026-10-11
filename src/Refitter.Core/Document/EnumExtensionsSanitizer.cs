@@ -10,7 +10,7 @@ namespace Refitter.Core;
 /// to load. This converts that object form to the array form in a JSON document before NSwag parses it.
 /// Other spellings are not bound by NJsonSchema, so they load as plain extension data and are left alone.
 /// </summary>
-internal static class EnumDescriptionsSanitizer
+internal static class EnumExtensionsSanitizer
 {
     private static readonly HashSet<string> EnumDescriptionsKeywords = new(StringComparer.Ordinal)
     {
