@@ -84,6 +84,40 @@ public class ObjectEnumDescriptionsTests
     }
 
     [Test]
+    [Arguments("yaml", OpenApiYamlSpec)]
+    [Arguments("json", OpenApiSpec)]
+    public async Task Can_Generate_Code_From_Referenced_File(string extension, string componentsSpec)
+    {
+        var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(folder);
+        var mainSpec = extension == "yaml"
+            ? """
+              openapi: 3.1.1
+              info: { title: Repro, version: v1 }
+              paths:
+                /status:
+                  get:
+                    operationId: GetStatus
+                    responses: { '200': { description: OK, content: { application/json: { schema: { $ref: './components.yaml#/components/schemas/Status' } } } } }
+              """
+            : """
+              {
+                "openapi": "3.1.1",
+                "info": { "title": "Repro", "version": "v1" },
+                "paths": { "/status": { "get": { "operationId": "GetStatus", "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "./components.json#/components/schemas/Status" } } } } } } } }
+              }
+              """;
+        var mainFile = Path.Combine(folder, $"main.{extension}");
+        await File.WriteAllTextAsync(mainFile, mainSpec);
+        await File.WriteAllTextAsync(Path.Combine(folder, $"components.{extension}"), componentsSpec);
+
+        var generatedCode = await GenerateCode(mainFile);
+
+        generatedCode.Should().Contain("Task<Status> GetStatus(");
+        Directory.Delete(folder, true);
+    }
+
+    [Test]
     [Category("Integration")]
     public async Task Can_Build_Generated_Code()
     {
