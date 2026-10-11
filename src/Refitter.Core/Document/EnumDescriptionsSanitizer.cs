@@ -5,18 +5,23 @@ using Newtonsoft.Json.Linq;
 namespace Refitter.Core;
 
 /// <summary>
-/// NJsonSchema reads <c>x-enumDescriptions</c> as an array parallel to <c>enum</c>, so a document using the
-/// object form keyed by enum value (as docusaurus-theme-openapi-docs renders it) fails to load.
-/// This converts that object form to the array form in a JSON document before NSwag parses it.
+/// NJsonSchema reads <c>x-enumDescriptions</c> and <c>x-enum-descriptions</c> as arrays parallel to <c>enum</c>,
+/// so a document using the object form keyed by enum value (as docusaurus-theme-openapi-docs renders it) fails
+/// to load. This converts that object form to the array form in a JSON document before NSwag parses it.
+/// Other spellings are not bound by NJsonSchema, so they load as plain extension data and are left alone.
 /// </summary>
 internal static class EnumDescriptionsSanitizer
 {
-    private const string EnumDescriptionsKeyword = "x-enumDescriptions";
+    private static readonly HashSet<string> EnumDescriptionsKeywords = new(StringComparer.Ordinal)
+    {
+        "x-enumDescriptions",
+        "x-enum-descriptions",
+    };
 
     // A cheap text scan that finds candidate objects, so that documents without them
     // are returned untouched instead of being parsed and re-serialized.
     private static readonly Regex CandidateRegex = new(
-        @"""x-enumDescriptions""\s*:\s*\{",
+        @"""x-enum(?:Descriptions|-descriptions)""\s*:\s*\{",
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(5));
 
@@ -37,7 +42,7 @@ internal static class EnumDescriptionsSanitizer
         var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
         {
-            if (property.Name != EnumDescriptionsKeyword || property.Value is not JObject descriptions)
+            if (!EnumDescriptionsKeywords.Contains(property.Name) || property.Value is not JObject descriptions)
                 continue;
 
             if (property.Parent?["enum"] is JArray enumValues)

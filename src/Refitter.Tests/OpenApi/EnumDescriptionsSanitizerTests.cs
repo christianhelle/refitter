@@ -7,19 +7,21 @@ namespace Refitter.Tests.OpenApi;
 public class EnumDescriptionsSanitizerTests
 {
     [Test]
-    public void Converts_Object_To_Array_In_Enum_Order()
+    [Arguments("x-enumDescriptions")]
+    [Arguments("x-enum-descriptions")]
+    public void Converts_Object_To_Array_In_Enum_Order(string keyword)
     {
-        const string json = """
+        var json = $$"""
             {
               "type": "string",
               "enum": ["pending", "done"],
-              "x-enumDescriptions": { "done": "Finished.", "pending": "Not started yet." }
+              "{{keyword}}": { "done": "Finished.", "pending": "Not started yet." }
             }
             """;
 
         var result = JObject.Parse(EnumDescriptionsSanitizer.Sanitize(json));
 
-        result["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal("Not started yet.", "Finished.");
+        result[keyword]!.ToObject<string[]>().Should().Equal("Not started yet.", "Finished.");
         result["enum"]!.ToObject<string[]>().Should().Equal("pending", "done");
     }
 

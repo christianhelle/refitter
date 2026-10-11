@@ -68,6 +68,19 @@ public class ObjectEnumDescriptionsTests
     }
 
     [Test]
+    [Arguments("x-enumDescriptions")]
+    [Arguments("x-enum-descriptions")]
+    [Arguments("x-enum-description")]
+    [Arguments("x-enum Description")]
+    public async Task Can_Generate_Code_With_Extension_Name_Variant(string extensionName)
+    {
+        var spec = OpenApiSpec.Replace("\"x-enumDescriptions\"", $"\"{extensionName}\"");
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);
+        var generatedCode = await GenerateCode(swaggerFile);
+        generatedCode.Should().Contain("Task<Status> GetStatus(");
+    }
+
+    [Test]
     public async Task Can_Generate_Code_From_Yaml()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiYamlSpec);
