@@ -26,6 +26,19 @@ public class EnumExtensionsSanitizerTests
     }
 
     [Test]
+    [Arguments("x-enumNames")]
+    [Arguments("x-enum-names")]
+    [Arguments("x-enum-varnames")]
+    public void Converts_Names_Object_To_Array_In_Enum_Order(string keyword)
+    {
+        var json = $$"""{ "type": "integer", "enum": [0, 1], "{{keyword}}": { "1": "Done", "0": "Pending" } }""";
+
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
+
+        result[keyword]!.ToObject<string[]>().Should().Equal("Pending", "Done");
+    }
+
+    [Test]
     [Arguments("""[1, 2]""", """{ "2": "Two", "1": "One" }""", "One", "Two")]
     [Arguments("""[true, false]""", """{ "false": "No", "true": "Yes" }""", "Yes", "No")]
     [Arguments("""["a", null]""", """{ "a": "A", "null": "None" }""", "A", "None")]

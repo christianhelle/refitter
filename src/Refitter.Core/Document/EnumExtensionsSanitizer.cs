@@ -5,23 +5,28 @@ using Newtonsoft.Json.Linq;
 namespace Refitter.Core;
 
 /// <summary>
-/// NJsonSchema reads <c>x-enumDescriptions</c> and <c>x-enum-descriptions</c> as arrays parallel to <c>enum</c>,
-/// so a document using the object form keyed by enum value (as docusaurus-theme-openapi-docs renders it) fails
-/// to load. This converts that object form to the array form in a JSON document before NSwag parses it.
-/// Other spellings are not bound by NJsonSchema, so they load as plain extension data and are left alone.
+/// NJsonSchema reads the enum description extensions (<c>x-enumDescriptions</c>, <c>x-enum-descriptions</c>) and
+/// the enum name extensions (<c>x-enumNames</c>, <c>x-enum-names</c>, <c>x-enum-varnames</c>) as arrays parallel
+/// to <c>enum</c>, so a document using the object form keyed by enum value (as docusaurus-theme-openapi-docs
+/// renders descriptions) fails to load. This converts that object form to the array form in a JSON document
+/// before NSwag parses it. Other spellings are not bound by NJsonSchema, so they load as plain extension data
+/// and are left alone.
 /// </summary>
 internal static class EnumExtensionsSanitizer
 {
-    private static readonly HashSet<string> EnumDescriptionsKeywords = new(StringComparer.Ordinal)
+    private static readonly HashSet<string> Keywords = new(StringComparer.Ordinal)
     {
         "x-enumDescriptions",
         "x-enum-descriptions",
+        "x-enumNames",
+        "x-enum-names",
+        "x-enum-varnames",
     };
 
     // A cheap text scan that finds candidate objects, so that documents without them
     // are returned untouched instead of being parsed and re-serialized.
     private static readonly Regex CandidateRegex = new(
-        @"""x-enum(?:Descriptions|-descriptions)""\s*:\s*\{",
+        @"""x-enum(?:Descriptions|-descriptions|Names|-names|-varnames)""\s*:\s*\{",
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(5));
 
@@ -42,17 +47,17 @@ internal static class EnumExtensionsSanitizer
         var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
         {
-            if (!EnumDescriptionsKeywords.Contains(property.Name) || property.Value is not JObject descriptions)
+            if (!Keywords.Contains(property.Name) || property.Value is not JObject valuesByKey)
                 continue;
 
             if (property.Parent?["enum"] is JArray enumValues)
             {
-                // Keep the array parallel to enum: values without a description get an empty one
-                property.Value = new JArray(enumValues.Select(value => descriptions[GetKey(value)] ?? string.Empty));
+                // Keep the array parallel to enum: values without an entry get an empty one
+                property.Value = new JArray(enumValues.Select(value => valuesByKey[GetKey(value)] ?? string.Empty));
             }
             else
             {
-                // Nothing to line the descriptions up with, and leaving the object would fail the load
+                // Nothing to line the entries up with, and leaving the object would fail the load
                 property.Remove();
             }
 
