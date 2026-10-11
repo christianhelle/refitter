@@ -41,7 +41,8 @@ internal static class EnumDescriptionsSanitizer
                 property.Value is JObject descriptions &&
                 property.Parent?["enum"] is JArray enumValues)
             {
-                property.Value = new JArray(enumValues.Select(value => descriptions[(string)value!]));
+                // Keep the array parallel to enum: values without a description get an empty one
+                property.Value = new JArray(enumValues.Select(value => descriptions[(string)value!] ?? string.Empty));
                 converted = true;
             }
         }

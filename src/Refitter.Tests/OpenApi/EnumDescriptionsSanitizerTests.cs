@@ -24,6 +24,18 @@ public class EnumDescriptionsSanitizerTests
     }
 
     [Test]
+    public void Uses_Empty_Description_For_Enum_Values_Without_One()
+    {
+        const string json = """
+            { "enum": ["a", "b", "c"], "x-enumDescriptions": { "b": "B", "unknown": "U" } }
+            """;
+
+        var result = JObject.Parse(EnumDescriptionsSanitizer.Sanitize(json));
+
+        result["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal("", "B", "");
+    }
+
+    [Test]
     public void Keeps_Other_Values_When_Converting()
     {
         const string json = """
