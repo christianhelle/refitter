@@ -127,17 +127,19 @@ internal static class EnumExtensionsSanitizer
     private static JToken? FindEntry(JObject valuesByKey, JToken value)
     {
         var entry = valuesByKey[GetKey(value)];
-        if (entry is not null || value.Type is not (JTokenType.Integer or JTokenType.Float))
+
+        // Only numbers have JSON text that parses as a number; strings are quoted, and true or null are not
+        if (entry is not null || !TryParseDecimal(value.ToString(Formatting.None), out var number))
             return entry;
 
         // Keys can spell a number differently from the enum value, like 1e2 for 100 or 2.50 for 2.5
-        var number = Convert.ToDouble(((JValue)value).Value, CultureInfo.InvariantCulture);
         return valuesByKey.Properties()
-            .FirstOrDefault(key =>
-                double.TryParse(key.Name, NumberStyles.Float, CultureInfo.InvariantCulture, out var keyNumber) &&
-                keyNumber.Equals(number))
+            .FirstOrDefault(key => TryParseDecimal(key.Name, out var keyNumber) && keyNumber == number)
             ?.Value;
     }
+
+    private static bool TryParseDecimal(string text, out decimal number) =>
+        decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out number);
 
     // Object keys are always strings, so other enum values (1, true, null) are matched by their JSON text
     private static string GetKey(JToken value) =>
