@@ -165,6 +165,23 @@ public class EnumExtensionsSanitizerTests
     }
 
     [Test]
+    [Arguments("x-enumDescriptions", 6)]
+    [Arguments("x-enumNames", 0)]
+    public void Converts_Escaped_Property_Names(string keyword, int escapedIndex)
+    {
+        // Built here rather than passed in, so the JSON gets a literal \uXXXX escape
+        var escapedKeyword = keyword.Substring(0, escapedIndex) +
+            $"\\u{(int)keyword[escapedIndex]:X4}" +
+            keyword.Substring(escapedIndex + 1);
+        var json = $$"""{ "enum": ["a"], "{{escapedKeyword}}": { "a": "A" } }""";
+        json.Should().Contain("\\u00");
+
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
+
+        result[keyword]!.ToObject<string[]>().Should().Equal("A");
+    }
+
+    [Test]
     public void Keeps_Other_Values_When_Converting()
     {
         const string json = """
@@ -191,5 +208,13 @@ public class EnumExtensionsSanitizerTests
     public void Returns_Same_Instance_When_Nothing_To_Convert(string content)
     {
         EnumExtensionsSanitizer.Sanitize(content).Should().BeSameAs(content);
+    }
+
+    [Test]
+    public void Returns_Same_Instance_When_Escapes_Hide_Nothing_To_Convert()
+    {
+        const string json = "{ \"description\": \"caf\\u00e9\", \"maximum\": 0.1000000000000000055 }";
+
+        EnumExtensionsSanitizer.Sanitize(json).Should().BeSameAs(json);
     }
 }
