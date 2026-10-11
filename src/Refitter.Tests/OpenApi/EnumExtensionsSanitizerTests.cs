@@ -146,6 +146,37 @@ public class EnumExtensionsSanitizerTests
     }
 
     [Test]
+    [Arguments("responses")]
+    [Arguments("properties")]
+    [Arguments("schemas")]
+    public void Converts_Extensions_On_Schema_Properties_Named_Like_Maps(string propertyName)
+    {
+        var json = $$"""
+            {
+              "properties": {
+                "{{propertyName}}": { "enum": ["a"], "x-enumDescriptions": { "a": "A" } },
+                "other": { "type": "string", "x-enumNames": { "a": "A" } }
+              }
+            }
+            """;
+
+        var result = JObject.Parse(EnumExtensionsSanitizer.Sanitize(json));
+
+        result["properties"]![propertyName]!["x-enumDescriptions"]!.ToObject<string[]>().Should().Equal("A");
+        ((JObject)result["properties"]!["other"]!).ContainsKey("x-enumNames").Should().BeFalse();
+    }
+
+    [Test]
+    public void Keeps_Named_Map_Entries_Under_Schema_Properties_Named_Like_Maps()
+    {
+        const string json = """
+            { "properties": { "responses": { "type": "object", "properties": { "x-enumNames": { "type": "string" } } } } }
+            """;
+
+        EnumExtensionsSanitizer.Sanitize(json).Should().BeSameAs(json);
+    }
+
+    [Test]
     public void Keeps_High_Precision_Numbers_When_Converting()
     {
         const string json = """

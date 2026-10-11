@@ -82,10 +82,10 @@ internal static class EnumExtensionsSanitizer
             return false;
 
         // An entry of a named map (a schema, response, parameter, ...) that happens to be named like the extension
-        if (property.Parent!.Parent is JProperty { Name: var mapName } && NamedMapKeywords.Contains(mapName))
+        if (IsNamedMapEntry(property))
             return false;
 
-        if (property.Parent["enum"] is JArray enumValues)
+        if (property.Parent!["enum"] is JArray enumValues)
         {
             // Keep the array parallel to enum. Values without a description get an empty one, and values
             // without a name get the enum value, so the member is named as if no names were given
@@ -100,6 +100,13 @@ internal static class EnumExtensionsSanitizer
 
         return true;
     }
+
+    // A property is an entry of a named map when its object is the value of a named map keyword. A keyword's
+    // name alone is not enough: a schema property called "responses" is itself an entry of "properties".
+    private static bool IsNamedMapEntry(JProperty property) =>
+        property.Parent!.Parent is JProperty map &&
+        NamedMapKeywords.Contains(map.Name) &&
+        !IsNamedMapEntry(map);
 
     // Numbers are read as decimals so that re-serializing keeps them exact. Only a document with a number
     // outside the decimal range falls back to doubles, the way NumericBoundsSanitizer reads documents.
