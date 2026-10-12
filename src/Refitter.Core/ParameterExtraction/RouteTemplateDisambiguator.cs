@@ -85,14 +85,24 @@ internal static class RouteTemplateDisambiguator
             .SelectMany(list => list.Attributes)
             .FirstOrDefault(attribute => attribute.Name.ToString() == "AliasAs");
 
+    // Binds the parameter to the alias, which is redundant when it equals the parameter name
     private static string WithAlias((string Text, ParameterSyntax Syntax) parameter, string alias)
     {
+        var isRedundant = alias == parameter.Syntax.Identifier.ValueText;
         var aliasAttribute = GetAliasAttribute(parameter.Syntax);
         if (aliasAttribute == null)
-            return $"[AliasAs(\"{alias}\")] {parameter.Text}";
+            return isRedundant ? parameter.Text : $"[AliasAs(\"{alias}\")] {parameter.Text}";
 
-        var span = aliasAttribute.Span;
-        var start = span.Start - Prefix.Length;
-        return parameter.Text.Substring(0, start) + $"AliasAs(\"{alias}\")" + parameter.Text.Substring(start + span.Length);
+        var attributeList = (AttributeListSyntax)aliasAttribute.Parent!;
+        var attributes = attributeList.Attributes
+            .Where(attribute => attribute != aliasAttribute || !isRedundant)
+            .Select(attribute => attribute == aliasAttribute ? $"AliasAs(\"{alias}\")" : attribute.ToString())
+            .ToList();
+
+        // Removing the only attribute of a list also removes the whitespace after it
+        var start = attributeList.Span.Start - Prefix.Length;
+        var end = (attributes.Count == 0 ? attributeList.FullSpan.End : attributeList.Span.End) - Prefix.Length;
+        var replacement = attributes.Count == 0 ? string.Empty : $"[{string.Join(", ", attributes)}]";
+        return parameter.Text.Substring(0, start) + replacement + parameter.Text.Substring(end);
     }
 }
