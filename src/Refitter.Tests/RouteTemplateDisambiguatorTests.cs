@@ -51,4 +51,28 @@ public class RouteTemplateDisambiguatorTests
         path.Should().Be("/v1/{idPath}/items/{id}");
         result.Should().Equal("[Required] string idPath", "[AliasAs(\"id\")] string idPath2");
     }
+
+    [Test]
+    public void Renames_Placeholder_Colliding_With_Deduplicated_Parameter()
+    {
+        var (path, result) = RouteTemplateDisambiguator.Disambiguate(
+            "/upload/{id}",
+            ["string id", "[AliasAs(\"id\")] string id2", "StreamPart file"],
+            ["id"]);
+
+        path.Should().Be("/upload/{id3}");
+        result.Should().Equal("[AliasAs(\"id3\")] string id", "[AliasAs(\"id\")] string id2", "StreamPart file");
+    }
+
+    [Test]
+    public void Uses_Keyword_Parameter_Name_Without_Escape()
+    {
+        var (path, result) = RouteTemplateDisambiguator.Disambiguate(
+            "/classes/{class}",
+            ["string @class", "[Query, AliasAs(\"Class\")] string class2"],
+            ["class"]);
+
+        path.Should().Be("/classes/{class3}");
+        result.Should().Equal("[AliasAs(\"class3\")] string @class", "[Query, AliasAs(\"Class\")] string class2");
+    }
 }
