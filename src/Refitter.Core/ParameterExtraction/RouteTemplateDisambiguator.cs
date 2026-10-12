@@ -24,6 +24,9 @@ internal static class RouteTemplateDisambiguator
         IReadOnlyList<string> parameters,
         IReadOnlyList<string> routeParameterNames)
     {
+        if (string.IsNullOrEmpty(path))
+            return (path, parameters);
+
         var result = parameters.ToList();
         var placeholders = routeParameterNames
             .Where(name => path.Contains($"{{{name}}}"))

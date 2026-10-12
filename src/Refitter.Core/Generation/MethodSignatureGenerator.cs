@@ -8,7 +8,7 @@ internal class MethodSignatureGenerator(RefitGeneratorSettings settings)
 {
     private readonly ParameterListBuilder parameterListBuilder = new(settings);
 
-    public (string ParametersString, IReadOnlyList<string> Parameters, string? DynamicQuerystringParameters) Generate(
+    public (string Path, string ParametersString, IReadOnlyList<string> Parameters, string? DynamicQuerystringParameters) Generate(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         string dynamicQuerystringParameterType)
@@ -19,6 +19,6 @@ internal class MethodSignatureGenerator(RefitGeneratorSettings settings)
             dynamicQuerystringParameterType);
 
         var parametersString = string.Join(", ", parameterList.Parameters);
-        return (parametersString, parameterList.Parameters, parameterList.DynamicQuerystringCode);
+        return (parameterList.Path, parametersString, parameterList.Parameters, parameterList.DynamicQuerystringCode);
     }
 }

@@ -238,7 +238,7 @@ internal class InterfaceGenerator
         var dynamicQuerystringParameterType =
             partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
 
-        var (parametersString, parameters, operationDynamicQuerystringParameters) =
+        var (path, parametersString, parameters, operationDynamicQuerystringParameters) =
             methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
 
         var isApiResponseType = returnTypeGenerator.IsApiResponseType(returnType);
@@ -258,7 +258,7 @@ internal class InterfaceGenerator
             code.AppendLine($"{Separator}{Separator}{attribute}");
         }
 
-        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(op.Path)}\")]")
+        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(path)}\")]")
             .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
             .AppendLine();
 
@@ -282,7 +282,7 @@ internal class InterfaceGenerator
 
             var nonOptionalParametersString = string.Join(", ", nonOptionalParameters);
 
-            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(op.Path)}\")]")
+            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(path)}\")]")
                 .AppendLine($"{Separator}{Separator}{returnType} {methodName}({nonOptionalParametersString});")
                 .AppendLine();
         }

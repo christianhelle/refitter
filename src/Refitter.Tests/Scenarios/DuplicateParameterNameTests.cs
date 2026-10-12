@@ -51,7 +51,10 @@ public class DuplicateParameterNameTests
     {
         var generatedCode = await GenerateCode(settings => settings.UseCancellationTokens = true);
         generatedCode.Should().Contain("Task Search([AliasAs(\"cancellationToken\")] [Query] string cancellationToken2, CancellationToken cancellationToken = default);");
-        generatedCode.Should().Contain("Task GetItem([AliasAs(\"Id\")] string idPath, [AliasAs(\"id\")] string idPath2, CancellationToken cancellationToken = default);");
+        generatedCode.Should().Contain("[Get(\"/v1/{idPath}/items/{id}\")]");
+        generatedCode.Should().Contain("Task GetItem(string idPath, [AliasAs(\"id\")] string idPath2, CancellationToken cancellationToken = default);");
+        generatedCode.Should().Contain("[Post(\"/upload/{id3}\")]");
+        generatedCode.Should().Contain("[AliasAs(\"id3\")] string id");
         generatedCode.Should().Contain("[AliasAs(\"id\")] string id2");
         generatedCode.Should().Contain("<param name=\"cancellationToken2\">");
         generatedCode.Should().Contain("<param name=\"idPath2\">");

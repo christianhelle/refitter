@@ -5,7 +5,7 @@ namespace Refitter.Core;
 
 internal interface IMethodSignatureGenerator
 {
-    (string ParametersString, IReadOnlyList<string> Parameters, string? DynamicQuerystringParameters) Generate(
+    (string Path, string ParametersString, IReadOnlyList<string> Parameters, string? DynamicQuerystringParameters) Generate(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         string dynamicQuerystringParameterType);

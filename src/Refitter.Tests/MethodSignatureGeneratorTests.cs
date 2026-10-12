@@ -39,7 +39,7 @@ public class MethodSignatureGeneratorTests
         var operation = document.Paths["/test/{id}"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
         operationModel.Path = "/test/{id}";
-        var (parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
 
         parametersString.Should().Contain("int id");
     }
@@ -73,7 +73,7 @@ public class MethodSignatureGeneratorTests
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
 
         parametersString.Should().Contain("string search");
     }
@@ -111,7 +111,7 @@ public class MethodSignatureGeneratorTests
 
         var operation = document.Paths["/test"]["post"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
 
         parametersString.Should().Contain("body");
     }
@@ -140,7 +140,7 @@ public class MethodSignatureGeneratorTests
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
 
         parametersString.Should().Contain("CancellationToken");
     }
@@ -178,7 +178,7 @@ public class MethodSignatureGeneratorTests
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (_, _, dynamicQs) = sut.Generate(operationModel, operation, "TestQueryParams");
+        var (_, _, _, dynamicQs) = sut.Generate(operationModel, operation, "TestQueryParams");
 
         dynamicQs.Should().NotBeNull();
     }
@@ -210,7 +210,7 @@ public class MethodSignatureGeneratorTests
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
 
         parametersString.Should().Contain("IApizrRequestOptions");
     }
@@ -245,7 +245,7 @@ public class MethodSignatureGeneratorTests
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (_, parameters, _) = sut.Generate(operationModel, operation, string.Empty);
+        var (_, _, parameters, _) = sut.Generate(operationModel, operation, string.Empty);
 
         parameters.Should().NotBeEmpty();
     }
