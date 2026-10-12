@@ -12,6 +12,16 @@ Describe the changes include in this pull request. What is this fixing or improv
 
 If this pull request resolves or implements an existing issue then please associate it.
 
+#### Checklist:
+
+See the [Definition of Done](https://github.com/christianhelle/refitter/blob/main/CONTRIBUTING.md#definition-of-done) for details. If you would like help with any of these, just say so in the description.
+
+- [ ] Linked issue (`Closes #...`)
+- [ ] Scenario tests that assert on the generated code and compile it with `BuildHelper.BuildCSharp()` (`[Category("Integration")]`)
+- [ ] Full test suite passes locally (`dotnet test --solution src/Refitter.slnx -c Release`)
+- [ ] Documentation updated if settings or CLI arguments changed (`README.md`, `refitter-file-format.md`, `json-schema.json`)
+- [ ] "Allow edits by maintainers" is enabled
+
 #### Example OpenAPI Specifications:
 ```yaml
 swagger: '2.0'
