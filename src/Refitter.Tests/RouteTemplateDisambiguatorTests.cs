@@ -15,4 +15,16 @@ public class RouteTemplateDisambiguatorTests
         path.Should().Be("/items/{id}");
         result.Should().Equal(parameters);
     }
+
+    [Test]
+    public void Renames_Placeholder_Colliding_With_Query_Alias_Differing_By_Case()
+    {
+        var (path, result) = RouteTemplateDisambiguator.Disambiguate(
+            "/api/parent/{id}/child",
+            ["int id", "[Query, AliasAs(\"ID\")] int? iD"],
+            ["id"]);
+
+        path.Should().Be("/api/parent/{id2}/child");
+        result.Should().Equal("[AliasAs(\"id2\")] int id", "[Query, AliasAs(\"ID\")] int? iD");
+    }
 }
