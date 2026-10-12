@@ -1,10 +1,15 @@
 # Contributing to Refitter
 
-Thank you for your interest in contributing to Refitter! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to Refitter! This document explains what is expected from a contribution, so you know the full scope of the work **before** you start writing code.
 
 ## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
+- [Before You Start](#before-you-start)
+- [Definition of Done](#definition-of-done)
+- [What to Expect from Code Review](#what-to-expect-from-code-review)
+- [Using AI Tools](#using-ai-tools)
+- [Getting Help or Handing Over](#getting-help-or-handing-over)
 - [How to Contribute](#how-to-contribute)
   - [Reporting Issues](#reporting-issues)
   - [Feature Requests](#feature-requests)
@@ -18,6 +23,83 @@ Thank you for your interest in contributing to Refitter! This document provides 
 ## Code of Conduct
 
 Be respectful and assume good intent. This applies both ways: to contributors and to the maintainer. Review comments are about the code, never about the person who wrote it.
+
+## Before You Start
+
+Refitter has a large number of options, and many of them interact with each other (dependency injection, Polly/HttpResilience, Apizr, multiple files, contract generation, and so on). Once a feature is merged, the maintainer is the one who supports it, fixes it when it breaks, and answers the issues about it — for years.
+
+Because of this, **every pull request is held to the same [Definition of Done](#definition-of-done), regardless of how many lines of code it changes.** A 10-line change that adds a new setting needs the same tests and documentation as a 500-line one. In practice, the code change is often the smallest part of the work; tests and documentation usually take longer.
+
+For anything other than a small bug fix:
+
+- **Open an issue first** (or comment on an existing one) describing what you want to add. This lets us agree on the scope, the setting name, and the default behavior before you invest time in it.
+- **Read the [Definition of Done](#definition-of-done)** so you know what the full pull request will contain.
+- If the scope feels like more than you want to take on, that is completely fine — say so in the issue. See [Getting Help or Handing Over](#getting-help-or-handing-over).
+
+## Definition of Done
+
+A pull request is ready to merge when all of the following are true. Reviews are checked against this list.
+
+**Code**
+
+- [ ] The solution builds in Release (`dotnet build -c Release src/Refitter.slnx`). Most projects have `TreatWarningsAsErrors` enabled.
+- [ ] The code follows `.editorconfig` and the [Style Guide](#style-guide) (for example: no `_` prefix on private fields, explicit types instead of `var`).
+- [ ] Existing behavior is unchanged unless the change is intentional and discussed. New options are **off by default**.
+
+**Tests**
+
+- [ ] New features have scenario tests in the `Refitter.Tests.Scenarios` namespace (see [Testing](#testing)) that:
+  - contain an example OpenAPI specification as a `const string`,
+  - assert that the expected code **is** generated,
+  - assert that the code it replaces **is not** generated (where relevant),
+  - compile the generated code with `BuildHelper.BuildCSharp(generatedCode)`, in a test marked `[Category("Integration")]`.
+- [ ] Bug fixes have a regression test that fails without the fix.
+- [ ] If the option interacts with other options, those combinations are tested too. For example, a change to dependency injection output should be covered alongside `HttpMessageHandlers`, Polly/HttpResilience and the other options tested in `src/Refitter.Tests/DependencyInjection/`.
+- [ ] The full test suite passes locally: `dotnet test --solution src/Refitter.slnx -c Release`. See `AGENTS.md` for the pre-build step the source generator tests need.
+
+A test that only checks for a string in the output is not enough on its own: it can pass on code that does not compile. The build verification is what catches that.
+
+**Documentation**
+
+- [ ] A new `.refitter` setting is documented in **all** of these places:
+  - `README.md`: the `.refitter` sample and the settings description list
+  - `docs/docfx_project/articles/refitter-file-format.md`
+  - `docs/json-schema.json` (editors use this for validation and auto-complete)
+- [ ] A new CLI argument is also documented in the CLI usage section of `README.md`.
+- [ ] Public APIs and settings have XML documentation comments.
+- [ ] Any requirements or limitations are written down: for example, a minimum Refit version, or options that are ignored when another option is enabled.
+
+**Pull request**
+
+- [ ] The description explains what changed and why, and links the issue with `Closes #<issue number>`.
+- [ ] "Allow edits by maintainers" is enabled.
+
+## What to Expect from Code Review
+
+Every pull request is reviewed by several automated tools (CodeRabbit, SonarQube Cloud, Codecov and AI review agents). The maintainer then pulls the branch, builds it, and reviews it by hand.
+
+The result is often a **long, itemized review — even for a small change.** That is normal here and it is not a judgement of you or your work. It is the Definition of Done applied to your pull request, written out in full so nothing is left vague. Reviews usually separate:
+
+- **Blocking** items: these must be fixed before merge (for example, generated code that does not compile, or missing tests or documentation).
+- **Smaller points**: suggestions about naming, style or wording. These are open for discussion.
+
+If you disagree with a review comment, reply on the thread and explain why. Pushing back is welcome; it often leads to a better result.
+
+## Using AI Tools
+
+You are welcome to use AI coding tools. The repository includes an [`AGENTS.md`](AGENTS.md) file that describes the build, test conventions and project layout for coding agents, and it is a good way to produce the tests and documentation listed above.
+
+Whether code is written by hand or with AI, you are responsible for the result: it has to compile, pass the tests and do what the pull request says it does.
+
+## Getting Help or Handing Over
+
+The requirements above can be a lot of work, especially for a first contribution. You have options:
+
+- **Ask for help.** If you are stuck on the tests, the build helper or the documentation, ask in the pull request. The maintainer is happy to point you in the right direction or to push the missing parts to your branch.
+- **Hand it over.** If you only want to contribute the core change, say so. With "Allow edits by maintainers" enabled, the maintainer can finish the pull request. Your commits and credit are kept.
+- **Open an issue instead.** A well-described feature request or bug report with an example OpenAPI specification is a valuable contribution on its own.
+
+What does not work well is a pull request that stays incomplete with no reply: it cannot be merged and it blocks others from picking up the work. Unfinished pull requests may be closed or taken over after a while.
 
 ## How to Contribute
 
@@ -45,11 +127,13 @@ Feature requests are welcome! Please follow the feature request template in `.gi
 
 ### Pull Requests
 
-1. Fork the repository
-2. Create a new branch for your changes
-3. Make your changes following the development guidelines below
-4. Submit a pull request with a clear description of the changes and any related issues
-5. Follow the pull request template in `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md` which asks for:
+1. For anything other than a small bug fix, open or comment on an issue first (see [Before You Start](#before-you-start))
+2. Fork the repository
+3. Create a new branch for your changes
+4. Make your changes following the development guidelines below
+5. Check your changes against the [Definition of Done](#definition-of-done)
+6. Submit a pull request with a clear description of the changes and any related issues, with "Allow edits by maintainers" enabled
+7. Follow the pull request template in `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md` which asks for:
    - A description of the changes being made
    - Association with existing issues if applicable
    - Example OpenAPI specifications
@@ -145,8 +229,8 @@ public class MyFeatureTests
 
 - **New features must be documented in the README files**.
 - Documentation is especially important for:
-  - New CLI tool arguments
-  - Changes to the .refitter file format
+  - New CLI tool arguments (`README.md`)
+  - Changes to the .refitter file format (`README.md`, `docs/docfx_project/articles/refitter-file-format.md` **and** `docs/json-schema.json`)
   - API changes or additions
 - Update both code comments and user-facing documentation.
 - Documentation should be clear, concise, and include examples where appropriate.
