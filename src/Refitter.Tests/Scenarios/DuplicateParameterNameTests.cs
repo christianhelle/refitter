@@ -65,7 +65,7 @@ public class DuplicateParameterNameTests
     {
         var generatedCode = await GenerateCode();
 
-        var request = await RefitRequestCapture.SendAsync(generatedCode, "IDupParams", "GetItem", "a", "b");
+        var request = await RefitRequestCapture.SendAsync(RefitClient.Reflection, generatedCode, "IDupParams", "GetItem", "a", "b");
 
         request.RequestUri!.PathAndQuery.Should().Be("/v1/a/items/b");
     }
