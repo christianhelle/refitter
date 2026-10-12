@@ -71,7 +71,7 @@ A test that only checks for a string in the output is not enough on its own: it 
 
 **Pull request**
 
-- [ ] The description explains what changed and why, and links the issue with `Closes #<issue number>`.
+- [ ] The description explains what changed and why. If there is a related issue, it is linked with `Closes #<issue number>`.
 - [ ] "Allow edits by maintainers" is enabled.
 
 ## What to Expect from Code Review
