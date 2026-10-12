@@ -46,6 +46,16 @@ public class CaseInsensitiveRouteParameterTests
     }
 
     [Test]
+    public async Task Refit_Sends_Path_And_Query_Parameters()
+    {
+        var generatedCode = await GenerateCode();
+
+        var request = await RefitRequestCapture.SendAsync(generatedCode, "IRepro", "GetSomething", 1, 2);
+
+        request.RequestUri!.PathAndQuery.Should().Be("/api/parent/1/child?ID=2");
+    }
+
+    [Test]
     [Category("Integration")]
     public async Task Can_Build_Generated_Code()
     {

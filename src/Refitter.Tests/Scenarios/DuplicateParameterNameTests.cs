@@ -61,6 +61,16 @@ public class DuplicateParameterNameTests
     }
 
     [Test]
+    public async Task Refit_Sends_Path_Parameters_Differing_By_Case()
+    {
+        var generatedCode = await GenerateCode();
+
+        var request = await RefitRequestCapture.SendAsync(generatedCode, "IDupParams", "GetItem", "a", "b");
+
+        request.RequestUri!.PathAndQuery.Should().Be("/v1/a/items/b");
+    }
+
+    [Test]
     [Category("Integration")]
     public async Task Can_Build_Generated_Code()
     {
