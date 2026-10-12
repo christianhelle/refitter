@@ -17,7 +17,7 @@ Thank you for your interest in contributing to Refitter! This document provides 
 
 ## Code of Conduct
 
-Please review and adhere to our code of conduct to ensure a positive and inclusive environment for all contributors.
+Be respectful and assume good intent. This applies both ways: to contributors and to the maintainer. Review comments are about the code, never about the person who wrote it.
 
 ## How to Contribute
 
