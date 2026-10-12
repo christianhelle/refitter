@@ -1,4 +1,0 @@
-{
-  "openApiPath": "../Resources/CaseInsensitiveRouteParameters.json",
-  "namespace": "Refitter.Tests.CaseInsensitiveRouteParameters"
-}
