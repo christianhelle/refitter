@@ -1,5 +1,21 @@
 # Changelog
 
+## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.120...HEAD)
+
+**Implemented enhancements:**
+
+- Rename route placeholders that collide case-insensitively with other parameters [\#1341](https://github.com/christianhelle/refitter/pull/1341) ([christianhelle](https://github.com/christianhelle))
+
+**Fixed bugs:**
+
+- Runtime error: duplicate path/query param names [\#1338](https://github.com/christianhelle/refitter/issues/1338)
+
+**Merged pull requests:**
+
+- Clarify contributor expectations in contributing guide [\#1339](https://github.com/christianhelle/refitter/pull/1339) ([christianhelle](https://github.com/christianhelle))
+
 ## [2.3.1-preview.120](https://github.com/christianhelle/refitter/tree/2.3.1-preview.120) (2026-10-11)
 
 [Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.119...2.3.1-preview.120)
