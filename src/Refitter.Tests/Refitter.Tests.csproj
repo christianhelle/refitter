@@ -37,7 +37,7 @@
       <!-- Lets RefitRequestCapture run Refit's compile-time client generator on in-memory compilations -->
       <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
         <_Parameter1>RefitInterfaceStubGenerator</_Parameter1>
-        <_Parameter2>$(PkgRefit)\analyzers\dotnet\roslyn4.8\cs\InterfaceStubGeneratorV2.dll</_Parameter2>
+        <_Parameter2>$([System.IO.Path]::Combine($(PkgRefit), 'analyzers', 'dotnet', 'roslyn4.8', 'cs', 'InterfaceStubGeneratorV2.dll'))</_Parameter2>
       </AssemblyAttribute>
     </ItemGroup>
 
