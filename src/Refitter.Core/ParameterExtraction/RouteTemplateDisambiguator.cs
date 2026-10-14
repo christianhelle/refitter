@@ -97,7 +97,7 @@ internal static class RouteTemplateDisambiguator
         if (aliasAttribute == null)
             return isRedundant ? parameter.Text : $"[AliasAs(\"{alias}\")] {parameter.Text}";
 
-        var attributeList = (AttributeListSyntax)aliasAttribute.Parent!;
+        var attributeList = parameter.Syntax.AttributeLists.First(list => list.Attributes.Contains(aliasAttribute));
         var attributes = attributeList.Attributes
             .Where(attribute => attribute != aliasAttribute || !isRedundant)
             .Select(attribute => attribute == aliasAttribute ? $"AliasAs(\"{alias}\")" : attribute.ToString())
