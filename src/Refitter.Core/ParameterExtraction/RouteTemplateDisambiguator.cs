@@ -92,10 +92,12 @@ internal static class RouteTemplateDisambiguator
     // Binds the parameter to the alias, which is redundant when it equals the parameter name
     private static string WithAlias((string Text, ParameterSyntax Syntax) parameter, string alias)
     {
-        var isRedundant = alias == parameter.Syntax.Identifier.ValueText;
+        // A parameter without an alias is bound by its name, which collides, so its alias is never redundant
         var aliasAttribute = GetAliasAttribute(parameter.Syntax);
         if (aliasAttribute == null)
-            return isRedundant ? parameter.Text : $"[AliasAs(\"{alias}\")] {parameter.Text}";
+            return $"[AliasAs(\"{alias}\")] {parameter.Text}";
+
+        var isRedundant = alias == parameter.Syntax.Identifier.ValueText;
 
         var attributeList = parameter.Syntax.AttributeLists.First(list => list.Attributes.Contains(aliasAttribute));
         var attributes = attributeList.Attributes
