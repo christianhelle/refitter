@@ -50,6 +50,7 @@ public class SettingsTests
         settings.IncludeInheritanceHierarchy.Should().BeFalse();
         settings.NoBanner.Should().BeFalse();
         settings.SkipDefaultAdditionalProperties.Should().BeFalse();
+        settings.ForceAdditionalProperties.Should().BeFalse();
         settings.OperationNameGenerator.Should().Be(OperationNameGeneratorTypes.Default);
         settings.ImmutableRecords.Should().BeFalse();
         settings.UseApizr.Should().BeFalse();
