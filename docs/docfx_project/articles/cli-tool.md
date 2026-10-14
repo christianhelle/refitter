@@ -89,6 +89,7 @@ OPTIONS:
         --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used
         --no-banner                                              Don't show donation banner
         --skip-default-additional-properties                     Set to true to skip default additional properties
+        --force-additional-properties                            Generate additional properties on every contract, even when the schema sets additionalProperties to false
         --allow-remote-refs                                      Resolve remote (http/https) $ref references inside the document. Disabled by default to prevent generation-time SSRF
         --simple-output                                          Generate output with no color, no formatting, no emojis, and no banners suitable for terminal or IDE output
         --collection-format                      Multi           Determines the format of collection parameters. May be one of:

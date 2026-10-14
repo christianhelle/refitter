@@ -622,6 +622,7 @@ OPTIONS:
         --include-inheritance-hierarchy                          Keep all possible inherited types/union types even if they are not directly used
         --no-banner                                              Don't show donation banner
         --skip-default-additional-properties                     Set to true to skip default additional properties
+        --force-additional-properties                            Generate additional properties on every contract, even when the schema sets additionalProperties to false
         --simple-output                                          Generate simple, plain-text console output without ASCII art, tables, emojis, or color formatting
         --collection-format                      Multi           Determines the format of collection parameters. May be one of:
                                                                  - Multi (separate parameter instances for each array item)
