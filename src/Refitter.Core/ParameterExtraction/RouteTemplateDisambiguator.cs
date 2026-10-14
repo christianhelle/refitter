@@ -58,9 +58,10 @@ internal static class RouteTemplateDisambiguator
 
             var name = parsed[routeIndex].Syntax.Identifier.ValueText;
             var uniqueName = name;
-            for (var suffix = 2; usedNames.Contains(uniqueName); suffix++)
+            var suffix = 2;
+            while (usedNames.Contains(uniqueName))
             {
-                uniqueName = name + suffix;
+                uniqueName = name + suffix++;
             }
 
             path = path.Replace($"{{{placeholder}}}", $"{{{uniqueName}}}");
