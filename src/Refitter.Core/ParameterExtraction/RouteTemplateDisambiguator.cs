@@ -78,10 +78,10 @@ internal static class RouteTemplateDisambiguator
         return (parameter, tree.GetRoot().DescendantNodes().OfType<ParameterSyntax>().First());
     }
 
-    // The name Refit binds the parameter by
+    // The name Refit binds the parameter by. Refitter always emits AliasAs with a string literal
     private static string GetUrlName(ParameterSyntax parameter) =>
-        GetAliasAttribute(parameter)?.ArgumentList?.Arguments[0].Expression is LiteralExpressionSyntax literal
-            ? literal.Token.ValueText
+        GetAliasAttribute(parameter) is { } aliasAttribute
+            ? aliasAttribute.DescendantNodes().OfType<LiteralExpressionSyntax>().First().Token.ValueText
             : parameter.Identifier.ValueText;
 
     private static AttributeSyntax? GetAliasAttribute(ParameterSyntax parameter) =>
