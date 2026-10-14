@@ -24,11 +24,21 @@
     <ItemGroup>
         <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.9.6" PrivateAssets="all" />
+        <PackageReference Include="Refit" Version="16.2.0" GeneratePathProperty="true" />
+        <PackageReference Include="Refit.Reflection" Version="16.2.0" />
         <PackageReference Include="TUnit" Version="1.71.0" />
         <PackageReference Include="coverlet.collector" Version="10.0.1">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Lets RefitRequestCapture run Refit's compile-time client generator on in-memory compilations -->
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+        <_Parameter1>RefitInterfaceStubGenerator</_Parameter1>
+        <_Parameter2>$([System.IO.Path]::Combine($(PkgRefit), 'analyzers', 'dotnet', 'roslyn4.8', 'cs', 'InterfaceStubGeneratorV2.dll'))</_Parameter2>
+      </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>

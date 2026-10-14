@@ -238,7 +238,7 @@ internal class InterfaceGenerator
         var dynamicQuerystringParameterType =
             partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
 
-        var (parametersString, parameters, operationDynamicQuerystringParameters) =
+        var methodSignature =
             methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
 
         var isApiResponseType = returnTypeGenerator.IsApiResponseType(returnType);
@@ -247,7 +247,7 @@ internal class InterfaceGenerator
         {
             docGenerator.AppendMethodDocumentation(
                 operationModel,
-                parameters,
+                methodSignature.Parameters,
                 isApiResponseType,
                 code,
                 dynamicQuerystringParameterType);
@@ -258,13 +258,13 @@ internal class InterfaceGenerator
             code.AppendLine($"{Separator}{Separator}{attribute}");
         }
 
-        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(op.Path)}\")]")
-            .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parametersString});")
+        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(methodSignature.Path)}\")]")
+            .AppendLine($"{Separator}{Separator}{returnType} {methodName}({methodSignature.ParametersString});")
             .AppendLine();
 
-        if (parametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
+        if (methodSignature.ParametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
         {
-            var nonOptionalParameters = parameters.Where(parameter => !parameter.Contains("?")).ToList();
+            var nonOptionalParameters = methodSignature.Parameters.Where(parameter => !parameter.Contains("?")).ToList();
             if (settings.GenerateXmlDocCodeComments)
             {
                 docGenerator.AppendMethodDocumentation(
@@ -282,12 +282,12 @@ internal class InterfaceGenerator
 
             var nonOptionalParametersString = string.Join(", ", nonOptionalParameters);
 
-            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(op.Path)}\")]")
+            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(methodSignature.Path)}\")]")
                 .AppendLine($"{Separator}{Separator}{returnType} {methodName}({nonOptionalParametersString});")
                 .AppendLine();
         }
 
-        return (operationDynamicQuerystringParameters ?? string.Empty, dynamicQuerystringParameterType);
+        return (methodSignature.DynamicQuerystringParameters ?? string.Empty, dynamicQuerystringParameterType);
     }
 
     private static string GetParameterSignature(

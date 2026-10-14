@@ -45,7 +45,8 @@ public class ParameterNameCollisionTests
     public async Task Disambiguates_Parameters_By_Location()
     {
         var generatedCode = await GenerateCode();
-        generatedCode.Should().Contain("[AliasAs(\"body\")] string bodyPath");
+        generatedCode.Should().Contain("[Post(\"/c/{bodyPath}\")]");
+        generatedCode.Should().Contain("Task PostC(string bodyPath,");
         generatedCode.Should().Contain("[Header(\"Body\")] string bodyHeader");
         generatedCode.Should().Contain("[Query, AliasAs(\"id\")] string idQuery");
         generatedCode.Should().Contain("[Header(\"id\")] string idHeader");

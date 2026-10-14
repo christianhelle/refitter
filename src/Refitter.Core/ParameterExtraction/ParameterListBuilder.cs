@@ -47,8 +47,14 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
         else
             hasAppendedParameter = false;
 
-        return new ParameterList(
+        var (path, uniqueParameters) = RouteTemplateDisambiguator.Disambiguate(
+            operationModel.Path,
             ParameterNameDeduplicator.Deduplicate(parameters, hasAppendedParameter),
-            dynamicQuerystringCode);
+            operationModel.Parameters
+                .Where(p => p.Kind == OpenApiParameterKind.Path)
+                .Select(p => p.Name)
+                .ToList());
+
+        return new ParameterList(path, uniqueParameters, dynamicQuerystringCode);
     }
 }
