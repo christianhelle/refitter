@@ -23,6 +23,7 @@ internal static class SettingsMapper
         result.GenerateXmlDocCodeComments = !settings.NoXmlDocCodeComments;
         result.GenerateDeprecatedOperations = !settings.NoDeprecatedOperations;
         result.GenerateDefaultAdditionalProperties = !settings.SkipDefaultAdditionalProperties;
+        result.ForceAdditionalProperties = settings.ForceAdditionalProperties;
         result.AllowRemoteReferences = settings.AllowRemoteReferences;
         result.Silent = settings.Silent;
         result.TypeAccessibility = settings.InternalTypeAccessibility

@@ -63,6 +63,7 @@ The following is an example `.refitter` file
     "^Person.+"
   ],
   "generateDefaultAdditionalProperties": true, // Optional. default=true
+  "forceAdditionalProperties": false, // Optional. default=false
   "allowRemoteReferences": false, // Optional. Default=false. When true, remote http/https $ref references inside the document are resolved
   "silent": false, // Optional. Default=false. Suppress all console output when running the CLI tool. Errors are still reported through the exit code
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
@@ -190,6 +191,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
 - `keepSchemaPatterns`: A collection of regular expressions to force to keep matching schema. This is used together with `trimUnusedSchema`
 - `includeInheritanceHierarchy`: Set to true to keep all possible type-instances of inheritance/union types. If this is false only directly referenced types will be kept. This works in conjunction with `trimUnusedSchema`
 - `generateDefaultAdditionalProperties`: Set to `false` to skip default additional properties. Default is `true`
+- `forceAdditionalProperties`: Set to `true` to generate additional properties (`[JsonExtensionData]`) on every contract, even when the schema sets `additionalProperties: false`. Useful for read-modify-write clients that must round-trip fields unknown to an older spec. Schema-valued additional properties are left unchanged. Takes precedence over `generateDefaultAdditionalProperties`. Default is `false`
 - `allowRemoteReferences`: When `true`, remote (`http`/`https`) `$ref` references inside the document are resolved. Disabled by default to prevent generation-time SSRF and remote file inclusion. Local `$ref` references are always confined to the input document's directory tree. Default is `false`
 - `silent`: Set to `true` to suppress all console output when running the CLI tool. Errors are still reported through the exit code. Default is `false`
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
@@ -422,6 +424,10 @@ When using `openApiPaths`, the documents are merged into a single generated clie
         "generateDefaultAdditionalProperties": {
             "type": "boolean",
             "description": "Indicates whether to generate default additional properties."
+        },
+        "forceAdditionalProperties": {
+            "type": "boolean",
+            "description": "Indicates whether to generate additional properties even when schemas set additionalProperties to false."
         },
         "allowRemoteReferences": {
             "type": "boolean",

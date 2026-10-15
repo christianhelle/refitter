@@ -342,6 +342,20 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public bool GenerateDefaultAdditionalProperties { get; set; } = true;
 
     /// <summary>
+    /// Set to <c>true</c> to generate additional properties (extension data) on every contract,
+    /// even when the schema sets <c>additionalProperties: false</c>. Schema-valued additional properties are left unchanged.
+    /// This takes precedence over <see cref="GenerateDefaultAdditionalProperties"/>. Default is <c>false</c>
+    /// </summary>
+    [Description(
+        """
+        Generate additional properties (extension data) on every contract, even when the schema sets additionalProperties to false.
+        Schema-valued additional properties are left unchanged.
+        This takes precedence over GenerateDefaultAdditionalProperties. Default is false.
+        """
+    )]
+    public bool ForceAdditionalProperties { get; set; }
+
+    /// <summary>
     /// Set to <c>true</c> to generate contracts as immutable records instead of classes
     /// </summary>
     [Description("Generate contracts as immutable records instead of classes.")]

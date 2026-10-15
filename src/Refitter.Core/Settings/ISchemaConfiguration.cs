@@ -24,4 +24,9 @@ public interface ISchemaConfiguration
     /// Gets a value indicating whether to generate default additional properties.
     /// </summary>
     bool GenerateDefaultAdditionalProperties { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether to generate additional properties even when schemas disallow them.
+    /// </summary>
+    bool ForceAdditionalProperties { get; }
 }

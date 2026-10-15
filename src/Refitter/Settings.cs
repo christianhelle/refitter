@@ -233,6 +233,11 @@ public sealed class Settings : CommandSettings
     [DefaultValue(false)]
     public bool SkipDefaultAdditionalProperties { get; set; }
 
+    [Description("Generate additional properties on every contract, even when the schema sets additionalProperties to false")]
+    [CommandOption("--force-additional-properties")]
+    [DefaultValue(false)]
+    public bool ForceAdditionalProperties { get; set; }
+
     [Description("""
                  The NSwag IOperationNameGenerator implementation to use.
                  May be one of:

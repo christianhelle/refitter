@@ -213,6 +213,20 @@ public class SettingsMapperTests
     }
 
     [Test]
+    public void Map_Should_Copy_ForceAdditionalProperties()
+    {
+        var settings = new Settings
+        {
+            OpenApiPath = "https://example.com/openapi.json",
+            ForceAdditionalProperties = true,
+        };
+
+        var result = SettingsMapper.Map(settings);
+
+        result.ForceAdditionalProperties.Should().BeTrue();
+    }
+
+    [Test]
     public void Map_Should_Map_InternalTypeAccessibility()
     {
         var settings = new Settings
