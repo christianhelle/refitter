@@ -730,7 +730,7 @@
 **Implemented enhancements:**
 
 - Use NSwag's built-in System.Text.Json polymorphic serialization [\#772](https://github.com/christianhelle/refitter/pull/772) ([0xced](https://github.com/0xced))
-- chore: add ability to skip-validation + simplify unicode logging [\#767](https://github.com/christianhelle/refitter/pull/767) ([david-pw](https://github.com/david-pw))
+- chore: add ability to skip-validation + simplify unicode logging [\#767](https://github.com/christianhelle/refitter/pull/767) ([ghost](https://github.com/ghost))
 - Do not remove colon from url paths, verify they're not present in operation names [\#765](https://github.com/christianhelle/refitter/pull/765) ([eoma-knowit](https://github.com/eoma-knowit))
 
 **Fixed bugs:**
