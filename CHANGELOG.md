@@ -6,6 +6,8 @@
 
 **Implemented enhancements:**
 
+- Option to generate extension data properties even when schemas set additionalProperties: false [\#1340](https://github.com/christianhelle/refitter/issues/1340)
+- Add option to force additional properties on closed schemas [\#1342](https://github.com/christianhelle/refitter/pull/1342) ([christianhelle](https://github.com/christianhelle))
 - Rename route placeholders that collide case-insensitively with other parameters [\#1341](https://github.com/christianhelle/refitter/pull/1341) ([christianhelle](https://github.com/christianhelle))
 
 **Fixed bugs:**
