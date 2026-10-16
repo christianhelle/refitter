@@ -279,27 +279,27 @@ public class GenerateCommandTests
     }
 
     [Test]
-    public void Command_Should_Have_Protected_Validate_Method()
+    public void Command_Should_Have_Public_Validate_Method()
     {
         var command = new GenerateCommand();
         var method = command.GetType().GetMethod(
             "Validate",
-            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
         method.Should().NotBeNull();
-        method!.IsFamily.Should().BeTrue();
+        method!.IsPublic.Should().BeTrue();
     }
 
     [Test]
-    public void Command_Should_Have_Protected_ExecuteAsync_Method()
+    public void Command_Should_Have_Public_ExecuteAsync_Method()
     {
         var command = new GenerateCommand();
         var method = command.GetType().GetMethod(
             "ExecuteAsync",
-            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
         method.Should().NotBeNull();
-        method!.IsFamily.Should().BeTrue();
+        method!.IsPublic.Should().BeTrue();
     }
 
     [Test]
