@@ -24,7 +24,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             : new RichGenerationReporter();
     }
 
-    protected override ValidationResult Validate(CommandContext context, Settings settings)
+    public override ValidationResult Validate(CommandContext context, Settings settings)
     {
         if (!settings.NoLogging)
             Analytics.Configure();
@@ -47,7 +47,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return validationResult;
     }
 
-    protected override async Task<int> ExecuteAsync(
+    public override async Task<int> ExecuteAsync(
         CommandContext context,
         Settings settings,
         CancellationToken cancellationToken)
