@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.120...HEAD)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.121...HEAD)
+
+**Merged pull requests:**
+
+- Upgrade Spectre.Console.Cli to 0.57.2 [\#1344](https://github.com/christianhelle/refitter/pull/1344) ([christianhelle](https://github.com/christianhelle))
+
+## [2.3.1-preview.121](https://github.com/christianhelle/refitter/tree/2.3.1-preview.121) (2026-10-15)
+
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.120...2.3.1-preview.121)
 
 **Implemented enhancements:**
 
