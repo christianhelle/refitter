@@ -1,58 +1,31 @@
 # Changelog
 
-## [Unreleased](https://github.com/christianhelle/refitter/tree/HEAD)
+## [2.3.1](https://github.com/christianhelle/refitter/tree/2.3.1) (2026-10-16)
 
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.121...HEAD)
-
-**Merged pull requests:**
-
-- Upgrade Spectre.Console.Cli to 0.57.2 [\#1344](https://github.com/christianhelle/refitter/pull/1344) ([christianhelle](https://github.com/christianhelle))
-
-## [2.3.1-preview.121](https://github.com/christianhelle/refitter/tree/2.3.1-preview.121) (2026-10-15)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.120...2.3.1-preview.121)
+[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.0...2.3.1)
 
 **Implemented enhancements:**
 
 - Option to generate extension data properties even when schemas set additionalProperties: false [\#1340](https://github.com/christianhelle/refitter/issues/1340)
+- Object-valued x-enumDescriptions fails the whole document load [\#1336](https://github.com/christianhelle/refitter/issues/1336)
+- Add support for AddRefitGeneratedClient [\#1330](https://github.com/christianhelle/refitter/issues/1330)
+- Refitter.MSBuild: pass JsonLibraryVersion from an MSBuild property [\#1327](https://github.com/christianhelle/refitter/issues/1327)
 - Add option to force additional properties on closed schemas [\#1342](https://github.com/christianhelle/refitter/pull/1342) ([christianhelle](https://github.com/christianhelle))
 - Rename route placeholders that collide case-insensitively with other parameters [\#1341](https://github.com/christianhelle/refitter/pull/1341) ([christianhelle](https://github.com/christianhelle))
+- Handle object-valued enum extensions such as x-enumDescriptions [\#1337](https://github.com/christianhelle/refitter/pull/1337) ([christianhelle](https://github.com/christianhelle))
+- Add useGeneratedRefitClient to register clients with AddRefitGeneratedClient [\#1334](https://github.com/christianhelle/refitter/pull/1334) ([christianhelle](https://github.com/christianhelle))
+- Add RefitterJsonLibraryVersion MSBuild property [\#1328](https://github.com/christianhelle/refitter/pull/1328) ([christianhelle](https://github.com/christianhelle))
+- Fix the line endings of generated code [\#1323](https://github.com/christianhelle/refitter/pull/1323) ([paule96](https://github.com/paule96))
 
 **Fixed bugs:**
 
 - Runtime error: duplicate path/query param names [\#1338](https://github.com/christianhelle/refitter/issues/1338)
-
-**Merged pull requests:**
-
-- Clarify contributor expectations in contributing guide [\#1339](https://github.com/christianhelle/refitter/pull/1339) ([christianhelle](https://github.com/christianhelle))
-
-## [2.3.1-preview.120](https://github.com/christianhelle/refitter/tree/2.3.1-preview.120) (2026-10-11)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.1-preview.119...2.3.1-preview.120)
-
-**Implemented enhancements:**
-
-- Object-valued x-enumDescriptions fails the whole document load [\#1336](https://github.com/christianhelle/refitter/issues/1336)
-- Add support for AddRefitGeneratedClient [\#1330](https://github.com/christianhelle/refitter/issues/1330)
-- Handle object-valued enum extensions such as x-enumDescriptions [\#1337](https://github.com/christianhelle/refitter/pull/1337) ([christianhelle](https://github.com/christianhelle))
-- Add useGeneratedRefitClient to register clients with AddRefitGeneratedClient [\#1334](https://github.com/christianhelle/refitter/pull/1334) ([christianhelle](https://github.com/christianhelle))
-
-**Fixed bugs:**
-
 - Polymorphic collection generated as first oneOf type instead of base type [\#1333](https://github.com/christianhelle/refitter/issues/1333)
 
-## [2.3.1-preview.119](https://github.com/christianhelle/refitter/tree/2.3.1-preview.119) (2026-10-05)
-
-[Full Changelog](https://github.com/christianhelle/refitter/compare/2.3.0...2.3.1-preview.119)
-
-**Implemented enhancements:**
-
-- Refitter.MSBuild: pass JsonLibraryVersion from an MSBuild property [\#1327](https://github.com/christianhelle/refitter/issues/1327)
-- Add RefitterJsonLibraryVersion MSBuild property [\#1328](https://github.com/christianhelle/refitter/pull/1328) ([christianhelle](https://github.com/christianhelle))
-- Fix the line endings of generated code [\#1323](https://github.com/christianhelle/refitter/pull/1323) ([paule96](https://github.com/paule96))
-
 **Merged pull requests:**
 
+- Upgrade Spectre.Console.Cli to 0.57.2 [\#1344](https://github.com/christianhelle/refitter/pull/1344) ([christianhelle](https://github.com/christianhelle))
+- Clarify contributor expectations in contributing guide [\#1339](https://github.com/christianhelle/refitter/pull/1339) ([christianhelle](https://github.com/christianhelle))
 - Update dependency TUnit to 1.71.0 [\#1322](https://github.com/christianhelle/refitter/pull/1322) ([renovate[bot]](https://github.com/apps/renovate))
 
 ## [2.3.0](https://github.com/christianhelle/refitter/tree/2.3.0) (2026-09-28)
