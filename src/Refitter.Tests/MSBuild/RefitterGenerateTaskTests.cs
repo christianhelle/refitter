@@ -820,6 +820,135 @@ public class RefitterGenerateTaskTests
     }
 
     [Test]
+    public void Execute_Should_Not_Pass_Output_Root_When_Not_Set()
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            CreateRefitterSettingsFile(workspace);
+            string generatedFile = CreateGeneratedFile(workspace);
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 8.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                startInfo.Arguments.Should().NotContain("--output-root");
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            RefitterGenerateTask task = CreateTask(workspace);
+
+            task.Execute().Should().BeTrue();
+            task.GeneratedFiles.Should().ContainSingle();
+            task.SupersededFiles.Should().BeEmpty();
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void Execute_Should_Pass_Per_File_Output_Root_And_Report_Superseded_Files()
+    {
+        string workspace = CreateWorkspace();
+
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(workspace, "apis"));
+            CreateRefitterSettingsFile(workspace, Path.Combine("apis", "petstore.refitter"));
+            string outputRoot = Path.Combine(workspace, "obj", "Debug", "net8.0", "Refitter");
+            string fileOutputRoot = Path.Combine(outputRoot, "apis", "petstore");
+            string generatedFile = Path.Combine(fileOutputRoot, "Generated", "Petstore.cs");
+            Directory.CreateDirectory(Path.GetDirectoryName(generatedFile)!);
+            File.WriteAllText(generatedFile, "// generated");
+
+            RefitterGenerateTask.InstalledDotnetRuntimesProvider = () => ["Microsoft.NETCore.App 8.0.0"];
+            RefitterGenerateTask.FileExists = path =>
+                path.Contains("net8.0", StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(path);
+            RefitterGenerateTask.ProcessRunner = (startInfo, logOutput, _) =>
+            {
+                startInfo.Arguments.Should().Contain($"--output-root \"{fileOutputRoot}\"");
+                logOutput($"{RefitterGenerateTask.GeneratedFileMarker}{generatedFile}");
+                return new RefitterGenerateTask.ProcessExecutionResult(false, 0);
+            };
+
+            RefitterGenerateTask task = CreateTask(workspace);
+            task.IncludePatterns = string.Empty;
+            task.OutputRoot = outputRoot + Path.DirectorySeparatorChar;
+
+            task.Execute().Should().BeTrue();
+            task.GeneratedFiles.Should().ContainSingle().Which.ItemSpec.Should().Be(generatedFile);
+            task.SupersededFiles.Should().ContainSingle().Which.ItemSpec.Should().Be(
+                Path.Combine(workspace, "apis", "Generated", "Petstore.cs"));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+            DeleteWorkspace(workspace);
+        }
+    }
+
+    [Test]
+    public void GetFileOutputRoot_Should_Return_Null_When_Output_Root_Is_Not_Set()
+    {
+        RefitterGenerateTask.GetFileOutputRoot(string.Empty, Path.GetTempPath(), Path.Combine(Path.GetTempPath(), "petstore.refitter"))
+            .Should().BeNull();
+    }
+
+    [Test]
+    public void GetFileOutputRoot_Should_Use_File_Name_When_Project_Directory_Is_Blank()
+    {
+        string outputRoot = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "obj", "Refitter"));
+
+        RefitterGenerateTask.GetFileOutputRoot(outputRoot, string.Empty, Path.Combine(Path.GetTempPath(), "apis", "petstore.refitter"))
+            .Should().Be(Path.Combine(outputRoot, "petstore"));
+    }
+
+    [Test]
+    public void GetFileOutputRoot_Should_Not_End_With_Directory_Separator()
+    {
+        string projectDirectory = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project"));
+        string outputRoot = Path.Combine(projectDirectory, "obj", "net9.0", "Refitter") + Path.DirectorySeparatorChar;
+
+        RefitterGenerateTask.GetFileOutputRoot(outputRoot, projectDirectory, Path.Combine(projectDirectory, "petstore.refitter"))
+            .Should().Be(Path.Combine(projectDirectory, "obj", "net9.0", "Refitter", "petstore"));
+    }
+
+    [Test]
+    [Arguments("_parent", "..")]
+    [Arguments("__parent", "_parent")]
+    [Arguments("__", "_")]
+    [Arguments("___", "__")]
+    [Arguments("Generated", "Generated")]
+    public void GetSupersededFilePath_Should_Decode_Segments(string encodedSegment, string decodedSegment)
+    {
+        string settingsDirectory = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "apis"));
+        string fileOutputRoot = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "obj", "Refitter", "apis", "petstore"));
+        string generatedFile = Path.Combine(fileOutputRoot, encodedSegment, "Contracts.cs");
+
+        RefitterGenerateTask.GetSupersededFilePath(generatedFile, fileOutputRoot, settingsDirectory)
+            .Should().Be(Path.GetFullPath(Path.Combine(settingsDirectory, decodedSegment, "Contracts.cs")));
+    }
+
+    [Test]
+    public void GetSupersededFilePath_Should_Map_Parent_Directory_Segments_Back()
+    {
+        string settingsDirectory = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "apis"));
+        string fileOutputRoot = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "obj", "Refitter", "apis", "petstore"));
+        string generatedFile = Path.Combine(fileOutputRoot, RefitterGenerateTask.ParentDirectorySegment, "Shared", "Contracts.cs");
+
+        RefitterGenerateTask.GetSupersededFilePath(generatedFile, fileOutputRoot, settingsDirectory)
+            .Should().Be(Path.GetFullPath(Path.Combine(Path.GetTempPath(), "project", "Shared", "Contracts.cs")));
+    }
+
+    [Test]
     public void Execute_Should_Fall_Back_To_DotNet8_Runtime_When_Newer_Runtimes_Are_Unavailable()
     {
         var workspace = CreateWorkspace();

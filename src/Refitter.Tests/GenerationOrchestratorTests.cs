@@ -75,6 +75,72 @@ public class GenerationOrchestratorTests
     }
 
     [Test]
+    public async Task RunAsync_Should_Write_Under_Output_Root_When_Specified()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "GenerationOrchestratorTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            var openApiPath = Path.Combine(workspace, "spec.json");
+            var settingsFilePath = Path.Combine(workspace, "petstore.refitter");
+            var outputRoot = Path.Combine(workspace, "obj", "net8.0", "Refitter");
+            Directory.CreateDirectory(workspace);
+
+            File.WriteAllText(
+                openApiPath,
+                """
+                {
+                  "openapi": "3.0.0",
+                  "info": { "title": "Test API", "version": "1.0.0" },
+                  "paths": {
+                    "/pets": {
+                      "get": {
+                        "operationId": "GetPets",
+                        "responses": { "200": { "description": "ok" } }
+                      }
+                    }
+                  }
+                }
+                """);
+
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = openApiPath,
+                Namespace = "TestNamespace",
+                OutputFolder = "Generated",
+                OutputFilename = "Petstore.cs",
+            };
+
+            var cliSettings = new Settings
+            {
+                SettingsFilePath = settingsFilePath,
+                OutputRoot = outputRoot,
+                NoLogging = true,
+                NoBanner = true,
+                SkipValidation = true,
+            };
+
+            var result = await new GenerationOrchestrator().RunAsync(
+                settings,
+                cliSettings,
+                new SilentGenerationReporter(),
+                default);
+
+            result.Should().Be(0);
+            File.Exists(Path.Combine(outputRoot, "Generated", "Petstore.cs")).Should().BeTrue();
+            File.Exists(Path.Combine(workspace, "Generated", "Petstore.cs")).Should().BeFalse();
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    [Test]
     public async Task RunAsync_Should_Generate_Multiple_Files_And_Return_Zero()
     {
         var workspace = Path.Combine(

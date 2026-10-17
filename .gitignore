@@ -290,6 +290,7 @@ tmp/
 test/Generated/GeneratedCode/*.generated.cs
 test/MSBuild/Generated/**/*.cs
 test/MSBuild/GeneratedOutput/**/*.cs
+test/MSBuild.MultiTarget/Generated/**/*.cs
 .squad/orchestration-log/
 .squad/log/
 .squad/decisions/inbox/

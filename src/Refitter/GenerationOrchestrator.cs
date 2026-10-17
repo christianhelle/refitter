@@ -32,7 +32,7 @@ public sealed class GenerationOrchestrator
                     Path.GetDirectoryName(Path.GetFullPath(settingsFilePath)) ?? string.Empty);
             }
 
-            var writer = new CliFileWriter(reporter);
+            var writer = CreateFileWriter(cliSettings, reporter);
             IValidator? validator = cliSettings.SkipValidation
                 ? null
                 : new OpenApiValidatorAdapter();
@@ -94,6 +94,19 @@ public sealed class GenerationOrchestrator
             await Analytics.LogError(exception, cliSettings);
             return ToProcessExitCode(exception);
         }
+    }
+
+    internal static IFileWriter CreateFileWriter(Settings cliSettings, IGenerationReporter reporter)
+    {
+        var writer = new CliFileWriter(reporter);
+        if (string.IsNullOrWhiteSpace(cliSettings.OutputRoot))
+            return writer;
+
+        var baseDirectory = string.IsNullOrWhiteSpace(cliSettings.SettingsFilePath)
+            ? Directory.GetCurrentDirectory()
+            : Path.GetDirectoryName(Path.GetFullPath(cliSettings.SettingsFilePath))!;
+
+        return new OutputRootFileWriter(writer, baseDirectory, cliSettings.OutputRoot);
     }
 
     internal static void ReportValidationDiagnostics(

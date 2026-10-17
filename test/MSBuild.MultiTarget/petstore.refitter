@@ -1,0 +1,10 @@
+{
+  "openApiPath": "../OpenAPI/v3.0/petstore.json",
+  "namespace": "Refitter.MSBuild.MultiTarget.Petstore",
+  "outputFolder": "./Generated",
+  "outputFilename": "Petstore.cs",
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstore"
+  }
+}
