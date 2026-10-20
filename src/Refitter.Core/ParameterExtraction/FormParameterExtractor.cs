@@ -65,7 +65,7 @@ internal static class FormParameterExtractor
                 if (operationParameter != null)
                 {
                     // NSwag does not carry the body schema's required list over to form parameters
-                    AddOperationParameter(operationParameter, operationParameter.IsRequired || property.Value.IsRequired);
+                    AddOperationParameter(operationParameter, property.Value.IsRequired);
                     continue;
                 }
 
