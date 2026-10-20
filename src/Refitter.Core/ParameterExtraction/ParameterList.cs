@@ -5,7 +5,9 @@ namespace Refitter.Core;
 /// they bind to and any dynamic querystring or multipart form object wrapper type source that must be
 /// emitted for the operation.
 /// </summary>
+#pragma warning disable S1186 // Positional record constructor is compiler-generated
 internal sealed record ParameterList(
+#pragma warning restore S1186
     string Path,
     IReadOnlyList<string> Parameters,
     string? DynamicQuerystringCode)

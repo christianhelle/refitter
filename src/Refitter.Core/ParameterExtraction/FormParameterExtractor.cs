@@ -133,15 +133,19 @@ internal static class FormParameterExtractor
 /// A single field of a form request body, rendered either as its own method parameter or as a
 /// property of a <c>[FormObject]</c> wrapper type.
 /// </summary>
+#pragma warning disable S1186 // Positional record constructor is compiler-generated
 internal sealed record FormField(
+#pragma warning restore S1186
     string Name,
     string VariableName,
     string Type,
     bool IsRequired,
     string? Description)
 {
+#pragma warning disable S2325 // Uses the positional record properties, so it cannot be static
     public bool IsFile => Type.Contains("StreamPart");
 
     public string ToParameter() =>
         $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetAliasAsAttribute(Name, VariableName))}{Type} {VariableName}";
+#pragma warning restore S2325
 }
