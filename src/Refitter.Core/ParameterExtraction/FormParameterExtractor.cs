@@ -4,9 +4,9 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal sealed class FormParameterExtractor
+internal static class FormParameterExtractor
 {
-    public (IReadOnlyList<string> Parameters, string? FormObjectCode) Extract(
+    public static (IReadOnlyList<string> Parameters, string? FormObjectCode) Extract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings,

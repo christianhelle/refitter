@@ -13,7 +13,6 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
     private readonly QueryParameterExtractor queryExtractor = new();
     private readonly BodyParameterExtractor bodyExtractor = new();
     private readonly HeaderParameterExtractor headerExtractor = new();
-    private readonly FormParameterExtractor formExtractor = new();
 
     public ParameterList Build(
         CSharpOperationModel operationModel,
@@ -32,7 +31,7 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
 
         parameters.AddRange(bodyExtractor.Extract(operationModel, settings));
         parameters.AddRange(headerExtractor.Extract(operationModel, operation, settings));
-        var (formParameters, formObjectCode) = formExtractor.Extract(
+        var (formParameters, formObjectCode) = FormParameterExtractor.Extract(
             operationModel,
             operation,
             settings,
