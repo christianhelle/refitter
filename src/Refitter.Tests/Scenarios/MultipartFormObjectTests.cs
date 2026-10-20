@@ -69,6 +69,7 @@ public class MultipartFormObjectTests
                       properties:
                         title: { type: string }
                         body: { type: string }
+                        kind: { $ref: '#/components/schemas/StreamPartKind' }
                         attachment: { type: string, format: binary }
               responses: { '204': { description: ok } }
         components:
@@ -76,6 +77,9 @@ public class MultipartFormObjectTests
             MessageType:
               type: string
               enum: [CHAT, SYSTEM]
+            StreamPartKind:
+              type: string
+              enum: [NOTE, MEMO]
         """;
 
     [Test]
@@ -107,6 +111,23 @@ public class MultipartFormObjectTests
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("public CreateNoteFormData(string title, string body)");
+    }
+
+    [Test]
+    public async Task Keeps_Fields_Whose_Type_Name_Contains_StreamPart_In_FormObject()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("Task CreateNote([FormObject] CreateNoteFormData formData, StreamPart attachment);");
+        generatedCode.Should().Contain("public StreamPartKind? Kind { get; set; }");
+    }
+
+    [Test]
+    public async Task Keeps_Nullable_File_Fields_Separate_With_Optional_Parameters()
+    {
+        var generatedCode = await GenerateCode(configure: settings => settings.OptionalParameters = true);
+        generatedCode.Should().Contain("[FormObject] SendMessageFormData formData");
+        generatedCode.Should().Contain("IEnumerable<StreamPart>? attachments");
+        generatedCode.Should().NotContain("StreamPart? Attachments");
     }
 
     [Test]

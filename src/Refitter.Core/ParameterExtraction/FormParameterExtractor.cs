@@ -143,7 +143,10 @@ internal sealed record FormField(
     string? Description)
 {
 #pragma warning disable S2325 // Uses the positional record properties, so it cannot be static
-    public bool IsFile => Type.Contains("StreamPart");
+    // Matches StreamPart and collections of it (optionally nullable), not types whose name merely contains it
+    public bool IsFile =>
+        Type.TrimEnd('?') is var type &&
+        (type == "StreamPart" || type.EndsWith("<StreamPart>", StringComparison.Ordinal));
 
     public string ToParameter() =>
         $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetAliasAsAttribute(Name, VariableName))}{Type} {VariableName}";
