@@ -280,6 +280,14 @@ public sealed class Settings : CommandSettings
     public bool UseDynamicQuerystringParameters { get; set; }
 
     [Description("""
+                 Wrap the non-file fields of a multipart/form-data request body into a single [[FormObject]] parameter.
+                 Requires the Refit.Reflection package. See https://www.reactiveui.net/documentation/refit/requests/multipart/#flatten-a-form-object-reflection-only-path for more information.
+                 """)]
+    [CommandOption("--use-multipart-form-object")]
+    [DefaultValue(false)]
+    public bool UseMultipartFormObject { get; set; }
+
+    [Description("""
                  Use System.Text.Json polymorphic serialization.
                  Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
                  To have the native support of inheritance (de)serialization and fallback to base types when
