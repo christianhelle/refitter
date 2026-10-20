@@ -380,6 +380,21 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
     public bool UseDynamicQuerystringParameters { get; set; }
 
     /// <summary>
+    /// Set to <c>true</c> to wrap the non-file fields of a multipart/form-data request body into a single
+    /// <c>[FormObject]</c> parameter, so Refit writes each field as a plain text part. Default is <c>false</c> (no wrapping).
+    /// Requires the Refit.Reflection package and is not supported by AddRefitGeneratedClient or NativeAOT.
+    /// See https://www.reactiveui.net/documentation/refit/requests/multipart/#flatten-a-form-object-reflection-only-path for more information.
+    /// </summary>
+    [Description(
+        """
+        Wrap the non-file fields of a multipart/form-data request body into a single [FormObject] parameter.
+        Requires the Refit.Reflection package and is not supported by AddRefitGeneratedClient or NativeAOT.
+        See https://www.reactiveui.net/documentation/refit/requests/multipart/#flatten-a-form-object-reflection-only-path for more information.
+        """
+    )]
+    public bool UseMultipartFormObject { get; set; }
+
+    /// <summary>
     /// Set to <c>true</c> to generate multiple files. Default is <c>false</c>
     /// This is automatically set to <c>true</c> when <see cref="ContractsOutputFolder"/> is specified
     /// Refit interface(s) are written to a file called RefitInterfaces.cs

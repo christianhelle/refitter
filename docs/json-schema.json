@@ -501,6 +501,10 @@
       "description": "Wrap multiple query parameters into a single complex one.\r\nSee https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information.",
       "type": "boolean"
     },
+    "useMultipartFormObject": {
+      "description": "Wrap the non-file fields of a multipart/form-data request body into a single [FormObject] parameter.\r\nRequires the Refit.Reflection package and is not supported by AddRefitGeneratedClient or NativeAOT.\r\nSee https://www.reactiveui.net/documentation/refit/requests/multipart/#flatten-a-form-object-reflection-only-path for more information.",
+      "type": "boolean"
+    },
     "generateMultipleFiles": {
       "description": "Generate multiple files. Default is false.\r\nThis is automatically set to true when ContractsOutputFolder is specified\r\nRefit interface(s) are written to a file called RefitInterfaces.cs\r\nContracts are written to a file called Contracts.cs\r\nDependency Injection is written to a file called DependencyInjection.cs",
       "type": "boolean"
