@@ -12,6 +12,22 @@ namespace Refitter.Tests.Scenarios;
 /// </summary>
 public class MultipartFormObjectTests
 {
+    private const string SwaggerSpec = """
+        swagger: '2.0'
+        info: { title: MultipartFormObjectSwagger, version: v1 }
+        paths:
+          /pets/{petId}/image:
+            post:
+              operationId: UploadImage
+              consumes: [multipart/form-data]
+              parameters:
+                - { name: petId, in: path, required: true, type: integer, format: int64 }
+                - { name: caption, in: formData, required: true, type: string }
+                - { name: category, in: formData, type: string, enum: [CAT, DOG] }
+                - { name: image, in: formData, type: file }
+              responses: { '204': { description: ok } }
+        """;
+
     private const string OpenApiSpec = """
         openapi: 3.0.1
         info: { title: MultipartFormObject, version: v1 }
@@ -26,7 +42,7 @@ public class MultipartFormObjectTests
                       type: object
                       required: [message]
                       properties:
-                        message: { type: string }
+                        message: { type: string, description: The text of the message }
                         messageType: { $ref: '#/components/schemas/MessageType' }
                         attachments: { type: array, items: { type: string, format: binary } }
               responses: { '204': { description: ok } }
@@ -40,6 +56,20 @@ public class MultipartFormObjectTests
                       type: object
                       properties:
                         file: { type: string, format: binary }
+              responses: { '204': { description: ok } }
+          /api/v1/notes:
+            post:
+              operationId: CreateNote
+              requestBody:
+                content:
+                  multipart/form-data:
+                    schema:
+                      type: object
+                      required: [title, body]
+                      properties:
+                        title: { type: string }
+                        body: { type: string }
+                        attachment: { type: string, format: binary }
               responses: { '204': { description: ok } }
         components:
           schemas:
@@ -70,6 +100,44 @@ public class MultipartFormObjectTests
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("public SendMessageFormData(string message)");
         generatedCode.Should().Contain("this.Message = message;");
+    }
+
+    [Test]
+    public async Task Injects_Every_Required_Field_Through_Constructor()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("public CreateNoteFormData(string title, string body)");
+    }
+
+    [Test]
+    public async Task Generates_Record_With_Init_Setters_For_Immutable_Records()
+    {
+        var generatedCode = await GenerateCode(configure: settings => settings.ImmutableRecords = true);
+        generatedCode.Should().Contain("public record SendMessageFormData");
+        generatedCode.Should().Contain("public MessageType? MessageType { get; init; }");
+    }
+
+    [Test]
+    public async Task Generates_Record_For_Native_Records()
+    {
+        var generatedCode = await GenerateCode(
+            configure: settings => settings.CodeGeneratorSettings = new CodeGeneratorSettings { GenerateNativeRecords = true });
+        generatedCode.Should().Contain("public record SendMessageFormData");
+    }
+
+    [Test]
+    public async Task Wraps_Swagger2_FormData_Parameters()
+    {
+        var generatedCode = await GenerateCode(SwaggerSpec);
+        generatedCode.Should().Contain("Task UploadImage(long petId, [FormObject] UploadImageFormData formData, StreamPart image);");
+        generatedCode.Should().Contain("public UploadImageFormData(string caption)");
+    }
+
+    [Test]
+    public async Task Documents_FormObject_Properties_With_Field_Descriptions()
+    {
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("/// The text of the message");
     }
 
     [Test]
@@ -130,17 +198,37 @@ public class MultipartFormObjectTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    private static async Task<string> GenerateCode(
-        bool useMultipartFormObject = true,
-        MultipleInterfaces multipleInterfaces = MultipleInterfaces.Unset)
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_With_Immutable_Records()
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
-        var sut = await RefitGenerator.CreateAsync(new RefitGeneratorSettings
+        var generatedCode = await GenerateCode(configure: settings => settings.ImmutableRecords = true);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_From_Swagger2()
+    {
+        var generatedCode = await GenerateCode(SwaggerSpec);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    private static async Task<string> GenerateCode(
+        string openApiSpec = OpenApiSpec,
+        bool useMultipartFormObject = true,
+        MultipleInterfaces multipleInterfaces = MultipleInterfaces.Unset,
+        Action<RefitGeneratorSettings>? configure = null)
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(openApiSpec);
+        var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
             UseMultipartFormObject = useMultipartFormObject,
             MultipleInterfaces = multipleInterfaces,
-        });
+        };
+        configure?.Invoke(settings);
+        var sut = await RefitGenerator.CreateAsync(settings);
         return sut.Generate();
     }
 }
