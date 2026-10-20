@@ -151,15 +151,14 @@ internal class InterfaceGenerator
 
         foreach (var op in operations)
         {
-            var (dynamicQuerystringParams, _) = GenerateMethod(
+            foreach (var parameterType in GenerateMethod(
                 op,
                 interfaceName,
                 partitioning,
                 knownMethodIdentifiers,
-                code);
-            if (!string.IsNullOrWhiteSpace(dynamicQuerystringParams))
+                code))
             {
-                dynamicQuerystringParametersCodeBuilder.AppendLine(dynamicQuerystringParams);
+                dynamicQuerystringParametersCodeBuilder.AppendLine(parameterType.Content);
             }
         }
 
@@ -193,15 +192,14 @@ internal class InterfaceGenerator
 
         foreach (var op in operations)
         {
-            var (dynamicQuerystringParams, dynamicQuerystringType) = GenerateMethod(
+            foreach (var parameterType in GenerateMethod(
                 op,
                 interfaceName,
                 partitioning,
                 knownMethodIdentifiers,
-                code);
-            if (!string.IsNullOrWhiteSpace(dynamicQuerystringParams))
+                code))
             {
-                yield return new GeneratedCode(dynamicQuerystringType, dynamicQuerystringParams);
+                yield return parameterType;
             }
         }
 
@@ -210,7 +208,8 @@ internal class InterfaceGenerator
         yield return new(interfaceName, code.ToString());
     }
 
-    private (string DynamicQuerystringParameters, string DynamicQuerystringParameterType) GenerateMethod(
+    // Returns the wrapper types (dynamic querystring and multipart form object) the method's parameters use
+    private List<GeneratedCode> GenerateMethod(
         OpenApiOperationInfo op,
         string interfaceName,
         IInterfacePartitioning partitioning,
@@ -221,7 +220,7 @@ internal class InterfaceGenerator
 
         if (!settings.GenerateDeprecatedOperations && operation.IsDeprecated)
         {
-            return (string.Empty, string.Empty);
+            return [];
         }
 
         var returnType = returnTypeGenerator.Generate(operation);
@@ -287,7 +286,20 @@ internal class InterfaceGenerator
                 .AppendLine();
         }
 
-        return (methodSignature.DynamicQuerystringParameters ?? string.Empty, dynamicQuerystringParameterType);
+        var parameterTypes = new List<GeneratedCode>();
+        if (!string.IsNullOrWhiteSpace(methodSignature.DynamicQuerystringParameters))
+        {
+            parameterTypes.Add(new GeneratedCode(dynamicQuerystringParameterType, methodSignature.DynamicQuerystringParameters!));
+        }
+
+        if (!string.IsNullOrWhiteSpace(methodSignature.FormObjectParameters))
+        {
+            parameterTypes.Add(new GeneratedCode(
+                ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType),
+                methodSignature.FormObjectParameters!));
+        }
+
+        return parameterTypes;
     }
 
     private static string GetParameterSignature(

@@ -32,7 +32,12 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
 
         parameters.AddRange(bodyExtractor.Extract(operationModel, settings));
         parameters.AddRange(headerExtractor.Extract(operationModel, operation, settings));
-        parameters.AddRange(formExtractor.Extract(operationModel, operation, settings));
+        var (formParameters, formObjectCode) = formExtractor.Extract(
+            operationModel,
+            operation,
+            settings,
+            ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType));
+        parameters.AddRange(formParameters);
 
         parameters = OptionalParameterReorderer.Reorder(
             parameters,
@@ -55,6 +60,9 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
                 .Select(p => p.Name)
                 .ToList());
 
-        return new ParameterList(path, uniqueParameters, dynamicQuerystringCode);
+        return new ParameterList(path, uniqueParameters, dynamicQuerystringCode)
+        {
+            FormObjectCode = formObjectCode,
+        };
     }
 }

@@ -23,6 +23,9 @@ internal class MethodSignatureGenerator(RefitGeneratorSettings settings)
             parameterList.Path,
             parametersString,
             parameterList.Parameters,
-            parameterList.DynamicQuerystringCode);
+            parameterList.DynamicQuerystringCode)
+        {
+            FormObjectParameters = parameterList.FormObjectCode,
+        };
     }
 }

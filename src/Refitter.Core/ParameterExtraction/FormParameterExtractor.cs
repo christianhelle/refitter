@@ -6,23 +6,50 @@ namespace Refitter.Core;
 
 internal sealed class FormParameterExtractor
 {
-    public IEnumerable<string> Extract(
+    public (IReadOnlyList<string> Parameters, string? FormObjectCode) Extract(
+        CSharpOperationModel operationModel,
+        OpenApiOperation operation,
+        RefitGeneratorSettings settings,
+        string formObjectParameterType)
+    {
+        var formFields = GetFormFields(operationModel, operation, settings);
+
+        var nonFileFields = formFields.Where(f => !f.IsFile).ToList();
+        if (!settings.UseMultipartFormObject ||
+            !operationModel.Consumes.Contains("multipart/form-data") ||
+            nonFileFields.Count == 0)
+        {
+            return (formFields.Select(f => f.ToParameter()).ToList(), null);
+        }
+
+        var formObjectCode = FormObjectParameterBuilder.Build(nonFileFields, formObjectParameterType, settings);
+        var parameters = new List<string> { $"[FormObject] {formObjectParameterType} formData" };
+        parameters.AddRange(formFields.Where(f => f.IsFile).Select(f => f.ToParameter()));
+        return (parameters, formObjectCode);
+    }
+
+    private static List<FormField> GetFormFields(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
     {
         var seenFormParameterNames = new HashSet<string>(StringComparer.Ordinal);
-        var formParameters = new List<string>();
+        var formFields = new List<FormField>();
         var operationFormParameters = operationModel.Parameters
             .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
             .ToList();
 
-        void AddOperationParameter(CSharpParameterModel p)
+        void AddOperationParameter(CSharpParameterModel p, bool isRequired)
         {
             var variableName = ParameterNaming.ConvertToVariableName(p.VariableName);
             if (seenFormParameterNames.Add(variableName))
             {
-                formParameters.Add($"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}");
+                formFields.Add(new FormField(
+                    p.Name,
+                    variableName,
+                    ParameterTypeResolver.GetParameterType(p, settings),
+                    isRequired,
+                    p.Description));
             }
         }
 
@@ -37,26 +64,30 @@ internal sealed class FormParameterExtractor
                 var operationParameter = operationFormParameters.FirstOrDefault(p => p.Name == property.Key);
                 if (operationParameter != null)
                 {
-                    AddOperationParameter(operationParameter);
+                    // NSwag does not carry the body schema's required list over to form parameters
+                    AddOperationParameter(operationParameter, operationParameter.IsRequired || property.Value.IsRequired);
                     continue;
                 }
 
                 var variableName = ParameterNaming.ConvertToVariableName(property.Key);
                 if (seenFormParameterNames.Add(variableName))
                 {
-                    var aliasAttribute = ParameterAttributeFormatter.GetAliasAsAttribute(property.Key, variableName);
-                    var propertyType = GetPropertyType(property.Value, settings);
-                    formParameters.Add($"{ParameterAttributeFormatter.JoinAttributes(aliasAttribute)}{propertyType} {variableName}");
+                    formFields.Add(new FormField(
+                        property.Key,
+                        variableName,
+                        GetPropertyType(property.Value, settings),
+                        property.Value.IsRequired,
+                        property.Value.Description));
                 }
             }
         }
 
         foreach (var p in operationFormParameters)
         {
-            AddOperationParameter(p);
+            AddOperationParameter(p, p.IsRequired);
         }
 
-        return formParameters;
+        return formFields;
     }
 
     private static IEnumerable<KeyValuePair<string, JsonSchemaProperty>> GetProperties(
@@ -96,4 +127,21 @@ internal sealed class FormParameterExtractor
 
     private static bool IsBinary(JsonSchema schema) =>
         schema.Type == JsonObjectType.String && schema.Format == "binary";
+}
+
+/// <summary>
+/// A single field of a form request body, rendered either as its own method parameter or as a
+/// property of a <c>[FormObject]</c> wrapper type.
+/// </summary>
+internal sealed record FormField(
+    string Name,
+    string VariableName,
+    string Type,
+    bool IsRequired,
+    string? Description)
+{
+    public bool IsFile => Type.Contains("StreamPart");
+
+    public string ToParameter() =>
+        $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetAliasAsAttribute(Name, VariableName))}{Type} {VariableName}";
 }
