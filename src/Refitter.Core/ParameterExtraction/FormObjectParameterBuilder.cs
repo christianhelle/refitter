@@ -48,9 +48,11 @@ internal static class FormObjectParameterBuilder
             }
 
             propertiesCodeBuilder.AppendLine();
-            if (settings.GenerateXmlDocCodeComments && !string.IsNullOrWhiteSpace(formField.Description))
+            if (settings.GenerateXmlDocCodeComments &&
+                formField.Description is { } description &&
+                !string.IsNullOrWhiteSpace(description))
             {
-                var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(formField.Description!);
+                var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(description);
                 DynamicQuerystringParameterBuilder.AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
             }
 

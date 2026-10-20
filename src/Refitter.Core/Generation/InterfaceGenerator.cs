@@ -287,16 +287,18 @@ internal class InterfaceGenerator
         }
 
         var parameterTypes = new List<GeneratedCode>();
-        if (!string.IsNullOrWhiteSpace(methodSignature.DynamicQuerystringParameters))
+        if (methodSignature.DynamicQuerystringParameters is { } dynamicQuerystringParameters &&
+            !string.IsNullOrWhiteSpace(dynamicQuerystringParameters))
         {
-            parameterTypes.Add(new GeneratedCode(dynamicQuerystringParameterType, methodSignature.DynamicQuerystringParameters!));
+            parameterTypes.Add(new GeneratedCode(dynamicQuerystringParameterType, dynamicQuerystringParameters));
         }
 
-        if (!string.IsNullOrWhiteSpace(methodSignature.FormObjectParameters))
+        if (methodSignature.FormObjectParameters is { } formObjectParameters &&
+            !string.IsNullOrWhiteSpace(formObjectParameters))
         {
             parameterTypes.Add(new GeneratedCode(
                 ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType),
-                methodSignature.FormObjectParameters!));
+                formObjectParameters));
         }
 
         return parameterTypes;
