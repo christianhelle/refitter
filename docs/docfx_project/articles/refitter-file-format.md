@@ -69,6 +69,7 @@ The following is an example `.refitter` file
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": false, // Optional. Default=false
+  "useMultipartFormObject": false, // Optional. Default=false
   "usePolymorphicSerialization": true, // Optional. Default=false
   "generateDisposableClients": true, // Optional. Default=false
   "collectionFormat": "Multi", // Optional. Determines the format of collection parameters. Values=Multi|Csv|Ssv|Tsv|Pipes. Default=Multi. Array query parameters that declare an OpenAPI 3 style of form, pipeDelimited or spaceDelimited, or an explicit explode, use the matching format instead; other styles use this setting
@@ -197,6 +198,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
+- `useMultipartFormObject`: Set to `true` to wrap the non-file fields of a `multipart/form-data` request body into a single `[FormObject]` parameter, so Refit writes each field (including enums) as a plain text part instead of a JSON part. File fields stay as separate `StreamPart` parameters. Default is `false` (no wrapping). Requires the `Refit.Reflection` package and is not supported by `AddRefitGeneratedClient` or NativeAOT. See <https://www.reactiveui.net/documentation/refit/requests/multipart/#flatten-a-form-object-reflection-only-path> for more information.
 - `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization.
 - `generateMultipleFiles`: Set to `true` to generate multiple files. This is automatically set to `true` when `ContractsOutputFolder` is specified. Refit interface(s) are written to a file called `RefitInterfaces.cs`, Contracts are written to a file called `Contracts.cs`, and Dependency Injection is written to a file called `DependencyInjection.cs`
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients, including optional Windows Authentication support
@@ -448,6 +450,10 @@ When using `openApiPaths`, the documents are merged into a single generated clie
         "useDynamicQuerystringParameters": {
             "type": "boolean",
             "description": "Set to true to wrap multiple query parameters into a single complex one."
+        },
+        "useMultipartFormObject": {
+            "type": "boolean",
+            "description": "Set to true to wrap the non-file fields of a multipart/form-data request body into a single [FormObject] parameter. Requires the Refit.Reflection package."
         },
         "usePolymorphicSerialization": {
             "type": "boolean",

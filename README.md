@@ -155,6 +155,8 @@ OPTIONS:
                                                                  See https://refitter.github.io for more information and https://www.apizr.net to get started with Apizr
         --use-dynamic-querystring-parameters                     Enable wrapping multiple query parameters into a single complex one. Default is no wrapping.
                                                                  See https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters for more information
+        --use-multipart-form-object                              Wrap the non-file fields of a multipart/form-data request body into a single [FormObject] parameter.
+                                                                 Requires the Refit.Reflection package. See https://www.reactiveui.net/documentation/refit/requests/multipart/#flatten-a-form-object-reflection-only-path for more information
         --use-polymorphic-serialization                          Use System.Text.Json polymorphic serialization.
                                                                  Replaces NSwag JsonInheritanceConverter attributes with System.Text.Json JsonPolymorphicAttributes.
                                                                  To have the native support of inheritance (de)serialization and fallback to base types when
@@ -298,6 +300,7 @@ The following is an example `.refitter` file using a single OpenAPI specificatio
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": true, // Optional. Default=false
+  "useMultipartFormObject": false, // Optional. Default=false
   "usePolymorphicSerialization": true, // Optional. Default=false
   "collectionFormat": "Multi", // Optional. Default=Multi. The collection format for array query parameters. Possible values: Multi, Csv, Ssv, Tsv, Pipes
   "contractTypeSuffix": null, // Optional. Default=null. Suffix to append to all generated contract type names (e.g., "Dto" would rename Pet to PetDto)
@@ -424,6 +427,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
+- `useMultipartFormObject`: Set to `true` to wrap the non-file fields of a `multipart/form-data` request body into a single `[FormObject]` parameter, so Refit writes each field (including enums) as a plain text part instead of a JSON part. File fields stay as separate `StreamPart` parameters. Default is `false` (no wrapping). Requires the `Refit.Reflection` package and is not supported by `AddRefitGeneratedClient` or NativeAOT. See <https://www.reactiveui.net/documentation/refit/requests/multipart/#flatten-a-form-object-reflection-only-path> for more information.
 - `usePolymorphicSerialization`: Set to `true` to use System.Text.Json polymorphic serialization. Replaces NSwag `JsonInheritanceConverter` attributes with `System.Text.Json` `JsonPolymorphicAttributes`. Default is `false`. See <https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism>
 - `collectionFormat` - The collection format for array query parameters. Possible values: `Multi`, `Csv`, `Ssv`, `Tsv`, `Pipes`. Default is `Multi`. Array query parameters that declare an OpenAPI 3 `style`/`explode` use the matching format instead: `form` or `explode: true` → `Multi`, `explode: false` → `Csv`, `pipeDelimited` → `Pipes`, `spaceDelimited` → `Ssv`. Parameters with other styles (e.g. `deepObject`) or without `style`/`explode` use this setting
 - `contractTypeSuffix` - An optional suffix to append to all generated contract type names. For example, setting this to `Dto` would rename `Pet` to `PetDto`. Default is `null` (no suffix)
