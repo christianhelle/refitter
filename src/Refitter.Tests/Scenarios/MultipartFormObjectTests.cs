@@ -69,6 +69,7 @@ public class MultipartFormObjectTests
                       properties:
                         title: { type: string }
                         body: { type: string }
+                        tags: { type: array, items: { type: string } }
                         kind: { $ref: '#/components/schemas/StreamPartKind' }
                         attachment: { type: string, format: binary }
               responses: { '204': { description: ok } }
@@ -137,6 +138,15 @@ public class MultipartFormObjectTests
         var generatedCode = await GenerateCode(configure: settings => settings.TypeAccessibility = TypeAccessibility.Internal);
         generatedCode.Should().Contain("internal class SendMessageFormData");
         generatedCode.Should().Contain("public MessageType? MessageType { get; set; }");
+    }
+
+    [Test]
+    public async Task Sends_Collection_Fields_As_Repeated_Parts()
+    {
+        // Without CollectionFormat.Multi, Refit joins a [FormObject] collection into one comma-separated part
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("[AliasAs(\"tags\"), Query(CollectionFormat.Multi)]");
+        generatedCode.Should().Contain("public IEnumerable<string> Tags { get; set; }");
     }
 
     [Test]

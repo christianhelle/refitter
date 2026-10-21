@@ -49,6 +49,7 @@ internal static class FormParameterExtractor
                     variableName,
                     ParameterTypeResolver.GetParameterType(p, settings),
                     isRequired,
+                    p.IsArray,
                     p.Description));
             }
         }
@@ -77,6 +78,7 @@ internal static class FormParameterExtractor
                         variableName,
                         GetPropertyType(property.Value, settings),
                         property.Value.IsRequired,
+                        property.Value.ActualSchema.Type.HasFlag(JsonObjectType.Array),
                         property.Value.Description));
                 }
             }
@@ -140,6 +142,7 @@ internal sealed record FormField(
     string VariableName,
     string Type,
     bool IsRequired,
+    bool IsCollection,
     string? Description)
 {
 #pragma warning disable S2325 // Uses the positional record properties, so it cannot be static

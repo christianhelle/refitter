@@ -31,8 +31,11 @@ internal static class FormObjectParameterBuilder
         foreach (var formField in formFields)
         {
             var propertyName = formField.VariableName.TrimStart('@').CapitalizeFirstCharacter();
+            // Refit joins a [FormObject] collection into one comma-separated part unless told to repeat it,
+            // whereas a separate collection parameter is sent as one part per item
             var attributes = ParameterAttributeFormatter.JoinAttributes(
-                ParameterAttributeFormatter.GetAliasAsAttribute(formField.Name, propertyName)).TrimEnd();
+                ParameterAttributeFormatter.GetAliasAsAttribute(formField.Name, propertyName),
+                formField.IsCollection ? "Query(CollectionFormat.Multi)" : string.Empty).TrimEnd();
 
             if (formField.IsRequired)
             {
