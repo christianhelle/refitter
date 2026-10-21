@@ -28,9 +28,15 @@ internal static class FormObjectParameterBuilder
         var initializedParametersCodeBuilder = new StringBuilder();
         var propertiesCodeBuilder = new StringBuilder();
 
+        // A member cannot share its enclosing type's name (CS0542), and [AliasAs] keeps the wire name
+        var knownPropertyNames = new HashSet<string>(StringComparer.Ordinal) { formObjectParameterType };
+
         foreach (var formField in formFields)
         {
-            var propertyName = formField.VariableName.TrimStart('@').CapitalizeFirstCharacter();
+            var propertyName = IdentifierUtils.Counted(
+                knownPropertyNames,
+                formField.VariableName.TrimStart('@').CapitalizeFirstCharacter());
+            knownPropertyNames.Add(propertyName);
             // Refit joins a [FormObject] collection into one comma-separated part unless told to repeat it,
             // whereas a separate collection parameter is sent as one part per item
             var attributes = ParameterAttributeFormatter.JoinAttributes(

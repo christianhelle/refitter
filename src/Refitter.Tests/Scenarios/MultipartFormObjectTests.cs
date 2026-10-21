@@ -73,6 +73,18 @@ public class MultipartFormObjectTests
                         kind: { $ref: '#/components/schemas/StreamPartKind' }
                         attachment: { type: string, format: binary }
               responses: { '204': { description: ok } }
+          /api/v1/uploads:
+            post:
+              operationId: Upload
+              requestBody:
+                content:
+                  multipart/form-data:
+                    schema:
+                      type: object
+                      properties:
+                        uploadFormData: { type: string }
+                        file: { type: string, format: binary }
+              responses: { '204': { description: ok } }
         components:
           schemas:
             MessageType:
@@ -147,6 +159,16 @@ public class MultipartFormObjectTests
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[AliasAs(\"tags\"), Query(CollectionFormat.Multi)]");
         generatedCode.Should().Contain("public IEnumerable<string> Tags { get; set; }");
+    }
+
+    [Test]
+    public async Task Does_Not_Name_A_Property_After_Its_FormObject_Type()
+    {
+        // A member cannot share its enclosing type's name (CS0542)
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("Task Upload([FormObject] UploadFormData formData, StreamPart file);");
+        generatedCode.Should().Contain("[AliasAs(\"uploadFormData\")]");
+        generatedCode.Should().Contain("public string UploadFormData2 { get; set; }");
     }
 
     [Test]
