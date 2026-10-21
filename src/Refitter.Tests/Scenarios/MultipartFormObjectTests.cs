@@ -264,6 +264,21 @@ public class MultipartFormObjectTests
     }
 
     [Test]
+    [Arguments(MultipleInterfaces.ByEndpoint)]
+    [Arguments(MultipleInterfaces.ByTag)]
+    public async Task Registers_Only_Interfaces_With_Dependency_Injection(MultipleInterfaces multipleInterfaces)
+    {
+        var generatedCode = await GenerateCode(
+            multipleInterfaces: multipleInterfaces,
+            configure: settings => settings.DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://example.com/api/v1",
+            });
+        generatedCode.Should().Contain(".AddRefitClient<I");
+        generatedCode.Should().NotContain("FormData>(settings)");
+    }
+
+    [Test]
     public async Task Emits_FormObject_Type_As_Separate_File()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -302,6 +317,19 @@ public class MultipartFormObjectTests
     public async Task Can_Build_Generated_Code_With_Immutable_Records()
     {
         var generatedCode = await GenerateCode(configure: settings => settings.ImmutableRecords = true);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_With_Dependency_Injection()
+    {
+        var generatedCode = await GenerateCode(
+            multipleInterfaces: MultipleInterfaces.ByTag,
+            configure: settings => settings.DependencyInjectionSettings = new DependencyInjectionSettings
+            {
+                BaseUrl = "https://example.com/api/v1",
+            });
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 

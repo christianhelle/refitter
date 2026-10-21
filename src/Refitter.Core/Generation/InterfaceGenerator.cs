@@ -301,14 +301,20 @@ internal class InterfaceGenerator
         if (methodSignature.DynamicQuerystringParameters is { } dynamicQuerystringParameters &&
             !string.IsNullOrWhiteSpace(dynamicQuerystringParameters))
         {
-            parameterTypes.Add(new GeneratedCode(dynamicQuerystringParameterType, dynamicQuerystringParameters));
+            parameterTypes.Add(new GeneratedCode(dynamicQuerystringParameterType, dynamicQuerystringParameters)
+            {
+                IsInterface = false,
+            });
         }
 
         if (methodSignature.FormObjectParameters is { } formObjectParameters &&
             !string.IsNullOrWhiteSpace(formObjectParameters))
         {
             knownTypeIdentifiers.Add(formObjectParameterType);
-            parameterTypes.Add(new GeneratedCode(formObjectParameterType, formObjectParameters));
+            parameterTypes.Add(new GeneratedCode(formObjectParameterType, formObjectParameters)
+            {
+                IsInterface = false,
+            });
         }
 
         return parameterTypes;
