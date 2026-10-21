@@ -28,6 +28,35 @@ public class MultipartFormObjectTests
               responses: { '204': { description: ok } }
         """;
 
+    private const string ContractNameClashSpec = """
+        openapi: 3.0.1
+        info: { title: MultipartFormObjectClash, version: v1 }
+        paths:
+          /api/v1/uploads:
+            post:
+              operationId: Upload
+              requestBody:
+                content:
+                  multipart/form-data:
+                    schema:
+                      type: object
+                      properties:
+                        caption: { type: string }
+                        file: { type: string, format: binary }
+              responses:
+                '200':
+                  description: ok
+                  content:
+                    application/json:
+                      schema: { $ref: '#/components/schemas/UploadFormData' }
+        components:
+          schemas:
+            UploadFormData:
+              type: object
+              properties:
+                id: { type: string }
+        """;
+
     private const string OpenApiSpec = """
         openapi: 3.0.1
         info: { title: MultipartFormObject, version: v1 }
@@ -172,6 +201,14 @@ public class MultipartFormObjectTests
     }
 
     [Test]
+    public async Task Does_Not_Reuse_A_Contract_Type_Name_For_The_FormObject_Type()
+    {
+        var generatedCode = await GenerateCode(ContractNameClashSpec);
+        generatedCode.Should().Contain("Task<UploadFormData> Upload([FormObject] UploadFormData2 formData, StreamPart file);");
+        generatedCode.Should().Contain("public class UploadFormData2");
+    }
+
+    [Test]
     public async Task Generates_Record_With_Init_Setters_For_Immutable_Records()
     {
         var generatedCode = await GenerateCode(configure: settings => settings.ImmutableRecords = true);
@@ -273,6 +310,14 @@ public class MultipartFormObjectTests
     public async Task Can_Build_Generated_Code_From_Swagger2()
     {
         var generatedCode = await GenerateCode(SwaggerSpec);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_When_A_Contract_Has_The_FormObject_Type_Name()
+    {
+        var generatedCode = await GenerateCode(ContractNameClashSpec);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 

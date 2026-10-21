@@ -17,7 +17,8 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
     public ParameterList Build(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
-        string dynamicQuerystringParameterType)
+        string dynamicQuerystringParameterType,
+        string? formObjectParameterType = null)
     {
         var parameters = new List<string>();
 
@@ -35,7 +36,7 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
             operationModel,
             operation,
             settings,
-            ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType));
+            formObjectParameterType ?? ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType));
         parameters.AddRange(formParameters);
 
         parameters = OptionalParameterReorderer.Reorder(

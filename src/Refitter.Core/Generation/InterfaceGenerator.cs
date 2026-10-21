@@ -156,6 +156,7 @@ internal class InterfaceGenerator
                 interfaceName,
                 partitioning,
                 knownMethodIdentifiers,
+                knownInterfaceIdentifiers,
                 code))
             {
                 dynamicQuerystringParametersCodeBuilder.AppendLine(parameterType.Content);
@@ -197,6 +198,7 @@ internal class InterfaceGenerator
                 interfaceName,
                 partitioning,
                 knownMethodIdentifiers,
+                knownInterfaceIdentifiers,
                 code))
             {
                 yield return parameterType;
@@ -214,6 +216,7 @@ internal class InterfaceGenerator
         string interfaceName,
         IInterfacePartitioning partitioning,
         Dictionary<string, HashSet<string>> knownMethodIdentifiers,
+        HashSet<string> knownTypeIdentifiers,
         StringBuilder code)
     {
         var operation = op.Operation;
@@ -237,8 +240,16 @@ internal class InterfaceGenerator
         var dynamicQuerystringParameterType =
             partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
 
-        var methodSignature =
-            methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
+        // The form object shares the namespace with the contracts and interfaces
+        var formObjectParameterType = IdentifierUtils.Counted(
+            knownTypeIdentifiers,
+            ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType));
+
+        var methodSignature = methodSignatureGenerator.Generate(
+            operationModel,
+            operation,
+            dynamicQuerystringParameterType,
+            formObjectParameterType);
 
         var isApiResponseType = returnTypeGenerator.IsApiResponseType(returnType);
 
@@ -296,9 +307,8 @@ internal class InterfaceGenerator
         if (methodSignature.FormObjectParameters is { } formObjectParameters &&
             !string.IsNullOrWhiteSpace(formObjectParameters))
         {
-            parameterTypes.Add(new GeneratedCode(
-                ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType),
-                formObjectParameters));
+            knownTypeIdentifiers.Add(formObjectParameterType);
+            parameterTypes.Add(new GeneratedCode(formObjectParameterType, formObjectParameters));
         }
 
         return parameterTypes;

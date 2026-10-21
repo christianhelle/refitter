@@ -11,12 +11,14 @@ internal class MethodSignatureGenerator(RefitGeneratorSettings settings)
     public MethodSignature Generate(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
-        string dynamicQuerystringParameterType)
+        string dynamicQuerystringParameterType,
+        string? formObjectParameterType = null)
     {
         var parameterList = parameterListBuilder.Build(
             operationModel,
             operation,
-            dynamicQuerystringParameterType);
+            dynamicQuerystringParameterType,
+            formObjectParameterType);
 
         var parametersString = string.Join(", ", parameterList.Parameters);
         return new MethodSignature(
