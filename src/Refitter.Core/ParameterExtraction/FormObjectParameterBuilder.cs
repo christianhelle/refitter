@@ -64,9 +64,10 @@ internal static class FormObjectParameterBuilder
         """);
             }
 
+            // Refit only reads the public properties of a [FormObject], whatever the type's accessibility
             propertiesCodeBuilder.Append(
     $$"""
-                {{modifier}} {{formField.Type}} {{propertyName}} { get; {{setterStyle}}; }
+                public {{formField.Type}} {{propertyName}} { get; {{setterStyle}}; }
         """);
             propertiesCodeBuilder.AppendLine();
         }

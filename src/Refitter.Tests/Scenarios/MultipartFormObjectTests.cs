@@ -131,6 +131,15 @@ public class MultipartFormObjectTests
     }
 
     [Test]
+    public async Task Keeps_FormObject_Properties_Public_For_Internal_Types()
+    {
+        // Refit only reads the public properties of a [FormObject]
+        var generatedCode = await GenerateCode(configure: settings => settings.TypeAccessibility = TypeAccessibility.Internal);
+        generatedCode.Should().Contain("internal class SendMessageFormData");
+        generatedCode.Should().Contain("public MessageType? MessageType { get; set; }");
+    }
+
+    [Test]
     public async Task Generates_Record_With_Init_Setters_For_Immutable_Records()
     {
         var generatedCode = await GenerateCode(configure: settings => settings.ImmutableRecords = true);
