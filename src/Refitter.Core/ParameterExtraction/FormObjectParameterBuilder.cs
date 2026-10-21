@@ -37,11 +37,6 @@ internal static class FormObjectParameterBuilder
                 knownPropertyNames,
                 formField.VariableName.TrimStart('@').CapitalizeFirstCharacter());
             knownPropertyNames.Add(propertyName);
-            // Refit joins a [FormObject] collection into one comma-separated part unless told to repeat it,
-            // whereas a separate collection parameter is sent as one part per item
-            var attributes = ParameterAttributeFormatter.JoinAttributes(
-                ParameterAttributeFormatter.GetAliasAsAttribute(formField.Name, propertyName),
-                formField.IsCollection ? "Query(CollectionFormat.Multi)" : string.Empty).TrimEnd();
 
             if (formField.IsRequired)
             {
@@ -56,29 +51,7 @@ internal static class FormObjectParameterBuilder
         """);
             }
 
-            propertiesCodeBuilder.AppendLine();
-            if (settings.GenerateXmlDocCodeComments &&
-                formField.Description is { } description &&
-                !string.IsNullOrWhiteSpace(description))
-            {
-                var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(description);
-                DynamicQuerystringParameterBuilder.AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
-            }
-
-            if (attributes.Length > 0)
-            {
-                propertiesCodeBuilder.AppendLine(
-    $$"""
-                {{attributes}}
-        """);
-            }
-
-            // Refit only reads the public properties of a [FormObject], whatever the type's accessibility
-            propertiesCodeBuilder.Append(
-    $$"""
-                public {{formField.Type}} {{propertyName}} { get; {{setterStyle}}; }
-        """);
-            propertiesCodeBuilder.AppendLine();
+            AppendProperty(formField, propertyName, setterStyle, settings, propertiesCodeBuilder);
         }
 
         codeBuilder.AppendLine(
@@ -105,5 +78,43 @@ internal static class FormObjectParameterBuilder
         """);
 
         return codeBuilder.ToString();
+    }
+
+    private static void AppendProperty(
+        FormField formField,
+        string propertyName,
+        string setterStyle,
+        RefitGeneratorSettings settings,
+        StringBuilder propertiesCodeBuilder)
+    {
+        // Refit joins a [FormObject] collection into one comma-separated part unless told to repeat it,
+        // whereas a separate collection parameter is sent as one part per item
+        var attributes = ParameterAttributeFormatter.JoinAttributes(
+            ParameterAttributeFormatter.GetAliasAsAttribute(formField.Name, propertyName),
+            formField.IsCollection ? "Query(CollectionFormat.Multi)" : string.Empty).TrimEnd();
+
+        propertiesCodeBuilder.AppendLine();
+        if (settings.GenerateXmlDocCodeComments &&
+            formField.Description is { } description &&
+            !string.IsNullOrWhiteSpace(description))
+        {
+            var escapedDescription = XmlDocumentationGenerator.SanitizeResponseDescription(description);
+            DynamicQuerystringParameterBuilder.AppendXmlDocComment(escapedDescription, propertiesCodeBuilder);
+        }
+
+        if (attributes.Length > 0)
+        {
+            propertiesCodeBuilder.AppendLine(
+    $$"""
+            {{attributes}}
+    """);
+        }
+
+        // Refit only reads the public properties of a [FormObject], whatever the type's accessibility
+        propertiesCodeBuilder.Append(
+    $$"""
+            public {{formField.Type}} {{propertyName}} { get; {{setterStyle}}; }
+    """);
+        propertiesCodeBuilder.AppendLine();
     }
 }
