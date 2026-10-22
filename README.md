@@ -559,7 +559,54 @@ To keep `jsonLibraryVersion` in sync with the target framework of the consuming 
 </PropertyGroup>
 ```
 
-`RefitterJsonLibraryVersion` must be a version number such as `9.0`. If the `.refitter` file sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, that value takes precedence over a default (`8.0`) property value. Generation fails only when both the property and the `.refitter` file specify non-default values, so use only one source. Because `8.0` is the default, an explicit `"jsonLibraryVersion": 8.0` in the `.refitter` file is treated the same as not setting it, and is overridden by `RefitterJsonLibraryVersion`. For multi-targeted projects (`TargetFrameworks`), every target framework writes to the same generated files, so don't derive the value from `$(TargetFramework)`. Set a fixed value that matches the lowest target framework instead, for example `<RefitterJsonLibraryVersion>8.0</RefitterJsonLibraryVersion>` for `net8.0;net9.0`.
+`RefitterJsonLibraryVersion` must be a version number such as `9.0`. If the `.refitter` file sets a non-default `codeGeneratorSettings.jsonLibraryVersion`, that value takes precedence over a default (`8.0`) property value. Generation fails only when both the property and the `.refitter` file specify non-default values, so use only one source. Because `8.0` is the default, an explicit `"jsonLibraryVersion": 8.0` in the `.refitter` file is treated the same as not setting it, and is overridden by `RefitterJsonLibraryVersion`. For multi-targeted projects (`TargetFrameworks`), every target framework writes to the same generated files, so don't derive the value from `$(TargetFramework)`. Set a fixed value that matches the lowest target framework instead, for example `<RefitterJsonLibraryVersion>8.0</RefitterJsonLibraryVersion>` for `net8.0;net9.0`. To generate different code per target framework, see [Multi-targeted projects](#multi-targeted-projects).
+
+### Multi-targeted projects
+
+In a project with `<TargetFrameworks>`, MSBuild runs one inner build per target framework, and each inner build runs Refitter. With a single `.refitter` file, every target framework writes and compiles the same generated files, so the generated code has to work for all of them.
+
+To generate different code per target framework, for example a different `jsonLibraryVersion`, give each target framework its own `.refitter` file with its own `outputFolder` under `obj`, and select it with a conditional `RefitterIncludePatterns`:
+
+```xml
+<PropertyGroup>
+  <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+</PropertyGroup>
+
+<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <RefitterIncludePatterns>petstore.net8.refitter</RefitterIncludePatterns>
+</PropertyGroup>
+
+<PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
+  <RefitterIncludePatterns>petstore.net10.refitter</RefitterIncludePatterns>
+</PropertyGroup>
+```
+
+`petstore.net8.refitter`:
+
+```json
+{
+  "openApiPath": "./petstore.json",
+  "namespace": "MyApp.Petstore",
+  "outputFolder": "./obj/Refitter/net8.0",
+  "outputFilename": "Petstore.cs"
+}
+```
+
+`petstore.net10.refitter`:
+
+```json
+{
+  "openApiPath": "./petstore.json",
+  "namespace": "MyApp.Petstore",
+  "outputFolder": "./obj/Refitter/net10.0",
+  "outputFilename": "Petstore.cs",
+  "codeGeneratorSettings": {
+    "jsonLibraryVersion": 9.0
+  }
+}
+```
+
+The files only differ in `outputFolder` and the settings that should change per target framework. Keep `outputFolder` under `obj`: the .NET SDK doesn't include files from `obj` in compilation by default, so each inner build compiles only the file it generated. A folder in the project directory, such as `./Generated`, is picked up by every inner build from the second build on and causes duplicate type errors.
 
 ### Example
 
