@@ -30,6 +30,12 @@ internal static class FormObjectParameterBuilder
 
         // A member cannot share its enclosing type's name (CS0542), and [AliasAs] keeps the wire name
         var knownPropertyNames = new HashSet<string>(StringComparer.Ordinal) { formObjectParameterType };
+        if (isRecord)
+        {
+            // A record cannot declare members named after its synthesized members (CS8859)
+            knownPropertyNames.Add("Clone");
+            knownPropertyNames.Add("EqualityContract");
+        }
 
         foreach (var formField in formFields)
         {

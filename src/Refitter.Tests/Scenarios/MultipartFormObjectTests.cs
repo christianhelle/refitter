@@ -100,6 +100,7 @@ public class MultipartFormObjectTests
                         body: { type: string }
                         tags: { type: array, items: { type: string } }
                         kind: { $ref: '#/components/schemas/StreamPartKind' }
+                        clone: { type: string }
                         attachment: { type: string, format: binary }
               responses: { '204': { description: ok } }
           /api/v1/uploads:
@@ -241,6 +242,15 @@ public class MultipartFormObjectTests
         var generatedCode = await GenerateCode(configure: settings => settings.ImmutableRecords = true);
         generatedCode.Should().Contain("public record SendMessageFormData");
         generatedCode.Should().Contain("public MessageType? MessageType { get; init; }");
+    }
+
+    [Test]
+    public async Task Does_Not_Name_A_Record_Property_After_A_Synthesized_Record_Member()
+    {
+        // A record cannot declare a member named Clone (CS8859)
+        var generatedCode = await GenerateCode(configure: settings => settings.ImmutableRecords = true);
+        generatedCode.Should().Contain("[AliasAs(\"clone\")]");
+        generatedCode.Should().Contain("public string Clone2 { get; init; }");
     }
 
     [Test]
