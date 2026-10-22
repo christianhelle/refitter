@@ -114,8 +114,26 @@ public class MultipartFormObjectTests
                         uploadFormData: { type: string }
                         file: { type: string, format: binary }
               responses: { '204': { description: ok } }
+          /api/v1/profiles:
+            post:
+              operationId: UpdateProfile
+              requestBody:
+                content:
+                  multipart/form-data:
+                    schema:
+                      type: object
+                      properties:
+                        name: { type: string }
+                        address: { $ref: '#/components/schemas/Address' }
+                        previousAddresses: { type: array, items: { $ref: '#/components/schemas/Address' } }
+                        photo: { type: string, format: binary }
+              responses: { '204': { description: ok } }
         components:
           schemas:
+            Address:
+              type: object
+              properties:
+                city: { type: string }
             MessageType:
               type: string
               enum: [CHAT, SYSTEM]
@@ -206,6 +224,15 @@ public class MultipartFormObjectTests
         var generatedCode = await GenerateCode(ContractNameClashSpec);
         generatedCode.Should().Contain("Task<UploadFormData> Upload([FormObject] UploadFormData2 formData, StreamPart file);");
         generatedCode.Should().Contain("public class UploadFormData2");
+    }
+
+    [Test]
+    public async Task Keeps_Object_Fields_As_Separate_Json_Parts()
+    {
+        // Refit flattens [FormObject] object properties into nested text parts, while OpenAPI sends them as JSON parts
+        var generatedCode = await GenerateCode();
+        generatedCode.Should().Contain("Task UpdateProfile([FormObject] UpdateProfileFormData formData, Address address, IEnumerable<Address> previousAddresses, StreamPart photo);");
+        generatedCode.Should().NotContain("public Address Address { get; set; }");
     }
 
     [Test]

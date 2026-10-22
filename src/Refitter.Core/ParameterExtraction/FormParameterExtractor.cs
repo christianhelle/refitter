@@ -14,17 +14,19 @@ internal static class FormParameterExtractor
     {
         var formFields = GetFormFields(operationModel, operation, settings);
 
-        var nonFileFields = formFields.Where(f => !f.IsFile).ToList();
+        // Refit flattens [FormObject] object properties into nested text parts, whereas a separate
+        // object parameter is sent as the JSON part OpenAPI specifies, so only simple fields are wrapped
+        var wrappedFields = formFields.Where(f => !f.IsFile && !f.IsComplex).ToList();
         if (!settings.UseMultipartFormObject ||
             !operationModel.Consumes.Contains("multipart/form-data") ||
-            nonFileFields.Count == 0)
+            wrappedFields.Count == 0)
         {
             return (formFields.Select(f => f.ToParameter()).ToList(), null);
         }
 
-        var formObjectCode = FormObjectParameterBuilder.Build(nonFileFields, formObjectParameterType, settings);
+        var formObjectCode = FormObjectParameterBuilder.Build(wrappedFields, formObjectParameterType, settings);
         var parameters = new List<string> { $"[FormObject] {formObjectParameterType} formData" };
-        parameters.AddRange(formFields.Where(f => f.IsFile).Select(f => f.ToParameter()));
+        parameters.AddRange(formFields.Where(f => f.IsFile || f.IsComplex).Select(f => f.ToParameter()));
         return (parameters, formObjectCode);
     }
 
@@ -39,7 +41,7 @@ internal static class FormParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.FormData && !p.IsBinaryBodyParameter)
             .ToList();
 
-        void AddOperationParameter(CSharpParameterModel p, bool isRequired)
+        void AddOperationParameter(CSharpParameterModel p, bool isRequired, bool isComplex)
         {
             var variableName = ParameterNaming.ConvertToVariableName(p.VariableName);
             if (seenFormParameterNames.Add(variableName))
@@ -50,6 +52,7 @@ internal static class FormParameterExtractor
                     ParameterTypeResolver.GetParameterType(p, settings),
                     isRequired,
                     p.IsArray,
+                    isComplex,
                     p.Description));
             }
         }
@@ -66,7 +69,7 @@ internal static class FormParameterExtractor
                 if (operationParameter != null)
                 {
                     // NSwag does not carry the body schema's required list over to form parameters
-                    AddOperationParameter(operationParameter, property.Value.IsRequired);
+                    AddOperationParameter(operationParameter, property.Value.IsRequired, IsComplex(property.Value));
                     continue;
                 }
 
@@ -79,6 +82,7 @@ internal static class FormParameterExtractor
                         GetPropertyType(property.Value, settings),
                         property.Value.IsRequired,
                         property.Value.ActualSchema.Type.HasFlag(JsonObjectType.Array),
+                        IsComplex(property.Value),
                         property.Value.Description));
                 }
             }
@@ -86,7 +90,7 @@ internal static class FormParameterExtractor
 
         foreach (var p in operationFormParameters)
         {
-            AddOperationParameter(p, p.IsRequired);
+            AddOperationParameter(p, p.IsRequired, false);
         }
 
         return formFields;
@@ -127,6 +131,16 @@ internal static class FormParameterExtractor
         return ParameterTypeResolver.GetCSharpType(propertySchema, settings);
     }
 
+    // Objects, and collections of objects, as opposed to scalars, enums and files
+    private static bool IsComplex(JsonSchema schema)
+    {
+        var actualSchema = schema.ActualSchema;
+        if (actualSchema.Type.HasFlag(JsonObjectType.Array))
+            return actualSchema.Item is { } itemSchema && IsComplex(itemSchema);
+
+        return actualSchema.IsObject && !actualSchema.IsEnumeration;
+    }
+
     private static bool IsBinary(JsonSchema schema) =>
         schema.Type == JsonObjectType.String && schema.Format == "binary";
 }
@@ -143,6 +157,7 @@ internal sealed record FormField(
     string Type,
     bool IsRequired,
     bool IsCollection,
+    bool IsComplex,
     string? Description)
 {
 #pragma warning disable S2325 // Uses the positional record properties, so it cannot be static
