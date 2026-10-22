@@ -381,7 +381,8 @@ public class RefitGeneratorSettings : IOutputConfiguration, INamingConfiguration
 
     /// <summary>
     /// Set to <c>true</c> to wrap the non-file fields of a multipart/form-data request body into a single
-    /// <c>[FormObject]</c> parameter, so Refit writes each field as a plain text part. Default is <c>false</c> (no wrapping).
+    /// <c>[FormObject]</c> parameter, so Refit writes each field as a plain text part. File and object fields stay as
+    /// separate parameters. Default is <c>false</c> (no wrapping).
     /// Requires the Refit.Reflection package and is not supported by AddRefitGeneratedClient or NativeAOT.
     /// See https://www.reactiveui.net/documentation/refit/requests/multipart/#flatten-a-form-object-reflection-only-path for more information.
     /// </summary>
