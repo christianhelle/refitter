@@ -31,6 +31,7 @@ internal sealed class GeneratorPipeline
             contracts = ObsoleteContractAttributeRemover.Remove(contracts, interfaces.Select(c => c.Content));
 
         var interfaceNames = interfaces
+            .Where(c => c.IsInterface)
             .Select(c => c.TypeName)
             .Where(name => !string.IsNullOrEmpty(name))
             .ToArray();
@@ -129,11 +130,14 @@ internal sealed class GeneratorPipeline
         return new[]
             {
                 new GeneratedCode(typeName, code.ToString())
+                {
+                    IsInterface = generatedCodes.Length == 0 || generatedCodes[0].IsInterface,
+                }
             }
             .Union(
                 generatedCodes
                     .Skip(1)
-                    .Select(c => new GeneratedCode(c.TypeName, string.Empty)))
+                    .Select(c => new GeneratedCode(c.TypeName, string.Empty) { IsInterface = c.IsInterface }))
             .ToArray();
     }
 

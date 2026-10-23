@@ -78,4 +78,15 @@ internal static class ParameterNaming
     {
         return IdentifierUtils.ToCompilableIdentifier(parameterModel.VariableName);
     }
+
+    // The form object type sits next to the dynamic querystring type of the same method,
+    // so it follows that type's per-partitioning naming with a FormData suffix
+    public static string GetFormObjectParameterType(string dynamicQuerystringParameterType)
+    {
+        const string querystringSuffix = "QueryParams";
+        var baseName = dynamicQuerystringParameterType.EndsWith(querystringSuffix, StringComparison.Ordinal)
+            ? dynamicQuerystringParameterType.Substring(0, dynamicQuerystringParameterType.Length - querystringSuffix.Length)
+            : dynamicQuerystringParameterType;
+        return baseName + "FormData";
+    }
 }

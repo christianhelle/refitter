@@ -297,6 +297,7 @@ STANDARD_VARIANTS=(
     # This is a known Refitter limitation. We test generation works but skip compilation.
     "ContractOnly|ContractOnly|--contract-only"
     "DynamicQuerystring|DynamicQuerystring|--use-dynamic-querystring-parameters"
+    "MultipartFormObject|MultipartFormObject|--use-multipart-form-object"
     "IntegerTypeInt64|IntegerTypeInt64|--integer-type Int64"
     "TrimUnusedSchema|TrimUnusedSchema|--trim-unused-schema"
     "OptionalNullable|OptionalNullable|--optional-nullable-parameters"

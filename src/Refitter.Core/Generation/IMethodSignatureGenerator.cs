@@ -8,5 +8,6 @@ internal interface IMethodSignatureGenerator
     MethodSignature Generate(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
-        string dynamicQuerystringParameterType);
+        string dynamicQuerystringParameterType,
+        string? formObjectParameterType = null);
 }

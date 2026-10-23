@@ -204,6 +204,7 @@ The following is an example `.refitter` file
   "operationNameGenerator": "Default", // Optional. May be one of Default, MultipleClientsFromOperationId, MultipleClientsFromPathSegments, MultipleClientsFromFirstTagAndOperationId, MultipleClientsFromFirstTagAndOperationName, MultipleClientsFromFirstTagAndPathSegments, SingleClientFromOperationId, SingleClientFromPathSegments
   "immutableRecords": false,
   "useDynamicQuerystringParameters": true, // Optional. Default=false
+  "useMultipartFormObject": false, // Optional. Default=false
   "usePolymorphicSerialization": false, // Optional. Default=false
   "generateDisposableClients": false, // Optional. Default=false
   "dependencyInjectionSettings": { // Optional
@@ -319,6 +320,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `operationNameGenerator`: The NSwag `IOperationNameGenerator` implementation to use. See <https://refitter.github.io/api/Refitter.Core.OperationNameGeneratorTypes.html>
 - `immutableRecords`: Set to `true` to generate contracts as immutable records instead of classes. Default is `false`
 - `useDynamicQuerystringParameters`: Set to `true` to wrap multiple query parameters into a single complex one. Default is `false` (no wrapping). See <https://github.com/reactiveui/refit?tab=readme-ov-file#dynamic-querystring-parameters> for more information.
+- `useMultipartFormObject`: Set to `true` to wrap the non-file fields of a `multipart/form-data` request body into a single `[FormObject]` parameter, so Refit writes each field (including enums) as a plain text part instead of a JSON part. File fields stay as separate `StreamPart` parameters, and object fields stay as separate parameters sent as JSON parts. Default is `false` (no wrapping). Requires the `Refit.Reflection` package and is not supported by `AddRefitGeneratedClient` or NativeAOT. See <https://www.reactiveui.net/documentation/refit/requests/multipart/#flatten-a-form-object-reflection-only-path> for more information.
 - `usePolymorphicSerialization`: Set to `true` to use `System.Text.Json` polymorphic serialization. Default is `false`
 - `generateDisposableClients`: Set to `true` to generate Refit clients that implement `IDisposable`. Default is `false`
 - `dependencyInjectionSettings` - Setting this will generated extension methods to `IServiceCollection` for configuring Refit clients, including optional Windows Authentication support

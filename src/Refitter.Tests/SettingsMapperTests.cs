@@ -26,6 +26,7 @@ public class SettingsMapperTests
             OperationNameGenerator = OperationNameGeneratorTypes.MultipleClientsFromOperationId,
             ImmutableRecords = true,
             UseDynamicQuerystringParameters = true,
+            UseMultipartFormObject = true,
             UsePolymorphicSerialization = true,
             GenerateDisposableClients = true,
             CollectionFormat = CollectionFormat.Csv,
@@ -50,6 +51,7 @@ public class SettingsMapperTests
         result.OperationNameGenerator.Should().Be(OperationNameGeneratorTypes.MultipleClientsFromOperationId);
         result.ImmutableRecords.Should().BeTrue();
         result.UseDynamicQuerystringParameters.Should().BeTrue();
+        result.UseMultipartFormObject.Should().BeTrue();
         result.UsePolymorphicSerialization.Should().BeTrue();
         result.GenerateDisposableClients.Should().BeTrue();
         result.CollectionFormat.Should().Be(CollectionFormat.Csv);

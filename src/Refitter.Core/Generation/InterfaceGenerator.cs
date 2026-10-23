@@ -151,15 +151,15 @@ internal class InterfaceGenerator
 
         foreach (var op in operations)
         {
-            var (dynamicQuerystringParams, _) = GenerateMethod(
+            foreach (var parameterType in GenerateMethod(
                 op,
                 interfaceName,
                 partitioning,
                 knownMethodIdentifiers,
-                code);
-            if (!string.IsNullOrWhiteSpace(dynamicQuerystringParams))
+                knownInterfaceIdentifiers,
+                code))
             {
-                dynamicQuerystringParametersCodeBuilder.AppendLine(dynamicQuerystringParams);
+                dynamicQuerystringParametersCodeBuilder.AppendLine(parameterType.Content);
             }
         }
 
@@ -193,15 +193,15 @@ internal class InterfaceGenerator
 
         foreach (var op in operations)
         {
-            var (dynamicQuerystringParams, dynamicQuerystringType) = GenerateMethod(
+            foreach (var parameterType in GenerateMethod(
                 op,
                 interfaceName,
                 partitioning,
                 knownMethodIdentifiers,
-                code);
-            if (!string.IsNullOrWhiteSpace(dynamicQuerystringParams))
+                knownInterfaceIdentifiers,
+                code))
             {
-                yield return new GeneratedCode(dynamicQuerystringType, dynamicQuerystringParams);
+                yield return parameterType;
             }
         }
 
@@ -210,18 +210,20 @@ internal class InterfaceGenerator
         yield return new(interfaceName, code.ToString());
     }
 
-    private (string DynamicQuerystringParameters, string DynamicQuerystringParameterType) GenerateMethod(
+    // Returns the wrapper types (dynamic querystring and multipart form object) the method's parameters use
+    private List<GeneratedCode> GenerateMethod(
         OpenApiOperationInfo op,
         string interfaceName,
         IInterfacePartitioning partitioning,
         Dictionary<string, HashSet<string>> knownMethodIdentifiers,
+        HashSet<string> knownTypeIdentifiers,
         StringBuilder code)
     {
         var operation = op.Operation;
 
         if (!settings.GenerateDeprecatedOperations && operation.IsDeprecated)
         {
-            return (string.Empty, string.Empty);
+            return [];
         }
 
         var returnType = returnTypeGenerator.Generate(operation);
@@ -238,8 +240,16 @@ internal class InterfaceGenerator
         var dynamicQuerystringParameterType =
             partitioning.GetDynamicQuerystringParameterType(interfaceName, methodName);
 
-        var methodSignature =
-            methodSignatureGenerator.Generate(operationModel, operation, dynamicQuerystringParameterType);
+        // The form object shares the namespace with the contracts and interfaces
+        var formObjectParameterType = IdentifierUtils.Counted(
+            knownTypeIdentifiers,
+            ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType));
+
+        var methodSignature = methodSignatureGenerator.Generate(
+            operationModel,
+            operation,
+            dynamicQuerystringParameterType,
+            formObjectParameterType);
 
         var isApiResponseType = returnTypeGenerator.IsApiResponseType(returnType);
 
@@ -287,7 +297,27 @@ internal class InterfaceGenerator
                 .AppendLine();
         }
 
-        return (methodSignature.DynamicQuerystringParameters ?? string.Empty, dynamicQuerystringParameterType);
+        var parameterTypes = new List<GeneratedCode>();
+        if (methodSignature.DynamicQuerystringParameters is { } dynamicQuerystringParameters &&
+            !string.IsNullOrWhiteSpace(dynamicQuerystringParameters))
+        {
+            parameterTypes.Add(new GeneratedCode(dynamicQuerystringParameterType, dynamicQuerystringParameters)
+            {
+                IsInterface = false,
+            });
+        }
+
+        if (methodSignature.FormObjectParameters is { } formObjectParameters &&
+            !string.IsNullOrWhiteSpace(formObjectParameters))
+        {
+            knownTypeIdentifiers.Add(formObjectParameterType);
+            parameterTypes.Add(new GeneratedCode(formObjectParameterType, formObjectParameters)
+            {
+                IsInterface = false,
+            });
+        }
+
+        return parameterTypes;
     }
 
     private static string GetParameterSignature(

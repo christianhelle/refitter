@@ -16,4 +16,10 @@ public record GeneratedCode(string TypeName, string Content)
     /// Gets the filename for the generated code based on the type name.
     /// </summary>
     public string Filename { get; } = $"{TypeName}.cs";
+
+    /// <summary>
+    /// Gets whether the generated type is a Refit interface, rather than a parameter wrapper type
+    /// such as a dynamic querystring or multipart form object, so only interfaces are registered.
+    /// </summary>
+    internal bool IsInterface { get; init; } = true;
 }
