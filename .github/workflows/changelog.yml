@@ -12,7 +12,9 @@ on:
       - 'main' 
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: read
+  issues: read
 
 jobs:
   changelog:
@@ -24,15 +26,14 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '4.0.7'
-      - name: Install github_changelog_generator
-        run: gem install github_changelog_generator
       - name: Re-generate CHANGELOG.md
-        run: github_changelog_generator --user christianhelle --project refitter --token ${{ secrets.PAT }}
+        id: changelog
+        uses: christianhelle/changelog-generator-action@main
+        with:
+          output: CHANGELOG.md
+          github-token: ${{ secrets.PAT }}
       - name: Git commit CHANGELOG.md
+        if: steps.changelog.outputs.changed == 'true'
         run: |
           git config --global user.name "Continuous Integration"
           git config --global user.email "username@users.noreply.github.com"
