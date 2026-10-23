@@ -97,9 +97,60 @@ public class ItemSchemaStreamingResponseTests
         generatedCode.Should().Contain("IAsyncEnumerable<MyStreamData> MyStreamEndpoint(");
     }
 
+    private const string OpenApi32YamlSpec = """
+        openapi: 3.2.0
+        info:
+          title: Program-SSE | v1
+          version: 1.0.0
+        paths:
+          /:
+            get:
+              operationId: MyStreamEndpoint
+              responses:
+                '200':
+                  description: Success
+                  content:
+                    text/event-stream:
+                      itemSchema:
+                        required:
+                          - data
+                        type: object
+                        properties:
+                          data:
+                            $ref: '#/components/schemas/MyStreamData'
+                          event:
+                            type: string
+                          id:
+                            type: string
+        components:
+          schemas:
+            MyStreamData:
+              type: object
+              properties:
+                message:
+                  type: string
+                index:
+                  type: integer
+                  format: int32
+        """;
+
+    [Test]
+    public async Task Generates_Typed_IAsyncEnumerable_From_Yaml_ItemSchema()
+    {
+        string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApi32YamlSpec);
+        string generatedCode = await GenerateCodeFromFile(swaggerFile);
+        generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> MyStreamEndpoint(");
+        generatedCode.Should().Contain("public MyStreamData Data { get; set; }");
+    }
+
     private static async Task<string> GenerateCode(string spec)
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);
+        return await GenerateCodeFromFile(swaggerFile);
+    }
+
+    private static async Task<string> GenerateCodeFromFile(string swaggerFile)
+    {
         RefitGeneratorSettings settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile
