@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- Update NuGet packages ([#1353](https://github.com/christianhelle/refitter/pull/1353)) ([@christianhelle](https://github.com/christianhelle/))
 - Generate changelog with chlogr ([#1352](https://github.com/christianhelle/refitter/pull/1352)) ([@christianhelle](https://github.com/christianhelle/))
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
