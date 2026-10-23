@@ -6,6 +6,9 @@
 - Generate changelog with chlogr ([#1352](https://github.com/christianhelle/refitter/pull/1352)) ([@christianhelle](https://github.com/christianhelle/))
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
+### Features
+- Add option to wrap multipart form fields in a FormObject parameter ([#1347](https://github.com/christianhelle/refitter/pull/1347)) ([@christianhelle](https://github.com/christianhelle/))
+
 
 ## [2.3.1](https://github.com/christianhelle/refitter/releases/tag/2.3.1) (2026-10-17)
 
