@@ -7,6 +7,7 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Use discriminated base type for inline oneOf of derived types ([#1335](https://github.com/christianhelle/refitter/pull/1335)) ([@christianhelle](https://github.com/christianhelle/))
 - Add option to wrap multipart form fields in a FormObject parameter ([#1347](https://github.com/christianhelle/refitter/pull/1347)) ([@christianhelle](https://github.com/christianhelle/))
 
 
