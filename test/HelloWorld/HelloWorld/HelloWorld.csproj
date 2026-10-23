@@ -12,8 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Refit" Version="16.2.0" />
-    <PackageReference Include="System.Text.Json" Version="10.0.12" />
+    <PackageReference Include="Refit" Version="16.4.0" />
+    <PackageReference Include="System.Text.Json" Version="10.0.13" />
   </ItemGroup>
 
 </Project>
