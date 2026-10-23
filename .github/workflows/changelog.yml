@@ -12,7 +12,7 @@ on:
       - 'main' 
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: read
   issues: read
 
