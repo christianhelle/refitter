@@ -1,0 +1,84 @@
+using AwesomeAssertions;
+using Refitter.Core;
+using Refitter.Tests.Build;
+using Refitter.Tests.TestUtilities;
+using TUnit.Core;
+
+namespace Refitter.Tests.Scenarios;
+
+public class ItemSchemaStreamingResponseTests
+{
+    private const string OpenApi32Spec = """
+        {
+          "openapi": "3.2.0",
+          "info": { "title": "Program-SSE | v1", "version": "1.0.0" },
+          "paths": {
+            "/": {
+              "get": {
+                "operationId": "MyStreamEndpoint",
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "content": {
+                      "text/event-stream": {
+                        "itemSchema": {
+                          "required": [ "data" ],
+                          "type": "object",
+                          "properties": {
+                            "data": { "$ref": "#/components/schemas/MyStreamData" },
+                            "event": { "type": "string" },
+                            "id": { "type": "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "MyStreamData": {
+                "type": "object",
+                "properties": {
+                  "message": { "type": "string" },
+                  "index": { "type": "integer", "format": "int32" }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Generates_Typed_IAsyncEnumerable_From_ItemSchema()
+    {
+        string generatedCode = await GenerateCode(OpenApi32Spec);
+        generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> MyStreamEndpoint(");
+        generatedCode.Should().Contain("public MyStreamData Data { get; set; }");
+    }
+
+    [Test]
+    [Category("Integration")]
+    public async Task Can_Build_Generated_Code_From_ItemSchema()
+    {
+        string generatedCode = await GenerateCode(OpenApi32Spec);
+        BuildHelper
+            .BuildCSharp(generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    private static async Task<string> GenerateCode(string spec)
+    {
+        string swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);
+        RefitGeneratorSettings settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile
+        };
+
+        RefitGenerator sut = await RefitGenerator.CreateAsync(settings);
+        return sut.Generate();
+    }
+}
