@@ -46,7 +46,11 @@ internal static class ItemSchemaSanitizer
         if (!ItemSchemaKeywords.Contains(property.Name) || !IsMediaTypeObject(property.Parent))
             return false;
 
+        // A schema given alongside itemSchema already describes the whole response, so it is kept
         var mediaType = (JObject)property.Parent!;
+        if (mediaType.ContainsKey("schema"))
+            return false;
+
         property.Remove();
         mediaType["schema"] = new JObject
         {

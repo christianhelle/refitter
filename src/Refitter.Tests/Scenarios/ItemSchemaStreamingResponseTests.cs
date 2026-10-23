@@ -83,6 +83,20 @@ public class ItemSchemaStreamingResponseTests
             .BeTrue();
     }
 
+    private static readonly string SchemaAndItemSchemaSpec = OpenApi32Spec.Replace(
+        "\"itemSchema\": {",
+        """
+        "schema": { "type": "array", "items": { "$ref": "#/components/schemas/MyStreamData" } },
+                                "itemSchema": {
+        """);
+
+    [Test]
+    public async Task Prefers_Schema_Over_ItemSchema()
+    {
+        string generatedCode = await GenerateCode(SchemaAndItemSchemaSpec);
+        generatedCode.Should().Contain("IAsyncEnumerable<MyStreamData> MyStreamEndpoint(");
+    }
+
     private static async Task<string> GenerateCode(string spec)
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);
