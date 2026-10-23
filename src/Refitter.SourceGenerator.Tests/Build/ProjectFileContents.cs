@@ -12,7 +12,7 @@ public static class ProjectFileContents
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""16.1.0"" />
-    <PackageReference Include=""System.Text.Json"" Version=""10.0.12"" />
+    <PackageReference Include=""System.Text.Json"" Version=""10.0.13"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""5.0.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
     <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.12"" />
@@ -41,7 +41,7 @@ public static class ProjectFileContents
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include=""Refit.HttpClientFactory"" Version=""16.1.0"" />
-    <PackageReference Include=""System.Text.Json"" Version=""10.0.12"" />
+    <PackageReference Include=""System.Text.Json"" Version=""10.0.13"" />
     <PackageReference Include=""System.ComponentModel.Annotations"" Version=""5.0.0"" />
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
     <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.12"" />
