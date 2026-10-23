@@ -143,6 +143,26 @@ public class ItemSchemaStreamingResponseTests
         generatedCode.Should().Contain("public MyStreamData Data { get; set; }");
     }
 
+    // A property named "content" is a schema, not a content map, so its "itemSchema" property is left alone
+    private static readonly string ContentPropertySpec = OpenApi32Spec.Replace(
+        "\"message\": { \"type\": \"string\" },",
+        """
+        "message": { "type": "string" },
+                          "content": {
+                            "type": "object",
+                            "properties": {
+                              "itemSchema": { "type": "string" }
+                            }
+                          },
+        """);
+
+    [Test]
+    public async Task Leaves_Schema_Properties_Named_ItemSchema_Untouched()
+    {
+        string generatedCode = await GenerateCode(ContentPropertySpec);
+        generatedCode.Should().Contain("public string ItemSchema { get; set; }");
+    }
+
     private static async Task<string> GenerateCode(string spec)
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);

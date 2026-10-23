@@ -61,11 +61,13 @@ internal static class ItemSchemaSanitizer
         return true;
     }
 
-    // A media type object is an entry of a "content" map, like "content": { "text/event-stream": { ... } }
+    // A media type object is an entry of a "content" map, like "content": { "text/event-stream": { ... } }.
+    // A schema property called "content" is itself an entry of "properties", so its value is a schema instead.
     private static bool IsMediaTypeObject(JContainer? container) =>
         container is JObject &&
         container.Parent is JProperty &&
-        container.Parent.Parent?.Parent is JProperty { Name: "content" };
+        container.Parent.Parent?.Parent is JProperty { Name: "content" } content &&
+        !NamedMapEntries.IsEntry(content);
 
     // Numbers are read as decimals so that re-serializing keeps them exact. Only a document with a number
     // outside the decimal range falls back to doubles, the way NumericBoundsSanitizer reads documents.
