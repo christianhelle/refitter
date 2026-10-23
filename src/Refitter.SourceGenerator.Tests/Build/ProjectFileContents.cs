@@ -17,7 +17,7 @@ public static class ProjectFileContents
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
     <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.13"" />
     <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.13"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.11.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.13"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
     <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
@@ -46,7 +46,7 @@ public static class ProjectFileContents
     <PackageReference Include=""System.Runtime.Serialization.Primitives"" Version=""4.3.0"" />
     <PackageReference Include=""Microsoft.Extensions.DependencyInjection"" Version=""10.0.13"" />
     <PackageReference Include=""Microsoft.Extensions.Http.Polly"" Version=""10.0.13"" />
-    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.10.0"" />
+    <PackageReference Include=""Microsoft.Extensions.Http.Resilience"" Version=""10.11.0"" />
     <PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""10.0.13"" />
     <PackageReference Include=""Polly.Contrib.WaitAndRetry"" Version=""1.1.1"" />
     <PackageReference Include=""System.Reactive"" Version=""7.0.0"" />
