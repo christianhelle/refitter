@@ -50,7 +50,7 @@ To use the package, install `Refitter.MSBuild`
 
 ```xml
 <ItemGroup>
-    <PackageReference Include="Refitter.MSBuild" Version="1.6.3" />
+    <PackageReference Include="Refitter.MSBuild" Version="2.3.1" />
 </ItemGroup>
 ```
 
