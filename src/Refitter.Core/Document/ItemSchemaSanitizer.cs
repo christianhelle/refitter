@@ -8,15 +8,22 @@ namespace Refitter.Core;
 /// OpenAPI 3.2 describes each item of a sequential media type, like <c>text/event-stream</c>, with
 /// <c>itemSchema</c> on the media type object. NSwag only reads <c>schema</c>, so the item type is dropped and
 /// streaming responses fall back to <c>object</c>. This rewrites <c>itemSchema</c> to a <c>schema</c> holding an
-/// array of those items in a JSON document before NSwag parses it.
+/// array of those items in a JSON document before NSwag parses it. Documents written as OpenAPI 3.1 carry the
+/// same schema in the <c>x-oai-itemSchema</c> extension.
 /// </summary>
 internal static class ItemSchemaSanitizer
 {
+    private static readonly HashSet<string> ItemSchemaKeywords = new(StringComparer.Ordinal)
+    {
+        "itemSchema",
+        "x-oai-itemSchema",
+    };
+
     // A cheap text scan that finds candidate objects, so that documents without them
     // are returned untouched instead of being parsed and re-serialized. A \u escape could spell
     // a property name the scan cannot see, so documents with one are always parsed.
     private static readonly Regex CandidateRegex = new(
-        @"""itemSchema""\s*:|\\u",
+        @"""(?:x-oai-)?itemSchema""\s*:|\\u",
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(5));
 
@@ -36,7 +43,7 @@ internal static class ItemSchemaSanitizer
 
     private static bool TryConvert(JProperty property)
     {
-        if (property.Name != "itemSchema" || !IsMediaTypeObject(property.Parent))
+        if (!ItemSchemaKeywords.Contains(property.Name) || !IsMediaTypeObject(property.Parent))
             return false;
 
         var mediaType = (JObject)property.Parent!;

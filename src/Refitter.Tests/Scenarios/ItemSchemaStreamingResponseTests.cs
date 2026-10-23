@@ -51,19 +51,32 @@ public class ItemSchemaStreamingResponseTests
         }
         """;
 
-    [Test]
-    public async Task Generates_Typed_IAsyncEnumerable_From_ItemSchema()
+    // OpenAPI 3.1 has no itemSchema, so Microsoft.OpenApi writes it as an extension
+    private static readonly string OpenApi31Spec = OpenApi32Spec
+        .Replace("\"3.2.0\"", "\"3.1.0\"")
+        .Replace("\"itemSchema\"", "\"x-oai-itemSchema\"");
+
+    public static IEnumerable<string> Specs()
     {
-        string generatedCode = await GenerateCode(OpenApi32Spec);
+        yield return OpenApi32Spec;
+        yield return OpenApi31Spec;
+    }
+
+    [Test]
+    [MethodDataSource(nameof(Specs))]
+    public async Task Generates_Typed_IAsyncEnumerable_From_ItemSchema(string spec)
+    {
+        string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> MyStreamEndpoint(");
         generatedCode.Should().Contain("public MyStreamData Data { get; set; }");
     }
 
     [Test]
     [Category("Integration")]
-    public async Task Can_Build_Generated_Code_From_ItemSchema()
+    [MethodDataSource(nameof(Specs))]
+    public async Task Can_Build_Generated_Code_From_ItemSchema(string spec)
     {
-        string generatedCode = await GenerateCode(OpenApi32Spec);
+        string generatedCode = await GenerateCode(spec);
         BuildHelper
             .BuildCSharp(generatedCode)
             .Should()
