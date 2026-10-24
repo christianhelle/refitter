@@ -116,6 +116,48 @@ public class ItemSchemaStreamingResponseTests
         generatedCode.Should().Contain("IAsyncEnumerable<object> MyStreamEndpoint(");
     }
 
+    private static readonly string ParameterizedEventStreamSpec = OpenApi32Spec.Replace(
+        "\"text/event-stream\"",
+        "\"text/event-stream; charset=utf-8\"");
+
+    [Test]
+    public async Task Uses_Event_Data_As_Item_Type_For_Parameterized_Event_Stream()
+    {
+        string generatedCode = await GenerateCode(ParameterizedEventStreamSpec);
+        generatedCode.Should().Contain("IAsyncEnumerable<MyStreamData> MyStreamEndpoint(");
+    }
+
+    // A reference can point into an array, like the first entry of an allOf
+    private static readonly string ArrayPointerSpec = OpenApi32Spec
+        .Replace(
+            "\"$ref\": \"#/components/schemas/MyStreamData\"",
+            "\"$ref\": \"#/components/schemas/Payload/allOf/0\"")
+        .Replace(
+            "\"schemas\": {",
+            """
+            "schemas": {
+                          "Payload": { "allOf": [ { "$ref": "#/components/schemas/MyStreamData" } ] },
+            """);
+
+    [Test]
+    public async Task Resolves_Event_Data_Reference_Into_An_Array()
+    {
+        // NSwag names the item type after the component that holds the array
+        string generatedCode = await GenerateCode(ArrayPointerSpec);
+        generatedCode.Should().Contain("IAsyncEnumerable<Payload> MyStreamEndpoint(");
+    }
+
+    private static readonly string ArrayPointerOutOfRangeSpec = ArrayPointerSpec.Replace(
+        "#/components/schemas/Payload/allOf/0",
+        "#/components/schemas/Payload/allOf/1");
+
+    [Test]
+    public async Task Ignores_ItemSchema_With_Reference_Past_The_End_Of_An_Array()
+    {
+        string generatedCode = await GenerateCode(ArrayPointerOutOfRangeSpec);
+        generatedCode.Should().Contain("IAsyncEnumerable<object> MyStreamEndpoint(");
+    }
+
     // A boolean schema allows any item, so there is no item type to generate
     private const string BooleanItemSchemaSpec = """
         {
