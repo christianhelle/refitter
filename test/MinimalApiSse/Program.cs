@@ -9,9 +9,10 @@ var app = builder.Build();
 
 app.MapGet(
         "/",
-        () => TypedResults.ServerSentEvents(
-            Enumerable.Range(0, 10).ToAsyncEnumerable().Select(x => new MyStreamData("Hello World!", x))
-        )
+        () =>
+            TypedResults.ServerSentEvents(
+                Enumerable.Range(0, 10).ToAsyncEnumerable().Select(x => new MyStreamData("Hello World!", x))
+            )
     )
     .WithName("MyStreamEndpoint");
 
