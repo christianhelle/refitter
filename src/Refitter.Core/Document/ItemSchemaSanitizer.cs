@@ -15,6 +15,10 @@ namespace Refitter.Core;
 /// <c>id</c> fields, but Refit deserializes only the <c>data</c> of each event. Its <c>data</c> schema is the
 /// item type for those responses.
 /// </para>
+/// <para>
+/// An item schema that references a component missing from the document is left alone, so the document still
+/// loads with an untyped stream instead of failing on the reference.
+/// </para>
 /// </summary>
 internal static class ItemSchemaSanitizer
 {
@@ -61,6 +65,9 @@ internal static class ItemSchemaSanitizer
             ? data
             : property.Value;
 
+        if (HasUnresolvedLocalReference(itemSchema))
+            return false;
+
         property.Remove();
         mediaType["schema"] = new JObject
         {
@@ -69,6 +76,38 @@ internal static class ItemSchemaSanitizer
         };
 
         return true;
+    }
+
+    private static bool HasUnresolvedLocalReference(JToken schema) =>
+        schema is JContainer container &&
+        container
+            .Descendants()
+            .OfType<JProperty>()
+            .Any(property =>
+                property.Name == "$ref" &&
+                property.Value.Type == JTokenType.String &&
+                ((string)property.Value!).StartsWith("#/", StringComparison.Ordinal) &&
+                ResolvePointer(schema.Root, ((string)property.Value!).Substring(1)) is null);
+
+    // Resolves a JSON pointer like /components/schemas/Pet against the document
+    private static JToken? ResolvePointer(JToken root, string pointer)
+    {
+        JToken? current = root;
+        foreach (var segment in pointer.Split('/').Skip(1))
+        {
+            var name = Uri.UnescapeDataString(segment).Replace("~1", "/").Replace("~0", "~");
+            current = current switch
+            {
+                JObject obj => obj[name],
+                JArray array when int.TryParse(name, out var index) && index >= 0 && index < array.Count => array[index],
+                _ => null,
+            };
+
+            if (current is null)
+                return null;
+        }
+
+        return current;
     }
 
     private static bool IsServerSentEvents(string mediaTypeName)

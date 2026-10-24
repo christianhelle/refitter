@@ -104,6 +104,18 @@ public class ItemSchemaStreamingResponseTests
         generatedCode.Should().Contain("public MyStreamData Payload { get; set; }");
     }
 
+    // ASP.NET Core 11 can reference an event data schema it never adds to the components
+    private static readonly string UnresolvedReferenceSpec = OpenApi32Spec.Replace(
+        "#/components/schemas/MyStreamData",
+        "#/components/schemas/Missing");
+
+    [Test]
+    public async Task Ignores_ItemSchema_With_Unresolved_Reference()
+    {
+        string generatedCode = await GenerateCode(UnresolvedReferenceSpec);
+        generatedCode.Should().Contain("IAsyncEnumerable<object> MyStreamEndpoint(");
+    }
+
     private static readonly string SchemaAndItemSchemaSpec = OpenApi32Spec.Replace(
         "\"itemSchema\": {",
         """
