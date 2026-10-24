@@ -64,11 +64,10 @@ public class ItemSchemaStreamingResponseTests
 
     [Test]
     [MethodDataSource(nameof(Specs))]
-    public async Task Generates_Typed_IAsyncEnumerable_From_ItemSchema(string spec)
+    public async Task Uses_Event_Data_As_Item_Type_For_Server_Sent_Events(string spec)
     {
         string generatedCode = await GenerateCode(spec);
-        generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> MyStreamEndpoint(");
-        generatedCode.Should().Contain("public MyStreamData Data { get; set; }");
+        generatedCode.Should().Contain("IAsyncEnumerable<MyStreamData> MyStreamEndpoint(");
     }
 
     [Test]
@@ -146,12 +145,11 @@ public class ItemSchemaStreamingResponseTests
         """;
 
     [Test]
-    public async Task Generates_Typed_IAsyncEnumerable_From_Yaml_ItemSchema()
+    public async Task Uses_Event_Data_As_Item_Type_For_Yaml_Server_Sent_Events()
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApi32YamlSpec);
         string generatedCode = await GenerateCodeFromFile(swaggerFile);
-        generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> MyStreamEndpoint(");
-        generatedCode.Should().Contain("public MyStreamData Data { get; set; }");
+        generatedCode.Should().Contain("IAsyncEnumerable<MyStreamData> MyStreamEndpoint(");
     }
 
     // A property named "content" is a schema, not a content map, so its "itemSchema" property is left alone

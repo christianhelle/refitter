@@ -10,6 +10,11 @@ namespace Refitter.Core;
 /// streaming responses fall back to <c>object</c>. This rewrites <c>itemSchema</c> to a <c>schema</c> holding an
 /// array of those items in a JSON document before NSwag parses it. Documents written as OpenAPI 3.1 carry the
 /// same schema in the <c>x-oai-itemSchema</c> extension.
+/// <para>
+/// The item schema of <c>text/event-stream</c> describes a whole event, with <c>data</c>, <c>event</c> and
+/// <c>id</c> fields, but Refit deserializes only the <c>data</c> of each event. Its <c>data</c> schema is the
+/// item type for those responses.
+/// </para>
 /// </summary>
 internal static class ItemSchemaSanitizer
 {
@@ -51,14 +56,29 @@ internal static class ItemSchemaSanitizer
         if (mediaType.ContainsKey("schema"))
             return false;
 
+        var mediaTypeName = ((JProperty)mediaType.Parent!).Name;
+        var itemSchema = IsServerSentEvents(mediaTypeName) && property.Value["properties"]?["data"] is JObject data
+            ? data
+            : property.Value;
+
         property.Remove();
         mediaType["schema"] = new JObject
         {
             ["type"] = "array",
-            ["items"] = property.Value,
+            ["items"] = itemSchema,
         };
 
         return true;
+    }
+
+    private static bool IsServerSentEvents(string mediaTypeName)
+    {
+        var separatorIndex = mediaTypeName.IndexOf(';');
+        var mediaType = separatorIndex >= 0
+            ? mediaTypeName.Substring(0, separatorIndex)
+            : mediaTypeName;
+
+        return string.Equals(mediaType.Trim(), "text/event-stream", StringComparison.OrdinalIgnoreCase);
     }
 
     // A media type object is an entry of a "content" map, like "content": { "text/event-stream": { ... } }.
