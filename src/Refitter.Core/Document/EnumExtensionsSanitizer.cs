@@ -28,27 +28,15 @@ internal static class EnumExtensionsSanitizer
         "x-enum-varnames",
     };
 
-    // A cheap text scan that finds candidate objects, so that documents without them
-    // are returned untouched instead of being parsed and re-serialized. A \u escape could spell
-    // a property name the scan cannot see, so documents with one are always parsed.
+    // Finds candidate objects. A \u escape could spell a property name the scan cannot see,
+    // so documents with one are always parsed.
     private static readonly Regex CandidateRegex = new(
         @"""x-enum(?:Descriptions|-descriptions|Names|-names|-varnames)""\s*:\s*\{|\\u",
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(5));
 
-    public static string Sanitize(string json)
-    {
-        if (!CandidateRegex.IsMatch(json))
-            return json;
-
-        var document = SanitizerJson.Parse(json);
-
-        var converted = false;
-        foreach (var property in document.Descendants().OfType<JProperty>().ToList())
-            converted |= TryConvert(property);
-
-        return converted ? document.ToString(Formatting.None) : json;
-    }
+    public static string Sanitize(string json) =>
+        SanitizerJson.Rewrite(json, CandidateRegex, TryConvert);
 
     private static bool TryConvert(JProperty property)
     {
