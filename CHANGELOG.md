@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- Support OpenAPI 3.2 itemSchema for streaming responses ([#1355](https://github.com/christianhelle/refitter/pull/1355)) ([@christianhelle](https://github.com/christianhelle/))
 - Update NuGet packages ([#1353](https://github.com/christianhelle/refitter/pull/1353)) ([@christianhelle](https://github.com/christianhelle/))
 - Generate changelog with chlogr ([#1352](https://github.com/christianhelle/refitter/pull/1352)) ([@christianhelle](https://github.com/christianhelle/))
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
