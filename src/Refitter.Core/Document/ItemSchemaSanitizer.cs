@@ -39,11 +39,14 @@ internal static class ItemSchemaSanitizer
 
     private static bool TryConvert(JProperty property)
     {
-        if (!ItemSchemaKeywords.Contains(property.Name) || !IsMediaTypeObject(property.Parent))
+        if (!ItemSchemaKeywords.Contains(property.Name))
+            return false;
+
+        var mediaType = (JObject)property.Parent!;
+        if (!IsMediaTypeObject(mediaType))
             return false;
 
         // A schema given alongside itemSchema already describes the whole response, so it is kept
-        var mediaType = (JObject)property.Parent!;
         if (mediaType.ContainsKey("schema"))
             return false;
 
@@ -90,9 +93,8 @@ internal static class ItemSchemaSanitizer
             : null;
     }
 
-    private static bool HasUnresolvedLocalReference(JToken schema) =>
-        schema is JContainer container &&
-        container
+    private static bool HasUnresolvedLocalReference(JObject schema) =>
+        schema
             .Descendants()
             .OfType<JProperty>()
             .Any(property =>
@@ -134,9 +136,8 @@ internal static class ItemSchemaSanitizer
 
     // A media type object is an entry of a "content" map, like "content": { "text/event-stream": { ... } }.
     // A schema property called "content" is itself an entry of "properties", so its value is a schema instead.
-    private static bool IsMediaTypeObject(JContainer? container) =>
-        container is JObject &&
-        container.Parent is JProperty &&
-        container.Parent.Parent?.Parent is JProperty { Name: "content" } content &&
+    private static bool IsMediaTypeObject(JObject mediaType) =>
+        mediaType.Parent is JProperty entry &&
+        entry.Parent?.Parent is JProperty { Name: "content" } content &&
         !NamedMapEntries.IsEntry(content);
 }
