@@ -93,6 +93,17 @@ public class ItemSchemaStreamingResponseTests
         generatedCode.Should().Contain("public MyStreamData Data { get; set; }");
     }
 
+    // Without a data field the event shape is unknown, so the item schema itself is the item type
+    private static readonly string EventsWithoutDataSpec = OpenApi32Spec.Replace("\"data\"", "\"payload\"");
+
+    [Test]
+    public async Task Uses_ItemSchema_As_Item_Type_For_Server_Sent_Events_Without_Data()
+    {
+        string generatedCode = await GenerateCode(EventsWithoutDataSpec);
+        generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> MyStreamEndpoint(");
+        generatedCode.Should().Contain("public MyStreamData Payload { get; set; }");
+    }
+
     private static readonly string SchemaAndItemSchemaSpec = OpenApi32Spec.Replace(
         "\"itemSchema\": {",
         """
