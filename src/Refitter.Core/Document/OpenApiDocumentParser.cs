@@ -62,7 +62,7 @@ internal static class OpenApiDocumentParser
     }
 
     private static string Sanitize(string json) =>
-        EnumExtensionsSanitizer.Sanitize(NumericBoundsSanitizer.Sanitize(json));
+        ItemSchemaSanitizer.Sanitize(EnumExtensionsSanitizer.Sanitize(NumericBoundsSanitizer.Sanitize(json)));
 
     private sealed class SanitizingJsonReferenceResolver(JsonSchemaAppender schemaAppender)
         : JsonReferenceResolver(schemaAppender)
