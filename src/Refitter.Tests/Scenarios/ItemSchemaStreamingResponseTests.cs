@@ -83,6 +83,17 @@ public class ItemSchemaStreamingResponseTests
             .BeTrue();
     }
 
+    // Each JSON line is a whole item, so the item schema itself is the stream's item type
+    private static readonly string JsonLinesSpec = OpenApi32Spec.Replace("text/event-stream", "application/jsonl");
+
+    [Test]
+    public async Task Uses_ItemSchema_As_Item_Type_For_Json_Lines()
+    {
+        string generatedCode = await GenerateCode(JsonLinesSpec);
+        generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> MyStreamEndpoint(");
+        generatedCode.Should().Contain("public MyStreamData Data { get; set; }");
+    }
+
     private static readonly string SchemaAndItemSchemaSpec = OpenApi32Spec.Replace(
         "\"itemSchema\": {",
         """
