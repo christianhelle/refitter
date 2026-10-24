@@ -6,10 +6,39 @@
 using FastEndpoints;
 using FastEndpoints.OpenApi;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder();
 builder.Services.AddFastEndpoints();
-builder.Services.OpenApiDocument();
+builder.Services.OpenApiDocument(o =>
+{
+    o.ConfigureOpenApi = api =>
+    {
+        api.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+
+        api.AddOperationTransformer(
+            (operation, context, ct) =>
+            {
+                if (operation.Responses is null)
+                    return Task.CompletedTask;
+
+                foreach (var response in operation.Responses.Values)
+                {
+                    if (
+                        response.Content?.TryGetValue("text/event-stream", out var content) == true
+                        && content is OpenApiMediaType { ItemSchema: { } itemSchema } mediaType
+                    )
+                    {
+                        mediaType.Schema ??= itemSchema;
+                        mediaType.ItemSchema = null;
+                    }
+                }
+
+                return Task.CompletedTask;
+            }
+        );
+    };
+});
 
 var app = builder.Build();
 
@@ -20,8 +49,7 @@ await app.RunAsync();
 
 public record MyStreamData(string Message, int Index);
 
-public sealed class MyStreamEndpoint
-    : EndpointWithoutRequest<ServerSentEventsResult<MyStreamData>>
+public sealed class MyStreamEndpoint : EndpointWithoutRequest<ServerSentEventsResult<MyStreamData>>
 {
     public override void Configure()
     {
@@ -31,6 +59,10 @@ public sealed class MyStreamEndpoint
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        await Send.ResultAsync(TypedResults.ServerSentEvents(Enumerable.Range(0, 10).ToAsyncEnumerable().Select(x => new MyStreamData("Hello World!", x))));
+        await Send.ResultAsync(
+            TypedResults.ServerSentEvents(
+                Enumerable.Range(0, 10).ToAsyncEnumerable().Select(x => new MyStreamData("Hello World!", x))
+            )
+        );
     }
 }
