@@ -88,6 +88,47 @@ public class ItemSchemaSanitizerTests
         mediaType["schema"]!["type"]!.Value<string>().Should().Be("array");
     }
 
+    // A link's requestBody and parameters are literal values, so nothing under a links map is a media type
+    [Test]
+    [Arguments("requestBody")]
+    [Arguments("parameters")]
+    public void Leaves_Content_Map_Inside_A_Link_Untouched(string field)
+    {
+        var json = $$"""
+            {
+              "responses": {
+                "200": {
+                  "links": {
+                    "next": {
+                      "operationId": "getEvents",
+                      "{{field}}": { "content": { "text/event-stream": { "itemSchema": { "type": "string" } } } }
+                    }
+                  }
+                }
+              }
+            }
+            """;
+
+        ItemSchemaSanitizer.Sanitize(json).Should().Be(json);
+    }
+
+    [Test]
+    public void Converts_ItemSchema_Of_Request_Body()
+    {
+        var json = """
+            {
+              "requestBody": {
+                "content": { "text/event-stream": { "itemSchema": { "type": "object" } } }
+              }
+            }
+            """;
+
+        var result = JObject.Parse(ItemSchemaSanitizer.Sanitize(json));
+
+        result["requestBody"]!["content"]!["text/event-stream"]!["schema"]!["type"]!.Value<string>()
+            .Should().Be("array");
+    }
+
     [Test]
     public void Leaves_Content_Map_Inside_A_Named_Example_Value_Untouched()
     {

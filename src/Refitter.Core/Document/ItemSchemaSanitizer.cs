@@ -27,7 +27,8 @@ internal static class ItemSchemaSanitizer
         "x-oai-itemSchema",
     };
 
-    // Keywords whose values are literal JSON, like example payloads, so nothing inside them is OpenAPI
+    // Keywords whose values hold no media types, like example payloads and other literal JSON. A link's
+    // requestBody and parameters are literal values too, and nothing else under a links map is a media type.
     private static readonly HashSet<string> LiteralValueKeywords = new(StringComparer.Ordinal)
     {
         "example",
@@ -38,6 +39,7 @@ internal static class ItemSchemaSanitizer
         "value",
         "dataValue",
         "serializedValue",
+        "links",
     };
 
     // Finds candidate objects. A \u escape could spell a property name the scan cannot see,
@@ -149,7 +151,7 @@ internal static class ItemSchemaSanitizer
 
     // A media type object is an entry of a "content" map, like "content": { "text/event-stream": { ... } }.
     // A schema property called "content" is itself an entry of "properties", so its value is a schema instead,
-    // and a "content" inside an example or extension value is only data.
+    // and a "content" inside an example, link or extension value is only data.
     private static bool IsMediaTypeObject(JObject mediaType) =>
         mediaType.Parent is JProperty entry &&
         entry.Parent?.Parent is JProperty { Name: "content" } content &&
