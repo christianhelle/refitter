@@ -27,6 +27,19 @@ internal static class ItemSchemaSanitizer
         "x-oai-itemSchema",
     };
 
+    // Keywords whose values are literal JSON, like example payloads, so nothing inside them is OpenAPI
+    private static readonly HashSet<string> LiteralValueKeywords = new(StringComparer.Ordinal)
+    {
+        "example",
+        "examples",
+        "default",
+        "const",
+        "enum",
+        "value",
+        "dataValue",
+        "serializedValue",
+    };
+
     // Finds candidate objects. A \u escape could spell a property name the scan cannot see,
     // so documents with one are always parsed.
     private static readonly Regex CandidateRegex = new(
@@ -135,9 +148,19 @@ internal static class ItemSchemaSanitizer
     }
 
     // A media type object is an entry of a "content" map, like "content": { "text/event-stream": { ... } }.
-    // A schema property called "content" is itself an entry of "properties", so its value is a schema instead.
+    // A schema property called "content" is itself an entry of "properties", so its value is a schema instead,
+    // and a "content" inside an example or extension value is only data.
     private static bool IsMediaTypeObject(JObject mediaType) =>
         mediaType.Parent is JProperty entry &&
         entry.Parent?.Parent is JProperty { Name: "content" } content &&
-        !NamedMapEntries.IsEntry(content);
+        !NamedMapEntries.IsEntry(content) &&
+        !IsInsideLiteralValue(content);
+
+    private static bool IsInsideLiteralValue(JToken token) =>
+        token
+            .Ancestors()
+            .OfType<JProperty>()
+            .Any(ancestor =>
+                (LiteralValueKeywords.Contains(ancestor.Name) || ancestor.Name.StartsWith("x-", StringComparison.Ordinal)) &&
+                !NamedMapEntries.IsEntry(ancestor));
 }
