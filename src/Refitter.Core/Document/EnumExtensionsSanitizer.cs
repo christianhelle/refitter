@@ -41,7 +41,7 @@ internal static class EnumExtensionsSanitizer
         if (!CandidateRegex.IsMatch(json))
             return json;
 
-        var document = Parse(json);
+        var document = SanitizerJson.Parse(json);
 
         var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
@@ -74,32 +74,6 @@ internal static class EnumExtensionsSanitizer
         }
 
         return true;
-    }
-
-    // Numbers are read as decimals so that re-serializing keeps them exact. Only a document with a number
-    // outside the decimal range falls back to doubles, the way NumericBoundsSanitizer reads documents.
-    private static JContainer Parse(string json)
-    {
-        try
-        {
-            return Parse(json, FloatParseHandling.Decimal);
-        }
-        catch (JsonReaderException)
-        {
-            return Parse(json, FloatParseHandling.Double);
-        }
-    }
-
-    private static JContainer Parse(string json, FloatParseHandling floatParseHandling)
-    {
-        using var reader = new JsonTextReader(new StringReader(json))
-        {
-            DateParseHandling = DateParseHandling.None,
-            FloatParseHandling = floatParseHandling,
-        };
-
-        // The candidate scan only matches a property name, so the root is an object or array
-        return (JContainer)JToken.ReadFrom(reader);
     }
 
     private static JToken? FindEntry(JObject valuesByKey, JToken value)
