@@ -2,6 +2,8 @@
 #:package Microsoft.AspNetCore.OpenApi@11.0.0-rc.2.26504.105
 #:property PublishAot=false
 
+using MinimalApiSse;
+
 var builder = WebApplication.CreateBuilder();
 builder.Services.AddOpenApi();
 
@@ -20,4 +22,7 @@ app.MapOpenApi();
 
 await app.RunAsync();
 
-public record MyStreamData(string Message, int Index);
+namespace MinimalApiSse
+{
+    public record MyStreamData(string Message, int Index);
+}

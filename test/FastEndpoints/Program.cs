@@ -25,7 +25,8 @@ builder.Services.OpenApiDocument(o =>
                 foreach (var response in operation.Responses.Values)
                 {
                     if (
-                        response.Content?.TryGetValue("text/event-stream", out var content) == true
+                        response.Content is { } contents
+                        && contents.TryGetValue("text/event-stream", out var content)
                         && content is OpenApiMediaType { ItemSchema: { } itemSchema } mediaType
                     )
                     {
@@ -47,22 +48,25 @@ app.MapOpenApi();
 
 await app.RunAsync();
 
-public record MyStreamData(string Message, int Index);
-
-public sealed class MyStreamEndpoint : EndpointWithoutRequest<ServerSentEventsResult<MyStreamData>>
+namespace FastEndpointsSample
 {
-    public override void Configure()
-    {
-        Get("/");
-        AllowAnonymous();
-    }
+    public record MyStreamData(string Message, int Index);
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public sealed class MyStreamEndpoint : EndpointWithoutRequest<ServerSentEventsResult<MyStreamData>>
     {
-        await Send.ResultAsync(
-            TypedResults.ServerSentEvents(
-                Enumerable.Range(0, 10).ToAsyncEnumerable().Select(x => new MyStreamData("Hello World!", x))
-            )
-        );
+        public override void Configure()
+        {
+            Get("/");
+            AllowAnonymous();
+        }
+
+        public override async Task HandleAsync(CancellationToken ct)
+        {
+            await Send.ResultAsync(
+                TypedResults.ServerSentEvents(
+                    Enumerable.Range(0, 10).ToAsyncEnumerable().Select(x => new MyStreamData("Hello World!", x))
+                )
+            );
+        }
     }
 }
