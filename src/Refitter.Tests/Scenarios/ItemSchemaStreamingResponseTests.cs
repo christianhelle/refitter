@@ -146,6 +146,68 @@ public class ItemSchemaStreamingResponseTests
         generatedCode.Should().Contain("IAsyncEnumerable<object> MyStreamEndpoint(");
     }
 
+    // The event envelope can be a component of its own, possibly behind another reference
+    private const string ReferencedEnvelopeSpec = """
+        {
+          "openapi": "3.2.0",
+          "info": { "title": "Referenced envelope", "version": "1.0.0" },
+          "paths": {
+            "/": {
+              "get": {
+                "operationId": "MyStreamEndpoint",
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "content": {
+                      "text/event-stream": {
+                        "itemSchema": { "$ref": "#/components/schemas/EventAlias" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "EventAlias": { "$ref": "#/components/schemas/Event" },
+              "Event": {
+                "type": "object",
+                "properties": {
+                  "data": { "$ref": "#/components/schemas/MyStreamData" },
+                  "event": { "type": "string" }
+                }
+              },
+              "MyStreamData": {
+                "type": "object",
+                "properties": {
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Uses_Event_Data_As_Item_Type_For_Referenced_Event_Envelope()
+    {
+        string generatedCode = await GenerateCode(ReferencedEnvelopeSpec);
+        generatedCode.Should().Contain("IAsyncEnumerable<MyStreamData> MyStreamEndpoint(");
+    }
+
+    // A reference cycle has no envelope to unwrap. Unwrapping must stop, leaving NSwag to report the cycle
+    private static readonly string ReferenceCycleSpec = ReferencedEnvelopeSpec.Replace(
+        "\"Event\": {",
+        "\"Event\": { \"$ref\": \"#/components/schemas/EventAlias\" },\n\"Unused\": {");
+
+    [Test]
+    public async Task Stops_Unwrapping_Referenced_Event_Envelope_Cycle()
+    {
+        Func<Task> act = () => GenerateCode(ReferenceCycleSpec);
+        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("*Cyclic references*");
+    }
+
     private static readonly string SchemaAndItemSchemaSpec = OpenApi32Spec.Replace(
         "\"itemSchema\": {",
         """

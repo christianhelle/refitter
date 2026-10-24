@@ -61,13 +61,13 @@ internal static class ItemSchemaSanitizer
             return false;
 
         // A boolean schema allows any item, so the stream stays untyped
-        if (property.Value is not JObject)
+        if (property.Value is not JObject envelope)
             return false;
 
         var mediaTypeName = ((JProperty)mediaType.Parent!).Name;
-        var itemSchema = IsServerSentEvents(mediaTypeName) && property.Value["properties"]?["data"] is JObject data
+        var itemSchema = IsServerSentEvents(mediaTypeName) && GetEventData(envelope) is { } data
             ? data
-            : property.Value;
+            : envelope;
 
         if (HasUnresolvedLocalReference(itemSchema))
             return false;
@@ -80,6 +80,27 @@ internal static class ItemSchemaSanitizer
         };
 
         return true;
+    }
+
+    // The event envelope can be a reference to a component, possibly through other references, so local
+    // references are followed to the envelope itself. A reference cycle has no envelope to unwrap.
+    private static JObject? GetEventData(JObject envelope)
+    {
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        JToken? schema = envelope;
+        while (schema is JObject { } reference && reference["$ref"] is JValue { Value: string path })
+        {
+            if (!path.StartsWith("#/", StringComparison.Ordinal) || !visited.Add(path))
+                return null;
+
+            schema = ResolvePointer(envelope.Root, path.Substring(1));
+        }
+
+        return schema is JObject { } resolved &&
+               resolved["properties"] is JObject properties &&
+               properties["data"] is JObject data
+            ? data
+            : null;
     }
 
     private static bool HasUnresolvedLocalReference(JToken schema) =>
