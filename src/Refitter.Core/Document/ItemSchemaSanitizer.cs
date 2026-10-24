@@ -1,0 +1,168 @@
+using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
+
+namespace Refitter.Core;
+
+/// <summary>
+/// OpenAPI 3.2 describes each item of a sequential media type, like <c>text/event-stream</c>, with
+/// <c>itemSchema</c> on the media type object. NSwag only reads <c>schema</c>, so the item type is dropped and
+/// streaming responses fall back to <c>object</c>. This rewrites <c>itemSchema</c> to a <c>schema</c> holding an
+/// array of those items in a JSON document before NSwag parses it. Documents written as OpenAPI 3.1 carry the
+/// same schema in the <c>x-oai-itemSchema</c> extension.
+/// <para>
+/// The item schema of <c>text/event-stream</c> describes a whole event, with <c>data</c>, <c>event</c> and
+/// <c>id</c> fields, but Refit deserializes only the <c>data</c> of each event. Its <c>data</c> schema is the
+/// item type for those responses.
+/// </para>
+/// <para>
+/// An item schema that references a component missing from the document is left alone, so the document still
+/// loads with an untyped stream instead of failing on the reference.
+/// </para>
+/// </summary>
+internal static class ItemSchemaSanitizer
+{
+    private static readonly HashSet<string> ItemSchemaKeywords = new(StringComparer.Ordinal)
+    {
+        "itemSchema",
+        "x-oai-itemSchema",
+    };
+
+    // Keywords whose values hold no media types, like example payloads and other literal JSON. A link's
+    // requestBody and parameters are literal values too, and nothing else under a links map is a media type.
+    private static readonly HashSet<string> LiteralValueKeywords = new(StringComparer.Ordinal)
+    {
+        "example",
+        "examples",
+        "default",
+        "const",
+        "enum",
+        "value",
+        "dataValue",
+        "serializedValue",
+        "links",
+    };
+
+    // Finds candidate objects. A \u escape could spell a property name the scan cannot see,
+    // so documents with one are always parsed.
+    private static readonly Regex CandidateRegex = new(
+        @"""(?:x-oai-)?itemSchema""\s*:|\\u",
+        RegexOptions.Compiled,
+        TimeSpan.FromSeconds(5));
+
+    public static string Sanitize(string json) =>
+        SanitizerJson.Rewrite(json, CandidateRegex, TryConvert);
+
+    private static bool TryConvert(JProperty property)
+    {
+        if (!ItemSchemaKeywords.Contains(property.Name))
+            return false;
+
+        var mediaType = (JObject)property.Parent!;
+        if (!IsMediaTypeObject(mediaType))
+            return false;
+
+        // A schema given alongside itemSchema already describes the whole response, so it is kept
+        if (mediaType.ContainsKey("schema"))
+            return false;
+
+        // A boolean schema allows any item, so the stream stays untyped
+        if (property.Value is not JObject envelope)
+            return false;
+
+        var mediaTypeName = ((JProperty)mediaType.Parent!).Name;
+        var itemSchema = IsServerSentEvents(mediaTypeName) && GetEventData(envelope) is { } data
+            ? data
+            : envelope;
+
+        if (HasUnresolvedLocalReference(itemSchema))
+            return false;
+
+        property.Remove();
+        mediaType["schema"] = new JObject
+        {
+            ["type"] = "array",
+            ["items"] = itemSchema,
+        };
+
+        return true;
+    }
+
+    // The event envelope can be a reference to a component, possibly through other references, so local
+    // references are followed to the envelope itself. A reference cycle has no envelope to unwrap.
+    private static JObject? GetEventData(JObject envelope)
+    {
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        JToken? schema = envelope;
+        while (schema is JObject { } reference && reference["$ref"] is JValue { Value: string path })
+        {
+            if (!path.StartsWith("#/", StringComparison.Ordinal) || !visited.Add(path))
+                return null;
+
+            schema = ResolvePointer(envelope.Root, path.Substring(1));
+        }
+
+        return schema is JObject { } resolved &&
+               resolved["properties"] is JObject properties &&
+               properties["data"] is JObject data
+            ? data
+            : null;
+    }
+
+    private static bool HasUnresolvedLocalReference(JObject schema) =>
+        schema
+            .Descendants()
+            .OfType<JProperty>()
+            .Any(property =>
+                property.Name == "$ref" &&
+                property.Value.Type == JTokenType.String &&
+                ((string)property.Value!).StartsWith("#/", StringComparison.Ordinal) &&
+                ResolvePointer(schema.Root, ((string)property.Value!).Substring(1)) is null);
+
+    // Resolves a JSON pointer like /components/schemas/Pet against the document
+    private static JToken? ResolvePointer(JToken root, string pointer)
+    {
+        JToken? current = root;
+        foreach (var segment in pointer.Split('/').Skip(1))
+        {
+            var name = Uri.UnescapeDataString(segment).Replace("~1", "/").Replace("~0", "~");
+            current = current switch
+            {
+                JObject obj => obj[name],
+                JArray array when int.TryParse(name, out var index) && index >= 0 && index < array.Count => array[index],
+                _ => null,
+            };
+
+            if (current is null)
+                return null;
+        }
+
+        return current;
+    }
+
+    private static bool IsServerSentEvents(string mediaTypeName)
+    {
+        var separatorIndex = mediaTypeName.IndexOf(';');
+        var mediaType = separatorIndex >= 0
+            ? mediaTypeName.Substring(0, separatorIndex)
+            : mediaTypeName;
+
+        return string.Equals(mediaType.Trim(), "text/event-stream", StringComparison.OrdinalIgnoreCase);
+    }
+
+    // A media type object is an entry of a "content" map, like "content": { "text/event-stream": { ... } }.
+    // A schema property called "content" is itself an entry of "properties", so its value is a schema instead,
+    // and a "content" inside an example, link or extension value is only data.
+    private static bool IsMediaTypeObject(JObject mediaType) =>
+        mediaType.Parent is JProperty &&
+        mediaType.Ancestors().ElementAtOrDefault(2) is JProperty { Name: "content" } content &&
+        !NamedMapEntries.IsEntry(content) &&
+        !IsInsideLiteralValue(content);
+
+    private static bool IsInsideLiteralValue(JToken token) =>
+        token
+            .Ancestors()
+            .OfType<JProperty>()
+            .Any(ancestor =>
+                (LiteralValueKeywords.Contains(ancestor.Name) || ancestor.Name.StartsWith("x-", StringComparison.Ordinal)) &&
+                !NamedMapEntries.IsEntry(ancestor));
+}

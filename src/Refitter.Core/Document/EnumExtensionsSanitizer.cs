@@ -28,52 +28,15 @@ internal static class EnumExtensionsSanitizer
         "x-enum-varnames",
     };
 
-    // OpenAPI and JSON Schema maps whose keys are user-chosen names
-    private static readonly HashSet<string> NamedMapKeywords = new(StringComparer.Ordinal)
-    {
-        "properties",
-        "patternProperties",
-        "dependentSchemas",
-        "definitions",
-        "$defs",
-        "schemas",
-        "responses",
-        "parameters",
-        "examples",
-        "requestBodies",
-        "headers",
-        "securitySchemes",
-        "securityDefinitions",
-        "links",
-        "callbacks",
-        "pathItems",
-        "webhooks",
-        "content",
-        "encoding",
-        "variables",
-    };
-
-    // A cheap text scan that finds candidate objects, so that documents without them
-    // are returned untouched instead of being parsed and re-serialized. A \u escape could spell
-    // a property name the scan cannot see, so documents with one are always parsed.
+    // Finds candidate objects. A \u escape could spell a property name the scan cannot see,
+    // so documents with one are always parsed.
     private static readonly Regex CandidateRegex = new(
         @"""x-enum(?:Descriptions|-descriptions|Names|-names|-varnames)""\s*:\s*\{|\\u",
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(5));
 
-    public static string Sanitize(string json)
-    {
-        if (!CandidateRegex.IsMatch(json))
-            return json;
-
-        var document = Parse(json);
-
-        var converted = false;
-        foreach (var property in document.Descendants().OfType<JProperty>().ToList())
-            converted |= TryConvert(property);
-
-        return converted ? document.ToString(Formatting.None) : json;
-    }
+    public static string Sanitize(string json) =>
+        SanitizerJson.Rewrite(json, CandidateRegex, TryConvert);
 
     private static bool TryConvert(JProperty property)
     {
@@ -82,7 +45,7 @@ internal static class EnumExtensionsSanitizer
             return false;
 
         // An entry of a named map (a schema, response, parameter, ...) that happens to be named like the extension
-        if (IsNamedMapEntry(property))
+        if (NamedMapEntries.IsEntry(property))
             return false;
 
         if (property.Parent!["enum"] is JArray enumValues)
@@ -99,39 +62,6 @@ internal static class EnumExtensionsSanitizer
         }
 
         return true;
-    }
-
-    // A property is an entry of a named map when its object is the value of a named map keyword. A keyword's
-    // name alone is not enough: a schema property called "responses" is itself an entry of "properties".
-    private static bool IsNamedMapEntry(JProperty property) =>
-        property.Parent!.Parent is JProperty map &&
-        NamedMapKeywords.Contains(map.Name) &&
-        !IsNamedMapEntry(map);
-
-    // Numbers are read as decimals so that re-serializing keeps them exact. Only a document with a number
-    // outside the decimal range falls back to doubles, the way NumericBoundsSanitizer reads documents.
-    private static JContainer Parse(string json)
-    {
-        try
-        {
-            return Parse(json, FloatParseHandling.Decimal);
-        }
-        catch (JsonReaderException)
-        {
-            return Parse(json, FloatParseHandling.Double);
-        }
-    }
-
-    private static JContainer Parse(string json, FloatParseHandling floatParseHandling)
-    {
-        using var reader = new JsonTextReader(new StringReader(json))
-        {
-            DateParseHandling = DateParseHandling.None,
-            FloatParseHandling = floatParseHandling,
-        };
-
-        // The candidate scan only matches a property name, so the root is an object or array
-        return (JContainer)JToken.ReadFrom(reader);
     }
 
     private static JToken? FindEntry(JObject valuesByKey, JToken value)

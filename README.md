@@ -968,6 +968,8 @@ Status: Sold
 
 Endpoints whose success response uses a streaming content type (`application/x-ndjson`, `application/jsonl`, `application/x-jsonlines`, or `text/event-stream`) generate an `IAsyncEnumerable<T>` return type by default so you can consume the response as a stream.
 
+The item type `T` comes from the media type's `schema`, or from the OpenAPI 3.2 `itemSchema` keyword (written as `x-oai-itemSchema` in OpenAPI 3.1 documents), which ASP.NET Core 11 uses to describe Server-Sent Events. When a media type has both, `schema` takes precedence. For `text/event-stream`, Refit deserializes the `data` field of each event, so `T` is the schema of the item's `data` property when it has one. An item schema that references a component missing from the document is ignored, and the operation returns `IAsyncEnumerable<object>`.
+
 Streaming is skipped when the schema is a primitive (`string`, `number`, `integer`, or `boolean`). Those operations use the normal configured return type instead. This avoids `IAsyncEnumerable<string>` for NDJSON bodies described as a raw string.
 
 Set `returnIAsyncEnumerable` to `false` (CLI: `--no-async-enumerable`) to skip `IAsyncEnumerable<T>` and use the normal configured return type (`Task<T>`, `IObservable<T>`, or `IApiResponse` wrapping). A `responseTypeOverride` for a streaming operation still takes precedence.
