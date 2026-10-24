@@ -60,6 +60,10 @@ internal static class ItemSchemaSanitizer
         if (mediaType.ContainsKey("schema"))
             return false;
 
+        // A boolean schema allows any item, so the stream stays untyped
+        if (property.Value is not JObject)
+            return false;
+
         var mediaTypeName = ((JProperty)mediaType.Parent!).Name;
         var itemSchema = IsServerSentEvents(mediaTypeName) && property.Value["properties"]?["data"] is JObject data
             ? data

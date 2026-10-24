@@ -116,6 +116,36 @@ public class ItemSchemaStreamingResponseTests
         generatedCode.Should().Contain("IAsyncEnumerable<object> MyStreamEndpoint(");
     }
 
+    // A boolean schema allows any item, so there is no item type to generate
+    private const string BooleanItemSchemaSpec = """
+        {
+          "openapi": "3.2.0",
+          "info": { "title": "Boolean item schema", "version": "1.0.0" },
+          "paths": {
+            "/": {
+              "get": {
+                "operationId": "MyStreamEndpoint",
+                "responses": {
+                  "200": {
+                    "description": "Success",
+                    "content": {
+                      "text/event-stream": { "itemSchema": true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [Test]
+    public async Task Uses_Object_For_Boolean_ItemSchema()
+    {
+        string generatedCode = await GenerateCode(BooleanItemSchemaSpec);
+        generatedCode.Should().Contain("IAsyncEnumerable<object> MyStreamEndpoint(");
+    }
+
     private static readonly string SchemaAndItemSchemaSpec = OpenApi32Spec.Replace(
         "\"itemSchema\": {",
         """
