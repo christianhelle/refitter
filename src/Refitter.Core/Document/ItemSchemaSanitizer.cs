@@ -153,8 +153,8 @@ internal static class ItemSchemaSanitizer
     // A schema property called "content" is itself an entry of "properties", so its value is a schema instead,
     // and a "content" inside an example, link or extension value is only data.
     private static bool IsMediaTypeObject(JObject mediaType) =>
-        mediaType.Parent is JProperty entry &&
-        entry.Parent?.Parent is JProperty { Name: "content" } content &&
+        mediaType.Parent is JProperty &&
+        mediaType.Ancestors().ElementAtOrDefault(2) is JProperty { Name: "content" } content &&
         !NamedMapEntries.IsEntry(content) &&
         !IsInsideLiteralValue(content);
 
