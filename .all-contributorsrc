@@ -1,6 +1,7 @@
 {
   "files": [
-    "README.md"
+    "README.md",
+    "docs/docfx_project/index.md"
   ],
   "imageSize": 100,
   "commit": false,
