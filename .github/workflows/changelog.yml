@@ -9,7 +9,9 @@ on:
       - '!src/**/*.csproj'
       - '!src/**/*.cs'
     branches:
-      - 'main' 
+      - 'main'
+    tags:
+      - '**'
 
 permissions:
   contents: read
@@ -18,12 +20,13 @@ permissions:
 
 jobs:
   changelog:
-    if: github.ref == 'refs/heads/main' && github.repository == 'christianhelle/refitter'
+    if: github.repository == 'christianhelle/refitter' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
     runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout repository
         uses: actions/checkout@v7
         with:
+          ref: main
           fetch-depth: 0
           token: ${{ secrets.PAT }}
       - name: Re-generate CHANGELOG.md
@@ -39,4 +42,4 @@ jobs:
           git config --global user.email "username@users.noreply.github.com"
           git add CHANGELOG.md
           git commit -m "Update changelog [skip ci]"
-          git push
+          git push origin HEAD:main
