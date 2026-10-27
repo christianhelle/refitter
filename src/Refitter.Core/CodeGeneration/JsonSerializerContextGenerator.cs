@@ -145,6 +145,7 @@ internal static class JsonSerializerContextGenerator
         $"_{propertyName}",
         $"Create_{propertyName}",
         $"{propertyName}PropInit",
+        $"{propertyName}CtorParamInit",
         $"{propertyName}SerializeHandler",
     ];
 
