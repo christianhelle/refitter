@@ -491,29 +491,6 @@ public class JsonSerializerContextGeneratorTests
 
     [Category("Integration")]
     [Test]
-    public void Generate_Builds_With_Type_Named_After_Constructor_Initializer_Of_Replacement()
-    {
-        const string contracts = """
-            namespace My.Contracts
-            {
-                public record Options(string Name);
-
-                public partial class OptionsTypeInfoCtorParamInit
-                {
-                    public string Name { get; set; }
-                }
-            }
-            """;
-
-        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
-
-        result.Should().Contain(
-            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo2\")]");
-        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
-    }
-
-    [Category("Integration")]
-    [Test]
     public void Generate_Builds_With_Generic_Registration_Named_Like_Replacement()
     {
         const string contracts = """
@@ -552,17 +529,19 @@ public class JsonSerializerContextGeneratorTests
 
     [Category("Integration")]
     [Test]
-    public void Generate_Builds_With_Type_Named_After_Generated_Helper_Of_Replacement()
+    [Arguments("_OptionsTypeInfo")]
+    [Arguments("Create_OptionsTypeInfo")]
+    [Arguments("OptionsTypeInfoPropInit")]
+    [Arguments("OptionsTypeInfoCtorParamInit")]
+    [Arguments("OptionsTypeInfoSerializeHandler")]
+    public void Generate_Builds_With_Type_Named_After_Generated_Helper_Of_Replacement(string typeName)
     {
-        const string contracts = """
+        var contracts = $$"""
             namespace My.Contracts
             {
-                public partial class Options
-                {
-                    public string Name { get; set; }
-                }
+                public record Options(string Name);
 
-                public partial class Create_OptionsTypeInfo
+                public partial class {{typeName}}
                 {
                     public string Name { get; set; }
                 }
