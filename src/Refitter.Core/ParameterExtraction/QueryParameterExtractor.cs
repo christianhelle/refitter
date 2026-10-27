@@ -3,9 +3,9 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal sealed class QueryParameterExtractor
+internal static class QueryParameterExtractor
 {
-    public (IReadOnlyList<string> Parameters, string? DynamicQuerystringCode) Extract(
+    public static (IReadOnlyList<string> Parameters, string? DynamicQuerystringCode) Extract(
         CSharpOperationModel operationModel,
         RefitGeneratorSettings settings,
         string dynamicQuerystringParameterType)
