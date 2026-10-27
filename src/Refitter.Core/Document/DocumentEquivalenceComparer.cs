@@ -148,7 +148,7 @@ internal sealed class DocumentEquivalenceComparer
     /// </summary>
     /// <param name="value">The value to serialize to JSON.</param>
     /// <returns>A JSON string representation of the value.</returns>
-    public string CreateOpenApiJson(object value)
+    public static string CreateOpenApiJson(object value)
         => value switch
         {
             OpenApiDocument document => document.ToJson(),

@@ -1495,7 +1495,7 @@ paths:
         => DocumentEquivalenceComparer.GetDefinitionName(schema);
 
     private static string InvokeCreateOpenApiJson(object value)
-        => Comparer.CreateOpenApiJson(value);
+        => DocumentEquivalenceComparer.CreateOpenApiJson(value);
 
     private static JObject InvokeRemoveNullProperties(JObject json)
         => DocumentEquivalenceComparer.RemoveNullProperties(json);
