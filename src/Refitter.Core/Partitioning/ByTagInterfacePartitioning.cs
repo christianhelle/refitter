@@ -44,7 +44,7 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
     public string GetDynamicQuerystringParameterType(string interfaceName, string methodName)
     {
         var prefix = interfaceName;
-        if (prefix.StartsWith("I"))
+        if (prefix.StartsWith('I'))
         {
             prefix = prefix.Substring(1);
         }

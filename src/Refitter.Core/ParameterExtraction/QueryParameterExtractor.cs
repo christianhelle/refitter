@@ -34,7 +34,7 @@ internal sealed class QueryParameterExtractor
             : null;
 
         var allNullable = queryParameters.All(p =>
-            ParameterTypeResolver.GetQueryParameterType(p, settings).EndsWith("?"));
+            ParameterTypeResolver.GetQueryParameterType(p, settings).EndsWith('?'));
 
         var dynamicQuerystringParameter = $"[Query] {dynamicQuerystringParameterType}";
         if (allNullable)
