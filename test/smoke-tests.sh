@@ -521,6 +521,11 @@ run_tests() {
     generate_from_settings_file "./multiple-sources.refitter"
     build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true
 
+    # Mastodon has a contract named Options that collides with JsonSerializerContext.Options
+    clean_generated_code
+    generate_from_settings_file "./mastodon.refitter"
+    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true
+
     clean_generated_code
     generate_from_settings_file "./Streaming/.refitter"
     build_solution "./Streaming/Streaming.csproj"

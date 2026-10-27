@@ -1,0 +1,17 @@
+{
+  "openApiPath": "./OpenAPI/v3.1/mastodon.json",
+  "namespace": "Mastodon",
+  "contractsNamespace": "Mastodon.Entities",
+  "silent": true,
+  "outputFolder": "GeneratedCode",
+  "contractsOutputFolder": "GeneratedCode",
+  "generateMultipleFiles": true,
+  "multipleInterfaces": "ByTag",
+  "useCancellationTokens": true,
+  "optionalParameters": true,
+  "generateJsonSerializerContext": true,
+  "generateDefaultAdditionalProperties": false,
+  "codeGeneratorSettings": {
+    "generateNullableReferenceTypes": true
+  }
+}

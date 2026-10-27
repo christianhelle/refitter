@@ -424,6 +424,168 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Test]
+    public void Generate_Renames_TypeInfo_Property_For_Type_Named_Options()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Options
+                {
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo\")]");
+    }
+
+    [Category("Integration")]
+    [Test]
+    public void Generate_Builds_With_Type_Named_Options()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Options
+                {
+                    public string Name { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
+    }
+
+    [Category("Integration")]
+    [Test]
+    public void Generate_Builds_With_Types_Named_Options_And_OptionsTypeInfo()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Options
+                {
+                    public string Name { get; set; }
+                }
+
+                public partial class OptionsTypeInfo
+                {
+                    public string Name { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo2\")]");
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(OptionsTypeInfo))]");
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
+    }
+
+    [Category("Integration")]
+    [Test]
+    public void Generate_Builds_With_Generic_Registration_Named_Like_Replacement()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Options
+                {
+                    public string Name { get; set; }
+                }
+
+                public partial class TypeInfo
+                {
+                    public string Name { get; set; }
+                }
+
+                public partial class Options<T>
+                {
+                    public T Value { get; set; }
+                }
+
+                public partial class Holder
+                {
+                    public Options<TypeInfo> Value { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options<TypeInfo>))]");
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo2\")]");
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
+    }
+
+    [Category("Integration")]
+    [Test]
+    [Arguments("_OptionsTypeInfo")]
+    [Arguments("Create_OptionsTypeInfo")]
+    [Arguments("OptionsTypeInfoPropInit")]
+    [Arguments("OptionsTypeInfoCtorParamInit")]
+    [Arguments("OptionsTypeInfoSerializeHandler")]
+    public void Generate_Builds_With_Type_Named_After_Generated_Helper_Of_Replacement(string typeName)
+    {
+        var contracts = $$"""
+            namespace My.Contracts
+            {
+                public record Options(string Name);
+
+                public partial class {{typeName}}
+                {
+                    public string Name { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo2\")]");
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
+    }
+
+    [Category("Integration")]
+    [Test]
+    [Arguments("Default")]
+    [Arguments("GetTypeInfo")]
+    [Arguments("GeneratedSerializerOptions")]
+    [Arguments("Equals")]
+    [Arguments("GetHashCode")]
+    [Arguments("GetType")]
+    [Arguments("ToString")]
+    [Arguments("GetRuntimeConverterForType")]
+    [Arguments("ExpandConverter")]
+    [Arguments("TryGetTypeInfoForRuntimeCustomConverter")]
+    [Arguments("GetConverterForNullableProperty")]
+    public void Generate_Builds_With_Type_Named_After_JsonSerializerContext_Member(string typeName)
+    {
+        var contracts = $$"""
+            namespace My.Contracts
+            {
+                public partial class {{typeName}}
+                {
+                    public string Name { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain($"TypeInfoPropertyName = \"{typeName}TypeInfo\"");
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
+    }
+
     private static RefitGeneratorSettings CreateSettings(
         string interfaceName = "IMyApi",
         string @namespace = "My.Clients",

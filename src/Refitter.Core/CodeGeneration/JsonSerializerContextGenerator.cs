@@ -35,9 +35,14 @@ internal static class JsonSerializerContextGenerator
 
         // Deprecated contracts are marked [Obsolete], and referencing them here would raise CS0612/CS0618
         sb.AppendLine("#pragma warning disable 612, 618");
+        var usedMemberNames = new HashSet<string>(
+            typeNames
+                .SelectMany(t => GetPossibleTypeInfoPropertyNames(SyntaxFactory.ParseTypeName(t)))
+                .SelectMany(GetGeneratedMemberNames),
+            StringComparer.Ordinal);
         foreach (var typeName in typeNames.OrderBy(t => t))
         {
-            sb.AppendLine($"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}))]");
+            sb.AppendLine(FormatJsonSerializableAttribute(typeName, usedMemberNames));
         }
 
         sb.AppendLine(
@@ -50,6 +55,108 @@ internal static class JsonSerializerContextGenerator
         return sb.ToString()
             .TrimEnd('\r', '\n');
     }
+
+    /// <summary>
+    /// Formats a JsonSerializable attribute, renaming the generated JsonTypeInfo property
+    /// when the default name would collide with a JsonSerializerContext member
+    /// </summary>
+    private static string FormatJsonSerializableAttribute(string typeName, HashSet<string> usedMemberNames)
+    {
+        var propertyName = GetDefaultTypeInfoPropertyName(typeName);
+        if (propertyName is null || !ReservedTypeInfoPropertyNames.Contains(propertyName))
+            return $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}))]";
+
+        var replacement = $"{propertyName}TypeInfo";
+        var suffix = 2;
+        while (GetGeneratedMemberNames(replacement).Any(usedMemberNames.Contains))
+        {
+            replacement = $"{propertyName}TypeInfo{suffix++}";
+        }
+
+        usedMemberNames.UnionWith(GetGeneratedMemberNames(replacement));
+
+        return $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}), TypeInfoPropertyName = \"{replacement}\")]";
+    }
+
+    /// <summary>
+    /// Gets the property name System.Text.Json would generate for a non-generic type, or null otherwise
+    /// </summary>
+    private static string? GetDefaultTypeInfoPropertyName(string typeName) =>
+        typeName.IndexOfAny(['<', '[', '?']) >= 0
+            ? null
+            : typeName.Substring(typeName.LastIndexOf('.') + 1);
+
+    /// <summary>
+    /// Gets the property names System.Text.Json may generate for a registered type.
+    /// Nullable types yield both forms, because only value types get a Nullable prefix.
+    /// </summary>
+    private static IEnumerable<string> GetPossibleTypeInfoPropertyNames(TypeSyntax typeSyntax) =>
+        typeSyntax switch
+        {
+            NullableTypeSyntax nullableType =>
+                GetPossibleTypeInfoPropertyNames(nullableType.ElementType)
+                    .SelectMany(name => new[] { name, $"Nullable{name}" }),
+            ArrayTypeSyntax arrayType =>
+                GetPossibleTypeInfoPropertyNames(arrayType.ElementType)
+                    .Select(name => name + string.Concat(
+                        arrayType.RankSpecifiers.Select(r => r.Rank == 1 ? "Array" : $"Array{r.Rank}D"))),
+            QualifiedNameSyntax qualifiedName => GetPossibleTypeInfoPropertyNames(qualifiedName.Right),
+            GenericNameSyntax genericName =>
+                genericName.TypeArgumentList.Arguments.Aggregate(
+                    (IEnumerable<string>)new[] { genericName.Identifier.Text },
+                    (prefixes, argument) => prefixes.SelectMany(
+                        prefix => GetPossibleTypeInfoPropertyNames(argument).Select(name => prefix + name))),
+            PredefinedTypeSyntax predefinedType => new[] { ClrTypeNames[predefinedType.Keyword.Text] },
+            _ => new[] { typeSyntax.ToString() },
+        };
+
+    private static readonly Dictionary<string, string> ClrTypeNames = new(StringComparer.Ordinal)
+    {
+        ["bool"] = "Boolean",
+        ["byte"] = "Byte",
+        ["sbyte"] = "SByte",
+        ["char"] = "Char",
+        ["decimal"] = "Decimal",
+        ["double"] = "Double",
+        ["float"] = "Single",
+        ["int"] = "Int32",
+        ["uint"] = "UInt32",
+        ["long"] = "Int64",
+        ["ulong"] = "UInt64",
+        ["short"] = "Int16",
+        ["ushort"] = "UInt16",
+        ["object"] = "Object",
+        ["string"] = "String",
+    };
+
+    /// <summary>
+    /// Gets the context members System.Text.Json generates for a JsonTypeInfo property
+    /// </summary>
+    private static string[] GetGeneratedMemberNames(string propertyName) =>
+    [
+        propertyName,
+        $"_{propertyName}",
+        $"Create_{propertyName}",
+        $"{propertyName}PropInit",
+        $"{propertyName}CtorParamInit",
+        $"{propertyName}SerializeHandler",
+    ];
+
+    private static readonly HashSet<string> ReservedTypeInfoPropertyNames = new(StringComparer.Ordinal)
+    {
+        "Options",
+        "Default",
+        "GetTypeInfo",
+        "GeneratedSerializerOptions",
+        "Equals",
+        "GetHashCode",
+        "GetType",
+        "ToString",
+        "GetRuntimeConverterForType",
+        "ExpandConverter",
+        "TryGetTypeInfoForRuntimeCustomConverter",
+        "GetConverterForNullableProperty",
+    };
 
     /// <summary>
     /// Gets the generated JsonSerializerContext type name.
