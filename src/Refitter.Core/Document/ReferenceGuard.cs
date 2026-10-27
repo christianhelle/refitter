@@ -148,20 +148,15 @@ internal static class ReferenceGuard
             }
 
             var resolved = ResolveLocalReference(reference, currentDirectory, rootDirectory);
-            if (resolved == null)
-                continue;
-
             await ValidateLocalFileAsync(resolved, rootDirectory, allowRemoteReferences, visited, cancellationToken)
                 .ConfigureAwait(false);
         }
     }
 
-    private static string? ResolveLocalReference(string reference, string currentDirectory, string rootDirectory)
+    private static string ResolveLocalReference(string reference, string currentDirectory, string rootDirectory)
     {
+        // Same-document "#..." references are filtered out by the caller, so a file part is always present
         var fileRef = reference.Split('#')[0];
-        if (string.IsNullOrWhiteSpace(fileRef))
-            return null;
-
         var resolved = Path.GetFullPath(Path.Combine(currentDirectory, fileRef));
         if (!IsWithin(rootDirectory, resolved))
         {
