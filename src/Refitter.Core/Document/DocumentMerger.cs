@@ -32,7 +32,7 @@ internal sealed class DocumentMerger : IDocumentMerger
         {
             var document = documents[i];
             MergeAll(baseDocument.Paths, document.Paths, "path");
-            MergeAll(baseDocument.Components?.Schemas, document.Components?.Schemas, "schema");
+            MergeAll(baseDocument.Components.Schemas, document.Components.Schemas, "schema");
             MergeAll(baseDocument.Definitions, document.Definitions, "definition");
             MergeAll(baseDocument.SecurityDefinitions, document.SecurityDefinitions, "security scheme");
 
@@ -49,13 +49,10 @@ internal sealed class DocumentMerger : IDocumentMerger
         => OpenApiDocument.FromJsonAsync(document.ToJson()).GetAwaiter().GetResult();
 
     private void MergeAll<TValue>(
-        IDictionary<string, TValue>? target,
-        IDictionary<string, TValue>? source,
+        IDictionary<string, TValue> target,
+        IDictionary<string, TValue> source,
         string itemType)
     {
-        if (target == null || source == null)
-            return;
-
         foreach (var item in source)
         {
             MergeIfMissingOrThrowOnConflict(target, item.Key, item.Value, itemType);

@@ -93,17 +93,9 @@ internal static class SchemaWalker
 
     private static IEnumerable<JsonSchema?> EnumerateResponseSchemas(OpenApiResponse response)
     {
-        if (response.Headers != null)
+        foreach (var header in response.Headers.Values)
         {
-            foreach (var header in response.Headers.Values)
-            {
-                yield return header;
-            }
-        }
-
-        if (response.Content == null)
-        {
-            yield break;
+            yield return header;
         }
 
         foreach (var content in response.Content.Values)
