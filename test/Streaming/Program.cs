@@ -2,8 +2,8 @@ using Refit;
 using Test;
 
 // LM Studio listens on localhost:1234 by default; set LMSTUDIO_BASE_URL to point elsewhere
-var configuredBaseUrl = Environment.GetEnvironmentVariable("LMSTUDIO_BASE_URL");
-var baseUrl = string.IsNullOrWhiteSpace(configuredBaseUrl)
+string? configuredBaseUrl = Environment.GetEnvironmentVariable("LMSTUDIO_BASE_URL");
+string baseUrl = string.IsNullOrWhiteSpace(configuredBaseUrl)
     ? new UriBuilder(Uri.UriSchemeHttp, "localhost", 1234).Uri.ToString()
     : configuredBaseUrl;
 var api = RestService.For<ILMStudiov1RESTAPI>(baseUrl);
