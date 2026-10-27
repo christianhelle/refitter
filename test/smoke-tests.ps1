@@ -149,6 +149,7 @@ function CleanGeneratedCode
         }
         catch [System.Management.Automation.ItemNotFoundException] {
             # Ignore not-found errors (path/file disappeared between enumeration and deletion)
+            Write-Verbose "Skipped missing item: $($_.Exception.Message)"
         }
         try {
             Get-ChildItem './GeneratedCode' -Directory -ErrorAction Stop |
@@ -156,6 +157,7 @@ function CleanGeneratedCode
         }
         catch [System.Management.Automation.ItemNotFoundException] {
             # Ignore not-found errors (directory disappeared between enumeration and deletion)
+            Write-Verbose "Skipped missing item: $($_.Exception.Message)"
         }
     }
 }
@@ -457,6 +459,7 @@ function RunUrlTests
         }
         catch [System.Management.Automation.ItemNotFoundException] {
             # Ignore not-found errors (path/file doesn't exist yet)
+            Write-Verbose "Skipped missing item: $($_.Exception.Message)"
         }
 
         $exitCode = StartRefitter `
