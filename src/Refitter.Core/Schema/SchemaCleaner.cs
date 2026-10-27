@@ -67,36 +67,8 @@ public class SchemaCleaner
 
     private (IReadOnlyCollection<JsonSchema>, HashSet<string>) FindUsedJsonSchema(OpenApiDocument doc)
     {
-        var toProcess = new Stack<JsonSchema>();
-        var schemaIdLookup = new Dictionary<JsonSchema, List<string>>();
-        foreach (var kvp in document.Components.Schemas)
-        {
-            var actualSchema = kvp.Value.ActualSchema;
-            if (!schemaIdLookup.TryGetValue(actualSchema, out var aliases))
-            {
-                aliases = [];
-                schemaIdLookup[actualSchema] = aliases;
-            }
-
-            aliases.Add(kvp.Key);
-        }
-
-        foreach (var kvp in doc.Components.Schemas)
-        {
-            var schema = kvp.Key;
-            if (keepSchemaRegexes.Any(x => x.IsMatch(schema)))
-            {
-                TryPush(kvp.Value, toProcess);
-            }
-        }
-
-        foreach (var pathItem in doc.Paths.Select(kvp => kvp.Value))
-        {
-            foreach (JsonSchema? schema in GetSchemaForPath(pathItem))
-            {
-                TryPush(schema, toProcess);
-            }
-        }
+        var schemaIdLookup = BuildSchemaIdLookup();
+        var toProcess = CollectRootSchemas(doc);
 
         var seenIds = new HashSet<string>();
         var seen = new HashSet<JsonSchema>();
@@ -111,10 +83,7 @@ public class SchemaCleaner
 
             if (schemaIdLookup.TryGetValue(actualSchema, out var refIds))
             {
-                foreach (var refId in refIds)
-                {
-                    seenIds.Add(refId);
-                }
+                seenIds.UnionWith(refIds);
             }
 
             foreach (var subSchema in EnumerateSchema(actualSchema))
@@ -126,6 +95,40 @@ public class SchemaCleaner
         return (seen, seenIds);
     }
 
+    private Dictionary<JsonSchema, List<string>> BuildSchemaIdLookup()
+    {
+        var schemaIdLookup = new Dictionary<JsonSchema, List<string>>();
+        foreach (var kvp in document.Components.Schemas)
+        {
+            var actualSchema = kvp.Value.ActualSchema;
+            if (!schemaIdLookup.TryGetValue(actualSchema, out var aliases))
+            {
+                aliases = [];
+                schemaIdLookup[actualSchema] = aliases;
+            }
+
+            aliases.Add(kvp.Key);
+        }
+
+        return schemaIdLookup;
+    }
+
+    private Stack<JsonSchema> CollectRootSchemas(OpenApiDocument doc)
+    {
+        var toProcess = new Stack<JsonSchema>();
+        foreach (var kvp in doc.Components.Schemas.Where(kvp => keepSchemaRegexes.Any(x => x.IsMatch(kvp.Key))))
+        {
+            TryPush(kvp.Value, toProcess);
+        }
+
+        foreach (var schema in doc.Paths.Select(kvp => kvp.Value).SelectMany(GetSchemaForPath))
+        {
+            TryPush(schema, toProcess);
+        }
+
+        return toProcess;
+    }
+
     private static IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
     {
         foreach (var p in pathItem.Parameters)
@@ -133,33 +136,38 @@ public class SchemaCleaner
             yield return p;
         }
 
-        foreach (var op in pathItem.Values)
+        foreach (var schema in pathItem.Values.SelectMany(GetSchemaForOperation))
         {
-            if (op.RequestBody != null)
+            yield return schema;
+        }
+    }
+
+    private static IEnumerable<JsonSchema?> GetSchemaForOperation(OpenApiOperation op)
+    {
+        if (op.RequestBody != null)
+        {
+            var body = op.RequestBody;
+            foreach (var content in body.Content.Select(kvpBody => kvpBody.Value))
             {
-                var body = op.RequestBody;
-                foreach (var content in body.Content.Select(kvpBody => kvpBody.Value))
-                {
-                    yield return content.Schema;
-                }
+                yield return content.Schema;
+            }
+        }
+
+        foreach (var p in op.ActualParameters)
+        {
+            yield return p;
+        }
+
+        foreach (var resp in op.ActualResponses.Select(x => x.Value))
+        {
+            foreach (var header in resp.Headers.Select(x => x.Value))
+            {
+                yield return header;
             }
 
-            foreach (var p in op.ActualParameters)
+            foreach (var mediaType in resp.Content.Select(x => x.Value))
             {
-                yield return p;
-            }
-
-            foreach (var resp in op.ActualResponses.Select(x => x.Value))
-            {
-                foreach (var header in resp.Headers.Select(x => x.Value))
-                {
-                    yield return header;
-                }
-
-                foreach (var mediaType in resp.Content.Select(x => x.Value))
-                {
-                    yield return mediaType.Schema;
-                }
+                yield return mediaType.Schema;
             }
         }
     }
