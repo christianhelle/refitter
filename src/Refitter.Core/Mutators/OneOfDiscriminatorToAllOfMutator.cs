@@ -10,36 +10,38 @@ internal sealed class OneOfDiscriminatorToAllOfMutator : IOpenApiDocumentMutator
         foreach (var kvp in document.Components.Schemas)
         {
             var schema = kvp.Value?.ActualSchema;
-            if (schema == null)
-                continue;
+            if (schema?.DiscriminatorObject != null)
+                ConvertUnionToInheritance(schema);
+        }
+    }
 
-            if (schema.DiscriminatorObject == null)
-                continue;
+    private static void ConvertUnionToInheritance(JsonSchema schema)
+    {
+        var unionSchemas = schema.OneOf.Concat(schema.AnyOf).ToArray();
+        if (unionSchemas.Length == 0)
+            return;
 
-            var unionSchemas = schema.OneOf.Concat(schema.AnyOf).ToArray();
-            if (unionSchemas.Length == 0)
-                continue;
+        if (schema.Type == JsonObjectType.None || schema.Type == JsonObjectType.Null)
+            schema.Type = JsonObjectType.Object;
 
-            if (schema.Type == JsonObjectType.None || schema.Type == JsonObjectType.Null)
-                schema.Type = JsonObjectType.Object;
+        foreach (var subSchema in unionSchemas.Select(subSchemaRef => subSchemaRef?.ActualSchema))
+        {
+            if (subSchema != null)
+                InheritFrom(subSchema, schema);
+        }
 
-            foreach (var subSchemaRef in unionSchemas)
-            {
-                var subSchema = subSchemaRef?.ActualSchema;
-                if (subSchema == null)
-                    continue;
+        schema.OneOf.Clear();
+        schema.AnyOf.Clear();
+    }
 
-                bool alreadyInherits = subSchema.AllOf.Any(
-                    a => a.HasReference && a.ActualSchema == schema);
-                if (!alreadyInherits)
-                {
-                    var reference = new JsonSchema { Reference = schema };
-                    subSchema.AllOf.Add(reference);
-                }
-            }
-
-            schema.OneOf.Clear();
-            schema.AnyOf.Clear();
+    private static void InheritFrom(JsonSchema subSchema, JsonSchema schema)
+    {
+        bool alreadyInherits = subSchema.AllOf.Any(
+            a => a.HasReference && a.ActualSchema == schema);
+        if (!alreadyInherits)
+        {
+            var reference = new JsonSchema { Reference = schema };
+            subSchema.AllOf.Add(reference);
         }
     }
 }
