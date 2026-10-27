@@ -585,6 +585,10 @@ public class JsonSerializerContextGeneratorTests
     [Arguments("GetHashCode")]
     [Arguments("GetType")]
     [Arguments("ToString")]
+    [Arguments("GetRuntimeConverterForType")]
+    [Arguments("ExpandConverter")]
+    [Arguments("TryGetTypeInfoForRuntimeCustomConverter")]
+    [Arguments("GetConverterForNullableProperty")]
     public void Generate_Builds_With_Type_Named_After_JsonSerializerContext_Member(string typeName)
     {
         var contracts = $$"""

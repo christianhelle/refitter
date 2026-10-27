@@ -159,6 +159,10 @@ internal static class JsonSerializerContextGenerator
         "GetHashCode",
         "GetType",
         "ToString",
+        "GetRuntimeConverterForType",
+        "ExpandConverter",
+        "TryGetTypeInfoForRuntimeCustomConverter",
+        "GetConverterForNullableProperty",
     };
 
     /// <summary>
