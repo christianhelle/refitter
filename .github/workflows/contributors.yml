@@ -23,7 +23,9 @@ jobs:
           ref: main
           token: ${{ secrets.PAT }}
       - name: Re-generate contributors lists
-        run: npx -y all-contributors-cli@6.26.1 generate
+        run: |
+          npm install --global --ignore-scripts all-contributors-cli@6.26.1
+          all-contributors generate
       - name: Git commit contributors lists
         run: |
           if git diff --quiet -- README.md docs/docfx_project/index.md; then
