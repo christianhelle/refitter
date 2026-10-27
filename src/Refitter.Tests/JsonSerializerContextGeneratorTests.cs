@@ -424,6 +424,43 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Test]
+    public void Generate_Renames_TypeInfo_Property_For_Type_Named_Options()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Options
+                {
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo\")]");
+    }
+
+    [Category("Integration")]
+    [Test]
+    public void Generate_Builds_With_Type_Named_Options()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Options
+                {
+                    public string Name { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
+    }
+
     private static RefitGeneratorSettings CreateSettings(
         string interfaceName = "IMyApi",
         string @namespace = "My.Clients",

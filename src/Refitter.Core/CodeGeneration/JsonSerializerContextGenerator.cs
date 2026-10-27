@@ -37,7 +37,7 @@ internal static class JsonSerializerContextGenerator
         sb.AppendLine("#pragma warning disable 612, 618");
         foreach (var typeName in typeNames.OrderBy(t => t))
         {
-            sb.AppendLine($"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}))]");
+            sb.AppendLine(FormatJsonSerializableAttribute(typeName));
         }
 
         sb.AppendLine(
@@ -50,6 +50,31 @@ internal static class JsonSerializerContextGenerator
         return sb.ToString()
             .TrimEnd('\r', '\n');
     }
+
+    /// <summary>
+    /// Formats a JsonSerializable attribute, renaming the generated JsonTypeInfo property
+    /// when the default name would collide with a JsonSerializerContext member
+    /// </summary>
+    private static string FormatJsonSerializableAttribute(string typeName)
+    {
+        var propertyName = GetDefaultTypeInfoPropertyName(typeName);
+        return propertyName is not null && ReservedTypeInfoPropertyNames.Contains(propertyName)
+            ? $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}), TypeInfoPropertyName = \"{propertyName}TypeInfo\")]"
+            : $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}))]";
+    }
+
+    /// <summary>
+    /// Gets the property name System.Text.Json would generate for a non-generic type, or null otherwise
+    /// </summary>
+    private static string? GetDefaultTypeInfoPropertyName(string typeName) =>
+        typeName.IndexOfAny(['<', '[', '?']) >= 0
+            ? null
+            : typeName.Substring(typeName.LastIndexOf('.') + 1);
+
+    private static readonly HashSet<string> ReservedTypeInfoPropertyNames = new(StringComparer.Ordinal)
+    {
+        "Options",
+    };
 
     /// <summary>
     /// Gets the generated JsonSerializerContext type name.
