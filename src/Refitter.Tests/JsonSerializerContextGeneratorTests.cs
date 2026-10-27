@@ -491,6 +491,44 @@ public class JsonSerializerContextGeneratorTests
 
     [Category("Integration")]
     [Test]
+    public void Generate_Builds_With_Generic_Registration_Named_Like_Replacement()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Options
+                {
+                    public string Name { get; set; }
+                }
+
+                public partial class TypeInfo
+                {
+                    public string Name { get; set; }
+                }
+
+                public partial class Options<T>
+                {
+                    public T Value { get; set; }
+                }
+
+                public partial class Holder
+                {
+                    public Options<TypeInfo> Value { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options<TypeInfo>))]");
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo2\")]");
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
+    }
+
+    [Category("Integration")]
+    [Test]
     public void Generate_Builds_With_Type_Named_After_Generated_Helper_Of_Replacement()
     {
         const string contracts = """

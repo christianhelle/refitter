@@ -37,8 +37,7 @@ internal static class JsonSerializerContextGenerator
         sb.AppendLine("#pragma warning disable 612, 618");
         var usedMemberNames = new HashSet<string>(
             typeNames
-                .Select(GetDefaultTypeInfoPropertyName)
-                .OfType<string>()
+                .SelectMany(t => GetPossibleTypeInfoPropertyNames(SyntaxFactory.ParseTypeName(t)))
                 .SelectMany(GetGeneratedMemberNames),
             StringComparer.Ordinal);
         foreach (var typeName in typeNames.OrderBy(t => t))
@@ -86,6 +85,56 @@ internal static class JsonSerializerContextGenerator
         typeName.IndexOfAny(['<', '[', '?']) >= 0
             ? null
             : typeName.Substring(typeName.LastIndexOf('.') + 1);
+
+    /// <summary>
+    /// Gets the property names System.Text.Json may generate for a registered type.
+    /// Nullable types yield both forms, because only value types get a Nullable prefix.
+    /// </summary>
+    private static IEnumerable<string> GetPossibleTypeInfoPropertyNames(TypeSyntax typeSyntax) =>
+        typeSyntax switch
+        {
+            NullableTypeSyntax nullableType =>
+                GetPossibleTypeInfoPropertyNames(nullableType.ElementType)
+                    .SelectMany(name => new[] { name, $"Nullable{name}" }),
+            ArrayTypeSyntax arrayType =>
+                GetPossibleTypeInfoPropertyNames(arrayType.ElementType)
+                    .Select(name => name + string.Concat(
+                        arrayType.RankSpecifiers.Select(r => r.Rank == 1 ? "Array" : $"Array{r.Rank}D"))),
+            QualifiedNameSyntax qualifiedName => GetPossibleTypeInfoPropertyNames(qualifiedName.Right),
+            AliasQualifiedNameSyntax aliasQualifiedName => GetPossibleTypeInfoPropertyNames(aliasQualifiedName.Name),
+            GenericNameSyntax genericName =>
+                genericName.TypeArgumentList.Arguments.Aggregate(
+                    (IEnumerable<string>)new[] { genericName.Identifier.Text },
+                    (prefixes, argument) => prefixes.SelectMany(
+                        prefix => GetPossibleTypeInfoPropertyNames(argument).Select(name => prefix + name))),
+            PredefinedTypeSyntax predefinedType =>
+                new[]
+                {
+                    ClrTypeNames.TryGetValue(predefinedType.Keyword.Text, out var clrTypeName)
+                        ? clrTypeName
+                        : predefinedType.Keyword.Text
+                },
+            _ => new[] { typeSyntax.ToString() },
+        };
+
+    private static readonly Dictionary<string, string> ClrTypeNames = new(StringComparer.Ordinal)
+    {
+        ["bool"] = "Boolean",
+        ["byte"] = "Byte",
+        ["sbyte"] = "SByte",
+        ["char"] = "Char",
+        ["decimal"] = "Decimal",
+        ["double"] = "Double",
+        ["float"] = "Single",
+        ["int"] = "Int32",
+        ["uint"] = "UInt32",
+        ["long"] = "Int64",
+        ["ulong"] = "UInt64",
+        ["short"] = "Int16",
+        ["ushort"] = "UInt16",
+        ["object"] = "Object",
+        ["string"] = "String",
+    };
 
     /// <summary>
     /// Gets the context members System.Text.Json generates for a JsonTypeInfo property
