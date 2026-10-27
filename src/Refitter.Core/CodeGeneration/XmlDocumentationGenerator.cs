@@ -74,7 +74,7 @@ public class XmlDocumentationGenerator
         var title = document.Info?.Title;
         if (!string.IsNullOrEmpty(title))
         {
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title!), code, indent: Separator);
+            AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title!), code, indent: Separator);
         }
     }
 
@@ -102,14 +102,14 @@ public class XmlDocumentationGenerator
             return;
 
         if (!string.IsNullOrWhiteSpace(method.Summary))
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(method.Summary), code);
+            AppendXmlCommentBlock(SummaryTag, EscapeSymbols(method.Summary), code);
 
         if (!string.IsNullOrWhiteSpace(method.Description))
-            this.AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
+            AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
 
         foreach (var (name, type, alias) in GetEmittedParameters(parameters))
         {
-            this.AppendXmlCommentBlock(
+            AppendXmlCommentBlock(
                 ParamKeyword,
                 GetParameterDescription(method, name, type, alias, dynamicQuerystringParameterType),
                 code,
@@ -121,7 +121,7 @@ public class XmlDocumentationGenerator
 
         if (hasApiResponse)
         {
-            this.AppendXmlCommentBlock("returns", this.BuildApiResponseDescription(method.Responses), code);
+            AppendXmlCommentBlock("returns", this.BuildApiResponseDescription(method.Responses), code);
         }
         else
         {
@@ -133,18 +133,18 @@ public class XmlDocumentationGenerator
                     ? "A <see cref=\"Task\"/> representing the result of the request."
                     : SanitizeResponseDescription(description);
 
-                this.AppendXmlCommentBlock("returns", description, code);
+                AppendXmlCommentBlock("returns", description, code);
             }
             else
             {
                 // Document the returned task even when there is no result.
-                this.AppendXmlCommentBlock(
+                AppendXmlCommentBlock(
                     "returns",
                     "A <see cref=\"Task\"/> that completes when the request is finished.",
                     code);
             }
 
-            this.AppendXmlCommentBlock(
+            AppendXmlCommentBlock(
                 "exception",
                 this.BuildErrorDescription(method.Responses),
                 code,
@@ -165,7 +165,7 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the tag to.</param>
     /// <param name="attributes">An optional dictionary of attributes to add to the tag.</param>
     /// <param name="indent">The whitespace to add before new lines.</param>
-    private void AppendXmlCommentBlock(
+    private static void AppendXmlCommentBlock(
         string tagName,
         string content,
         StringBuilder code,
@@ -206,7 +206,7 @@ public class XmlDocumentationGenerator
             summary = EscapeSymbols(preferredSummary!);
         }
 
-        this.AppendXmlCommentBlock(SummaryTag, summary, code, indent: Separator);
+        AppendXmlCommentBlock(SummaryTag, summary, code, indent: Separator);
     }
 
     /// <summary>
