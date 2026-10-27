@@ -380,10 +380,7 @@ public class XmlDocumentationGenerator
             var current = input[index];
             if (current != '\\' || index == input.Length - 1)
             {
-                if (IsValidXmlChar(current))
-                {
-                    result.Append(current);
-                }
+                AppendIfValidXmlChar(result, current);
                 index++;
                 continue;
             }
@@ -393,62 +390,68 @@ public class XmlDocumentationGenerator
 
             if (escapedCharacter == 'u' && index + 4 <= input.Length)
             {
-                var hexValue = input.Substring(index, 4);
-                if (int.TryParse(
-                    hexValue,
-                    NumberStyles.HexNumber,
-                    CultureInfo.InvariantCulture,
-                    out var unicodeCodePoint))
-                {
-                    char decodedChar = (char)unicodeCodePoint;
-                    if (IsValidXmlChar(decodedChar))
-                    {
-                        result.Append(decodedChar);
-                    }
-                    index += 4;
-                    continue;
-                }
-                else
-                {
-                    // Malformed \uXXXX (non-hex characters): append the raw escape sequence and advance past it
-                    result.Append('\\');
-                    result.Append('u');
-                    result.Append(hexValue);
-                    index += 4;
-                    continue;
-                }
+                AppendUnicodeEscape(result, input.Substring(index, 4));
+                index += 4;
+                continue;
             }
 
-            char? decodedSimpleChar = escapedCharacter switch
-            {
-                '"' => '"',
-                '\\' => '\\',
-                '/' => '/',
-                'b' => '\b',
-                'f' => '\f',
-                'n' => '\n',
-                'r' => '\r',
-                't' => '\t',
-                _ => null
-            };
-
-            if (decodedSimpleChar.HasValue)
-            {
-                if (IsValidXmlChar(decodedSimpleChar.Value))
-                {
-                    result.Append(decodedSimpleChar.Value);
-                }
-            }
-            else
-            {
-                // Fallback for unknown escape sequences: keep as is (e.g. \z -> \z)
-                // But we must sanitize the backslash and the char
-                if (IsValidXmlChar('\\')) result.Append('\\');
-                if (IsValidXmlChar(escapedCharacter)) result.Append(escapedCharacter);
-            }
+            AppendSimpleEscape(result, escapedCharacter);
         }
 
         return result.ToString();
+    }
+
+    private static void AppendUnicodeEscape(StringBuilder result, string hexValue)
+    {
+        if (int.TryParse(
+            hexValue,
+            NumberStyles.HexNumber,
+            CultureInfo.InvariantCulture,
+            out var unicodeCodePoint))
+        {
+            AppendIfValidXmlChar(result, (char)unicodeCodePoint);
+            return;
+        }
+
+        // Malformed \uXXXX (non-hex characters): append the raw escape sequence
+        result.Append('\\');
+        result.Append('u');
+        result.Append(hexValue);
+    }
+
+    private static void AppendSimpleEscape(StringBuilder result, char escapedCharacter)
+    {
+        char? decodedSimpleChar = escapedCharacter switch
+        {
+            '"' => '"',
+            '\\' => '\\',
+            '/' => '/',
+            'b' => '\b',
+            'f' => '\f',
+            'n' => '\n',
+            'r' => '\r',
+            't' => '\t',
+            _ => null
+        };
+
+        if (decodedSimpleChar.HasValue)
+        {
+            AppendIfValidXmlChar(result, decodedSimpleChar.Value);
+            return;
+        }
+
+        // Fallback for unknown escape sequences: keep as is (e.g. \z -> \z)
+        // But we must sanitize the backslash and the char
+        AppendIfValidXmlChar(result, '\\');
+        AppendIfValidXmlChar(result, escapedCharacter);
+    }
+
+    private static void AppendIfValidXmlChar(StringBuilder result, char c)
+    {
+        if (IsValidXmlChar(c))
+        {
+            result.Append(c);
+        }
     }
 
     private static bool IsValidXmlChar(char c)
