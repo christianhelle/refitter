@@ -58,8 +58,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new SimpleGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
@@ -126,8 +125,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new SimpleGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             var generatedFiles = Directory.GetFiles(outputDir, "*.cs");
@@ -170,8 +168,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new SimpleGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().NotBe(0);
         }
@@ -231,8 +228,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new SimpleGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
@@ -295,8 +291,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new SimpleGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
@@ -362,8 +357,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new TestGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
@@ -434,8 +428,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new TestGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
@@ -501,8 +494,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new TestGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             reporter.AllPathsFilteredWarningCalled.Should().BeTrue();
@@ -565,8 +557,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new CapturingGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
@@ -638,8 +629,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new TestGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
@@ -683,8 +673,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new CapturingGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().NotBe(0);
             reporter.GenerationFailedCalled.Should().BeTrue();
@@ -754,8 +743,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new SimpleGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().Be(0);
             File.Exists(outputPath).Should().BeTrue();
@@ -824,8 +812,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new SimpleGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().NotBe(0);
 
@@ -880,8 +867,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new CapturingGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().NotBe(0);
             reporter.GenerationFailedCalled.Should().BeTrue();
@@ -944,8 +930,7 @@ public class GenerationOrchestratorTests
             };
 
             var reporter = new CapturingGenerationReporter();
-            var orchestrator = new GenerationOrchestrator();
-            var result = await orchestrator.RunAsync(settings, cliSettings, reporter, default);
+            var result = await GenerationOrchestrator.RunAsync(settings, cliSettings, reporter, default);
 
             result.Should().NotBe(0);
             reporter.GenerationFailedCalled.Should().BeTrue();
