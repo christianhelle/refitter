@@ -64,6 +64,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
+CORE_SOLUTION="./ConsoleApp/ConsoleApp.Core.slnx"
+
 # Resolved once by run_tests and used by start_refitter
 CURRENT_PROCESS_PATH=""
 CURRENT_USE_DOCKER=false
@@ -493,7 +495,7 @@ run_tests() {
         echo "Restore failed: ConsoleApp.slnx" >&2
         exit 1
     fi
-    invoke_child_process dotnet "restore ConsoleApp.Core.slnx" restore ./ConsoleApp/ConsoleApp.Core.slnx --nologo -v q
+    invoke_child_process dotnet "restore ConsoleApp.Core.slnx" restore "$CORE_SOLUTION" --nologo -v q
     if [[ $? -ne 0 ]]; then
         echo "Restore failed: ConsoleApp.Core.slnx" >&2
         exit 1
@@ -522,12 +524,12 @@ run_tests() {
 
     clean_generated_code
     generate_from_settings_file "./multiple-sources.refitter"
-    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true
+    build_solution "$CORE_SOLUTION" true
 
     # Mastodon has a contract named Options that collides with JsonSerializerContext.Options
     clean_generated_code
     generate_from_settings_file "./mastodon.refitter"
-    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true
+    build_solution "$CORE_SOLUTION" true
 
     clean_generated_code
     generate_from_settings_file "./Streaming/.refitter"
@@ -587,7 +589,7 @@ run_tests() {
     # Phase 6: Build netCore variants
     # ==========================================
     verbose_log "Building netCore variants"
-    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+    build_solution "$CORE_SOLUTION" true true
 
     # ==========================================
     # Phase 7: URL-based tests (network-dependent)
@@ -645,7 +647,7 @@ run_tests() {
     # Build only what was successfully generated. A total absence of output means
     # even the Default generator failed, which is a regression worth reporting.
     if compgen -G "./GeneratedCode/OpNameGen_*.generated.cs" >/dev/null; then
-        build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+        build_solution "$CORE_SOLUTION" true true
     else
         echo "Operation Name Generator Tests produced no generated files" >&2
         exit 1
@@ -671,7 +673,7 @@ run_tests() {
             exit 1
         fi
     done
-    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+    build_solution "$CORE_SOLUTION" true true
 
     # ==========================================
     # Phase 10: Combination Tests
@@ -708,7 +710,7 @@ run_tests() {
             exit 1
         fi
     done
-    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+    build_solution "$CORE_SOLUTION" true true
 
     # ==========================================
     # Phase 11: Asana API regression test (issue #359)
@@ -730,7 +732,7 @@ run_tests() {
         echo "Asana API generation failed (issue #359 regression)" >&2
         exit 1
     fi
-    build_solution "./ConsoleApp/ConsoleApp.Core.slnx" true true
+    build_solution "$CORE_SOLUTION" true true
 }
 
 main() {
