@@ -441,8 +441,8 @@ public class XmlDocumentationGenerator
         }
 
         // Fallback for unknown escape sequences: keep as is (e.g. \z -> \z)
-        // But we must sanitize the backslash and the char
-        AppendIfValidXmlChar(result, '\\');
+        // But we must sanitize the escaped char
+        result.Append('\\');
         AppendIfValidXmlChar(result, escapedCharacter);
     }
 
