@@ -40,7 +40,7 @@ public class XmlDocumentationGenerator
         var controllerTag = document.Tags?.FirstOrDefault(t => t.Name.SanitizeControllerTag() == tag);
         var controllerDescription = controllerTag?.Description;
         var fallbackSummary = $"Operations for {EscapeSymbols(tag)}.";
-        this.AppendInterfaceSummary(controllerDescription, fallbackSummary, code);
+        AppendInterfaceSummary(controllerDescription, fallbackSummary, code);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public class XmlDocumentationGenerator
         var fallbackSummary = !string.IsNullOrWhiteSpace(operationId)
             ? $"Operations for {EscapeSymbols(operationId!)}."
             : "Operations for endpoint.";
-        this.AppendInterfaceSummary(summary, fallbackSummary, code);
+        AppendInterfaceSummary(summary, fallbackSummary, code);
     }
 
     /// <summary>
@@ -198,7 +198,7 @@ public class XmlDocumentationGenerator
         }
     }
 
-    private void AppendInterfaceSummary(string? preferredSummary, string fallbackSummary, StringBuilder code)
+    private static void AppendInterfaceSummary(string? preferredSummary, string fallbackSummary, StringBuilder code)
     {
         var summary = fallbackSummary;
         if (!string.IsNullOrWhiteSpace(preferredSummary))
