@@ -463,6 +463,34 @@ public class JsonSerializerContextGeneratorTests
 
     [Category("Integration")]
     [Test]
+    public void Generate_Builds_With_Types_Named_Options_And_OptionsTypeInfo()
+    {
+        const string contracts = """
+            namespace My.Contracts
+            {
+                public partial class Options
+                {
+                    public string Name { get; set; }
+                }
+
+                public partial class OptionsTypeInfo
+                {
+                    public string Name { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo2\")]");
+        result.Should().Contain(
+            "[global::System.Text.Json.Serialization.JsonSerializable(typeof(OptionsTypeInfo))]");
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
+    }
+
+    [Category("Integration")]
+    [Test]
     [Arguments("Default")]
     [Arguments("GetTypeInfo")]
     [Arguments("GeneratedSerializerOptions")]

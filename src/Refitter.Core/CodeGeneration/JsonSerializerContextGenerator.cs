@@ -35,9 +35,12 @@ internal static class JsonSerializerContextGenerator
 
         // Deprecated contracts are marked [Obsolete], and referencing them here would raise CS0612/CS0618
         sb.AppendLine("#pragma warning disable 612, 618");
+        var usedPropertyNames = new HashSet<string>(
+            typeNames.Select(GetDefaultTypeInfoPropertyName).OfType<string>(),
+            StringComparer.Ordinal);
         foreach (var typeName in typeNames.OrderBy(t => t))
         {
-            sb.AppendLine(FormatJsonSerializableAttribute(typeName));
+            sb.AppendLine(FormatJsonSerializableAttribute(typeName, usedPropertyNames));
         }
 
         sb.AppendLine(
@@ -55,12 +58,19 @@ internal static class JsonSerializerContextGenerator
     /// Formats a JsonSerializable attribute, renaming the generated JsonTypeInfo property
     /// when the default name would collide with a JsonSerializerContext member
     /// </summary>
-    private static string FormatJsonSerializableAttribute(string typeName)
+    private static string FormatJsonSerializableAttribute(string typeName, HashSet<string> usedPropertyNames)
     {
         var propertyName = GetDefaultTypeInfoPropertyName(typeName);
-        return propertyName is not null && ReservedTypeInfoPropertyNames.Contains(propertyName)
-            ? $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}), TypeInfoPropertyName = \"{propertyName}TypeInfo\")]"
-            : $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}))]";
+        if (propertyName is null || !ReservedTypeInfoPropertyNames.Contains(propertyName))
+            return $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}))]";
+
+        var replacement = $"{propertyName}TypeInfo";
+        for (var suffix = 2; !usedPropertyNames.Add(replacement); suffix++)
+        {
+            replacement = $"{propertyName}TypeInfo{suffix}";
+        }
+
+        return $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}), TypeInfoPropertyName = \"{replacement}\")]";
     }
 
     /// <summary>
