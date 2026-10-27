@@ -130,7 +130,7 @@ public class SchemaCleaner
         return (seen, seenIds);
     }
 
-    private IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
+    private static IEnumerable<JsonSchema?> GetSchemaForPath(OpenApiPathItem pathItem)
     {
         foreach (var p in pathItem.Parameters)
         {
@@ -168,7 +168,7 @@ public class SchemaCleaner
         }
     }
 
-    private void TryPush(JsonSchema? schema, Stack<JsonSchema> stack)
+    private static void TryPush(JsonSchema? schema, Stack<JsonSchema> stack)
     {
         if (schema == null)
         {
