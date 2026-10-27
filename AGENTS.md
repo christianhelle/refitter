@@ -9,22 +9,22 @@ OpenAPI-to-Refit code generator. Multi-package solution: CLI tool, MSBuild task,
 - Build: `dotnet build -c Release src/Refitter.slnx`
 - Test: `dotnet test --solution src/Refitter.slnx -c Release`
 
-### Fast Feedback (TUnit category filters)
+### Fast Feedback (MSTest category filters)
 
-TUnit uses `--treenode-filter` instead of the VSTest `--filter` syntax.
+MSTest on Microsoft.Testing.Platform filters by category with `--filter "TestCategory=..."`.
 
 ```bash
-# Fast unit tests only (no subprocess compilation — ~41s, 2152 tests)
-dotnet test --treenode-filter "/*/*/*/*[Category!=Integration]" --solution src/Refitter.slnx -c Release --no-build
+# Fast unit tests only (no subprocess compilation)
+dotnet test --filter "TestCategory!=Integration" --solution src/Refitter.slnx -c Release --no-build
 
-# Integration tests only (compilation verification — ~17s, 88 tests)
-dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-build --treenode-filter "/*/*/*/*[Category=Integration]"
+# Integration tests only (compilation verification)
+dotnet test --project src/Refitter.Tests/Refitter.Tests.csproj -c Release --no-build --filter "TestCategory=Integration"
 
 # Full suite before commit
 dotnet test --solution src/Refitter.slnx -c Release
 ```
 
-**Convention:** Only `[Category("Integration")]` is explicitly declared — tests that call `BuildHelper.BuildCSharp()` which spawns `dotnet build`. All other tests are unmarked and treated as unit tests by default.
+**Convention:** Only `[TestCategory("Integration")]` is explicitly declared — tests that call `BuildHelper.BuildCSharp()` which spawns `dotnet build`. All other tests are unmarked and treated as unit tests by default.
 
 **Source Generator tests require a pre-build step.** Before running `dotnet test` on `Refitter.SourceGenerator.Tests`, the CI does:
 
@@ -49,8 +49,8 @@ Run these first if source generator tests fail with missing generated types.
 
 ## Testing
 
-- **Framework**: TUnit (not xUnit). Attributes: `[Test]`, `[Arguments(...)]`.
-- **Runner**: `Microsoft.Testing.Platform` (configured in `global.json`). Both test projects set `OutputType=Exe` and `GenerateProgramFile=false`.
+- **Framework**: MSTest v4 (not xUnit). Attributes: `[TestClass]`, `[TestMethod]`, `[DataRow(...)]`, `[DynamicData(...)]`. Tests run in parallel at method level (`MSTestSettings.cs`); use `[DoNotParallelize]` for tests touching shared global state. Assertions use AwesomeAssertions, not MSTest `Assert`.
+- **Runner**: `Microsoft.Testing.Platform` (configured in `global.json`). Both test projects set `OutputType=Exe`, `GenerateProgramFile=false` and `EnableMSTestRunner=true`.
 - **Unit test pattern**: Scenario tests under `Refitter.Tests.Scenarios` contain an OpenAPI spec as a `const string`, generate code via `RefitGenerator.CreateAsync(...).Generate()`, assert string patterns, and verify compilation with `BuildHelper.BuildCSharp(generatedCode)`.
 - **Temp file helper**: `SwaggerFileHelper.CreateSwaggerFile(contents)` creates a temp YAML file; `CreateSwaggerJsonFile` for JSON.
 - **Build helper**: `BuildHelper.BuildCSharp()` writes generated code to a temp project and invokes `dotnet build` to verify it compiles. It defaults to `net8.0` but supports `net9.0` and `net10.0`.
