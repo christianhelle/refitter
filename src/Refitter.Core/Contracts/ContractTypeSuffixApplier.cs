@@ -167,7 +167,7 @@ internal static class ContractTypeSuffixApplier
             return node.Right is GenericNameSyntax genericName
                 ? node.WithRight(
                     genericName.WithTypeArgumentList(
-                        (TypeArgumentListSyntax)Visit(genericName.TypeArgumentList)!))
+                        (TypeArgumentListSyntax)Visit(genericName.TypeArgumentList)))
                 : node;
         }
 

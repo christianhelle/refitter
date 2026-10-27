@@ -233,7 +233,7 @@ internal class ReturnTypeGenerator(
         {
             typeName = typeName
                 .Replace("ICollection", codeGeneration.CodeGeneratorSettings!.ArrayType)
-                .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings!.ArrayType);
+                .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings.ArrayType);
         }
 
         return typeName;

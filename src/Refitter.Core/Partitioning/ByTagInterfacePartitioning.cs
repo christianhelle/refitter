@@ -35,7 +35,7 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
         var methodName = baseOperationName.CapitalizeFirstCharacter();
         if (settings.OperationNameTemplate?.Contains("{operationName}") ?? false)
         {
-            methodName = settings.OperationNameTemplate!.Replace("{operationName}", methodName);
+            methodName = settings.OperationNameTemplate.Replace("{operationName}", methodName);
         }
 
         return methodName;
