@@ -358,10 +358,11 @@ public class RefitterGenerateTask : MSBuildTask
                 .Where(installed => !string.IsNullOrWhiteSpace(installed))
                 .ToArray();
 
-            foreach (var runtime in bundledRuntimes.Where(runtime =>
-                         FileExists(runtime.Path) &&
-                         detectedRuntimes.Any(installed =>
-                             installed.StartsWith(runtime.RuntimePrefix, StringComparison.Ordinal))))
+            var runtime = bundledRuntimes.FirstOrDefault(candidate =>
+                FileExists(candidate.Path) &&
+                detectedRuntimes.Any(installed =>
+                    installed.StartsWith(candidate.RuntimePrefix, StringComparison.Ordinal)));
+            if (runtime is not null)
             {
                 logCommandLine($"Detected {GetDisplayFramework(runtime.TargetFramework)} runtime. Using {GetDisplayFramework(runtime.TargetFramework)} version of Refitter.");
                 return runtime.Path;
