@@ -101,19 +101,12 @@ internal static class JsonSerializerContextGenerator
                     .Select(name => name + string.Concat(
                         arrayType.RankSpecifiers.Select(r => r.Rank == 1 ? "Array" : $"Array{r.Rank}D"))),
             QualifiedNameSyntax qualifiedName => GetPossibleTypeInfoPropertyNames(qualifiedName.Right),
-            AliasQualifiedNameSyntax aliasQualifiedName => GetPossibleTypeInfoPropertyNames(aliasQualifiedName.Name),
             GenericNameSyntax genericName =>
                 genericName.TypeArgumentList.Arguments.Aggregate(
                     (IEnumerable<string>)new[] { genericName.Identifier.Text },
                     (prefixes, argument) => prefixes.SelectMany(
                         prefix => GetPossibleTypeInfoPropertyNames(argument).Select(name => prefix + name))),
-            PredefinedTypeSyntax predefinedType =>
-                new[]
-                {
-                    ClrTypeNames.TryGetValue(predefinedType.Keyword.Text, out var clrTypeName)
-                        ? clrTypeName
-                        : predefinedType.Keyword.Text
-                },
+            PredefinedTypeSyntax predefinedType => new[] { ClrTypeNames[predefinedType.Keyword.Text] },
             _ => new[] { typeSyntax.ToString() },
         };
 
