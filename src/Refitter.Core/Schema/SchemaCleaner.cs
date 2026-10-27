@@ -50,16 +50,19 @@ public class SchemaCleaner
         if (!IncludeInheritanceHierarchy)
         {
             // Fix any "abstract/sum" types so that the unused-types get removed
-            foreach (var discriminator in usedJsonSchema.Select(schema => schema.DiscriminatorObject).OfType<OpenApiDiscriminator>())
+            foreach (var mapping in usedJsonSchema
+                         .Select(schema => schema.DiscriminatorObject)
+                         .OfType<OpenApiDiscriminator>()
+                         .Select(discriminator => discriminator.Mapping))
             {
-                var keepMappings = discriminator.Mapping
+                var keepMappings = mapping
                     .Where(x => usedJsonSchema.Contains(x.Value.ActualSchema))
                     .ToArray();
 
-                discriminator.Mapping.Clear();
+                mapping.Clear();
                 foreach (var kvp in keepMappings)
                 {
-                    discriminator.Mapping[kvp.Key] = kvp.Value;
+                    mapping[kvp.Key] = kvp.Value;
                 }
             }
         }

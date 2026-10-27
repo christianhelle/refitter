@@ -24,10 +24,9 @@ internal sealed class OneOfDiscriminatorToAllOfMutator : IOpenApiDocumentMutator
         if (schema.Type == JsonObjectType.None || schema.Type == JsonObjectType.Null)
             schema.Type = JsonObjectType.Object;
 
-        foreach (var subSchema in unionSchemas.Select(subSchemaRef => subSchemaRef?.ActualSchema))
+        foreach (var subSchema in unionSchemas.Select(subSchemaRef => subSchemaRef?.ActualSchema).OfType<JsonSchema>())
         {
-            if (subSchema != null)
-                InheritFrom(subSchema, schema);
+            InheritFrom(subSchema, schema);
         }
 
         schema.OneOf.Clear();
