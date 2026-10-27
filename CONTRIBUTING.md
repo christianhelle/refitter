@@ -52,7 +52,7 @@ A pull request is ready to merge when all of the following are true. Reviews are
   - contain an example OpenAPI specification as a `const string`,
   - assert that the expected code **is** generated,
   - assert that the code it replaces **is not** generated (where relevant),
-  - compile the generated code with `BuildHelper.BuildCSharp(generatedCode)`, in a test marked `[Category("Integration")]`.
+  - compile the generated code with `BuildHelper.BuildCSharp(generatedCode)`, in a test marked `[TestCategory("Integration")]`.
 - [ ] Bug fixes have a regression test that fails without the fix.
 - [ ] If the option interacts with other options, those combinations are tested too. For example, a change to dependency injection output should be covered alongside `HttpMessageHandlers`, Polly/HttpResilience and the other options tested in `src/Refitter.Tests/DependencyInjection/`.
 - [ ] The full test suite passes locally: `dotnet test --solution src/Refitter.slnx -c Release`. See `AGENTS.md` for the pre-build step the source generator tests need.
@@ -157,8 +157,8 @@ Feature requests are welcome! Please follow the feature request template in `.gi
   - Verify that the generated code builds successfully
 - Test coverage should be comprehensive, covering both normal operation and edge cases.
 - All tests must pass before submitting a pull request.
-- **Testing Framework**: The project uses [TUnit](https://github.com/thomhurst/TUnit) instead of xUnit for unit testing, which provides 3x faster test execution.
-- **Assertion Library**: Assertions use [AwesomeAssertions](https://github.com/AwesomeAssertions/AwesomeAssertions), the Apache-2.0 community fork of FluentAssertions, not `TUnit.Assertions`.
+- **Testing Framework**: The project uses [MSTest](https://github.com/microsoft/testfx) v4 running on Microsoft.Testing.Platform. Mark test classes with `[TestClass]`, test methods with `[TestMethod]`, and data-driven cases with `[DataRow(...)]`.
+- **Assertion Library**: Assertions use [AwesomeAssertions](https://github.com/AwesomeAssertions/AwesomeAssertions), the Apache-2.0 community fork of FluentAssertions, not MSTest's `Assert` class.
 
 Example test pattern:
 
@@ -167,29 +167,29 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
+[TestClass]
 public class MyFeatureTests
 {
     private const string OpenApiSpec = @"
     // Your OpenAPI specification here
     ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Expected_Pattern()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("ExpectedPattern");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

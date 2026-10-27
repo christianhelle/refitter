@@ -38,4 +38,4 @@ When contributing to the documentation:
 
 ## Testing Framework
 
-Refitter uses [TUnit](https://github.com/thomhurst/TUnit) for unit testing instead of xUnit. TUnit provides significantly faster test execution (3x faster), which improves both local development and CI/CD pipeline performance. When writing tests for new features or bug fixes, use TUnit's `[Test]` attribute instead of xUnit's `[Fact]` or `[Theory]`.
+Refitter uses [MSTest](https://github.com/microsoft/testfx) v4 for unit testing. When writing tests for new features or bug fixes, mark test classes with `[TestClass]`, test methods with `[TestMethod]`, and supply parameterized test data with `[DataRow(...)]`.
