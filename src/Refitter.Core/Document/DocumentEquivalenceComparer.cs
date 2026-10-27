@@ -225,7 +225,7 @@ internal sealed class DocumentEquivalenceComparer
             json[propertyName] = new JArray(items);
     }
 
-    private OpenApiDocument CreateDocumentWithSchema(JsonSchema schema)
+    private static OpenApiDocument CreateDocumentWithSchema(JsonSchema schema)
     {
         var document = CreateSerializationDocument();
         document.Definitions["Schema"] = schema;
