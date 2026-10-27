@@ -17,6 +17,18 @@ public class XmlDocumentationGenerator
     private const string SummaryTag = "summary";
     private const string ParamKeyword = "param";
 
+    private static readonly Dictionary<char, char> SimpleEscapes = new()
+    {
+        ['"'] = '"',
+        ['\\'] = '\\',
+        ['/'] = '/',
+        ['b'] = '\b',
+        ['f'] = '\f',
+        ['n'] = '\n',
+        ['r'] = '\r',
+        ['t'] = '\t',
+    };
+
     /// <summary>
     /// Instantiates a new instance of the <see cref="XmlDocumentationGenerator"/> class.
     /// </summary>
@@ -421,22 +433,9 @@ public class XmlDocumentationGenerator
 
     private static void AppendSimpleEscape(StringBuilder result, char escapedCharacter)
     {
-        char? decodedSimpleChar = escapedCharacter switch
+        if (SimpleEscapes.TryGetValue(escapedCharacter, out var decodedSimpleChar))
         {
-            '"' => '"',
-            '\\' => '\\',
-            '/' => '/',
-            'b' => '\b',
-            'f' => '\f',
-            'n' => '\n',
-            'r' => '\r',
-            't' => '\t',
-            _ => null
-        };
-
-        if (decodedSimpleChar.HasValue)
-        {
-            AppendIfValidXmlChar(result, decodedSimpleChar.Value);
+            AppendIfValidXmlChar(result, decodedSimpleChar);
             return;
         }
 
