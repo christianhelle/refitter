@@ -258,4 +258,15 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         var car = document.Components!.Schemas["Car"].ActualSchema;
         car.AllOf.Should().BeEmpty();
     }
+
+    [Test]
+    public void Mutate_Skips_Null_Component_Schemas()
+    {
+        var document = new OpenApiDocument();
+        document.Components.Schemas["Missing"] = null!;
+
+        var act = () => new OneOfDiscriminatorToAllOfMutator().Mutate(document);
+
+        act.Should().NotThrow();
+    }
 }
