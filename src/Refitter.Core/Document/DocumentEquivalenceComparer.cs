@@ -163,7 +163,7 @@ internal sealed class DocumentEquivalenceComparer
     /// </summary>
     /// <param name="definitions">The dictionary to add schema definitions to.</param>
     /// <param name="schema">The root schema to process.</param>
-    public void AddReferencedSchemas(IDictionary<string, JsonSchema> definitions, JsonSchema schema)
+    public static void AddReferencedSchemas(IDictionary<string, JsonSchema> definitions, JsonSchema schema)
     {
         var visited = new HashSet<JsonSchema>(JsonSchemaReferenceComparer.Instance);
         var schemasToProcess = new Stack<JsonSchema>();

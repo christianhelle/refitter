@@ -1489,7 +1489,7 @@ paths:
         => Comparer.CreateCanonicalJsonToken(value);
 
     private static void InvokeAddReferencedSchemas(IDictionary<string, JsonSchema> definitions, JsonSchema schema)
-        => Comparer.AddReferencedSchemas(definitions, schema);
+        => DocumentEquivalenceComparer.AddReferencedSchemas(definitions, schema);
 
     private static string? InvokeGetDefinitionName(JsonSchema schema)
         => DocumentEquivalenceComparer.GetDefinitionName(schema);
