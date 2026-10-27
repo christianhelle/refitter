@@ -31,41 +31,14 @@ internal sealed class DocumentMerger : IDocumentMerger
         for (var i = 1; i < documents.Length; i++)
         {
             var document = documents[i];
-            foreach (var path in document.Paths)
-            {
-                MergeIfMissingOrThrowOnConflict(baseDocument.Paths, path.Key, path.Value, "path");
-            }
+            MergeAll(baseDocument.Paths, document.Paths, "path");
+            MergeAll(baseDocument.Components?.Schemas, document.Components?.Schemas, "schema");
+            MergeAll(baseDocument.Definitions, document.Definitions, "definition");
+            MergeAll(baseDocument.SecurityDefinitions, document.SecurityDefinitions, "security scheme");
 
-            if (document.Components?.Schemas?.Count > 0 && baseDocument.Components?.Schemas != null)
+            foreach (var tag in document.Tags.Where(tag => tagNames.Add(tag.Name)))
             {
-                foreach (var schema in document.Components.Schemas)
-                {
-                    MergeIfMissingOrThrowOnConflict(baseDocument.Components.Schemas, schema.Key, schema.Value, "schema");
-                }
-            }
-
-            if (document.Definitions != null)
-            {
-                foreach (var definition in document.Definitions)
-                {
-                    MergeIfMissingOrThrowOnConflict(baseDocument.Definitions, definition.Key, definition.Value, "definition");
-                }
-            }
-
-            if (document.SecurityDefinitions != null)
-            {
-                foreach (var securityDefinition in document.SecurityDefinitions)
-                {
-                    MergeIfMissingOrThrowOnConflict(baseDocument.SecurityDefinitions, securityDefinition.Key, securityDefinition.Value, "security scheme");
-                }
-            }
-
-            if (document.Tags.Count > 0)
-            {
-                foreach (var tag in document.Tags.Where(tag => tagNames.Add(tag.Name)))
-                {
-                    baseDocument.Tags.Add(tag);
-                }
+                baseDocument.Tags.Add(tag);
             }
         }
 
@@ -74,6 +47,20 @@ internal sealed class DocumentMerger : IDocumentMerger
 
     private static OpenApiDocument CloneDocument(OpenApiDocument document)
         => OpenApiDocument.FromJsonAsync(document.ToJson()).GetAwaiter().GetResult();
+
+    private void MergeAll<TValue>(
+        IDictionary<string, TValue>? target,
+        IDictionary<string, TValue>? source,
+        string itemType)
+    {
+        if (target == null || source == null)
+            return;
+
+        foreach (var item in source)
+        {
+            MergeIfMissingOrThrowOnConflict(target, item.Key, item.Value, itemType);
+        }
+    }
 
     private void MergeIfMissingOrThrowOnConflict<TValue>(
         IDictionary<string, TValue> target,
