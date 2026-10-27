@@ -54,4 +54,28 @@ public class JsonEscapeDecodingBranchTests
 
         result.Should().Be(@"a\qb");
     }
+
+    [Test]
+    public void DecodeJsonEscapedText_Strips_Unknown_Escape_Of_Invalid_Xml_Char()
+    {
+        var result = XmlDocumentationGenerator.DecodeJsonEscapedText("a\\\u0001b");
+
+        result.Should().Be(@"a\b");
+    }
+
+    [Test]
+    public void DecodeJsonEscapedText_Strips_Unicode_Escape_Of_Invalid_Xml_Char()
+    {
+        var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\u0001b");
+
+        result.Should().Be("ab");
+    }
+
+    [Test]
+    public void DecodeJsonEscapedText_Keeps_Trailing_Backslash()
+    {
+        var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"ab\");
+
+        result.Should().Be(@"ab\");
+    }
 }
