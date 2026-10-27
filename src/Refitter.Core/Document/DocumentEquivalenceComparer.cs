@@ -180,10 +180,9 @@ internal sealed class DocumentEquivalenceComparer
             if (definitionName != null && !definitions.ContainsKey(definitionName))
                 definitions.Add(definitionName, actualSchema);
 
-            foreach (var childSchema in EnumerateTraversableSchemas(actualSchema))
+            foreach (var childSchema in EnumerateTraversableSchemas(actualSchema).OfType<JsonSchema>())
             {
-                if (childSchema != null)
-                    schemasToProcess.Push(childSchema);
+                schemasToProcess.Push(childSchema);
             }
         }
     }

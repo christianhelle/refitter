@@ -176,12 +176,12 @@ internal static class ReferenceGuard
 
     private static IEnumerable<string> ExtractReferences(string content)
     {
-        foreach (Match match in RefPattern.Matches(content))
+        foreach (var groups in RefPattern.Matches(content).Cast<Match>().Select(match => match.Groups))
         {
             // Group 1 = quoted value, Group 2 = unquoted YAML scalar
-            var value = !string.IsNullOrEmpty(match.Groups[1].Value)
-                ? match.Groups[1].Value.Trim()
-                : match.Groups[2].Value.Trim();
+            var value = !string.IsNullOrEmpty(groups[1].Value)
+                ? groups[1].Value.Trim()
+                : groups[2].Value.Trim();
             if (value.Length > 0)
                 yield return value;
         }

@@ -116,23 +116,20 @@ public class RefitterRunner
         CancellationToken cancellationToken)
     {
         var openApiPaths = GetOpenApiPaths(settings);
-        foreach (var specPath in openApiPaths)
+        foreach (var specPath in openApiPaths.Where(path => !string.IsNullOrWhiteSpace(path)))
         {
-            if (!string.IsNullOrWhiteSpace(specPath))
-            {
-                var validationResult = await validator.ValidateAsync(
-                    specPath,
-                    settings.AllowRemoteReferences,
-                    cancellationToken);
+            var validationResult = await validator.ValidateAsync(
+                specPath,
+                settings.AllowRemoteReferences,
+                cancellationToken);
 
-                foreach (var error in validationResult.Diagnostics.Errors)
-                    diagnostics.Add(new RunnerDiagnostic(error.Message, IsError: true));
+            foreach (var error in validationResult.Diagnostics.Errors)
+                diagnostics.Add(new RunnerDiagnostic(error.Message, IsError: true));
 
-                foreach (var warning in validationResult.Diagnostics.Warnings)
-                    diagnostics.Add(new RunnerDiagnostic(warning.Message, IsError: false));
+            foreach (var warning in validationResult.Diagnostics.Warnings)
+                diagnostics.Add(new RunnerDiagnostic(warning.Message, IsError: false));
 
-                validationResult.ThrowIfInvalid();
-            }
+            validationResult.ThrowIfInvalid();
         }
     }
 

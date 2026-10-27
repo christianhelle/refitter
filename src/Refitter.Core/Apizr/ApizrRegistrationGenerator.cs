@@ -89,12 +89,9 @@ internal static class ApizrRegistrationGenerator
             builder.WithBaseAddress(iocSettings!.BaseUrl!, "ApizrDuplicateStrategy.Ignore");
         }
 
-        foreach (var adapter in Adapters)
+        foreach (var adapter in Adapters.Where(adapter => adapter.CanApply(settings)))
         {
-            if (adapter.CanApply(settings))
-            {
-                adapter.Apply(builder, settings);
-            }
+            adapter.Apply(builder, settings);
         }
 
         builder.AddPackage(ApizrPackages.Apizr);

@@ -62,10 +62,9 @@ internal sealed class DocumentMerger : IDocumentMerger
 
             if (document.Tags.Count > 0)
             {
-                foreach (var tag in document.Tags)
+                foreach (var tag in document.Tags.Where(tag => tagNames.Add(tag.Name)))
                 {
-                    if (tagNames.Add(tag.Name))
-                        baseDocument.Tags.Add(tag);
+                    baseDocument.Tags.Add(tag);
                 }
             }
         }

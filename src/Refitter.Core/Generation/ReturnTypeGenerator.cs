@@ -81,14 +81,11 @@ internal class ReturnTypeGenerator(
             if (response.Content?.Any() != true)
                 continue;
 
-            foreach (var contentEntry in response.Content)
+            foreach (var contentEntry in response.Content.Where(entry => IsFileContentType(entry.Key)))
             {
-                if (IsFileContentType(contentEntry.Key))
-                {
-                    var schema = contentEntry.Value?.Schema;
-                    if (schema?.Format == "binary" || schema?.Type == NJsonSchema.JsonObjectType.File)
-                        return true;
-                }
+                var schema = contentEntry.Value?.Schema;
+                if (schema?.Format == "binary" || schema?.Type == NJsonSchema.JsonObjectType.File)
+                    return true;
             }
         }
 
