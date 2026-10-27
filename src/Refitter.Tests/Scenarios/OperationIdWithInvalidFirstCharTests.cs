@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class OperationIdWithInvalidFirstCharTests
 {
 
@@ -31,21 +31,21 @@ paths:
           description: 'successful operation'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Adds_Underscore_At_Beginning_With_Ivalid_Methode_Name()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("_2fa");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

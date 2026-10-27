@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// operationIds that collide once casing and separators are normalized.
 /// </summary>
+[TestClass]
 public class OperationIdSeparatorCollisionTests
 {
     private const string OpenApiSpec = """
@@ -29,14 +29,14 @@ public class OperationIdSeparatorCollisionTests
               responses: { '204': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Distinct_Method_Names()
     {
         var generatedCode = await GenerateCode();
@@ -45,16 +45,16 @@ public class OperationIdSeparatorCollisionTests
         generatedCode.Should().Contain("Task C();");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_By_Endpoint()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint);

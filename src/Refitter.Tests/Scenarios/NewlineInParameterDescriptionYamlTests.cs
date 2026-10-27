@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class NewlineInParameterDescriptionYamlTests
 {
     private const string OpenApiSpec = @"
@@ -43,14 +43,14 @@ paths:
                   type: object
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Newlines_In_Parameter_Description_Are_Properly_Formatted()
     {
         var generatedCode = await GenerateCode();
@@ -60,7 +60,7 @@ paths:
         generatedCode.Should().Contain("/// If set to 'only', the result will only include deleted dialogs");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
@@ -70,7 +70,7 @@ paths:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Newlines_In_QueryParams_Class_Description_Are_Properly_Formatted()
     {
         var generatedCode = await GenerateCodeWithDynamicQuerystring();
@@ -81,7 +81,7 @@ paths:
         generatedCode.Should().Contain("/// If set to 'only', the result will only include deleted dialogs");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_DynamicQuerystring()
     {
         var generatedCode = await GenerateCodeWithDynamicQuerystring();

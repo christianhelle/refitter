@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Required/optional combined with nullable for parameters, enums and properties.
 /// </summary>
+[TestClass]
 public class RequiredNullableCombinationTests
 {
     private const string OpenApiSpec = """
@@ -40,14 +40,14 @@ public class RequiredNullableCombinationTests
                 d: { type: string, format: date-time, nullable: true }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Nullable_Parameters()
     {
         var generatedCode = await GenerateCode();
@@ -56,24 +56,24 @@ public class RequiredNullableCombinationTests
         generatedCode.Should().Contain("[Query] Color? optEnum");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Optional_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.OptionalParameters = true);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Immutable_Records()
     {
         var generatedCode = await GenerateCode(settings => settings.ImmutableRecords = true);

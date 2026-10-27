@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// TRACE operations cannot be expressed with Refit attributes (#1265).
 /// </summary>
+[TestClass]
 public class TraceOperationTests
 {
     private const string OpenApiSpec = """
@@ -35,28 +35,28 @@ public class TraceOperationTests
               responses: { '200': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Generate_Unknown_Trace_Attribute()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotContain("[Trace(");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Skips_Trace_Operation()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotContain("TraceR");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Other_Operations_On_Same_Path()
     {
         var generatedCode = await GenerateCode();
@@ -64,16 +64,16 @@ public class TraceOperationTests
         generatedCode.Should().Contain("Task GetR(");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_ByEndpoint_With_Dependency_Injection()
     {
         var generatedCode = await GenerateCode(settings =>
@@ -85,10 +85,10 @@ public class TraceOperationTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Arguments(MultipleInterfaces.Unset)]
-    [Arguments(MultipleInterfaces.ByEndpoint)]
-    [Arguments(MultipleInterfaces.ByTag)]
+    [TestMethod]
+    [DataRow(MultipleInterfaces.Unset)]
+    [DataRow(MultipleInterfaces.ByEndpoint)]
+    [DataRow(MultipleInterfaces.ByTag)]
     public async Task Can_Generate_Code_When_All_Operations_Are_Trace(MultipleInterfaces multipleInterfaces)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(TraceOnlySpec);

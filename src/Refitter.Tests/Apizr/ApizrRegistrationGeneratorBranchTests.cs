@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class ApizrRegistrationGeneratorBranchTests
 {
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_Empty_HttpMessageHandlers()
     {
         var settings = new RefitGeneratorSettings
@@ -33,7 +34,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("AddApizrManagerFor<IPetApi>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Polly_With_Empty_HttpMessageHandlers()
     {
         var settings = new RefitGeneratorSettings
@@ -64,7 +65,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_HttpResilience_With_Empty_HttpMessageHandlers()
     {
         var settings = new RefitGeneratorSettings
@@ -94,7 +95,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("AddStandardResilienceHandler");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_BaseUrl()
     {
         var settings = new RefitGeneratorSettings
@@ -120,7 +121,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().NotContain("WithBaseAddress");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_CacheProvider_Akavache()
     {
         var settings = new RefitGeneratorSettings
@@ -147,7 +148,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("WithAkavacheCacheHandler()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_CacheProvider_MonkeyCache()
     {
         var settings = new RefitGeneratorSettings
@@ -174,7 +175,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("WithCacheHandler(new MonkeyCacheHandler(Barrel.Current))");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_CacheProvider_InMemory()
     {
         var settings = new RefitGeneratorSettings
@@ -200,7 +201,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("WithInMemoryCacheHandler()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_CacheProvider_DistributedAsString()
     {
         var settings = new RefitGeneratorSettings
@@ -226,7 +227,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("WithDistributedCacheHandler<string>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_CacheProvider_DistributedAsByteArray()
     {
         var settings = new RefitGeneratorSettings
@@ -252,7 +253,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("WithDistributedCacheHandler<byte[]>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_MappingProvider_AutoMapper_WithDI()
     {
         var settings = new RefitGeneratorSettings
@@ -280,7 +281,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().NotContain("new MapperConfiguration");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_MappingProvider_AutoMapper_WithoutDI()
     {
         var settings = new RefitGeneratorSettings
@@ -302,7 +303,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("WithAutoMapperMappingHandler(new MapperConfiguration(config => { /* YOUR_MAPPINGS_HERE */ }))");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_MappingProvider_Mapster_WithDI()
     {
         var settings = new RefitGeneratorSettings
@@ -331,7 +332,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().NotContain("new Mapper()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_MappingProvider_Mapster_WithoutDI()
     {
         var settings = new RefitGeneratorSettings
@@ -354,7 +355,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("WithMapsterMappingHandler(new Mapper())");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_Priority()
     {
         var settings = new RefitGeneratorSettings
@@ -380,7 +381,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("WithPriority()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_Mediation_WithDI()
     {
         var settings = new RefitGeneratorSettings
@@ -407,7 +408,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().Contain("WithMediation()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_Mediation_WithoutDI_ShouldNotGenerate()
     {
         var settings = new RefitGeneratorSettings
@@ -428,7 +429,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().NotContain("WithMediation()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_TransientErrorHandler_None_And_HttpMessageHandlers()
     {
         var settings = new RefitGeneratorSettings
@@ -462,7 +463,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().NotContain("AddStandardResilienceHandler");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_CacheProvider_InMemory_WithoutDI_ShouldNotGenerate()
     {
         var settings = new RefitGeneratorSettings
@@ -483,7 +484,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().NotContain("WithInMemoryCacheHandler()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_CacheProvider_DistributedAsString_WithoutDI_ShouldNotGenerate()
     {
         var settings = new RefitGeneratorSettings
@@ -504,7 +505,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().NotContain("WithDistributedCacheHandler<string>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_CacheProvider_DistributedAsByteArray_WithoutDI_ShouldNotGenerate()
     {
         var settings = new RefitGeneratorSettings
@@ -525,7 +526,7 @@ public class ApizrRegistrationGeneratorBranchTests
         code.Should().NotContain("WithDistributedCacheHandler<byte[]>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Combined_Settings_All_Features()
     {
         var settings = new RefitGeneratorSettings

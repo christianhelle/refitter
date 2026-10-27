@@ -1,13 +1,13 @@
 using AwesomeAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class IdentifierUtilsTests
 {
-    [Test]
+    [TestMethod]
     public void Counted_Returns_Original_Name_When_Not_In_Set()
     {
         var knownIdentifiers = new HashSet<string>();
@@ -15,7 +15,7 @@ public class IdentifierUtilsTests
         result.Should().Be("TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_Returns_Name_With_Suffix_When_Not_In_Set()
     {
         var knownIdentifiers = new HashSet<string>();
@@ -23,7 +23,7 @@ public class IdentifierUtilsTests
         result.Should().Be("TestNameAsync");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_Returns_Name_With_Counter_When_Already_In_Set()
     {
         var knownIdentifiers = new HashSet<string> { "TestName" };
@@ -31,7 +31,7 @@ public class IdentifierUtilsTests
         result.Should().Be("TestName2");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_Returns_Name_With_Counter_And_Suffix_When_Already_In_Set()
     {
         var knownIdentifiers = new HashSet<string> { "TestNameAsync" };
@@ -39,7 +39,7 @@ public class IdentifierUtilsTests
         result.Should().Be("TestName2Async");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_Increments_Counter_When_Multiple_Conflicts()
     {
         var knownIdentifiers = new HashSet<string> { "TestName", "TestName2" };
@@ -47,7 +47,7 @@ public class IdentifierUtilsTests
         result.Should().Be("TestName3");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_With_Parent_Returns_Name_When_Not_In_Set()
     {
         var knownIdentifiers = new HashSet<string>();
@@ -55,7 +55,7 @@ public class IdentifierUtilsTests
         result.Should().Be("ChildName");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_With_Parent_Returns_Name_With_Counter_When_Conflict()
     {
         var knownIdentifiers = new HashSet<string> { "ParentName.ChildName" };
@@ -63,7 +63,7 @@ public class IdentifierUtilsTests
         result.Should().Be("ChildName2");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_With_Parent_And_Suffix_Returns_Correct_Name()
     {
         var knownIdentifiers = new HashSet<string> { "ParentName.ChildNameAsync" };
@@ -71,7 +71,7 @@ public class IdentifierUtilsTests
         result.Should().Be("ChildName2Async");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_With_Signature_Returns_Name_When_Not_In_Set()
     {
         var knownIdentifiers = new Dictionary<string, HashSet<string>>();
@@ -79,7 +79,7 @@ public class IdentifierUtilsTests
         result.Should().Be("GetItems");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_With_Signature_Allows_Overload_When_Signature_Differs()
     {
         var knownIdentifiers = new Dictionary<string, HashSet<string>>
@@ -90,7 +90,7 @@ public class IdentifierUtilsTests
         result.Should().Be("GetItems");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_With_Signature_Appends_Counter_When_Signature_Collides()
     {
         var knownIdentifiers = new Dictionary<string, HashSet<string>>
@@ -101,7 +101,7 @@ public class IdentifierUtilsTests
         result.Should().Be("GetItems2");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_With_Signature_Increments_Counter_On_Multiple_Collisions()
     {
         var knownIdentifiers = new Dictionary<string, HashSet<string>>
@@ -113,7 +113,7 @@ public class IdentifierUtilsTests
         result.Should().Be("GetItems3");
     }
 
-    [Test]
+    [TestMethod]
     public void Counted_With_Signature_Counts_Per_Signature()
     {
         var knownIdentifiers = new Dictionary<string, HashSet<string>>
@@ -126,183 +126,183 @@ public class IdentifierUtilsTests
         duplicate.Should().Be("GetItems2");
     }
 
-    [Test]
+    [TestMethod]
     public void ToCompilableIdentifier_Prefixes_Digit_Prefixed_PascalCase_Names()
     {
         var result = IdentifierUtils.ToCompilableIdentifier("42QuestionField");
         result.Should().Be("_42QuestionField");
     }
 
-    [Test]
+    [TestMethod]
     public void NormalizeSchemaTypeNameHint_Preserves_Normal_Dotted_Names()
     {
         var result = IdentifierUtils.NormalizeSchemaTypeNameHint("Namespace.LookUpErnResponse");
         result.Should().Be("Namespace.LookUpErnResponse");
     }
 
-    [Test]
+    [TestMethod]
     public void NormalizeSchemaTypeNameHint_Removes_Empty_Segments()
     {
         var result = IdentifierUtils.NormalizeSchemaTypeNameHint("Namespace..LookUpErnResponse.");
         result.Should().Be("Namespace.LookUpErnResponse");
     }
 
-    [Test]
+    [TestMethod]
     public void NormalizeSchemaTypeNameHint_Returns_Null_When_No_Usable_Segments_Exist()
     {
         var result = IdentifierUtils.NormalizeSchemaTypeNameHint("...");
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Spaces()
     {
         var result = "Test Name".Sanitize();
         result.Should().Be("TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Dashes()
     {
         var result = "Test-Name".Sanitize();
         result.Should().Be("TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Dots()
     {
         var result = "Test.Name".Sanitize();
         result.Should().Be("TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Special_Characters()
     {
         var result = "Test!@#$%^&*()Name".Sanitize();
         result.Should().Be("TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Quotes()
     {
         var result = "Test\"Name'".Sanitize();
         result.Should().Be("TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Newlines_And_Tabs()
     {
         var result = "Test\nName\t".Sanitize();
         result.Should().Be("TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Brackets_And_Braces()
     {
         var result = "Test[Name]{Value}(Param)".Sanitize();
         result.Should().Be("TestNameValueParam");
     }
 
-    [Test]
-    [Arguments("Pet API — «v2»", "PetAPIv2")]
-    [Arguments("Test?=~`Name", "TestName")]
-    [Arguments("«Pets»", "_Pets")]
-    [Arguments("Pet\U00010400Api", "PetApi")] // Roslyn rejects supplementary-plane characters (CS1056)
+    [TestMethod]
+    [DataRow("Pet API — «v2»", "PetAPIv2")]
+    [DataRow("Test?=~`Name", "TestName")]
+    [DataRow("«Pets»", "_Pets")]
+    [DataRow("Pet\U00010400Api", "PetApi")] // Roslyn rejects supplementary-plane characters (CS1056)
     public void Sanitize_Removes_Characters_Invalid_In_Identifiers(string value, string expected)
     {
         value.Sanitize().Should().Be(expected);
     }
 
-    [Test]
-    [Arguments("Café", "Café")]
-    [Arguments("Näme_Ünïcödé", "Näme_Ünïcödé")]
-    [Arguments("Café", "Café")]
+    [TestMethod]
+    [DataRow("Café", "Café")]
+    [DataRow("Näme_Ünïcödé", "Näme_Ünïcödé")]
+    [DataRow("Café", "Café")]
     public void Sanitize_Keeps_Unicode_Identifier_Characters(string value, string expected)
     {
         value.Sanitize().Should().Be(expected);
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Angle_Brackets()
     {
         var result = "Test<Name>Value".Sanitize();
         result.Should().Be("TestNameValue");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Pipes_And_Slashes()
     {
         var result = "Test|Name/Value\\Item".Sanitize();
         result.Should().Be("TestNameValueItem");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Colons_Semicolons_And_Commas()
     {
         var result = "Test:Name;Value,Item".Sanitize();
         result.Should().Be("TestNameValueItem");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Adds_Underscore_Prefix_When_Starting_With_Number()
     {
         var result = "123Test".Sanitize();
         result.Should().Be("_123Test");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Preserves_Underscore_Prefix()
     {
         var result = "_TestName".Sanitize();
         result.Should().Be("_TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Preserves_Valid_Identifier_Characters()
     {
         var result = "Test_Name123".Sanitize();
         result.Should().Be("Test_Name123");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Handles_Multiple_Consecutive_Illegal_Characters()
     {
         var result = "Test   ---   Name".Sanitize();
         result.Should().Be("TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Adds_Underscore_When_Starting_With_Lowercase()
     {
         var result = "aTestName".Sanitize();
         result.Should().Be("aTestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Removes_Special_Characters_Including_At_Symbol()
     {
         var result = "@TestName".Sanitize();
         result.Should().Be("_TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Trims_Trailing_Dashes()
     {
         var result = "TestName---".Sanitize();
         result.Should().Be("TestName");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Complex_String_With_Multiple_Issues()
     {
         var result = "123-Test Name!@#Value".Sanitize();
         result.Should().Be("_123TestNameValue");
     }
 
-    [Test]
-    [Arguments(null)]
-    [Arguments("")]
-    [Arguments("   ")]
+    [TestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    [DataRow("   ")]
     public void ToCompilableIdentifier_Returns_Underscore_For_Blank_Input(string? value)
     {
         var result = IdentifierUtils.ToCompilableIdentifier(value);
@@ -310,7 +310,7 @@ public class IdentifierUtilsTests
         result.Should().Be("_");
     }
 
-    [Test]
+    [TestMethod]
     public void ToCompilableIdentifier_Preserves_Verbatim_Identifier()
     {
         var result = IdentifierUtils.ToCompilableIdentifier("@class");
@@ -318,7 +318,7 @@ public class IdentifierUtilsTests
         result.Should().Be("@class");
     }
 
-    [Test]
+    [TestMethod]
     public void ToCompilableIdentifier_Escapes_Reserved_Keyword()
     {
         var result = IdentifierUtils.ToCompilableIdentifier("class");
@@ -326,7 +326,7 @@ public class IdentifierUtilsTests
         result.Should().Be("@class");
     }
 
-    [Test]
+    [TestMethod]
     public void ToCompilableIdentifier_Falls_Back_To_Underscore_When_All_Characters_Are_Illegal()
     {
         var result = IdentifierUtils.ToCompilableIdentifier("@");
@@ -334,31 +334,31 @@ public class IdentifierUtilsTests
         result.Should().Be("_");
     }
 
-    [Test]
+    [TestMethod]
     public void IsValidIdentifier_Returns_False_For_Blank_Input()
     {
         IdentifierUtils.IsValidIdentifier(null).Should().BeFalse();
         IdentifierUtils.IsValidIdentifier(string.Empty).Should().BeFalse();
     }
 
-    [Test]
-    [Arguments("@class", false)]
-    [Arguments("@valid", true)]
-    [Arguments("@", false)]
+    [TestMethod]
+    [DataRow("@class", false)]
+    [DataRow("@valid", true)]
+    [DataRow("@", false)]
     public void IsValidIdentifier_Handles_Verbatim_Prefix(string value, bool expected)
     {
         IdentifierUtils.IsValidIdentifier(value).Should().Be(expected);
     }
 
-    [Test]
-    [Arguments("")]
-    [Arguments(null)]
+    [TestMethod]
+    [DataRow("")]
+    [DataRow(null)]
     public void EscapeReservedKeyword_Returns_Input_For_Blank_Value(string? value)
     {
         IdentifierUtils.EscapeReservedKeyword(value!).Should().Be(value);
     }
 
-    [Test]
+    [TestMethod]
     public void EscapeReservedKeyword_Leaves_Verbatim_Identifier_Untouched()
     {
         IdentifierUtils.EscapeReservedKeyword("@class").Should().Be("@class");

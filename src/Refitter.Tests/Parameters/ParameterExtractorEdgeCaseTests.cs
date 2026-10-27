@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Parameters;
 
+[TestClass]
 public class ParameterExtractorEdgeCaseTests
 {
     #region ConvertToVariableName Edge Cases
@@ -49,7 +50,7 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task ConvertToVariableName_Handles_Empty_String_Property()
     {
         string generatedCode = await GenerateCodeWithSpecialCharacters();
@@ -57,7 +58,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"\")] string unnamed");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertToVariableName_Handles_Dashes()
     {
         string generatedCode = await GenerateCodeWithSpecialCharacters();
@@ -66,7 +67,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"field-with-dashes\")] string field_with_dashes");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertToVariableName_Handles_Dots()
     {
         string generatedCode = await GenerateCodeWithSpecialCharacters();
@@ -75,7 +76,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"field.with.dots\")] string field_with_dots");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertToVariableName_Handles_Special_Characters()
     {
         string generatedCode = await GenerateCodeWithSpecialCharacters();
@@ -83,7 +84,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"field@special#chars\")] string fieldspecial_chars");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertToVariableName_Generated_Code_Builds()
     {
         string generatedCode = await GenerateCodeWithSpecialCharacters();
@@ -150,7 +151,7 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_FormData_Includes_Text_Fields()
     {
         string generatedCode = await GenerateCodeWithMultipartTextFields();
@@ -160,14 +161,14 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("string category");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_FormData_Includes_Array_Text_Fields()
     {
         string generatedCode = await GenerateCodeWithMultipartTextFields();
         generatedCode.Should().Contain("IEnumerable<string> tags");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_FormData_Includes_Binary_Fields()
     {
         string generatedCode = await GenerateCodeWithMultipartTextFields();
@@ -175,7 +176,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("StreamPart documentFile");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_FormData_Text_Fields_Have_Correct_Attributes()
     {
         string generatedCode = await GenerateCodeWithMultipartTextFields();
@@ -185,7 +186,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("IEnumerable<string> tags");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_FormData_Mixed_Fields_Builds()
     {
         string generatedCode = await GenerateCodeWithMultipartTextFields();
@@ -252,14 +253,14 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task ApizrRequestOptions_Included_When_Enabled()
     {
         string generatedCode = await GenerateCodeWithApizrRequestOptions();
         generatedCode.Should().Contain("[RequestOptions] IApizrRequestOptions options");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ApizrRequestOptions_Not_Included_When_Disabled()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecForApizr);
@@ -274,7 +275,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().NotContain("IApizrRequestOptions options");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ApizrRequestOptions_Included_In_All_Methods()
     {
         string generatedCode = await GenerateCodeWithApizrRequestOptions();
@@ -285,8 +286,8 @@ public class ParameterExtractorEdgeCaseTests
         occurrences.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ApizrRequestOptions_Code_Builds()
     {
         string generatedCode = await GenerateCodeWithApizrRequestOptions();
@@ -350,14 +351,14 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task CancellationToken_Included_When_Enabled()
     {
         string generatedCode = await GenerateCodeWithCancellationToken();
         generatedCode.Should().Contain("CancellationToken cancellationToken = default");
     }
 
-    [Test]
+    [TestMethod]
     public async Task CancellationToken_Not_Included_When_Disabled()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecForCancellation);
@@ -372,7 +373,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().NotContain("CancellationToken cancellationToken");
     }
 
-    [Test]
+    [TestMethod]
     public async Task CancellationToken_Included_In_All_Methods()
     {
         string generatedCode = await GenerateCodeWithCancellationToken();
@@ -383,15 +384,15 @@ public class ParameterExtractorEdgeCaseTests
         occurrences.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task CancellationToken_Code_Builds()
     {
         string generatedCode = await GenerateCodeWithCancellationToken();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task CancellationToken_Not_Included_When_ApizrRequestOptions_Used()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecForCancellation);
@@ -473,7 +474,7 @@ public class ParameterExtractorEdgeCaseTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Complex_Multipart_With_Special_Characters_And_Mixed_Types()
     {
         string generatedCode = await GenerateCodeComplexMultipart();
@@ -494,7 +495,7 @@ public class ParameterExtractorEdgeCaseTests
         generatedCode.Should().Contain("[AliasAs(\"profile.pic\")]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Complex_Multipart_Code_Builds()
     {
         string generatedCode = await GenerateCodeComplexMultipart();

@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class MutuallyExclusiveSettingsTests
 {
     private const string OpenApiSpec = @"
@@ -57,28 +57,28 @@ public class MutuallyExclusiveSettingsTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Both_Disabled_Still_Generates_Code()
     {
         string generatedCode = await GenerateCodeWithBothDisabled();
         generatedCode.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Both_Disabled_Can_Build_Code()
     {
         string generatedCode = await GenerateCodeWithBothDisabled();
         generatedCode.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Both_Response_Types_Generates_Code()
     {
         string generatedCode = await GenerateCodeWithBothResponseTypes();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Both_Response_Types_Can_Build()
     {
         string generatedCode = await GenerateCodeWithBothResponseTypes();
@@ -88,14 +88,14 @@ public class MutuallyExclusiveSettingsTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Both_Response_Types_Prefers_ApiResponse()
     {
         string generatedCode = await GenerateCodeWithBothResponseTypes();
         generatedCode.Should().Contain("IApiResponse");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ApiResponse_Setting_Takes_Precedence_Over_Observable()
     {
         string generatedCode = await GenerateCodeWithBothResponseTypes();

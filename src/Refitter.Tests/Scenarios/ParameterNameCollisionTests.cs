@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Parameters with the same name in different locations (path, query, header, body).
 /// </summary>
+[TestClass]
 public class ParameterNameCollisionTests
 {
     private const string OpenApiSpec = """
@@ -34,14 +34,14 @@ public class ParameterNameCollisionTests
               responses: { '204': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Disambiguates_Parameters_By_Location()
     {
         var generatedCode = await GenerateCode();
@@ -52,8 +52,8 @@ public class ParameterNameCollisionTests
         generatedCode.Should().Contain("[Header(\"id\")] string idHeader");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

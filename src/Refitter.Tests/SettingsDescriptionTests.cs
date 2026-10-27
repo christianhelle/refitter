@@ -1,16 +1,16 @@
-using System.ComponentModel;
+using DescriptionAttribute = System.ComponentModel.DescriptionAttribute;
 using System.Reflection;
 using AwesomeAssertions;
 using Spectre.Console;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class SettingsDescriptionTests
 {
     // Spectre.Console renders option descriptions as markup, so an unescaped [Attribute]
     // in a description makes --help fail with "Could not find color or style"
-    [Test]
+    [TestMethod]
     public void Option_Descriptions_Are_Valid_Markup()
     {
         var descriptions = typeof(Settings)

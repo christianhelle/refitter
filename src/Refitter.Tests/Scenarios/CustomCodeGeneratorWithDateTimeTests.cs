@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class CustomCodeGeneratorWithDateTimeTests
 {
     private const string OpenApiSpec =
@@ -73,35 +73,35 @@ public class CustomCodeGeneratorWithDateTimeTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GeneratedCode_Contains_DateTime_Parameter()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("System.DateTime");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GeneratedCode_NotContains_DateTimeOffset_Parameter()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotContain("System.DateTimeOffset");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

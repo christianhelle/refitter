@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Regression tests for PR #1064 blockers: #1013, #1018, #1053
 /// </summary>
+[TestClass]
 public class BlockerRegressions
 {
     #region Issue #1013 - Suffix Target Collision Prevention
@@ -77,7 +77,7 @@ public class BlockerRegressions
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Issue1013_Prevents_Suffix_Collision_When_Target_Type_Already_Exists()
     {
         // Arrange: Schema has "Pet" and "PetDto" types. Applying "Dto" suffix to "Pet" would collide with existing "PetDto".
@@ -91,7 +91,7 @@ public class BlockerRegressions
         result.Should().Contain("public partial class PetDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Issue1013_Does_Not_Corrupt_Type_References_When_Collision_Exists()
     {
         // Repro: When "Pet" → "PetDto" and "PetDto" already exists, references must resolve correctly
@@ -103,8 +103,8 @@ public class BlockerRegressions
         result.Should().NotContain("Task<PetDtoDto>");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Issue1013_Generated_Code_With_Suffix_Collision_Compiles()
     {
         // Prove that collision scenario produces compilable code
@@ -161,7 +161,7 @@ public class BlockerRegressions
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Issue1018_Deduplicates_Multipart_Parameters_By_Sanitized_Identifier()
     {
         // Repro: "a-b", "a b", "a.b" all sanitize to "a_b" → must dedupe on final identifier, not original key
@@ -175,7 +175,7 @@ public class BlockerRegressions
         matches.Count.Should().BeLessThanOrEqualTo(1, "deduplication should prevent duplicate sanitized identifiers");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Issue1018_First_Multipart_Parameter_Wins_After_Sanitization()
     {
         // Repro: When multiple keys sanitize to same identifier, first wins (consistent with HashSet.Add semantics)
@@ -185,8 +185,8 @@ public class BlockerRegressions
         generatedCode.Should().Contain("[AliasAs(\"a-b\")]", "first parameter with sanitized name should be emitted");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Issue1018_Generated_Code_With_Duplicate_Sanitized_Names_Compiles()
     {
         // Prove that deduplication prevents compilation errors
@@ -259,7 +259,7 @@ public class BlockerRegressions
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Issue1053_Keywords_Are_Escaped_Not_Double_Prefixed()
     {
         // Repro: Sanitize("class") should return "@class", not "I@class" or "_@class"
@@ -276,7 +276,7 @@ public class BlockerRegressions
         generatedCode.Should().NotContain("_@event");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Issue1053_Sanitize_Routes_Through_EscapeReservedKeyword()
     {
         // Repro: Sanitize() must call EscapeReservedKeyword() to properly handle C# keywords
@@ -287,7 +287,7 @@ public class BlockerRegressions
         sanitizedEvent.Should().Be("@event", "Sanitize must escape reserved keywords");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Issue1053_Title_With_Special_Chars_Does_Not_Produce_Invalid_Identifiers()
     {
         // Repro: Title "@class-Service" should sanitize cleanly without invalid prefixes
@@ -299,7 +299,7 @@ public class BlockerRegressions
         generatedCode.Should().NotContain("class @");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Issue1053_Parameter_Name_With_Leading_At_Sign_Is_Stripped()
     {
         // Repro: Parameter "@while" should become "@while" (keyword-escaped), not "@@while"
@@ -310,7 +310,7 @@ public class BlockerRegressions
         generatedCode.Should().NotContain("@@while");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Issue1053_Schema_Names_As_Keywords_Are_Properly_Escaped()
     {
         // Repro: Schema named "class" is capitalized by NSwag to "Class" (not a keyword)
@@ -328,8 +328,8 @@ public class BlockerRegressions
         generatedCode.Should().Contain("@while");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Issue1053_Generated_Code_With_Keywords_Compiles()
     {
         // Prove that keyword handling produces compilable code
@@ -375,7 +375,7 @@ public class BlockerRegressions
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Issue1102_TagNamedPublic_DoesNotProduceIAtPublicApi()
     {
         // Repro: Tag "public" (lowercase reserved keyword) should not produce I@publicApi
@@ -396,8 +396,8 @@ public class BlockerRegressions
         generatedCode.Should().Contain("interface IPublicApi");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Issue1102_TagNamedPublic_GeneratedCode_Compiles()
     {
         // Prove that the fix produces compilable code
@@ -414,7 +414,7 @@ public class BlockerRegressions
             "generated code must compile (I@publicApi is invalid and would not compile)");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Issue1102_TagNamedPublic_AllReservedKeywordsHandled()
     {
         // Verify all reserved keywords in tags are handled correctly

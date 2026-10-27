@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
 {
     private const string OpenApiSpec = """
@@ -159,38 +159,38 @@ public class TrimUnusedSchemaAliasWithLeadingDigitPropertyTests
                 type: number
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_OpenApi2()
     {
         var generatedCode = await GenerateCodeFromSpec(OpenApiSpec2);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_OpenApi2()
     {
         var generatedCode = await GenerateCodeFromSpec(OpenApiSpec2);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Generated_Identifier_Is_Valid_And_Compilable()
     {
         var generatedCode = await GenerateCode();

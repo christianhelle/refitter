@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class MultipleInterfacesByTagsTests
 {
     private const string OpenApiSpec = @"
@@ -116,28 +116,28 @@ paths:
           description: 'successful operation'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Foo_Interface()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IFooApi");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Bar_Interface()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IBarApi");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
         string generatedCode = await GenerateCode(true);
@@ -146,7 +146,7 @@ paths:
         generatedCode.Should().Contain("BarGetBarDetailsQueryParams");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

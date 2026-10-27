@@ -7,9 +7,10 @@ using Refitter.MSBuild;
 
 namespace Refitter.Tests.MSBuild;
 
+[TestClass]
 public class RefitterGenerateTaskTests
 {
-    [Test]
+    [TestMethod]
     public void FilterFiles_Should_Require_Exact_File_Name_Match()
     {
         var projectRoot = Path.Combine("C:", "repo");
@@ -25,7 +26,7 @@ public class RefitterGenerateTaskTests
         result.Should().ContainSingle().Which.Should().Be(Path.Combine(projectRoot, "petstore.refitter"));
     }
 
-    [Test]
+    [TestMethod]
     public void FilterFiles_Should_Match_Project_Relative_Path()
     {
         var projectRoot = Path.Combine("C:", "repo");
@@ -40,7 +41,7 @@ public class RefitterGenerateTaskTests
         result.Should().ContainSingle().Which.Should().Be(Path.Combine(projectRoot, "apis", "petstore.refitter"));
     }
 
-    [Test]
+    [TestMethod]
     public void FilterFiles_Should_Match_Exact_Full_Path()
     {
         var workspace = CreateWorkspace();
@@ -65,7 +66,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void FilterFiles_Should_Not_Match_Substring_Project_Relative_Path()
     {
         var projectRoot = Path.Combine("C:", "repo");
@@ -80,7 +81,7 @@ public class RefitterGenerateTaskTests
         result.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void FilterFiles_Should_Return_All_Files_When_IncludePatterns_Are_Empty()
     {
         var projectRoot = Path.Combine("C:", "repo");
@@ -95,7 +96,7 @@ public class RefitterGenerateTaskTests
         result.Should().Equal(files);
     }
 
-    [Test]
+    [TestMethod]
     public void FilterFiles_Should_Handle_Blank_Project_File_Directory()
     {
         var matchingFile = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "petstore.refitter"));
@@ -110,7 +111,7 @@ public class RefitterGenerateTaskTests
         result.Should().ContainSingle().Which.Should().Be(matchingFile);
     }
 
-    [Test]
+    [TestMethod]
     public void FilterFiles_Should_Normalize_Relative_Prefix_In_Include_Patterns()
     {
         var projectRoot = Path.Combine("C:", "repo");
@@ -125,7 +126,7 @@ public class RefitterGenerateTaskTests
         result.Should().ContainSingle().Which.Should().Be(Path.Combine(projectRoot, "apis", "petstore.refitter"));
     }
 
-    [Test]
+    [TestMethod]
     public void FilterFiles_Should_Handle_Project_Directory_With_Trailing_Separator()
     {
         var projectRoot = Path.Combine("C:", "repo");
@@ -140,7 +141,7 @@ public class RefitterGenerateTaskTests
         result.Should().ContainSingle().Which.Should().Be(Path.Combine(projectRoot, "apis", "petstore.refitter"));
     }
 
-    [Test]
+    [TestMethod]
     public void ParseGeneratedFilePath_Should_Return_File_Path_From_Marker()
     {
         var generatedFile = Path.Combine("C:", "repo", "Generated", "Petstore.cs");
@@ -150,7 +151,7 @@ public class RefitterGenerateTaskTests
         result.Should().Be(generatedFile);
     }
 
-    [Test]
+    [TestMethod]
     public void ParseGeneratedFilePath_Should_Return_Null_For_Empty_Marker_Path()
     {
         var result = RefitterGenerateTask.ParseGeneratedFilePath(RefitterGenerateTask.GeneratedFileMarker);
@@ -158,7 +159,7 @@ public class RefitterGenerateTaskTests
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void ParseGeneratedFilePath_Should_Return_Null_For_Whitespace_Output()
     {
         var result = RefitterGenerateTask.ParseGeneratedFilePath("   ");
@@ -166,7 +167,7 @@ public class RefitterGenerateTaskTests
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void ParseGeneratedFilePath_Should_Return_Null_For_Null_Output()
     {
         var result = RefitterGenerateTask.ParseGeneratedFilePath(null);
@@ -174,7 +175,7 @@ public class RefitterGenerateTaskTests
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void ParseGeneratedFilePath_Should_Ignore_Non_Marker_Output()
     {
         var result = RefitterGenerateTask.ParseGeneratedFilePath("Generated Output");
@@ -182,7 +183,7 @@ public class RefitterGenerateTaskTests
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void HandleProcessErrorOutput_Should_Ignore_Whitespace()
     {
         var messages = new List<string>();
@@ -192,7 +193,7 @@ public class RefitterGenerateTaskTests
         messages.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void HandleProcessErrorOutput_Should_Log_Non_Whitespace()
     {
         var messages = new List<string>();
@@ -202,7 +203,7 @@ public class RefitterGenerateTaskTests
         messages.Should().ContainSingle().Which.Should().Be("stderr output");
     }
 
-    [Test]
+    [TestMethod]
     public void HandleProcessStandardOutput_Should_Ignore_Whitespace()
     {
         var outputLines = new List<string>();
@@ -214,7 +215,7 @@ public class RefitterGenerateTaskTests
         logged.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void HandleProcessStandardOutput_Should_Record_And_Log_Output()
     {
         var outputLines = new List<string>();
@@ -226,7 +227,7 @@ public class RefitterGenerateTaskTests
         logged.Should().ContainSingle().Which.Should().Be("Generated output");
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveGeneratedFiles_Should_Deduplicate_Duplicate_Markers()
     {
         var workspace = CreateWorkspace();
@@ -271,7 +272,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveGeneratedFiles_Should_Fail_When_No_Markers_Are_Reported()
     {
         var outputLines = new[]
@@ -286,7 +287,7 @@ public class RefitterGenerateTaskTests
         errorMessage.Should().Be("Refitter did not report any generated files for petstore.refitter");
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveGeneratedFiles_Should_Log_Error_And_Set_Failed_When_No_Markers_Are_Reported()
     {
         var outputLines = new[]
@@ -303,7 +304,7 @@ public class RefitterGenerateTaskTests
         errors.Should().ContainSingle().Which.Should().Be("Refitter did not report any generated files for petstore.refitter");
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Fall_Back_When_Runtime_Discovery_Throws()
     {
         var workspace = CreateWorkspace();
@@ -339,7 +340,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveRefitterDll_Should_Fall_Back_When_Preferred_Runtime_Binary_Is_Missing()
     {
         try
@@ -364,7 +365,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveRefitterDll_Should_Return_Null_When_PackageFolder_Is_Blank()
     {
         var messages = new List<string>();
@@ -375,7 +376,7 @@ public class RefitterGenerateTaskTests
         messages.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveRefitterDll_Should_Ignore_Whitespace_Runtime_Entries_When_Falling_Back()
     {
         try
@@ -399,7 +400,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveRefitterDll_Should_Fall_Back_To_CoLocated_Cli()
     {
         try
@@ -423,7 +424,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveRefitterDll_Should_Return_First_Bundled_Path_When_No_Binaries_Exist()
     {
         try
@@ -443,7 +444,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void GetInstalledDotnetRuntimes_Should_Throw_TimeoutException_When_Runtime_Discovery_Times_Out()
     {
         try
@@ -467,7 +468,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void GetInstalledDotnetRuntimes_Should_Include_Termination_Failure_When_Runtime_Discovery_Cannot_Be_Stopped()
     {
         try
@@ -493,7 +494,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero()
     {
         try
@@ -517,7 +518,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void GetInstalledDotnetRuntimes_Should_Throw_When_Runtime_Discovery_Exits_NonZero_Without_Error_Output()
     {
         try
@@ -540,7 +541,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void GetInstalledDotnetRuntimes_Should_Return_Reported_Runtimes()
     {
         try
@@ -566,12 +567,12 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
-    [Arguments("net8.0", "net8.0")]
-    [Arguments("net10.0", "net10.0")]
-    [Arguments("tools", null)]
-    [Arguments("netpreview", null)]
-    [Arguments("net8..0", null)]
+    [TestMethod]
+    [DataRow("net8.0", "net8.0")]
+    [DataRow("net10.0", "net10.0")]
+    [DataRow("tools", null)]
+    [DataRow("netpreview", null)]
+    [DataRow("net8..0", null)]
     public void GetRuntimeTfm_Should_Only_Return_Numeric_Target_Framework_Folders(string folderName, string? expected)
     {
         var refitterDll = Path.Combine("packages", "refitter", folderName, "refitter.dll");
@@ -579,7 +580,7 @@ public class RefitterGenerateTaskTests
         InvokeGetRuntimeTfm(refitterDll).Should().Be(expected);
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Fall_Back_When_Runtime_Discovery_Times_Out()
     {
         var workspace = CreateWorkspace();
@@ -620,7 +621,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Use_DotNet9_Runtime_When_Available()
     {
         var workspace = CreateWorkspace();
@@ -658,7 +659,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Pass_JsonLibraryVersion_To_Refitter()
     {
         string workspace = CreateWorkspace();
@@ -696,7 +697,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Not_Pass_JsonLibraryVersion_When_Not_Set()
     {
         string workspace = CreateWorkspace();
@@ -733,9 +734,9 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
-    [Arguments("abc")]
-    [Arguments("8,0")]
+    [TestMethod]
+    [DataRow("abc")]
+    [DataRow("8,0")]
     public void Execute_Should_Fail_When_JsonLibraryVersion_Is_Invalid(string jsonLibraryVersion)
     {
         string workspace = CreateWorkspace();
@@ -773,7 +774,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Pass_Telemetry_Source_Args_To_Refitter()
     {
         string workspace = CreateWorkspace();
@@ -819,7 +820,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Fall_Back_To_DotNet8_Runtime_When_Newer_Runtimes_Are_Unavailable()
     {
         var workspace = CreateWorkspace();
@@ -856,7 +857,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Return_False_When_Refitter_Cli_Cannot_Be_Located()
     {
         var workspace = CreateWorkspace();
@@ -883,7 +884,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Log_Timeout_When_Process_Does_Not_Exit()
     {
         var workspace = CreateWorkspace();
@@ -910,7 +911,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Log_Millisecond_Timeout_Value()
     {
         var workspace = CreateWorkspace();
@@ -937,7 +938,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Log_When_Timed_Out_Process_Cannot_Be_Terminated()
     {
         var workspace = CreateWorkspace();
@@ -966,7 +967,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Log_Configured_Timeout_Value()
     {
         var workspace = CreateWorkspace();
@@ -993,7 +994,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Log_ProcessRunner_Exception_And_Return_False()
     {
         var workspace = CreateWorkspace();
@@ -1023,7 +1024,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Execute_Should_Log_When_Process_Exits_With_Non_Zero_Code()
     {
         var workspace = CreateWorkspace();
@@ -1049,7 +1050,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void RunProcess_Should_Return_Exit_Code_And_Forward_Output_When_Process_Completes()
     {
         var outputLines = new List<string>();
@@ -1089,7 +1090,7 @@ public class RefitterGenerateTaskTests
         outputLines.Should().NotBeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void RunProcess_Should_Return_TimedOut_Result_When_Process_Exceeds_Timeout()
     {
         try
@@ -1107,7 +1108,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void RunProcess_Should_Return_Termination_Exception_When_Kill_Fails_After_Timeout()
     {
         try
@@ -1127,7 +1128,7 @@ public class RefitterGenerateTaskTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void TryLogCommandLine_Should_Swallow_BuildEngine_Exceptions()
     {
         var task = new RefitterGenerateTask { BuildEngine = new RecordingBuildEngine { ThrowOnMessages = true } };
@@ -1136,7 +1137,7 @@ public class RefitterGenerateTaskTests
         action.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void TryLogError_Should_Swallow_BuildEngine_Exceptions()
     {
         var task = new RefitterGenerateTask { BuildEngine = new RecordingBuildEngine { ThrowOnErrors = true } };
@@ -1145,7 +1146,7 @@ public class RefitterGenerateTaskTests
         action.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void TryLogErrorFromException_Should_Swallow_BuildEngine_Exceptions()
     {
         var task = new RefitterGenerateTask { BuildEngine = new RecordingBuildEngine { ThrowOnErrors = true } };
@@ -1154,7 +1155,7 @@ public class RefitterGenerateTaskTests
         action.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void TryLogErrorFromException_Should_Log_When_BuildEngine_Allows_It()
     {
         var buildEngine = new RecordingBuildEngine();

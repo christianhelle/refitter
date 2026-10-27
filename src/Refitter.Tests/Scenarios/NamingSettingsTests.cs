@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class NamingSettingsTests
 {
     private const string OpenApiSpec = @"
@@ -37,43 +37,43 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode(useOpenApiTitle: true);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode(useOpenApiTitle: true);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_OpenApi_Title_As_Interface_Name()
     {
         string generatedCode = await GenerateCode(useOpenApiTitle: true);
         generatedCode.Should().Contain("interface IPetStore");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_Custom_Interface_Name()
     {
         string generatedCode = await GenerateCode(useOpenApiTitle: false, interfaceName: "MyCustomApi");
         generatedCode.Should().Contain("interface IMyCustomApi");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_Default_Interface_Name_When_Not_Configured()
     {
         string generatedCode = await GenerateCode(useOpenApiTitle: false, interfaceName: null);
         generatedCode.Should().Contain("interface IApiClient");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Custom_Interface_Name_Takes_Precedence_Over_OpenApi_Title()
     {
         string generatedCode = await GenerateCode(useOpenApiTitle: false, interfaceName: "OverrideApi");

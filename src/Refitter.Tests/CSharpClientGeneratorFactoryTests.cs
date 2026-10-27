@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class CSharpClientGeneratorFactoryTests
 {
     #region ProcessSchemaForIntegerType Tests
@@ -351,49 +351,49 @@ public class CSharpClientGeneratorFactoryTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForIntegerWithoutFormat()
     {
         string generatedCode = await GenerateCodeWithIntegerType(IntegerType.Int64);
         generatedCode.Should().Contain("long IntegerNoFormat");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForNestedInteger()
     {
         string generatedCode = await GenerateCodeWithIntegerType(IntegerType.Int64);
         generatedCode.Should().Contain("long NestedInt");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForArrayItems()
     {
         string generatedCode = await GenerateCodeWithIntegerType(IntegerType.Int64);
         generatedCode.Should().Contain("ICollection<long> ArrayOfIntegers");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForAdditionalProperties()
     {
         string generatedCode = await GenerateCodeWithIntegerType(IntegerType.Int64);
         generatedCode.Should().Contain("IDictionary<string, long>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForAllOfSchemas()
     {
         string generatedCode = await GenerateCodeWithIntegerType(IntegerType.Int64);
         generatedCode.Should().Contain("long AllOfProp");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForOneOfSchemas()
     {
         string generatedCode = await GenerateCodeWithIntegerType(IntegerType.Int64);
         generatedCode.Should().Contain("long OneOfProp");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForAnyOfSchemas()
     {
         string generatedCode = await GenerateCodeWithIntegerType(IntegerType.Int64);
@@ -402,7 +402,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("AnyOfInt");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_GeneratesLongForParameterWithoutFormat()
     {
         string generatedCode = await GenerateCodeWithIntegerType(IntegerType.Int64);
@@ -410,7 +410,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("intParam");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ProcessSchemaForIntegerType_WithInt64Setting_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeWithIntegerType(IntegerType.Int64);
@@ -420,8 +420,8 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ProcessSchemaWalkers_WithRecursivePropertyItemAndAdditionalPropertiesSchemas_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeWithIntegerType(RecursiveSchemaOpenApiSpec, IntegerType.Int64);
@@ -433,8 +433,8 @@ public class CSharpClientGeneratorFactoryTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ProcessSchemaWalkers_WithRecursiveAllOfSchemas_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeWithIntegerType(RecursiveAllOfOpenApiSpec, IntegerType.Int64);
@@ -444,8 +444,8 @@ public class CSharpClientGeneratorFactoryTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ProcessSchemaWalkers_WithRecursivePropertyItemAndAdditionalPropertiesSchemas_V2_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeWithIntegerType(RecursiveSchemaOpenApiSpecV2, IntegerType.Int64);
@@ -457,8 +457,8 @@ public class CSharpClientGeneratorFactoryTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ProcessSchemaWalkers_WithRecursiveAllOfSchemas_V2_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeWithIntegerType(RecursiveAllOfOpenApiSpecV2, IntegerType.Int64);
@@ -556,7 +556,7 @@ public class CSharpClientGeneratorFactoryTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesFalse_DoesNotGenerateAdditionalProperties()
     {
         string generatedCode = await GenerateCodeWithAdditionalProperties(false);
@@ -566,7 +566,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().NotContain("Dictionary<string, object> AdditionalProperties");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesTrue_GeneratesAdditionalProperties()
     {
         string generatedCode = await GenerateCodeWithAdditionalProperties(true);
@@ -574,7 +574,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("IDictionary<string, object>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesFalse_AppliesToAllSchemas()
     {
         string generatedCode = await GenerateCodeWithAdditionalProperties(false);
@@ -588,7 +588,7 @@ public class CSharpClientGeneratorFactoryTests
         additionalPropsLines.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesFalse_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeWithAdditionalProperties(false);
@@ -598,7 +598,7 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithGenerateDefaultAdditionalPropertiesTrue_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeWithAdditionalProperties(true);
@@ -785,14 +785,14 @@ public class CSharpClientGeneratorFactoryTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_GeneratesBaseClass()
     {
         string generatedCode = await GenerateCodeFromSpec(OneOfWithDiscriminatorOpenApiSpec);
         generatedCode.Should().Contain("class Vehicle");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_DoesNotGenerateAnonymousTypes()
     {
         string generatedCode = await GenerateCodeFromSpec(OneOfWithDiscriminatorOpenApiSpec);
@@ -800,7 +800,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().NotContain("Anonymous");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_GeneratesInheritanceHierarchy()
     {
         string generatedCode = await GenerateCodeFromSpec(OneOfWithDiscriminatorOpenApiSpec);
@@ -808,7 +808,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("Truck : Vehicle");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_GeneratesAllSubtypes()
     {
         string generatedCode = await GenerateCodeFromSpec(OneOfWithDiscriminatorOpenApiSpec);
@@ -816,7 +816,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("class Truck");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeFromSpec(OneOfWithDiscriminatorOpenApiSpec);
@@ -826,14 +826,14 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_GeneratesBaseClass()
     {
         string generatedCode = await GenerateCodeFromSpec(AnyOfWithDiscriminatorOpenApiSpec);
         generatedCode.Should().Contain("class Payment");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_DoesNotGenerateAnonymousTypes()
     {
         string generatedCode = await GenerateCodeFromSpec(AnyOfWithDiscriminatorOpenApiSpec);
@@ -841,7 +841,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().NotContain("Anonymous");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_GeneratesInheritanceHierarchy()
     {
         string generatedCode = await GenerateCodeFromSpec(AnyOfWithDiscriminatorOpenApiSpec);
@@ -849,7 +849,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("BankTransfer : Payment");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_GeneratesAllSubtypes()
     {
         string generatedCode = await GenerateCodeFromSpec(AnyOfWithDiscriminatorOpenApiSpec);
@@ -857,7 +857,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("class BankTransfer");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertAnyOfWithDiscriminatorToAllOf_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeFromSpec(AnyOfWithDiscriminatorOpenApiSpec);
@@ -867,7 +867,7 @@ public class CSharpClientGeneratorFactoryTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_WithPolymorphicSerialization_GeneratesJsonAttributes()
     {
         string generatedCode = await GenerateCodeFromSpec(OneOfWithDiscriminatorOpenApiSpec, usePolymorphicSerialization: true);
@@ -876,7 +876,7 @@ public class CSharpClientGeneratorFactoryTests
         generatedCode.Should().Contain("[JsonDerivedType(typeof(Truck)");
     }
 
-    [Test]
+    [TestMethod]
     public async Task ConvertOneOfWithDiscriminatorToAllOf_WithPolymorphicSerialization_CanBuildGeneratedCode()
     {
         string generatedCode = await GenerateCodeFromSpec(OneOfWithDiscriminatorOpenApiSpec, usePolymorphicSerialization: true);

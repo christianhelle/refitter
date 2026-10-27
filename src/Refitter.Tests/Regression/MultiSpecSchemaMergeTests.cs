@@ -9,6 +9,7 @@ namespace Refitter.Tests.Regression;
 /// Validates that schemas from all OpenAPI specs are preserved during merge
 /// </summary>
 
+[TestClass]
 public class MultiSpecSchemaMergeTests
 {
     // First spec: has paths but NO components section
@@ -167,7 +168,7 @@ public class MultiSpecSchemaMergeTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Should_Preserve_Schemas_When_First_Spec_Has_No_Components()
     {
         var (file1, file2) = await CreateSpecFiles(SpecNoComponents, SpecWithUserSchema);
@@ -179,7 +180,7 @@ public class MultiSpecSchemaMergeTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Preserve_Schemas_When_First_Spec_Has_Components_But_No_Schemas()
     {
         var (file1, file2) = await CreateSpecFiles(SpecComponentsNoSchemas, SpecWithProductSchema);
@@ -190,7 +191,7 @@ public class MultiSpecSchemaMergeTests
         generatedCode.Should().Contain("class Product");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Include_All_Schemas_In_Generated_Code()
     {
         var (file1, file2) = await CreateSpecFiles(SpecWithUserSchema, SpecWithProductSchema);
@@ -202,7 +203,7 @@ public class MultiSpecSchemaMergeTests
         generatedCode.Should().Contain("class Product");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Three_Spec_Merge_Should_Preserve_All_Schemas()
     {
         var file1 = await TestFile.CreateSwaggerFile(SpecNoComponents, "spec1.json");
@@ -216,7 +217,7 @@ public class MultiSpecSchemaMergeTests
         generatedCode.Should().Contain("class Product");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Reverse_Order_Should_Also_Preserve_All_Schemas()
     {
         // Test with schema-bearing spec first, then no-schema spec
@@ -227,7 +228,7 @@ public class MultiSpecSchemaMergeTests
         generatedCode.Should().Contain("class User");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Merged_Code_From_Multiple_Specs()
     {
         var (file1, file2, file3) = await CreateThreeSpecFiles();
@@ -240,7 +241,7 @@ public class MultiSpecSchemaMergeTests
             .BeTrue("merged code from multiple specs should compile");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Economic_OpenApiPaths_Generate_NonEmpty_Buildable_Code()
     {
         var repositoryRoot = GetRepositoryRoot();

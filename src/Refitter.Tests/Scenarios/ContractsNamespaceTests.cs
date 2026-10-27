@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class ContractsNamespaceTests
 {
     private const string OpenApiSpec = @"
@@ -76,14 +76,14 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode("TestApi.Contracts");
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode("TestApi.Contracts");
@@ -93,21 +93,21 @@ components:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Contracts_Namespace()
     {
         string generatedCode = await GenerateCode("TestApi.Contracts");
         generatedCode.Should().Contain("namespace TestApi.Contracts");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Interface_Namespace()
     {
         string generatedCode = await GenerateCode("TestApi.Contracts");
         generatedCode.Should().Contain("namespace TestApi");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_Same_Namespace_When_Not_Set()
     {
         string generatedCode = await GenerateCode(null);
@@ -118,7 +118,7 @@ components:
         namespaceCount.Should().BeGreaterThan(0);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_Without_Contracts_Namespace()
     {
         string generatedCode = await GenerateCode(null);

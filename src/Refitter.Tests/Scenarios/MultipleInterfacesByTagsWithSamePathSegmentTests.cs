@@ -2,7 +2,6 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
@@ -12,6 +11,7 @@ namespace Refitter.Tests.Scenarios;
 /// cross-interface uniqueness - deduplication should be per-interface.
 /// </summary>
 
+[TestClass]
 public class MultipleInterfacesByTagsWithSamePathSegmentTests
 {
     private const string OpenApiSpec = @"
@@ -56,35 +56,35 @@ paths:
           description: 'ok'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Manage_Interface()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IManageApi");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Account_Interface()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IAccountApi");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_User_Interface()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IUserApi");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Account_Interface_Does_Not_Have_Numeric_Suffix()
     {
         string generatedCode = await GenerateCode();
@@ -93,7 +93,7 @@ paths:
         generatedCode.Should().NotContainAny("Info2(", "Info3(", "InfoGet2(", "InfoGet3(", "InfoGET2(", "InfoGET3(");
     }
 
-    [Test]
+    [TestMethod]
     public async Task User_Interface_Does_Not_Have_Numeric_Suffix()
     {
         string generatedCode = await GenerateCode();
@@ -101,7 +101,7 @@ paths:
         generatedCode.Should().NotContainAny("Info2(", "Info3(", "InfoGet2(", "InfoGet3(", "InfoGET2(", "InfoGET3(");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

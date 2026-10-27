@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Keyword-named and cookie parameters produce XML docs for parameters that are not emitted (#1263).
 /// </summary>
+[TestClass]
 public class XmlDocParameterMismatchTests
 {
     private const string OpenApiSpec = """
@@ -24,14 +24,14 @@ public class XmlDocParameterMismatchTests
               responses: { '204': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Documents_Keyword_Parameters_Without_Escape_Prefix()
     {
         var generatedCode = await GenerateCode();
@@ -39,16 +39,16 @@ public class XmlDocParameterMismatchTests
         generatedCode.Should().NotContain("<param name=\"@class\">");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Dynamic_Querystring_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.UseDynamicQuerystringParameters = true);

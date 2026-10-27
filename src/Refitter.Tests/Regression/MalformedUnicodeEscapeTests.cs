@@ -8,9 +8,10 @@ namespace Refitter.Tests.Regression;
 /// Validates that malformed Unicode escape sequences (e.g., \uZZZZ) are handled correctly without consuming extra characters
 /// </summary>
 
+[TestClass]
 public class MalformedUnicodeEscapeTests
 {
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Handles_Valid_Unicode_Escape()
     {
         // Valid: \u0048 = 'H'
@@ -20,7 +21,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Be("Hello");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Handles_Malformed_Unicode_Escape_NonHex()
     {
         // Malformed: \uZZZZ (Z is not valid hex)
@@ -31,7 +32,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain(@"\uZZZZ");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Handles_Malformed_Unicode_Escape_Mixed()
     {
         // Malformed: \uZZ12 (first two chars are non-hex)
@@ -41,7 +42,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain(@"\uZZ12");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Does_Not_Misread_After_Malformed_Unicode()
     {
         // Malformed \uZZZZ followed by valid escape: \u0041 = 'A'
@@ -54,7 +55,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain("A");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Handles_Malformed_Unicode_With_Trailing_Backslash()
     {
         // Malformed \uZZZZ followed by another escape
@@ -66,7 +67,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain("\n");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Handles_Unicode_Too_Short()
     {
         // Too short: \u00 (only 2 hex digits instead of 4)
@@ -77,7 +78,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().NotBeNullOrEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Advances_Correctly_After_Failed_Parse()
     {
         // Multiple malformed escapes in sequence
@@ -89,7 +90,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain("\uABCD");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Handles_Mixed_Valid_And_Malformed()
     {
         // Valid escape, malformed escape, valid escape
@@ -101,7 +102,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain(@"\uXXXX");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Handles_Standard_Escapes_After_Malformed_Unicode()
     {
         // Malformed unicode followed by standard escapes
@@ -115,7 +116,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain(@"\uZZZZ");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Handles_Quoted_String_After_Malformed_Unicode()
     {
         // Malformed unicode followed by escaped quote
@@ -126,7 +127,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain("\"");
     }
 
-    [Test]
+    [TestMethod]
     public void SanitizeResponseDescription_Handles_Malformed_Unicode()
     {
         // Malformed unicode should be preserved and XML chars escaped
@@ -138,7 +139,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain("&amp;");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Preserves_Valid_Xml_Control_Chars()
     {
         // Valid XML control chars should be preserved
@@ -150,7 +151,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().Contain("\r");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Strips_Invalid_Control_Chars()
     {
         // Invalid XML control chars (e.g., 0x01) should be stripped
@@ -162,7 +163,7 @@ public class MalformedUnicodeEscapeTests
         result.Should().NotContain("\x01");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Handles_Complex_Real_World_Scenario()
     {
         // Real-world scenario: mixed valid escapes, malformed unicode, and standard text

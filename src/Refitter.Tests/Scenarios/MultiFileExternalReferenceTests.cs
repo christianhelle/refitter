@@ -1,7 +1,6 @@
 using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
@@ -9,6 +8,7 @@ namespace Refitter.Tests.Scenarios;
 /// End-to-end coverage for OpenAPI documents that pull schemas in from a sibling
 /// file via a relative <c>$ref</c>, for both OpenAPI 3.0 and Swagger 2.0.
 /// </summary>
+[TestClass]
 public class MultiFileExternalReferenceTests
 {
     private const string OpenApiV3Spec =
@@ -72,21 +72,21 @@ paths:
       name:
         type: string";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_From_OpenApi_V3_External_Reference()
     {
         string generatedCode = await GenerateCode(OpenApiV3Spec, OpenApiV3Components);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_From_Swagger_V2_External_Reference()
     {
         string generatedCode = await GenerateCode(SwaggerV2Spec, SwaggerV2Components);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_Externally_Referenced_Contract_For_OpenApi_V3()
     {
         string generatedCode = await GenerateCode(OpenApiV3Spec, OpenApiV3Components);
@@ -96,7 +96,7 @@ paths:
         generatedCode.Should().Contain("public string Name { get; set; }");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_Externally_Referenced_Contract_For_Swagger_V2()
     {
         string generatedCode = await GenerateCode(SwaggerV2Spec, SwaggerV2Components);
@@ -107,7 +107,7 @@ paths:
         generatedCode.Should().Contain("public string Name { get; set; }");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_Interface_Returning_The_External_Type()
     {
         string generatedCode = await GenerateCode(OpenApiV3Spec, OpenApiV3Components);
@@ -116,16 +116,16 @@ paths:
         generatedCode.Should().Contain("Task<User> GetUsers(");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_From_OpenApi_V3_External_Reference()
     {
         string generatedCode = await GenerateCode(OpenApiV3Spec, OpenApiV3Components);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_From_Swagger_V2_External_Reference()
     {
         string generatedCode = await GenerateCode(SwaggerV2Spec, SwaggerV2Components);

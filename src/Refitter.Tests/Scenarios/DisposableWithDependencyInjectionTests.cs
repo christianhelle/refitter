@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class DisposableWithDependencyInjectionTests
 {
     private const string OpenApiSpec = @"
@@ -77,29 +77,29 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_IDisposable()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("IDisposable");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_DI_Registration()
     {
         string generatedCode = await GenerateCode();

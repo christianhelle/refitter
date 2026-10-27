@@ -5,9 +5,10 @@ using Refitter.Core.Validation;
 
 namespace Refitter.Tests.OpenApi;
 
+[TestClass]
 public class AttributeStringValidatorResponseTests
 {
-    [Test]
+    [TestMethod]
     public void Validate_Returns_When_Operation_Has_No_Responses()
     {
         OpenApiDiagnostic diagnostic = new() { SpecificationVersion = OpenApiSpecVersion.OpenApi3_0 };

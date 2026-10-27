@@ -2,14 +2,14 @@ using AwesomeAssertions;
 using NJsonSchema;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class FixMissingIntegerTypesMutatorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithFormatInt32AndNoType_SetsTypeToInteger()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -40,7 +40,7 @@ public class FixMissingIntegerTypesMutatorTests
         schema.Type.Should().Be(JsonObjectType.Integer);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithFormatInt64AndNoType_SetsTypeToInteger()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -71,7 +71,7 @@ public class FixMissingIntegerTypesMutatorTests
         schema.Type.Should().Be(JsonObjectType.Integer);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithFormatFloatAndNoType_SetsTypeToNumber()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -102,7 +102,7 @@ public class FixMissingIntegerTypesMutatorTests
         schema.Type.Should().Be(JsonObjectType.Number);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithFormatDoubleAndNoType_SetsTypeToNumber()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -133,7 +133,7 @@ public class FixMissingIntegerTypesMutatorTests
         schema.Type.Should().Be(JsonObjectType.Number);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithFormatInt32AndExistingType_DoesNotChangeType()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -164,7 +164,7 @@ public class FixMissingIntegerTypesMutatorTests
         schema.Type.Should().Be(JsonObjectType.Integer);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithoutFormat_DoesNotChangeType()
     {
         var document = await OpenApiDocument.FromJsonAsync("""

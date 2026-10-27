@@ -4,10 +4,10 @@ using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class RefitGeneratorAdvancedTests
 {
     private const string OpenApiSpec = @"
@@ -92,7 +92,7 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 1: ContractTypeSuffix in GenerateMultipleFiles (Lines 249-256)
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_Applies_ContractTypeSuffix_To_All_Files()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -127,7 +127,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_ContractTypeSuffix_Can_Build()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -157,7 +157,7 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 2: GenerateContracts = false in GenerateMultipleFiles (Lines 221-227)
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_With_GenerateContracts_False_Excludes_Contracts_File()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -181,7 +181,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_With_GenerateContracts_False_Still_Has_Interface_Files()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -209,7 +209,7 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 3: Empty DI config should not add config file (Lines 229-247)
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_Empty_DI_Config_Does_Not_Add_DependencyInjection_File()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -239,7 +239,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_With_Valid_DI_Config_Includes_DependencyInjection_File()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -275,7 +275,7 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 4: AdditionalNamespaces in GenerateClient (Lines 297-305)
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_With_AdditionalNamespaces_Includes_Using_Statements()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -308,8 +308,8 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task GenerateMultipleFiles_With_AdditionalNamespaces_Code_Builds()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -333,7 +333,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_AdditionalNamespaces_With_MultipleInterfaces_ByEndpoint()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -369,7 +369,7 @@ public class RefitGeneratorAdvancedTests
 
     #region Gap 5: OpenApiPaths array (Line 45-46)
 
-    [Test]
+    [TestMethod]
     public async Task CreateAsync_With_OpenApiPaths_Array_Loads_Multiple_Documents()
     {
         const string spec1 = @"
@@ -445,8 +445,8 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task CreateAsync_With_OpenApiPaths_Array_Builds_Successfully()
     {
         const string spec1 = @"
@@ -550,7 +550,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task CreateAsync_With_OpenApiPaths_Array_In_MultipleFiles_Mode()
     {
         const string spec1 = @"
@@ -632,7 +632,7 @@ public class RefitGeneratorAdvancedTests
 
     #region Combined Scenarios
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_With_ContractTypeSuffix_And_AdditionalNamespaces()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -673,8 +673,8 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task GenerateMultipleFiles_With_JsonSerializerContext_Adds_Context_File()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -705,7 +705,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_With_GenerateContracts_False_And_ContractTypeSuffix()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -736,8 +736,8 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void NormalizeSwagger2OptionalReferencePropertyNullability_Removes_Nullability_From_Reference_Type_Shapes()
     {
         const string contracts = """
@@ -785,7 +785,7 @@ public class RefitGeneratorAdvancedTests
         BuildHelper.BuildCSharp(normalized).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void NormalizeSwagger2OptionalReferencePropertyNullability_Incorrectly_Removes_Nullability_From_Struct_Value_Types()
     {
         const string contracts = """
@@ -854,7 +854,7 @@ public class RefitGeneratorAdvancedTests
         normalized.Should().Contain("public int? BuiltInValueType { get; set; }");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Does_Not_Emit_JsonSerializerContext_When_Contracts_Are_Disabled()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -884,7 +884,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_Does_Not_Add_JsonSerializerContext_File_When_Contracts_Are_Disabled()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -914,7 +914,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_Handles_Missing_Document_Info_For_JsonSerializerContext_File_Name()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -945,7 +945,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void GenerateJsonSerializerContext_Handles_Missing_Document_Info()
     {
         const string contracts = """
@@ -975,7 +975,7 @@ public class RefitGeneratorAdvancedTests
         serializerContext.Should().Contain("internal partial class TestApiSerializerContext");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_Does_Not_Add_JsonSerializerContext_File_When_No_Contract_Types_Are_Generated()
     {
         const string specWithoutSchemas = """
@@ -1026,7 +1026,7 @@ public class RefitGeneratorAdvancedTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_With_Whitespace_OpenApi_Title_Uses_InterfaceName_For_Apizr_Title_Fallback()
     {
         const string specWithWhitespaceTitle = """

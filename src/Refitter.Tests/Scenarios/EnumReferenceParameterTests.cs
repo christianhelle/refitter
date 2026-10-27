@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Referenced string and int64 enums used as path, query and array parameters.
 /// </summary>
+[TestClass]
 public class EnumReferenceParameterTests
 {
     private const string OpenApiSpec = """
@@ -32,30 +32,30 @@ public class EnumReferenceParameterTests
             NumKind: { type: integer, format: int64, enum: [10, 20] }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Enum_Types_For_Parameters()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<ICollection<Kind>> GetE(Kind kind, [Query(CollectionFormat.Multi)] IEnumerable<Kind> kinds, [Query] NumKind? numKind);");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Optional_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.OptionalParameters = true);

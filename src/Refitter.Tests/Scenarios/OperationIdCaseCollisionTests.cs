@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// operationIds that differ only by case across different tags.
 /// </summary>
+[TestClass]
 public class OperationIdCaseCollisionTests
 {
     private const string OpenApiSpec = """
@@ -27,14 +27,14 @@ public class OperationIdCaseCollisionTests
               responses: { '200': { description: ok, content: { application/json: { schema: { type: array, items: { type: integer } } } } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Distinct_Method_Names()
     {
         var generatedCode = await GenerateCode();
@@ -42,24 +42,24 @@ public class OperationIdCaseCollisionTests
         generatedCode.Should().Contain("Task<ICollection<int>> B();");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_By_Tag()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByTag);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_By_Endpoint()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint);

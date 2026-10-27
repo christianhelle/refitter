@@ -4,10 +4,10 @@ using NJsonSchema.CodeGeneration;
 using NSwag;
 using NSwag.CodeGeneration;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class CSharpClientGeneratorFactoryNameGeneratorTests
 {
     private sealed class StubParameterNameGenerator : IParameterNameGenerator
@@ -38,7 +38,7 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
             }
             """);
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithCustomParameterNameGenerator_UsesIt()
     {
         var document = await CreateDocumentAsync();
@@ -54,7 +54,7 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         generator.Settings.ParameterNameGenerator.Should().BeSameAs(parameterNameGenerator);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithoutCustomParameterNameGenerator_KeepsDefault()
     {
         var document = await CreateDocumentAsync();
@@ -66,7 +66,7 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
         generator.Settings.ParameterNameGenerator.Should().NotBeOfType<StubParameterNameGenerator>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithCustomPropertyNameGenerator_UsesIt()
     {
         var document = await CreateDocumentAsync();
@@ -86,7 +86,7 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
             .Should().BeSameAs(propertyNameGenerator);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithPreserveOriginalPropertyNamingPolicy_UsesPreservingGenerator()
     {
         var document = await CreateDocumentAsync();
@@ -103,7 +103,7 @@ public class CSharpClientGeneratorFactoryNameGeneratorTests
             .Which.Inner.Should().BeOfType<PreserveOriginalPropertyNameGenerator>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithDefaultPropertyNamingPolicy_UsesUniqueCSharpGenerator()
     {
         var document = await CreateDocumentAsync();

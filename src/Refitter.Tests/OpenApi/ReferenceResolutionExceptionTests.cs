@@ -3,9 +3,10 @@ using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;
 
+[TestClass]
 public class ReferenceResolutionExceptionTests
 {
-    [Test]
+    [TestMethod]
     public void Constructor_With_Message_Sets_Message()
     {
         var exception = new ReferenceResolutionException("reference resolution failed");
@@ -13,7 +14,7 @@ public class ReferenceResolutionExceptionTests
         exception.Message.Should().Be("reference resolution failed");
     }
 
-    [Test]
+    [TestMethod]
     public void Constructor_With_Message_And_InnerException_Sets_InnerException()
     {
         var innerException = new InvalidOperationException("inner");

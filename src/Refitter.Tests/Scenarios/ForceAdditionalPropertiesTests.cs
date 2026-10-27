@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class ForceAdditionalPropertiesTests
 {
     private const string OpenApiSpec = """
@@ -68,7 +68,7 @@ public class ForceAdditionalPropertiesTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Closed_Schemas_Do_Not_Get_AdditionalProperties_By_Default()
     {
         string generatedCode = await GenerateCode(forceAdditionalProperties: false);
@@ -76,7 +76,7 @@ public class ForceAdditionalPropertiesTests
         generatedCode.Should().NotContain("AdditionalProperties");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Closed_Schemas_Get_AdditionalProperties_When_Forced()
     {
         string generatedCode = await GenerateCode(forceAdditionalProperties: true);
@@ -84,7 +84,7 @@ public class ForceAdditionalPropertiesTests
         generatedCode.Should().Contain("IDictionary<string, object> AdditionalProperties");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Forced_AdditionalProperties_Take_Precedence_Over_Skipping_Defaults()
     {
         string generatedCode = await GenerateCode(
@@ -93,8 +93,8 @@ public class ForceAdditionalPropertiesTests
         generatedCode.Should().Contain("IDictionary<string, object> AdditionalProperties");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_When_Forced()
     {
         string generatedCode = await GenerateCode(forceAdditionalProperties: true);

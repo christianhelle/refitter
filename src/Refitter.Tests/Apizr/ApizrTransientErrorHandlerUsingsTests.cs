@@ -3,13 +3,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Apizr;
 
 /// <summary>
 /// Apizr registration code must not emit duplicate using directives for the transient error handler (#1264).
 /// </summary>
+[TestClass]
 public class ApizrTransientErrorHandlerUsingsTests
 {
     private const string OpenApiSpec = """
@@ -22,19 +22,19 @@ public class ApizrTransientErrorHandlerUsingsTests
               responses: { '204': { description: ok } }
         """;
 
-    [Test]
-    [Arguments(TransientErrorHandler.HttpResilience, "using Microsoft.Extensions.Http.Resilience;")]
-    [Arguments(TransientErrorHandler.Polly, "using Polly.Extensions.Http;")]
+    [TestMethod]
+    [DataRow(TransientErrorHandler.HttpResilience, "using Microsoft.Extensions.Http.Resilience;")]
+    [DataRow(TransientErrorHandler.Polly, "using Polly.Extensions.Http;")]
     public async Task Emits_Transient_Error_Handler_Using_Once(TransientErrorHandler handler, string usingDirective)
     {
         var generatedCode = await GenerateCode(handler);
         Regex.Matches(generatedCode, Regex.Escape(usingDirective)).Count.Should().Be(1);
     }
 
-    [Test]
-    [Category("Integration")]
-    [Arguments(TransientErrorHandler.HttpResilience)]
-    [Arguments(TransientErrorHandler.Polly)]
+    [TestMethod]
+    [TestCategory("Integration")]
+    [DataRow(TransientErrorHandler.HttpResilience)]
+    [DataRow(TransientErrorHandler.Polly)]
     public async Task Can_Build_Generated_Code(TransientErrorHandler handler)
     {
         var generatedCode = await GenerateCode(handler);

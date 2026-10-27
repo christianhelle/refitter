@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class ContractTypeSuffixTests
 {
     private const string OpenApiSpec = @"
@@ -143,14 +143,14 @@ public class ContractTypeSuffixTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Suffix()
     {
         string generatedCode = await GenerateCode("Dto");
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Dto_Suffix_For_Classes()
     {
         string generatedCode = await GenerateCode("Dto");
@@ -159,14 +159,14 @@ public class ContractTypeSuffixTests
         generatedCode.Should().Contain("public partial class OwnerDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Dto_Suffix_For_Enums()
     {
         string generatedCode = await GenerateCode("Dto");
         generatedCode.Should().Contain("public enum PetStatusDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_Suffixed_Types_In_Properties()
     {
         string generatedCode = await GenerateCode("Dto");
@@ -174,7 +174,7 @@ public class ContractTypeSuffixTests
         generatedCode.Should().Contain("public OwnerDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_Suffixed_Types_In_Method_Signatures()
     {
         string generatedCode = await GenerateCode("Dto");
@@ -184,7 +184,7 @@ public class ContractTypeSuffixTests
         generatedCode.Should().Contain("[Body] PetRequestDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Contract_Suffix()
     {
         string generatedCode = await GenerateCode("Contract");
@@ -193,7 +193,7 @@ public class ContractTypeSuffixTests
         generatedCode.Should().Contain("public enum PetStatusContract");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Model_Suffix()
     {
         string generatedCode = await GenerateCode("Model");
@@ -202,7 +202,7 @@ public class ContractTypeSuffixTests
         generatedCode.Should().Contain("public enum PetStatusModel");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Suffix()
     {
         string generatedCode = await GenerateCode("Dto");
@@ -212,7 +212,7 @@ public class ContractTypeSuffixTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Apply_Suffix_When_Not_Specified()
     {
         string generatedCode = await GenerateCode(null);
@@ -222,7 +222,7 @@ public class ContractTypeSuffixTests
         generatedCode.Should().NotContain("public partial class OwnerDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Apply_Suffix_When_Empty()
     {
         string generatedCode = await GenerateCode(string.Empty);
@@ -230,7 +230,7 @@ public class ContractTypeSuffixTests
         generatedCode.Should().NotContain("public partial class PetDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Apply_Double_Suffix_When_Type_Already_Has_Suffix()
     {
         // This tests the #1013 fix: prevent double-suffixing
@@ -247,7 +247,7 @@ public class ContractTypeSuffixTests
         result.Should().Contain("OwnerDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Corrupt_Comments_With_Type_Names()
     {
         // #1013 regression test: comments containing type names should not be modified
@@ -268,7 +268,7 @@ public class ContractTypeSuffixTests
         result.Should().Contain("public partial class PetDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Corrupt_String_Literals_With_Type_Names()
     {
         // #1013 regression test: string literals should not be modified
@@ -289,7 +289,7 @@ public class ContractTypeSuffixTests
         result.Should().Contain("public partial class PetDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Corrupt_Property_Names_Containing_Type_Names()
     {
         // #1013 regression test: property names that happen to contain type name strings
@@ -310,7 +310,7 @@ public class ContractTypeSuffixTests
         result.Should().Contain("public partial class OwnerDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Create_Collision_When_Suffixed_Type_Already_Exists()
     {
         // #1013 regression test: handle pre-existing suffixed types
@@ -332,7 +332,7 @@ public class ContractTypeSuffixTests
         result.Should().NotContain("PetDtoDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Preserves_XML_Documentation_Comments()
     {
         // #1013 regression test: XML docs should be preserved exactly
@@ -353,7 +353,7 @@ public class ContractTypeSuffixTests
         result.Should().Contain("public partial class PetDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Corrupt_Method_Parameters_Named_After_Types()
     {
         // #1013 regression test: parameter names should not be corrupted

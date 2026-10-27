@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class MultipleFilesWithDependencyInjectionTests
 {
     private const string OpenApiSpec = @"
@@ -89,14 +89,14 @@ public class MultipleFilesWithDependencyInjectionTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedFiles = await GenerateCode();
         generatedFiles.Should().NotBeNullOrEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         var generatedFiles = await GenerateCode();
@@ -107,7 +107,7 @@ public class MultipleFilesWithDependencyInjectionTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_DI_Registration()
     {
         var generatedFiles = await GenerateCode();
@@ -116,7 +116,7 @@ public class MultipleFilesWithDependencyInjectionTests
         combinedCode.Should().Contain("IServiceCollection");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_Generated_Refit_Client_Registration()
     {
         var generatedFiles = await GenerateCode(true);
@@ -125,14 +125,14 @@ public class MultipleFilesWithDependencyInjectionTests
         combinedCode.Should().Contain("IServiceCollection");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Multiple_Files()
     {
         var generatedFiles = await GenerateCode();
         generatedFiles.Should().HaveCountGreaterThan(1);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Files_Include_Contracts_And_Interface()
     {
         var generatedFiles = await GenerateCode();

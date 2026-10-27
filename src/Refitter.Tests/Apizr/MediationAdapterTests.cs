@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class MediationAdapterTests
 {
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_True_When_Mediation_Enabled_With_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -23,7 +24,7 @@ public class MediationAdapterTests
         adapter.CanApply(settings).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_When_Mediation_Disabled()
     {
         var settings = new RefitGeneratorSettings
@@ -40,7 +41,7 @@ public class MediationAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_When_Mediation_Enabled_Without_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -56,7 +57,7 @@ public class MediationAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_Mediation_To_Options()
     {
         var settings = new RefitGeneratorSettings

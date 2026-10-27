@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Enum values that differ only by case generate duplicate members (#1267).
 /// </summary>
+[TestClass]
 public class EnumCaseCollisionTests
 {
     private const string OpenApiSpec = """
@@ -24,14 +24,14 @@ public class EnumCaseCollisionTests
             Mode: { type: string, enum: [a, A] }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Unique_Member_Names_And_Keeps_Values()
     {
         var generatedCode = await GenerateCode();
@@ -39,8 +39,8 @@ public class EnumCaseCollisionTests
         generatedCode.Should().MatchRegex(@"Value = @""A""\)\]\s*A2 = 1,");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

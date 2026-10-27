@@ -1,10 +1,10 @@
 using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class ForceAdditionalPropertiesMutatorTests
 {
     private const string ClosedSchemasSpec = """
@@ -34,7 +34,7 @@ public class ForceAdditionalPropertiesMutatorTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithForceAdditionalPropertiesTrue_SetsAllowAdditionalPropertiesToTrue()
     {
         var document = await OpenApiDocument.FromJsonAsync(ClosedSchemasSpec);
@@ -48,7 +48,7 @@ public class ForceAdditionalPropertiesMutatorTests
             .Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithForceAdditionalPropertiesFalse_DoesNotChangeAllowAdditionalProperties()
     {
         var document = await OpenApiDocument.FromJsonAsync(ClosedSchemasSpec);
@@ -62,7 +62,7 @@ public class ForceAdditionalPropertiesMutatorTests
             .Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithForceAdditionalPropertiesTrue_KeepsSchemaValuedAdditionalProperties()
     {
         var document = await OpenApiDocument.FromJsonAsync(ClosedSchemasSpec);
@@ -75,7 +75,7 @@ public class ForceAdditionalPropertiesMutatorTests
             .Should().NotBeNull().And.BeSameAs(expected);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithNoComponentsSchemas_DoesNotThrow()
     {
         var document = await OpenApiDocument.FromJsonAsync("""

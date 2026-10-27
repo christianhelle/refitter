@@ -3,14 +3,14 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using AwesomeAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests.SettingsFile;
 
 
+[TestClass]
 public class JsonSchemaConsistencyTests
 {
-    [Test]
+    [TestMethod]
     public async Task JsonSchema_Should_Match_Serializable_Settings()
     {
         string schemaPath = FindRepoFile("docs", "json-schema.json");

@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class InlineOneOfDerivedTypesTests
 {
     private const string OpenApiSpec = @"
@@ -120,14 +120,14 @@ components:
               type: integer
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Base_Type_For_Inline_OneOf_Collection()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("ICollection<QuestionnaireQuestion> Questions");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Base_Type_For_Named_OneOf_Component_Collection()
     {
         string generatedCode = await GenerateCode(NamedUnionOpenApiSpec);
@@ -137,15 +137,15 @@ components:
         generatedCode.Should().NotContain("QuestionnaireQuestionUnion");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_For_Named_OneOf_Component()
     {
         string generatedCode = await GenerateCode(NamedUnionOpenApiSpec, usePolymorphicSerialization: true);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Base_Type_Regardless_Of_OneOf_Order()
     {
         string reversedSpec = OpenApiSpec
@@ -158,7 +158,7 @@ components:
         generatedCode.Should().Contain("ICollection<QuestionnaireQuestion> Questions");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_JsonDerivedType_Attributes_On_Base_Type()
     {
         string generatedCode = await GenerateCode(usePolymorphicSerialization: true);
@@ -166,7 +166,7 @@ components:
         generatedCode.Should().Contain("[JsonDerivedType(typeof(ExistingQuestion), typeDiscriminator: \"existing\")]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Base_Type_When_OneOf_Includes_Base_Type()
     {
         string specWithBaseType = OpenApiSpec.Replace(
@@ -178,7 +178,7 @@ components:
         generatedCode.Should().Contain("ICollection<QuestionnaireQuestion> Questions");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Use_Base_Type_When_Schema_Has_Both_OneOf_And_AnyOf()
     {
         string specWithMixedUnion = OpenApiSpec.Replace(
@@ -190,7 +190,7 @@ components:
         generatedCode.Should().NotContain("ICollection<QuestionnaireQuestion> Questions");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Use_Base_Type_When_It_Is_Not_The_Generated_Parent()
     {
         string normalizedSpec = OpenApiSpec.Replace("\r\n", "\n");
@@ -205,7 +205,7 @@ components:
         generatedCode.Should().NotContain("ICollection<QuestionnaireQuestion> Questions");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Use_Base_Type_When_Not_All_OneOf_Types_Derive_From_It()
     {
         string specWithUnrelatedType = OpenApiSpec.Replace(
@@ -217,16 +217,16 @@ components:
         generatedCode.Should().NotContain("ICollection<QuestionnaireQuestion> Questions");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Polymorphic_Serialization()
     {
         string generatedCode = await GenerateCode(usePolymorphicSerialization: true);

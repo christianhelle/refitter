@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class HttpMessageHandlerAdapterTests
 {
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_True_When_Handlers_Present()
     {
         var settings = new RefitGeneratorSettings
@@ -22,7 +23,7 @@ public class HttpMessageHandlerAdapterTests
         adapter.CanApply(settings).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_When_No_Handlers()
     {
         var settings = new RefitGeneratorSettings
@@ -35,7 +36,7 @@ public class HttpMessageHandlerAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_When_No_DI_Settings()
     {
         var settings = new RefitGeneratorSettings
@@ -47,7 +48,7 @@ public class HttpMessageHandlerAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_DelegatingHandlers()
     {
         var settings = new RefitGeneratorSettings

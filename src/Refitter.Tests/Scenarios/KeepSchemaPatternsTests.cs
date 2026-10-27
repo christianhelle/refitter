@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class KeepSchemaPatternsTests
 {
     private const string OpenApiSpec = @"
@@ -115,14 +115,14 @@ components:
       additionalProperties: false
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Keeps_Unreferenced_Schema()
     {
         string generatedCode = await GenerateCode();
@@ -134,7 +134,7 @@ components:
         generatedCode.Should().Contain("class Metadata");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

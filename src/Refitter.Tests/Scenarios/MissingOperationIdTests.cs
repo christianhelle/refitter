@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Operations without operationId, including the root path and hyphenated path parameters.
 /// </summary>
+[TestClass]
 public class MissingOperationIdTests
 {
     private const string OpenApiSpec = """
@@ -36,14 +36,14 @@ public class MissingOperationIdTests
               responses: { '200': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Method_Names_From_Paths()
     {
         var generatedCode = await GenerateCode();
@@ -52,25 +52,25 @@ public class MissingOperationIdTests
         generatedCode.Should().Contain("[AliasAs(\"friend-id\")] int friend_id");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_By_Tag()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByTag);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
-    [Skip("https://github.com/christianhelle/refitter/issues/1266")]
+    [TestMethod]
+    [TestCategory("Integration")]
+    [Ignore("https://github.com/christianhelle/refitter/issues/1266")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_By_Endpoint()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint);

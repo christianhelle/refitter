@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class RefitGeneratorTests
 {
     private const string OpenApiSpec = @"
@@ -69,7 +69,7 @@ paths:
           description: success
 ";
 
-    [Test]
+    [TestMethod]
     public async Task CreateAsync_LoadsAndProcessesDocument()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -91,7 +91,7 @@ paths:
         generatedCode.Should().Contain("PipelineTest");
     }
 
-    [Test]
+    [TestMethod]
     public async Task CreateAsync_WithFilteredDocument_ReturnsGeneratorWithFilteredDocument()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -112,7 +112,7 @@ paths:
         generatedCode.Should().Contain("PipelineTest");
     }
 
-    [Test]
+    [TestMethod]
     public async Task CreateAsync_FilterByTags_PreservesOnlyMatchingPaths()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -133,7 +133,7 @@ paths:
         generatedCode.Should().Contain("PipelineTest");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_ProducesValidCode()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -150,7 +150,7 @@ paths:
         generatedCode.Should().Contain("PipelineTest");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_ProducesOutput()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -169,7 +169,7 @@ paths:
         result.Files.Should().NotBeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task CreateAsync_WithSwagger20_LoadsAndProcessesDocument()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);
@@ -191,7 +191,7 @@ paths:
         generatedCode.Should().Contain("PipelineTest");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_WithSwagger20_ProducesValidCode()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);

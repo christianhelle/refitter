@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class GenerateDefaultAdditionalPropertiesTests
 {
     private const string OpenApiSpec = @"
@@ -75,14 +75,14 @@ public class GenerateDefaultAdditionalPropertiesTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -92,7 +92,7 @@ public class GenerateDefaultAdditionalPropertiesTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_AdditionalProperties_When_Enabled()
     {
         string generatedCode = await GenerateCode(generateDefaultAdditionalProperties: true);
@@ -100,7 +100,7 @@ public class GenerateDefaultAdditionalPropertiesTests
         generatedCode.Should().Contain("IDictionary<string, object>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_AdditionalProperties_When_Disabled()
     {
         string generatedCode = await GenerateCode(generateDefaultAdditionalProperties: false);

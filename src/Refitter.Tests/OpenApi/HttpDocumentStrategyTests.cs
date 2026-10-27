@@ -5,9 +5,10 @@ using Refitter.Core;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class HttpDocumentStrategyTests
 {
-    [Test]
+    [TestMethod]
     public async Task Returns_Null_For_File_Paths()
     {
         var strategy = new HttpDocumentStrategy();
@@ -16,7 +17,7 @@ public class HttpDocumentStrategyTests
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Returns_Null_When_Http_Fails()
     {
         var handler = new MockHttpMessageHandler(
@@ -29,7 +30,7 @@ public class HttpDocumentStrategyTests
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Loads_Json_Spec_From_Http()
     {
         var spec = @"{
@@ -51,7 +52,7 @@ public class HttpDocumentStrategyTests
         result!.Info.Title.Should().Be("Test API");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Loads_Yaml_Spec_From_Http()
     {
         var spec = @"openapi: 3.0.0
@@ -73,7 +74,7 @@ paths: {}";
         result!.Info.Title.Should().Be("YAML Test API");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Returns_Null_For_Invalid_Http_Content()
     {
         var handler = new MockHttpMessageHandler(
@@ -107,9 +108,9 @@ paths: {}";
         }
     }
 
-    [Test]
-    [Arguments(LargeNumericBoundsSpecs.Yaml, "https://example.com/spec.yaml")]
-    [Arguments(LargeNumericBoundsSpecs.Json, "https://example.com/spec.json")]
+    [TestMethod]
+    [DataRow(LargeNumericBoundsSpecs.Yaml, "https://example.com/spec.yaml")]
+    [DataRow(LargeNumericBoundsSpecs.Json, "https://example.com/spec.json")]
     public async Task Clamps_Numeric_Bounds_Outside_Decimal_Range(string spec, string url)
     {
         var handler = new MockHttpMessageHandler(

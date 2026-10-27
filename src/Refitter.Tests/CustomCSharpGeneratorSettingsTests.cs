@@ -3,10 +3,10 @@ using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.Resources;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class CustomCSharpGeneratorSettingsTests
 {
     private const string RecursiveExcludedTypeOpenApiSpec = """
@@ -170,11 +170,11 @@ public class CustomCSharpGeneratorSettingsTests
         }
         """;
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Default_DateType(
         SampleOpenSpecifications version,
         string filename)
@@ -186,11 +186,11 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain(settings.CodeGeneratorSettings!.DateType);
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Default_DateTimeType(
         SampleOpenSpecifications version,
         string filename)
@@ -202,11 +202,11 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain(settings.CodeGeneratorSettings!.DateTimeType);
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Default_ArrayType(
         SampleOpenSpecifications version,
         string filename)
@@ -218,11 +218,11 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("ICollection<");
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Custom_DateType(
         SampleOpenSpecifications version,
         string filename)
@@ -235,11 +235,11 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("DateTime");
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Custom_DateTimeType(
         SampleOpenSpecifications version,
         string filename)
@@ -252,11 +252,11 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("DateTime");
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_Custom_ArrayType(
         SampleOpenSpecifications version,
         string filename)
@@ -269,11 +269,11 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("System.Collection.Generic.IList<");
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_With_ExcludedTypeNames(
         SampleOpenSpecifications version,
         string filename)
@@ -289,8 +289,8 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().NotContain("class User");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Generate_With_ExcludedTypeNames_On_Recursive_Schema_And_PreserveOriginal_Property_Names()
     {
         var settings = new RefitGeneratorSettings
@@ -321,8 +321,8 @@ public class CustomCSharpGeneratorSettingsTests
         BuildHelper.BuildCSharp(generatedCode, RecursiveExternalNodeStub).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Generate_With_ExcludedTypeNames_On_Recursive_Schema_And_PreserveOriginal_Property_Names_V2()
     {
         var settings = new RefitGeneratorSettings
@@ -353,11 +353,11 @@ public class CustomCSharpGeneratorSettingsTests
         BuildHelper.BuildCSharp(generatedCode, RecursiveExternalNodeStub).Should().BeTrue();
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_With_Immutable_Records(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();
@@ -369,11 +369,11 @@ public class CustomCSharpGeneratorSettingsTests
         generatedCode.Should().Contain("[JsonConstructor]");
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Can_Generate_With_CustomTemplates(SampleOpenSpecifications version, string filename)
     {
         var settings = new RefitGeneratorSettings();

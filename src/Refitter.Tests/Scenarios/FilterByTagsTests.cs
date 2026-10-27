@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class FilterByTagsTests
 {
     private const string OpenApiSpec = @"
@@ -66,14 +66,14 @@ paths:
           description: 'successful operation'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_BarAndBaz_Methods()
     {
         string generatedCode = await GenerateCode();
@@ -83,7 +83,7 @@ paths:
         generatedCode.Should().NotContain("/foo");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

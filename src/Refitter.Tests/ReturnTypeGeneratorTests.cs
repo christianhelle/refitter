@@ -1,14 +1,14 @@
 using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class ReturnTypeGeneratorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Task_For_Void_Response()
     {
         var spec = """
@@ -39,7 +39,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Task_Of_Type_For_Success_Response()
     {
         var spec = """
@@ -79,7 +79,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IApiResponse_When_Wrapping_Enabled()
     {
         var spec = """
@@ -119,7 +119,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<IApiResponse<string>>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IObservable_When_Observable_Enabled()
     {
         var spec = """
@@ -159,7 +159,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IObservable<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task IsFileStreamResponse_Returns_True_For_Binary_Content()
     {
         var spec = """
@@ -200,7 +200,7 @@ public class ReturnTypeGeneratorTests
         result.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task IsFileStreamResponse_Returns_False_For_Json_Content()
     {
         var spec = """
@@ -240,7 +240,7 @@ public class ReturnTypeGeneratorTests
         result.Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_FileStream_Response_Type()
     {
         var spec = """
@@ -281,7 +281,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<HttpResponseMessage>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task IsApiResponseType_Detects_Task_Of_HttpResponseMessage()
     {
         var settings = new RefitGeneratorSettings();
@@ -300,7 +300,7 @@ public class ReturnTypeGeneratorTests
         sut.IsApiResponseType("Task<IApiResponse<string>>").Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_With_ResponseTypeOverride_Uses_Custom_Type()
     {
         var spec = """
@@ -339,11 +339,11 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<MyCustomType>");
     }
 
-    [Test]
-    [Arguments("application/x-ndjson")]
-    [Arguments("application/jsonl")]
-    [Arguments("application/x-jsonlines")]
-    [Arguments("text/event-stream")]
+    [TestMethod]
+    [DataRow("application/x-ndjson")]
+    [DataRow("application/jsonl")]
+    [DataRow("application/x-jsonlines")]
+    [DataRow("text/event-stream")]
     public async Task Generate_Returns_IAsyncEnumerable_For_Streaming_Array_Response(
         string contentType)
     {
@@ -385,7 +385,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IAsyncEnumerable_For_Non_Array_Schema_Streaming_Response()
     {
         var spec = """
@@ -428,7 +428,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<Anonymous>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IAsyncEnumerable_For_Streaming_Response_When_ApiResponse_Enabled()
     {
         var spec = """
@@ -472,7 +472,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_With_ResponseTypeOverride_Still_Overrides_Streaming()
     {
         var spec = """
@@ -514,7 +514,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<MyCustomType>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IAsyncEnumerable_For_Streaming_Response_When_Observable_Enabled()
     {
         var spec = """
@@ -558,7 +558,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IAsyncEnumerable_For_Streaming_Response_With_Parameterized_Content_Type()
     {
         var spec = """
@@ -599,7 +599,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IAsyncEnumerable_For_Default_Streaming_Response_With_SchemaLess_200()
     {
         var spec = """
@@ -646,7 +646,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IAsyncEnumerable_Of_Object_For_Streaming_Response_With_No_Schema()
     {
         var spec = """
@@ -682,7 +682,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<object>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IAsyncEnumerable_Of_Object_For_Streaming_Response_With_Null_Media_Type()
     {
         var spec = """
@@ -724,11 +724,11 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<object>");
     }
 
-    [Test]
-    [Arguments("string", "Task<string>")]
-    [Arguments("number", "Task<double>")]
-    [Arguments("integer", "Task<int>")]
-    [Arguments("boolean", "Task<bool>")]
+    [TestMethod]
+    [DataRow("string", "Task<string>")]
+    [DataRow("number", "Task<double>")]
+    [DataRow("integer", "Task<int>")]
+    [DataRow("boolean", "Task<bool>")]
     public async Task Generate_Returns_Task_For_Streaming_Response_With_Primitive_Schema(
         string schemaType,
         string expectedReturnType)
@@ -770,7 +770,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be(expectedReturnType);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Json_Schema_Type_When_Streaming_Schema_Is_Primitive()
     {
         var spec = """
@@ -819,7 +819,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<Anonymous>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Prefers_Json_Schema_When_Primitive_Ndjson_Is_Listed_First()
     {
         var spec = """
@@ -867,7 +867,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<Anonymous>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Task_Of_String_For_Nullable_Streaming_String_Schema()
     {
         var spec = """
@@ -908,7 +908,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Task_Of_String_For_Streaming_Schema_Referenced_As_String()
     {
         var spec = """
@@ -955,7 +955,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Task_When_ReturnIAsyncEnumerable_Is_Disabled()
     {
         var spec = """
@@ -999,7 +999,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<ICollection<string>>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Task_For_Swagger2_Streaming_Response_With_Primitive_Schema()
     {
         var spec = """
@@ -1031,7 +1031,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Does_Not_Return_IAsyncEnumerable_For_Non_Streaming_Swagger2_Produces()
     {
         var spec = """
@@ -1065,7 +1065,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<ICollection<string>>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_With_ResponseTypeOverride_Void_Returns_Task()
     {
         var spec = """
@@ -1104,7 +1104,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Does_Not_Return_IAsyncEnumerable_For_Mixed_Swagger2_Produces()
     {
         var spec = """
@@ -1139,7 +1139,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<ICollection<string>>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Does_Not_Return_IAsyncEnumerable_For_Mixed_Document_Level_Swagger2_Produces()
     {
         var spec = """
@@ -1174,11 +1174,11 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<ICollection<string>>");
     }
 
-    [Test]
-    [Arguments("application/x-ndjson")]
-    [Arguments("application/jsonl")]
-    [Arguments("application/x-jsonlines")]
-    [Arguments("text/event-stream")]
+    [TestMethod]
+    [DataRow("application/x-ndjson")]
+    [DataRow("application/jsonl")]
+    [DataRow("application/x-jsonlines")]
+    [DataRow("text/event-stream")]
     public async Task Generate_Returns_Task_For_Primitive_String_Across_Streaming_Media_Types(
         string contentType)
     {
@@ -1217,7 +1217,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_IAsyncEnumerable_For_Mixed_Json_And_Array_Streaming_Response()
     {
         // Documents the current behavior: a mixed response still streams when the
@@ -1268,7 +1268,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Streaming_Type_When_Later_Status_Code_Streams()
     {
         string spec = """
@@ -1317,7 +1317,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("IAsyncEnumerable<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Task_For_Mixed_Swagger2_Produces_With_Primitive_Schema()
     {
         string spec = """
@@ -1350,7 +1350,7 @@ public class ReturnTypeGeneratorTests
         result.Should().Be("Task<string>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task IsFileStreamResponse_Detects_Swagger2_File_Type_Responses()
     {
         var spec = """
@@ -1379,7 +1379,7 @@ public class ReturnTypeGeneratorTests
         sut.IsFileStreamResponse(document.Paths["/download"]["get"]).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Uses_IAsyncEnumerable_For_Non_RefitGeneratorSettings_Configuration()
     {
         var spec = """

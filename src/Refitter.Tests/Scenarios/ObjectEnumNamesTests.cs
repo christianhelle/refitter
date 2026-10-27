@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// x-enumNames, x-enum-names and x-enum-varnames as an object keyed by enum value instead of an array (#1336).
 /// </summary>
+[TestClass]
 public class ObjectEnumNamesTests
 {
     private const string OpenApiSpec = """
@@ -42,10 +42,10 @@ public class ObjectEnumNamesTests
         }
         """;
 
-    [Test]
-    [Arguments("x-enumNames")]
-    [Arguments("x-enum-names")]
-    [Arguments("x-enum-varnames")]
+    [TestMethod]
+    [DataRow("x-enumNames")]
+    [DataRow("x-enum-names")]
+    [DataRow("x-enum-varnames")]
     public async Task Can_Generate_Code(string extensionName)
     {
         var generatedCode = await GenerateCode(extensionName);
@@ -54,7 +54,7 @@ public class ObjectEnumNamesTests
     }
 
     // NJsonSchema only names enum members from x-enumNames; it reads the dashed spellings but does not use them
-    [Test]
+    [TestMethod]
     public async Task Generates_Enum_Members_Named_From_Object()
     {
         var generatedCode = await GenerateCode("x-enumNames");
@@ -62,8 +62,8 @@ public class ObjectEnumNamesTests
         generatedCode.Should().Contain("Done = 1");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_When_Some_Values_Have_No_Name()
     {
         var spec = OpenApiSpec.Replace("\"x-enumNames\": { \"1\": \"Done\", \"0\": \"Pending\" }", "\"x-enumNames\": { \"0\": \"Pending\" }");
@@ -76,11 +76,11 @@ public class ObjectEnumNamesTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
-    [Arguments("x-enumNames")]
-    [Arguments("x-enum-names")]
-    [Arguments("x-enum-varnames")]
+    [TestMethod]
+    [TestCategory("Integration")]
+    [DataRow("x-enumNames")]
+    [DataRow("x-enum-names")]
+    [DataRow("x-enum-varnames")]
     public async Task Can_Build_Generated_Code(string extensionName)
     {
         var generatedCode = await GenerateCode(extensionName);

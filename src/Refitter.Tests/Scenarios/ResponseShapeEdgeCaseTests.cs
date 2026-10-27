@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Header-only responses, 204 with content, competing 200/201, redirects, primitive and nullable responses.
 /// </summary>
+[TestClass]
 public class ResponseShapeEdgeCaseTests
 {
     private const string OpenApiSpec = """
@@ -65,14 +65,14 @@ public class ResponseShapeEdgeCaseTests
             B: { type: object, properties: { b: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Return_Types_For_Response_Shapes()
     {
         var generatedCode = await GenerateCode();
@@ -85,16 +85,16 @@ public class ResponseShapeEdgeCaseTests
         generatedCode.Should().Contain("Task<A> GetNullable();");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_IApiResponse()
     {
         var generatedCode = await GenerateCode(settings => settings.ReturnIApiResponse = true);

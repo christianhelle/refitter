@@ -5,9 +5,10 @@ using Refitter.Tests.Resources;
 
 namespace Refitter.Tests.OpenApi;
 
+[TestClass]
 public class DocumentLoadingCancellationTests
 {
-    [Test]
+    [TestMethod]
     public async Task FileDocumentStrategy_Propagates_Cancellation()
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(
@@ -22,7 +23,7 @@ public class DocumentLoadingCancellationTests
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task HttpDocumentStrategy_Propagates_Cancellation()
     {
         using var cts = new CancellationTokenSource();
@@ -34,7 +35,7 @@ public class DocumentLoadingCancellationTests
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task DocumentLoader_Propagates_Cancellation_From_Strategy()
     {
         var loader = new DocumentLoader(new IDocumentLoadingStrategy[] { new CancellingStrategy() });
@@ -44,7 +45,7 @@ public class DocumentLoadingCancellationTests
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Test]
+    [TestMethod]
     public void DocumentLoader_Throws_On_Null_Strategies()
     {
         var act = () => new DocumentLoader(null!);

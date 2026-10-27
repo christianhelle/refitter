@@ -1,14 +1,14 @@
 using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class MethodSignatureGeneratorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Route_Parameter()
     {
         var spec = """
@@ -44,7 +44,7 @@ public class MethodSignatureGeneratorTests
         parametersString.Should().Contain("int id");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Query_Parameter()
     {
         var spec = """
@@ -78,7 +78,7 @@ public class MethodSignatureGeneratorTests
         parametersString.Should().Contain("string search");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Includes_Body_Parameter()
     {
         var spec = """
@@ -116,7 +116,7 @@ public class MethodSignatureGeneratorTests
         parametersString.Should().Contain("body");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_With_CancellationToken_Includes_CancellationToken()
     {
         var spec = """
@@ -145,7 +145,7 @@ public class MethodSignatureGeneratorTests
         parametersString.Should().Contain("CancellationToken");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_With_DynamicQuerystring_Returns_Generated_Code()
     {
         var spec = """
@@ -183,7 +183,7 @@ public class MethodSignatureGeneratorTests
         dynamicQs.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_With_Apizr_RequestOptions_Includes_Options_Parameter()
     {
         var spec = """
@@ -215,7 +215,7 @@ public class MethodSignatureGeneratorTests
         parametersString.Should().Contain("IApizrRequestOptions");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Parameters_List_For_Apizr_Overload_Filtering()
     {
         var spec = """

@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class MappingProviderAdapterTests
 {
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_True_When_MappingProvider_Is_Set()
     {
         var settings = new RefitGeneratorSettings
@@ -22,7 +23,7 @@ public class MappingProviderAdapterTests
         adapter.CanApply(settings).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_When_MappingProvider_Is_None()
     {
         var settings = new RefitGeneratorSettings
@@ -38,7 +39,7 @@ public class MappingProviderAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_AutoMapper_With_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -60,7 +61,7 @@ public class MappingProviderAdapterTests
         result.Should().Contain("Apizr.Integrations.AutoMapper");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_AutoMapper_Without_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -79,7 +80,7 @@ public class MappingProviderAdapterTests
         result.Should().Contain("using AutoMapper;");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_Mapster_With_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -102,7 +103,7 @@ public class MappingProviderAdapterTests
         result.Should().Contain("Apizr.Integrations.Mapster");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_Mapster_Without_DI()
     {
         var settings = new RefitGeneratorSettings

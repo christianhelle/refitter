@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// A schema named like the generated interface collides with it (#1270).
 /// </summary>
+[TestClass]
 public class InterfaceNameCollisionTests
 {
     private const string OpenApiSpec = """
@@ -24,14 +24,14 @@ public class InterfaceNameCollisionTests
             IPet: { type: object, properties: { a: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Renames_Interface_That_Collides_With_Contract()
     {
         var generatedCode = await GenerateCode();
@@ -40,7 +40,7 @@ public class InterfaceNameCollisionTests
         generatedCode.Should().Contain("Task<IPet> GetPet(");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Keeps_Interface_Name_When_Contract_Type_Suffix_Avoids_Collision()
     {
         var generatedCode = await GenerateCode(settings => settings.ContractTypeSuffix = "Dto");
@@ -48,7 +48,7 @@ public class InterfaceNameCollisionTests
         generatedCode.Should().Contain("public partial class IPetDto");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Renames_Interface_That_Collides_With_Suffixed_Contract()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec.Replace("IPet", "I"));
@@ -60,7 +60,7 @@ public class InterfaceNameCollisionTests
         generatedCode.Should().Contain("public partial interface IPet2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Renames_Interface_When_Suffix_Is_Skipped_Because_Target_Exists()
     {
         // ContractTypeSuffixApplier leaves IPet unsuffixed because IPetDto already exists
@@ -75,7 +75,7 @@ public class InterfaceNameCollisionTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Keeps_ByTag_Interfaces_Unique_After_Renaming_For_A_Contract()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
@@ -106,8 +106,8 @@ public class InterfaceNameCollisionTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_ByTag_With_Dependency_Injection()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
@@ -128,8 +128,8 @@ public class InterfaceNameCollisionTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

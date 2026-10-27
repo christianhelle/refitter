@@ -3,9 +3,10 @@ using AwesomeAssertions;
 namespace Refitter.Tests.Telemetry;
 
 
+[TestClass]
 public class SupportInformationTests
 {
-    [Test]
+    [TestMethod]
     public void GetSupportKey_Should_Return_7_Character_String()
     {
         var supportKey = SupportInformation.GetSupportKey();
@@ -14,7 +15,7 @@ public class SupportInformationTests
         supportKey.Length.Should().Be(7);
     }
 
-    [Test]
+    [TestMethod]
     public void GetSupportKey_Should_Be_Consistent()
     {
         var key1 = SupportInformation.GetSupportKey();
@@ -23,7 +24,7 @@ public class SupportInformationTests
         key1.Should().Be(key2);
     }
 
-    [Test]
+    [TestMethod]
     public void GetAnonymousIdentity_Should_Return_Hash()
     {
         var identity = SupportInformation.GetAnonymousIdentity();
@@ -32,7 +33,7 @@ public class SupportInformationTests
         identity.Length.Should().BeGreaterThan(7);
     }
 
-    [Test]
+    [TestMethod]
     public void GetAnonymousIdentity_Should_Be_Consistent()
     {
         var identity1 = SupportInformation.GetAnonymousIdentity();
@@ -41,7 +42,7 @@ public class SupportInformationTests
         identity1.Should().Be(identity2);
     }
 
-    [Test]
+    [TestMethod]
     public void GetAnonymousIdentity_Should_Be_Lowercase()
     {
         var identity = SupportInformation.GetAnonymousIdentity();
@@ -49,7 +50,7 @@ public class SupportInformationTests
         identity.Should().Be(identity.ToLowerInvariant());
     }
 
-    [Test]
+    [TestMethod]
     public void GetSupportKey_Should_Be_First_7_Chars_Of_AnonymousIdentity()
     {
         var identity = SupportInformation.GetAnonymousIdentity();
@@ -58,7 +59,7 @@ public class SupportInformationTests
         supportKey.Should().Be(identity[..7]);
     }
 
-    [Test]
+    [TestMethod]
     public void GetAnonymousIdentity_Should_Be_Base64_Encoded()
     {
         var identity = SupportInformation.GetAnonymousIdentity();
@@ -68,7 +69,7 @@ public class SupportInformationTests
         identity.Should().MatchRegex("^[a-z0-9+/=]+$");
     }
 
-    [Test]
+    [TestMethod]
     public void GetSupportKey_Should_Not_Be_Empty()
     {
         var supportKey = SupportInformation.GetSupportKey();
@@ -76,7 +77,7 @@ public class SupportInformationTests
         supportKey.Should().NotBeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void GetAnonymousIdentity_Should_Not_Contain_Username_Directly()
     {
         var identity = SupportInformation.GetAnonymousIdentity();

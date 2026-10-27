@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// OpenAPI 3.1 jsonSchemaDialect, license identifier, $ref siblings, prefixItems, if/then/else and contentMediaType.
 /// </summary>
+[TestClass]
 public class OpenApi31AdvancedKeywordTests
 {
     private const string OpenApiSpec = """
@@ -49,14 +49,14 @@ public class OpenApi31AdvancedKeywordTests
                 dep: { type: string, deprecated: true }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Contracts_For_OpenApi31_Keywords()
     {
         var generatedCode = await GenerateCode();
@@ -64,16 +64,16 @@ public class OpenApi31AdvancedKeywordTests
         generatedCode.Should().Contain("public ICollection<object> Tuple { get; set; }");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Immutable_Records()
     {
         var generatedCode = await GenerateCode(settings => settings.ImmutableRecords = true);

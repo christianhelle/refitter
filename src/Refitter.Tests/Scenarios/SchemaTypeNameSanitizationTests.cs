@@ -6,6 +6,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class SchemaTypeNameSanitizationTests
 {
     private const string SanitizedDtoName = "LookUpErnResponse";
@@ -101,7 +102,7 @@ public class SchemaTypeNameSanitizationTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Issue1083_Sanitizes_Trailing_Dot_Schema_Name_In_Contract_And_Method_Signature()
     {
         string generatedCode = await GenerateCode();
@@ -113,8 +114,8 @@ public class SchemaTypeNameSanitizationTests
         generatedCode.Should().Contain($"Task<{SanitizedDtoName}> LookUpErn(");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Issue1083_Dotted_Schema_Name_Generated_Code_Can_Build()
     {
         string generatedCode = await GenerateCode();
@@ -122,8 +123,8 @@ public class SchemaTypeNameSanitizationTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Issue1083_Preserves_Normal_Schema_Name_When_Malformed_Name_Normalizes_To_Same_Type()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithCollision);
