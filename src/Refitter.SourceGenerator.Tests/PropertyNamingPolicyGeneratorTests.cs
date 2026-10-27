@@ -1,14 +1,14 @@
 using AwesomeAssertions;
 using Refit;
 using Refitter.Tests.PropertyNamingPolicy;
-using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
 
 
+[TestClass]
 public class PropertyNamingPolicyGeneratorTests
 {
-    [Test]
+    [TestMethod]
     public void Should_Generate_Refit_Interface_For_Recursive_Property_Naming_Scenario()
     {
         typeof(IRecursivePropertyNamingApi)
@@ -24,7 +24,7 @@ public class PropertyNamingPolicyGeneratorTests
             .BeTrue("interface should have at least one Refit HTTP method attribute");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Preserve_Recursive_Property_Names()
     {
         var recursiveNodeType = typeof(RecursiveNode);
@@ -35,7 +35,7 @@ public class PropertyNamingPolicyGeneratorTests
         recursiveNodeType.GetProperty("child_count")!.PropertyType.Should().Be(typeof(long));
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Generate_Recursive_Properties_And_Use_Stubbed_Excluded_Type()
     {
         var recursiveNodeType = typeof(RecursiveNode);

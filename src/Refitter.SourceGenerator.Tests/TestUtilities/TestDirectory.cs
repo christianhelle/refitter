@@ -3,6 +3,7 @@ namespace Refitter.SourceGenerators.Tests.TestUtilities;
 /// <summary>
 /// Provides a per test run temporary directory that is deleted when the test session ends
 /// </summary>
+[TestClass]
 public static class TestDirectory
 {
     /// <summary>
@@ -24,7 +25,7 @@ public static class TestDirectory
         return folder;
     }
 
-    [After(HookType.TestSession)]
+    [AssemblyCleanup]
     public static void Cleanup()
     {
         try
