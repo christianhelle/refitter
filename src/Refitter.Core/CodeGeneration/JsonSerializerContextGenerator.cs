@@ -65,9 +65,10 @@ internal static class JsonSerializerContextGenerator
             return $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}))]";
 
         var replacement = $"{propertyName}TypeInfo";
-        for (var suffix = 2; !usedPropertyNames.Add(replacement); suffix++)
+        var suffix = 2;
+        while (!usedPropertyNames.Add(replacement))
         {
-            replacement = $"{propertyName}TypeInfo{suffix}";
+            replacement = $"{propertyName}TypeInfo{suffix++}";
         }
 
         return $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}), TypeInfoPropertyName = \"{replacement}\")]";
