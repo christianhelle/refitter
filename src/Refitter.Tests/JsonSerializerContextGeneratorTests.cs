@@ -461,6 +461,33 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
+    [Category("Integration")]
+    [Test]
+    [Arguments("Default")]
+    [Arguments("GetTypeInfo")]
+    [Arguments("GeneratedSerializerOptions")]
+    [Arguments("Equals")]
+    [Arguments("GetHashCode")]
+    [Arguments("GetType")]
+    [Arguments("ToString")]
+    public void Generate_Builds_With_Type_Named_After_JsonSerializerContext_Member(string typeName)
+    {
+        var contracts = $$"""
+            namespace My.Contracts
+            {
+                public partial class {{typeName}}
+                {
+                    public string Name { get; set; }
+                }
+            }
+            """;
+
+        var result = JsonSerializerContextGenerator.Generate(contracts, CreateSettings());
+
+        result.Should().Contain($"TypeInfoPropertyName = \"{typeName}TypeInfo\"");
+        BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
+    }
+
     private static RefitGeneratorSettings CreateSettings(
         string interfaceName = "IMyApi",
         string @namespace = "My.Clients",

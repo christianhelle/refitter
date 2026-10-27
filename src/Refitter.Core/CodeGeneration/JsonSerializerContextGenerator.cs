@@ -74,6 +74,13 @@ internal static class JsonSerializerContextGenerator
     private static readonly HashSet<string> ReservedTypeInfoPropertyNames = new(StringComparer.Ordinal)
     {
         "Options",
+        "Default",
+        "GetTypeInfo",
+        "GeneratedSerializerOptions",
+        "Equals",
+        "GetHashCode",
+        "GetType",
+        "ToString",
     };
 
     /// <summary>
