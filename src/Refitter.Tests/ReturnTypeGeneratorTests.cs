@@ -198,6 +198,42 @@ public class ReturnTypeGeneratorTests
     }
 
     [Test]
+    public void IsFileStreamResponse_Returns_True_For_File_Typed_Schema()
+    {
+        var operation = CreateOperationWithContent(
+            "application/octet-stream",
+            new OpenApiMediaType { Schema = new NJsonSchema.JsonSchema { Type = NJsonSchema.JsonObjectType.File } });
+
+        ReturnTypeGenerator.IsFileStreamResponse(operation).Should().BeTrue();
+    }
+
+    [Test]
+    public void IsFileStreamResponse_Returns_False_For_File_Content_Without_Schema()
+    {
+        var operation = CreateOperationWithContent("application/octet-stream", new OpenApiMediaType());
+
+        ReturnTypeGenerator.IsFileStreamResponse(operation).Should().BeFalse();
+    }
+
+    [Test]
+    public void IsFileStreamResponse_Returns_False_For_File_Content_Without_Media_Type()
+    {
+        var operation = CreateOperationWithContent("application/pdf", null);
+
+        ReturnTypeGenerator.IsFileStreamResponse(operation).Should().BeFalse();
+    }
+
+    private static OpenApiOperation CreateOperationWithContent(string contentType, OpenApiMediaType? mediaType)
+    {
+        var response = new OpenApiResponse();
+        response.Content[contentType] = mediaType!;
+
+        var operation = new OpenApiOperation();
+        operation.Responses["200"] = response;
+        return operation;
+    }
+
+    [Test]
     public async Task IsFileStreamResponse_Returns_False_For_Json_Content()
     {
         var spec = """
