@@ -133,7 +133,7 @@ internal sealed class DocumentEquivalenceComparer
     /// </summary>
     /// <param name="json">The JSON object to process.</param>
     /// <returns>The modified JSON object with null properties removed.</returns>
-    public JObject RemoveNullProperties(JObject json)
+    public static JObject RemoveNullProperties(JObject json)
     {
         foreach (var property in json.Properties().Where(property => property.Value.Type == JTokenType.Null).ToArray())
         {
@@ -193,7 +193,7 @@ internal sealed class DocumentEquivalenceComparer
     /// </summary>
     /// <param name="schema">The schema to extract the definition name from.</param>
     /// <returns>The definition name if found; otherwise, null.</returns>
-    public string? GetDefinitionName(JsonSchema schema)
+    public static string? GetDefinitionName(JsonSchema schema)
     {
         var referencePath = ((NJsonSchema.References.IJsonReferenceBase)schema).ReferencePath;
         if (string.IsNullOrWhiteSpace(referencePath))

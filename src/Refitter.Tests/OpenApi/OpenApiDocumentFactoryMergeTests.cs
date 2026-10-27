@@ -1492,13 +1492,13 @@ paths:
         => Comparer.AddReferencedSchemas(definitions, schema);
 
     private static string? InvokeGetDefinitionName(JsonSchema schema)
-        => Comparer.GetDefinitionName(schema);
+        => DocumentEquivalenceComparer.GetDefinitionName(schema);
 
     private static string InvokeCreateOpenApiJson(object value)
         => Comparer.CreateOpenApiJson(value);
 
     private static JObject InvokeRemoveNullProperties(JObject json)
-        => Comparer.RemoveNullProperties(json);
+        => DocumentEquivalenceComparer.RemoveNullProperties(json);
 
     private sealed class SelfReferencingValue
     {
