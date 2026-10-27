@@ -35,12 +35,15 @@ internal static class JsonSerializerContextGenerator
 
         // Deprecated contracts are marked [Obsolete], and referencing them here would raise CS0612/CS0618
         sb.AppendLine("#pragma warning disable 612, 618");
-        var usedPropertyNames = new HashSet<string>(
-            typeNames.Select(GetDefaultTypeInfoPropertyName).OfType<string>(),
+        var usedMemberNames = new HashSet<string>(
+            typeNames
+                .Select(GetDefaultTypeInfoPropertyName)
+                .OfType<string>()
+                .SelectMany(GetGeneratedMemberNames),
             StringComparer.Ordinal);
         foreach (var typeName in typeNames.OrderBy(t => t))
         {
-            sb.AppendLine(FormatJsonSerializableAttribute(typeName, usedPropertyNames));
+            sb.AppendLine(FormatJsonSerializableAttribute(typeName, usedMemberNames));
         }
 
         sb.AppendLine(
@@ -58,7 +61,7 @@ internal static class JsonSerializerContextGenerator
     /// Formats a JsonSerializable attribute, renaming the generated JsonTypeInfo property
     /// when the default name would collide with a JsonSerializerContext member
     /// </summary>
-    private static string FormatJsonSerializableAttribute(string typeName, HashSet<string> usedPropertyNames)
+    private static string FormatJsonSerializableAttribute(string typeName, HashSet<string> usedMemberNames)
     {
         var propertyName = GetDefaultTypeInfoPropertyName(typeName);
         if (propertyName is null || !ReservedTypeInfoPropertyNames.Contains(propertyName))
@@ -66,10 +69,12 @@ internal static class JsonSerializerContextGenerator
 
         var replacement = $"{propertyName}TypeInfo";
         var suffix = 2;
-        while (!usedPropertyNames.Add(replacement))
+        while (GetGeneratedMemberNames(replacement).Any(usedMemberNames.Contains))
         {
             replacement = $"{propertyName}TypeInfo{suffix++}";
         }
+
+        usedMemberNames.UnionWith(GetGeneratedMemberNames(replacement));
 
         return $"    [global::System.Text.Json.Serialization.JsonSerializable(typeof({typeName}), TypeInfoPropertyName = \"{replacement}\")]";
     }
@@ -81,6 +86,18 @@ internal static class JsonSerializerContextGenerator
         typeName.IndexOfAny(['<', '[', '?']) >= 0
             ? null
             : typeName.Substring(typeName.LastIndexOf('.') + 1);
+
+    /// <summary>
+    /// Gets the context members System.Text.Json generates for a JsonTypeInfo property
+    /// </summary>
+    private static string[] GetGeneratedMemberNames(string propertyName) =>
+    [
+        propertyName,
+        $"_{propertyName}",
+        $"Create_{propertyName}",
+        $"{propertyName}PropInit",
+        $"{propertyName}SerializeHandler",
+    ];
 
     private static readonly HashSet<string> ReservedTypeInfoPropertyNames = new(StringComparer.Ordinal)
     {
