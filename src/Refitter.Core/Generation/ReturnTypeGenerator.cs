@@ -67,7 +67,7 @@ internal class ReturnTypeGenerator(
                ApiResponseTypeRegex.IsMatch(typeName);
     }
 
-    public bool IsFileStreamResponse(OpenApiOperation operation)
+    public static bool IsFileStreamResponse(OpenApiOperation operation)
     {
         var successCodes = new[] { "200", "201", "202", "203", "206", "2XX" };
 
