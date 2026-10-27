@@ -411,6 +411,7 @@ public class RefitterGenerateTask : MSBuildTask
 
     private static string GetDisplayFramework(string targetFramework) => targetFramework.Replace("net", ".NET ");
 
+#pragma warning disable S2325 // False positive: Log is an instance property inherited from Task
     private void TryLogErrorFromException(Exception e)
     {
         try
@@ -446,6 +447,7 @@ public class RefitterGenerateTask : MSBuildTask
             Debug.WriteLine($"Failed to log error: {ex}");
         }
     }
+#pragma warning restore S2325
 
     internal static string[] FilterFiles(string[] files, string includePatterns, string projectFileDirectory)
     {

@@ -18,7 +18,9 @@ public class RefitterRunner
     /// <param name="outputPath">Optional CLI output path override.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A <see cref="RunResult"/> containing generated files, warnings, diagnostics, and the exit code.</returns>
+#pragma warning disable S2325 // Instance method kept for public API compatibility
     public async Task<RunResult> RunAsync(
+#pragma warning restore S2325
         RefitGeneratorSettings settings,
         IFileWriter? writer = null,
         IValidator? validator = null,
