@@ -45,17 +45,18 @@ function Invoke-ChildProcess
 
     if ($p.ExitCode -ne 0)
     {
-        Write-Host "FAILED: $Description (exit code $($p.ExitCode))"
-        Write-Host "Command: $FilePath $Arguments"
+        $InformationPreference = "Continue"
+        Write-Information "FAILED: $Description (exit code $($p.ExitCode))"
+        Write-Information "Command: $FilePath $Arguments"
         if (Test-Path $stdoutLog)
         {
-            Write-Host "-- stdout --"
-            Get-Content $stdoutLog -Tail 60 | ForEach-Object { Write-Host $_ }
+            Write-Information "-- stdout --"
+            Get-Content $stdoutLog -Tail 60 | ForEach-Object { Write-Information $_ }
         }
         if (Test-Path $stderrLog)
         {
-            Write-Host "-- stderr --"
-            Get-Content $stderrLog -Tail 60 | ForEach-Object { Write-Host $_ }
+            Write-Information "-- stderr --"
+            Get-Content $stderrLog -Tail 60 | ForEach-Object { Write-Information $_ }
         }
     }
 
