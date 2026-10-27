@@ -160,6 +160,9 @@ build_docker_prefix() {
     Linux | Darwin)
         printf -- '--user\0%s:%s\0' "$(id -u)" "$(id -g)"
         ;;
+    *)
+        # Other hosts (e.g. Windows) run the container as its default user
+        ;;
     esac
 
     printf 'christianhelle/refitter\0'
