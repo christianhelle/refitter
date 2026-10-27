@@ -307,6 +307,11 @@ function RunTests
     GenerateFromSettingsFile -settingsFile "./multiple-sources.refitter" -processPath $processPath -useDocker $UseDocker
     BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore
 
+    # Mastodon has a contract named Options that collides with JsonSerializerContext.Options
+    CleanGeneratedCode
+    GenerateFromSettingsFile -settingsFile "./mastodon.refitter" -processPath $processPath -useDocker $UseDocker
+    BuildSolution -solution "./ConsoleApp/ConsoleApp.Core.slnx" -noRestore
+
     CleanGeneratedCode
     GenerateFromSettingsFile -settingsFile "./Streaming/.refitter" -processPath $processPath -useDocker $UseDocker
     BuildSolution -solution "./Streaming/Streaming.csproj"
