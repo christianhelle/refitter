@@ -42,59 +42,73 @@ internal static class SchemaWalker
             yield return schema;
         }
 
-        foreach (var pathItem in document.Paths.Values)
+        foreach (var pathItem in document.Paths.Values.Where(pathItem => pathItem != null))
         {
-            if (pathItem == null)
+            foreach (var schema in EnumeratePathItemSchemas(pathItem))
             {
-                continue;
+                yield return schema;
             }
+        }
+    }
 
-            foreach (var parameter in pathItem.Parameters)
+    private static IEnumerable<JsonSchema?> EnumeratePathItemSchemas(OpenApiPathItem pathItem)
+    {
+        foreach (var parameter in pathItem.Parameters)
+        {
+            yield return parameter;
+        }
+
+        foreach (var operation in pathItem.Values.Where(operation => operation != null))
+        {
+            foreach (var schema in EnumerateOperationSchemas(operation))
             {
-                yield return parameter;
+                yield return schema;
             }
+        }
+    }
 
-            foreach (var operation in pathItem.Values)
+    private static IEnumerable<JsonSchema?> EnumerateOperationSchemas(OpenApiOperation operation)
+    {
+        foreach (var parameter in operation.ActualParameters)
+        {
+            yield return parameter;
+        }
+
+        if (operation.RequestBody?.Content != null)
+        {
+            foreach (var content in operation.RequestBody.Content.Values)
             {
-                if (operation == null)
-                {
-                    continue;
-                }
-
-                foreach (var parameter in operation.ActualParameters)
-                {
-                    yield return parameter;
-                }
-
-                if (operation.RequestBody?.Content != null)
-                {
-                    foreach (var content in operation.RequestBody.Content.Values)
-                    {
-                        yield return content.Schema;
-                    }
-                }
-
-                foreach (var response in operation.ActualResponses.Values)
-                {
-                    if (response.Headers != null)
-                    {
-                        foreach (var header in response.Headers.Values)
-                        {
-                            yield return header;
-                        }
-                    }
-
-                    if (response.Content == null)
-                    {
-                        continue;
-                    }
-
-                    foreach (var content in response.Content.Values)
-                    {
-                        yield return content.Schema;
-                    }
-                }
+                yield return content.Schema;
             }
+        }
+
+        foreach (var response in operation.ActualResponses.Values)
+        {
+            foreach (var schema in EnumerateResponseSchemas(response))
+            {
+                yield return schema;
+            }
+        }
+    }
+
+    private static IEnumerable<JsonSchema?> EnumerateResponseSchemas(OpenApiResponse response)
+    {
+        if (response.Headers != null)
+        {
+            foreach (var header in response.Headers.Values)
+            {
+                yield return header;
+            }
+        }
+
+        if (response.Content == null)
+        {
+            yield break;
+        }
+
+        foreach (var content in response.Content.Values)
+        {
+            yield return content.Schema;
         }
     }
 
