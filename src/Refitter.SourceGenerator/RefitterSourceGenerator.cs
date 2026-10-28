@@ -128,10 +128,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             context,
             compilation,
             augmentedCompilation,
-            generator,
-            "System.Text.Json",
+            new NestedGenerator(generator, "System.Text.Json", optionsProvider),
             parseOptions,
-            optionsProvider,
             hintName => contextNames.Any(name => hintName.StartsWith(name + ".", StringComparison.Ordinal)),
             diagnostic => diagnostic.Location.SourceTree is { } tree && !compilation.ContainsSyntaxTree(tree));
     }
@@ -165,10 +163,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             context,
             compilation,
             augmentedCompilation,
-            generator,
-            "Refit",
+            new NestedGenerator(generator, "Refit", new RefitGeneratorOptionsProvider(optionsProvider)),
             parseOptions,
-            new RefitGeneratorOptionsProvider(optionsProvider),
             _ => true,
             _ => true);
 
@@ -233,19 +229,17 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         SourceProductionContext context,
         Compilation compilation,
         Compilation augmentedCompilation,
-        IIncrementalGenerator generator,
-        string generatorName,
+        NestedGenerator nestedGenerator,
         CSharpParseOptions parseOptions,
-        AnalyzerConfigOptionsProvider optionsProvider,
         Func<string, bool> includeSource,
         Func<Diagnostic, bool> includeDiagnostic)
     {
         try
         {
             var driver = CSharpGeneratorDriver.Create(
-                new[] { generator.AsSourceGenerator() },
+                new[] { nestedGenerator.Generator.AsSourceGenerator() },
                 parseOptions: parseOptions,
-                optionsProvider: optionsProvider);
+                optionsProvider: nestedGenerator.OptionsProvider);
 
             var runResult = driver
                 .RunGenerators(augmentedCompilation, context.CancellationToken)
@@ -261,18 +255,18 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 if (result.Exception is not null)
                 {
                     context.ReportDiagnostic(
-                        CreateDiagnostic(CreateNestedGeneratorFailedDiagnostic(generatorName, result.Exception)));
+                        CreateDiagnostic(CreateNestedGeneratorFailedDiagnostic(nestedGenerator.Name, result.Exception)));
                 }
 
                 foreach (var source in result.GeneratedSources.Where(source => includeSource(source.HintName)))
                 {
-                    context.AddSource(generatorName + "." + source.HintName, source.SourceText);
+                    context.AddSource(nestedGenerator.Name + "." + source.HintName, source.SourceText);
                 }
             }
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
-            context.ReportDiagnostic(CreateDiagnostic(CreateNestedGeneratorFailedDiagnostic(generatorName, e)));
+            context.ReportDiagnostic(CreateDiagnostic(CreateNestedGeneratorFailedDiagnostic(nestedGenerator.Name, e)));
         }
     }
 
@@ -594,9 +588,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         const string extension = ".g.cs";
         var baseName = hintName.Substring(0, hintName.Length - extension.Length);
         var uniqueName = hintName;
-        for (var i = 2; !usedHintNames.Add(uniqueName); i++)
+        var counter = 2;
+        while (!usedHintNames.Add(uniqueName))
         {
-            uniqueName = $"{baseName}{i}{extension}";
+            uniqueName = $"{baseName}{counter}{extension}";
+            counter++;
         }
 
         return uniqueName;
@@ -623,6 +619,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         EquatableArray<GeneratedSource> Sources);
 
     internal readonly record struct GeneratedSource(string HintName, string Content);
+
+    private readonly record struct NestedGenerator(
+        IIncrementalGenerator Generator,
+        string Name,
+        AnalyzerConfigOptionsProvider OptionsProvider);
 
     [SuppressMessage(
         "Major Code Smell",
