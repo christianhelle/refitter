@@ -171,7 +171,63 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             new RefitGeneratorOptionsProvider(optionsProvider),
             _ => true,
             _ => true);
+
+        ReportRefitAnalyzerDiagnostics(context, compilation, augmentedCompilation, optionsProvider);
     }
+
+    private static void ReportRefitAnalyzerDiagnostics(
+        SourceProductionContext context,
+        Compilation compilation,
+        Compilation augmentedCompilation,
+        AnalyzerConfigOptionsProvider optionsProvider)
+    {
+        // Refit's analyzer skips its generation checks (such as RF006) while its generator is disabled,
+        // so report the diagnostics it only finds when the generator is enabled
+        var analyzer = LoadedGeneratorLocator.CreateRefitAnalyzer(compilation);
+        if (analyzer is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var reported = new HashSet<(string, Location, string)>(
+                GetAnalyzerDiagnostics(augmentedCompilation, analyzer, optionsProvider, context.CancellationToken)
+                    .Select(GetDiagnosticKey));
+
+            var diagnostics = GetAnalyzerDiagnostics(
+                augmentedCompilation,
+                analyzer,
+                new RefitGeneratorOptionsProvider(optionsProvider),
+                context.CancellationToken);
+
+            foreach (var diagnostic in diagnostics.Where(d => !reported.Contains(GetDiagnosticKey(d))))
+            {
+                context.ReportDiagnostic(RelocateDiagnostic(compilation, diagnostic));
+            }
+        }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            context.ReportDiagnostic(CreateDiagnostic(CreateNestedGeneratorFailedDiagnostic("Refit analyzer", e)));
+        }
+    }
+
+    private static ImmutableArray<Diagnostic> GetAnalyzerDiagnostics(
+        Compilation compilation,
+        DiagnosticAnalyzer analyzer,
+        AnalyzerConfigOptionsProvider optionsProvider,
+        CancellationToken cancellationToken) =>
+        compilation
+            .WithAnalyzers(
+                ImmutableArray.Create(analyzer),
+                new AnalyzerOptions(ImmutableArray<AdditionalText>.Empty, optionsProvider),
+                cancellationToken)
+            .GetAnalyzerDiagnosticsAsync(cancellationToken)
+            .GetAwaiter()
+            .GetResult();
+
+    private static (string, Location, string) GetDiagnosticKey(Diagnostic diagnostic) =>
+        (diagnostic.Id, diagnostic.Location, diagnostic.GetMessage());
 
     private static void RunGenerator(
         SourceProductionContext context,
