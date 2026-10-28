@@ -1,7 +1,11 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
 using Refitter.Core;
 
 namespace Refitter.SourceGenerator;
@@ -42,7 +46,111 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         });
 
         // generate code for each .refitter file and add it to the compilation
-        context.RegisterSourceOutput(refitterFiles.Select(GenerateCode), ProcessResults);
+        var generatedCode = refitterFiles.Select(GenerateCode);
+        context.RegisterSourceOutput(generatedCode, ProcessResults);
+
+        // run Refit's generator over the project and the Refitter output so the Refit stubs
+        // are produced in the same build, since Refit's own pass cannot see generated sources
+        var refitInputs = context.CompilationProvider
+            .Combine(generatedCode.Select((code, _) => code.Sources).Collect())
+            .Combine(context.ParseOptionsProvider)
+            .Combine(context.AnalyzerConfigOptionsProvider);
+
+        context.RegisterImplementationSourceOutput(
+            refitInputs,
+            static (spc, input) => RunRefitGenerator(
+                spc,
+                input.Left.Left.Left,
+                input.Left.Left.Right,
+                input.Left.Right,
+                input.Right));
+    }
+
+    private static void RunRefitGenerator(
+        SourceProductionContext context,
+        Compilation compilation,
+        ImmutableArray<EquatableArray<GeneratedSource>> refitterSources,
+        ParseOptions parseOptions,
+        AnalyzerConfigOptionsProvider optionsProvider)
+    {
+        if (!optionsProvider.GlobalOptions.TryGetValue("build_property.RefitterRunsRefitGenerator", out var value) ||
+            !string.Equals(value, "true", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        var generator = RefitGeneratorLocator.Create(compilation);
+        if (generator is null)
+        {
+            context.ReportDiagnostic(CreateDiagnostic(CreateRefitGeneratorNotFoundDiagnostic()));
+            return;
+        }
+
+        try
+        {
+            var syntaxTrees = refitterSources
+                .SelectMany(sources => sources)
+                .Select(source => CSharpSyntaxTree.ParseText(
+                    SourceText.From(source.Content, Encoding.UTF8),
+                    (CSharpParseOptions)parseOptions,
+                    source.HintName,
+                    context.CancellationToken));
+
+            var driver = CSharpGeneratorDriver.Create(
+                new[] { generator.AsSourceGenerator() },
+                parseOptions: (CSharpParseOptions)parseOptions,
+                optionsProvider: new RefitGeneratorOptionsProvider(optionsProvider));
+
+            var runResult = driver
+                .RunGenerators(compilation.AddSyntaxTrees(syntaxTrees), context.CancellationToken)
+                .GetRunResult();
+
+            foreach (var diagnostic in runResult.Diagnostics)
+            {
+                context.ReportDiagnostic(RelocateDiagnostic(compilation, diagnostic));
+            }
+
+            foreach (var result in runResult.Results)
+            {
+                if (result.Exception is not null)
+                {
+                    context.ReportDiagnostic(CreateDiagnostic(CreateRefitGeneratorFailedDiagnostic(result.Exception)));
+                }
+
+                foreach (var source in result.GeneratedSources)
+                {
+                    context.AddSource("Refit." + source.HintName, source.SourceText);
+                }
+            }
+        }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            context.ReportDiagnostic(CreateDiagnostic(CreateRefitGeneratorFailedDiagnostic(e)));
+        }
+    }
+
+    private static Diagnostic RelocateDiagnostic(Compilation compilation, Diagnostic diagnostic)
+    {
+        // diagnostics in syntax trees that only exist in the nested compilation can't be reported as-is
+        var tree = diagnostic.Location.SourceTree;
+        if (tree is null || compilation.ContainsSyntaxTree(tree))
+        {
+            return diagnostic;
+        }
+
+        var descriptor = new DiagnosticDescriptor(
+            diagnostic.Id,
+            diagnostic.Descriptor.Title,
+            "{0}",
+            diagnostic.Descriptor.Category,
+            diagnostic.Severity,
+            isEnabledByDefault: true);
+
+        var lineSpan = diagnostic.Location.GetLineSpan();
+        return Diagnostic.Create(
+            descriptor,
+            Location.None,
+            $"{diagnostic.GetMessage()} ({lineSpan.Path}:{lineSpan.StartLinePosition.Line + 1})");
     }
 
     private static void ProcessResults(SourceProductionContext context, GeneratedCode result)
@@ -242,6 +350,20 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             "Warning",
             "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
             DiagnosticSeverity.Warning);
+
+    private static GeneratedDiagnostic CreateRefitGeneratorNotFoundDiagnostic() =>
+        new(
+            "REFITTER006",
+            "Refit source generator not found",
+            "Refitter could not find the Refit source generator, so no Refit implementations were generated. Add a direct PackageReference to Refit to the project.",
+            DiagnosticSeverity.Warning);
+
+    private static GeneratedDiagnostic CreateRefitGeneratorFailedDiagnostic(Exception exception) =>
+        new(
+            "REFITTER007",
+            "Refit source generator failed",
+            $"The Refit source generator failed when run by Refitter: {exception}",
+            DiagnosticSeverity.Error);
 
     private static GeneratedDiagnostic CreateErrorDiagnostic(string message) =>
         new(

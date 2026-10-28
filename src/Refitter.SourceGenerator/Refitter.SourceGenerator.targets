@@ -1,0 +1,20 @@
+<Project>
+
+  <!--
+  Refit's source generator runs against the same input compilation as Refitter, so it cannot see the
+  Refit interfaces that Refitter generates. Refitter therefore disables the consumer's Refit generator
+  and runs that same generator itself over the project sources plus the Refitter output.
+
+  This has to be a .targets file so that a DisableRefitSourceGenerator value set in the project body
+  (for example when using Refit.Reflection) is respected: in that case Refit generation stays off.
+  -->
+  <PropertyGroup Condition="'$(DisableRefitSourceGenerator)' != 'true'">
+    <RefitterRunsRefitGenerator>true</RefitterRunsRefitGenerator>
+    <DisableRefitSourceGenerator>true</DisableRefitSourceGenerator>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="RefitterRunsRefitGenerator" />
+  </ItemGroup>
+
+</Project>
