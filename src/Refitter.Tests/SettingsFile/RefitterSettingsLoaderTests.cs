@@ -4,11 +4,12 @@ using Refitter.Core;
 namespace Refitter.Tests.SettingsFile;
 
 
+[TestClass]
 public class RefitterSettingsLoaderTests
 {
     private static readonly string BaseDirectory = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "refitter-loader-tests"));
 
-    [Test]
+    [TestMethod]
     public void Load_Deserializes_Settings()
     {
         const string json = """{"namespace": "Acme.Api", "openApiPath": "https://example.com/openapi.json"}""";
@@ -18,7 +19,7 @@ public class RefitterSettingsLoaderTests
         settings.Namespace.Should().Be("Acme.Api");
     }
 
-    [Test]
+    [TestMethod]
     public void Load_Throws_On_Invalid_Json()
     {
         var act = () => RefitterSettingsLoader.Load("{ not valid json", BaseDirectory);
@@ -26,7 +27,7 @@ public class RefitterSettingsLoaderTests
         act.Should().Throw<System.Text.Json.JsonException>();
     }
 
-    [Test]
+    [TestMethod]
     public void Resolves_Relative_OpenApiPath_Against_BaseDirectory()
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = "specs/openapi.json" };
@@ -36,7 +37,7 @@ public class RefitterSettingsLoaderTests
         settings.OpenApiPath.Should().Be(Path.GetFullPath(Path.Combine(BaseDirectory, "specs/openapi.json")));
     }
 
-    [Test]
+    [TestMethod]
     public void Leaves_Url_OpenApiPath_Untouched()
     {
         const string url = "https://example.com/openapi.json";
@@ -47,7 +48,7 @@ public class RefitterSettingsLoaderTests
         settings.OpenApiPath.Should().Be(url);
     }
 
-    [Test]
+    [TestMethod]
     public void Leaves_Rooted_OpenApiPath_Untouched()
     {
         var rooted = Path.GetFullPath(Path.Combine(BaseDirectory, "absolute", "openapi.json"));
@@ -58,7 +59,7 @@ public class RefitterSettingsLoaderTests
         settings.OpenApiPath.Should().Be(rooted);
     }
 
-    [Test]
+    [TestMethod]
     public void Resolves_Relative_Entries_In_OpenApiPaths_And_Preserves_Urls()
     {
         const string url = "https://example.com/openapi.json";
@@ -73,7 +74,7 @@ public class RefitterSettingsLoaderTests
         settings.OpenApiPaths![1].Should().Be(url);
     }
 
-    [Test]
+    [TestMethod]
     public void Leaves_Rooted_Entry_In_OpenApiPaths_Untouched()
     {
         var rootedPath = Path.GetFullPath(Path.Combine(BaseDirectory, "absolute", "spec.json"));
@@ -87,7 +88,7 @@ public class RefitterSettingsLoaderTests
         settings.OpenApiPaths![0].Should().Be(rootedPath);
     }
 
-    [Test]
+    [TestMethod]
     public void Does_Not_Modify_OpenApiPath_When_Null_Or_Empty()
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = null };
@@ -97,7 +98,7 @@ public class RefitterSettingsLoaderTests
         settings.OpenApiPath.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void Does_Not_Modify_OpenApiPaths_When_Empty_Array()
     {
         var settings = new RefitGeneratorSettings { OpenApiPaths = Array.Empty<string>() };
@@ -107,17 +108,17 @@ public class RefitterSettingsLoaderTests
         settings.OpenApiPaths.Should().BeEmpty();
     }
 
-    [Test]
-    [Arguments("https://example.com/openapi.json", true)]
-    [Arguments("http://example.com/openapi.json", true)]
-    [Arguments("specs/openapi.json", false)]
-    [Arguments("ftp://example.com/openapi.json", false)]
+    [TestMethod]
+    [DataRow("https://example.com/openapi.json", true)]
+    [DataRow("http://example.com/openapi.json", true)]
+    [DataRow("specs/openapi.json", false)]
+    [DataRow("ftp://example.com/openapi.json", false)]
     public void IsUrl_Detects_Http_And_Https(string path, bool expected)
     {
         RefitterSettingsLoader.IsUrl(path).Should().Be(expected);
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyDefaults_Should_Enable_GenerateMultipleFiles_When_ContractsOutputFolder_Is_Set()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -132,7 +133,7 @@ public class RefitterSettingsLoaderTests
         refitSettings.OutputFolder.Should().Be(RefitGeneratorSettings.DefaultOutputFolder);
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyDefaults_Should_Fallback_To_Output_When_SettingsFilePath_Has_No_Filename()
     {
         var refitSettings = new RefitGeneratorSettings();
@@ -145,7 +146,7 @@ public class RefitterSettingsLoaderTests
         refitSettings.OutputFilename.Should().Be("Output.cs");
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyDefaults_Should_Fallback_To_Output_When_OutputFilename_Is_Whitespace()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -159,7 +160,7 @@ public class RefitterSettingsLoaderTests
         refitSettings.OutputFilename.Should().Be("petstore.cs");
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyDefaults_Should_Preserve_Existing_OutputFilename()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -173,7 +174,7 @@ public class RefitterSettingsLoaderTests
         refitSettings.OutputFilename.Should().Be("CustomClient.cs");
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyDefaults_Should_Not_Set_GenerateMultipleFiles_When_No_ContractsFolder()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -184,7 +185,7 @@ public class RefitterSettingsLoaderTests
         refitSettings.GenerateMultipleFiles.Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveRelativeSpecPaths_Null_OpenApiPaths_Does_Not_Throw()
     {
         var settings = new RefitGeneratorSettings
@@ -199,7 +200,7 @@ public class RefitterSettingsLoaderTests
         settings.OpenApiPaths.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveRelativeSpecPaths_Empty_OpenApiPath_Does_Not_Resolve()
     {
         var settings = new RefitGeneratorSettings

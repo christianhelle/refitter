@@ -6,6 +6,7 @@ using Refitter.SourceGenerators.Tests.TestUtilities;
 namespace Refitter.SourceGenerators.Tests;
 
 
+[TestClass]
 public class SourceGeneratorFileIOTests
 {
     private const string OpenApiSpec = @"
@@ -37,7 +38,7 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Test_CoreGenerator_DoesNotWriteToFileSystem()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -64,7 +65,7 @@ components:
         generatedCode.Should().Contain("partial interface ITestAPI");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_CoreGenerator_ConcurrentGeneration()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -89,7 +90,7 @@ components:
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_CoreGenerator_GeneratedCodeIsValid()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -111,7 +112,7 @@ components:
             .BeTrue("generated code should compile successfully");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_CoreGenerator_OutputFilename_NotCreatedOnDisk()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);

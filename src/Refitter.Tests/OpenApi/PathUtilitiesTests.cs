@@ -4,50 +4,50 @@ using Refitter.Core;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class PathUtilitiesTests
 {
-    [Test]
-    [Arguments("http://example.com/spec.json")]
-    [Arguments("https://example.com/spec.yaml")]
-    [Arguments("HTTP://EXAMPLE.COM/SPEC.JSON")]
-    [Arguments("https://example.com/path/to/spec.yml")]
+    [TestMethod]
+    [DataRow("http://example.com/spec.json")]
+    [DataRow("https://example.com/spec.yaml")]
+    [DataRow("HTTP://EXAMPLE.COM/SPEC.JSON")]
+    [DataRow("https://example.com/path/to/spec.yml")]
     public void IsHttp_Detects_Http_Paths(string path)
     {
         PathUtilities.IsHttp(path).Should().BeTrue();
     }
 
-    [Test]
-    [Arguments("/local/path/spec.json")]
-    [Arguments("C:\\local\\path\\spec.yaml")]
-    [Arguments("relative/path/spec.json")]
-    [Arguments("")]
+    [TestMethod]
+    [DataRow("/local/path/spec.json")]
+    [DataRow("C:\\local\\path\\spec.yaml")]
+    [DataRow("relative/path/spec.json")]
+    [DataRow("")]
     public void IsHttp_Returns_False_For_NonHttp_Paths(string path)
     {
         PathUtilities.IsHttp(path).Should().BeFalse();
     }
 
-    [Test]
-    [Arguments("spec.yaml")]
-    [Arguments("spec.yml")]
-    [Arguments("spec.YAML")]
-    [Arguments("spec.YML")]
-    [Arguments("/path/to/spec.yaml")]
-    [Arguments("https://example.com/spec.yaml")]
-    [Arguments("https://example.com/spec.yaml?query=param")]
-    [Arguments("https://example.com/spec.yaml#fragment")]
-    [Arguments("spec.YAML")]
+    [TestMethod]
+    [DataRow("spec.yaml")]
+    [DataRow("spec.yml")]
+    [DataRow("spec.YAML")]
+    [DataRow("spec.YML")]
+    [DataRow("/path/to/spec.yaml")]
+    [DataRow("https://example.com/spec.yaml")]
+    [DataRow("https://example.com/spec.yaml?query=param")]
+    [DataRow("https://example.com/spec.yaml#fragment")]
     public void IsYaml_Detects_Yaml_Paths(string path)
     {
         PathUtilities.IsYaml(path).Should().BeTrue();
     }
 
-    [Test]
-    [Arguments("spec.json")]
-    [Arguments("spec.xml")]
-    [Arguments("/path/to/spec.json")]
-    [Arguments("https://example.com/spec.json")]
-    [Arguments("spec")]
-    [Arguments("")]
+    [TestMethod]
+    [DataRow("spec.json")]
+    [DataRow("spec.xml")]
+    [DataRow("/path/to/spec.json")]
+    [DataRow("https://example.com/spec.json")]
+    [DataRow("spec")]
+    [DataRow("")]
     public void IsYaml_Returns_False_For_NonYaml_Paths(string path)
     {
         PathUtilities.IsYaml(path).Should().BeFalse();

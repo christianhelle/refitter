@@ -4,9 +4,10 @@ using Refitter.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class UniqueEnumNameGeneratorTests
 {
-    [Test]
+    [TestMethod]
     public void Suffixes_Names_That_Collide_After_Sanitizing()
     {
         var schema = CreateStringEnum("a", "A", "b", "a-");
@@ -16,7 +17,7 @@ public class UniqueEnumNameGeneratorTests
         names.Should().Equal("A", "A2", "B", "A3");
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Names_That_Do_Not_Collide()
     {
         var schema = CreateStringEnum("available", "pending", "sold");
@@ -26,7 +27,7 @@ public class UniqueEnumNameGeneratorTests
         names.Should().Equal("Available", "Pending", "Sold");
     }
 
-    [Test]
+    [TestMethod]
     public void Skips_Suffixes_Already_Used_By_Other_Values()
     {
         var schema = CreateStringEnum("a", "A2", "A");
@@ -36,7 +37,7 @@ public class UniqueEnumNameGeneratorTests
         names.Should().Equal("A", "A2", "A3");
     }
 
-    [Test]
+    [TestMethod]
     public void Uses_Enumeration_Names_And_Integer_Value_Names()
     {
         var schema = new JsonSchema { Type = JsonObjectType.Integer };
@@ -51,7 +52,7 @@ public class UniqueEnumNameGeneratorTests
         names.Should().Equal("One", "One2", "_3");
     }
 
-    [Test]
+    [TestMethod]
     public void Ignores_Null_Values_Like_NJsonSchema()
     {
         var schema = CreateStringEnum("a", null, "A");
@@ -62,7 +63,7 @@ public class UniqueEnumNameGeneratorTests
         generator.Generate(2, "A", "A", schema).Should().Be("A2");
     }
 
-    [Test]
+    [TestMethod]
     public void Returns_The_Same_Names_When_Enumerated_Again()
     {
         var schema = CreateStringEnum("a", "A");

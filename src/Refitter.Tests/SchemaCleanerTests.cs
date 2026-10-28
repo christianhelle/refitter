@@ -2,16 +2,16 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Resources;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class SchemaCleanerTests
 {
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2)]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2)]
     public async Task RemoveUnreferencedSchema_Removes_Unused_Schemas(SampleOpenSpecifications version)
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
@@ -26,9 +26,9 @@ public class SchemaCleanerTests
         document.Components.Schemas.Count.Should().BeLessThanOrEqualTo(initialCount);
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2)]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2)]
     public async Task RemoveUnreferencedSchema_Keeps_Referenced_Schemas(SampleOpenSpecifications version)
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
@@ -41,9 +41,9 @@ public class SchemaCleanerTests
         document.Components.Schemas.Should().NotBeEmpty();
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "Pet.*")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "Pet")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "Pet.*")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "Pet")]
     public async Task RemoveUnreferencedSchema_Keeps_Schemas_Matching_Pattern(
         SampleOpenSpecifications version,
         string pattern)
@@ -58,9 +58,9 @@ public class SchemaCleanerTests
         document.Components.Schemas.Keys.Should().Contain(k => k.Contains("Pet"));
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, true)]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, false)]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, true)]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, false)]
     public async Task RemoveUnreferencedSchema_Handles_IncludeInheritanceHierarchy_Flag(
         SampleOpenSpecifications version,
         bool includeHierarchy)
@@ -78,9 +78,9 @@ public class SchemaCleanerTests
         document.Components.Schemas.Should().NotBeEmpty();
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2)]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2)]
     public async Task SchemaCleaner_Constructor_Accepts_Parameters(SampleOpenSpecifications version)
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
@@ -93,8 +93,8 @@ public class SchemaCleanerTests
         cleaner.IncludeInheritanceHierarchy.Should().BeFalse();
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
     public async Task SchemaCleaner_IncludeInheritanceHierarchy_Can_Be_Set(SampleOpenSpecifications version)
     {
         var spec = EmbeddedResources.GetSwaggerPetstore(version);
@@ -109,7 +109,7 @@ public class SchemaCleanerTests
         cleaner.IncludeInheritanceHierarchy.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task RemoveUnreferencedSchema_Handles_Alias_Schemas_Sharing_The_Same_Instance()
     {
         const string spec = """
@@ -175,7 +175,7 @@ public class SchemaCleanerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaCleaner_Handles_DiscriminatorObject_With_Mapping()
     {
         const string spec = @"{
@@ -266,7 +266,7 @@ public class SchemaCleanerTests
         document.Components.Schemas.Should().NotContainKey("UnusedSchema");
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaCleaner_Cleans_Discriminator_Mappings_When_Not_Including_Hierarchy()
     {
         const string spec = @"{
@@ -350,7 +350,7 @@ public class SchemaCleanerTests
         finalMappingCount.Should().BeLessThanOrEqualTo(initialMappingCount);
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaCleaner_TryPush_Handles_NonNull_Schema()
     {
         const string spec = @"{

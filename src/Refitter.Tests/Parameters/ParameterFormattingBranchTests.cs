@@ -1,13 +1,13 @@
 using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Parameters;
 
+[TestClass]
 public class ParameterFormattingBranchTests
 {
-    [Test]
+    [TestMethod]
     public async Task Query_Date_Parameters_Use_The_Configured_Date_Format()
     {
         const string spec = @"
@@ -41,7 +41,7 @@ paths:
         generatedCode.Should().Contain("[Query(Format = \"dd/MM/yyyy\")]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Query_DateTime_Parameters_Use_The_Configured_DateTime_Format()
     {
         const string spec = @"
@@ -75,7 +75,7 @@ paths:
         generatedCode.Should().Contain("[Query(Format = \"yyyy-MM-ddTHH:mm:ss\")]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Path_Parameters_Missing_From_The_Url_Template_Are_Ordered_Last()
     {
         const string spec = @"

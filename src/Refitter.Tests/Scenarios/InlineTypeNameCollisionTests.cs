@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Inline enum and object names that collide with existing component schema names.
 /// </summary>
+[TestClass]
 public class InlineTypeNameCollisionTests
 {
     private const string OpenApiSpec = """
@@ -30,22 +30,22 @@ public class InlineTypeNameCollisionTests
             PetKind: { type: string, enum: [c, d] }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Renames_Colliding_Inline_Types()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("public PetStatus2 Status { get; set; }");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

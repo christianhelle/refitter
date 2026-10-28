@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Regression;
 
+[TestClass]
 public class OpenApiTitleAngleBracketIdentifierTests
 {
     private const string OpenApiSpec = """
@@ -34,7 +35,7 @@ public class OpenApiTitleAngleBracketIdentifierTests
                   type: string
         """;
 
-    [Test]
+    [TestMethod]
     public async Task OpenApi_Title_With_Angle_Brackets_Does_Not_Leak_Invalid_Interface_Or_Context_Names()
     {
         string generatedCode = await GenerateCode();
@@ -45,8 +46,8 @@ public class OpenApiTitleAngleBracketIdentifierTests
         generatedCode.Should().NotContain("Invoice<Client>APISerializerContext");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task OpenApi_Title_With_Angle_Brackets_Generated_Code_Builds()
     {
         string generatedCode = await GenerateCode();

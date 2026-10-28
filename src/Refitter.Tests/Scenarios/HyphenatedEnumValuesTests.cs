@@ -3,7 +3,6 @@ using AwesomeAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
@@ -17,6 +16,7 @@ namespace Refitter.Tests.Scenarios;
 /// respects [EnumMember] (e.g. JsonStringEnumMemberConverter).
 /// </summary>
 
+[TestClass]
 public class HyphenatedEnumValuesTests
 {
     private const string OpenApiSpec = @"
@@ -70,14 +70,14 @@ public class HyphenatedEnumValuesTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -87,7 +87,7 @@ public class HyphenatedEnumValuesTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Places_JsonConverter_On_Enum_Type_Not_Property()
     {
         string generatedCode = await GenerateCode();
@@ -103,7 +103,7 @@ public class HyphenatedEnumValuesTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_EnumMember_Attributes()
     {
         string generatedCode = await GenerateCode();
@@ -115,7 +115,7 @@ public class HyphenatedEnumValuesTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Without_InlineJsonConverters_Builds()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: false);
@@ -125,7 +125,7 @@ public class HyphenatedEnumValuesTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Without_InlineJsonConverters_Has_No_JsonConverter()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: false);

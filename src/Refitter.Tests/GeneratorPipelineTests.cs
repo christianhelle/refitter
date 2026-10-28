@@ -1,11 +1,11 @@
 using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class GeneratorPipelineTests
 {
     private const string OpenApiSpec = """
@@ -84,7 +84,7 @@ public class GeneratorPipelineTests
                   description: 'ok'
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Run_Returns_All_Generated_Artifacts()
     {
         var settings = new RefitGeneratorSettings
@@ -112,7 +112,7 @@ public class GeneratorPipelineTests
         result.InterfaceNames.Should().Equal(result.Interfaces.Select(code => code.TypeName));
     }
 
-    [Test]
+    [TestMethod]
     public async Task Run_ByTag_Preserves_PreGeneration_OperationIds_For_Interface_Naming()
     {
         var settings = new RefitGeneratorSettings

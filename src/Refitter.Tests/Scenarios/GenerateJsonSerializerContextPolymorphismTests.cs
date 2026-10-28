@@ -2,11 +2,11 @@ using System.Diagnostics;
 using System.Text;
 using AwesomeAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class GenerateJsonSerializerContextPolymorphismTests
 {
     private const string OpenApiSpec = """
@@ -114,7 +114,7 @@ public class GenerateJsonSerializerContextPolymorphismTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Context_Supports_Polymorphic_Roundtrip_When_Reflection_Is_Disabled()
     {
         var generatedCode = await GenerateCode();

@@ -2,7 +2,6 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Regression;
 
@@ -10,6 +9,7 @@ namespace Refitter.Tests.Regression;
 /// Regression tests for Issue #1190: dynamic QueryParams types are incorrectly shared
 /// by GET endpoints with the same method name across different controllers/tags.
 /// </summary>
+[TestClass]
 public class Issue1190DynamicQueryParamsByTagTests
 {
     private const string OpenApiSpec = """
@@ -118,7 +118,7 @@ public class Issue1190DynamicQueryParamsByTagTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task ByTag_Generates_Distinct_QueryParams_Types_Per_Tag()
     {
         string generatedCode = await GenerateCode();
@@ -138,8 +138,8 @@ public class Issue1190DynamicQueryParamsByTagTests
         generatedCode.Should().Contain("MaterialFilter");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ByTag_Generated_Code_With_Distinct_QueryParams_Builds()
     {
         string generatedCode = await GenerateCode();
@@ -148,7 +148,7 @@ public class Issue1190DynamicQueryParamsByTagTests
 
     // ── Swagger 2.0 companion tests ─────────────────────────────────────────
 
-    [Test]
+    [TestMethod]
     public async Task ByTag_Generates_Distinct_QueryParams_Types_Per_Tag_Swagger2()
     {
         string generatedCode = await GenerateCodeSwagger2();
@@ -168,8 +168,8 @@ public class Issue1190DynamicQueryParamsByTagTests
         generatedCode.Should().Contain("MaterialFilter");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ByTag_Generated_Code_With_Distinct_QueryParams_Builds_Swagger2()
     {
         string generatedCode = await GenerateCodeSwagger2();

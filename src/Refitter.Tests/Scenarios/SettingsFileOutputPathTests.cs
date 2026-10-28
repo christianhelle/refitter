@@ -8,6 +8,7 @@ namespace Refitter.Tests.Scenarios;
 /// Regression tests for issue #998: MSBuild + .NET 10 ignores outputFolder and filename-from-.refitter behavior
 /// Tests exercise the actual GenerateCommand helper logic via reflection
 /// </summary>
+[TestClass]
 public class SettingsFileOutputPathTests
 {
     private const string MinimalOpenApiSpec = """
@@ -37,7 +38,7 @@ public class SettingsFileOutputPathTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public void SettingsFile_WithoutOutputFilename_UsesRefitterFilenameFallback()
     {
         var tempDir = CreateTempDirectory();
@@ -72,7 +73,7 @@ public class SettingsFileOutputPathTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void SettingsFile_WithExplicitDefaultOutputFolder_RootsToSettingsFileDirectory()
     {
         var tempDir = CreateTempDirectory();
@@ -106,8 +107,8 @@ public class SettingsFileOutputPathTests
         }
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task SettingsFile_PreservesNamingInterfaceName()
     {
         // Arrange: .refitter with custom naming.interfaceName

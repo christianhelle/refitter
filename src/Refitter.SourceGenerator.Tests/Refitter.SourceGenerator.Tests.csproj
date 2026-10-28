@@ -7,6 +7,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GenerateProgramFile>false</GenerateProgramFile>
+        <EnableMSTestRunner>true</EnableMSTestRunner>
         <RootNamespace>Refitter.SourceGenerators.Tests</RootNamespace>
     </PropertyGroup>
 
@@ -17,7 +18,7 @@
         <PackageReference Include="H.Generators.Extensions" Version="1.24.2" />
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
-        <PackageReference Include="TUnit" Version="1.76.0" />
+        <PackageReference Include="MSTest" Version="4.5.1" />
         <PackageReference Include="coverlet.collector" Version="10.1.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>

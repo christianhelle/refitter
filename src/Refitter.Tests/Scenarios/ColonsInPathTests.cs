@@ -3,11 +3,11 @@ using AwesomeAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class ColonsInPathTests
 {
     private const string OpenApiSpec = @"
@@ -45,14 +45,14 @@ parameters:
     format: uuid
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_OperationName_Without_Colons()
     {
         var generatedCode = await GenerateCode();
@@ -61,7 +61,7 @@ parameters:
         generatedCode.Should().Contain("\"/orders/{orderId}/:orderItems/{orderItemId}\"");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

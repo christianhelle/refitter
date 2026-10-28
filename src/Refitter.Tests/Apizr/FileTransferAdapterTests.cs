@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class FileTransferAdapterTests
 {
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_True_When_FileTransfer_Enabled()
     {
         var settings = new RefitGeneratorSettings
@@ -22,7 +23,7 @@ public class FileTransferAdapterTests
         adapter.CanApply(settings).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_When_FileTransfer_Disabled()
     {
         var settings = new RefitGeneratorSettings
@@ -38,7 +39,7 @@ public class FileTransferAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_FileTransferMediation_With_DI_And_Mediation()
     {
         var settings = new RefitGeneratorSettings
@@ -59,7 +60,7 @@ public class FileTransferAdapterTests
         result.Should().Contain("Apizr.Integrations.FileTransfer.MediatR");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_FileTransfer_Package_With_DI_Without_Mediation()
     {
         var settings = new RefitGeneratorSettings
@@ -79,7 +80,7 @@ public class FileTransferAdapterTests
         result.Should().NotContain("WithFileTransferMediation()");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_FileTransfer_Package_Without_DI()
     {
         var settings = new RefitGeneratorSettings

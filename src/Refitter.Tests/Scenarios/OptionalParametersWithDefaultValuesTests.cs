@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class OptionalParametersWithDefaultValuesTests
 {
     private const string OpenApiSpec =
@@ -90,14 +90,14 @@ public class OptionalParametersWithDefaultValuesTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Should_Have_Optional_Parameters_With_Default_Values()
     {
         string generatedCode = await GenerateCode();
@@ -106,7 +106,7 @@ public class OptionalParametersWithDefaultValuesTests
         generatedCode.Should().Contain("string? filter = \"active\"");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Should_Have_Required_Parameters_Without_Defaults()
     {
         string generatedCode = await GenerateCode();
@@ -116,8 +116,8 @@ public class OptionalParametersWithDefaultValuesTests
         generatedCode.Should().NotContain("System.DateTimeOffset end =");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

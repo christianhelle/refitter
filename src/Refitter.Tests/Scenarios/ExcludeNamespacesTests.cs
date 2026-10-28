@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class ExcludeNamespacesTests
 {
     private const string OpenApiSpec = @"
@@ -63,14 +63,14 @@ components:
             type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode(["System.Xml.Serialization"]);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode(["System.Xml.Serialization"]);
@@ -80,14 +80,14 @@ components:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_Excluded_Namespace()
     {
         string generatedCode = await GenerateCode(["System.Xml.Serialization"]);
         generatedCode.Should().NotContain("using System.Xml.Serialization;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Excluded_Namespace_When_Not_Excluded()
     {
         string generatedCode = await GenerateCode([]);
@@ -96,7 +96,7 @@ components:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Exclude_Multiple_Namespaces()
     {
         string generatedCode = await GenerateCode(["System.Xml.Serialization", "System.ComponentModel"]);
@@ -104,7 +104,7 @@ components:
         generatedCode.Should().NotContain("using System.ComponentModel;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Multiple_Exclusions()
     {
         string generatedCode = await GenerateCode(["System.Xml.Serialization", "System.ComponentModel"]);
@@ -114,7 +114,7 @@ components:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Still_Contains_Required_Namespaces()
     {
         string generatedCode = await GenerateCode(["System.Xml.Serialization"]);

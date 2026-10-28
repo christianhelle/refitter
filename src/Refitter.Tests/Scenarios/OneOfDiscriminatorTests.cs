@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class OneOfDiscriminatorTests
 {
     private const string OpenApiSpec = @"
@@ -113,28 +113,28 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Base_Type_For_OneOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("class IdentityProvider");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Generate_Anonymous_Type_For_OneOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotContain("IdentityProvider2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_All_Subtypes_For_OneOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode();
@@ -142,7 +142,7 @@ components:
         generatedCode.Should().Contain("class FacebookIdentityProvider");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Inheritance_Hierarchy_For_OneOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode();
@@ -150,7 +150,7 @@ components:
         generatedCode.Should().Contain("FacebookIdentityProvider : IdentityProvider");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Correct_Property_Type_For_OneOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode();
@@ -158,7 +158,7 @@ components:
         generatedCode.Should().Contain("ICollection<IdentityProvider> IdentityProviders");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -168,14 +168,14 @@ components:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Polymorphic_Serialization()
     {
         string generatedCode = await GenerateCode(usePolymorphicSerialization: true);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_JsonPolymorphic_Attributes_For_OneOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode(usePolymorphicSerialization: true);
@@ -184,7 +184,7 @@ components:
         generatedCode.Should().Contain("[JsonDerivedType(typeof(FacebookIdentityProvider)");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Polymorphic_Serialization()
     {
         string generatedCode = await GenerateCode(usePolymorphicSerialization: true);
@@ -194,28 +194,28 @@ components:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_For_AnyOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode(spec: AnyOfOpenApiSpec);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Base_Type_For_AnyOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode(spec: AnyOfOpenApiSpec);
         generatedCode.Should().Contain("class Notification");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Generate_Anonymous_Type_For_AnyOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode(spec: AnyOfOpenApiSpec);
         generatedCode.Should().NotContain("Notification2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_All_Subtypes_For_AnyOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode(spec: AnyOfOpenApiSpec);
@@ -223,7 +223,7 @@ components:
         generatedCode.Should().Contain("class SmsNotification");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Inheritance_Hierarchy_For_AnyOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode(spec: AnyOfOpenApiSpec);
@@ -231,7 +231,7 @@ components:
         generatedCode.Should().Contain("SmsNotification : Notification");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Correct_Property_Type_For_AnyOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode(spec: AnyOfOpenApiSpec);
@@ -239,7 +239,7 @@ components:
         generatedCode.Should().Contain("ICollection<Notification> Notifications");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_For_AnyOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode(spec: AnyOfOpenApiSpec);
@@ -249,7 +249,7 @@ components:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_JsonPolymorphic_Attributes_For_AnyOf_With_Discriminator()
     {
         string generatedCode = await GenerateCode(spec: AnyOfOpenApiSpec, usePolymorphicSerialization: true);
@@ -258,7 +258,7 @@ components:
         generatedCode.Should().Contain("[JsonDerivedType(typeof(SmsNotification)");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_For_AnyOf_With_Discriminator_And_Polymorphic_Serialization()
     {
         string generatedCode = await GenerateCode(spec: AnyOfOpenApiSpec, usePolymorphicSerialization: true);

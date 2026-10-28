@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Schemas named like BCL types (Task, Object, String, File) must still produce compilable code.
 /// </summary>
+[TestClass]
 public class SchemaNamedLikeBclTypeTests
 {
     private const string OpenApiSpec = """
@@ -54,14 +54,14 @@ public class SchemaNamedLikeBclTypeTests
             File: { type: object, properties: { name: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Return_Types_For_Schemas_Named_Like_Bcl_Types()
     {
         var generatedCode = await GenerateCode();
@@ -70,8 +70,8 @@ public class SchemaNamedLikeBclTypeTests
         generatedCode.Should().Contain("Task<File> GetC();");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

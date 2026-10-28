@@ -6,6 +6,7 @@ using Refitter.Core.Validation;
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class RefitterRunnerTests
 {
     private static string CreateTempDirectory() =>
@@ -37,7 +38,7 @@ public class RefitterRunnerTests
         return path;
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Generate_Code_And_Return_PlannedFiles()
     {
         var workspace = CreateTempDirectory();
@@ -73,7 +74,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Call_Writer_When_Provided()
     {
         var workspace = CreateTempDirectory();
@@ -107,7 +108,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Not_Call_Writer_When_Null()
     {
         var workspace = CreateTempDirectory();
@@ -139,7 +140,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Call_Validator_When_Provided()
     {
         var workspace = CreateTempDirectory();
@@ -172,7 +173,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Not_Call_Validator_When_Null()
     {
         var workspace = CreateTempDirectory();
@@ -203,7 +204,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Detect_UseIsoDateFormat_Warning()
     {
         var workspace = CreateTempDirectory();
@@ -242,7 +243,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Detect_Deprecated_Polly_Warning()
     {
         var workspace = CreateTempDirectory();
@@ -282,7 +283,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Detect_Both_Warnings()
     {
         var workspace = CreateTempDirectory();
@@ -327,7 +328,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_MultipleFiles_Should_Generate_Multiple_PlannedFiles()
     {
         var workspace = CreateTempDirectory();
@@ -359,7 +360,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_NonExistent_Spec_Should_Return_NonZero()
     {
         var settings = new RefitGeneratorSettings
@@ -381,7 +382,7 @@ public class RefitterRunnerTests
         result.Diagnostics.Should().Contain(d => d.IsError);
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_Validation_Errors_Should_Return_Diagnostics()
     {
         var workspace = CreateTempDirectory();
@@ -418,7 +419,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_Validation_Warnings_Should_Return_NonError_Diagnostics()
     {
         var workspace = CreateTempDirectory();
@@ -455,7 +456,7 @@ public class RefitterRunnerTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_MultipleOpenApiPaths_Should_Validate_All()
     {
         var workspace = CreateTempDirectory();

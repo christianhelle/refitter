@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class UseIsoDateFormatTests
 {
     private const string OpenApiSpec =
@@ -46,14 +46,14 @@ paths:
           description: No response was specified
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task GeneratedCode_Contains_Date_Format_String()
     {
         string generatedCode = await GenerateCode();
@@ -61,7 +61,7 @@ paths:
         generatedCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_to");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GeneratedCode_NotContains_DateTime_Format_String()
     {
         string generatedCode = await GenerateCode();
@@ -69,14 +69,14 @@ paths:
         generatedCode.Should().NotContain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset time_datetime");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GeneratedCode_Contains_Date_Format_String_With_Empty_Settings()
     {
         string generatedCode = await GenerateCode(new CodeGeneratorSettings());
@@ -84,7 +84,7 @@ paths:
         generatedCode.Should().Contain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset valid_to");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GeneratedCode_NotContains_DateTime_Format_String_With_Empty_Settings()
     {
         string generatedCode = await GenerateCode(new CodeGeneratorSettings());
@@ -92,16 +92,16 @@ paths:
         generatedCode.Should().NotContain(@"[Query(Format = ""yyyy-MM-dd"")] System.DateTimeOffset time_datetime");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter_With_Empty_Settings()
     {
         string generatedCode = await GenerateCode(new CodeGeneratorSettings());
         generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
-    [Test]
-    [Arguments("dd/MM/yyyy", "yyyy-MM-ddTHH:mm:ss")]
-    [Arguments("MM-dd-yyyy", "HH:mm:ss")]
+    [TestMethod]
+    [DataRow("dd/MM/yyyy", "yyyy-MM-ddTHH:mm:ss")]
+    [DataRow("MM-dd-yyyy", "HH:mm:ss")]
     public async Task GeneratedCode_Contains_Date_Format_String_With_Settings(
         string dateFormat,
         string dateTimeFormat)
@@ -119,9 +119,9 @@ paths:
         generatedCode.Should().Contain(@$"[Query] System.TimeSpan test_time");
     }
 
-    [Test]
-    [Arguments("dd/MM/yyyy")]
-    [Arguments("MM-dd-yyyy")]
+    [TestMethod]
+    [DataRow("dd/MM/yyyy")]
+    [DataRow("MM-dd-yyyy")]
     public async Task GeneratedCode_NotContains_DateTime_Format_String_With_Settings(string format)
     {
         string generatedCode = await GenerateCode(new CodeGeneratorSettings { DateFormat = format });
@@ -129,17 +129,17 @@ paths:
         generatedCode.Should().NotContain(@$"[Query(Format = ""{format}"")] System.DateTimeOffset time_datetime");
     }
 
-    [Test]
-    [Arguments("dd/MM/yyyy")]
-    [Arguments("MM-dd-yyyy")]
+    [TestMethod]
+    [DataRow("dd/MM/yyyy")]
+    [DataRow("MM-dd-yyyy")]
     public async Task GeneratedCode_Contains_TimeSpan_Parameter_With_Settings(string format)
     {
         string generatedCode = await GenerateCode(new CodeGeneratorSettings { DateFormat = format });
         generatedCode.Should().Contain("[Query] System.TimeSpan");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

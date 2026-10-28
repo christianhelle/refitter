@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Integer enums named through x-enum-varnames and x-enumNames.
 /// </summary>
+[TestClass]
 public class EnumVarNamesExtensionTests
 {
     private const string OpenApiSpec = """
@@ -32,14 +32,14 @@ public class EnumVarNamesExtensionTests
               x-enum-descriptions: [low, med, high]
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Enum_Var_Names()
     {
         var generatedCode = await GenerateCode();
@@ -48,8 +48,8 @@ public class EnumVarNamesExtensionTests
         generatedCode.Should().Contain("High = 2,");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

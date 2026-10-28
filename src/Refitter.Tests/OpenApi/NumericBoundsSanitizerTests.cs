@@ -5,17 +5,18 @@ using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;
 
+[TestClass]
 public class NumericBoundsSanitizerTests
 {
-    [Test]
-    [Arguments("maximum", "1.7976931348623157e308", 1)]
-    [Arguments("maximum", "1.7976931348623157E+308", 1)]
-    [Arguments("minimum", "-1.7976931348623157E+308", -1)]
-    [Arguments("exclusiveMaximum", "8e28", 1)]
-    [Arguments("exclusiveMinimum", "-8e28", -1)]
-    [Arguments("maximum", "100000000000000000000000000000000", 1)]
-    [Arguments("maximum", "7.922816251426434e28", 1)]
-    [Arguments("maximum", "\"1.7976931348623157e308\"", 1)]
+    [TestMethod]
+    [DataRow("maximum", "1.7976931348623157e308", 1)]
+    [DataRow("maximum", "1.7976931348623157E+308", 1)]
+    [DataRow("minimum", "-1.7976931348623157E+308", -1)]
+    [DataRow("exclusiveMaximum", "8e28", 1)]
+    [DataRow("exclusiveMinimum", "-8e28", -1)]
+    [DataRow("maximum", "100000000000000000000000000000000", 1)]
+    [DataRow("maximum", "7.922816251426434e28", 1)]
+    [DataRow("maximum", "\"1.7976931348623157e308\"", 1)]
     public void Clamps_Bounds_Outside_Decimal_Range(string keyword, string value, int sign)
     {
         var json = $$"""{ "type": "number", "{{keyword}}": {{value}} }""";
@@ -26,7 +27,7 @@ public class NumericBoundsSanitizerTests
         result["type"]!.Value<string>().Should().Be("number");
     }
 
-    [Test]
+    [TestMethod]
     public void Clamps_Nested_Bounds_And_Keeps_Other_Values()
     {
         const string json = """
@@ -59,7 +60,7 @@ public class NumericBoundsSanitizerTests
         properties["d"]!["maximum"]!.Value<string>().Should().Be("unbounded");
     }
 
-    [Test]
+    [TestMethod]
     public void Does_Not_Change_Description_Text_That_Looks_Like_A_Bound()
     {
         const string json = """
@@ -75,7 +76,7 @@ public class NumericBoundsSanitizerTests
         result["maximum"]!.Value<decimal>().Should().Be(decimal.MaxValue);
     }
 
-    [Test]
+    [TestMethod]
     public void Does_Not_Change_Schema_Properties_Named_Like_Bounds()
     {
         const string json = """
@@ -89,12 +90,12 @@ public class NumericBoundsSanitizerTests
         maximumProperty["maximum"]!.Value<decimal>().Should().Be(decimal.MaxValue);
     }
 
-    [Test]
-    [Arguments("""{ "maximum": 7.9e28, "minimum": -100 }""")]
-    [Arguments("""{ "description": "maximum: 1e300, then more" }""")]
-    [Arguments("""{ "maxLength": 1e300 }""")]
-    [Arguments("openapi: 3.0.1")]
-    [Arguments("\"maximum: 1e300\"")]
+    [TestMethod]
+    [DataRow("""{ "maximum": 7.9e28, "minimum": -100 }""")]
+    [DataRow("""{ "description": "maximum: 1e300, then more" }""")]
+    [DataRow("""{ "maxLength": 1e300 }""")]
+    [DataRow("openapi: 3.0.1")]
+    [DataRow("\"maximum: 1e300\"")]
     public void Returns_Same_Instance_When_Nothing_To_Clamp(string content)
     {
         NumericBoundsSanitizer.Sanitize(content).Should().BeSameAs(content);

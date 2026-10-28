@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class AcceptedResponseObjectTests
 {
     private const string OpenApiSpec =
@@ -95,49 +95,49 @@ components:
           type: 'string'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_Accepted_Response_Return_Type()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<Job> CreateJob();");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Prefer_Ok_Over_Accepted_When_Both_Are_Present()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<Job> GetJob(string id);");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Not_Generate_Return_Type_When_Accepted_Has_No_Content()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task CreateBatch();");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_HttpResponseMessage_When_Accepted_Returns_Binary_Content()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<HttpResponseMessage> CreateExport();");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_Job_Contract()
     {
         string generatedCode = await GenerateCode();

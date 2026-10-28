@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Parameters, request bodies and responses referenced from components.
 /// </summary>
+[TestClass]
 public class ComponentReferenceTests
 {
     private const string OpenApiSpec = """
@@ -50,30 +50,30 @@ public class ComponentReferenceTests
             Problem: { type: object, properties: { title: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Resolves_Component_References()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<Item> PutR(string id, [Body] Item body, [Header(\"If-Match\")] string if_Match);");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_IApiResponse()
     {
         var generatedCode = await GenerateCode(settings => settings.ReturnIApiResponse = true);

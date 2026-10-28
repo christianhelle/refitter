@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// A schema named Task shadows System.Threading.Tasks.Task for void operations (#1275).
 /// </summary>
+[TestClass]
 public class TaskSchemaNameTests
 {
     private const string OpenApiSpec = """
@@ -27,36 +27,36 @@ public class TaskSchemaNameTests
             Task: { type: object, properties: { id: { type: integer } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Fully_Qualifies_Task_For_Void_Operations()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("System.Threading.Tasks.Task DeleteTasks(");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Keeps_Generic_Task_For_Operations_With_Result()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<ICollection<Task>> GetTasks(");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Qualify_Task_Without_Task_Schema()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec.Replace("Task", "Job"));
@@ -67,8 +67,8 @@ public class TaskSchemaNameTests
         generatedCode.Should().NotContain("System.Threading.Tasks.Task");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_And_Cancellation_Tokens()
     {
         var generatedCode = await GenerateCode(settings =>
@@ -79,8 +79,8 @@ public class TaskSchemaNameTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Contract_Type_Suffix()
     {
         var generatedCode = await GenerateCode(settings => settings.ContractTypeSuffix = "Dto");

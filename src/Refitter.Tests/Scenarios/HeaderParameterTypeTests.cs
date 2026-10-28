@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Typed header parameters and headers named like standard HTTP headers.
 /// </summary>
+[TestClass]
 public class HeaderParameterTypeTests
 {
     private const string OpenApiSpec = """
@@ -34,14 +34,14 @@ public class HeaderParameterTypeTests
                   content: { application/json: { schema: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Typed_Header_Parameters()
     {
         var generatedCode = await GenerateCode();
@@ -51,7 +51,7 @@ public class HeaderParameterTypeTests
         generatedCode.Should().Contain("[Header(\"Authorization\")] string authorization");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Array_Header_As_Comma_Separated_String()
     {
         // Refit sends header values with ToString(), so a collection would be sent as its type name
@@ -60,30 +60,30 @@ public class HeaderParameterTypeTests
         generatedCode.Should().NotContain("IEnumerable<string> x_Array");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Optional_Array_Header_As_Nullable_String()
     {
         var generatedCode = await GenerateCode(settings => settings.OptionalParameters = true);
         generatedCode.Should().Contain("[Header(\"X-Array\")] string? x_Array");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Array_Header_As_String_With_Dynamic_Querystring_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.UseDynamicQuerystringParameters = true);
         generatedCode.Should().Contain("[Header(\"X-Array\")] string x_Array");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Cancellation_Tokens()
     {
         var generatedCode = await GenerateCode(settings => settings.UseCancellationTokens = true);

@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Multipart bodies composed with allOf include the properties of every member (#1277).
 /// </summary>
+[TestClass]
 public class MultipartAllOfTests
 {
     private const string OpenApiSpec = """
@@ -69,29 +69,29 @@ public class MultipartAllOfTests
                 raw: { type: array }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Includes_Properties_From_All_AllOf_Members_Once()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task PostFiles(IEnumerable<StreamPart> attachments, IEnumerable<string> labels, IEnumerable<int> ids, IEnumerable<object> raw, string note);");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Uses_IEnumerable_For_Arrays_From_Referenced_Members()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task PostTagged(StreamPart file, IEnumerable<string> labels, IEnumerable<object> raw, string note);");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Multipart_Operation_Without_Schema()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task PostEmpty(");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

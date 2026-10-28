@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Operation-level parameters override path-level parameters with the same name and location.
 /// </summary>
+[TestClass]
 public class PathLevelParameterOverrideTests
 {
     private const string OpenApiSpec = """
@@ -27,14 +27,14 @@ public class PathLevelParameterOverrideTests
               responses: { '200': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Operation_Level_Parameter_Definition()
     {
         var generatedCode = await GenerateCode();
@@ -42,8 +42,8 @@ public class PathLevelParameterOverrideTests
         generatedCode.Should().NotContain("string id");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

@@ -4,6 +4,7 @@ using Refitter.Core;
 namespace Refitter.Tests.DependencyInjection;
 
 
+[TestClass]
 public class DependencyInjectionGeneratorWithPollyTests
 {
     private readonly RefitGeneratorSettings settings = new()
@@ -22,7 +23,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         }
     };
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_For_Multiple_Interfaces()
     {
         string code = DependencyInjectionGenerator.Generate(
@@ -37,7 +38,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         code.Should().Contain("AddRefitClient<IStoreApi>(settings)");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_HttpMessageHandlers()
     {
         string code = DependencyInjectionGenerator.Generate(
@@ -52,7 +53,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         code.Should().Contain("AddHttpMessageHandler<DiagnosticMessageHandler>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_Polly()
     {
         string code = DependencyInjectionGenerator.Generate(
@@ -68,7 +69,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         code.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_Windows_Authentication_And_Polly()
     {
         settings.DependencyInjectionSettings!.UseWindowsAuthentication = true;
@@ -92,7 +93,7 @@ public class DependencyInjectionGeneratorWithPollyTests
             .Should().BeLessThan(code.IndexOf(".AddPolicyHandler("));
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_Polly()
     {
         settings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
@@ -110,7 +111,7 @@ public class DependencyInjectionGeneratorWithPollyTests
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_BaseUrl()
     {
         settings.DependencyInjectionSettings!.BaseUrl = null;

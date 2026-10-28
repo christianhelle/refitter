@@ -4,6 +4,7 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class ApizrGeneratorWithMicrosoftHttpResilienceTests
 {
     private readonly RefitGeneratorSettings extendedSettings = new()
@@ -47,7 +48,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
 
     #region Extended
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Extended_Registration_For_Single_Interface()
     {
         string code = ApizrRegistrationGenerator.Generate(
@@ -60,7 +61,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
         code.Should().Contain("AddApizrManagerFor<IPetApi>(optionsBuilder)");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Extended_Registration_For_Multiple_Interfaces()
     {
         string code = ApizrRegistrationGenerator.Generate(
@@ -75,7 +76,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
         code.Should().Contain("AddManagerFor<IStoreApi>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_HttpMessageHandlers()
     {
         string code = ApizrRegistrationGenerator.Generate(
@@ -89,7 +90,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
         code.Should().Contain("WithDelegatingHandler<DiagnosticMessageHandler>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_HttpResilience()
     {
         string code = ApizrRegistrationGenerator.Generate(
@@ -102,7 +103,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
         code.Should().Contain("AddStandardResilienceHandler");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_TransientErrorHandler()
     {
         extendedSettings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
@@ -119,7 +120,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_BaseUrl()
     {
         extendedSettings.DependencyInjectionSettings!.BaseUrl = null;
@@ -138,7 +139,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
     #region Static
 
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Static_Registration_For_Single_Interface()
     {
         string code = ApizrRegistrationGenerator.Generate(
@@ -151,7 +152,7 @@ public class ApizrGeneratorWithMicrosoftHttpResilienceTests
         code.Should().Contain("CreateManagerFor<IPetApi>(optionsBuilder)");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Static_Registration_For_Multiple_Interfaces()
     {
         string code = ApizrRegistrationGenerator.Generate(

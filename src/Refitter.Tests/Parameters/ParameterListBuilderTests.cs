@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests.Parameters;
 
+[TestClass]
 public class ParameterListBuilderTests
 {
     private const string TwoQueryParameterSpec = """
@@ -69,7 +69,7 @@ public class ParameterListBuilderTests
                   description: Success
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Build_With_DynamicQuerystring_Returns_Wrapper_Parameter_And_Code()
     {
         var (operationModel, operation, settings) = await SetupAsync(
@@ -84,7 +84,7 @@ public class ParameterListBuilderTests
             .Which.Should().Contain("[Query] TestQueryParams").And.Contain("queryParams");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Build_Without_DynamicQuerystring_Returns_Null_Code_And_Individual_Parameters()
     {
         var (operationModel, operation, settings) = await SetupAsync(
@@ -98,7 +98,7 @@ public class ParameterListBuilderTests
         result.Parameters.Should().HaveCount(2);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Build_Appends_CancellationToken_When_Enabled()
     {
         var (operationModel, operation, settings) = await SetupAsync(
@@ -112,7 +112,7 @@ public class ParameterListBuilderTests
             .Which.Should().Be("CancellationToken cancellationToken = default");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Build_Appends_ApizrRequestOptions_When_Enabled()
     {
         var (operationModel, operation, settings) = await SetupAsync(
@@ -126,7 +126,7 @@ public class ParameterListBuilderTests
             .Which.Should().Contain("IApizrRequestOptions options");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Build_Orders_Optional_Parameters_After_Required()
     {
         var (operationModel, operation, settings) = await SetupAsync(

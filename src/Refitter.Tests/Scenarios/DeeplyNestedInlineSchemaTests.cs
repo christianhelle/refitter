@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Deeply nested inline objects, arrays and enums in request and response bodies.
 /// </summary>
+[TestClass]
 public class DeeplyNestedInlineSchemaTests
 {
     private const string OpenApiSpec = """
@@ -47,14 +47,14 @@ public class DeeplyNestedInlineSchemaTests
                               status: { type: string, enum: [x, y] }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Named_Types_For_Inline_Schemas()
     {
         var generatedCode = await GenerateCode();
@@ -63,16 +63,16 @@ public class DeeplyNestedInlineSchemaTests
         generatedCode.Should().Contain("public enum ResultStatus");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Immutable_Records()
     {
         var generatedCode = await GenerateCode(settings => settings.ImmutableRecords = true);

@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Enum values that are empty, signed, prefixed with symbols, keywords, unicode, numeric or boolean.
 /// </summary>
+[TestClass]
 public class EnumValueEdgeCaseTests
 {
     private const string OpenApiSpec = """
@@ -37,14 +37,14 @@ public class EnumValueEdgeCaseTests
                 unicode: { type: string, enum: ['über', 'naïve', '日本'] }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Sanitizes_Enum_Member_Names()
     {
         var generatedCode = await GenerateCode();
@@ -60,16 +60,16 @@ public class EnumValueEdgeCaseTests
         generatedCode.Should().Contain("日本 = 2,");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Optional_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.OptionalParameters = true);

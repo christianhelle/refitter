@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Regression;
 
+[TestClass]
 public class MissingInterfaceXmlDocsWarningsAsErrorsTests
 {
     private const string ByTagSpec = """
@@ -50,7 +51,7 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
                   description: 'ok'
         """;
 
-    [Test]
+    [TestMethod]
     public async Task ByTag_Generates_Interface_Fallback_Summary_When_Tag_Description_Is_Missing()
     {
         string generatedCode = await GenerateCode(ByTagSpec, MultipleInterfaces.ByTag);
@@ -59,8 +60,8 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
         generatedCode.Should().Contain("/// <summary>Operations for Orders.</summary>");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ByTag_Generated_Code_Builds_With_Warnings_As_Errors()
     {
         string generatedCode = await GenerateCode(ByTagSpec, MultipleInterfaces.ByTag);
@@ -68,7 +69,7 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
         BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task ByEndpoint_Generates_Interface_Fallback_Summary_When_Endpoint_Summary_Is_Missing()
     {
         string generatedCode = await GenerateCode(ByEndpointSpec, MultipleInterfaces.ByEndpoint);
@@ -78,8 +79,8 @@ public class MissingInterfaceXmlDocsWarningsAsErrorsTests
         generatedCode.Should().Contain("/// <summary>Operations for");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ByEndpoint_Generated_Code_Builds_With_Warnings_As_Errors()
     {
         string generatedCode = await GenerateCode(ByEndpointSpec, MultipleInterfaces.ByEndpoint);

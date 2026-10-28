@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class MissingParameterDescriptionTests
 {
     private const string OpenApiSpec = @"
@@ -47,14 +47,14 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Param_Tags_For_All_Parameters()
     {
         var generatedCode = await GenerateCode();
@@ -62,7 +62,7 @@ components:
         generatedCode.Should().Contain("/// <param name=\"includeDetails\">includeDetails parameter</param>");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

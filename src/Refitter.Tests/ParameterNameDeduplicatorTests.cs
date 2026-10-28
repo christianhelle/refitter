@@ -3,9 +3,10 @@ using Refitter.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class ParameterNameDeduplicatorTests
 {
-    [Test]
+    [TestMethod]
     public void Returns_Parameters_Unchanged_Without_Duplicates()
     {
         string[] parameters = ["string id", "[Query] string name", "CancellationToken cancellationToken = default"];
@@ -13,7 +14,7 @@ public class ParameterNameDeduplicatorTests
         ParameterNameDeduplicator.Deduplicate(parameters, hasAppendedParameter: true).Should().Equal(parameters);
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Cancellation_Token_Name_And_Renames_Query_Parameter()
     {
         var result = ParameterNameDeduplicator.Deduplicate(
@@ -25,7 +26,7 @@ public class ParameterNameDeduplicatorTests
             "CancellationToken cancellationToken = default");
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Request_Options_Name()
     {
         var result = ParameterNameDeduplicator.Deduplicate(
@@ -37,7 +38,7 @@ public class ParameterNameDeduplicatorTests
             "[RequestOptions] IApizrRequestOptions options");
     }
 
-    [Test]
+    [TestMethod]
     public void Renames_Operation_Parameter_Typed_Like_The_Appended_Parameter()
     {
         var result = ParameterNameDeduplicator.Deduplicate(
@@ -49,7 +50,7 @@ public class ParameterNameDeduplicatorTests
             "CancellationToken cancellationToken = default");
     }
 
-    [Test]
+    [TestMethod]
     public void Renames_Duplicates_Of_Any_Type_Without_Appended_Parameter()
     {
         var result = ParameterNameDeduplicator.Deduplicate(
@@ -59,7 +60,7 @@ public class ParameterNameDeduplicatorTests
         result.Should().Equal("[Body] CancellationToken token", "[Header(\"token\")] CancellationToken token2");
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Existing_Alias_When_Renaming()
     {
         var result = ParameterNameDeduplicator.Deduplicate(
@@ -69,7 +70,7 @@ public class ParameterNameDeduplicatorTests
         result.Should().Equal("[AliasAs(\"Id\")] string idPath", "[AliasAs(\"id\")] string idPath2");
     }
 
-    [Test]
+    [TestMethod]
     public void Adds_Alias_For_Parameters_Bound_By_Name()
     {
         var result = ParameterNameDeduplicator.Deduplicate(["string id", "string id", "StreamPart file"], hasAppendedParameter: false);
@@ -77,10 +78,10 @@ public class ParameterNameDeduplicatorTests
         result.Should().Equal("string id", "[AliasAs(\"id\")] string id2", "StreamPart file");
     }
 
-    [Test]
-    [Arguments("[Header(\"id\")] string id", "[Header(\"id\")] string id2")]
-    [Arguments("[Body] Body id", "[Body] Body id2")]
-    [Arguments("[Body(BodySerializationMethod.UrlEncoded)] Body id", "[Body(BodySerializationMethod.UrlEncoded)] Body id2")]
+    [TestMethod]
+    [DataRow("[Header(\"id\")] string id", "[Header(\"id\")] string id2")]
+    [DataRow("[Body] Body id", "[Body] Body id2")]
+    [DataRow("[Body(BodySerializationMethod.UrlEncoded)] Body id", "[Body(BodySerializationMethod.UrlEncoded)] Body id2")]
     public void Does_Not_Add_Alias_For_Parameters_Not_Bound_By_Name(string duplicate, string expected)
     {
         var result = ParameterNameDeduplicator.Deduplicate(["string id", duplicate], hasAppendedParameter: false);
@@ -88,7 +89,7 @@ public class ParameterNameDeduplicatorTests
         result.Should().Equal("string id", expected);
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Default_Values()
     {
         var result = ParameterNameDeduplicator.Deduplicate(["string page", "[Query] int page = 1"], hasAppendedParameter: false);
@@ -96,7 +97,7 @@ public class ParameterNameDeduplicatorTests
         result.Should().Equal("string page", "[AliasAs(\"page\")] [Query] int page2 = 1");
     }
 
-    [Test]
+    [TestMethod]
     public void Drops_Keyword_Escape_When_Renaming()
     {
         var result = ParameterNameDeduplicator.Deduplicate(["[Query] string @class", "string @class"], hasAppendedParameter: false);
@@ -104,7 +105,7 @@ public class ParameterNameDeduplicatorTests
         result.Should().Equal("[Query] string @class", "[AliasAs(\"class\")] string class2");
     }
 
-    [Test]
+    [TestMethod]
     public void Skips_Suffixes_Already_Used()
     {
         var result = ParameterNameDeduplicator.Deduplicate(["string id", "string id2", "string id"], hasAppendedParameter: false);

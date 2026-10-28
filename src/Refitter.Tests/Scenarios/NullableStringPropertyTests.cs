@@ -2,7 +2,6 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
@@ -11,6 +10,7 @@ namespace Refitter.Tests.Scenarios;
 /// https://github.com/christianhelle/refitter/issues/580
 /// </summary>
 
+[TestClass]
 public class NullableStringPropertyTests
 {
     private const string OpenApiSpecWithNullableProperties = @"
@@ -101,7 +101,7 @@ components:
           nullable: true
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Test_Nullable_StringProperty_GeneratedWithQuestionMark()
     {
         // Arrange & Act
@@ -122,7 +122,7 @@ components:
             "postalCode property is marked nullable: false");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_Nullable_DoubleProperty_GeneratedWithQuestionMark()
     {
         // Arrange & Act
@@ -136,7 +136,7 @@ components:
             "longitude property is marked nullable: true");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_Nullable_StringNotInRequired_Field()
     {
         // Arrange & Act
@@ -148,7 +148,7 @@ components:
             "lastName is nullable: true and not in required array");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_Nullable_StringInRequired_Field_Still_Nullable()
     {
         // Arrange & Act
@@ -164,7 +164,7 @@ components:
             "firstName is in required array and marked nullable: false");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_NullableReferenceTypes_Directive_Present()
     {
         // Arrange & Act
@@ -174,7 +174,7 @@ components:
         generatedCode.Should().Contain("#nullable enable");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Nullable_Strings()
     {
         // Arrange & Act
@@ -187,7 +187,7 @@ components:
             .BeTrue("generated code with nullable strings should compile");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_Multiple_Nullable_Properties_In_Same_Model()
     {
         // Arrange & Act

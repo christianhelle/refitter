@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// deepObject style query parameters and bracketed query parameter names.
 /// </summary>
+[TestClass]
 public class DeepObjectQueryParameterTests
 {
     private const string OpenApiSpec = """
@@ -38,14 +38,14 @@ public class DeepObjectQueryParameterTests
                 '200': { description: OK }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Aliased_Bracketed_Query_Parameters()
     {
         var generatedCode = await GenerateCode();
@@ -54,16 +54,16 @@ public class DeepObjectQueryParameterTests
         generatedCode.Should().Contain("[Query] Filter filter");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Dynamic_Querystring_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.UseDynamicQuerystringParameters = true);

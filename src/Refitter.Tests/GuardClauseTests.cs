@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class GuardClauseTests
 {
     /// <summary>
@@ -13,7 +14,7 @@ public class GuardClauseTests
     /// </summary>
     private const string UnreachableRemoteDocument = "http://127.0.0.1:1/openapi.json";
 
-    [Test]
+    [TestMethod]
     public async Task OpenApiValidator_Propagates_Cancellation_For_Remote_Document()
     {
         using var cts = new CancellationTokenSource();
@@ -27,7 +28,7 @@ public class GuardClauseTests
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task OpenApiDocumentFactory_Propagates_Cancellation_For_Remote_Document()
     {
         using var cts = new CancellationTokenSource();
@@ -41,7 +42,7 @@ public class GuardClauseTests
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task RefitGenerator_CreateAsync_Throws_On_Null_Settings()
     {
         var act = async () => await RefitGenerator.CreateAsync(null!);
@@ -49,7 +50,7 @@ public class GuardClauseTests
         await act.Should().ThrowAsync<ArgumentNullException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task RefitGenerator_CreateAsync_Throws_On_Null_KeepSchemaPatterns()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile("""

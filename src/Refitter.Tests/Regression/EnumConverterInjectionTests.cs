@@ -10,6 +10,7 @@ namespace Refitter.Tests.Regression;
 /// Validates that both internal and public enums receive JsonConverter attributes
 /// </summary>
 
+[TestClass]
 public class EnumConverterInjectionTests
 {
     private const string OpenApiSpec = @"
@@ -74,7 +75,7 @@ public class EnumConverterInjectionTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Internal_Enums_Should_Have_JsonConverter()
     {
         string generatedCode = await GenerateCodeWithInternalTypes();
@@ -97,7 +98,7 @@ public class EnumConverterInjectionTests
             "all three internal enums should have JsonConverter attributes");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Public_Enums_Should_Have_JsonConverter()
     {
         string generatedCode = await GenerateCodeWithPublicTypes();
@@ -115,7 +116,7 @@ public class EnumConverterInjectionTests
             "all three public enums should have JsonConverter attributes");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multiple_Internal_Enums_Should_All_Have_Converter()
     {
         string generatedCode = await GenerateCodeWithInternalTypes();
@@ -139,7 +140,7 @@ public class EnumConverterInjectionTests
         enumNames.Should().Contain("PetVisibility");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Internal_Enums()
     {
         string generatedCode = await GenerateCodeWithInternalTypes();
@@ -150,7 +151,7 @@ public class EnumConverterInjectionTests
             .BeTrue("generated code with internal enums should compile");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Public_Enums()
     {
         string generatedCode = await GenerateCodeWithPublicTypes();

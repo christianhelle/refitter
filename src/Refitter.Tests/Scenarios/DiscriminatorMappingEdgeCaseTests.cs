@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Discriminator property and mapping keys containing dashes, spaces and digits.
 /// </summary>
+[TestClass]
 public class DiscriminatorMappingEdgeCaseTests
 {
     private const string OpenApiSpec = """
@@ -46,14 +46,14 @@ public class DiscriminatorMappingEdgeCaseTests
               allOf: [ { $ref: '#/components/schemas/Pet' }, { type: object, properties: { wings: { type: integer } } } ]
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Preserves_Discriminator_Mapping_Keys()
     {
         var generatedCode = await GenerateCode();
@@ -62,7 +62,7 @@ public class DiscriminatorMappingEdgeCaseTests
         generatedCode.Should().Contain("[JsonInheritanceAttribute(\"1\", typeof(Bird))]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Preserves_Discriminator_Mapping_Keys_With_Polymorphic_Serialization()
     {
         var generatedCode = await GenerateCode(settings => settings.UsePolymorphicSerialization = true);
@@ -71,24 +71,24 @@ public class DiscriminatorMappingEdgeCaseTests
         generatedCode.Should().Contain("[JsonDerivedType(typeof(Bird), typeDiscriminator: \"1\")]");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Polymorphic_Serialization()
     {
         var generatedCode = await GenerateCode(settings => settings.UsePolymorphicSerialization = true);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Immutable_Records()
     {
         var generatedCode = await GenerateCode(settings => settings.ImmutableRecords = true);

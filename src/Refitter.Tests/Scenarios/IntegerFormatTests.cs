@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class IntegerFormatTests
 {
     private const string OpenApiSpec =
@@ -190,35 +190,35 @@ public class IntegerFormatTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Default_Generates_Integer_Without_Format_As_Int()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("int IntegerWithoutFormat");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Integer_Without_Format_As_Long()
     {
         string generatedCode = await GenerateCodeWithLongIntegers();
         generatedCode.Should().Contain("long IntegerWithoutFormat");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Always_Respects_Explicit_Int32_Format()
     {
         string generatedCode = await GenerateCodeWithLongIntegers();
         generatedCode.Should().Contain("int IntegerWithInt32Format");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Always_Respects_Explicit_Int64_Format()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("long IntegerWithInt64Format");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Default()
     {
         string generatedCode = await GenerateCode();
@@ -228,7 +228,7 @@ public class IntegerFormatTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Long()
     {
         string generatedCode = await GenerateCodeWithLongIntegers();

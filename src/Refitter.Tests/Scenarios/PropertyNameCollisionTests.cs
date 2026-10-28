@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Property names that collide after normalization or with generated members (#1268).
 /// </summary>
+[TestClass]
 public class PropertyNameCollisionTests
 {
     private const string OpenApiSpec = """
@@ -30,14 +30,14 @@ public class PropertyNameCollisionTests
                 AdditionalProperties: { type: string }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Unique_Member_Names_And_Keeps_Wire_Names()
     {
         var generatedCode = await GenerateCode();
@@ -48,8 +48,8 @@ public class PropertyNameCollisionTests
         generatedCode.Should().Contain("public IDictionary<string, object> AdditionalProperties");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Preserved_Property_Names_And_Immutable_Records()
     {
         var generatedCode = await GenerateCode(settings =>
@@ -60,10 +60,10 @@ public class PropertyNameCollisionTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
-    [Arguments("- $ref: '#/components/schemas/Base'")]
-    [Arguments("- type: object\n          properties: { user_name: { type: string } }")]
+    [TestMethod]
+    [TestCategory("Integration")]
+    [DataRow("- $ref: '#/components/schemas/Base'")]
+    [DataRow("- type: object\n          properties: { user_name: { type: string } }")]
     public async Task Can_Build_Generated_Code_With_Colliding_AllOf_Members(string firstMember)
     {
         var spec = $$"""
@@ -92,8 +92,8 @@ public class PropertyNameCollisionTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

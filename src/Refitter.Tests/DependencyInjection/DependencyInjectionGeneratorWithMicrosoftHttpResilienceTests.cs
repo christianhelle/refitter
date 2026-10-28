@@ -4,6 +4,7 @@ using Refitter.Core;
 namespace Refitter.Tests.DependencyInjection;
 
 
+[TestClass]
 public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
 {
     private readonly RefitGeneratorSettings settings = new()
@@ -20,7 +21,7 @@ public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
         }
     };
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_For_Multiple_Interfaces()
     {
         string code = DependencyInjectionGenerator.Generate(
@@ -35,7 +36,7 @@ public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
         code.Should().Contain("AddRefitClient<IStoreApi>(settings)");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_HttpMessageHandlers()
     {
         string code = DependencyInjectionGenerator.Generate(
@@ -50,7 +51,7 @@ public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
         code.Should().Contain("AddHttpMessageHandler<DiagnosticMessageHandler>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_HttpResilience()
     {
         string code = DependencyInjectionGenerator.Generate(
@@ -64,7 +65,7 @@ public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
         code.Should().Contain("AddStandardResilienceHandler");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_TransientErrorHandler()
     {
         settings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
@@ -82,7 +83,7 @@ public class DependencyInjectionGeneratorWithMicrosoftHttpResilienceTests
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_BaseUrl()
     {
         settings.DependencyInjectionSettings!.BaseUrl = null;

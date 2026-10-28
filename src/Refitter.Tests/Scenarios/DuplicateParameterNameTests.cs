@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Path parameters differing by case and path/multipart name clashes produce duplicate parameters (#1269).
 /// </summary>
+[TestClass]
 public class DuplicateParameterNameTests
 {
     private const string OpenApiSpec = """
@@ -39,14 +39,14 @@ public class DuplicateParameterNameTests
               responses: { '204': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Renames_Duplicate_Parameters_And_Keeps_Wire_Names()
     {
         var generatedCode = await GenerateCode(settings => settings.UseCancellationTokens = true);
@@ -60,9 +60,9 @@ public class DuplicateParameterNameTests
         generatedCode.Should().Contain("<param name=\"idPath2\">");
     }
 
-    [Test]
-    [Arguments(RefitClient.Reflection)]
-    [Arguments(RefitClient.Generated)]
+    [TestMethod]
+    [DataRow(RefitClient.Reflection)]
+    [DataRow(RefitClient.Generated)]
     public async Task Refit_Sends_Path_Parameters_Differing_By_Case(RefitClient client)
     {
         var generatedCode = await GenerateCode();
@@ -72,16 +72,16 @@ public class DuplicateParameterNameTests
         request.RequestUri!.PathAndQuery.Should().Be("/v1/a/items/b");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Cancellation_Tokens()
     {
         var generatedCode = await GenerateCode(settings => settings.UseCancellationTokens = true);

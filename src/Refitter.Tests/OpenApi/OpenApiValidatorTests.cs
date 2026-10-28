@@ -6,9 +6,10 @@ using Refitter.Tests.TestUtilities;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class OpenApiValidatorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Validate_Should_Return_Valid_Result_For_Valid_OpenAPI_V3_Spec()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
@@ -31,7 +32,7 @@ public class OpenApiValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validate_Should_Return_Valid_Result_For_Valid_OpenAPI_V2_Spec()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV2);
@@ -54,7 +55,7 @@ public class OpenApiValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validate_Should_Collect_Statistics()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
@@ -76,7 +77,7 @@ public class OpenApiValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validate_Should_Return_Diagnostics_With_Zero_Errors_For_Valid_Spec()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
@@ -95,7 +96,7 @@ public class OpenApiValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validate_Should_Parse_Remote_OpenApi_Document()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
@@ -107,7 +108,7 @@ public class OpenApiValidatorTests
         result.Diagnostics.Errors.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validate_Should_Throw_InvalidOperationException_When_Remote_Download_Fails()
     {
         var act = () => OpenApiValidator.Validate("http://127.0.0.1:1/openapi.json");

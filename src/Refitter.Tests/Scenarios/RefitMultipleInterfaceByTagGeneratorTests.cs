@@ -6,9 +6,10 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class RefitMultipleInterfaceByTagGeneratorTests
 {
-    [Test]
+    [TestMethod]
     public async Task RefitMultipleInterfaceByTagGenerator_Creates_Ungrouped_Interface_When_Operation_Has_No_Tags()
     {
         const string spec = @"
@@ -49,7 +50,7 @@ paths:
         Regex.IsMatch(generatedCode, @"interface I\w+Api.*GetUntaggedResource", RegexOptions.Singleline).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task RefitMultipleInterfaceByTagGenerator_Groups_All_Tagged_Operations()
     {
         const string spec = @"
@@ -92,8 +93,8 @@ paths:
         generatedCode.Should().Contain("GetBar");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task RefitMultipleInterfaceByTagGenerator_Generated_Code_Compiles()
     {
         const string spec = @"

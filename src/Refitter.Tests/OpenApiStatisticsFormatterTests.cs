@@ -1,24 +1,24 @@
 using AwesomeAssertions;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class OpenApiStatisticsFormatterTests
 {
-    [Test]
+    [TestMethod]
     public void Parse_Returns_Empty_For_Empty_String()
     {
         OpenApiStatisticsFormatter.Parse(string.Empty).Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void Parse_Returns_Empty_When_No_Lines_Start_With_Dash()
     {
         OpenApiStatisticsFormatter.Parse("Paths: 5\nOperations: 10").Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void Parse_Returns_Label_Value_Pairs_From_Dash_Lines()
     {
         var statistics = $"- Paths: 5{Environment.NewLine}- Operations: 10{Environment.NewLine}- Schemas: 20";
@@ -31,7 +31,7 @@ public class OpenApiStatisticsFormatterTests
         result[2].Should().Be(("Schemas", "20"));
     }
 
-    [Test]
+    [TestMethod]
     public void Parse_Skips_Lines_Not_Starting_With_Dash()
     {
         var statistics = $"Summary:{Environment.NewLine}- Paths: 5{Environment.NewLine}Footer";
@@ -42,7 +42,7 @@ public class OpenApiStatisticsFormatterTests
         result[0].Should().Be(("Paths", "5"));
     }
 
-    [Test]
+    [TestMethod]
     public void Parse_Skips_Lines_Without_Colon_Separator()
     {
         var statistics = $"- ValidLine: 1{Environment.NewLine}- NoColon";
@@ -53,31 +53,31 @@ public class OpenApiStatisticsFormatterTests
         result[0].Should().Be(("ValidLine", "1"));
     }
 
-    [Test]
-    [Arguments("Paths", "📝")]
-    [Arguments("Operations", "⚡")]
-    [Arguments("Parameters", "📝")]
-    [Arguments("Request Bodies", "📤")]
-    [Arguments("Responses", "📥")]
-    [Arguments("Links", "🔗")]
-    [Arguments("Callbacks", "🔄")]
-    [Arguments("Schemas", "📋")]
-    [Arguments("Unknown Metric", "📊")]
+    [TestMethod]
+    [DataRow("Paths", "📝")]
+    [DataRow("Operations", "⚡")]
+    [DataRow("Parameters", "📝")]
+    [DataRow("Request Bodies", "📤")]
+    [DataRow("Responses", "📥")]
+    [DataRow("Links", "🔗")]
+    [DataRow("Callbacks", "🔄")]
+    [DataRow("Schemas", "📋")]
+    [DataRow("Unknown Metric", "📊")]
     public void GetIcon_Returns_Expected_Icon(string label, string expectedIcon)
     {
         OpenApiStatisticsFormatter.GetIcon(label).Should().Be(expectedIcon);
     }
 
-    [Test]
-    [Arguments("Paths", "API endpoints defined")]
-    [Arguments("Operations", "HTTP operations available")]
-    [Arguments("Parameters", "Input parameters defined")]
-    [Arguments("Request Bodies", "Request body schemas")]
-    [Arguments("Responses", "Response schemas defined")]
-    [Arguments("Links", "Operation links")]
-    [Arguments("Callbacks", "Callback definitions")]
-    [Arguments("Schemas", "Data schemas defined")]
-    [Arguments("Unknown Metric", "API specification metric")]
+    [TestMethod]
+    [DataRow("Paths", "API endpoints defined")]
+    [DataRow("Operations", "HTTP operations available")]
+    [DataRow("Parameters", "Input parameters defined")]
+    [DataRow("Request Bodies", "Request body schemas")]
+    [DataRow("Responses", "Response schemas defined")]
+    [DataRow("Links", "Operation links")]
+    [DataRow("Callbacks", "Callback definitions")]
+    [DataRow("Schemas", "Data schemas defined")]
+    [DataRow("Unknown Metric", "API specification metric")]
     public void GetDescription_Returns_Expected_Description(string label, string expectedDescription)
     {
         OpenApiStatisticsFormatter.GetDescription(label).Should().Be(expectedDescription);

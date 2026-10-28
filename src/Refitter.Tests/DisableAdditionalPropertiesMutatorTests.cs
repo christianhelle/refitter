@@ -1,14 +1,14 @@
 using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class DisableAdditionalPropertiesMutatorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithGenerateDefaultAdditionalPropertiesFalse_SetsAllowAdditionalPropertiesToFalse()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -36,7 +36,7 @@ public class DisableAdditionalPropertiesMutatorTests
             .Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithoutComponents_DoesNothing()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -55,7 +55,7 @@ public class DisableAdditionalPropertiesMutatorTests
         document.Components.Schemas.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithGenerateDefaultAdditionalPropertiesTrue_DoesNotChangeAllowAdditionalProperties()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -85,7 +85,7 @@ public class DisableAdditionalPropertiesMutatorTests
             .Should().Be(expected);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithNoComponentsSchemas_DoesNotThrow()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -102,7 +102,7 @@ public class DisableAdditionalPropertiesMutatorTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithGenerateDefaultAdditionalPropertiesFalse_AppliesToAllSchemas()
     {
         var document = await OpenApiDocument.FromJsonAsync("""

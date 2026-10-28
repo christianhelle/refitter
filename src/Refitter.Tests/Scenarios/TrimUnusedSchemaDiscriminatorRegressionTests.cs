@@ -3,10 +3,10 @@ using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class TrimUnusedSchemaDiscriminatorRegressionTests
 {
     private const string OpenApiSpec = """
@@ -58,9 +58,9 @@ public class TrimUnusedSchemaDiscriminatorRegressionTests
                   enum: [unused]
         """;
 
-    [Test]
-    [Arguments("anyOf")]
-    [Arguments("oneOf")]
+    [TestMethod]
+    [DataRow("anyOf")]
+    [DataRow("oneOf")]
     public async Task Trimming_Keeps_Mappings_For_Reachable_Union_Targets(string unionType)
     {
         RefitGenerator generator = await CreateGenerator(unionType);
@@ -72,9 +72,9 @@ public class TrimUnusedSchemaDiscriminatorRegressionTests
             .DiscriminatorObject!.Mapping.Keys.Should().BeEquivalentTo(["sonarr", "radarr"]);
     }
 
-    [Test]
-    [Arguments("anyOf")]
-    [Arguments("oneOf")]
+    [TestMethod]
+    [DataRow("anyOf")]
+    [DataRow("oneOf")]
     public async Task Including_Hierarchy_Keeps_All_Discriminator_Mappings(string unionType)
     {
         RefitGenerator generator = await CreateGenerator(
@@ -89,9 +89,9 @@ public class TrimUnusedSchemaDiscriminatorRegressionTests
             .BeEquivalentTo(["sonarr", "radarr", "unused"]);
     }
 
-    [Test]
-    [Arguments("anyOf")]
-    [Arguments("oneOf")]
+    [TestMethod]
+    [DataRow("anyOf")]
+    [DataRow("oneOf")]
     public async Task Disabling_Trimming_Keeps_All_Discriminator_Mappings(string unionType)
     {
         RefitGenerator generator = await CreateGenerator(unionType, trimUnusedSchema: false);
@@ -104,9 +104,9 @@ public class TrimUnusedSchemaDiscriminatorRegressionTests
             .BeEquivalentTo(["sonarr", "radarr", "unused"]);
     }
 
-    [Test]
-    [Arguments("anyOf")]
-    [Arguments("oneOf")]
+    [TestMethod]
+    [DataRow("anyOf")]
+    [DataRow("oneOf")]
     public async Task Trimming_Preserves_Mapping_Keys_In_Generated_Attributes(string unionType)
     {
         RefitGenerator generator = await CreateGenerator(unionType);
@@ -124,10 +124,10 @@ public class TrimUnusedSchemaDiscriminatorRegressionTests
         generatedCode.Should().NotContain("class UnusedResult");
     }
 
-    [Category("Integration")]
-    [Test]
-    [Arguments("anyOf")]
-    [Arguments("oneOf")]
+    [TestCategory("Integration")]
+    [TestMethod]
+    [DataRow("anyOf")]
+    [DataRow("oneOf")]
     public async Task Trimmed_Polymorphic_Output_Can_Build(string unionType)
     {
         RefitGenerator generator = await CreateGenerator(unionType);

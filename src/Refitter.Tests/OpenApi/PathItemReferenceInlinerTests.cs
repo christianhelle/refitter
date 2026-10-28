@@ -4,9 +4,10 @@ using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;
 
+[TestClass]
 public class PathItemReferenceInlinerTests
 {
-    [Test]
+    [TestMethod]
     public void Inlines_Path_Items_Referenced_From_Components()
     {
         const string json = """
@@ -33,7 +34,7 @@ public class PathItemReferenceInlinerTests
         result["paths"]!["/external"]!["$ref"]!.Value<string>().Should().Be("./other.yaml#/components/pathItems/Other");
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Sibling_Fields_Of_The_Reference()
     {
         const string json = """
@@ -56,7 +57,7 @@ public class PathItemReferenceInlinerTests
         path["get"]!["operationId"]!.Value<string>().Should().Be("GetA");
     }
 
-    [Test]
+    [TestMethod]
     public void Follows_References_Between_Path_Items()
     {
         const string json = """
@@ -77,9 +78,9 @@ public class PathItemReferenceInlinerTests
         path["get"]!["operationId"]!.Value<string>().Should().Be("GetB");
     }
 
-    [Test]
-    [Arguments(@"#\/components\/pathItems\/A")]
-    [Arguments(@"#/components/pathItems/A")]
+    [TestMethod]
+    [DataRow(@"#\/components\/pathItems\/A")]
+    [DataRow(@"#/components/pathItems/A")]
     public void Resolves_References_Written_With_Json_Escapes(string reference)
     {
         var json = $$"""
@@ -94,7 +95,7 @@ public class PathItemReferenceInlinerTests
         path["get"]!["operationId"]!.Value<string>().Should().Be("GetA");
     }
 
-    [Test]
+    [TestMethod]
     public void Resolves_Escaped_Json_Pointer_Names()
     {
         const string json = """
@@ -109,9 +110,9 @@ public class PathItemReferenceInlinerTests
         path["get"]!["operationId"]!.Value<string>().Should().Be("GetA");
     }
 
-    [Test]
-    [Arguments("#/components/pathItems/Missing")]
-    [Arguments("#/components/pathItems/Self")]
+    [TestMethod]
+    [DataRow("#/components/pathItems/Missing")]
+    [DataRow("#/components/pathItems/Self")]
     public void Leaves_Unresolvable_References_Unchanged(string reference)
     {
         var json = $$"""
@@ -126,12 +127,12 @@ public class PathItemReferenceInlinerTests
         path["$ref"]!.Value<string>().Should().Be(reference);
     }
 
-    [Test]
-    [Arguments("""{ "openapi": "3.1.0", "paths": {} }""")]
-    [Arguments("""{ "paths": { "/a": { "$ref": "./other.yaml#/pathItems/A" } } }""")]
-    [Arguments("""{ "description": "#/components/pathItems/A" }""")]
-    [Arguments("""{ "paths": { "/a": { "$ref": "#/components/pathItems/A" } } }""")]
-    [Arguments("""["#/components/pathItems/A"]""")]
+    [TestMethod]
+    [DataRow("""{ "openapi": "3.1.0", "paths": {} }""")]
+    [DataRow("""{ "paths": { "/a": { "$ref": "./other.yaml#/pathItems/A" } } }""")]
+    [DataRow("""{ "description": "#/components/pathItems/A" }""")]
+    [DataRow("""{ "paths": { "/a": { "$ref": "#/components/pathItems/A" } } }""")]
+    [DataRow("""["#/components/pathItems/A"]""")]
     public void Returns_Same_Instance_When_Nothing_To_Inline(string json)
     {
         PathItemReferenceInliner.Inline(json).Should().BeSameAs(json);

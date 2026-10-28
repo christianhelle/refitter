@@ -5,9 +5,10 @@ using Refitter.Core;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class DocumentLoaderCompositorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Throws_On_Empty_Path()
     {
         var loader = new DocumentLoader();
@@ -16,7 +17,7 @@ public class DocumentLoaderCompositorTests
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Throws_On_Null_Path()
     {
         var loader = new DocumentLoader();
@@ -25,7 +26,7 @@ public class DocumentLoaderCompositorTests
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Throws_When_All_Strategies_Fail()
     {
         var strategies = new IDocumentLoadingStrategy[]
@@ -40,7 +41,7 @@ public class DocumentLoaderCompositorTests
         await act.Should().ThrowAsync<InvalidOperationException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Returns_First_Successful_Result()
     {
         var strategies = new IDocumentLoadingStrategy[]
@@ -57,7 +58,7 @@ public class DocumentLoaderCompositorTests
         result.Info.Title.Should().Be("First Success");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Skips_Strategies_That_Return_Null()
     {
         var strategies = new IDocumentLoadingStrategy[]
@@ -74,7 +75,7 @@ public class DocumentLoaderCompositorTests
         result.Info.Title.Should().Be("Third Time");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Loads_Valid_File_With_Default_Strategies()
     {
         var spec = @"{

@@ -3,9 +3,10 @@ using Refitter.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class RouteTemplateDisambiguatorTests
 {
-    [Test]
+    [TestMethod]
     public void Returns_Path_And_Parameters_Unchanged_Without_Collisions()
     {
         string[] parameters = ["long id", "[Query] string name", "CancellationToken cancellationToken = default"];
@@ -16,7 +17,7 @@ public class RouteTemplateDisambiguatorTests
         result.Should().Equal(parameters);
     }
 
-    [Test]
+    [TestMethod]
     public void Renames_Placeholder_Colliding_With_Query_Alias_Differing_By_Case()
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(
@@ -28,7 +29,7 @@ public class RouteTemplateDisambiguatorTests
         result.Should().Equal("[AliasAs(\"id2\")] int id", "[Query, AliasAs(\"ID\")] int? iD");
     }
 
-    [Test]
+    [TestMethod]
     public void Drops_Alias_When_Placeholder_Is_Renamed_To_Parameter_Name()
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(
@@ -40,7 +41,7 @@ public class RouteTemplateDisambiguatorTests
         result.Should().Equal("string idPath", "[AliasAs(\"id\")] string idPath2");
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Other_Attributes_When_Dropping_Alias()
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(
@@ -52,7 +53,7 @@ public class RouteTemplateDisambiguatorTests
         result.Should().Equal("[Required] string idPath", "[AliasAs(\"id\")] string idPath2");
     }
 
-    [Test]
+    [TestMethod]
     public void Renames_Placeholder_Colliding_With_Deduplicated_Parameter()
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(
@@ -64,7 +65,7 @@ public class RouteTemplateDisambiguatorTests
         result.Should().Equal("[AliasAs(\"id3\")] string id", "[AliasAs(\"id\")] string id2", "StreamPart file");
     }
 
-    [Test]
+    [TestMethod]
     public void Uses_Keyword_Parameter_Name_Without_Escape()
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(

@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios
 {
+    [TestClass]
     public class NumericFormatWithPatternTests
     {
         private const string OpenApiSpec = @"
@@ -42,14 +42,14 @@ components:
           format: int64
 ";
 
-        [Test]
+        [TestMethod]
         public async Task Can_Generate_Code()
         {
             string generatedCode = await GenerateCode();
             generatedCode.Should().NotBeNullOrWhiteSpace();
         }
 
-        [Test]
+        [TestMethod]
         public async Task Should_Generate_Float_For_Properties_With_Format_Float_And_Pattern()
         {
             string generatedCode = await GenerateCode();
@@ -61,7 +61,7 @@ components:
             generatedCode.Should().NotContain("public object Temperature { get; set; }");
         }
 
-        [Test]
+        [TestMethod]
         public async Task Should_Generate_Double_For_Properties_With_Format_Double_And_Pattern()
         {
             string generatedCode = await GenerateCode();
@@ -73,7 +73,7 @@ components:
             generatedCode.Should().NotContain("public object Humidity { get; set; }");
         }
 
-        [Test]
+        [TestMethod]
         public async Task Should_Generate_Long_For_Properties_With_Format_Int64_And_Pattern()
         {
             string generatedCode = await GenerateCode();
@@ -85,7 +85,7 @@ components:
             generatedCode.Should().NotContain("public object Pressure { get; set; }");
         }
 
-        [Test]
+        [TestMethod]
         public async Task Can_Build_Generated_Code()
         {
             string generatedCode = await GenerateCode();

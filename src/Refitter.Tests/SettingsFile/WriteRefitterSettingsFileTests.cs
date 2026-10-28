@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.SettingsFile;
 
 
+[TestClass]
 public class WriteRefitterSettingsFileTests
 {
-    [Test]
+    [TestMethod]
     public void DetermineSettingsFilePath_Returns_Default_Path_When_No_Output_Path_Specified()
     {
         // Arrange
@@ -22,7 +23,7 @@ public class WriteRefitterSettingsFileTests
         result.Should().Be(".refitter");
     }
 
-    [Test]
+    [TestMethod]
     public void DetermineSettingsFilePath_Returns_Custom_Path_When_Output_Path_Is_File()
     {
         // Arrange
@@ -40,7 +41,7 @@ public class WriteRefitterSettingsFileTests
         result.Should().Be(Path.Combine(expectedDir, ".refitter"));
     }
 
-    [Test]
+    [TestMethod]
     public void DetermineSettingsFilePath_Returns_Custom_Path_When_Output_Path_Is_Directory_And_GenerateMultipleFiles()
     {
         // Arrange
@@ -58,7 +59,7 @@ public class WriteRefitterSettingsFileTests
         result.Should().Be(Path.Combine(customPath, ".refitter"));
     }
 
-    [Test]
+    [TestMethod]
     public void DetermineSettingsFilePath_Returns_Custom_Path_When_ContractsOutputPath_Is_Set()
     {
         // Arrange
@@ -77,7 +78,7 @@ public class WriteRefitterSettingsFileTests
         result.Should().Be(Path.Combine(customPath, ".refitter"));
     }
 
-    [Test]
+    [TestMethod]
     public void DetermineSettingsFilePath_Returns_Default_When_Output_Path_Is_Empty()
     {
         // Arrange
@@ -93,7 +94,7 @@ public class WriteRefitterSettingsFileTests
         result.Should().Be(".refitter");
     }
 
-    [Test]
+    [TestMethod]
     public void DetermineSettingsFilePath_Returns_Default_When_Output_Path_Is_Null()
     {
         // Arrange
@@ -109,7 +110,7 @@ public class WriteRefitterSettingsFileTests
         result.Should().Be(".refitter");
     }
 
-    [Test]
+    [TestMethod]
     public async Task WriteRefitterSettingsFile_Creates_File_With_Custom_Output_Path()
     {
         // Arrange
@@ -148,7 +149,7 @@ public class WriteRefitterSettingsFileTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task WriteRefitterSettingsFile_Creates_File_When_GenerateMultipleFiles_Is_True()
     {
         // Arrange
@@ -190,7 +191,7 @@ public class WriteRefitterSettingsFileTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task WriteRefitterSettingsFile_Creates_File_When_ContractsOutputPath_Is_Set()
     {
         // Arrange
@@ -237,7 +238,7 @@ public class WriteRefitterSettingsFileTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task WriteRefitterSettingsFile_Serializes_RefitGeneratorSettings_Correctly()
     {
         // Arrange
@@ -286,7 +287,7 @@ public class WriteRefitterSettingsFileTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task WriteRefitterSettingsFile_Creates_Directory_If_Not_Exists()
     {
         // Arrange

@@ -3,14 +3,14 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using AwesomeAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class GenerateCommandTests
 {
-    [Test]
+    [TestMethod]
     public void Validate_Should_Call_SettingsValidator()
     {
         var command = new GenerateCommand();
@@ -28,7 +28,7 @@ public class GenerateCommandTests
         validationResult.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Work_With_Valid_URL()
     {
         var settings = new Settings
@@ -42,7 +42,7 @@ public class GenerateCommandTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_MultipleFiles_Uses_FileLike_Output()
     {
         var settings = new Settings
@@ -60,7 +60,7 @@ public class GenerateCommandTests
         result.Message.Should().Contain("--multiple-files --output ./Generated");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_MultipleFiles_Uses_Explicit_Default_Output_File()
     {
         var settings = new Settings
@@ -77,7 +77,7 @@ public class GenerateCommandTests
         result.Message.Should().Contain("Invalid --output value 'Output.cs'");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_ContractsOutput_Uses_FileLike_Output()
     {
         var settings = new Settings
@@ -94,7 +94,7 @@ public class GenerateCommandTests
         result.Message.Should().Contain("--contracts-output ./Generated/Contracts");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_When_MultipleFiles_Uses_Directory_Output()
     {
         var settings = new Settings
@@ -110,7 +110,7 @@ public class GenerateCommandTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_When_SingleFile_Uses_FileLike_Output()
     {
         var settings = new Settings
@@ -125,7 +125,7 @@ public class GenerateCommandTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_Both_OpenApiPath_And_SettingsFilePath_Are_Empty()
     {
         var settings = new Settings
@@ -140,7 +140,7 @@ public class GenerateCommandTests
         result.Successful.Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_File_Does_Not_Exist()
     {
         var settings = new Settings
@@ -155,7 +155,7 @@ public class GenerateCommandTests
         result.Message.Should().Contain("File not found");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_For_Invalid_OperationNameTemplate()
     {
         var settings = new Settings
@@ -171,7 +171,7 @@ public class GenerateCommandTests
         result.Message.Should().Contain("{operationName}");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_For_Valid_OperationNameTemplate()
     {
         var settings = new Settings
@@ -186,7 +186,7 @@ public class GenerateCommandTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void CreateRefitGeneratorSettings_Should_Map_PropertyNamingPolicy()
     {
         var settings = new Settings
@@ -200,7 +200,7 @@ public class GenerateCommandTests
         refitSettings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PreserveOriginal);
     }
 
-    [Test]
+    [TestMethod]
     public void CreateRefitGeneratorSettings_Should_Map_JsonLibraryVersion_From_CLI()
     {
         var settings = new Settings
@@ -214,7 +214,7 @@ public class GenerateCommandTests
         refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(9.0m);
     }
 
-    [Test]
+    [TestMethod]
     public void CreateRefitGeneratorSettings_Should_Use_Default_JsonLibraryVersion_When_CLI_Not_Set()
     {
         var settings = new Settings
@@ -228,7 +228,7 @@ public class GenerateCommandTests
         refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(8.0m);
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyCliOverrides_Should_Apply_JsonLibraryVersion_To_Settings_File_Without_CodeGeneratorSettings()
     {
         var settings = new Settings { JsonLibraryVersion = 9.0m };
@@ -239,7 +239,7 @@ public class GenerateCommandTests
         refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(9.0m);
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyCliOverrides_Should_Override_Default_JsonLibraryVersion_From_Settings_File()
     {
         var settings = new Settings { JsonLibraryVersion = 10.0m };
@@ -253,7 +253,7 @@ public class GenerateCommandTests
         refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(10.0m);
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyCliOverrides_Should_Keep_NonDefault_JsonLibraryVersion_From_Settings_File()
     {
         var settings = new Settings { JsonLibraryVersion = 8.0m };
@@ -267,7 +267,7 @@ public class GenerateCommandTests
         refitSettings.CodeGeneratorSettings!.JsonLibraryVersion.Should().Be(9.0m);
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyCliOverrides_Should_Leave_Settings_Untouched_When_CLI_JsonLibraryVersion_Not_Set()
     {
         var settings = new Settings { JsonLibraryVersion = null };
@@ -278,7 +278,7 @@ public class GenerateCommandTests
         refitSettings.CodeGeneratorSettings.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void Command_Should_Have_Public_Validate_Method()
     {
         var command = new GenerateCommand();
@@ -290,7 +290,7 @@ public class GenerateCommandTests
         method!.IsPublic.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Command_Should_Have_Public_ExecuteAsync_Method()
     {
         var command = new GenerateCommand();
@@ -302,7 +302,7 @@ public class GenerateCommandTests
         method!.IsPublic.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Default()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -327,7 +327,7 @@ public class GenerateCommandTests
         result.Should().Be(expectedPath);
     }
 
-    [Test]
+    [TestMethod]
     public void GetOutputPath_Should_Use_Explicit_Cli_Output_File_Path()
     {
         var settings = new Settings
@@ -349,7 +349,7 @@ public class GenerateCommandTests
         result.Should().Be(Path.Combine("GeneratedCode", "Petstore.cs"));
     }
 
-    [Test]
+    [TestMethod]
     public void GetOutputPath_Should_Use_Default_Cli_Output_File_In_Current_Directory()
     {
         var settings = new Settings
@@ -371,7 +371,7 @@ public class GenerateCommandTests
         result.Should().Be(Settings.DefaultOutputPath);
     }
 
-    [Test]
+    [TestMethod]
     public void GetOutputPath_Should_Root_Relative_To_SettingsFile_When_OutputFolder_Is_Custom()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -396,7 +396,7 @@ public class GenerateCommandTests
         result.Should().Be(expectedPath);
     }
 
-    [Test]
+    [TestMethod]
     public void GetOutputPath_Should_Use_SettingsFileName_When_OutputFilename_Is_Missing()
     {
         // OutputFilename will be defaulted by ApplySettingsFileDefaults
@@ -427,7 +427,7 @@ public class GenerateCommandTests
         result.Should().Be(expectedPath);
     }
 
-    [Test]
+    [TestMethod]
     public void GetOutputPath_For_MultipleFiles_Should_Use_Explicit_Cli_Output_Directory()
     {
         var settings = new Settings
@@ -451,7 +451,7 @@ public class GenerateCommandTests
         result.Should().Be(Path.Combine("GeneratedCode", "MultipleFiles", "RefitInterfaces.cs"));
     }
 
-    [Test]
+    [TestMethod]
     public void GetOutputPath_For_MultipleFiles_WithSettingsFile_Should_Use_Explicit_Cli_Output_Directory()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -477,7 +477,7 @@ public class GenerateCommandTests
         result.Should().Be(Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "GeneratedCode", "MultipleFiles", "RefitInterfaces.cs"));
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyDefaults_Should_Set_Default_OutputFolder()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -491,7 +491,7 @@ public class GenerateCommandTests
         refitSettings.OutputFolder.Should().Be("./Generated");
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyDefaults_Should_Preserve_Explicit_OutputFolder()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -505,7 +505,7 @@ public class GenerateCommandTests
         refitSettings.OutputFolder.Should().Be("./CustomFolder");
     }
 
-    [Test]
+    [TestMethod]
     public void ApplyDefaults_Should_Set_Default_When_Empty_OutputFolder()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -519,7 +519,7 @@ public class GenerateCommandTests
         refitSettings.OutputFolder.Should().Be("./Generated");
     }
 
-    [Test]
+    [TestMethod]
     public void ResolveRelativeSpecPaths_Should_Normalize_Relative_OpenApiPaths_And_Preserve_Urls()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -536,7 +536,7 @@ public class GenerateCommandTests
             "https://example.com/openapi.json");
     }
 
-    [Test]
+    [TestMethod]
     public void Program_Main_Should_Show_Help_When_Invoked_Without_Arguments()
     {
         var result = InvokeProgram([]);
@@ -550,7 +550,7 @@ public class GenerateCommandTests
         normalizedOutput.Should().Contain("--generate-authentication-header");
     }
 
-    [Test]
+    [TestMethod]
     public void Program_Main_Should_Accept_Legacy_GenerateAuthenticationHeader_Boolean_Syntax()
     {
         var workspace = CreateWorkspace();
@@ -618,7 +618,7 @@ public class GenerateCommandTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Program_Main_Should_Produce_No_Output_When_Silent()
     {
         string workspace = CreateWorkspace();
@@ -670,7 +670,7 @@ public class GenerateCommandTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Program_Main_Should_Produce_No_Output_When_Settings_File_Is_Silent()
     {
         string workspace = CreateWorkspace();
