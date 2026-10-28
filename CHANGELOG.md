@@ -3,6 +3,8 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- Update dependency MSTest to 4.5.2 ([#1361](https://github.com/christianhelle/refitter/pull/1361)) (@renovate[bot])
+- Update dependency Polly to 8.8.1 ([#1356](https://github.com/christianhelle/refitter/pull/1356)) (@renovate[bot])
 - Update NuGet packages ([#1353](https://github.com/christianhelle/refitter/pull/1353)) ([@christianhelle](https://github.com/christianhelle/))
 - Generate changelog with chlogr ([#1352](https://github.com/christianhelle/refitter/pull/1352)) ([@christianhelle](https://github.com/christianhelle/))
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
