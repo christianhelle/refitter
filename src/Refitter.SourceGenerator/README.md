@@ -25,7 +25,9 @@ The generated code is added to the compilation in memory, together with the Refi
 
 #### How it works with the Refit source generator
 
-Roslyn runs every source generator against the same input, so the Refit source generator can't see the interfaces that Refitter generates. To produce everything in one build, `Refitter.SourceGenerator` sets `DisableRefitSourceGenerator` to `true` for the regular compiler pass and runs the Refit source generator from the project's own `Refit` package itself, over the project code plus the Refitter output. Hand-written Refit interfaces in the same project are generated as before.
+Roslyn runs every source generator against the same input, so the Refit source generator can't see the interfaces that Refitter generates. To produce everything in one build, `Refitter.SourceGenerator` sets `DisableRefitSourceGenerator` to `true` for the regular compiler pass and runs the Refit source generator from the project's own `Refit` package itself, over the project code plus the Refitter output. Hand-written Refit interfaces in the same project are generated as before. Refit analyzer checks that only run while the Refit source generator is enabled, such as `RF006` (and `RefitRequireGeneratedRequests`), are still reported.
+
+For the same reason, when `generateJsonSerializerContext` is enabled, Refitter also runs the System.Text.Json source generator over the `JsonSerializerContext` it generates.
 
 If the project sets `DisableRefitSourceGenerator` to `true` itself, for example when using `Refit.Reflection`, Refitter leaves Refit source generation off and only emits its own code.
 
