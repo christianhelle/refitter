@@ -16,7 +16,7 @@ internal static class SettingsSanitizer
 
     internal const string UnknownSettingsKey = "unknown-settings";
 
-    private static readonly Regex JsonNumber = new(@"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?$", RegexOptions.CultureInvariant);
+    private static readonly Regex JsonNumber = new(@"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
 
     /// <summary>
     /// Returns a flat JSON object of setting paths and sanitized values, or null if the file can't be read as JSON.
@@ -252,6 +252,18 @@ internal static class SettingsSanitizer
             }
         }
 
+        private static bool IsJsonNumber(string literal)
+        {
+            try
+            {
+                return JsonNumber.IsMatch(literal);
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return false;
+            }
+        }
+
         private Literal ReadLiteral()
         {
             var start = position;
@@ -261,7 +273,7 @@ internal static class SettingsSanitizer
             }
 
             var literal = text.Substring(start, position - start);
-            if (literal is "true" or "false" or "null" || JsonNumber.IsMatch(literal))
+            if (literal is "true" or "false" or "null" || IsJsonNumber(literal))
             {
                 return new Literal(literal);
             }
