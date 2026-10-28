@@ -33,7 +33,7 @@ internal static class TelemetryPayload
         var envelopes = settingsFileContents
             .Select(contents => CreateEnvelope(
                 SettingsFileEventName,
-                new Dictionary<string, string> { { "settings", contents } },
+                CreateSettingsProperties(contents),
                 tags,
                 supportKey,
                 time))
@@ -51,6 +51,19 @@ internal static class TelemetryPayload
                 time));
 
         return "[" + string.Join(",", envelopes) + "]";
+    }
+
+    // Only the sanitized settings are sent, never the raw file contents
+    private static Dictionary<string, string> CreateSettingsProperties(string contents)
+    {
+        var properties = new Dictionary<string, string>();
+        var settings = SettingsSanitizer.Sanitize(contents);
+        if (settings is not null)
+        {
+            properties["settings"] = settings;
+        }
+
+        return properties;
     }
 
     public static string GetVersion() =>
