@@ -6,9 +6,10 @@ using Spectre.Console.Cli;
 namespace Refitter.Tests.SettingsFile;
 
 
+[TestClass]
 public class SettingsTests
 {
-    [Test]
+    [TestMethod]
     public void Default_Values_Should_Be_Set_Correctly()
     {
         var settings = new Refitter.Settings();
@@ -67,42 +68,42 @@ public class SettingsTests
         settings.JsonLibraryVersion.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_OpenApiPath()
     {
         var settings = new Refitter.Settings { OpenApiPath = "https://example.com/openapi.json" };
         settings.OpenApiPath.Should().Be("https://example.com/openapi.json");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_SettingsFilePath()
     {
         var settings = new Refitter.Settings { SettingsFilePath = "./settings.refitter" };
         settings.SettingsFilePath.Should().Be("./settings.refitter");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_Namespace()
     {
         var settings = new Refitter.Settings { Namespace = "MyNamespace" };
         settings.Namespace.Should().Be("MyNamespace");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_ContractsNamespace()
     {
         var settings = new Refitter.Settings { ContractsNamespace = "MyContracts" };
         settings.ContractsNamespace.Should().Be("MyContracts");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_OutputPath()
     {
         var settings = new Refitter.Settings { OutputPath = "./Generated.cs" };
         settings.OutputPath.Should().Be("./Generated.cs");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_Flags()
     {
         var settings = new Refitter.Settings
@@ -159,7 +160,7 @@ public class SettingsTests
         settings.NoInlineJsonConverters.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_MultipleInterfaces()
     {
         var settings = new Refitter.Settings { MultipleInterfaces = MultipleInterfaces.ByEndpoint };
@@ -169,7 +170,7 @@ public class SettingsTests
         settings.MultipleInterfaces.Should().Be(MultipleInterfaces.ByTag);
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_OperationNameGenerator()
     {
         var settings = new Refitter.Settings
@@ -179,7 +180,7 @@ public class SettingsTests
         settings.OperationNameGenerator.Should().Be(OperationNameGeneratorTypes.MultipleClientsFromOperationId);
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_CollectionFormat()
     {
         var settings = new Refitter.Settings { CollectionFormat = CollectionFormat.Csv };
@@ -195,7 +196,7 @@ public class SettingsTests
         settings.CollectionFormat.Should().Be(CollectionFormat.Pipes);
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_IntegerType()
     {
         var settings = new Refitter.Settings { IntegerType = IntegerType.Int64 };
@@ -205,7 +206,7 @@ public class SettingsTests
         settings.IntegerType.Should().Be(IntegerType.Int32);
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_PropertyNamingPolicy()
     {
         var settings = new Refitter.Settings { PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal };
@@ -215,7 +216,7 @@ public class SettingsTests
         settings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PascalCase);
     }
 
-    [Test]
+    [TestMethod]
     public void TryGetAuthenticationHeaderStyle_Should_Map_Legacy_Boolean_True_To_Method()
     {
         var settings = new Refitter.Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "true" } };
@@ -227,7 +228,7 @@ public class SettingsTests
         errorMessage.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void TryGetAuthenticationHeaderStyle_Should_Map_Legacy_Boolean_False_To_None()
     {
         var settings = new Refitter.Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "false" } };
@@ -239,7 +240,7 @@ public class SettingsTests
         errorMessage.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void TryGetAuthenticationHeaderStyle_Should_Map_Flag_Without_Value_To_Method()
     {
         var settings = new Refitter.Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "" } };
@@ -251,7 +252,7 @@ public class SettingsTests
         errorMessage.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void TryGetAuthenticationHeaderStyle_Should_Parse_Enum_Values_Case_Insensitively()
     {
         var settings = new Refitter.Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "parameter" } };
@@ -263,7 +264,7 @@ public class SettingsTests
         errorMessage.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void TryGetAuthenticationHeaderStyle_Should_Reject_Invalid_Values()
     {
         var settings = new Refitter.Settings { GenerateAuthenticationHeader = new FlagValue<string> { IsSet = true, Value = "headers" } };
@@ -275,7 +276,7 @@ public class SettingsTests
         errorMessage.Should().Contain("Valid values are None, Method, Parameter, true, or false");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_String_Arrays()
     {
         var settings = new Refitter.Settings
@@ -296,21 +297,21 @@ public class SettingsTests
         settings.KeepSchemaPatterns.Should().HaveCount(1);
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_OperationNameTemplate()
     {
         var settings = new Refitter.Settings { OperationNameTemplate = "{operationName}Async" };
         settings.OperationNameTemplate.Should().Be("{operationName}Async");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Allow_Setting_CustomTemplateDirectory()
     {
         var settings = new Refitter.Settings { CustomTemplateDirectory = "./templates" };
         settings.CustomTemplateDirectory.Should().Be("./templates");
     }
 
-    [Test]
+    [TestMethod]
     public void DefaultOutputPath_Constant_Should_Be_Defined()
     {
         Refitter.Settings.DefaultOutputPath.Should().Be("Output.cs");

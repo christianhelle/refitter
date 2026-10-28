@@ -3,11 +3,12 @@ using Refitter.Core;
 
 namespace Refitter.Tests.Regression;
 
+[TestClass]
 public class JsonEscapeDecodingBranchTests
 {
-    [Test]
-    [Arguments(null)]
-    [Arguments("")]
+    [TestMethod]
+    [DataRow(null)]
+    [DataRow("")]
     public void DecodeJsonEscapedText_Returns_Input_For_Null_Or_Empty(string? input)
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(input!);
@@ -15,7 +16,7 @@ public class JsonEscapeDecodingBranchTests
         result.Should().Be(input);
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Decodes_Backslash_Escape()
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\\b");
@@ -23,7 +24,7 @@ public class JsonEscapeDecodingBranchTests
         result.Should().Be(@"a\b");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Decodes_Forward_Slash_Escape()
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\/b");
@@ -31,7 +32,7 @@ public class JsonEscapeDecodingBranchTests
         result.Should().Be("a/b");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Decodes_Backspace_Escape()
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\bb");
@@ -39,7 +40,7 @@ public class JsonEscapeDecodingBranchTests
         result.Should().Be("ab");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Decodes_Form_Feed_Escape()
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\fb");
@@ -47,7 +48,7 @@ public class JsonEscapeDecodingBranchTests
         result.Should().Be("ab");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Preserves_Unknown_Escape_Sequence()
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\qb");
@@ -55,7 +56,7 @@ public class JsonEscapeDecodingBranchTests
         result.Should().Be(@"a\qb");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Strips_Unknown_Escape_Of_Invalid_Xml_Char()
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText("a\\\u0001b");
@@ -63,7 +64,7 @@ public class JsonEscapeDecodingBranchTests
         result.Should().Be(@"a\b");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Strips_Unicode_Escape_Of_Invalid_Xml_Char()
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"a\u0001b");
@@ -71,7 +72,7 @@ public class JsonEscapeDecodingBranchTests
         result.Should().Be("ab");
     }
 
-    [Test]
+    [TestMethod]
     public void DecodeJsonEscapedText_Keeps_Trailing_Backslash()
     {
         var result = XmlDocumentationGenerator.DecodeJsonEscapedText(@"ab\");

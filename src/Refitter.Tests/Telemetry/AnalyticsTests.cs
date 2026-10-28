@@ -9,10 +9,11 @@ using Refitter.Core;
 namespace Refitter.Tests.Telemetry;
 
 
+[TestClass]
 public class AnalyticsTests
 {
-    [Test]
-    [NotInParallel("Telemetry")]
+    [TestMethod]
+    [DoNotParallelize]
     public void Configure_Should_Not_Throw()
     {
         var action = () => Analytics.Configure();
@@ -20,7 +21,7 @@ public class AnalyticsTests
         action.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void LogFeatureUsage_Should_Skip_When_NoLogging_Is_True()
     {
         var settings = new Settings
@@ -35,7 +36,7 @@ public class AnalyticsTests
         action.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task LogError_Should_Skip_When_NoLogging_Is_True()
     {
         var settings = new Settings
@@ -50,7 +51,7 @@ public class AnalyticsTests
         await action.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public void LogFeatureUsage_Should_Handle_Null_Properties()
     {
         var settings = new Settings
@@ -68,7 +69,7 @@ public class AnalyticsTests
         action.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void IsMsbuildInvocation_Should_Be_True_Only_For_Msbuild_Source()
     {
         Analytics.IsMsbuildInvocation("msbuild").Should().BeTrue();
@@ -78,8 +79,8 @@ public class AnalyticsTests
         Analytics.IsMsbuildInvocation(null).Should().BeFalse();
     }
 
-    [Test]
-    [NotInParallel("Telemetry")]
+    [TestMethod]
+    [DoNotParallelize]
     public void LogFeatureUsage_Should_Track_Msbuild_Invocation_With_Telemetry_Settings()
     {
         var previousClient = Analytics.GetTelemetryClient();
@@ -114,8 +115,8 @@ public class AnalyticsTests
         }
     }
 
-    [Test]
-    [NotInParallel("Telemetry")]
+    [TestMethod]
+    [DoNotParallelize]
     public async Task LogError_Should_Apply_Msbuild_Telemetry_Source()
     {
         var previousClient = Analytics.GetTelemetryClient();

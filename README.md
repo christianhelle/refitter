@@ -1449,7 +1449,7 @@ Please head to the [Apizr documentation](https://www.apizr.net) to get more.
 
 ## Testing
 
-Refitter uses [TUnit](https://github.com/thomhurst/TUnit) as its testing framework instead of xUnit. TUnit was chosen for its superior performance, providing 3x faster test execution compared to xUnit. This significantly improves the developer experience when running the test suite locally and in CI/CD pipelines.
+Refitter uses [MSTest](https://github.com/microsoft/testfx) v4 on [Microsoft.Testing.Platform](https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-intro) as its testing framework, with [AwesomeAssertions](https://github.com/AwesomeAssertions/AwesomeAssertions) for assertions. Tests run in parallel at the method level.
 
 To run the tests:
 

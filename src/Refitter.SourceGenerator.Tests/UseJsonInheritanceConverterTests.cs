@@ -1,20 +1,20 @@
 using AwesomeAssertions;
 using Refitter.Tests.UseJsonInheritanceConverter;
-using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
 
 
+[TestClass]
 public class UseJsonInheritanceConverterTests
 {
-    [Test]
+    [TestMethod]
     public void Should_Generate_JsonInheritanceConverter_Usage() =>
         typeof(SomeComponent)
             .GetCustomAttributes(typeof(JsonInheritanceConverterAttribute), false)
             .Should()
             .HaveCount(1);
 
-    [Test]
+    [TestMethod]
     public void Should_Generate_JsonInheritanceAttribute_Usage() =>
         typeof(SomeComponent)
             .GetCustomAttributes(typeof(JsonInheritanceAttribute), false)

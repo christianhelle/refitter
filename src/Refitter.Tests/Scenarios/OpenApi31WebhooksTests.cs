@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// OpenAPI 3.1 webhooks are ignored while regular paths are still generated.
 /// </summary>
+[TestClass]
 public class OpenApi31WebhooksTests
 {
     private const string OpenApiSpec = """
@@ -32,14 +32,14 @@ public class OpenApi31WebhooksTests
             Pet: { type: object, properties: { name: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Paths_But_Not_Webhooks()
     {
         var generatedCode = await GenerateCode();
@@ -48,8 +48,8 @@ public class OpenApi31WebhooksTests
         generatedCode.Should().NotContain("NewPet(");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

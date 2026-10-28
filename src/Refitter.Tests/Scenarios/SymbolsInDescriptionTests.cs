@@ -3,11 +3,11 @@ using AwesomeAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class SymbolsInDescriptionTests
 {
     private const string OpenApiSpec = @"
@@ -35,21 +35,21 @@ definitions:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Symbols_In_Description_Are_Escaped()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("&lt;test&gt; &gt;&gt; &lt;&lt; &lt;/test&gt;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

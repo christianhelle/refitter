@@ -11,9 +11,10 @@ namespace Refitter.Tests;
 /// is a no-op. The delegate-wrapping methods must still invoke their delegates.
 /// </summary>
 
+[TestClass]
 public class SilentGenerationReporterTests
 {
-    [Test]
+    [TestMethod]
     public void ReportHeader_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportHeader("1.2.3");
@@ -21,7 +22,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSupportKey_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportSupportKey("TEST-KEY-123");
@@ -29,13 +30,13 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task ReportSingleFileGenerationProgressAsync_Does_Not_Throw()
     {
         await new SilentGenerationReporter().ReportSingleFileGenerationProgressAsync();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSingleFileOutput_Does_Not_Throw()
     {
         Action act = () =>
@@ -44,7 +45,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFilesWithProgressAsync_Invokes_Generator_And_Returns_Result()
     {
         bool called = false;
@@ -59,7 +60,7 @@ public class SilentGenerationReporterTests
         result.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void BeginMultiFileOutput_AddFile_And_Complete_Do_Not_Throw()
     {
         Action act = () =>
@@ -72,7 +73,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportFileWritten_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportFileWritten("/output/Api.cs");
@@ -80,7 +81,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task ValidateWithProgressAsync_Invokes_Validator()
     {
         bool called = false;
@@ -93,7 +94,7 @@ public class SilentGenerationReporterTests
         called.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationFailed_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportValidationFailed();
@@ -101,7 +102,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationDiagnostic_Error_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportValidationDiagnostic(
@@ -111,7 +112,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationDiagnostic_Warning_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportValidationDiagnostic(
@@ -121,7 +122,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationStatistics_Does_Not_Throw()
     {
         OpenApiValidationResult result = new OpenApiValidationResult(
@@ -133,7 +134,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSuccess_SingleFile_Does_Not_Throw()
     {
         Action act = () =>
@@ -142,7 +143,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSuccess_MultipleFiles_Does_Not_Throw()
     {
         Action act = () =>
@@ -151,7 +152,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportDonationBanner_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportDonationBanner();
@@ -159,7 +160,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportConfigurationWarnings_Does_Not_Throw()
     {
         List<Warning> warnings = new List<Warning>
@@ -173,7 +174,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportAllPathsFilteredWarning_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter()
@@ -182,7 +183,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSettingsFileGenerated_Does_Not_Throw()
     {
         Action act = () =>
@@ -191,7 +192,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportGenerationFailed_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportGenerationFailed();
@@ -199,7 +200,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportUnsupportedVersion_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportUnsupportedVersion("1.0");
@@ -207,7 +208,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportExceptionDetails_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter()
@@ -216,7 +217,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSkipValidationSuggestion_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportSkipValidationSuggestion();
@@ -224,7 +225,7 @@ public class SilentGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSupportHelp_Does_Not_Throw()
     {
         Action act = () => new SilentGenerationReporter().ReportSupportHelp();

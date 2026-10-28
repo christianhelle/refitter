@@ -6,16 +6,17 @@ using Refitter.Core.Validation;
 
 namespace Refitter.Tests.OpenApi;
 
+[TestClass]
 public class AttributeStringValidatorTests
 {
-    [Test]
+    [TestMethod]
     public void ContainsUnsafeCharacters_Should_Return_False_For_Null_And_Safe_Values()
     {
         AttributeStringValidator.ContainsUnsafeCharacters(null).Should().BeFalse();
         AttributeStringValidator.ContainsUnsafeCharacters("X-Api-Key").Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void ContainsUnsafeCharacters_Should_Return_True_For_Unsafe_Values()
     {
         AttributeStringValidator.ContainsUnsafeCharacters("X\"Api").Should().BeTrue();
@@ -23,7 +24,7 @@ public class AttributeStringValidatorTests
         AttributeStringValidator.ContainsUnsafeCharacters("X\nApi").Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Return_When_Document_Is_Null()
     {
         OpenApiDiagnostic diagnostic = new();
@@ -33,7 +34,7 @@ public class AttributeStringValidatorTests
         diagnostic.Errors.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Validate_SecurityScheme_And_Return_When_Paths_Are_Null()
     {
         OpenApiDiagnostic diagnostic = new();
@@ -74,7 +75,7 @@ public class AttributeStringValidatorTests
         diagnostic.Errors[0].Message.Should().Contain("Security scheme 'unsafeHeader'");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Report_Path_And_Header_Errors_And_Skip_Null_Branches()
     {
         OpenApiDiagnostic diagnostic = new();
@@ -128,7 +129,7 @@ public class AttributeStringValidatorTests
         diagnostic.Errors.Select(x => x.Pointer).Should().Contain(new[] { "unsafe\"path", "X\"Bad" });
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Report_ContentType_Errors_For_OpenApi3()
     {
         OpenApiDiagnostic diagnostic = new() { SpecificationVersion = OpenApiSpecVersion.OpenApi3_0 };
@@ -141,7 +142,7 @@ public class AttributeStringValidatorTests
         diagnostic.Errors.Select(x => x.Pointer).Should().Contain(new[] { "application/json\")] x", "text/plain\"" });
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Not_Report_ContentType_Errors_For_OpenApi2()
     {
         OpenApiDiagnostic diagnostic = new() { SpecificationVersion = OpenApiSpecVersion.OpenApi2_0 };

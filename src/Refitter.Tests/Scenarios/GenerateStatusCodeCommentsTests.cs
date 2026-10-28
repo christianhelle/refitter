@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class GenerateStatusCodeCommentsTests
 {
     private const string OpenApiSpec = @"
@@ -94,22 +94,22 @@ paths:
 ";
 
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode(generateStatusCodeComments: true);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode(generateStatusCodeComments: true);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Status_Code_Comments_When_Enabled()
     {
         string generatedCode = await GenerateCode(generateStatusCodeComments: true);
@@ -118,7 +118,7 @@ paths:
         generatedCode.Should().Contain("500");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_Status_Code_Comments_When_Disabled()
     {
         string generatedCode = await GenerateCode(generateStatusCodeComments: false);
@@ -134,7 +134,7 @@ paths:
         countWithout.Should().BeLessThan(countWith);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Response_Descriptions_When_Comments_Enabled()
     {
         string generatedCode = await GenerateCode(generateStatusCodeComments: true);
@@ -142,7 +142,7 @@ paths:
         generatedCode.Should().Contain("Bad request");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithUnicodeStatusCodeComments, generateStatusCodeComments: true);
@@ -152,7 +152,7 @@ paths:
             .And.NotContain(@"\u041e\u0448");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Preserves_Readable_Unicode_In_Status_Code_Comments_Swagger20()
     {
         string generatedCode = await GenerateCode(Swagger20SpecWithUnicodeStatusCodeComments, generateStatusCodeComments: true);
@@ -162,8 +162,8 @@ paths:
             .And.NotContain(@"\u041e\u0448");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Unicode_Status_Code_Comments_Can_Build()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithUnicodeStatusCodeComments, generateStatusCodeComments: true);

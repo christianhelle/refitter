@@ -9,9 +9,10 @@ namespace Refitter.Tests.Regression;
 /// Tests issues: #1021, #1030, #1031, #1044, #1045, #1046, #1048, #1050, #1054
 /// </summary>
 
+[TestClass]
 public class SettingsCliRegressionTests
 {
-    [Test]
+    [TestMethod]
     public void Issue1054_CreateAsync_Should_Throw_ArgumentNullException_For_Null_Paths()
     {
         // #1054: Correct exception type for null CreateAsync(IEnumerable)
@@ -19,7 +20,7 @@ public class SettingsCliRegressionTests
         act.Should().ThrowAsync<ArgumentNullException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task RefitGenerator_CreateAsync_Should_Throw_When_Both_OpenApiPath_And_OpenApiPaths_Are_Missing()
     {
         var settings = new RefitGeneratorSettings
@@ -35,7 +36,7 @@ public class SettingsCliRegressionTests
             .WithMessage("*OpenApiPath*OpenApiPaths*");
     }
 
-    [Test]
+    [TestMethod]
     public async Task RefitGenerator_CreateAsync_Should_Throw_When_OpenApiPath_Is_Whitespace_And_OpenApiPaths_Is_Empty()
     {
         var settings = new RefitGeneratorSettings
@@ -51,7 +52,7 @@ public class SettingsCliRegressionTests
             .WithMessage("*OpenApiPath*OpenApiPaths*");
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1046_OpenApiPaths_Should_Not_Serialize_When_Null()
     {
         // #1046: Default OpenApiPaths round-trip behavior
@@ -65,7 +66,7 @@ public class SettingsCliRegressionTests
         json.Should().NotContain("openApiPaths");
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1046_OpenApiPaths_Should_Not_Serialize_When_Default()
     {
         // #1046: Default OpenApiPaths round-trip behavior
@@ -79,7 +80,7 @@ public class SettingsCliRegressionTests
         json.Should().NotContain("openApiPaths");
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1045_OpenApiPath_And_OpenApiPaths_Are_Independent()
     {
         // #1045: OpenApiPath and OpenApiPaths are separate properties
@@ -93,7 +94,7 @@ public class SettingsCliRegressionTests
         settings.OpenApiPath.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1045_OpenApiPath_Should_Be_Null_When_OpenApiPaths_Empty()
     {
         // #1045: OpenApiPath should be null when OpenApiPaths is empty
@@ -105,7 +106,7 @@ public class SettingsCliRegressionTests
         settings.OpenApiPath.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1045_OpenApiPath_Should_Prefer_Explicit_Value_Over_OpenApiPaths()
     {
         // #1045: Explicit OpenApiPath takes precedence
@@ -118,7 +119,7 @@ public class SettingsCliRegressionTests
         settings.OpenApiPath.Should().Be("explicit.json");
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1044_Validate_Should_Fail_When_Both_OpenApiPath_And_OpenApiPaths_Are_Set()
     {
         // #1044: OpenApiPath + OpenApiPaths precedence validation
@@ -149,7 +150,7 @@ public class SettingsCliRegressionTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1030_Validate_Should_Check_All_OpenApiPaths_Entries()
     {
         // #1030: Validate all openApiPaths
@@ -185,7 +186,7 @@ public class SettingsCliRegressionTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1030_Validate_Should_Succeed_When_All_OpenApiPaths_Exist()
     {
         // #1030: Validate all openApiPaths
@@ -223,7 +224,7 @@ public class SettingsCliRegressionTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1030_Validate_Should_Allow_URLs_In_OpenApiPaths()
     {
         // #1030: URLs don't need file existence check
@@ -256,7 +257,7 @@ public class SettingsCliRegressionTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1050_Validate_Should_Provide_Clear_Error_For_Invalid_Enum()
     {
         // #1050: Improve enum-deserialization error clarity
@@ -288,7 +289,7 @@ public class SettingsCliRegressionTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1021_CLI_Output_Should_Override_Settings_File_Output()
     {
         // #1021: CLI --output no longer overrides when settings file used
@@ -315,7 +316,7 @@ public class SettingsCliRegressionTests
         Path.GetFullPath(result!).Should().EndWith(Path.Combine("CustomOutput", "MyApi.cs"));
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1021_Settings_File_Output_Should_Be_Used_When_No_CLI_Override()
     {
         // #1021: Settings file should be used when no explicit CLI output
@@ -342,7 +343,7 @@ public class SettingsCliRegressionTests
         result.Should().EndWith("CustomApi.cs");
     }
 
-    [Test]
+    [TestMethod]
     public void Issue1048_Validate_Should_Cache_Settings_To_Avoid_Double_Read()
     {
         // #1048: CLI reads .refitter twice

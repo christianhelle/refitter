@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Query arrays of enums, delimited styles, object and map parameters and content-encoded parameters.
 /// </summary>
+[TestClass]
 public class ComplexQueryParameterTests
 {
     private const string OpenApiSpec = """
@@ -37,14 +37,14 @@ public class ComplexQueryParameterTests
             Filter: { type: object, properties: { name: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Complex_Query_Parameters()
     {
         var generatedCode = await GenerateCode();
@@ -53,7 +53,7 @@ public class ComplexQueryParameterTests
         generatedCode.Should().Contain("[Query] IDictionary<string, string> map");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Collection_Format_From_Parameter_Style()
     {
         var generatedCode = await GenerateCode();
@@ -66,7 +66,7 @@ public class ComplexQueryParameterTests
         generatedCode.Should().Contain("[Query(CollectionFormat.Csv)] IEnumerable<string> formCsv");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Parameter_Style_Takes_Precedence_Over_Collection_Format_Setting()
     {
         var generatedCode = await GenerateCode(settings => settings.CollectionFormat = CollectionFormat.Tsv);
@@ -76,7 +76,7 @@ public class ComplexQueryParameterTests
         generatedCode.Should().Contain("[Query(CollectionFormat.Tsv)] IEnumerable<string> deepList");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Collection_Format_From_Parameter_Style_With_Dynamic_Querystring_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.UseDynamicQuerystringParameters = true);
@@ -85,16 +85,16 @@ public class ComplexQueryParameterTests
         generatedCode.Should().Contain("[Query(CollectionFormat.Csv)]");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Dynamic_Querystring_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.UseDynamicQuerystringParameters = true);

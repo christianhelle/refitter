@@ -3,10 +3,10 @@ using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class RefitCodeGeneratorTests
 {
     private const string OpenApiSpec = @"
@@ -55,7 +55,7 @@ paths:
           description: success
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Produces_Valid_Code()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -72,7 +72,7 @@ paths:
         result.Should().Contain("TestNamespace");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_WithFilteredDocument_ProducesValidCode()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -90,8 +90,8 @@ paths:
         result.Should().NotContain("\"/foo\"");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generate_Compiles_Successfully()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -109,7 +109,7 @@ paths:
         BuildHelper.BuildCSharp(result).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_Produces_Output()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -129,7 +129,7 @@ paths:
         result.Files.Should().Contain(f => f.TypeName == "Contracts");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_WithSwagger20_Produces_Valid_Code()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);
@@ -146,7 +146,7 @@ paths:
         result.Should().Contain("TestNamespace");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFiles_WithSwagger20_Produces_Output()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SwaggerSpec);

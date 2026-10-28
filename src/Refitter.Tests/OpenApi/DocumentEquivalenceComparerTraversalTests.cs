@@ -4,9 +4,10 @@ using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;
 
+[TestClass]
 public class DocumentEquivalenceComparerTraversalTests
 {
-    [Test]
+    [TestMethod]
     public void AddReferencedSchemas_Traverses_AllOf_SubSchemas()
     {
         var definitions = new Dictionary<string, JsonSchema>();
@@ -18,7 +19,7 @@ public class DocumentEquivalenceComparerTraversalTests
         definitions.Should().ContainKey("AllOfChild");
     }
 
-    [Test]
+    [TestMethod]
     public void AddReferencedSchemas_Traverses_OneOf_SubSchemas()
     {
         var definitions = new Dictionary<string, JsonSchema>();
@@ -30,7 +31,7 @@ public class DocumentEquivalenceComparerTraversalTests
         definitions.Should().ContainKey("OneOfChild");
     }
 
-    [Test]
+    [TestMethod]
     public void AddReferencedSchemas_Traverses_AnyOf_SubSchemas()
     {
         var definitions = new Dictionary<string, JsonSchema>();
@@ -42,7 +43,7 @@ public class DocumentEquivalenceComparerTraversalTests
         definitions.Should().ContainKey("AnyOfChild");
     }
 
-    [Test]
+    [TestMethod]
     public void AddReferencedSchemas_Traverses_Nested_Definitions()
     {
         var definitions = new Dictionary<string, JsonSchema>();

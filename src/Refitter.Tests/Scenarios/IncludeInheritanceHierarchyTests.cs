@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios
 {
+    [TestClass]
     public class IncludeInheritanceHierarchyTests
     {
         private const string OpenApiSpec = @"
@@ -58,16 +58,16 @@ components:
       additionalProperties: false
 ";
 
-        [Test]
-        [Arguments(true)]
-        [Arguments(false)]
+        [TestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
         public async Task Can_Generate_Code(bool includeHierarchy)
         {
             string generatedCode = await GenerateCode(includeHierarchy);
             generatedCode.Should().NotBeNullOrWhiteSpace();
         }
 
-        [Test]
+        [TestMethod]
         public async Task Removes_Unreferenced_Schema()
         {
             string generatedCode = await GenerateCode(includeHierarchy: false);
@@ -77,7 +77,7 @@ components:
             generatedCode.Should().Contain("class A");
         }
 
-        [Test]
+        [TestMethod]
         public async Task Keeps_All_Union_Cases_Schema()
         {
             string generatedCode = await GenerateCode(includeHierarchy: true);
@@ -87,9 +87,9 @@ components:
             generatedCode.Should().Contain("class A");
         }
 
-        [Test]
-        [Arguments(true)]
-        [Arguments(false)]
+        [TestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
         public async Task Can_Build_Generated_Code(bool includeHierarchy)
         {
             string generatedCode = await GenerateCode(includeHierarchy);

@@ -2,7 +2,6 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
@@ -11,6 +10,7 @@ namespace Refitter.Tests.Scenarios;
 /// https://github.com/christianhelle/refitter/issues/672
 /// </summary>
 
+[TestClass]
 public class MultipleInterfacesByTagMethodNamingTests
 {
     private const string OpenApiSpec = @"
@@ -147,14 +147,14 @@ paths:
           description: 'Success'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Separate_Interfaces_For_Each_Tag()
     {
         string generatedCode = await GenerateCode();
@@ -163,7 +163,7 @@ paths:
         generatedCode.Should().Contain("partial interface IOrdersApi");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Users_Interface_Should_Not_Have_Numbered_Method_Names()
     {
         string generatedCode = await GenerateCode();
@@ -181,7 +181,7 @@ paths:
         generatedCode.Should().NotContain("GetUserById2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Products_Interface_Should_Not_Have_Numbered_Method_Names()
     {
         string generatedCode = await GenerateCode();
@@ -198,7 +198,7 @@ paths:
         generatedCode.Should().NotContain("CreateProduct2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Orders_Interface_Should_Not_Have_Numbered_Method_Names()
     {
         string generatedCode = await GenerateCode();
@@ -213,7 +213,7 @@ paths:
         generatedCode.Should().NotContain("CreateOrder2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Method_Names_Should_Be_Identical_Across_Different_Interfaces()
     {
         string generatedCode = await GenerateCode();
@@ -244,7 +244,7 @@ paths:
             m.Contains("GetById") && (m.Contains("2(") || m.Contains("3(")));
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_MultipleInterfacesByTag_DuplicateOperationIds_NoGlobalCounter()
     {
         // This is the core bug test: operationIds are identical across tags
@@ -274,7 +274,7 @@ paths:
             "Orders interface should have GetAllOrders() not GetAllOrders3()");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_MultipleInterfacesByTag_NoConflict_WithinInterface()
     {
         // Test that a single operation in an interface doesn't get numbered
@@ -287,7 +287,7 @@ paths:
         generatedCode.Should().NotContain("GetOrderById2(");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Test_MultipleInterfacesByTag_EachInterface_HasOwnNamespace()
     {
         // Verify method naming is scoped per interface, not globally
@@ -315,7 +315,7 @@ paths:
         productsInterface.Should().NotContain("GetAllProducts2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

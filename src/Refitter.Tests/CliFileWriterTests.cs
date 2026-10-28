@@ -1,14 +1,14 @@
 using AwesomeAssertions;
 using Refitter;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class CliFileWriterTests
 {
-    [Test]
+    [TestMethod]
     public async Task WriteAsync_Creates_Directory_And_Writes_File()
     {
         var workspace = Path.Combine(
@@ -36,7 +36,7 @@ public class CliFileWriterTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task WriteAsync_Does_Not_Throw_When_Directory_Already_Exists()
     {
         var workspace = Path.Combine(
@@ -69,7 +69,7 @@ public class CliFileWriterTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task WriteAsync_Writes_To_File_In_Existing_Directory()
     {
         var workspace = Path.Combine(

@@ -1,13 +1,13 @@
 using AwesomeAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class SourceGeneratorFileWriterTests
 {
-    [Test]
+    [TestMethod]
     public async Task WriteAsync_Creates_Directory_And_Writes_File()
     {
         var workspace = Path.Combine(
@@ -34,7 +34,7 @@ public class SourceGeneratorFileWriterTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task WriteAsync_Skips_Write_When_Content_Identical()
     {
         var workspace = Path.Combine(
@@ -73,7 +73,7 @@ public class SourceGeneratorFileWriterTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task WriteAsync_Overwrites_When_Content_Differs()
     {
         var workspace = Path.Combine(

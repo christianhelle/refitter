@@ -4,6 +4,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.OpenApi;
 
+[TestClass]
 public class ReferenceGuardTests
 {
     private const string MainTemplate = @"{
@@ -54,7 +55,7 @@ components:
     private static string NewRoot() =>
         Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
 
-    [Test]
+    [TestMethod]
     public async Task Blocks_Remote_Reference_By_Default()
     {
         var root = NewRoot();
@@ -65,7 +66,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Allows_Remote_Reference_When_Enabled()
     {
         var root = NewRoot();
@@ -76,7 +77,7 @@ components:
         await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Blocks_Absolute_Out_Of_Tree_Reference()
     {
         var root = NewRoot();
@@ -88,7 +89,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Blocks_Parent_Traversal_Reference()
     {
         var root = NewRoot();
@@ -99,7 +100,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Allows_In_Tree_Relative_Reference()
     {
         var root = NewRoot();
@@ -111,7 +112,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Allows_Internal_Fragment_Reference()
     {
         var root = NewRoot();
@@ -122,7 +123,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Blocks_Remote_Reference_In_Swagger2_Spec()
     {
         var root = NewRoot();
@@ -133,7 +134,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Allows_In_Tree_Reference_In_Swagger2_Spec()
     {
         var root = NewRoot();
@@ -145,7 +146,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Blocks_Remote_Reference_In_YAML_Unquoted()
     {
         var root = NewRoot();
@@ -156,7 +157,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Allows_In_Tree_Reference_In_YAML_Unquoted()
     {
         var root = NewRoot();
@@ -168,7 +169,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Blocks_Parent_Traversal_In_YAML_Unquoted()
     {
         var root = NewRoot();
@@ -179,7 +180,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Ignores_Whitespace_OpenApiPath()
     {
         var act = () => ReferenceGuard.ValidateAsync("   ", allowRemoteReferences: false);
@@ -187,7 +188,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Ignores_Missing_Local_File()
     {
         var path = Path.Combine(NewRoot(), "does-not-exist.json");
@@ -197,7 +198,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Blocks_Dot_Relative_Reference_By_Default()
     {
         var content = MainTemplate.Replace("__REF__", "./schema.json#/components/schemas/Pet");
@@ -207,7 +208,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Allows_Dot_Relative_Reference_When_Enabled()
     {
         var content = MainTemplate.Replace("__REF__", "./schema.json#/components/schemas/Pet");
@@ -217,7 +218,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Blocks_Absolute_Http_Reference_By_Default()
     {
         var content = MainTemplate.Replace("__REF__", "http://example.org/schema.json#/components/schemas/Pet");
@@ -227,7 +228,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Allows_Absolute_Http_Reference_When_Enabled()
     {
         var content = MainTemplate.Replace("__REF__", "http://example.org/schema.json#/components/schemas/Pet");
@@ -237,7 +238,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Blocks_Non_Http_Scheme()
     {
         var content = MainTemplate.Replace("__REF__", "file:///etc/passwd");
@@ -247,7 +248,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Blocks_Bare_Relative_Reference_By_Default()
     {
         var content = MainTemplate.Replace("__REF__", "schema.json#/components/schemas/Pet");
@@ -257,7 +258,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Allows_Bare_Relative_Reference_When_Enabled()
     {
         var content = MainTemplate.Replace("__REF__", "schema.json#/components/schemas/Pet");
@@ -267,7 +268,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Throws_When_Remote_Entry_Cannot_Be_Downloaded()
     {
         var act = () => ReferenceGuard.ValidateAsync("http://127.0.0.1:1/openapi.json", allowRemoteReferences: true);
@@ -276,7 +277,7 @@ components:
             .WithMessage("*Failed to read OpenAPI document*");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Downloads_Remote_Entry_And_Validates_When_Reachable()
     {
         var remoteSpec = MainTemplate.Replace("__REF__", "#/components/schemas/InlineSchema")
@@ -288,7 +289,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Handles_Circular_Local_References_Without_Recursion_Error()
     {
         var root = NewRoot();
@@ -300,7 +301,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Allows_Missing_Local_Referenced_File()
     {
         var root = NewRoot();
@@ -311,7 +312,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Throws_OperationCanceled_When_Cancellation_Requested()
     {
         var root = NewRoot();
@@ -325,7 +326,7 @@ components:
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Blocks_Unresolvable_Reference_By_Default()
     {
         // Neither an absolute URI nor resolvable against the document URI, so it is treated as remote
@@ -336,7 +337,7 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Allows_Unresolvable_Reference_When_Enabled()
     {
         var content = MainTemplate.Replace("__REF__", "http://[unparseable");
@@ -346,7 +347,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Remote_Validation_Allows_Unresolvable_Root_Relative_Reference()
     {
         // Unparseable as a URI but root-relative, so it is not treated as a remote reference
@@ -357,7 +358,7 @@ components:
         await act.Should().NotThrowAsync();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Throws_When_Local_File_Cannot_Be_Read()
     {
         var root = NewRoot();

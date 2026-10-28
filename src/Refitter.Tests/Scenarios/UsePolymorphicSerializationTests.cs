@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class UsePolymorphicSerializationTests
 {
     private const string OpenApiSpec = @"
@@ -188,14 +188,14 @@ components:
         propertyName: $type
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Use_Polymorphic_Serialization()
     {
         string generatedCode = await GenerateCode();
@@ -211,7 +211,7 @@ components:
         generatedCode.Should().Contain("[JsonDerivedType(typeof(UserComponent2), typeDiscriminator: \"UserComponent2\")]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

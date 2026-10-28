@@ -3,7 +3,6 @@ using Refitter.Core;
 using Refitter.Core.Validation;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
@@ -11,6 +10,7 @@ namespace Refitter.Tests.Scenarios;
 // content-type key that closes the Refit attribute string and injects a [ModuleInitializer] file
 // class must not break out of the generated code, and must be rejected by validation.
 // Covers GHSA-3fhm-p725-h3g3 (path), GHSA-58x9-vjvp-6mx8 (header name), GHSA-p32v-8v8j-j534 (content-type).
+[TestClass]
 public class SecurityAttributeInjectionTests
 {
     private const string MaliciousPath =
@@ -153,7 +153,7 @@ paths:
                 type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Path_Injection_Does_Not_Break_Out_Of_Attribute()
     {
         string generatedCode = await GenerateCode(PathInjectionSpec);
@@ -161,15 +161,15 @@ paths:
         generatedCode.Should().NotContain("[Get(\"/q\")]");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Path_Injection_Is_Inert_And_Compiles()
     {
         string generatedCode = await GenerateCode(PathInjectionSpec);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Header_Injection_Does_Not_Break_Out_Of_Attribute()
     {
         string generatedCode = await GenerateCode(HeaderInjectionSpec);
@@ -177,15 +177,15 @@ paths:
         generatedCode.Should().NotContain("[Header(\"Y\")]");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Header_Injection_Is_Inert_And_Compiles()
     {
         string generatedCode = await GenerateCode(HeaderInjectionSpec);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validation_Rejects_Path_With_Breakout_Characters()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(PathInjectionSpec);
@@ -200,7 +200,7 @@ paths:
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Path_Injection_Does_Not_Break_Out_Of_Attribute_V2()
     {
         string generatedCode = await GenerateCode(PathInjectionSpecV2);
@@ -208,15 +208,15 @@ paths:
         generatedCode.Should().NotContain("[Get(\"/q\")]");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Path_Injection_Is_Inert_And_Compiles_V2()
     {
         string generatedCode = await GenerateCode(PathInjectionSpecV2);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Header_Injection_Does_Not_Break_Out_Of_Attribute_V2()
     {
         string generatedCode = await GenerateCode(HeaderInjectionSpecV2);
@@ -224,15 +224,15 @@ paths:
         generatedCode.Should().NotContain("[Header(\"Y\")]");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Header_Injection_Is_Inert_And_Compiles_V2()
     {
         string generatedCode = await GenerateCode(HeaderInjectionSpecV2);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validation_Rejects_Path_With_Breakout_Characters_V2()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(PathInjectionSpecV2);
@@ -247,7 +247,7 @@ paths:
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validation_Rejects_Header_With_Breakout_Characters()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(HeaderInjectionSpec);
@@ -262,7 +262,7 @@ paths:
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validation_Rejects_Header_With_Breakout_Characters_V2()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(HeaderInjectionSpecV2);
@@ -277,7 +277,7 @@ paths:
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task SecurityScheme_Header_Injection_Does_Not_Break_Out_Of_Attribute()
     {
         string generatedCode = await GenerateCode(
@@ -287,8 +287,8 @@ paths:
         generatedCode.Should().NotContain("[Header(\"Y\")]");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_SecurityScheme_Header_Injection_Is_Inert_And_Compiles()
     {
         string generatedCode = await GenerateCode(
@@ -297,7 +297,7 @@ paths:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validation_Rejects_SecurityScheme_Header_With_Breakout_Characters()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SecuritySchemeHeaderInjectionSpec);
@@ -312,7 +312,7 @@ paths:
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task SecurityScheme_Header_Injection_Does_Not_Break_Out_Of_Attribute_V2()
     {
         string generatedCode = await GenerateCode(
@@ -322,8 +322,8 @@ paths:
         generatedCode.Should().NotContain("[Header(\"Y\")]");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_SecurityScheme_Header_Injection_Is_Inert_And_Compiles_V2()
     {
         string generatedCode = await GenerateCode(
@@ -332,7 +332,7 @@ paths:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validation_Rejects_SecurityScheme_Header_With_Breakout_Characters_V2()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(SecuritySchemeHeaderInjectionSpecV2);
@@ -347,7 +347,7 @@ paths:
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task ContentType_Injection_Does_Not_Break_Out_Of_Attribute()
     {
         string generatedCode = await GenerateCode(ContentTypeInjectionSpec);
@@ -355,15 +355,15 @@ paths:
         generatedCode.Should().NotContain("application/json\")]");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_ContentType_Injection_Is_Inert_And_Compiles()
     {
         string generatedCode = await GenerateCode(ContentTypeInjectionSpec);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Validation_Rejects_ContentType_With_Breakout_Characters()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(ContentTypeInjectionSpec);

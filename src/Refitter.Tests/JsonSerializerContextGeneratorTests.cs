@@ -4,9 +4,10 @@ using Refitter.Tests.Build;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class JsonSerializerContextGeneratorTests
 {
-    [Test]
+    [TestMethod]
     public void Generate_Returns_Empty_When_Contracts_Are_Whitespace()
     {
         JsonSerializerContextGenerator.Generate(" \r\n\t ", CreateSettings())
@@ -14,7 +15,7 @@ public class JsonSerializerContextGeneratorTests
             .BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void Generate_Returns_Empty_When_No_Types()
     {
         var settings = CreateSettings();
@@ -24,7 +25,7 @@ public class JsonSerializerContextGeneratorTests
             .BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void Generate_Suppresses_Obsolete_Warnings_For_Deprecated_Contracts()
     {
         const string contracts = """
@@ -47,7 +48,7 @@ public class JsonSerializerContextGeneratorTests
         restore.Should().BeGreaterThan(attribute);
     }
 
-    [Test]
+    [TestMethod]
     public void Generate_Uses_OpenApi_Title_For_Context_Name_When_Enabled()
     {
         const string contracts = """
@@ -68,7 +69,7 @@ public class JsonSerializerContextGeneratorTests
         result.Should().NotContain("IgnoredApiSerializerContext");
     }
 
-    [Test]
+    [TestMethod]
     public void Generate_Sanitizes_Angle_Brackets_In_OpenApi_Title_For_Context_Name()
     {
         const string contracts = """
@@ -89,7 +90,7 @@ public class JsonSerializerContextGeneratorTests
         result.Should().NotContain("Pet<Service>SerializerContext");
     }
 
-    [Test]
+    [TestMethod]
     public void Generate_Uses_Contracts_Namespace_And_Strips_Interface_Prefix()
     {
         const string contracts = """
@@ -109,7 +110,7 @@ public class JsonSerializerContextGeneratorTests
         result.Should().NotContain("IMyApiSerializerContext");
     }
 
-    [Test]
+    [TestMethod]
     public void Generate_Falls_Back_To_Default_Context_Name_When_Interface_Name_Is_Missing()
     {
         const string contracts = """
@@ -127,7 +128,7 @@ public class JsonSerializerContextGeneratorTests
         result.Should().Contain("internal partial class ApiClientSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
     }
 
-    [Test]
+    [TestMethod]
     public void Generate_Registers_Types_Once()
     {
         const string contracts = """
@@ -159,8 +160,8 @@ public class JsonSerializerContextGeneratorTests
         result.Split("[global::System.Text.Json.Serialization.JsonSerializable(typeof(Pet))]").Length.Should().Be(2);
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Registers_Nested_Types_With_Qualified_Name()
     {
         const string contracts = """
@@ -182,8 +183,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Registers_Closed_Generic_Usages_And_Skips_Open_Generic_Declarations()
     {
         const string contracts = """
@@ -212,8 +213,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Skips_Generic_Usages_That_Still_Reference_Open_Type_Parameters()
     {
         const string contracts = """
@@ -248,8 +249,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Global_Qualifies_Types_Outside_The_Context_Namespace()
     {
         const string contracts = """
@@ -275,8 +276,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Formats_Nullable_Array_And_Qualified_Generic_Usages()
     {
         const string contracts = """
@@ -309,8 +310,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Formats_Alias_Qualified_Generic_Usages()
     {
         const string contracts = """
@@ -343,8 +344,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Formats_Alias_Qualified_Declared_Types_Using_Namespace_Alias()
     {
         const string contracts = """
@@ -377,8 +378,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Formats_NonDeclared_Generic_Type_Arguments()
     {
         const string contracts = """
@@ -408,8 +409,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Handles_Declared_Types_In_Global_Namespace()
     {
         const string contracts = """
@@ -424,7 +425,7 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Generate_Renames_TypeInfo_Property_For_Type_Named_Options()
     {
         const string contracts = """
@@ -442,8 +443,8 @@ public class JsonSerializerContextGeneratorTests
             "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo\")]");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Builds_With_Type_Named_Options()
     {
         const string contracts = """
@@ -461,8 +462,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Builds_With_Types_Named_Options_And_OptionsTypeInfo()
     {
         const string contracts = """
@@ -489,8 +490,8 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public void Generate_Builds_With_Generic_Registration_Named_Like_Replacement()
     {
         const string contracts = """
@@ -527,13 +528,13 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
-    [Arguments("_OptionsTypeInfo")]
-    [Arguments("Create_OptionsTypeInfo")]
-    [Arguments("OptionsTypeInfoPropInit")]
-    [Arguments("OptionsTypeInfoCtorParamInit")]
-    [Arguments("OptionsTypeInfoSerializeHandler")]
+    [TestCategory("Integration")]
+    [TestMethod]
+    [DataRow("_OptionsTypeInfo")]
+    [DataRow("Create_OptionsTypeInfo")]
+    [DataRow("OptionsTypeInfoPropInit")]
+    [DataRow("OptionsTypeInfoCtorParamInit")]
+    [DataRow("OptionsTypeInfoSerializeHandler")]
     public void Generate_Builds_With_Type_Named_After_Generated_Helper_Of_Replacement(string typeName)
     {
         var contracts = $$"""
@@ -555,19 +556,19 @@ public class JsonSerializerContextGeneratorTests
         BuildHelper.BuildCSharp(new[] { contracts, result }).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
-    [Arguments("Default")]
-    [Arguments("GetTypeInfo")]
-    [Arguments("GeneratedSerializerOptions")]
-    [Arguments("Equals")]
-    [Arguments("GetHashCode")]
-    [Arguments("GetType")]
-    [Arguments("ToString")]
-    [Arguments("GetRuntimeConverterForType")]
-    [Arguments("ExpandConverter")]
-    [Arguments("TryGetTypeInfoForRuntimeCustomConverter")]
-    [Arguments("GetConverterForNullableProperty")]
+    [TestCategory("Integration")]
+    [TestMethod]
+    [DataRow("Default")]
+    [DataRow("GetTypeInfo")]
+    [DataRow("GeneratedSerializerOptions")]
+    [DataRow("Equals")]
+    [DataRow("GetHashCode")]
+    [DataRow("GetType")]
+    [DataRow("ToString")]
+    [DataRow("GetRuntimeConverterForType")]
+    [DataRow("ExpandConverter")]
+    [DataRow("TryGetTypeInfoForRuntimeCustomConverter")]
+    [DataRow("GetConverterForNullableProperty")]
     public void Generate_Builds_With_Type_Named_After_JsonSerializerContext_Member(string typeName)
     {
         var contracts = $$"""

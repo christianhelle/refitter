@@ -17,7 +17,7 @@ If this pull request resolves or implements an existing issue then please associ
 See the [Definition of Done](https://github.com/christianhelle/refitter/blob/main/CONTRIBUTING.md#definition-of-done) for details. Tick the items that apply to your change. If you would like help with any of these, just say so in the description.
 
 - [ ] Related issue linked (`Closes #...`), if there is one
-- [ ] New features: scenario tests that assert on the generated code and compile it with `BuildHelper.BuildCSharp()` (`[Category("Integration")]`)
+- [ ] New features: scenario tests that assert on the generated code and compile it with `BuildHelper.BuildCSharp()` (`[TestCategory("Integration")]`)
 - [ ] Bug fixes: a regression test that fails without the fix
 - [ ] Full test suite passes locally (`dotnet test --solution src/Refitter.slnx -c Release`)
 - [ ] Documentation updated if settings or CLI arguments changed (`README.md`, `refitter-file-format.md`, `json-schema.json`)

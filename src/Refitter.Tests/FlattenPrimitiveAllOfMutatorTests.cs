@@ -2,14 +2,14 @@ using AwesomeAssertions;
 using NJsonSchema;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class FlattenPrimitiveAllOfMutatorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithSingleStringAllOf_CollapsesToString()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -44,10 +44,10 @@ public class FlattenPrimitiveAllOfMutatorTests
         parent.Description.Should().Be("the parent id");
     }
 
-    [Test]
-    [Arguments("integer", "int64", JsonObjectType.Integer)]
-    [Arguments("number", "double", JsonObjectType.Number)]
-    [Arguments("boolean", null, JsonObjectType.Boolean)]
+    [TestMethod]
+    [DataRow("integer", "int64", JsonObjectType.Integer)]
+    [DataRow("number", "double", JsonObjectType.Number)]
+    [DataRow("boolean", null, JsonObjectType.Boolean)]
     public async Task Mutate_WithSinglePrimitiveAllOf_CollapsesToPrimitive(
         string jsonType,
         string? format,
@@ -87,7 +87,7 @@ public class FlattenPrimitiveAllOfMutatorTests
             value.Format.Should().Be(format);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithSingleEnumAllOf_PreservesEnumeration()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -123,7 +123,7 @@ public class FlattenPrimitiveAllOfMutatorTests
         priority.Enumeration.Should().BeEquivalentTo(new[] { "low", "medium", "high" });
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithRefToPrimitiveAllOf_CollapsesToPrimitive()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -158,7 +158,7 @@ public class FlattenPrimitiveAllOfMutatorTests
         id.AllOf.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithRefToObjectAllOf_LeavesSchemaUnchanged()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -189,7 +189,7 @@ public class FlattenPrimitiveAllOfMutatorTests
         actual.Properties.Should().ContainKey("name");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithObjectPropertiesAndAllOf_LeavesSchemaUnchanged()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -216,7 +216,7 @@ public class FlattenPrimitiveAllOfMutatorTests
             .Should().HaveCount(1);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithMultipleAllOfItems_LeavesSchemaUnchanged()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -247,7 +247,7 @@ public class FlattenPrimitiveAllOfMutatorTests
             .Should().HaveCount(2);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithSingleEnumAllOf_PreservesEnumerationNames()
     {
         var document = await OpenApiDocument.FromJsonAsync("""

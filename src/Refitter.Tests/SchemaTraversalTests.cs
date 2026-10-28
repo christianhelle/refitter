@@ -5,9 +5,10 @@ using Refitter.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class SchemaTraversalTests
 {
-    [Test]
+    [TestMethod]
     public async Task SchemaWalker_Visits_Schemas_Reached_Through_Definitions()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -34,7 +35,7 @@ public class SchemaTraversalTests
         visited.Select(s => s.Type).Should().Contain(JsonObjectType.String);
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaWalker_Visits_Schemas_Reached_Through_Tuple_Items()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -60,7 +61,7 @@ public class SchemaTraversalTests
         visited.Should().Contain(tupleItem);
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaWalker_Visits_Schemas_Reached_Through_Path_Parameters()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -87,7 +88,7 @@ public class SchemaTraversalTests
         visited.Select(s => s.Type).Should().Contain(JsonObjectType.Boolean);
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Additional_Properties()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -131,7 +132,7 @@ public class SchemaTraversalTests
         document.Components.Schemas.Should().NotContainKey("Unused");
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Dictionary_Key()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -175,7 +176,7 @@ public class SchemaTraversalTests
         document.Components.Schemas.Should().NotContainKey("Unused");
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaCleaner_Ignores_Response_Content_Without_Schema()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -217,7 +218,7 @@ public class SchemaTraversalTests
         document.Components.Schemas.Should().NotContainKey("Unused");
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Path_Item_Parameters()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -250,7 +251,7 @@ public class SchemaTraversalTests
         document.Components.Schemas.Should().NotContainKey("Unused");
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Tuple_Items()
     {
         var document = await CreateDocumentWithReferencedRootAsync();
@@ -265,7 +266,7 @@ public class SchemaTraversalTests
         document.Components.Schemas.Should().NotContainKey("Unused");
     }
 
-    [Test]
+    [TestMethod]
     public async Task SchemaCleaner_Keeps_Schemas_Reached_Through_Definitions()
     {
         var document = await CreateDocumentWithReferencedRootAsync();

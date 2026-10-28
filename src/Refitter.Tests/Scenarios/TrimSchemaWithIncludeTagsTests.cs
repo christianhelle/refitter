@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class TrimSchemaWithIncludeTagsTests
 {
     private const string OpenApiSpec = @"
@@ -103,22 +103,22 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Included_Tag_Endpoints()
     {
         string generatedCode = await GenerateCode();
@@ -126,7 +126,7 @@ components:
         generatedCode.Should().Contain("GetPetById");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_Excluded_Tag_Endpoints()
     {
         string generatedCode = await GenerateCode();
@@ -134,7 +134,7 @@ components:
         generatedCode.Should().NotContain("GetOwnerById");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_Unused_Schemas()
     {
         string generatedCode = await GenerateCode();

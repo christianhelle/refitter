@@ -4,6 +4,7 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class ApizrGeneratorWithPollyTests
 {
     private readonly RefitGeneratorSettings extendedSettings = new()
@@ -32,7 +33,7 @@ public class ApizrGeneratorWithPollyTests
         }
     };
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Extended_Registration_For_Single_Interface()
     {
         string code = ApizrRegistrationGenerator.Generate(
@@ -45,7 +46,7 @@ public class ApizrGeneratorWithPollyTests
         code.Should().Contain("AddApizrManagerFor<IPetApi>(optionsBuilder)");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Extended_Registration_For_Multiple_Interfaces()
     {
         string code = ApizrRegistrationGenerator.Generate(
@@ -60,7 +61,7 @@ public class ApizrGeneratorWithPollyTests
         code.Should().Contain("AddManagerFor<IStoreApi>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_HttpMessageHandlers()
     {
         string code = ApizrRegistrationGenerator.Generate(
@@ -75,7 +76,7 @@ public class ApizrGeneratorWithPollyTests
         code.Should().Contain("WithDelegatingHandler<DiagnosticMessageHandler>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_Polly()
     {
         string code = ApizrRegistrationGenerator.Generate(
@@ -91,7 +92,7 @@ public class ApizrGeneratorWithPollyTests
         code.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_Polly()
     {
         extendedSettings.DependencyInjectionSettings!.TransientErrorHandler = TransientErrorHandler.None;
@@ -109,7 +110,7 @@ public class ApizrGeneratorWithPollyTests
         code.Should().NotContain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_BaseUrl()
     {
         extendedSettings.DependencyInjectionSettings!.BaseUrl = null;

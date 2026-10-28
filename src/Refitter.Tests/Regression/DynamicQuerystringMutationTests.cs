@@ -8,6 +8,7 @@ namespace Refitter.Tests.Regression;
 /// Validates that XML documentation still sees the original query parameters after wrapper generation.
 /// </summary>
 
+[TestClass]
 public class DynamicQuerystringMutationTests
 {
     private const string OpenApiSpec = """
@@ -55,10 +56,10 @@ public class DynamicQuerystringMutationTests
         }
         """;
 
-    [Test]
-    [Arguments(MultipleInterfaces.Unset)]
-    [Arguments(MultipleInterfaces.ByTag)]
-    [Arguments(MultipleInterfaces.ByEndpoint)]
+    [TestMethod]
+    [DataRow(MultipleInterfaces.Unset)]
+    [DataRow(MultipleInterfaces.ByTag)]
+    [DataRow(MultipleInterfaces.ByEndpoint)]
     public async Task Dynamic_Querystring_Generation_Preserves_Original_Query_Param_Documentation(
         MultipleInterfaces multipleInterfaces)
     {

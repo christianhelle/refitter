@@ -7,9 +7,10 @@ using Refitter.Core.Validation;
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class GenerationOrchestratorTests
 {
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Generate_Code_And_Return_Zero()
     {
         var workspace = Path.Combine(
@@ -73,7 +74,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Generate_Multiple_Files_And_Return_Zero()
     {
         var workspace = Path.Combine(
@@ -140,7 +141,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Return_NonZero_On_Exception()
     {
         var workspace = Path.Combine(
@@ -179,7 +180,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_NoBanner_False_Still_Completes_Successfully()
     {
         var workspace = Path.Combine(
@@ -240,7 +241,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_MultipleOpenApiPaths_Completes_Successfully()
     {
         var workspace = Path.Combine(
@@ -303,7 +304,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_UseIsoDateFormat_And_DateFormat_Shows_Warning()
     {
         var workspace = Path.Combine(
@@ -373,7 +374,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_Deprecated_UsePolly_Shows_Warning()
     {
         var workspace = Path.Combine(
@@ -444,7 +445,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_IncludePathMatches_NoMatch_Shows_Warning()
     {
         var workspace = Path.Combine(
@@ -508,7 +509,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_SkipValidation_False_And_Valid_Spec_Succeeds()
     {
         var workspace = Path.Combine(
@@ -569,7 +570,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_Both_Warnings_Displayed()
     {
         var workspace = Path.Combine(
@@ -645,7 +646,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_SkipValidation_False_And_Non_Existent_File_Shows_SkipValidation_Suggestion()
     {
         var workspace = Path.Combine(
@@ -688,7 +689,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_With_SettingsFilePath_Resolves_Paths_And_Does_Not_Write_Settings_File()
     {
         var workspace = Path.Combine(
@@ -760,7 +761,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Return_Exit_Code_That_Survives_Process_Truncation_On_Validation_Failure()
     {
         var workspace = Path.Combine(
@@ -827,7 +828,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Report_Unsupported_Specification_Version()
     {
         var workspace = Path.Combine(
@@ -880,7 +881,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task RunAsync_Should_Report_Validation_Diagnostics_When_Validation_Fails()
     {
         var workspace = Path.Combine(
@@ -945,7 +946,7 @@ public class GenerationOrchestratorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationDiagnostics_Reports_Both_Errors_And_Warnings()
     {
         OpenApiDiagnostic diagnostic = new OpenApiDiagnostic();
@@ -966,7 +967,7 @@ public class GenerationOrchestratorTests
             .Should().ContainSingle(d => !d.IsError && d.Error.Message == "a warning");
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationDiagnostics_Reports_Failure_When_There_Are_No_Diagnostics()
     {
         OpenApiValidationException exception = new OpenApiValidationException(
@@ -979,11 +980,11 @@ public class GenerationOrchestratorTests
         reporter.ValidationDiagnostics.Should().BeEmpty();
     }
 
-    [Test]
-    [Arguments(unchecked((int)0x80131500), 1)]
-    [Arguments(0, 1)]
-    [Arguments(unchecked((int)0x80131509), unchecked((int)0x80131509))]
-    [Arguments(unchecked((int)0x80070002), unchecked((int)0x80070002))]
+    [TestMethod]
+    [DataRow(unchecked((int)0x80131500), 1)]
+    [DataRow(0, 1)]
+    [DataRow(unchecked((int)0x80131509), unchecked((int)0x80131509))]
+    [DataRow(unchecked((int)0x80070002), unchecked((int)0x80070002))]
     public void ToProcessExitCode_Never_Truncates_To_Success(int hresult, int expected)
     {
         Exception exception = new Exception("boom") { HResult = hresult };

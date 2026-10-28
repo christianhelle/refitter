@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class DefaultResponseObjectTests
 {
     private const string OpenApiSpec = @"
@@ -113,14 +113,14 @@ components:
           type: 'string'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -130,7 +130,7 @@ components:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_Default_Response_Return_Types()
     {
         string generatedCode = await GenerateCode();
@@ -138,7 +138,7 @@ components:
         generatedCode.Should().Contain("Task<ICollection<User>> GetUsersWithDefault();");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_Range_Response_Return_Types()
     {
         string generatedCode = await GenerateCode();
@@ -146,7 +146,7 @@ components:
         generatedCode.Should().Contain("Task<ICollection<Category>> GetCategoriesWithRange();");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_User_Contract()
     {
         string generatedCode = await GenerateCode();
@@ -156,7 +156,7 @@ components:
         generatedCode.Should().Contain("public string Email { get; set; }");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Generate_Category_Contract()
     {
         string generatedCode = await GenerateCode();

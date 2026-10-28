@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class IdentifierCorrectnessTests
 {
     #region Issue #1018 - Invalid Parameter Identifiers in Multipart Form Data
@@ -55,14 +55,14 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Invalid_Multipart_Identifiers()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_LeadingDigit_Identifiers_Are_Prefixed()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers);
@@ -70,7 +70,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string 123File");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_ReservedKeyword_Identifiers_Are_Escaped()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers);
@@ -78,7 +78,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("@event");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_SpecialChar_Identifiers_Are_Sanitized()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers);
@@ -86,8 +86,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string !special");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Invalid_Multipart_Identifiers_Compiles()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers);
@@ -142,7 +142,7 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Invalid_Security_Identifiers()
     {
         var generatedCode = await GenerateCode(
@@ -151,7 +151,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task SecurityScheme_LeadingDigit_Identifiers_Are_Prefixed()
     {
         var generatedCode = await GenerateCode(
@@ -161,7 +161,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string 1Token");
     }
 
-    [Test]
+    [TestMethod]
     public async Task SecurityScheme_ReservedKeyword_Identifiers_Are_Escaped()
     {
         var generatedCode = await GenerateCode(
@@ -170,8 +170,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("@class");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Invalid_Security_Identifiers_Compiles()
     {
         var generatedCode = await GenerateCode(
@@ -224,7 +224,7 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Querystring_Leading_NonLetter()
     {
         var generatedCode = await GenerateCode(
@@ -233,7 +233,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Uses_This_Qualifier()
     {
         var generatedCode = await GenerateCode(
@@ -244,8 +244,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("this._foo = _foo;");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Compiles()
     {
         var generatedCode = await GenerateCode(
@@ -301,14 +301,14 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Generic_Parameters()
     {
         var generatedCode = await GenerateCode(ParametersWithGenerics, optionalParameters: true);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generic_Dictionary_Parameter_Not_Misclassified_As_Nullable()
     {
         var generatedCode = await GenerateCode(ParametersWithGenerics, optionalParameters: true);
@@ -318,8 +318,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("IDictionary<string, string?> filters = default");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Generic_Parameters_Compiles()
     {
         var generatedCode = await GenerateCode(ParametersWithGenerics, optionalParameters: true);
@@ -377,14 +377,14 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Invalid_Multipart_Identifiers_Swagger2()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_LeadingDigit_Identifiers_Are_Prefixed_Swagger2()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
@@ -392,7 +392,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string 123File");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_ReservedKeyword_Identifiers_Are_Escaped_Swagger2()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
@@ -400,7 +400,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("@event");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Multipart_SpecialChar_Identifiers_Are_Sanitized_Swagger2()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
@@ -408,8 +408,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string !special");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Invalid_Multipart_Identifiers_Compiles_Swagger2()
     {
         var generatedCode = await GenerateCode(MultipartFormDataWithInvalidIdentifiers_Swagger2);
@@ -464,7 +464,7 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Invalid_Security_Identifiers_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -473,7 +473,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task SecurityScheme_LeadingDigit_Identifiers_Are_Prefixed_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -483,7 +483,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("string 1Token");
     }
 
-    [Test]
+    [TestMethod]
     public async Task SecurityScheme_ReservedKeyword_Identifiers_Are_Escaped_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -492,8 +492,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("@class");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Invalid_Security_Identifiers_Compiles_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -544,7 +544,7 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Querystring_Leading_NonLetter_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -553,7 +553,7 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Uses_This_Qualifier_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -564,8 +564,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("this._foo = _foo;");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Querystring_Leading_NonLetter_Compiles_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -619,14 +619,14 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Generic_Parameters_Swagger2()
     {
         var generatedCode = await GenerateCode(ParametersWithGenerics_Swagger2, optionalParameters: true);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generic_Dictionary_Parameter_Not_Misclassified_As_Nullable_Swagger2()
     {
         var generatedCode = await GenerateCode(ParametersWithGenerics_Swagger2, optionalParameters: true);
@@ -636,8 +636,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().NotContain("IDictionary<string, string?> filters = default");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Generic_Parameters_Compiles_Swagger2()
     {
         var generatedCode = await GenerateCode(ParametersWithGenerics_Swagger2, optionalParameters: true);
@@ -681,7 +681,7 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Optional_Parameter_With_Unsanitized_Name_Falls_Back_To_Sanitized_Variable_Name()
     {
         var generatedCode = await GenerateCode(
@@ -692,8 +692,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("\"abc\"");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Unsanitized_Parameter_Name_Compiles()
     {
         var generatedCode = await GenerateCode(
@@ -740,7 +740,7 @@ public class IdentifierCorrectnessTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Optional_Parameter_With_Unsanitized_Name_Falls_Back_To_Sanitized_Variable_Name_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -751,8 +751,8 @@ public class IdentifierCorrectnessTests
         generatedCode.Should().Contain("\"abc\"");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Unsanitized_Parameter_Name_Compiles_Swagger2()
     {
         var generatedCode = await GenerateCode(
@@ -766,7 +766,7 @@ public class IdentifierCorrectnessTests
 
     #region Issue #1037 - Empty Namespace List Crash
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Empty_Namespace_List()
     {
         var spec = """
@@ -800,7 +800,7 @@ public class IdentifierCorrectnessTests
 
     #region Issue #1053 - Reserved Keyword Escaping
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Escapes_Underscore_Keywords()
     {
         "__arglist".Sanitize().Should().Be("@__arglist");
@@ -809,7 +809,7 @@ public class IdentifierCorrectnessTests
         "__refvalue".Sanitize().Should().Be("@__refvalue");
     }
 
-    [Test]
+    [TestMethod]
     public void Sanitize_Escapes_Common_Keywords()
     {
         "class".Sanitize().Should().Be("@class");

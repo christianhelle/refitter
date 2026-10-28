@@ -8,6 +8,7 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Migrate tests from TUnit to MSTest v4.5 ([#1360](https://github.com/christianhelle/refitter/pull/1360)) ([@christianhelle](https://github.com/christianhelle/))
 - Fix JsonSerializerContext build failure for contracts named Options ([#1358](https://github.com/christianhelle/refitter/pull/1358)) ([@christianhelle](https://github.com/christianhelle/))
 - Support OpenAPI 3.2 itemSchema for streaming responses ([#1355](https://github.com/christianhelle/refitter/pull/1355)) ([@christianhelle](https://github.com/christianhelle/))
 - Use discriminated base type for inline oneOf of derived types ([#1335](https://github.com/christianhelle/refitter/pull/1335)) ([@christianhelle](https://github.com/christianhelle/))

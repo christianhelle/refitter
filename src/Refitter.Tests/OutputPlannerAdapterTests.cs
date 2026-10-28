@@ -1,15 +1,15 @@
 using AwesomeAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class OutputPlannerAdapterTests
 {
     private static readonly IOutputPlanner planner = new OutputPlannerAdapter();
 
-    [Test]
+    [TestMethod]
     public void Plan_SingleFile_DirectCli_Explicit_Output_Is_Used()
     {
         var config = new RefitGeneratorSettings
@@ -35,7 +35,7 @@ public class OutputPlannerAdapterTests
         planned[0].Content.Should().Be("// code");
     }
 
-    [Test]
+    [TestMethod]
     public void Plan_SingleFile_DirectCli_Default_Uses_DefaultOutputPath()
     {
         var config = new RefitGeneratorSettings
@@ -61,7 +61,7 @@ public class OutputPlannerAdapterTests
         planned[0].Content.Should().Be("// code");
     }
 
-    [Test]
+    [TestMethod]
     public void Plan_SingleFile_SettingsFile_Roots_Relative_To_Settings_Directory()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -89,7 +89,7 @@ public class OutputPlannerAdapterTests
         planned[0].Content.Should().Be("// code");
     }
 
-    [Test]
+    [TestMethod]
     public void Plan_MultiFile_DirectCli_Combines_Output_Directory_And_Filename()
     {
         var config = new RefitGeneratorSettings
@@ -114,7 +114,7 @@ public class OutputPlannerAdapterTests
         planned[0].Content.Should().Be("// interfaces");
     }
 
-    [Test]
+    [TestMethod]
     public void Plan_MultiFile_SettingsFile_Roots_Explicit_Cli_Override()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -141,7 +141,7 @@ public class OutputPlannerAdapterTests
         planned[0].Content.Should().Be("// interfaces");
     }
 
-    [Test]
+    [TestMethod]
     public void Plan_MultiFile_Reroutes_Contracts_To_Separate_Folder()
     {
         var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
@@ -172,7 +172,7 @@ public class OutputPlannerAdapterTests
         planned[1].Path.Should().Be(Path.Combine(contractsFolder, $"{TypenameConstants.Contracts}.cs"));
     }
 
-    [Test]
+    [TestMethod]
     public void Plan_Preserves_Content_For_Each_File()
     {
         var config = new RefitGeneratorSettings
@@ -197,7 +197,7 @@ public class OutputPlannerAdapterTests
         planned[1].Content.Should().Be("// content 2");
     }
 
-    [Test]
+    [TestMethod]
     public void Plan_SingleFile_With_No_Generated_Files_Plans_Empty_Content()
     {
         var config = new RefitGeneratorSettings

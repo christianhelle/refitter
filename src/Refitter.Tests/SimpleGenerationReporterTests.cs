@@ -7,14 +7,15 @@ namespace Refitter.Tests;
 
 /// <summary>
 /// Smoke tests for <see cref="SimpleGenerationReporter"/>. These exercise every method
-/// for line/branch coverage; the output is not asserted because TUnit prohibits
-/// redirecting Console.Out (TUnit0055). The methods only write to Console so they
+/// for line/branch coverage; the output is not asserted because Console.Out is
+/// shared by tests running in parallel. The methods only write to Console so they
 /// don't throw — a clean run is the success criterion.
 /// </summary>
 
+[TestClass]
 public class SimpleGenerationReporterTests
 {
-    [Test]
+    [TestMethod]
     public void ReportHeader_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportHeader("1.2.3");
@@ -22,7 +23,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSupportKey_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportSupportKey("TEST-KEY-123");
@@ -30,13 +31,13 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task ReportSingleFileGenerationProgressAsync_Does_Not_Throw()
     {
         await new SimpleGenerationReporter().ReportSingleFileGenerationProgressAsync();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSingleFileOutput_Does_Not_Throw()
     {
         var act = () =>
@@ -45,7 +46,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task GenerateMultipleFilesWithProgressAsync_Invokes_Generator_And_Returns_Result()
     {
         var called = false;
@@ -60,7 +61,7 @@ public class SimpleGenerationReporterTests
         result.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void BeginMultiFileOutput_AddFile_And_Complete_Do_Not_Throw()
     {
         var act = () =>
@@ -73,7 +74,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportFileWritten_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportFileWritten("/output/Api.cs");
@@ -81,7 +82,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task ValidateWithProgressAsync_Invokes_Validator()
     {
         var called = false;
@@ -94,7 +95,7 @@ public class SimpleGenerationReporterTests
         called.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationFailed_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportValidationFailed();
@@ -102,7 +103,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationDiagnostic_Error_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportValidationDiagnostic(
@@ -112,7 +113,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationDiagnostic_Warning_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportValidationDiagnostic(
@@ -122,7 +123,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationStatistics_Does_Not_Throw()
     {
         var result = new OpenApiValidationResult(
@@ -134,7 +135,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSuccess_SingleFile_Does_Not_Throw()
     {
         var act = () =>
@@ -143,7 +144,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSuccess_MultipleFiles_Does_Not_Throw()
     {
         var act = () =>
@@ -152,7 +153,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportDonationBanner_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportDonationBanner();
@@ -160,7 +161,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportConfigurationWarnings_Does_Not_Throw()
     {
         var warnings = new List<Warning>
@@ -174,7 +175,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportAllPathsFilteredWarning_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter()
@@ -183,7 +184,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSettingsFileGenerated_Does_Not_Throw()
     {
         var act = () =>
@@ -192,7 +193,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportGenerationFailed_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportGenerationFailed();
@@ -200,7 +201,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportUnsupportedVersion_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportUnsupportedVersion("1.0");
@@ -208,7 +209,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportExceptionDetails_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter()
@@ -217,7 +218,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSkipValidationSuggestion_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportSkipValidationSuggestion();
@@ -225,7 +226,7 @@ public class SimpleGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSupportHelp_Does_Not_Throw()
     {
         var act = () => new SimpleGenerationReporter().ReportSupportHelp();

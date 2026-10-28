@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class PropertyNamingPolicyTests
 {
     private const string OpenApiSpec = """
@@ -209,14 +209,14 @@ public class PropertyNamingPolicyTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Default_PascalCase_Property_Naming()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Default_PascalCase_Property_Naming_Remains_Unchanged()
     {
         string generatedCode = await GenerateCode();
@@ -224,15 +224,15 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("""[JsonPropertyName("node_id")]""");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Default_PascalCase_Minimally_Sanitizes_Invalid_Identifiers()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("public string _1stNode { get; set; }");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Default_PascalCase_Minimally_Sanitizes_Invalid_Identifiers_OpenApi2()
     {
         string generatedCode = await GenerateCodeFromSpec(OpenApiSpec2);
@@ -240,36 +240,36 @@ public class PropertyNamingPolicyTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task PreserveOriginal_Emits_Raw_Valid_Identifiers()
     {
         string generatedCode = await GenerateCode(PropertyNamingPolicy.PreserveOriginal);
         generatedCode.Should().Contain("public int node_id { get; set; }");
     }
 
-    [Test]
+    [TestMethod]
     public async Task PreserveOriginal_Escapes_Reserved_Keywords()
     {
         string generatedCode = await GenerateCode(PropertyNamingPolicy.PreserveOriginal);
         generatedCode.Should().Contain("public string @class { get; set; }");
     }
 
-    [Test]
+    [TestMethod]
     public async Task PreserveOriginal_Minimally_Sanitizes_Invalid_Identifiers()
     {
         string generatedCode = await GenerateCode(PropertyNamingPolicy.PreserveOriginal);
         generatedCode.Should().Contain("_1st_node { get; set; }");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task PreserveOriginal_Generated_Code_With_Recursive_Schemas_Can_Build()
     {
         string generatedCode = await GenerateCode(PropertyNamingPolicy.PreserveOriginal);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Default_PascalCase_Property_Naming_Prefixes_Digit_Prefixed_Properties()
     {
         string generatedCode = await GenerateCodeFromSpec(DigitPrefixedPropertyOpenApiSpec);
@@ -277,8 +277,8 @@ public class PropertyNamingPolicyTests
         generatedCode.Should().Contain("_42QuestionField { get; set; }");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Default_PascalCase_Digit_Prefixed_Properties_Can_Build()
     {
         string generatedCode = await GenerateCodeFromSpec(DigitPrefixedPropertyOpenApiSpec);

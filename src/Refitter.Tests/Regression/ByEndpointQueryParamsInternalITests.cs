@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Regression;
 
+[TestClass]
 public class ByEndpointQueryParamsInternalITests
 {
     private const string OpenApiSpec = """
@@ -37,7 +38,7 @@ public class ByEndpointQueryParamsInternalITests
                   description: 'ok'
         """;
 
-    [Test]
+    [TestMethod]
     public async Task ByEndpoint_Dynamic_Query_Params_Keep_Internal_I_Characters()
     {
         string generatedCode = await GenerateCode();
@@ -48,8 +49,8 @@ public class ByEndpointQueryParamsInternalITests
         generatedCode.Should().NotContain("GetnvoicenfoQueryParams");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task ByEndpoint_Dynamic_Query_Params_With_Internal_I_Characters_Build()
     {
         string generatedCode = await GenerateCode();

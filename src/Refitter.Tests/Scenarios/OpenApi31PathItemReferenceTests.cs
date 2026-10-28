@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// OpenAPI 3.1 path items referenced from components/pathItems (#1274).
 /// </summary>
+[TestClass]
 public class OpenApi31PathItemReferenceTests
 {
     private const string OpenApiSpec = """
@@ -26,30 +26,30 @@ public class OpenApi31PathItemReferenceTests
                 responses: { '204': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Operations_From_Referenced_Path_Items()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task GetItem(string id);");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_From_Json()
     {
         const string json = """

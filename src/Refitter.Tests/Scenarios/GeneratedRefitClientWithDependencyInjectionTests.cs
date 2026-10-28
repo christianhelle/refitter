@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class GeneratedRefitClientWithDependencyInjectionTests
 {
     private const string OpenApiSpec = @"
@@ -37,7 +37,7 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_AddRefitGeneratedClient_When_Enabled()
     {
         string generatedCode = await GenerateCode(true);
@@ -45,7 +45,7 @@ components:
         generatedCode.Should().NotContain("AddRefitClient<");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_AddRefitClient_By_Default()
     {
         string generatedCode = await GenerateCode(false);
@@ -53,8 +53,8 @@ components:
         generatedCode.Should().NotContain("AddRefitGeneratedClient");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_AddRefitGeneratedClient()
     {
         string generatedCode = await GenerateCode(true);

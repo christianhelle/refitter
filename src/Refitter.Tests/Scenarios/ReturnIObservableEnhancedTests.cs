@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class ReturnIObservableEnhancedTests
 {
     private const string OpenApiSpec = @"
@@ -55,21 +55,21 @@ components:
           type: number
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode(returnIObservable: true);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_IObservable()
     {
         string generatedCode = await GenerateCode(returnIObservable: true);
         generatedCode.Should().Contain("IObservable<");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_IObservable_When_Disabled()
     {
         string generatedCode = await GenerateCode(returnIObservable: false);
@@ -77,22 +77,22 @@ components:
         generatedCode.Should().Contain("Task<");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_Without_IObservable()
     {
         string generatedCode = await GenerateCode(returnIObservable: false);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Using_System_Reactive()
     {
         string generatedCode = await GenerateCode(returnIObservable: true);
         generatedCode.Should().Contain("using System.Reactive;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_IObservable_Code_Contains_Multiple_Methods()
     {
         string generatedCode = await GenerateCode(returnIObservable: true);
@@ -102,7 +102,7 @@ components:
         observableCount.Should().BeGreaterThanOrEqualTo(2);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Task_Code_Contains_Multiple_Methods()
     {
         string generatedCode = await GenerateCode(returnIObservable: false);

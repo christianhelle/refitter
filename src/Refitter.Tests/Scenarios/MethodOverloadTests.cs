@@ -2,7 +2,6 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
@@ -10,6 +9,7 @@ namespace Refitter.Tests.Scenarios;
 /// Test for Issue #1199: method overloading with same name but different parameters
 /// should generate overloads, not counter-suffixed names like CustomformatGet2.
 /// </summary>
+[TestClass]
 public class MethodOverloadTests
 {
     private const string OpenApiSpec = @"
@@ -66,18 +66,18 @@ public class MethodOverloadTests
 }
 ";
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Can_Generate_Code(string spec)
     {
         var generatedCode = await GenerateCode(spec);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Same_Name_Different_Params_Should_Use_Overloads_Not_Counter(string spec)
     {
         var generatedCode = await GenerateCode(spec);
@@ -86,9 +86,9 @@ public class MethodOverloadTests
         generatedCode.Should().NotContain("CustomformatGet2(");
     }
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Overloads_Should_Have_Different_Parameter_Lists(string spec)
     {
         var generatedCode = await GenerateCode(spec);
@@ -100,10 +100,10 @@ public class MethodOverloadTests
         generatedCode.Should().Contain("CustomformatGet(int id");
     }
 
-    [Test]
-    [Category("Integration")]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [TestCategory("Integration")]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Can_Build_Generated_Code(string spec)
     {
         var generatedCode = await GenerateCode(spec);

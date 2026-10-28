@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Callbacks, links and api key, bearer and OAuth2 security schemes.
 /// </summary>
+[TestClass]
 public class CallbacksLinksAndSecuritySchemeTests
 {
     private const string OpenApiSpec = """
@@ -50,14 +50,14 @@ public class CallbacksLinksAndSecuritySchemeTests
             Event: { type: object, properties: { name: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Ignores_Callbacks()
     {
         var generatedCode = await GenerateCode();
@@ -66,16 +66,16 @@ public class CallbacksLinksAndSecuritySchemeTests
         generatedCode.Should().NotContain("[Post(\"{$request.body#/callbackUrl}\")]");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_By_Tag()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByTag);

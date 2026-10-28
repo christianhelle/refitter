@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class IAsyncEnumerableResponseTests
 {
     private const string OpenApiSpec = @"
@@ -157,64 +157,64 @@ paths:
           description: A stream of untyped events
 ";
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Can_Generate_Code(string spec)
     {
         string generatedCode = await GenerateCode(spec);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Generates_IAsyncEnumerable_For_NDJson(string spec)
     {
         string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<");
     }
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Generates_IAsyncEnumerable_For_NDJson_Method(string spec)
     {
         string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous> GetEvents(");
     }
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Generates_IAsyncEnumerable_For_Jsonl_Method(string spec)
     {
         string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous2> GetEventsJsonl(");
     }
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Generates_IAsyncEnumerable_For_EventStream_Method(string spec)
     {
         string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<Anonymous3> GetEventsSse(");
     }
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Generates_IAsyncEnumerable_Of_Object_For_Untyped_Streaming_Response(string spec)
     {
         string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<object> GetEventsUntyped(");
     }
 
-    [Test]
-    [Category("Integration")]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [TestCategory("Integration")]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Can_Build_Generated_Code(string spec)
     {
         string generatedCode = await GenerateCode(spec);
@@ -249,7 +249,7 @@ paths:
                 type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Generate_IAsyncEnumerable_When_Ndjson_Schema_Is_String()
     {
         string generatedCode = await GenerateCode(MixedJsonAndPrimitiveNdjsonSpec);
@@ -257,8 +257,8 @@ paths:
         generatedCode.Should().Contain("Task<Response> GetLog(");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_For_Mixed_Json_And_Primitive_Ndjson()
     {
         string generatedCode = await GenerateCode(MixedJsonAndPrimitiveNdjsonSpec);
@@ -297,7 +297,7 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Task_With_Ref_Schema_For_Mixed_Json_And_Primitive_Ndjson()
     {
         string generatedCode = await GenerateCode(MixedRefJsonAndPrimitiveNdjsonSpec);
@@ -305,8 +305,8 @@ components:
         generatedCode.Should().Contain("Task<TaskInstancesLogResponse> GetLog(");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_For_Mixed_Ref_Json_And_Primitive_Ndjson()
     {
         string generatedCode = await GenerateCode(MixedRefJsonAndPrimitiveNdjsonSpec);
@@ -316,19 +316,19 @@ components:
             .BeTrue();
     }
 
-    [Test]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Does_Not_Generate_IAsyncEnumerable_When_Disabled(string spec)
     {
         string generatedCode = await GenerateCode(spec, settings => settings.ReturnIAsyncEnumerable = false);
         generatedCode.Should().NotContain("IAsyncEnumerable");
     }
 
-    [Test]
-    [Category("Integration")]
-    [Arguments(OpenApiSpec)]
-    [Arguments(Swagger2Spec)]
+    [TestMethod]
+    [TestCategory("Integration")]
+    [DataRow(OpenApiSpec)]
+    [DataRow(Swagger2Spec)]
     public async Task Can_Build_Generated_Code_When_IAsyncEnumerable_Disabled(string spec)
     {
         string generatedCode = await GenerateCode(spec, settings => settings.ReturnIAsyncEnumerable = false);

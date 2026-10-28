@@ -1,13 +1,13 @@
 using AwesomeAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class RefitInterfaceImportTests
 {
-    [Test]
+    [TestMethod]
     public void Should_Contain_SystemThreading()
     {
         var settings = new RefitGeneratorSettings { UseCancellationTokens = true };
@@ -15,7 +15,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().Contain("System.Threading");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_NotContain_SystemThreading()
     {
         var settings = new RefitGeneratorSettings { UseCancellationTokens = false };
@@ -23,7 +23,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().NotContain("System.Threading");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_NotContain_Any_System_Excluded()
     {
         var settings = new RefitGeneratorSettings { UseCancellationTokens = true, ReturnIObservable = false, ExcludeNamespaces = new string[] { "^System[.].*" } };
@@ -34,7 +34,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().NotContain("System.Threading.Tasks");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_NotContain_SystemThreading_Excluded()
     {
         var settings = new RefitGeneratorSettings { UseCancellationTokens = true, ReturnIObservable = false, ExcludeNamespaces = new string[] { "System.Threading$" } };
@@ -43,7 +43,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().Contain("System.Threading.Tasks");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Contain_ApizrConfiguringRequest()
     {
         var settings = new RefitGeneratorSettings { ApizrSettings = new ApizrSettings { WithRequestOptions = true, WithRegistrationHelper = true } };
@@ -51,7 +51,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().Contain("Apizr.Configuring.Request");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Contain_ApizrConfiguringRequest_And_NotContain_SystemThreading()
     {
         var settings = new RefitGeneratorSettings { ApizrSettings = new ApizrSettings { WithRequestOptions = true, WithRegistrationHelper = true }, UseCancellationTokens = true };
@@ -60,7 +60,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().NotContain("System.Threading");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Contain_SystemNetHttp_When_HttpResponseMessage_Is_Used()
     {
         var settings = new RefitGeneratorSettings();
@@ -68,7 +68,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().Contain("System.Net.Http");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_NotContain_SystemNetHttp_By_Default()
     {
         var settings = new RefitGeneratorSettings();
@@ -76,7 +76,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().NotContain("System.Net.Http");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_NotContain_SystemNetHttp_Excluded()
     {
         var settings = new RefitGeneratorSettings { ExcludeNamespaces = new string[] { "^System[.]Net[.]Http$" } };
@@ -84,7 +84,7 @@ public class RefitInterfaceImportTests
         refitInterfaceImport.Should().NotContain("System.Net.Http");
     }
 
-    [Test]
+    [TestMethod]
     public void GenerateNamespaceImports_Includes_SystemNetHttp_When_HttpResponseMessage_Is_Used()
     {
         var settings = new RefitGeneratorSettings();

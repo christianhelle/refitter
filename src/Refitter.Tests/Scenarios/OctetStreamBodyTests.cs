@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class OctetStreamBodyTests
 {
     private const string OpenApiSpec = @"
@@ -44,28 +44,28 @@ paths:
           description: successful operation
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Pet_Interface()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IPetApi");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_StreamPart_Parameter()
     {
         string generatedCode = await GenerateCode(true);
         generatedCode.Should().Contain("long petId, [Query] string additionalMetadata, StreamPart body");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

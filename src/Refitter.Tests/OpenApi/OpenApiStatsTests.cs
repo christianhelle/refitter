@@ -5,9 +5,10 @@ using Refitter.Core.Validation;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class OpenApiStatsTests
 {
-    [Test]
+    [TestMethod]
     public void Should_Initialize_With_Zero_Counts()
     {
         var stats = new OpenApiStats();
@@ -23,7 +24,7 @@ public class OpenApiStatsTests
         stats.CallbackCount.Should().Be(0);
     }
 
-    [Test]
+    [TestMethod]
     public void Visit_Parameter_Should_Increment_ParameterCount()
     {
         var stats = new OpenApiStats();
@@ -33,7 +34,7 @@ public class OpenApiStatsTests
         stats.ParameterCount.Should().Be(1);
     }
 
-    [Test]
+    [TestMethod]
     public void Visit_Schema_Should_Increment_SchemaCount()
     {
         var stats = new OpenApiStats();
@@ -43,7 +44,7 @@ public class OpenApiStatsTests
         stats.SchemaCount.Should().Be(1);
     }
 
-    [Test]
+    [TestMethod]
     public void Visit_Headers_Should_Increment_HeaderCount()
     {
         var stats = new OpenApiStats();
@@ -58,7 +59,7 @@ public class OpenApiStatsTests
         stats.HeaderCount.Should().Be(2);
     }
 
-    [Test]
+    [TestMethod]
     public void Visit_PathItem_Should_Increment_PathItemCount()
     {
         var stats = new OpenApiStats();
@@ -68,7 +69,7 @@ public class OpenApiStatsTests
         stats.PathItemCount.Should().Be(1);
     }
 
-    [Test]
+    [TestMethod]
     public void Visit_RequestBody_Should_Increment_RequestBodyCount()
     {
         var stats = new OpenApiStats();
@@ -78,7 +79,7 @@ public class OpenApiStatsTests
         stats.RequestBodyCount.Should().Be(1);
     }
 
-    [Test]
+    [TestMethod]
     public void Visit_Response_Should_Increment_ResponseCount()
     {
         var stats = new OpenApiStats();
@@ -94,7 +95,7 @@ public class OpenApiStatsTests
         stats.ResponseCount.Should().Be(3);
     }
 
-    [Test]
+    [TestMethod]
     public void Visit_Operation_Should_Increment_OperationCount()
     {
         var stats = new OpenApiStats();
@@ -105,7 +106,7 @@ public class OpenApiStatsTests
         stats.OperationCount.Should().Be(1);
     }
 
-    [Test]
+    [TestMethod]
     public void Visit_Link_Should_Increment_LinkCount()
     {
         var stats = new OpenApiStats();
@@ -115,7 +116,7 @@ public class OpenApiStatsTests
         stats.LinkCount.Should().Be(1);
     }
 
-    [Test]
+    [TestMethod]
     public void Visit_Callback_Should_Increment_CallbackCount()
     {
         var stats = new OpenApiStats();
@@ -125,7 +126,7 @@ public class OpenApiStatsTests
         stats.CallbackCount.Should().Be(1);
     }
 
-    [Test]
+    [TestMethod]
     public void ToString_Should_Return_Formatted_Statistics()
     {
         var stats = new OpenApiStats();
@@ -142,7 +143,7 @@ public class OpenApiStatsTests
         output.Should().Contain("Schemas: 1");
     }
 
-    [Test]
+    [TestMethod]
     public void Multiple_Visits_Should_Accumulate_Counts()
     {
         var stats = new OpenApiStats();

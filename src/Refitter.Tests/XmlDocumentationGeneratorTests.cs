@@ -8,6 +8,7 @@ using Refitter.Core;
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class XmlDocumentationGeneratorTests
 {
     private readonly XmlDocumentationGenerator generator = new(new RefitGeneratorSettings { GenerateXmlDocCodeComments = true });
@@ -19,7 +20,7 @@ public class XmlDocumentationGeneratorTests
         return generator.CreateOperationModel(operation);
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Interface_Doc_Without_Linebreaks()
     {
         var docs = new StringBuilder();
@@ -28,7 +29,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Trim().Should().Be("/// <summary>Test</summary>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Interface_Doc_With_Linebreaks()
     {
         var docs = new StringBuilder();
@@ -39,7 +40,7 @@ public class XmlDocumentationGeneratorTests
             .And.Contain("Test");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Interface_Doc_From_Controller_Tag()
     {
         var docs = new StringBuilder();
@@ -51,7 +52,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Trim().Should().Be("/// <summary>TestControllerDescription</summary>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Handle_Null_Document_Tags()
     {
         var docs = new StringBuilder();
@@ -62,7 +63,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Trim().Should().Be("/// <summary>Operations for TestController.</summary>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Escape_Xml_Special_Characters_In_Interface_Doc()
     {
         var docs = new StringBuilder();
@@ -74,7 +75,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Trim().Should().Be("/// <summary>Test &lt;tag&gt; &amp; content</summary>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Escape_Xml_Special_Characters_In_Method_Summary()
     {
         var docs = new StringBuilder();
@@ -83,7 +84,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Trim().Should().StartWith("/// <summary>Test &lt;tag&gt; &amp; content</summary>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Summary()
     {
         var docs = new StringBuilder();
@@ -92,7 +93,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Trim().Should().StartWith("/// <summary>TestSummary</summary>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Remarks()
     {
         var docs = new StringBuilder();
@@ -101,7 +102,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <remarks>TestDescription</remarks>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Param()
     {
         var docs = new StringBuilder();
@@ -113,7 +114,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <param name=\"testParam\">TestParameter</param>");
     }
 
-    [Test]
+    [TestMethod]
     public void Documents_Keyword_Parameters_Without_Escape_Prefix()
     {
         var docs = new StringBuilder();
@@ -126,7 +127,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().NotContain("@class");
     }
 
-    [Test]
+    [TestMethod]
     public void Documents_Only_Emitted_Parameters()
     {
         var docs = new StringBuilder();
@@ -144,7 +145,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().NotContain("session");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_ApizrRequestOptions_Param()
     {
         var docs = new StringBuilder();
@@ -156,7 +157,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <param name=\"options\">The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.</param>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_DynamicQuerystring_Param()
     {
         var docs = new StringBuilder();
@@ -168,7 +169,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
     }
 
-    [Test]
+    [TestMethod]
     public void Documents_Dynamic_Querystring_Wrapper_Even_When_A_Folded_Parameter_Is_Named_QueryParams()
     {
         var docs = new StringBuilder();
@@ -180,7 +181,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
     }
 
-    [Test]
+    [TestMethod]
     public void Documents_Parameter_Named_QueryParams_Without_Dynamic_Querystring()
     {
         var docs = new StringBuilder();
@@ -192,7 +193,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <param name=\"queryParams\">Real parameter</param>");
     }
 
-    [Test]
+    [TestMethod]
     public void Documents_Renamed_Parameter_With_Description_Of_Its_Alias()
     {
         var docs = new StringBuilder();
@@ -209,7 +210,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <param name=\"cancellationToken\">The cancellation token to cancel the request.</param>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_CancellationToken_Param()
     {
         var docs = new StringBuilder();
@@ -221,7 +222,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <param name=\"cancellationToken\">The cancellation token to cancel the request.</param>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Returns()
     {
         var docs = new StringBuilder();
@@ -241,7 +242,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <returns>TestResponse</returns>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Returns_With_Empty_Result()
     {
         var docs = new StringBuilder();
@@ -258,7 +259,7 @@ public class XmlDocumentationGeneratorTests
             .And.Contain("Task");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Returns_Without_Result()
     {
         var docs = new StringBuilder();
@@ -268,7 +269,7 @@ public class XmlDocumentationGeneratorTests
             .And.Contain("Task");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Throws()
     {
         var docs = new StringBuilder();
@@ -277,7 +278,7 @@ public class XmlDocumentationGeneratorTests
         docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Throws_With_Response_Code()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -295,7 +296,7 @@ public class XmlDocumentationGeneratorTests
             .And.Contain("<term>400</term>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Throws_With_Readable_Unicode_Status_Code_Comments()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -317,7 +318,7 @@ public class XmlDocumentationGeneratorTests
             .And.NotContain(@"\u041e\u0448");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Throws_Without_Response_Code()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -335,7 +336,7 @@ public class XmlDocumentationGeneratorTests
             .And.NotContain("<term>400</term>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_With_IApiResponse()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -354,7 +355,7 @@ public class XmlDocumentationGeneratorTests
             .And.Contain("<term>400</term>");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Method_Returns_With_Readable_Unicode_Description()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -390,7 +391,7 @@ public class XmlDocumentationGeneratorTests
             .And.NotContain(@"\u041e\u0448");
     }
 
-    [Test]
+    [TestMethod]
     public void XmlDocumentationGenerator_AppendInterfaceDocumentationByTag_Returns_Early_When_Disabled()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -407,7 +408,7 @@ public class XmlDocumentationGeneratorTests
         code.ToString().Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void XmlDocumentationGenerator_AppendInterfaceDocumentationByEndpoint_Returns_Early_When_Disabled()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings
@@ -423,7 +424,7 @@ public class XmlDocumentationGeneratorTests
         code.ToString().Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void XmlDocumentationGenerator_AppendMethodDocumentation_Returns_Early_When_Disabled()
     {
         var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings

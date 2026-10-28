@@ -1,16 +1,16 @@
 using AwesomeAssertions;
 using Refit;
 using Refitter.Tests.AdditionalFiles.ByEndpoint;
-using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
 
 
+[TestClass]
 public class MultipleInterfaceGeneratorTests
 {
     private const string ExpectedNamespace = "Refitter.Tests.AdditionalFiles.ByEndpoint";
 
-    [Test]
+    [TestMethod]
     public void Should_Generate_All_Interfaces()
     {
         typeof(IAddPetEndpoint).Namespace.Should().Be(ExpectedNamespace);
@@ -34,7 +34,7 @@ public class MultipleInterfaceGeneratorTests
         typeof(ICreateUsersWithListInputEndpoint).Namespace.Should().Be(ExpectedNamespace);
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Resolve_All_Refit_Interfaces()
     {
         VerifyHasRefitAttributes(typeof(IAddPetEndpoint));

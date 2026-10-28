@@ -5,9 +5,10 @@ using Refitter.Core.Validation;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class OpenApiValidationExceptionTests
 {
-    [Test]
+    [TestMethod]
     public void Should_Have_Correct_Message()
     {
         var diagnostic = new OpenApiDiagnostic();
@@ -19,7 +20,7 @@ public class OpenApiValidationExceptionTests
         exception.Message.Should().Be("OpenAPI validation failed");
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Expose_ValidationResult_Property()
     {
         var diagnostic = new OpenApiDiagnostic();
@@ -31,7 +32,7 @@ public class OpenApiValidationExceptionTests
         exception.ValidationResult.Should().Be(validationResult);
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Be_Throwable()
     {
         var diagnostic = new OpenApiDiagnostic();
@@ -44,7 +45,7 @@ public class OpenApiValidationExceptionTests
             .Which.ValidationResult.Should().Be(validationResult);
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Inherit_From_Exception()
     {
         var diagnostic = new OpenApiDiagnostic();

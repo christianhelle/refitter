@@ -55,7 +55,7 @@ jobs:
           -p:Version="${{ env.VERSION }}"
       shell: pwsh
     - name: 🧪 Unit tests (fast gate)
-      run: dotnet test --solution src/Refitter.slnx -c Release --no-build --treenode-filter "/*/*/*/*[Category!=Integration]"
+      run: dotnet test --solution src/Refitter.slnx -c Release --no-build --filter "TestCategory!=Integration"
     - name: 🧪 Full test suite
       if: ${{ success() }}
       run: dotnet test --solution src/Refitter.slnx -c Release --no-build

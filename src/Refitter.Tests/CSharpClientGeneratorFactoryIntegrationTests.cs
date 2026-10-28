@@ -3,14 +3,14 @@ using NJsonSchema;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class CSharpClientGeneratorFactoryIntegrationTests
 {
-    [Test]
+    [TestMethod]
     public async Task Create_AppliesMutatorsInOrder_BeforeBuildingGenerator()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -65,7 +65,7 @@ public class CSharpClientGeneratorFactoryIntegrationTests
         generator.Settings.CSharpGeneratorSettings.Namespace.Should().Be("TestNamespace");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithExplicitMutators_AppliesAllMutations()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -111,7 +111,7 @@ public class CSharpClientGeneratorFactoryIntegrationTests
         props["integerNoFormat"].ActualSchema.Format.Should().Be("int64");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithDefaultMutators_UsesStandardMutationOrder()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -152,7 +152,7 @@ public class CSharpClientGeneratorFactoryIntegrationTests
             .Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithCodeGeneratorSettings_AppliesExplictPropertyCopies()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -185,7 +185,7 @@ public class CSharpClientGeneratorFactoryIntegrationTests
             .Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_WithoutCodeGeneratorSettings_DoesNotThrow()
     {
         var document = await OpenApiDocument.FromJsonAsync("""

@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class TrimUnusedSchemaAliasRegressionTests
 {
     private const string AliasSafeTrimOpenApiSpec = """
@@ -187,15 +187,15 @@ public class TrimUnusedSchemaAliasRegressionTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_When_TrimUnusedSchema_Uses_Aliased_Component_Schemas()
     {
         string generatedCode = await GenerateCode(AliasSafeTrimOpenApiSpec);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task TrimUnusedSchema_With_Aliased_Component_Schemas_Can_Build()
     {
         string generatedCode = await GenerateCode(AliasSafeTrimOpenApiSpec);
@@ -203,8 +203,8 @@ public class TrimUnusedSchemaAliasRegressionTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Combined_Alias_Trim_And_Digit_Prefixed_Property_Regression_Can_Build()
     {
         string generatedCode = await GenerateCode(CombinedOpenApiSpec);
@@ -214,8 +214,8 @@ public class TrimUnusedSchemaAliasRegressionTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Combined_Regression_Can_Generate_From_Settings_File_Content()
     {
         string generatedCode = await GenerateCodeFromSettingsFileContent(CombinedOpenApiSpec);

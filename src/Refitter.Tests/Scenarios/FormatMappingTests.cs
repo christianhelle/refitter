@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// String, integer and number formats in parameters and properties, including unknown formats.
 /// </summary>
+[TestClass]
 public class FormatMappingTests
 {
     private const string OpenApiSpec = """
@@ -51,14 +51,14 @@ public class FormatMappingTests
                 intUnknownFmt: { type: integer, format: weird }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Maps_Formats_To_CSharp_Types()
     {
         var generatedCode = await GenerateCode();
@@ -70,16 +70,16 @@ public class FormatMappingTests
         generatedCode.Should().Contain("[Query] long? i64");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Optional_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.OptionalParameters = true);

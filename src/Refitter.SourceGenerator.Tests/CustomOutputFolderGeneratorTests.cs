@@ -1,21 +1,21 @@
 using AwesomeAssertions;
 using Refit;
 using Refitter.Tests.CustomGenerated;
-using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
 
 
+[TestClass]
 public class CustomOutputFolderGeneratorTests
 {
-    [Test]
+    [TestMethod]
     public void Should_Generate_Interface_Type() =>
         typeof(IApiInCustomGeneratedFolder)
             .Namespace
             .Should()
             .Be("Refitter.Tests.CustomGenerated");
 
-    [Test]
+    [TestMethod]
     public void Can_Resolve_Refit_Interface()
     {
         var hasRefitAttributes = typeof(IApiInCustomGeneratedFolder)

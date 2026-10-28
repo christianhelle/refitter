@@ -6,6 +6,7 @@ using Refitter.Tests.TestUtilities;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class ApizrWithCancellationTokensTests
 {
     private const string OpenApiSpec = @"
@@ -53,14 +54,14 @@ paths:
           description: 'successful operation'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -70,21 +71,21 @@ paths:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_RequestOptions()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[RequestOptions] IApizrRequestOptions options");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_CancellationToken_When_Apizr_Used()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotContain("CancellationToken cancellationToken");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_Apizr_Request_Options_Pattern()
     {
         string generatedCode = await GenerateCode();

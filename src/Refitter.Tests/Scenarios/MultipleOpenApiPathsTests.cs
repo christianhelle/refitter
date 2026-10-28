@@ -1,11 +1,11 @@
 using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class MultipleOpenApiPathsTests
 {
     private const string PetstoreV1Spec = @"openapi: '3.0.0'
@@ -72,7 +72,7 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_From_Multiple_Paths()
     {
         var (file1, file2) = await CreateTestSpecFiles();
@@ -90,7 +90,7 @@ components:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_From_Multiple_Paths()
     {
         var (file1, file2) = await CreateTestSpecFiles();
@@ -104,7 +104,7 @@ components:
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Operations_From_Both_Specs()
     {
         var (file1, file2) = await CreateTestSpecFiles();
@@ -120,7 +120,7 @@ components:
         generatedCode.Should().Contain("ListPetsV2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Schemas_From_Both_Specs()
     {
         var (file1, file2) = await CreateTestSpecFiles();
@@ -136,7 +136,7 @@ components:
         generatedCode.Should().Contain("PetV2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Single_Path_In_OpenApiPaths_Works_Same_As_OpenApiPath()
     {
         var (file1, _) = await CreateTestSpecFiles();
@@ -155,7 +155,7 @@ components:
         codeSingle.Should().Contain("ListPetsV1");
     }
 
-    [Test]
+    [TestMethod]
     public async Task OpenApiDocumentFactory_Merges_Multiple_Documents()
     {
         var (file1, file2) = await CreateTestSpecFiles();
@@ -167,7 +167,7 @@ components:
         merged.Paths.Should().ContainKey("/v2/pets");
     }
 
-    [Test]
+    [TestMethod]
     public async Task OpenApiDocumentFactory_Merge_Keeps_Base_Document_Info()
     {
         var (file1, file2) = await CreateTestSpecFiles();
@@ -177,7 +177,7 @@ components:
         merged.Info.Title.Should().Be("Petstore V1");
     }
 
-    [Test]
+    [TestMethod]
     public async Task OpenApiDocumentFactory_Merge_Throws_For_Duplicate_Paths()
     {
         var (file1, _) = await CreateTestSpecFiles();
@@ -188,7 +188,7 @@ components:
             .WithMessage("*duplicate path '/pets'*");
     }
 
-    [Test]
+    [TestMethod]
     public async Task OpenApiDocumentFactory_Merges_Schemas_From_All_Documents()
     {
         var (file1, file2) = await CreateTestSpecFiles();
@@ -199,7 +199,7 @@ components:
         merged.Components.Schemas.Should().ContainKey("PetV2");
     }
 
-    [Test]
+    [TestMethod]
     public async Task OpenApiDocumentFactory_Throws_For_Empty_Paths()
     {
         var act = async () => await OpenApiDocumentFactory.CreateAsync(Array.Empty<string>());

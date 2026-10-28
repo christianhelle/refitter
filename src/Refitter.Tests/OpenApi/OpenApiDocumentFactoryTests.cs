@@ -6,11 +6,12 @@ using Refitter.Tests.TestUtilities;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class OpenApiDocumentFactoryTests
 {
-    [Test]
-    [Arguments("https://developers.intellihr.io/docs/v1/swagger.json")] // GZIP encoded
-    [Arguments("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
+    [TestMethod]
+    [DataRow("https://developers.intellihr.io/docs/v1/swagger.json")] // GZIP encoded
+    [DataRow("http://raw.githubusercontent.com/christianhelle/refitter/main/test/OpenAPI/v3.0/petstore.json")]
     public async Task Create_From_Uri_Returns_NotNull(string url)
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = url };
@@ -19,7 +20,7 @@ public class OpenApiDocumentFactoryTests
             .NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Remote_Json_Uses_Remote_Branch()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
@@ -32,7 +33,7 @@ public class OpenApiDocumentFactoryTests
         document.Info.Title.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Remote_Json_Throws_When_Download_Fails()
     {
         var act = () => OpenApiDocumentFactory.CreateAsync("http://127.0.0.1:1/openapi.json");
@@ -41,7 +42,7 @@ public class OpenApiDocumentFactoryTests
             .WithMessage("*Failed to download OpenAPI document*");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Multiple_Paths_With_Remote_Entry_Merges_Successfully()
     {
         var remoteSpec = @"{
@@ -93,7 +94,7 @@ public class OpenApiDocumentFactoryTests
         document.Paths.Should().ContainKey("/remote");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Multiple_Paths_Throws_When_Remote_Download_Fails()
     {
         var localSpec = @"{
@@ -123,7 +124,7 @@ public class OpenApiDocumentFactoryTests
             .WithMessage("*Failed to download OpenAPI document*");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_With_CancellationToken_Overload_Delegates_To_Main_Overload()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
@@ -134,7 +135,7 @@ public class OpenApiDocumentFactoryTests
         document.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Single_Item_Path_Collection_Delegates_To_Single_Path()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
@@ -145,11 +146,11 @@ public class OpenApiDocumentFactoryTests
         document.Should().NotBeNull();
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "SwaggerPetstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "SwaggerPetstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "SwaggerPetstore.yaml")]
     public async Task Create_From_File_Returns_NotNull(SampleOpenSpecifications version, string filename)
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
@@ -159,12 +160,12 @@ public class OpenApiDocumentFactoryTests
             .NotBeNull();
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "petstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YAML")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YML")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "petstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YAML")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.YML")]
     public async Task Create_From_File_Detects_Format_Correctly(SampleOpenSpecifications version, string filename)
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(EmbeddedResources.GetSwaggerPetstore(version), filename);
@@ -175,7 +176,7 @@ public class OpenApiDocumentFactoryTests
         document.Info.Title.Should().NotBeNullOrEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_File_With_External_References_Returns_NotNull()
     {
         var spec = @"{
@@ -210,7 +211,7 @@ public class OpenApiDocumentFactoryTests
         document.Info.Title.Should().Be("Test API");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Yaml_File_Without_Extension_Returns_NotNull()
     {
         var spec = @"openapi: 3.0.0
@@ -234,16 +235,16 @@ paths:
         document.Info.Title.Should().Be("Test API");
     }
 
-    [Test]
-    [Arguments("https://petstore.swagger.io/v2/swagger.json")]
-    [Arguments("http://petstore.swagger.io/v2/swagger.json")]
+    [TestMethod]
+    [DataRow("https://petstore.swagger.io/v2/swagger.json")]
+    [DataRow("http://petstore.swagger.io/v2/swagger.json")]
     public async Task Create_From_Http_Url_Returns_NotNull(string url)
     {
         var document = await OpenApiDocumentFactory.CreateAsync(url);
         document.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_Handles_Missing_Info_Fields()
     {
         var spec = @"{
@@ -266,29 +267,29 @@ paths:
         document.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task IsHttp_Detects_Http_Protocol()
     {
         var document = await OpenApiDocumentFactory.CreateAsync("http://petstore.swagger.io/v2/swagger.json");
         document.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task IsHttp_Detects_Https_Protocol()
     {
         var document = await OpenApiDocumentFactory.CreateAsync("https://petstore.swagger.io/v2/swagger.json");
         document.Should().NotBeNull();
     }
 
-    [Test]
-    [Arguments("https://petstore.swagger.io/v2/swagger.yaml")]
+    [TestMethod]
+    [DataRow("https://petstore.swagger.io/v2/swagger.yaml")]
     public async Task Create_From_Yaml_Url_Returns_NotNull(string url)
     {
         var document = await OpenApiDocumentFactory.CreateAsync(url);
         document.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Invalid_File_Falls_Back_To_NSwag()
     {
         var spec = @"{
@@ -316,7 +317,7 @@ paths:
         document.Info.Title.Should().Be("Fallback Test");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Json_File_Without_External_References_Uses_NSwag()
     {
         var spec = @"{
@@ -358,7 +359,7 @@ paths:
         document.Info.Title.Should().Be("Direct NSwag Test");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Yaml_File_Without_External_References_Uses_NSwag()
     {
         var spec = @"openapi: 3.0.0
@@ -389,7 +390,7 @@ paths:
         document.Info.Title.Should().Be("YAML NSwag Test");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_OpenApi_34_File_With_External_References_Returns_NotNull()
     {
         var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
@@ -448,7 +449,7 @@ paths:
         document.Info.Title.Should().Be("External Ref API 3.4");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Json_File_With_External_References_Serializes_As_Json()
     {
         // Create a test folder for both files
@@ -507,7 +508,7 @@ paths:
         document.Info.Title.Should().Be("External Ref Test");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Yaml_File_With_External_References_Serializes_As_Yaml()
     {
         // Create a test folder for both files
@@ -552,7 +553,7 @@ paths:
         document.Info.Title.Should().Be("YAML External Ref Test");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_Populates_Missing_Info_When_Null()
     {
         // Create a test folder for both files
@@ -610,7 +611,7 @@ paths:
         // Note: This test verifies the code doesn't crash, actual behavior depends on OpenAPI reader implementation
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_Uses_Bot_Spec_With_Real_External_References()
     {
         // Use the actual bot.paths.yaml and bot.components.yaml from test resources
@@ -625,7 +626,7 @@ paths:
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Json_With_External_Reference_Resolves_Successfully()
     {
         // Test that external references are handled properly (covers lines 27-42)
@@ -703,7 +704,7 @@ paths:
         document.Paths.Should().ContainKey("/users/{id}");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Create_From_Yaml_With_External_Reference_Resolves_Successfully()
     {
         // Test that external references are handled properly (covers lines 27-42)
@@ -764,7 +765,7 @@ paths:
         document.Paths.Should().ContainKey("/users/{id}");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Clamps_Numeric_Bounds_Outside_Decimal_Range_From_Http()
     {
         await using var server = new LocalHttpServer(LargeNumericBoundsSpecs.Json);

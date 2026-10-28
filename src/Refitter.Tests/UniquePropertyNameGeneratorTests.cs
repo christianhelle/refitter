@@ -4,9 +4,10 @@ using Refitter.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class UniquePropertyNameGeneratorTests
 {
-    [Test]
+    [TestMethod]
     public void Suffixes_Properties_That_Normalize_To_The_Same_Name()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "user_name", "userName", "UserName", "email");
@@ -16,7 +17,7 @@ public class UniquePropertyNameGeneratorTests
         names.Should().Equal("UserName", "UserName2", "UserName3", "Email");
     }
 
-    [Test]
+    [TestMethod]
     public void Avoids_The_Enclosing_Type_Name()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "order", "id");
@@ -26,7 +27,7 @@ public class UniquePropertyNameGeneratorTests
         names.Should().Equal("Order2", "Id");
     }
 
-    [Test]
+    [TestMethod]
     public void Avoids_The_Generated_Additional_Properties_Member()
     {
         var schema = CreateSchema(allowAdditionalProperties: true, "AdditionalProperties");
@@ -36,7 +37,7 @@ public class UniquePropertyNameGeneratorTests
         names.Should().Equal("AdditionalProperties2");
     }
 
-    [Test]
+    [TestMethod]
     public void Allows_Additional_Properties_Name_When_No_Dictionary_Is_Generated()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "AdditionalProperties");
@@ -46,7 +47,7 @@ public class UniquePropertyNameGeneratorTests
         names.Should().Equal("AdditionalProperties");
     }
 
-    [Test]
+    [TestMethod]
     public void Reserves_Additional_Properties_For_Typed_Additional_Properties()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "AdditionalProperties");
@@ -57,7 +58,7 @@ public class UniquePropertyNameGeneratorTests
         names.Should().Equal("AdditionalProperties2");
     }
 
-    [Test]
+    [TestMethod]
     public void Ignores_Inheritance_Discriminator_Properties_That_Are_Not_Emitted()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "$type", "type");
@@ -68,7 +69,7 @@ public class UniquePropertyNameGeneratorTests
         names.Should().Equal("Type", "Type");
     }
 
-    [Test]
+    [TestMethod]
     public void Delegates_To_Inner_Generator_For_Properties_Without_Parent()
     {
         var property = new JsonSchemaProperty();
@@ -78,7 +79,7 @@ public class UniquePropertyNameGeneratorTests
         name.Should().Be("_");
     }
 
-    [Test]
+    [TestMethod]
     public void Returns_The_Same_Names_When_Generated_Again()
     {
         var schema = CreateSchema(allowAdditionalProperties: false, "a", "A");

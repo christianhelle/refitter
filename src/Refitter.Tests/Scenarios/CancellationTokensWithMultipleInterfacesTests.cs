@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class CancellationTokensWithMultipleInterfacesTests
 {
     private const string OpenApiSpec = @"
@@ -63,14 +63,14 @@ paths:
           description: 'successful operation'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -80,14 +80,14 @@ paths:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_CancellationToken()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("CancellationToken cancellationToken = default");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Multiple_Interfaces()
     {
         string generatedCode = await GenerateCode();

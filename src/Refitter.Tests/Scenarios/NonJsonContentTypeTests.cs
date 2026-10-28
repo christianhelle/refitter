@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// text/plain, text/csv, image/png and vendor JSON content types.
 /// </summary>
+[TestClass]
 public class NonJsonContentTypeTests
 {
     private const string OpenApiSpec = """
@@ -49,14 +49,14 @@ public class NonJsonContentTypeTests
             V: { type: object, properties: { a: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Methods_For_Non_Json_Content()
     {
         var generatedCode = await GenerateCode();
@@ -66,8 +66,8 @@ public class NonJsonContentTypeTests
         generatedCode.Should().Contain("Task<V> GetVendor();");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

@@ -4,11 +4,12 @@ using Refitter.Core;
 namespace Refitter.Tests.DependencyInjection;
 
 
+[TestClass]
 public class DependencyInjectionGeneratorBranchTests
 {
-    [Test]
-    [Arguments("\n")]
-    [Arguments("\r\n")]
+    [TestMethod]
+    [DataRow("\n")]
+    [DataRow("\r\n")]
     public void Can_Generate_With_BaseUrl_And_XmlDocComments(string newLine)
     {
         var settings = new RefitGeneratorSettings
@@ -45,9 +46,9 @@ public class DependencyInjectionGeneratorBranchTests
         code.ContainExpectedDependencyInjectionLineEndings(newLine);
     }
 
-    [Test]
-    [Arguments("\n")]
-    [Arguments("\r\n")]
+    [TestMethod]
+    [DataRow("\n")]
+    [DataRow("\r\n")]
     public void Can_Generate_Without_BaseUrl_And_With_XmlDocComments(string newLine)
     {
         var settings = new RefitGeneratorSettings
@@ -89,9 +90,9 @@ public class DependencyInjectionGeneratorBranchTests
         code.ContainExpectedDependencyInjectionLineEndings(newLine);
     }
 
-    [Test]
-    [Arguments("\n")]
-    [Arguments("\r\n")]
+    [TestMethod]
+    [DataRow("\n")]
+    [DataRow("\r\n")]
     public void NormalizeLineEndings_Uses_Requested_Newline(string newLine)
     {
         const string input = "first line\r\nsecond line\nthird line\rfourth line";
@@ -102,7 +103,7 @@ public class DependencyInjectionGeneratorBranchTests
         normalized.ContainExpectedDependencyInjectionLineEndings(newLine);
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_With_Empty_HttpMessageHandlers()
     {
         var settings = new RefitGeneratorSettings
@@ -123,7 +124,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().Contain("AddRefitClient<IPetApi>(settings)");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Polly_With_Empty_HttpMessageHandlers()
     {
         var settings = new RefitGeneratorSettings
@@ -148,7 +149,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().Contain("Backoff.DecorrelatedJitterBackoffV2");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_HttpResilience_With_Empty_HttpMessageHandlers()
     {
         var settings = new RefitGeneratorSettings
@@ -172,7 +173,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().Contain("AddStandardResilienceHandler");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_TransientErrorHandler_None_With_HttpMessageHandlers()
     {
         var settings = new RefitGeneratorSettings
@@ -201,7 +202,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().NotContain("AddStandardResilienceHandler");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Without_XmlDocComments()
     {
         var settings = new RefitGeneratorSettings
@@ -223,7 +224,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().NotContain("/// Extension methods for configuring Refit clients");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Polly_With_BaseUrl_And_XmlDocComments()
     {
         var settings = new RefitGeneratorSettings
@@ -253,7 +254,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().NotContain("/// <param name=\"baseUrl\">");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_HttpResilience_Without_BaseUrl_And_With_XmlDocComments()
     {
         var settings = new RefitGeneratorSettings
@@ -283,7 +284,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().Contain("AddStandardResilienceHandler");
     }
 
-    [Test]
+    [TestMethod]
     public void Does_Not_Generate_Windows_Authentication_By_Default()
     {
         var settings = new RefitGeneratorSettings
@@ -304,7 +305,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().NotContain("HttpClientHandler { UseDefaultCredentials = true }");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Generate_Windows_Authentication_For_TransientErrorHandler_None()
     {
         var settings = new RefitGeneratorSettings
@@ -326,7 +327,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().Contain(".ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseDefaultCredentials = true })");
     }
 
-    [Test]
+    [TestMethod]
     public void Uses_AddRefitClient_By_Default()
     {
         var settings = new RefitGeneratorSettings
@@ -347,7 +348,7 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().NotContain("AddRefitGeneratedClient");
     }
 
-    [Test]
+    [TestMethod]
     public void Uses_AddRefitGeneratedClient_When_UseGeneratedRefitClient_Is_Enabled()
     {
         var settings = new RefitGeneratorSettings
@@ -369,10 +370,10 @@ public class DependencyInjectionGeneratorBranchTests
         code.Should().NotContain("AddRefitClient<");
     }
 
-    [Test]
-    [Arguments(TransientErrorHandler.None)]
-    [Arguments(TransientErrorHandler.Polly)]
-    [Arguments(TransientErrorHandler.HttpResilience)]
+    [TestMethod]
+    [DataRow(TransientErrorHandler.None)]
+    [DataRow(TransientErrorHandler.Polly)]
+    [DataRow(TransientErrorHandler.HttpResilience)]
     public void UseGeneratedRefitClient_Keeps_Chained_Builder_Configuration(TransientErrorHandler transientErrorHandler)
     {
         var settings = new RefitGeneratorSettings

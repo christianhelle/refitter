@@ -3,14 +3,14 @@ using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.Resources;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class IllegalSymbolsTests
 {
-    [Test]
+    [TestMethod]
     public async Task Illegal_Symbols_In_Paths__Should_Build_Successfully()
     {
         var generatedCode = await GenerateCode(EmbeddedResources.SwaggerIllegalPathsJsonV3);
@@ -20,7 +20,7 @@ public class IllegalSymbolsTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Illegal_Symbols_In_Title__Should_Build_Successfully()
     {
         var generatedCode = await GenerateCode(EmbeddedResources.SwaggerIllegalSymbolsInTitleJsonV3);

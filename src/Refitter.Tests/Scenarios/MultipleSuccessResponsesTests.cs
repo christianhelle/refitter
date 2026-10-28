@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class MultipleSuccessResponsesTests
 {
     private const string OpenApiSpec = @"
@@ -58,21 +58,21 @@ components:
               type: 'string'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Has_No_Duplicate_Accept_Headers()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotContain("[Headers(\"Accept: application/json, application/json\")]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

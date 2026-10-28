@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class CaseSensitiveParametersTests
 {
     private const string OpenApiSpec = @"
@@ -42,24 +42,24 @@ paths:
           description: 'successful operation'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
-    [Arguments("Id")]
-    [Arguments("Title")]
-    [Arguments("Description")]
+    [TestMethod]
+    [DataRow("Id")]
+    [DataRow("Title")]
+    [DataRow("Description")]
     public async Task Generates_AliasAs_For_Parameters(string parameterName)
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain($"AliasAs(\"{parameterName}\")");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

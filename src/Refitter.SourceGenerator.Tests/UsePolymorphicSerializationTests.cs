@@ -1,21 +1,21 @@
 using System.Text.Json.Serialization;
 using AwesomeAssertions;
 using Refitter.Tests.UsePolymorphicSerialization;
-using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
 
 
+[TestClass]
 public class UsePolymorphicSerializationTests
 {
-    [Test]
+    [TestMethod]
     public void Should_Generate_JsonPolymorphicAttribute_Usage() =>
         typeof(SomeComponent)
             .GetCustomAttributes(typeof(JsonPolymorphicAttribute), false)
             .Should()
             .HaveCount(1);
 
-    [Test]
+    [TestMethod]
     public void Should_Generate_JsonDerivedTypeAttribute_Usage() =>
         typeof(SomeComponent)
             .GetCustomAttributes(typeof(JsonDerivedTypeAttribute), false)

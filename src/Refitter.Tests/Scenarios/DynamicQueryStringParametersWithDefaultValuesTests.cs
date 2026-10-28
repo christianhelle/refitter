@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class DynamicQueryStringParametersWithDefaultValuesTests
 {
     private const string OpenApiSpec =
@@ -90,14 +90,14 @@ public class DynamicQueryStringParametersWithDefaultValuesTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Should_Have_Optional_Parameters_With_Default_Values()
     {
         string generatedCode = await GenerateCode();
@@ -106,7 +106,7 @@ public class DynamicQueryStringParametersWithDefaultValuesTests
         generatedCode.Should().Contain("string? Filter { get; set; } = \"active\"");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Should_Have_Required_Parameters_Without_Defaults()
     {
         string generatedCode = await GenerateCode();
@@ -116,8 +116,8 @@ public class DynamicQueryStringParametersWithDefaultValuesTests
         generatedCode.Should().NotContain("System.DateTimeOffset  End { get; set; } =");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

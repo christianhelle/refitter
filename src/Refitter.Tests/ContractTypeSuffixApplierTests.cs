@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class ContractTypeSuffixApplierTests
 {
-    [Test]
+    [TestMethod]
     public void ContractTypeSuffixApplier_Returns_Original_Code_When_Suffix_Is_Null()
     {
         const string code = @"
@@ -31,7 +32,7 @@ namespace TestNamespace
         result.Should().Be(code);
     }
 
-    [Test]
+    [TestMethod]
     public void ContractTypeSuffixApplier_Returns_Original_Code_When_Suffix_Is_Empty()
     {
         const string code = @"
@@ -56,7 +57,7 @@ namespace TestNamespace
         result.Should().Be(code);
     }
 
-    [Test]
+    [TestMethod]
     public void ContractTypeSuffixApplier_Returns_Original_Code_When_Suffix_Is_Whitespace()
     {
         const string code = @"
@@ -81,7 +82,7 @@ namespace TestNamespace
         result.Should().Be(code);
     }
 
-    [Test]
+    [TestMethod]
     public void ContractTypeSuffixApplier_Applies_Suffix_When_Valid()
     {
         const string code = @"
@@ -109,7 +110,7 @@ namespace TestNamespace
         result.Should().NotContain($"public enum PetStatus{Environment.NewLine}");
     }
 
-    [Test]
+    [TestMethod]
     public void ContractTypeSuffixApplier_Applies_Suffix_To_Record_And_Struct_Declarations()
     {
         const string code = """
@@ -137,7 +138,7 @@ namespace TestNamespace
         result.Should().Contain("public PetStructDto Struct");
     }
 
-    [Test]
+    [TestMethod]
     public void ContractTypeSuffixApplier_Renames_Generic_Type_References()
     {
         const string code = @"
@@ -166,7 +167,7 @@ namespace TestNamespace
         result.Should().Contain("ICollection<T> Items");
     }
 
-    [Test]
+    [TestMethod]
     public void ContractTypeSuffixApplier_Does_Not_Rename_Generic_Framework_Type_Sharing_Contract_Name()
     {
         const string code = @"
@@ -189,7 +190,7 @@ namespace TestNamespace
         result.Should().Contain("Task<System.Collections.Generic.ICollection<TaskDto>> GetTasks()");
     }
 
-    [Test]
+    [TestMethod]
     public void ContractTypeSuffixApplier_Does_Not_Rename_System_Qualified_Type_Sharing_Contract_Name()
     {
         const string code = @"

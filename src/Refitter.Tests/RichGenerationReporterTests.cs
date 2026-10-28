@@ -12,30 +12,31 @@ namespace Refitter.Tests;
 /// A clean run (no exception) is the success criterion.
 /// </summary>
 
+[TestClass]
 public class RichGenerationReporterTests
 {
-    [Test]
+    [TestMethod]
     public void ReportHeader_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportHeader("1.2.3");
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSupportKey_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportSupportKey("TEST-KEY-123");
         act.Should().NotThrow();
     }
 
-    [Test]
-    [NotInParallel("SpectreConsole")]
+    [TestMethod]
+    [DoNotParallelize]
     public async Task ReportSingleFileGenerationProgressAsync_Does_Not_Throw()
     {
         await new RichGenerationReporter().ReportSingleFileGenerationProgressAsync();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSingleFileOutput_Does_Not_Throw()
     {
         var act = () =>
@@ -43,8 +44,8 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
-    [NotInParallel("SpectreConsole")]
+    [TestMethod]
+    [DoNotParallelize]
     public async Task GenerateMultipleFilesWithProgressAsync_Invokes_Generator()
     {
         var called = false;
@@ -59,7 +60,7 @@ public class RichGenerationReporterTests
         result.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void BeginMultiFileOutput_AddFile_And_Complete_Do_Not_Throw()
     {
         var act = () =>
@@ -72,15 +73,15 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportFileWritten_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportFileWritten("/output/Api.cs");
         act.Should().NotThrow();
     }
 
-    [Test]
-    [NotInParallel("SpectreConsole")]
+    [TestMethod]
+    [DoNotParallelize]
     public async Task ValidateWithProgressAsync_Invokes_Validator()
     {
         var called = false;
@@ -95,14 +96,14 @@ public class RichGenerationReporterTests
         called.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationFailed_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportValidationFailed();
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationDiagnostic_Error_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportValidationDiagnostic(
@@ -111,7 +112,7 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationDiagnostic_Warning_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportValidationDiagnostic(
@@ -120,7 +121,7 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportValidationStatistics_Does_Not_Throw()
     {
         var result = new OpenApiValidationResult(
@@ -131,7 +132,7 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSuccess_SingleFile_Does_Not_Throw()
     {
         var act = () =>
@@ -139,7 +140,7 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSuccess_MultipleFiles_Does_Not_Throw()
     {
         var act = () =>
@@ -147,14 +148,14 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportDonationBanner_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportDonationBanner();
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportConfigurationWarnings_Does_Not_Throw()
     {
         var warnings = new List<Warning>
@@ -167,7 +168,7 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportAllPathsFilteredWarning_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter()
@@ -175,7 +176,7 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSettingsFileGenerated_Does_Not_Throw()
     {
         var act = () =>
@@ -183,7 +184,7 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSettingsFileGenerated_Handles_Path_Without_Directory()
     {
         var act = () =>
@@ -191,21 +192,21 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportGenerationFailed_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportGenerationFailed();
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportUnsupportedVersion_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportUnsupportedVersion("1.0");
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportExceptionDetails_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter()
@@ -213,14 +214,14 @@ public class RichGenerationReporterTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSkipValidationSuggestion_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportSkipValidationSuggestion();
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public void ReportSupportHelp_Does_Not_Throw()
     {
         var act = () => new RichGenerationReporter().ReportSupportHelp();
