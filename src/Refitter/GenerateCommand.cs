@@ -85,8 +85,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
         IGenerationReporter reporter = CreateReporter(settings, refitGeneratorSettings);
 
-        var orchestrator = new GenerationOrchestrator();
-        return await orchestrator.RunAsync(
+        return await GenerationOrchestrator.RunAsync(
             refitGeneratorSettings,
             settings,
             reporter,

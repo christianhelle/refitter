@@ -32,25 +32,17 @@ public static class RefitDocumentFilter
 
         foreach (var path in clonedPaths)
         {
-            if (path.Value == null)
-                continue;
-
             var methods = path.Value
                 .Where(pair => pair.Value != null)
                 .ToArray();
 
-            foreach (var method in methods)
+            foreach (var method in methods.Where(method => method.Value.Tags?.Exists(includeTags.Contains) != true))
             {
-                if (method.Value == null)
-                    continue;
-
-                var exclude = method.Value.Tags?.Exists(includeTags.Contains) != true;
-                if (exclude)
-                    path.Value.Remove(method.Key);
-
-                if (path.Value.Count == 0)
-                    result.Paths.Remove(path.Key);
+                path.Value.Remove(method.Key);
             }
+
+            if (methods.Length > 0 && path.Value.Count == 0)
+                result.Paths.Remove(path.Key);
         }
 
         return result;

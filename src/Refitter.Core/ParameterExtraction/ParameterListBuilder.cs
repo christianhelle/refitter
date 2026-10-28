@@ -10,10 +10,6 @@ namespace Refitter.Core;
 /// </summary>
 internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
 {
-    private readonly QueryParameterExtractor queryExtractor = new();
-    private readonly BodyParameterExtractor bodyExtractor = new();
-    private readonly HeaderParameterExtractor headerExtractor = new();
-
     public ParameterList Build(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
@@ -24,14 +20,14 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
 
         parameters.AddRange(RouteParameterExtractor.Extract(operationModel));
 
-        var (queryParameters, dynamicQuerystringCode) = queryExtractor.Extract(
+        var (queryParameters, dynamicQuerystringCode) = QueryParameterExtractor.Extract(
             operationModel,
             settings,
             dynamicQuerystringParameterType);
         parameters.AddRange(queryParameters);
 
-        parameters.AddRange(bodyExtractor.Extract(operationModel, settings));
-        parameters.AddRange(headerExtractor.Extract(operationModel, operation, settings));
+        parameters.AddRange(BodyParameterExtractor.Extract(operationModel, settings));
+        parameters.AddRange(HeaderParameterExtractor.Extract(operationModel, operation, settings));
         var (formParameters, formObjectCode) = FormParameterExtractor.Extract(
             operationModel,
             operation,

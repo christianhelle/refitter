@@ -58,9 +58,10 @@ internal sealed class UniquePropertyNameGenerator(
             }
 
             var uniqueName = candidate;
-            for (var suffix = 2; !usedNames.Add(uniqueName); suffix++)
+            var suffix = 2;
+            while (!usedNames.Add(uniqueName))
             {
-                uniqueName = candidate + suffix;
+                uniqueName = candidate + suffix++;
             }
 
             names[property] = uniqueName;

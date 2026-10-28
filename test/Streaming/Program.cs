@@ -1,7 +1,12 @@
 using Refit;
 using Test;
 
-var api = RestService.For<ILMStudiov1RESTAPI>("http://localhost:1234");
+// LM Studio listens on localhost:1234 by default; set LMSTUDIO_BASE_URL to point elsewhere
+string? configuredBaseUrl = Environment.GetEnvironmentVariable("LMSTUDIO_BASE_URL");
+string baseUrl = string.IsNullOrWhiteSpace(configuredBaseUrl)
+    ? new UriBuilder(Uri.UriSchemeHttp, "localhost", 1234).Uri.ToString()
+    : configuredBaseUrl;
+var api = RestService.For<ILMStudiov1RESTAPI>(baseUrl);
 var modelsResponse = await api.ListModels();
 
 foreach (var model in modelsResponse.Models)

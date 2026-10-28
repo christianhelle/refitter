@@ -25,55 +25,20 @@ internal class MethodAttributeGenerator(
 
         var headers = new List<string>();
 
-        if (settings.AddAcceptHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
+        var isOpenApi3 = document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3;
+        if (settings.AddAcceptHeaders && isOpenApi3)
         {
-            var uniqueContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var response in operation.Responses.Values)
-            {
-                // Responses declared as a $ref to a shared component carry no inline
-                // content, so resolve through ActualResponse the way the return type
-                // generator does - otherwise the Accept header is silently omitted.
-                foreach (var contentType in response.ActualResponse.Content.Keys)
-                {
-                    uniqueContentTypes.Add(contentType);
-                }
-            }
-
-            if (uniqueContentTypes.Any())
-            {
-                headers.Add($"\"Accept: {string.Join(", ", uniqueContentTypes.Select(ParameterNaming.EscapeString))}\"");
-            }
+            AddAcceptHeader(headers, operation);
         }
 
-        if (settings.AddContentTypeHeaders && document.SchemaType is >= NJsonSchema.SchemaType.OpenApi3)
+        if (settings.AddContentTypeHeaders && isOpenApi3)
         {
-            var uniqueContentTypes = operation.RequestBody?.Content.Keys ?? Array.Empty<string>();
-            var contentType =
-                uniqueContentTypes.FirstOrDefault(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase)) ??
-                uniqueContentTypes.FirstOrDefault();
-
-            if (!string.IsNullOrWhiteSpace(contentType) && !operationModel.Consumes.Contains("multipart/form-data"))
-            {
-                headers.Add($"\"Content-Type: {ParameterNaming.EscapeString(contentType)}\"");
-            }
+            AddContentTypeHeader(headers, operation, operationModel);
         }
 
         if (settings.AuthenticationHeaderStyle == AuthenticationHeaderStyle.Method)
         {
-            foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
-            {
-                if ((settings.SecurityScheme != null && securitySchemeName != settings.SecurityScheme) ||
-                    !document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
-                {
-                    continue;
-                }
-
-                if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: var scheme }
-                    && string.Equals(scheme, "bearer", StringComparison.OrdinalIgnoreCase))
-                {
-                    headers.Add("\"Authorization: Bearer\"");
-                }
-            }
+            AddAuthorizationHeaders(headers, operationModel);
         }
 
         if (headers.Any())
@@ -82,5 +47,59 @@ internal class MethodAttributeGenerator(
         }
 
         return attributes.ToArray();
+    }
+
+    private static void AddAcceptHeader(List<string> headers, OpenApiOperation operation)
+    {
+        var uniqueContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var response in operation.Responses.Values)
+        {
+            // Responses declared as a $ref to a shared component carry no inline
+            // content, so resolve through ActualResponse the way the return type
+            // generator does - otherwise the Accept header is silently omitted.
+            foreach (var contentType in response.ActualResponse.Content.Keys)
+            {
+                uniqueContentTypes.Add(contentType);
+            }
+        }
+
+        if (uniqueContentTypes.Any())
+        {
+            headers.Add($"\"Accept: {string.Join(", ", uniqueContentTypes.Select(ParameterNaming.EscapeString))}\"");
+        }
+    }
+
+    private static void AddContentTypeHeader(
+        List<string> headers,
+        OpenApiOperation operation,
+        CSharpOperationModel operationModel)
+    {
+        var uniqueContentTypes = operation.RequestBody?.Content.Keys ?? Array.Empty<string>();
+        var contentType =
+            uniqueContentTypes.FirstOrDefault(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase)) ??
+            uniqueContentTypes.FirstOrDefault();
+
+        if (!string.IsNullOrWhiteSpace(contentType) && !operationModel.Consumes.Contains("multipart/form-data"))
+        {
+            headers.Add($"\"Content-Type: {ParameterNaming.EscapeString(contentType)}\"");
+        }
+    }
+
+    private void AddAuthorizationHeaders(List<string> headers, CSharpOperationModel operationModel)
+    {
+        foreach (var securitySchemeName in operationModel.Security.SelectMany(x => x.Keys))
+        {
+            if ((settings.SecurityScheme != null && securitySchemeName != settings.SecurityScheme) ||
+                !document.SecurityDefinitions.TryGetValue(securitySchemeName, out var securityScheme))
+            {
+                continue;
+            }
+
+            if (securityScheme is { Type: OpenApiSecuritySchemeType.Http, Scheme: var scheme }
+                && string.Equals(scheme, "bearer", StringComparison.OrdinalIgnoreCase))
+            {
+                headers.Add("\"Authorization: Bearer\"");
+            }
+        }
     }
 }

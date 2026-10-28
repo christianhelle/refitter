@@ -17,6 +17,18 @@ public class XmlDocumentationGenerator
     private const string SummaryTag = "summary";
     private const string ParamKeyword = "param";
 
+    private static readonly Dictionary<char, char> SimpleEscapes = new()
+    {
+        ['"'] = '"',
+        ['\\'] = '\\',
+        ['/'] = '/',
+        ['b'] = '\b',
+        ['f'] = '\f',
+        ['n'] = '\n',
+        ['r'] = '\r',
+        ['t'] = '\t',
+    };
+
     /// <summary>
     /// Instantiates a new instance of the <see cref="XmlDocumentationGenerator"/> class.
     /// </summary>
@@ -40,7 +52,7 @@ public class XmlDocumentationGenerator
         var controllerTag = document.Tags?.FirstOrDefault(t => t.Name.SanitizeControllerTag() == tag);
         var controllerDescription = controllerTag?.Description;
         var fallbackSummary = $"Operations for {EscapeSymbols(tag)}.";
-        this.AppendInterfaceSummary(controllerDescription, fallbackSummary, code);
+        AppendInterfaceSummary(controllerDescription, fallbackSummary, code);
     }
 
     /// <summary>
@@ -58,7 +70,7 @@ public class XmlDocumentationGenerator
         var fallbackSummary = !string.IsNullOrWhiteSpace(operationId)
             ? $"Operations for {EscapeSymbols(operationId!)}."
             : "Operations for endpoint.";
-        this.AppendInterfaceSummary(summary, fallbackSummary, code);
+        AppendInterfaceSummary(summary, fallbackSummary, code);
     }
 
     /// <summary>
@@ -74,7 +86,7 @@ public class XmlDocumentationGenerator
         var title = document.Info?.Title;
         if (!string.IsNullOrEmpty(title))
         {
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title!), code, indent: Separator);
+            AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title!), code, indent: Separator);
         }
     }
 
@@ -102,14 +114,14 @@ public class XmlDocumentationGenerator
             return;
 
         if (!string.IsNullOrWhiteSpace(method.Summary))
-            this.AppendXmlCommentBlock(SummaryTag, EscapeSymbols(method.Summary), code);
+            AppendXmlCommentBlock(SummaryTag, EscapeSymbols(method.Summary), code);
 
         if (!string.IsNullOrWhiteSpace(method.Description))
-            this.AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
+            AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
 
         foreach (var (name, type, alias) in GetEmittedParameters(parameters))
         {
-            this.AppendXmlCommentBlock(
+            AppendXmlCommentBlock(
                 ParamKeyword,
                 GetParameterDescription(method, name, type, alias, dynamicQuerystringParameterType),
                 code,
@@ -121,7 +133,7 @@ public class XmlDocumentationGenerator
 
         if (hasApiResponse)
         {
-            this.AppendXmlCommentBlock("returns", this.BuildApiResponseDescription(method.Responses), code);
+            AppendXmlCommentBlock("returns", this.BuildApiResponseDescription(method.Responses), code);
         }
         else
         {
@@ -133,18 +145,18 @@ public class XmlDocumentationGenerator
                     ? "A <see cref=\"Task\"/> representing the result of the request."
                     : SanitizeResponseDescription(description);
 
-                this.AppendXmlCommentBlock("returns", description, code);
+                AppendXmlCommentBlock("returns", description, code);
             }
             else
             {
                 // Document the returned task even when there is no result.
-                this.AppendXmlCommentBlock(
+                AppendXmlCommentBlock(
                     "returns",
                     "A <see cref=\"Task\"/> that completes when the request is finished.",
                     code);
             }
 
-            this.AppendXmlCommentBlock(
+            AppendXmlCommentBlock(
                 "exception",
                 this.BuildErrorDescription(method.Responses),
                 code,
@@ -165,7 +177,7 @@ public class XmlDocumentationGenerator
     /// <param name="code">The builder to append the tag to.</param>
     /// <param name="attributes">An optional dictionary of attributes to add to the tag.</param>
     /// <param name="indent">The whitespace to add before new lines.</param>
-    private void AppendXmlCommentBlock(
+    private static void AppendXmlCommentBlock(
         string tagName,
         string content,
         StringBuilder code,
@@ -198,7 +210,7 @@ public class XmlDocumentationGenerator
         }
     }
 
-    private void AppendInterfaceSummary(string? preferredSummary, string fallbackSummary, StringBuilder code)
+    private static void AppendInterfaceSummary(string? preferredSummary, string fallbackSummary, StringBuilder code)
     {
         var summary = fallbackSummary;
         if (!string.IsNullOrWhiteSpace(preferredSummary))
@@ -206,7 +218,7 @@ public class XmlDocumentationGenerator
             summary = EscapeSymbols(preferredSummary!);
         }
 
-        this.AppendXmlCommentBlock(SummaryTag, summary, code, indent: Separator);
+        AppendXmlCommentBlock(SummaryTag, summary, code, indent: Separator);
     }
 
     /// <summary>
@@ -380,10 +392,7 @@ public class XmlDocumentationGenerator
             var current = input[index];
             if (current != '\\' || index == input.Length - 1)
             {
-                if (IsValidXmlChar(current))
-                {
-                    result.Append(current);
-                }
+                AppendIfValidXmlChar(result, current);
                 index++;
                 continue;
             }
@@ -393,62 +402,55 @@ public class XmlDocumentationGenerator
 
             if (escapedCharacter == 'u' && index + 4 <= input.Length)
             {
-                var hexValue = input.Substring(index, 4);
-                if (int.TryParse(
-                    hexValue,
-                    NumberStyles.HexNumber,
-                    CultureInfo.InvariantCulture,
-                    out var unicodeCodePoint))
-                {
-                    char decodedChar = (char)unicodeCodePoint;
-                    if (IsValidXmlChar(decodedChar))
-                    {
-                        result.Append(decodedChar);
-                    }
-                    index += 4;
-                    continue;
-                }
-                else
-                {
-                    // Malformed \uXXXX (non-hex characters): append the raw escape sequence and advance past it
-                    result.Append('\\');
-                    result.Append('u');
-                    result.Append(hexValue);
-                    index += 4;
-                    continue;
-                }
+                AppendUnicodeEscape(result, input.Substring(index, 4));
+                index += 4;
+                continue;
             }
 
-            char? decodedSimpleChar = escapedCharacter switch
-            {
-                '"' => '"',
-                '\\' => '\\',
-                '/' => '/',
-                'b' => '\b',
-                'f' => '\f',
-                'n' => '\n',
-                'r' => '\r',
-                't' => '\t',
-                _ => null
-            };
-
-            if (decodedSimpleChar.HasValue)
-            {
-                if (IsValidXmlChar(decodedSimpleChar.Value))
-                {
-                    result.Append(decodedSimpleChar.Value);
-                }
-            }
-            else
-            {
-                // Fallback for unknown escape sequences: keep as is (e.g. \z -> \z)
-                // But we must sanitize the backslash and the char
-                if (IsValidXmlChar('\\')) result.Append('\\');
-                if (IsValidXmlChar(escapedCharacter)) result.Append(escapedCharacter);
-            }
+            AppendSimpleEscape(result, escapedCharacter);
         }
 
         return result.ToString();
+    }
+
+    private static void AppendUnicodeEscape(StringBuilder result, string hexValue)
+    {
+        if (int.TryParse(
+            hexValue,
+            NumberStyles.HexNumber,
+            CultureInfo.InvariantCulture,
+            out var unicodeCodePoint))
+        {
+            AppendIfValidXmlChar(result, (char)unicodeCodePoint);
+            return;
+        }
+
+        // Malformed \uXXXX (non-hex characters): append the raw escape sequence
+        result.Append('\\');
+        result.Append('u');
+        result.Append(hexValue);
+    }
+
+    private static void AppendSimpleEscape(StringBuilder result, char escapedCharacter)
+    {
+        if (SimpleEscapes.TryGetValue(escapedCharacter, out var decodedSimpleChar))
+        {
+            AppendIfValidXmlChar(result, decodedSimpleChar);
+            return;
+        }
+
+        // Fallback for unknown escape sequences: keep as is (e.g. \z -> \z)
+        // But we must sanitize the escaped char
+        result.Append('\\');
+        AppendIfValidXmlChar(result, escapedCharacter);
+    }
+
+    private static void AppendIfValidXmlChar(StringBuilder result, char c)
+    {
+        if (IsValidXmlChar(c))
+        {
+            result.Append(c);
+        }
     }
 
     private static bool IsValidXmlChar(char c)

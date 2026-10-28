@@ -31,7 +31,7 @@ internal class CustomCSharpTypeResolver(
 
             // Only append ? if the type is a value type and nullable reference types are enabled
             // For reference types, only append ? if GenerateNullableReferenceTypes is true
-            if (isNullable && !mappedType.EndsWith("?"))
+            if (isNullable && !mappedType.EndsWith('?'))
             {
                 // Try to determine if this is a value type by checking for common patterns
                 var isKnownValueType = IsValueType(mappedType);

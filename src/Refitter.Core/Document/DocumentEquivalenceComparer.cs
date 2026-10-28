@@ -133,7 +133,7 @@ internal sealed class DocumentEquivalenceComparer
     /// </summary>
     /// <param name="json">The JSON object to process.</param>
     /// <returns>The modified JSON object with null properties removed.</returns>
-    public JObject RemoveNullProperties(JObject json)
+    public static JObject RemoveNullProperties(JObject json)
     {
         foreach (var property in json.Properties().Where(property => property.Value.Type == JTokenType.Null).ToArray())
         {
@@ -148,7 +148,7 @@ internal sealed class DocumentEquivalenceComparer
     /// </summary>
     /// <param name="value">The value to serialize to JSON.</param>
     /// <returns>A JSON string representation of the value.</returns>
-    public string CreateOpenApiJson(object value)
+    public static string CreateOpenApiJson(object value)
         => value switch
         {
             OpenApiDocument document => document.ToJson(),
@@ -163,7 +163,7 @@ internal sealed class DocumentEquivalenceComparer
     /// </summary>
     /// <param name="definitions">The dictionary to add schema definitions to.</param>
     /// <param name="schema">The root schema to process.</param>
-    public void AddReferencedSchemas(IDictionary<string, JsonSchema> definitions, JsonSchema schema)
+    public static void AddReferencedSchemas(IDictionary<string, JsonSchema> definitions, JsonSchema schema)
     {
         var visited = new HashSet<JsonSchema>(JsonSchemaReferenceComparer.Instance);
         var schemasToProcess = new Stack<JsonSchema>();
@@ -180,10 +180,9 @@ internal sealed class DocumentEquivalenceComparer
             if (definitionName != null && !definitions.ContainsKey(definitionName))
                 definitions.Add(definitionName, actualSchema);
 
-            foreach (var childSchema in EnumerateTraversableSchemas(actualSchema))
+            foreach (var childSchema in EnumerateTraversableSchemas(actualSchema).OfType<JsonSchema>())
             {
-                if (childSchema != null)
-                    schemasToProcess.Push(childSchema);
+                schemasToProcess.Push(childSchema);
             }
         }
     }
@@ -193,7 +192,7 @@ internal sealed class DocumentEquivalenceComparer
     /// </summary>
     /// <param name="schema">The schema to extract the definition name from.</param>
     /// <returns>The definition name if found; otherwise, null.</returns>
-    public string? GetDefinitionName(JsonSchema schema)
+    public static string? GetDefinitionName(JsonSchema schema)
     {
         var referencePath = ((NJsonSchema.References.IJsonReferenceBase)schema).ReferencePath;
         if (string.IsNullOrWhiteSpace(referencePath))
@@ -226,7 +225,7 @@ internal sealed class DocumentEquivalenceComparer
             json[propertyName] = new JArray(items);
     }
 
-    private OpenApiDocument CreateDocumentWithSchema(JsonSchema schema)
+    private static OpenApiDocument CreateDocumentWithSchema(JsonSchema schema)
     {
         var document = CreateSerializationDocument();
         document.Definitions["Schema"] = schema;

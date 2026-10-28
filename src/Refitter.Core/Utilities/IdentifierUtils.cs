@@ -239,6 +239,11 @@ internal static class IdentifierUtils
                 : EscapeReservedKeyword(originalValue);
         }
 
+        return EscapeReservedKeyword(ReplaceInvalidIdentifierCharacters(originalValue));
+    }
+
+    private static string ReplaceInvalidIdentifierCharacters(string originalValue)
+    {
         var builder = new StringBuilder(originalValue.Length);
         var previousCharacterWasUnderscore = false;
 
@@ -277,9 +282,7 @@ internal static class IdentifierUtils
             }
         }
 
-        var identifier = builder.Length == 0 ? "_" : builder.ToString();
-
-        return EscapeReservedKeyword(identifier);
+        return builder.Length == 0 ? "_" : builder.ToString();
     }
 
     /// <summary>

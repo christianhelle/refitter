@@ -358,14 +358,14 @@ public class RefitterGenerateTask : MSBuildTask
                 .Where(installed => !string.IsNullOrWhiteSpace(installed))
                 .ToArray();
 
-            foreach (var runtime in bundledRuntimes.Where(runtime => FileExists(runtime.Path)))
+            var runtime = bundledRuntimes.FirstOrDefault(candidate =>
+                FileExists(candidate.Path) &&
+                detectedRuntimes.Any(installed =>
+                    installed.StartsWith(candidate.RuntimePrefix, StringComparison.Ordinal)));
+            if (runtime is not null)
             {
-                if (detectedRuntimes.Any(installed =>
-                        installed.StartsWith(runtime.RuntimePrefix, StringComparison.Ordinal)))
-                {
-                    logCommandLine($"Detected {GetDisplayFramework(runtime.TargetFramework)} runtime. Using {GetDisplayFramework(runtime.TargetFramework)} version of Refitter.");
-                    return runtime.Path;
-                }
+                logCommandLine($"Detected {GetDisplayFramework(runtime.TargetFramework)} runtime. Using {GetDisplayFramework(runtime.TargetFramework)} version of Refitter.");
+                return runtime.Path;
             }
         }
 
@@ -411,6 +411,7 @@ public class RefitterGenerateTask : MSBuildTask
 
     private static string GetDisplayFramework(string targetFramework) => targetFramework.Replace("net", ".NET ");
 
+#pragma warning disable S2325 // False positive: Log is an instance property inherited from Task
     private void TryLogErrorFromException(Exception e)
     {
         try
@@ -446,6 +447,7 @@ public class RefitterGenerateTask : MSBuildTask
             Debug.WriteLine($"Failed to log error: {ex}");
         }
     }
+#pragma warning restore S2325
 
     internal static string[] FilterFiles(string[] files, string includePatterns, string projectFileDirectory)
     {

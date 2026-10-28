@@ -5,9 +5,9 @@ using Refitter.Core.Validation;
 
 namespace Refitter;
 
-public sealed class GenerationOrchestrator
+public static class GenerationOrchestrator
 {
-    public async Task<int> RunAsync(
+    public static async Task<int> RunAsync(
         RefitGeneratorSettings generatorSettings,
         Settings cliSettings,
         IGenerationReporter reporter,
@@ -58,13 +58,7 @@ public sealed class GenerationOrchestrator
                     generatorSettings,
                     cancellationToken);
 
-            if (result.Warnings.Count > 0)
-                reporter.ReportConfigurationWarnings(result.Warnings);
-
-            var filteredPaths = result.Diagnostics
-                .FirstOrDefault(d => d.Message.Contains("All paths were filtered"));
-            if (filteredPaths != null)
-                reporter.ReportAllPathsFilteredWarning(generatorSettings.IncludePathMatches);
+            ReportWarnings(result, generatorSettings, reporter);
 
             stopwatch.Stop();
             reporter.ReportSuccess(stopwatch.Elapsed, generatorSettings.GenerateMultipleFiles);
@@ -76,24 +70,46 @@ public sealed class GenerationOrchestrator
         }
         catch (Exception exception)
         {
-            reporter.ReportGenerationFailed();
-
-            if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
-                reporter.ReportUnsupportedVersion(unsupportedSpecVersionException.SpecificationVersion);
-
-            if (exception is OpenApiValidationException validationException)
-                ReportValidationDiagnostics(reporter, validationException);
-            else
-                reporter.ReportExceptionDetails(exception);
-
-            if (!cliSettings.SkipValidation)
-                reporter.ReportSkipValidationSuggestion();
-
-            reporter.ReportSupportHelp();
-
-            await Analytics.LogError(exception, cliSettings);
-            return ToProcessExitCode(exception);
+            return await HandleFailureAsync(exception, cliSettings, reporter);
         }
+    }
+
+    private static void ReportWarnings(
+        RunResult result,
+        RefitGeneratorSettings generatorSettings,
+        IGenerationReporter reporter)
+    {
+        if (result.Warnings.Count > 0)
+            reporter.ReportConfigurationWarnings(result.Warnings);
+
+        var filteredPaths = result.Diagnostics
+            .FirstOrDefault(d => d.Message.Contains("All paths were filtered"));
+        if (filteredPaths != null)
+            reporter.ReportAllPathsFilteredWarning(generatorSettings.IncludePathMatches);
+    }
+
+    private static async Task<int> HandleFailureAsync(
+        Exception exception,
+        Settings cliSettings,
+        IGenerationReporter reporter)
+    {
+        reporter.ReportGenerationFailed();
+
+        if (exception is OpenApiUnsupportedSpecVersionException unsupportedSpecVersionException)
+            reporter.ReportUnsupportedVersion(unsupportedSpecVersionException.SpecificationVersion);
+
+        if (exception is OpenApiValidationException validationException)
+            ReportValidationDiagnostics(reporter, validationException);
+        else
+            reporter.ReportExceptionDetails(exception);
+
+        if (!cliSettings.SkipValidation)
+            reporter.ReportSkipValidationSuggestion();
+
+        reporter.ReportSupportHelp();
+
+        await Analytics.LogError(exception, cliSettings);
+        return ToProcessExitCode(exception);
     }
 
     internal static void ReportValidationDiagnostics(
