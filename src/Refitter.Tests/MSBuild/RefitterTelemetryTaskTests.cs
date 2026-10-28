@@ -115,6 +115,19 @@ public class RefitterTelemetryTaskTests
     }
 
     [TestMethod]
+    public void Execute_Counts_Case_Distinct_Paths_As_Separate_Files()
+    {
+        if (!IsCaseSensitive(workspace))
+        {
+            Assert.Inconclusive("Requires a case-sensitive file system");
+        }
+
+        CreateTask(CreateSettingsFile("api.refitter"), CreateSettingsFile("API.refitter")).Execute();
+
+        sentPayloads.Single().Should().Contain("\"file-count\":\"2\"");
+    }
+
+    [TestMethod]
     public void Execute_Does_Not_Fail_The_Build_When_Sending_Fails()
     {
         sender = (_, _) => throw new HttpRequestException("offline");
@@ -152,8 +165,10 @@ public class RefitterTelemetryTaskTests
             .Should().Equal("settings-file", "settings-file", "sourcegenerator-invocation");
         events.Should().OnlyContain(e =>
             e.GetProperty("properties").GetProperty("telemetry-source").GetString() == "sourcegenerator");
-        events[0].GetProperty("properties").GetProperty("settings").GetString()
-            .Should().Contain("\"openApiPath\"");
+        var settings = events[0].GetProperty("properties").GetProperty("settings").GetString();
+        settings.Should().Contain("\"openApiPath\":\"<redacted>\"");
+        settings.Should().NotContain("openapi.json");
+        document.RootElement.GetRawText().Should().NotContain("openapi.json");
         events[2].GetProperty("properties").GetProperty("file-count").GetString()
             .Should().Be("2");
     }
@@ -168,6 +183,20 @@ public class RefitterTelemetryTaskTests
             SettingsFiles = settingsFiles.Select(file => new TaskItem(file)).ToArray<ITaskItem>(),
             StampFile = Path.Combine(workspace, "obj", "refitter.sourcegenerator.telemetry"),
         };
+    }
+
+    private static bool IsCaseSensitive(string folder)
+    {
+        var probe = Path.Combine(folder, "case-probe");
+        File.WriteAllText(probe, string.Empty);
+        try
+        {
+            return !File.Exists(probe.ToUpperInvariant());
+        }
+        finally
+        {
+            File.Delete(probe);
+        }
     }
 
     private string CreateSettingsFile(string name)

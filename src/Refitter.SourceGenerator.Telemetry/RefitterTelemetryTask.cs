@@ -8,7 +8,7 @@ namespace Refitter.SourceGenerator.Telemetry;
 /// <summary>
 /// Reports anonymous usage telemetry for Refitter.SourceGenerator.
 /// This runs as an MSBuild task so that the source generator itself never makes network calls.
-/// Telemetry is only sent when the .refitter files change and the task never fails the build.
+/// Telemetry is only sent when the .refitter files or the package version change and the task never fails the build.
 /// </summary>
 public class RefitterTelemetryTask : MSBuildTask
 {
@@ -81,8 +81,8 @@ public class RefitterTelemetryTask : MSBuildTask
         var files = SettingsFiles
             .Select(item => item.GetMetadata("FullPath"))
             .Where(path => !string.IsNullOrWhiteSpace(path) && File.Exists(path))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(path => path, StringComparer.Ordinal)
             .ToArray();
 
         if (files.Length == 0)
