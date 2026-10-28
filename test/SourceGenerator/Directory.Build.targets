@@ -1,0 +1,4 @@
+<Project>
+    <!-- The released package imports these targets itself; a ProjectReference to the local generator does not -->
+    <Import Project="..\..\src\Refitter.SourceGenerator\Refitter.SourceGenerator.targets" Condition="'$(UseProductionRefitter)' != 'true'" />
+</Project>

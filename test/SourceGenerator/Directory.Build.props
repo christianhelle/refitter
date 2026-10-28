@@ -11,7 +11,6 @@
             <Link>Program.cs</Link>
         </Compile>
         <AdditionalFiles Include="..\*.refitter" />
-        <Compile Include="../Generated/*.cs" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" Condition="'$(UseProductionRefitter)' != 'true'" />
