@@ -26,16 +26,6 @@ dotnet test --solution src/Refitter.slnx -c Release
 
 **Convention:** Only `[Category("Integration")]` is explicitly declared — tests that call `BuildHelper.BuildCSharp()` which spawns `dotnet build`. All other tests are unmarked and treated as unit tests by default.
 
-**Source Generator tests require a pre-build step.** Before running `dotnet test` on `Refitter.SourceGenerator.Tests`, the CI does:
-
-```bash
-rm -rf src/Refitter.SourceGenerator.Tests/AdditionalFiles/Generated
-dotnet restore src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
-dotnet msbuild src/Refitter.SourceGenerator.Tests/Refitter.SourceGenerator.Tests.csproj
-```
-
-Run these first if source generator tests fail with missing generated types.
-
 ## Package Boundaries
 
 | Project | TFM | Role |
@@ -43,7 +33,7 @@ Run these first if source generator tests fail with missing generated types.
 | `Refitter.Core` | `netstandard2.0` | Core generation logic (NSwag-based) |
 | `Refitter` | `net8.0;net9.0;net10.0` | CLI tool (`PackAsTool`, container support) |
 | `Refitter.MSBuild` | `netstandard2.0` | MSBuild task; references `Refitter.Core` directly (in-process); no CLI binary dependency |
-| `Refitter.SourceGenerator` | `netstandard2.0` | Roslyn source generator; emits code in-memory via `AddSource()` (not to disk since v2.0.0) |
+| `Refitter.SourceGenerator` | `netstandard2.0` | Roslyn source generator; emits code in-memory via `AddSource()` and runs the consumer's Refit generator itself (see its `.targets`) |
 | `Refitter.Tests` | `net10.0` | Unit tests |
 | `Refitter.SourceGenerator.Tests` | `net8.0;net10.0` | Source generator integration tests |
 
@@ -54,7 +44,7 @@ Run these first if source generator tests fail with missing generated types.
 - **Unit test pattern**: Scenario tests under `Refitter.Tests.Scenarios` contain an OpenAPI spec as a `const string`, generate code via `RefitGenerator.CreateAsync(...).Generate()`, assert string patterns, and verify compilation with `BuildHelper.BuildCSharp(generatedCode)`.
 - **Temp file helper**: `SwaggerFileHelper.CreateSwaggerFile(contents)` creates a temp YAML file; `CreateSwaggerJsonFile` for JSON.
 - **Build helper**: `BuildHelper.BuildCSharp()` writes generated code to a temp project and invokes `dotnet build` to verify it compiles. It defaults to `net8.0` but supports `net9.0` and `net10.0`.
-- **Source generator tests**: Reference the generator as an `Analyzer` with `ReferenceOutputAssembly=false`. They verify generated types exist at runtime and have Refit HTTP attributes.
+- **Source generator tests**: Reference the generator as an `Analyzer` with `ReferenceOutputAssembly=false` and import `Refitter.SourceGenerator.targets` explicitly. They verify generated types exist at runtime, have Refit HTTP attributes, and get Refit generated implementations in the same build.
 
 ## CI / Smoke Tests
 

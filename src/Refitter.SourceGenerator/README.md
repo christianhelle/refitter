@@ -1,12 +1,8 @@
 ## Source Generator
 
-> **Recommendation:** Consider using [Refitter.MSBuild](https://www.nuget.org/packages/Refitter.MSBuild) instead to ensure that the code is generated pre-compile which allows the Refit source generator to work without rebuilding the project.
-
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
-The Refitter source generator creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code
-
-***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
+The source generator emits code in-memory and also generates the Refit implementations for it, so a single build is enough and nothing needs to be committed to source control.
 
 ### Installation
 
@@ -24,6 +20,14 @@ dotnet add package Refit
 After installing the package, add one or more `.refitter` files to your project.
 
 `Refitter.SourceGenerator` automatically includes `**/*.refitter` as Roslyn `AdditionalFiles` via its package props, so you do not need to add manual `<AdditionalFiles Include="..." />` entries unless you intentionally override that default behavior.
+
+The generated code is added to the compilation in memory, together with the Refit implementations, in a single build. Nothing is written to disk and nothing needs to be committed to source control. The `outputFolder`, `outputFilename`, and `contractsOutputFolder` settings don't create files when using the source generator. To inspect the generated code on disk, set `<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>` in the project file.
+
+#### How it works with the Refit source generator
+
+Roslyn runs every source generator against the same input, so the Refit source generator can't see the interfaces that Refitter generates. To produce everything in one build, `Refitter.SourceGenerator` sets `DisableRefitSourceGenerator` to `true` for the regular compiler pass and runs the Refit source generator from the project's own `Refit` package itself, over the project code plus the Refitter output. Hand-written Refit interfaces in the same project are generated as before.
+
+If the project sets `DisableRefitSourceGenerator` to `true` itself, for example when using `Refit.Reflection`, Refitter leaves Refit source generation off and only emits its own code.
 
 ### .Refitter File format
 
@@ -192,10 +196,10 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `useCancellationTokens` - Use cancellation tokens in the generated methods. Default is `false`
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
-- `outputFolder` - a string describing a relative path to a desired output folder. Default is `./Generated`
-- `outputFilename` - Output filename. Default is `Output.cs` when used from the CLI tool, otherwise its the .refitter filename. So `Petstore.refitter` becomes `Petstore.cs`.
-- `contractsOutputFolder` - a relative contracts output folder. Default is `NULL`
-- `generateMultipleFiles` - generates multiple disk files. Default is `false`
+- `outputFolder` - not used by the source generator, which doesn't write files to disk
+- `outputFilename` - not used by the source generator, which doesn't write files to disk
+- `contractsOutputFolder` - not used by the source generator, which doesn't write files to disk
+- `generateMultipleFiles` - splits the generated code into multiple sources. Default is `false`
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 - `excludeNamespaces` - A collection of regular expressions to exclude namespaces from the generated file. A use case for this is when your project has global usings where these namespaces would be redundant. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.
