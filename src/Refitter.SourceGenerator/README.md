@@ -33,7 +33,7 @@ If the project sets `DisableRefitSourceGenerator` to `true` itself, for example 
 
 #### Telemetry
 
-`Refitter.SourceGenerator` collects anonymous usage telemetry, the same as the Refitter CLI and `Refitter.MSBuild`. It reports which settings each `.refitter` file uses and the number of `.refitter` files in the project, tagged as coming from the source generator, together with an anonymous support key derived from a hash of the user and machine name. Only setting names, boolean and number values, and known enum values (such as `multipleInterfaces`) are sent. Paths, URLs, namespaces, other text values and comments are redacted and never leave the machine.
+`Refitter.SourceGenerator` collects anonymous usage telemetry, the same as the Refitter CLI and `Refitter.MSBuild`. It reports which settings each `.refitter` file uses and the number of `.refitter` files in the project, tagged as coming from the source generator, together with an anonymous support key derived from a hash of the user and machine name. Only setting names, boolean and number values, and known enum values (such as `multipleInterfaces`) are sent. Paths, URLs, namespaces, other text values and comments are redacted and never leave the machine, and settings that Refitter doesn't recognize are only counted, never named.
 
 The source generator itself never makes network calls. Telemetry is sent by a small MSBuild task in the package that runs after the build. It doesn't run in design-time builds (IDE), only sends when the `.refitter` files or the package version change (it keeps a stamp file in `obj`), uses a short timeout, and never fails the build.
 
