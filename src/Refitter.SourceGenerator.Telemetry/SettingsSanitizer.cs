@@ -1,41 +1,26 @@
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Refitter.SourceGenerator.Telemetry;
 
 /// <summary>
 /// Reduces a .refitter file to which settings are used, so that telemetry never carries
 /// paths, URLs, namespaces, comments or other free text that could be sensitive.
-/// Booleans, numbers and known enum values are kept; every other value is redacted.
+/// Only known setting names are reported. Booleans, numbers and defined enum members are kept;
+/// every other value is redacted.
 /// </summary>
 internal static class SettingsSanitizer
 {
     internal const string Redacted = "<redacted>";
 
-    private static readonly HashSet<string> NestedSettings = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "naming",
-        "dependencyInjectionSettings",
-        "apizrSettings",
-        "codeGeneratorSettings",
-    };
+    internal const string UnknownSettingsKey = "unknown-settings";
 
-    private static readonly HashSet<string> EnumSettings = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "authenticationHeaderStyle",
-        "collectionFormat",
-        "integerType",
-        "multipleInterfaces",
-        "operationNameGenerator",
-        "propertyNamingPolicy",
-        "transientErrorHandler",
-        "typeAccessibility",
-        "withCacheProvider",
-        "withMappingProvider",
-    };
+    private static readonly Regex JsonNumber = new(@"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?$", RegexOptions.CultureInvariant);
 
     /// <summary>
     /// Returns a flat JSON object of setting paths and sanitized values, or null if the file can't be read as JSON.
+    /// Only setting names from <see cref="KnownSettings"/> are reported; other keys are only counted.
     /// </summary>
     public static string? Sanitize(string contents)
     {
@@ -55,36 +40,62 @@ internal static class SettingsSanitizer
         }
 
         var values = new List<KeyValuePair<string, string>>();
-        Flatten(settings, string.Empty, values);
+        var unknownSettings = Flatten(settings, string.Empty, values);
+        if (unknownSettings > 0)
+        {
+            values.Add(new KeyValuePair<string, string>(UnknownSettingsKey, unknownSettings.ToString(CultureInfo.InvariantCulture)));
+        }
+
         return "{" + string.Join(",", values.Select(pair => TelemetryPayload.Quote(pair.Key) + ":" + pair.Value)) + "}";
     }
 
-    private static void Flatten(
+    /// <summary>Adds the known settings to <paramref name="values"/> and returns how many unknown settings were skipped.</summary>
+    private static int Flatten(
         List<KeyValuePair<string, object?>> settings,
         string prefix,
         List<KeyValuePair<string, string>> values)
     {
+        var unknownSettings = 0;
         foreach (var setting in settings)
         {
-            var path = prefix + setting.Key;
-            if (setting.Value is List<KeyValuePair<string, object?>> nested && prefix.Length == 0 && NestedSettings.Contains(setting.Key))
+            var nestedName = prefix.Length == 0 ? FindKnown(KnownSettings.NestedSettings, setting.Key) : null;
+            if (setting.Value is List<KeyValuePair<string, object?>> nested && nestedName is not null)
             {
-                Flatten(nested, path + ".", values);
+                unknownSettings += Flatten(nested, nestedName + ".", values);
                 continue;
             }
 
-            values.Add(new KeyValuePair<string, string>(path, SanitizeValue(setting.Key, setting.Value)));
+            var path = FindKnown(KnownSettings.Paths.Keys, prefix + setting.Key);
+            if (path is null)
+            {
+                unknownSettings++;
+                continue;
+            }
+
+            values.Add(new KeyValuePair<string, string>(path, SanitizeValue(KnownSettings.Paths[path], setting.Value)));
         }
+
+        return unknownSettings;
     }
 
-    private static string SanitizeValue(string key, object? value) =>
-        value switch
+    // Settings are read case-insensitively, but always reported with their canonical name
+    private static string? FindKnown(IEnumerable<string> known, string name) =>
+        known.FirstOrDefault(candidate => string.Equals(candidate, name, StringComparison.OrdinalIgnoreCase));
+
+    private static string SanitizeValue(string[]? enumMembers, object? value)
+    {
+        switch (value)
         {
-            Literal literal => literal.Text,
-            string text when EnumSettings.Contains(key) && text.Length <= 64 && text.All(char.IsLetterOrDigit) => TelemetryPayload.Quote(text),
-            List<object?> array => TelemetryPayload.Quote($"[{array.Count.ToString(CultureInfo.InvariantCulture)} items]"),
-            _ => TelemetryPayload.Quote(Redacted),
-        };
+            case Literal literal:
+                return literal.Text;
+            case string text when enumMembers is not null:
+                return TelemetryPayload.Quote(FindKnown(enumMembers, text) ?? Redacted);
+            case List<object?> array:
+                return TelemetryPayload.Quote($"[{array.Count.ToString(CultureInfo.InvariantCulture)} items]");
+            default:
+                return TelemetryPayload.Quote(Redacted);
+        }
+    }
 
     /// <summary>A JSON true, false, null or number, kept as written.</summary>
     private sealed class Literal(string text)
@@ -250,8 +261,7 @@ internal static class SettingsSanitizer
             }
 
             var literal = text.Substring(start, position - start);
-            if (literal is "true" or "false" or "null" ||
-                double.TryParse(literal, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+            if (literal is "true" or "false" or "null" || JsonNumber.IsMatch(literal))
             {
                 return new Literal(literal);
             }

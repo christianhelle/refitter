@@ -19,11 +19,13 @@ public class SettingsSanitizerTests
           "includeTags": [ "Pet", "Store" ],
           "responseTypeOverride": { "File_Upload": "IApiResponse" },
           "unknownApiKey": "sk-123", /* block comment */
+          "token=sk-456": true,
           "dependencyInjectionSettings": {
             "baseUrl": "https://internal.example.com",
             "maxRetryCount": 3,
-            "transientErrorHandler": "Polly",
+            "transientErrorHandler": "polly",
           },
+          "apizrSettings": { "integerType": "sk789" },
         }
         """;
 
@@ -33,7 +35,7 @@ public class SettingsSanitizerTests
         var result = SettingsSanitizer.Sanitize(Settings);
 
         result.Should().NotBeNull();
-        foreach (var secret in new[] { "password", "token", "hunter2", "Contoso", "sk-123", "internal.example.com", "Pet", "File_Upload", "not an enum" })
+        foreach (var secret in new[] { "password", "token", "hunter2", "Contoso", "sk-123", "internal.example.com", "Pet", "File_Upload", "not an enum", "sk-456", "sk789", "unknownApiKey" })
         {
             result.Should().NotContain(secret);
         }
@@ -51,10 +53,11 @@ public class SettingsSanitizerTests
         settings["typeAccessibility"].GetString().Should().Be(SettingsSanitizer.Redacted);
         settings["includeTags"].GetString().Should().Be("[2 items]");
         settings["responseTypeOverride"].GetString().Should().Be(SettingsSanitizer.Redacted);
-        settings["unknownApiKey"].GetString().Should().Be(SettingsSanitizer.Redacted);
         settings["dependencyInjectionSettings.baseUrl"].GetString().Should().Be(SettingsSanitizer.Redacted);
         settings["dependencyInjectionSettings.maxRetryCount"].GetInt32().Should().Be(3);
         settings["dependencyInjectionSettings.transientErrorHandler"].GetString().Should().Be("Polly");
+        settings.Should().NotContainKey("apizrSettings.integerType");
+        settings[SettingsSanitizer.UnknownSettingsKey].GetInt32().Should().Be(3);
     }
 
     [TestMethod]
@@ -63,6 +66,10 @@ public class SettingsSanitizerTests
     [DataRow("[ 1, 2 ]")]
     [DataRow("{ \"openApiPath\": ")]
     [DataRow("{ \"a\": 1 } trailing")]
+    [DataRow("{ \"a\": +1 }")]
+    [DataRow("{ \"a\": NaN }")]
+    [DataRow("{ \"a\": -Infinity }")]
+    [DataRow("{ \"a\": 01 }")]
     public void Sanitize_Returns_Null_For_Invalid_Settings(string contents) =>
         SettingsSanitizer.Sanitize(contents).Should().BeNull();
 
