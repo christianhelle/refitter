@@ -54,8 +54,4 @@
       <None Remove="README.md" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="AdditionalFiles\Generated\" />
-    </ItemGroup>
-
 </Project>

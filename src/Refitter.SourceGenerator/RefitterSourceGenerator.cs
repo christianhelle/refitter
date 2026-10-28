@@ -41,8 +41,8 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             }
         });
 
-        // generate code for each .refitter file and process the results
-        context.RegisterImplementationSourceOutput(refitterFiles.Select(GenerateCode), ProcessResults);
+        // generate code for each .refitter file and add it to the compilation
+        context.RegisterSourceOutput(refitterFiles.Select(GenerateCode), ProcessResults);
     }
 
     private static void ProcessResults(SourceProductionContext context, GeneratedCode result)
@@ -50,6 +50,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         foreach (var diagnostic in result.Diagnostics)
         {
             context.ReportDiagnostic(CreateDiagnostic(diagnostic));
+        }
+
+        foreach (var source in result.Sources)
+        {
+            context.AddSource(source.HintName, source.Content);
         }
     }
 
@@ -72,7 +77,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var json = TryReadRefitterFile(file, diagnostics, cancellationToken);
             if (json is null)
             {
-                return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+                return CreateFailedResult(diagnostics);
             }
 
             diagnostics.Add(CreateFileContentsDiagnostic(json));
@@ -80,7 +85,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var settings = TryDeserialize(json, diagnostics);
             if (settings is null)
             {
-                return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+                return CreateFailedResult(diagnostics);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -96,7 +101,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var runner = new RefitterRunner();
             var result = runner.RunAsync(
                     settings,
-                    writer: new SourceGeneratorFileWriter(),
+                    writer: null,
                     validator: null,
                     settingsFilePath: file.Path,
                     cancellationToken: cancellationToken)
@@ -119,25 +124,27 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 }
             }
 
+            var sources = new List<GeneratedSource>();
             if (result.Exception is null)
             {
+                var hintNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var plannedFile in result.GeneratedFiles)
                 {
-                    diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(plannedFile.Path));
+                    var hintName = CreateHintName(file.Path, plannedFile.Path, hintNames);
+                    sources.Add(new GeneratedSource(hintName, plannedFile.Content));
+                    diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(hintName));
                 }
             }
 
-            var outputPath = result.GeneratedFiles.Count > 0
-                ? result.GeneratedFiles[0].Path
-                : null;
-
-            return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), outputPath);
+            return new GeneratedCode(
+                diagnostics.ToImmutableArray().AsEquatableArray(),
+                sources.ToImmutableArray().AsEquatableArray());
         }
         catch (Exception e)
         {
             diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to generate code: {e}"));
 
-            return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+            return CreateFailedResult(diagnostics);
         }
     }
 
@@ -262,9 +269,54 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         return lastDot >= 0 ? fileName.Substring(0, lastDot) : fileName;
     }
 
+    private static GeneratedCode CreateFailedResult(List<GeneratedDiagnostic> diagnostics) =>
+        new(
+            diagnostics.ToImmutableArray().AsEquatableArray(),
+            ImmutableArray<GeneratedSource>.Empty.AsEquatableArray());
+
+    private static string CreateHintName(string settingsFilePath, string plannedFilePath, HashSet<string> usedHintNames)
+    {
+        var settingsName = GetFileNameWithoutExtension(settingsFilePath);
+        var plannedName = GetFileNameWithoutExtension(plannedFilePath);
+        if (plannedName.EndsWith(".g", StringComparison.OrdinalIgnoreCase))
+        {
+            plannedName = plannedName.Substring(0, plannedName.Length - 2);
+        }
+
+        var baseName = SanitizeHintName(
+            string.Equals(settingsName, plannedName, StringComparison.OrdinalIgnoreCase)
+                ? settingsName
+                : settingsName + "." + plannedName);
+
+        var hintName = baseName + ".g.cs";
+        for (var i = 2; !usedHintNames.Add(hintName); i++)
+        {
+            hintName = $"{baseName}{i}.g.cs";
+        }
+
+        return hintName;
+    }
+
+    private static string SanitizeHintName(string name)
+    {
+        var chars = name.ToCharArray();
+        for (var i = 0; i < chars.Length; i++)
+        {
+            var c = chars[i];
+            if (!char.IsLetterOrDigit(c) && c != '.' && c != '_' && c != '-')
+            {
+                chars[i] = '_';
+            }
+        }
+
+        return new string(chars);
+    }
+
     internal readonly record struct GeneratedCode(
         EquatableArray<GeneratedDiagnostic> Diagnostics,
-        string? OutputPath = null);
+        EquatableArray<GeneratedSource> Sources);
+
+    internal readonly record struct GeneratedSource(string HintName, string Content);
 
     [SuppressMessage(
         "Major Code Smell",
