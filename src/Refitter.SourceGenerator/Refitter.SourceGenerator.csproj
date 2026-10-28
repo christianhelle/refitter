@@ -25,9 +25,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Built only to be packed as the telemetry MSBuild task, see Refitter.SourceGenerator.targets -->
+    <ProjectReference Include="../Refitter.SourceGenerator.Telemetry/Refitter.SourceGenerator.Telemetry.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(AssemblyName).props" Pack="true" PackagePath="build" />
     <None Include="$(AssemblyName).targets" Pack="true" PackagePath="build" />
+    <None Include="../Refitter.SourceGenerator.Telemetry/bin/$(Configuration)/netstandard2.0/Refitter.SourceGenerator.Telemetry.dll" Pack="true" PackagePath="tasks/netstandard2.0" Visible="false" />
     <Compile Include="../Refitter.Core/*.cs" />
     <Compile Include="../Refitter.Core/Abstractions/*.cs" />
     <Compile Include="../Refitter.Core/Apizr/*.cs" />
