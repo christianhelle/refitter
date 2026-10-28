@@ -86,7 +86,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        var generator = RefitGeneratorLocator.Create(compilation);
+        var generator = LoadedGeneratorLocator.CreateRefitGenerator(compilation);
         if (generator is null)
         {
             context.ReportDiagnostic(CreateDiagnostic(CreateRefitGeneratorNotFoundDiagnostic()));
