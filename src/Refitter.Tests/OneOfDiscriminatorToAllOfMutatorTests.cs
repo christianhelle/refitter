@@ -263,7 +263,11 @@ public class OneOfDiscriminatorToAllOfMutatorTests
     public void Mutate_Skips_Null_Component_Schemas()
     {
         var document = new OpenApiDocument();
-        document.Components.Schemas["Missing"] = null!;
+
+        // The indexer's change handler drops null values, so seed through Initialize to keep the null entry
+        var schemas = (NSwag.Collections.ObservableDictionary<string, NJsonSchema.JsonSchema>)document.Components.Schemas;
+        schemas.Initialize(new Dictionary<string, NJsonSchema.JsonSchema> { ["Missing"] = null! });
+        schemas.Should().ContainKey("Missing").WhoseValue.Should().BeNull();
 
         var act = () => new OneOfDiscriminatorToAllOfMutator().Mutate(document);
 
