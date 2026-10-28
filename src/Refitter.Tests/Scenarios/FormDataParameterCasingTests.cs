@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class FormDataParameterCasingTests
 {
     private const string OpenApiSpec =
@@ -60,29 +60,29 @@ public class FormDataParameterCasingTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Multipart_Attribute()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("[Multipart]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FormData_Parameters_Should_Have_AliasAs_Attribute()
     {
         string generatedCode = await GenerateCode();

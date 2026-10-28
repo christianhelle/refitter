@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class GenerateJsonSerializerContextTests
 {
     private const string OpenApiSpec = """
@@ -55,14 +56,14 @@ public class GenerateJsonSerializerContextTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode(generateJsonSerializerContext: true);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_JsonSerializerContext()
     {
         var generatedCode = await GenerateCode(generateJsonSerializerContext: true);
@@ -71,8 +72,8 @@ public class GenerateJsonSerializerContextTests
         generatedCode.Should().Contain("internal partial class UsersApiSerializerContext : global::System.Text.Json.Serialization.JsonSerializerContext");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_JsonSerializerContext_Can_Build()
     {
         var generatedCode = await GenerateCode(generateJsonSerializerContext: true);
@@ -80,8 +81,8 @@ public class GenerateJsonSerializerContextTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Separate_Contracts_Namespace_Can_Build()
     {
         var generatedCode = await GenerateCode(
@@ -94,7 +95,7 @@ public class GenerateJsonSerializerContextTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_JsonSerializerContext_When_Disabled()
     {
         var generatedCode = await GenerateCode(generateJsonSerializerContext: false);

@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Parameters;
 
+[TestClass]
 public class ParameterExtractorDeepCoverageTests
 {
     #region Priority 1: EscapeString Special Characters
@@ -133,7 +134,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task EscapeString_Handles_Tab_Character()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithTabCharacterDefault);
@@ -141,7 +142,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain(@"= ""before\tafter""");
     }
 
-    [Test]
+    [TestMethod]
     public async Task EscapeString_Handles_Carriage_Return()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithCarriageReturnDefault);
@@ -149,7 +150,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain(@"= ""line1\rline2""");
     }
 
-    [Test]
+    [TestMethod]
     public async Task EscapeString_Handles_Form_Feed()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithFormFeedDefault);
@@ -157,7 +158,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain(@"= ""page1\fpage2""");
     }
 
-    [Test]
+    [TestMethod]
     public async Task EscapeString_Handles_Backspace()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithBackspaceDefault);
@@ -438,7 +439,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
-    [Test]
+    [TestMethod]
     public async Task FormatNumericValue_Float_Has_F_Suffix()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithFloatDefault);
@@ -446,7 +447,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("float? floatValue = 3.14f");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FormatNumericValue_Decimal_Has_M_Suffix()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithDecimalDefault);
@@ -454,7 +455,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("decimal? decimalValue = 99.99m");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FormatNumericValue_Double_Has_Implicit_Suffix()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithDoubleDefault);
@@ -462,7 +463,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().NotContain("2.718d");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FormatNumericValue_Long_Has_L_Suffix()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithLongDefault);
@@ -470,7 +471,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("long? longValue = 9223372036854775807L");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FormatNumericValue_Ulong_Has_UL_Suffix()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithUlongDefault);
@@ -478,7 +479,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("ulong? ulongValue = 18446744073709551615UL");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FormatNumericValue_Uint_Has_U_Suffix()
     {
         // NSwag maps integer/uint32 to int (not uint), so no U suffix is generated
@@ -487,7 +488,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("int? uintValue = 4294967295");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FormatNumericValue_All_Types_Together()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllNumericTypes);
@@ -500,8 +501,8 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("uintValue = 300");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task FormatNumericValue_Generated_Code_Builds()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllNumericTypes);
@@ -685,35 +686,35 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
-    [Test]
+    [TestMethod]
     public async Task GetCSharpType_String_Type()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllParameterTypes);
         generatedCode.Should().Contain("string? stringParam");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetCSharpType_Integer_Type()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllParameterTypes);
         generatedCode.Should().Contain("int? intParam");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetCSharpType_Number_Type()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllParameterTypes);
         generatedCode.Should().Contain("double? numberParam");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetCSharpType_Boolean_Type()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllParameterTypes);
         generatedCode.Should().Contain("bool? boolParam");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetCSharpType_Array_Type()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllParameterTypes);
@@ -722,7 +723,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("arrayParam");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetCSharpType_Object_Type()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllParameterTypes);
@@ -730,7 +731,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("string objectParam");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetCSharpType_Nullable_With_OptionalParameters()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecWithNullableParameters);
@@ -777,7 +778,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
-    [Test]
+    [TestMethod]
     public async Task NullablePattern_Matches_Escaped_CSharp_Identifier()
     {
         // NSwag prefixes reserved C# keywords with @ (e.g. "class" → "@class")
@@ -795,7 +796,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("@class = default");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetCSharpType_Array_Of_Integers()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithArrayOfIntegers);
@@ -804,7 +805,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("intArray");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetCSharpType_Array_Of_Booleans()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithArrayOfBooleans);
@@ -813,8 +814,8 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("boolArray");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task GetCSharpType_All_Types_Build()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithAllParameterTypes);
@@ -917,28 +918,28 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
-    [Test]
+    [TestMethod]
     public async Task GetIntegerTypeName_Int32_Format_Returns_Int()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithInt32Format);
         generatedCode.Should().Contain("int? int32Value");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetIntegerTypeName_Int64_Format_Returns_Long()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithInt64Format);
         generatedCode.Should().Contain("long? int64Value");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetIntegerTypeName_No_Format_Defaults_To_Int()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithIntegerNoFormat);
         generatedCode.Should().Contain("int? integerValue");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetIntegerTypeName_With_Int64_Setting()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecWithIntegerNoFormat);
@@ -957,7 +958,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("long? integerValue");
     }
 
-    [Test]
+    [TestMethod]
     public async Task GetIntegerTypeName_Format_Overrides_Setting()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpecWithInt32Format);
@@ -976,8 +977,8 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("int? int32Value");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task GetIntegerTypeName_Generated_Code_Builds()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithInt64Format);
@@ -1018,7 +1019,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
-    [Test]
+    [TestMethod]
     public async Task GetArrayType_Null_Item_Returns_Object_Array()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithArrayNoItems);
@@ -1027,8 +1028,8 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("arrayWithoutItems");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task GetArrayType_Null_Item_Generated_Code_Builds()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithArrayNoItems);
@@ -1103,7 +1104,7 @@ public class ParameterExtractorDeepCoverageTests
 }
 """;
 
-    [Test]
+    [TestMethod]
     public async Task FormatDoubleLiteral_Integer_Value_Adds_Point_Zero()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithDoubleIntegerDefault);
@@ -1111,7 +1112,7 @@ public class ParameterExtractorDeepCoverageTests
         generatedCode.Should().Contain("double? doubleValue = 42.0");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FormatDoubleLiteral_With_Exponent_No_Point_Zero()
     {
         string generatedCode = await GenerateCode(OpenApiSpecWithDoubleExponentDefault);

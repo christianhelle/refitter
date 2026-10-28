@@ -6,9 +6,10 @@ using Refitter.Core;
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class CustomCSharpTypeResolverTests
 {
-    [Test]
+    [TestMethod]
     public void Resolve_With_Format_Mapping_Returns_Mapped_Type()
     {
         var settings = new CSharpGeneratorSettings();
@@ -24,7 +25,7 @@ public class CustomCSharpTypeResolverTests
         result.Should().Be("long");
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_With_Nullable_Mapping_Returns_Nullable_Type()
     {
         var settings = new CSharpGeneratorSettings();
@@ -40,7 +41,7 @@ public class CustomCSharpTypeResolverTests
         result.Should().Be("long?");
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_With_Nullable_Mapping_Already_Nullable_Returns_As_Is()
     {
         var settings = new CSharpGeneratorSettings();
@@ -56,7 +57,7 @@ public class CustomCSharpTypeResolverTests
         result.Should().Be("string?");
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_With_Generic_Mapping_Returns_Nullable_Suffix()
     {
         var settings = new CSharpGeneratorSettings
@@ -75,7 +76,7 @@ public class CustomCSharpTypeResolverTests
         result.Should().Be("List<int>?");
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_With_Generic_Mapping_And_Nrt_Disabled_Returns_As_Is()
     {
         var settings = new CSharpGeneratorSettings();
@@ -91,9 +92,9 @@ public class CustomCSharpTypeResolverTests
         result.Should().Be("List<int>");
     }
 
-    [Test]
-    [Arguments("Nullable<Guid>")]
-    [Arguments("System.Nullable<Guid>")]
+    [TestMethod]
+    [DataRow("Nullable<Guid>")]
+    [DataRow("System.Nullable<Guid>")]
     public void Resolve_With_Already_Nullable_Value_Type_Mapping_Returns_As_Is(string mappedType)
     {
         var settings = new CSharpGeneratorSettings();
@@ -109,54 +110,54 @@ public class CustomCSharpTypeResolverTests
         result.Should().Be(mappedType);
     }
 
-    [Test]
-    [Arguments("System.Guid")]
-    [Arguments("System.DateTime")]
-    [Arguments("System.DateTimeOffset")]
-    [Arguments("System.TimeSpan")]
-    [Arguments("System.Decimal")]
-    [Arguments("System.Int32")]
-    [Arguments("System.Int64")]
-    [Arguments("System.Double")]
-    [Arguments("System.Single")]
-    [Arguments("System.Boolean")]
-    [Arguments("System.Byte")]
-    [Arguments("System.SByte")]
-    [Arguments("System.Int16")]
-    [Arguments("System.UInt16")]
-    [Arguments("System.UInt32")]
-    [Arguments("System.UInt64")]
-    [Arguments("System.Char")]
-    [Arguments("Guid")]
-    [Arguments("DateTime")]
-    [Arguments("DateTimeOffset")]
-    [Arguments("TimeSpan")]
-    [Arguments("Decimal")]
-    [Arguments("Int32")]
-    [Arguments("Char")]
-    [Arguments("Int64")]
-    [Arguments("Double")]
-    [Arguments("Single")]
-    [Arguments("Boolean")]
-    [Arguments("Byte")]
-    [Arguments("SByte")]
-    [Arguments("Int16")]
-    [Arguments("UInt16")]
-    [Arguments("UInt32")]
-    [Arguments("UInt64")]
-    [Arguments("ushort")]
-    [Arguments("bool")]
-    [Arguments("byte")]
-    [Arguments("sbyte")]
-    [Arguments("char")]
-    [Arguments("decimal")]
-    [Arguments("double")]
-    [Arguments("float")]
-    [Arguments("int")]
-    [Arguments("uint")]
-    [Arguments("long")]
-    [Arguments("ulong")]
-    [Arguments("short")]
+    [TestMethod]
+    [DataRow("System.Guid")]
+    [DataRow("System.DateTime")]
+    [DataRow("System.DateTimeOffset")]
+    [DataRow("System.TimeSpan")]
+    [DataRow("System.Decimal")]
+    [DataRow("System.Int32")]
+    [DataRow("System.Int64")]
+    [DataRow("System.Double")]
+    [DataRow("System.Single")]
+    [DataRow("System.Boolean")]
+    [DataRow("System.Byte")]
+    [DataRow("System.SByte")]
+    [DataRow("System.Int16")]
+    [DataRow("System.UInt16")]
+    [DataRow("System.UInt32")]
+    [DataRow("System.UInt64")]
+    [DataRow("System.Char")]
+    [DataRow("Guid")]
+    [DataRow("DateTime")]
+    [DataRow("DateTimeOffset")]
+    [DataRow("TimeSpan")]
+    [DataRow("Decimal")]
+    [DataRow("Int32")]
+    [DataRow("Char")]
+    [DataRow("Int64")]
+    [DataRow("Double")]
+    [DataRow("Single")]
+    [DataRow("Boolean")]
+    [DataRow("Byte")]
+    [DataRow("SByte")]
+    [DataRow("Int16")]
+    [DataRow("UInt16")]
+    [DataRow("UInt32")]
+    [DataRow("UInt64")]
+    [DataRow("ushort")]
+    [DataRow("bool")]
+    [DataRow("byte")]
+    [DataRow("sbyte")]
+    [DataRow("char")]
+    [DataRow("decimal")]
+    [DataRow("double")]
+    [DataRow("float")]
+    [DataRow("int")]
+    [DataRow("uint")]
+    [DataRow("long")]
+    [DataRow("ulong")]
+    [DataRow("short")]
     public void Resolve_With_Known_Value_Type_Mappings_Appends_Nullable_Suffix(string mappedType)
     {
         var settings = new CSharpGeneratorSettings();
@@ -172,7 +173,7 @@ public class CustomCSharpTypeResolverTests
         result.Should().Be($"{mappedType}?");
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_Without_Matching_Format_Falls_Through()
     {
         var settings = new CSharpGeneratorSettings();
@@ -189,7 +190,7 @@ public class CustomCSharpTypeResolverTests
         result.Should().NotBe("long");
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_With_Null_Mappings_Falls_Through()
     {
         var settings = new CSharpGeneratorSettings();
@@ -201,7 +202,7 @@ public class CustomCSharpTypeResolverTests
         result.Should().NotBeNullOrEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_With_Empty_Format_Falls_Through()
     {
         var settings = new CSharpGeneratorSettings();
@@ -217,7 +218,7 @@ public class CustomCSharpTypeResolverTests
         result.Should().NotBeNullOrEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_With_Null_Format_Falls_Through()
     {
         var settings = new CSharpGeneratorSettings();
@@ -233,7 +234,7 @@ public class CustomCSharpTypeResolverTests
         result.Should().NotBeNullOrEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_With_Multiple_Mappings_Returns_Correct_Type()
     {
         var settings = new CSharpGeneratorSettings();
@@ -252,7 +253,7 @@ public class CustomCSharpTypeResolverTests
         resolver.Resolve(new JsonSchema { Format = "uuid" }, false, null).Should().Be("Guid");
     }
 
-    [Test]
+    [TestMethod]
     public void Resolve_Nullable_With_Multiple_Mappings_Returns_Correct_Nullable_Types()
     {
         var settings = new CSharpGeneratorSettings();

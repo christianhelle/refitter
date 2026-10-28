@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// x-enumDescriptions as an object keyed by enum value, as docusaurus-theme-openapi-docs renders it (#1336).
 /// </summary>
+[TestClass]
 public class ObjectEnumDescriptionsTests
 {
     private const string OpenApiSpec = """
@@ -60,18 +60,18 @@ public class ObjectEnumDescriptionsTests
                 done: Finished.
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
-    [Arguments("x-enumDescriptions")]
-    [Arguments("x-enum-descriptions")]
-    [Arguments("x-enum-description")]
-    [Arguments("x-enum Description")]
+    [TestMethod]
+    [DataRow("x-enumDescriptions")]
+    [DataRow("x-enum-descriptions")]
+    [DataRow("x-enum-description")]
+    [DataRow("x-enum Description")]
     public async Task Can_Generate_Code_With_Extension_Name_Variant(string extensionName)
     {
         var spec = OpenApiSpec.Replace("\"x-enumDescriptions\"", $"\"{extensionName}\"");
@@ -80,7 +80,7 @@ public class ObjectEnumDescriptionsTests
         generatedCode.Should().Contain("Task<Status> GetStatus(");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Keeps_Response_Component_Named_Like_Extension()
     {
         const string spec = """
@@ -115,7 +115,7 @@ public class ObjectEnumDescriptionsTests
         generatedCode.Should().Contain("Task<Status> GetStatus(");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_From_Yaml()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiYamlSpec);
@@ -123,7 +123,7 @@ public class ObjectEnumDescriptionsTests
         generatedCode.Should().Contain("enum Status");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Enum()
     {
         var generatedCode = await GenerateCode();
@@ -131,9 +131,9 @@ public class ObjectEnumDescriptionsTests
         generatedCode.Should().Contain("Task<Status> GetStatus(");
     }
 
-    [Test]
-    [Arguments("yaml", OpenApiYamlSpec)]
-    [Arguments("json", OpenApiSpec)]
+    [TestMethod]
+    [DataRow("yaml", OpenApiYamlSpec)]
+    [DataRow("json", OpenApiSpec)]
     public async Task Can_Generate_Code_From_Referenced_File(string extension, string componentsSpec)
     {
         var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -165,8 +165,8 @@ public class ObjectEnumDescriptionsTests
         Directory.Delete(folder, true);
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

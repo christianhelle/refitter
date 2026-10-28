@@ -3,11 +3,11 @@ using AwesomeAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class CollectionFormatTests
 {
     private const string OpenApiSpec = @"
@@ -62,14 +62,14 @@ public class CollectionFormatTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -79,12 +79,12 @@ public class CollectionFormatTests
             .BeTrue();
     }
 
-    [Test]
-    [Arguments(CollectionFormat.Multi, "Query(CollectionFormat.Multi)")]
-    [Arguments(CollectionFormat.Csv, "Query(CollectionFormat.Csv)")]
-    [Arguments(CollectionFormat.Ssv, "Query(CollectionFormat.Ssv)")]
-    [Arguments(CollectionFormat.Tsv, "Query(CollectionFormat.Tsv)")]
-    [Arguments(CollectionFormat.Pipes, "Query(CollectionFormat.Pipes)")]
+    [TestMethod]
+    [DataRow(CollectionFormat.Multi, "Query(CollectionFormat.Multi)")]
+    [DataRow(CollectionFormat.Csv, "Query(CollectionFormat.Csv)")]
+    [DataRow(CollectionFormat.Ssv, "Query(CollectionFormat.Ssv)")]
+    [DataRow(CollectionFormat.Tsv, "Query(CollectionFormat.Tsv)")]
+    [DataRow(CollectionFormat.Pipes, "Query(CollectionFormat.Pipes)")]
     public async Task Generated_Code_Contains_Expected_Collection_Format(CollectionFormat format, string expectedAttribute)
     {
         string generatedCode = await GenerateCode(format);

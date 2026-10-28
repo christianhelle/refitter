@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// OpenAPI 3.1 const, numeric exclusiveMinimum/exclusiveMaximum and examples keywords.
 /// </summary>
+[TestClass]
 public class OpenApi31ConstAndExclusiveBoundsTests
 {
     private const string OpenApiSpec = """
@@ -35,14 +35,14 @@ public class OpenApi31ConstAndExclusiveBoundsTests
                 tags: { type: array, items: { type: string }, examples: [[a, b]] }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Properties_For_Const_And_Bounded_Values()
     {
         var generatedCode = await GenerateCode();
@@ -50,8 +50,8 @@ public class OpenApi31ConstAndExclusiveBoundsTests
         generatedCode.Should().Contain("public double Score { get; set; }");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

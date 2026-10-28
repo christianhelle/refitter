@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class PriorityAdapterTests
 {
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_True_When_Priority_Enabled()
     {
         var settings = new RefitGeneratorSettings
@@ -22,7 +23,7 @@ public class PriorityAdapterTests
         adapter.CanApply(settings).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_When_Priority_Disabled()
     {
         var settings = new RefitGeneratorSettings
@@ -38,7 +39,7 @@ public class PriorityAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_Priority_To_Options()
     {
         var settings = new RefitGeneratorSettings

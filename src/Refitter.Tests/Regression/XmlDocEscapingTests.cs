@@ -9,6 +9,7 @@ namespace Refitter.Tests.Regression;
 /// Regression tests for Issue #1035: XML doc emission does not escape user-supplied parameter / dynamic-querystring descriptions
 /// Validates that parameter descriptions containing XML-unsafe characters (&, <, >) are properly escaped in generated XML documentation
 /// </summary>
+[TestClass]
 public class XmlDocEscapingTests
 {
     private const string SpecWithUnsafeParameterDescription = @"
@@ -319,7 +320,7 @@ public class XmlDocEscapingTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Ampersand_In_Parameter_Description()
     {
         string generatedCode = await GenerateCode(SpecWithUnsafeParameterDescription);
@@ -329,7 +330,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().NotContain("/// <summary>\n                /// Search filter: use & for");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Less_Than_In_Parameter_Description()
     {
         string generatedCode = await GenerateCode(SpecWithUnsafeParameterDescription);
@@ -338,7 +339,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Greater_Than_In_Parameter_Description()
     {
         string generatedCode = await GenerateCode(SpecWithUnsafeParameterDescription);
@@ -347,7 +348,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&gt;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Multiple_Unsafe_Chars_In_Parameter_Description()
     {
         string generatedCode = await GenerateCode(SpecWithUnsafeParameterDescription);
@@ -356,7 +357,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;100 &amp; offset&gt;0");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Unsafe_Chars_In_Response_Description()
     {
         string generatedCode = await GenerateCode(SpecWithUnsafeResponseDescription);
@@ -365,7 +366,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("Success: returns data where x&lt;100 &amp; y&gt;0");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Unsafe_Chars_In_Exception_Description()
     {
         string generatedCode = await GenerateCode(SpecWithUnsafeResponseDescription, generateStatusCodeComments: true);
@@ -374,7 +375,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;10 &amp;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Unsafe_Chars_In_Dynamic_Querystring_Parameter_Descriptions()
     {
         var settings = new RefitGeneratorSettings
@@ -392,8 +393,8 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&gt;");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Escaped_Parameter_Descriptions()
     {
         string generatedCode = await GenerateCode(SpecWithUnsafeParameterDescription);
@@ -403,8 +404,8 @@ public class XmlDocEscapingTests
             "Generated code with escaped parameter descriptions should compile");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Escaped_Response_Descriptions()
     {
         string generatedCode = await GenerateCode(SpecWithUnsafeResponseDescription, generateStatusCodeComments: true);
@@ -413,8 +414,8 @@ public class XmlDocEscapingTests
             "Generated code with escaped response descriptions should compile");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Escaped_Dynamic_Querystring_Descriptions()
     {
         var settings = new RefitGeneratorSettings
@@ -432,7 +433,7 @@ public class XmlDocEscapingTests
 
     // ── Swagger 2.0 companion tests ─────────────────────────────────────────
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Ampersand_In_Parameter_Description_Swagger2()
     {
         string generatedCode = await GenerateCode(SpecWithSwagger2UnsafeParameterDescription);
@@ -441,7 +442,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().NotContain("/// <summary>\n                /// Search filter: use & for");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Less_Than_In_Parameter_Description_Swagger2()
     {
         string generatedCode = await GenerateCode(SpecWithSwagger2UnsafeParameterDescription);
@@ -449,7 +450,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Greater_Than_In_Parameter_Description_Swagger2()
     {
         string generatedCode = await GenerateCode(SpecWithSwagger2UnsafeParameterDescription);
@@ -457,7 +458,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&gt;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Multiple_Unsafe_Chars_In_Parameter_Description_Swagger2()
     {
         string generatedCode = await GenerateCode(SpecWithSwagger2UnsafeParameterDescription);
@@ -465,7 +466,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;100 &amp; offset&gt;0");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Unsafe_Chars_In_Response_Description_Swagger2()
     {
         string generatedCode = await GenerateCode(SpecWithSwagger2UnsafeResponseDescription);
@@ -473,7 +474,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("Success: returns data where x&lt;100 &amp; y&gt;0");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Unsafe_Chars_In_Exception_Description_Swagger2()
     {
         string generatedCode = await GenerateCode(SpecWithSwagger2UnsafeResponseDescription, generateStatusCodeComments: true);
@@ -481,7 +482,7 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&lt;10 &amp;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Escape_Unsafe_Chars_In_Dynamic_Querystring_Parameter_Descriptions_Swagger2()
     {
         var settings = new RefitGeneratorSettings
@@ -498,8 +499,8 @@ public class XmlDocEscapingTests
         generatedCode.Should().Contain("&gt;");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Escaped_Parameter_Descriptions_Swagger2()
     {
         string generatedCode = await GenerateCode(SpecWithSwagger2UnsafeParameterDescription);
@@ -508,8 +509,8 @@ public class XmlDocEscapingTests
             "Generated code with escaped parameter descriptions should compile");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Escaped_Response_Descriptions_Swagger2()
     {
         string generatedCode = await GenerateCode(SpecWithSwagger2UnsafeResponseDescription, generateStatusCodeComments: true);
@@ -518,8 +519,8 @@ public class XmlDocEscapingTests
             "Generated code with escaped response descriptions should compile");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Escaped_Dynamic_Querystring_Descriptions_Swagger2()
     {
         var settings = new RefitGeneratorSettings

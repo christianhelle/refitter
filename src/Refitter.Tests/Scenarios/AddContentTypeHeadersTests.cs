@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class AddContentTypeHeadersTests
 {
     private const string OpenApiSpec = @"
@@ -49,14 +49,14 @@ components:
           format: email
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode(true);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode(true);
@@ -66,21 +66,21 @@ components:
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_ContentType_Header_When_Enabled()
     {
         string generatedCode = await GenerateCode(true);
         generatedCode.Should().Contain("Content-Type: application/json");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_ContentType_Header_When_Disabled()
     {
         string generatedCode = await GenerateCode(false);
         generatedCode.Should().NotContain("Headers(\"Content-Type:");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_When_Disabled()
     {
         string generatedCode = await GenerateCode(false);

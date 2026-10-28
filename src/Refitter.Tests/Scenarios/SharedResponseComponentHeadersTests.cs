@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class SharedResponseComponentHeadersTests
 {
     private const string OpenApiSpec = @"
@@ -52,29 +52,29 @@ components:
           format: int64
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Accept_Header_For_Referenced_Response()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Accept: application/json");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Accept_Header_For_Referenced_Streaming_Response()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Accept: text/event-stream");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_IAsyncEnumerable_For_Referenced_Streaming_Response()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("IAsyncEnumerable<Event> GetEvents(");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

@@ -5,13 +5,14 @@ using Refitter.Tests.Resources;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class FileDocumentStrategyTests
 {
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "petstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yaml")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "petstore.json")]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "petstore.yaml")]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3, "petstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV3, "petstore.yaml")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2, "petstore.json")]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreYamlV2, "petstore.yaml")]
     public async Task Loads_Valid_OpenApi_Spec_From_File(
         SampleOpenSpecifications version,
         string filename)
@@ -26,10 +27,10 @@ public class FileDocumentStrategyTests
         result!.Info.Title.Should().NotBeNullOrEmpty();
     }
 
-    [Test]
-    [Arguments("petstore.json")]
-    [Arguments("petstore.yaml")]
-    [Arguments("petstore.yml")]
+    [TestMethod]
+    [DataRow("petstore.json")]
+    [DataRow("petstore.yaml")]
+    [DataRow("petstore.yml")]
     public async Task Returns_Null_For_Http_Uri(string filename)
     {
         var strategy = new FileDocumentStrategy();
@@ -38,7 +39,7 @@ public class FileDocumentStrategyTests
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Returns_Null_For_Nonexistent_File()
     {
         var strategy = new FileDocumentStrategy();
@@ -48,7 +49,7 @@ public class FileDocumentStrategyTests
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Returns_Null_For_Invalid_Spec()
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(
@@ -60,9 +61,9 @@ public class FileDocumentStrategyTests
         result.Should().BeNull();
     }
 
-    [Test]
-    [Arguments(LargeNumericBoundsSpecs.Yaml, "bounds.yaml")]
-    [Arguments(LargeNumericBoundsSpecs.Json, "bounds.json")]
+    [TestMethod]
+    [DataRow(LargeNumericBoundsSpecs.Yaml, "bounds.yaml")]
+    [DataRow(LargeNumericBoundsSpecs.Json, "bounds.json")]
     public async Task Clamps_Numeric_Bounds_Outside_Decimal_Range(string contents, string filename)
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(contents, filename);
@@ -74,9 +75,9 @@ public class FileDocumentStrategyTests
         LargeNumericBoundsSpecs.GetMinimum(result!).Should().Be(decimal.MinValue);
     }
 
-    [Test]
-    [Arguments("yaml")]
-    [Arguments("json")]
+    [TestMethod]
+    [DataRow("yaml")]
+    [DataRow("json")]
     public async Task Clamps_Numeric_Bounds_Outside_Decimal_Range_In_Referenced_Files(string extension)
     {
         var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());

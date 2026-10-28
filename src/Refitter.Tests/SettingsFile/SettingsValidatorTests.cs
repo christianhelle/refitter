@@ -5,9 +5,10 @@ using Refitter.Core;
 namespace Refitter.Tests.SettingsFile;
 
 
+[TestClass]
 public class SettingsValidatorTests
 {
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_Both_OpenApiPath_And_SettingsFilePath_Are_Empty()
     {
         var settings = new Refitter.Settings
@@ -22,7 +23,7 @@ public class SettingsValidatorTests
         result.Message.Should().Contain("either specify an input URL/file directly");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_Both_OpenApiPath_And_SettingsFilePath_Are_Present()
     {
         var settings = new Refitter.Settings
@@ -37,7 +38,7 @@ public class SettingsValidatorTests
         result.Message.Should().Contain("either specify an input URL/file directly");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_With_Valid_URL()
     {
         var settings = new Refitter.Settings
@@ -50,7 +51,7 @@ public class SettingsValidatorTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_With_Valid_Http_URL()
     {
         var settings = new Refitter.Settings
@@ -63,7 +64,7 @@ public class SettingsValidatorTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_File_Does_Not_Exist()
     {
         var settings = new Refitter.Settings
@@ -77,7 +78,7 @@ public class SettingsValidatorTests
         result.Message.Should().Contain("File not found");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_When_File_Exists()
     {
         var tempFile = Path.GetTempFileName();
@@ -100,7 +101,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_OperationNameTemplate_Missing_Placeholder()
     {
         var settings = new Refitter.Settings
@@ -116,7 +117,7 @@ public class SettingsValidatorTests
         result.Message.Should().Contain("{operationName}");
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_When_OperationNameTemplate_Has_Placeholder()
     {
         var settings = new Refitter.Settings
@@ -130,7 +131,7 @@ public class SettingsValidatorTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_When_OperationNameTemplate_Missing_Placeholder_With_ByEndpoint()
     {
         var settings = new Refitter.Settings
@@ -145,7 +146,7 @@ public class SettingsValidatorTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_With_Valid_Settings_File()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -174,7 +175,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_Settings_File_MultiFile_OutputFolder_Is_FileLike()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -206,7 +207,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_Settings_File_MultiFile_ContractsOutputFolder_Is_FileLike()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -237,7 +238,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_Settings_File_MultiFile_Cli_Output_Override_Is_FileLike()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -269,7 +270,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_When_Settings_File_MultiFile_Uses_Directory_Paths()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -300,7 +301,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_Settings_File_Has_Empty_OpenApiPath()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -329,7 +330,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_Both_Output_Paths_Are_Specified()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -361,7 +362,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_When_OutputPath_Is_Default_And_Settings_File_Has_Output()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -392,7 +393,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_When_OperationNameTemplate_Is_Null()
     {
         var settings = new Refitter.Settings
@@ -406,7 +407,7 @@ public class SettingsValidatorTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_When_OperationNameTemplate_Is_Empty()
     {
         var settings = new Refitter.Settings
@@ -420,7 +421,7 @@ public class SettingsValidatorTests
         result.Successful.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_With_Valid_OpenApiPaths_In_Settings_File()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -449,7 +450,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Succeed_With_Multiple_OpenApiPaths_In_Settings_File()
     {
         var tempSettingsFile = Path.GetTempFileName();
@@ -487,7 +488,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Normalize_Relative_OpenApiPaths_From_Settings_File()
     {
         var workspace = Path.Combine(Path.GetTempPath(), $"refitter-settings-{Guid.NewGuid():N}");
@@ -531,7 +532,7 @@ public class SettingsValidatorTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Validate_Should_Fail_When_Settings_File_Has_Empty_OpenApiPaths()
     {
         var tempSettingsFile = Path.GetTempFileName();

@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Multipart bodies with JSON-encoded parts, arrays, booleans, dates, $ref schemas and allOf.
 /// </summary>
+[TestClass]
 public class MultipartEdgeCaseTests
 {
     private const string OpenApiSpec = """
@@ -63,14 +63,14 @@ public class MultipartEdgeCaseTests
                 name: { type: string }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Multipart_Parameters()
     {
         var generatedCode = await GenerateCode();
@@ -78,15 +78,15 @@ public class MultipartEdgeCaseTests
         generatedCode.Should().Contain("Task PostM2(StreamPart file, string name);");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Includes_Referenced_Properties_For_AllOf_Multipart_Body()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task PostM3(StreamPart file, string name, string extra);");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

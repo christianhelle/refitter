@@ -5,7 +5,8 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Parameters;
 
-[Category("Integration")]
+[TestCategory("Integration")]
+[TestClass]
 public class RouteParameterOrderingTests
 {
     /// <summary>
@@ -102,9 +103,9 @@ public class RouteParameterOrderingTests
 }
 ";
 
-    [Test]
-    [Arguments(OpenApiSpecWithReversedPathParameters)]
-    [Arguments(OpenApiV2SpecWithReversedPathParameters)]
+    [TestMethod]
+    [DataRow(OpenApiSpecWithReversedPathParameters)]
+    [DataRow(OpenApiV2SpecWithReversedPathParameters)]
     public async Task Parameters_Are_In_Url_Order_Not_Spec_Definition_Order(string openApiSpec)
     {
         string generatedCode = await GenerateCode(openApiSpec);
@@ -162,9 +163,9 @@ public class RouteParameterOrderingTests
     /// Spec order:  paramB (first), paramA (second)
     /// URL order:   paramA (first), paramB (second)
     /// </summary>
-    [Test]
-    [Arguments(OpenApiSpecWithReversedPathParameters)]
-    [Arguments(OpenApiV2SpecWithReversedPathParameters)]
+    [TestMethod]
+    [DataRow(OpenApiSpecWithReversedPathParameters)]
+    [DataRow(OpenApiV2SpecWithReversedPathParameters)]
     public async Task Generated_Code_Compiles_Successfully_Against_Refit(string openApiSpec)
     {
         string generatedCode = await GenerateCode(openApiSpec);

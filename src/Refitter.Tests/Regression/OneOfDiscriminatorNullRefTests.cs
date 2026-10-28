@@ -9,6 +9,7 @@ namespace Refitter.Tests.Regression;
 /// Regression tests for Issue #1015: NullReferenceException on Swagger 2.0 documents
 /// Validates graceful handling when document.Components is null or document.Components.Schemas is null
 /// </summary>
+[TestClass]
 public class OneOfDiscriminatorNullRefTests
 {
     // Swagger 2.0 uses "definitions" not "components"
@@ -116,7 +117,7 @@ public class OneOfDiscriminatorNullRefTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Should_Not_Throw_NRE_On_Swagger_20_Document()
     {
         var act = async () =>
@@ -130,7 +131,7 @@ public class OneOfDiscriminatorNullRefTests
             "Swagger 2.0 documents have null Components, code should handle this gracefully");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Not_Throw_NRE_On_OpenAPI_Without_Components()
     {
         var act = async () =>
@@ -143,7 +144,7 @@ public class OneOfDiscriminatorNullRefTests
             "OpenAPI documents without components section should be handled gracefully");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Not_Throw_NRE_On_OpenAPI_Without_Schemas()
     {
         var act = async () =>
@@ -156,7 +157,7 @@ public class OneOfDiscriminatorNullRefTests
             "OpenAPI documents with components but no schemas should be handled gracefully");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_From_Swagger_20()
     {
         string generatedCode = await GenerateCode(Swagger20Spec);
@@ -165,7 +166,7 @@ public class OneOfDiscriminatorNullRefTests
         generatedCode.Should().Contain("GetPets");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_From_OpenAPI_Without_Components()
     {
         string generatedCode = await GenerateCode(OpenApi30NoComponents);
@@ -174,7 +175,7 @@ public class OneOfDiscriminatorNullRefTests
         generatedCode.Should().Contain("HealthCheck");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_From_OpenAPI_Without_Schemas()
     {
         string generatedCode = await GenerateCode(OpenApi30NoSchemas);
@@ -183,8 +184,8 @@ public class OneOfDiscriminatorNullRefTests
         generatedCode.Should().Contain("GetData");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_From_All_Variants()
     {
         var swagger20Code = await GenerateCode(Swagger20Spec);

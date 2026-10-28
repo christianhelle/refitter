@@ -2,14 +2,14 @@ using AwesomeAssertions;
 using NJsonSchema;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class CustomIntegerTypeMutatorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithInt64_AddsInt64FormatToIntegerSchemasWithoutFormat()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -40,7 +40,7 @@ public class CustomIntegerTypeMutatorTests
         schema.Format.Should().Be("int64");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithInt32_DoesNotAddFormat()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -71,7 +71,7 @@ public class CustomIntegerTypeMutatorTests
         schema.Format.Should().BeNullOrEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithInt64_DoesNotChangeIntegerSchemaWithExistingFormat()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -102,7 +102,7 @@ public class CustomIntegerTypeMutatorTests
         schema.Format.Should().Be("int32");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithInt64_OnlyAffectsIntegerSchemas()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -134,7 +134,7 @@ public class CustomIntegerTypeMutatorTests
         props["price"].ActualSchema.Format.Should().BeNullOrEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithInt64_AppliesToArrayItemSchemas()
     {
         var document = await OpenApiDocument.FromJsonAsync("""

@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Deprecated schemas used in operation signatures raise CS0612 in the generated code (#1278).
 /// </summary>
+[TestClass]
 public class DeprecatedSchemaTests
 {
     private const string OpenApiSpec = """
@@ -44,22 +44,22 @@ public class DeprecatedSchemaTests
                 value: { type: string }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Removes_Obsolete_From_Schemas_Used_By_Interface()
     {
         var generatedCode = await GenerateCode();
@@ -68,37 +68,37 @@ public class DeprecatedSchemaTests
         generatedCode.Should().Contain("public partial class OldItem");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Keeps_Obsolete_On_Schemas_Not_Used_By_Interface()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().MatchRegex(@"\[System\.Obsolete\]\s*public partial class Legacy\b");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Keeps_Obsolete_On_Deprecated_Operations()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().MatchRegex(@"\[System\.Obsolete\]\s*(\[[^\]]*\]\s*)*\[Get\(""/old""\)\]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Keeps_Obsolete_When_Clients_Are_Not_Generated()
     {
         var generatedCode = await GenerateCode(settings => settings.GenerateClients = false);
         generatedCode.Should().MatchRegex(@"\[System\.Obsolete\]\s*public partial class D\b");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByEndpoint);
         BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Multiple_Generated_Files()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -109,15 +109,15 @@ public class DeprecatedSchemaTests
         BuildHelper.BuildCSharp(warningsAsErrors: true, files).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Json_Serializer_Context()
     {
         var generatedCode = await GenerateCode(settings => settings.GenerateJsonSerializerContext = true);
         BuildHelper.BuildCSharp(warningsAsErrors: true, generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Removes_Obsolete_From_Internal_Schemas_Used_By_Interface()
     {
         var generatedCode = await GenerateCode(settings => settings.TypeAccessibility = TypeAccessibility.Internal);
@@ -125,8 +125,8 @@ public class DeprecatedSchemaTests
         generatedCode.Should().NotMatchRegex(@"\[System\.Obsolete\]\s*internal partial class (D|OldItem)\b");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Internal_Types()
     {
         var generatedCode = await GenerateCode(settings => settings.TypeAccessibility = TypeAccessibility.Internal);

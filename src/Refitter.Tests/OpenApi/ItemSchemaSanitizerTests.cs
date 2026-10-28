@@ -4,12 +4,13 @@ using Refitter.Core;
 
 namespace Refitter.Tests.OpenApi;
 
+[TestClass]
 public class ItemSchemaSanitizerTests
 {
-    [Test]
-    [Arguments("#/info/title/x")]
-    [Arguments("#/components/schemas/Payload/allOf/first")]
-    [Arguments("#/components/schemas/Payload/allOf/-1")]
+    [TestMethod]
+    [DataRow("#/info/title/x")]
+    [DataRow("#/components/schemas/Payload/allOf/first")]
+    [DataRow("#/components/schemas/Payload/allOf/-1")]
     public void Leaves_ItemSchema_With_Unresolvable_Pointer_Untouched(string reference)
     {
         var json = $$"""
@@ -37,21 +38,21 @@ public class ItemSchemaSanitizerTests
         ItemSchemaSanitizer.Sanitize(json).Should().Be(json);
     }
 
-    [Test]
-    [Arguments("""{ "x-samples": [ { "itemSchema": { "type": "string" } } ] }""")]
-    [Arguments("""{ "components": { "schemas": { "Event": { "itemSchema": { "type": "string" } } } } }""")]
-    [Arguments("""{ "text/event-stream": { "itemSchema": { "type": "string" } } }""")]
+    [TestMethod]
+    [DataRow("""{ "x-samples": [ { "itemSchema": { "type": "string" } } ] }""")]
+    [DataRow("""{ "components": { "schemas": { "Event": { "itemSchema": { "type": "string" } } } } }""")]
+    [DataRow("""{ "text/event-stream": { "itemSchema": { "type": "string" } } }""")]
     public void Leaves_ItemSchema_Outside_A_Content_Map_Untouched(string json)
     {
         ItemSchemaSanitizer.Sanitize(json).Should().Be(json);
     }
 
     // Example values, defaults and extensions are literal JSON that can look like a content map
-    [Test]
-    [Arguments("example")]
-    [Arguments("default")]
-    [Arguments("const")]
-    [Arguments("x-sample")]
+    [TestMethod]
+    [DataRow("example")]
+    [DataRow("default")]
+    [DataRow("const")]
+    [DataRow("x-sample")]
     public void Leaves_Content_Map_Inside_A_Literal_Value_Untouched(string keyword)
     {
         var json = $$"""
@@ -68,7 +69,7 @@ public class ItemSchemaSanitizerTests
     }
 
     // "default" is also a response code, an entry of the responses map rather than a literal value
-    [Test]
+    [TestMethod]
     public void Converts_ItemSchema_Of_Default_Response()
     {
         var json = """
@@ -89,9 +90,9 @@ public class ItemSchemaSanitizerTests
     }
 
     // A link's requestBody and parameters are literal values, so nothing under a links map is a media type
-    [Test]
-    [Arguments("requestBody")]
-    [Arguments("parameters")]
+    [TestMethod]
+    [DataRow("requestBody")]
+    [DataRow("parameters")]
     public void Leaves_Content_Map_Inside_A_Link_Untouched(string field)
     {
         var json = $$"""
@@ -112,7 +113,7 @@ public class ItemSchemaSanitizerTests
         ItemSchemaSanitizer.Sanitize(json).Should().Be(json);
     }
 
-    [Test]
+    [TestMethod]
     public void Converts_ItemSchema_Of_Request_Body()
     {
         var json = """
@@ -129,7 +130,7 @@ public class ItemSchemaSanitizerTests
             .Should().Be("array");
     }
 
-    [Test]
+    [TestMethod]
     public void Leaves_Content_Map_Inside_A_Named_Example_Value_Untouched()
     {
         var json = """

@@ -5,9 +5,10 @@ using Refitter.Core.Validation;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class OpenApiValidationResultTests
 {
-    [Test]
+    [TestMethod]
     public void IsValid_Should_Return_True_When_No_Errors()
     {
         var diagnostic = new OpenApiDiagnostic();
@@ -17,7 +18,7 @@ public class OpenApiValidationResultTests
         result.IsValid.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Expose_Diagnostics_Property()
     {
         var diagnostic = new OpenApiDiagnostic();
@@ -27,7 +28,7 @@ public class OpenApiValidationResultTests
         result.Diagnostics.Should().Be(diagnostic);
     }
 
-    [Test]
+    [TestMethod]
     public void Should_Expose_Statistics_Property()
     {
         var diagnostic = new OpenApiDiagnostic();
@@ -37,7 +38,7 @@ public class OpenApiValidationResultTests
         result.Statistics.Should().Be(stats);
     }
 
-    [Test]
+    [TestMethod]
     public void ThrowIfInvalid_Should_Not_Throw_When_Valid()
     {
         var diagnostic = new OpenApiDiagnostic();

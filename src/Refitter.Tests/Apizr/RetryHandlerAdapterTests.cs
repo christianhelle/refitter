@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class RetryHandlerAdapterTests
 {
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_True_For_Polly()
     {
         var settings = new RefitGeneratorSettings
@@ -22,7 +23,7 @@ public class RetryHandlerAdapterTests
         adapter.CanApply(settings).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_True_For_HttpResilience()
     {
         var settings = new RefitGeneratorSettings
@@ -38,7 +39,7 @@ public class RetryHandlerAdapterTests
         adapter.CanApply(settings).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_For_None()
     {
         var settings = new RefitGeneratorSettings
@@ -54,7 +55,7 @@ public class RetryHandlerAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_When_No_DI_Settings()
     {
         var settings = new RefitGeneratorSettings
@@ -66,7 +67,7 @@ public class RetryHandlerAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_Polly_Configuration()
     {
         var settings = new RefitGeneratorSettings
@@ -91,7 +92,7 @@ public class RetryHandlerAdapterTests
         result.Should().Contain("3");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_HttpResilience_Configuration()
     {
         var settings = new RefitGeneratorSettings

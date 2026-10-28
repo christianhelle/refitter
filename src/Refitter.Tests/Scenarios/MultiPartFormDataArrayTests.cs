@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class MultiPartFormDataArrayTests
 {
     private const string OpenApiSpec = @"
@@ -58,14 +58,14 @@ public class MultiPartFormDataArrayTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -75,7 +75,7 @@ public class MultiPartFormDataArrayTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_MultiPart_Attribute()
     {
         string generatedCode = await GenerateCode();
@@ -83,7 +83,7 @@ public class MultiPartFormDataArrayTests
         generatedCode.Should().NotContain("Content-Type: multipart/form-data");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_IEnumerable_StreamPart_For_File_Array()
     {
         string generatedCode = await GenerateCode();

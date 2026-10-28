@@ -1,12 +1,12 @@
 using AwesomeAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class RefitterRunnerOpenApiPathsTests
 {
-    [Test]
+    [TestMethod]
     public void GetOpenApiPaths_With_OpenApiPaths_Returns_Them()
     {
         var settings = new RefitGeneratorSettings
@@ -19,7 +19,7 @@ public class RefitterRunnerOpenApiPathsTests
             .Should().Equal("first.json", "second.json");
     }
 
-    [Test]
+    [TestMethod]
     public void GetOpenApiPaths_With_Single_OpenApiPath_Returns_It()
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = "only.json" };
@@ -28,7 +28,7 @@ public class RefitterRunnerOpenApiPathsTests
             .Should().Equal("only.json");
     }
 
-    [Test]
+    [TestMethod]
     public void GetOpenApiPaths_With_Empty_OpenApiPaths_Falls_Back_To_OpenApiPath()
     {
         var settings = new RefitGeneratorSettings
@@ -41,7 +41,7 @@ public class RefitterRunnerOpenApiPathsTests
             .Should().Equal("only.json");
     }
 
-    [Test]
+    [TestMethod]
     public void GetOpenApiPaths_Without_Any_Path_Returns_Empty()
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = null };

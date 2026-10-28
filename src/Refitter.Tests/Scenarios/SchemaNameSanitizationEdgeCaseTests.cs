@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Schema names containing brackets, dots, leading digits and dashes.
 /// </summary>
+[TestClass]
 public class SchemaNameSanitizationEdgeCaseTests
 {
     private const string OpenApiSpec = """
@@ -52,14 +52,14 @@ public class SchemaNameSanitizationEdgeCaseTests
             type-with-dashes: { type: object, properties: { id: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Sanitizes_Schema_Names()
     {
         var generatedCode = await GenerateCode();
@@ -68,8 +68,8 @@ public class SchemaNameSanitizationEdgeCaseTests
         generatedCode.Should().Contain("Task<TypeWithDashes> GetV();");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

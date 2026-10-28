@@ -1,44 +1,44 @@
 using AwesomeAssertions;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class StringCasingExtensionTests
 {
-    [Test]
-    [Arguments("some-string", "SomeString")]
+    [TestMethod]
+    [DataRow("some-string", "SomeString")]
     public void CanConvertToPascalCase(string input, string expected)
         => input.ConvertKebabCaseToPascalCase().Should().Be(expected);
 
-    [Test]
-    [Arguments("abcd", "Abcd")]
+    [TestMethod]
+    [DataRow("abcd", "Abcd")]
     public void CanCaptilalizeFirstLetter(string input, string expected)
         => input.CapitalizeFirstCharacter().Should().Be(expected);
 
-    [Test]
-    [Arguments("", "")]
+    [TestMethod]
+    [DataRow("", "")]
     public void CaptilalizeFirstLetterHandlesEmptyStrings(string input, string expected)
         => input.CapitalizeFirstCharacter().Should().Be(expected);
 
-    [Test]
-    [Arguments("foo/bar", "fooBar")]
+    [TestMethod]
+    [DataRow("foo/bar", "fooBar")]
     public void CanConvertRouteToCamelCase(string input, string expected)
         => input.ConvertRouteToCamelCase().Should().Be(expected);
 
-    [Test]
-    [Arguments("foo bar", "FooBar")]
+    [TestMethod]
+    [DataRow("foo bar", "FooBar")]
     public void CanConvertSpacesToPascalCase(string input, string expected)
         => input.ConvertSpacesToPascalCase().Should().Be(expected);
 
-    [Test]
-    [Arguments("foo:bar", "FooBar")]
+    [TestMethod]
+    [DataRow("foo:bar", "FooBar")]
     public void CanConvertColonsToPascalCase(string input, string expected)
         => input.ConvertColonsToPascalCase().Should().Be(expected);
 
-    [Test]
-    [Arguments("foo_bar", "FooBar")]
+    [TestMethod]
+    [DataRow("foo_bar", "FooBar")]
     public void CanConvertSnakeCaseToPascalCase(string input, string expected)
         => input.ConvertSnakeCaseToPascalCase().Should().Be(expected);
 }

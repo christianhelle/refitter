@@ -7,9 +7,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Parameters;
 
 
+[TestClass]
 public class ParameterExtractorPrivateCoverageTests
 {
-    [Test]
+    [TestMethod]
     public void GetDefaultValueForParameter_Returns_Default_For_Empty_Parameter_String()
     {
         var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
@@ -19,7 +20,7 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().Be("default");
     }
 
-    [Test]
+    [TestMethod]
     public void FormatDefaultValue_Returns_Default_For_Null_And_Unsupported_Types()
     {
         var nullResult = ParameterDefaultValueFormatter.FormatDefaultValue(null!, "string");
@@ -29,7 +30,7 @@ public class ParameterExtractorPrivateCoverageTests
         unsupportedTypeResult.Should().Be("default");
     }
 
-    [Test]
+    [TestMethod]
     public void EscapeString_Handles_Vertical_Tab_And_Null_Characters()
     {
         var result = ParameterNaming.EscapeString("before\vbetween\0after");
@@ -37,7 +38,7 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().Be("before\\vbetween\\0after");
     }
 
-    [Test]
+    [TestMethod]
     public void EscapeString_Encodes_Generic_Control_Characters_As_Unicode_Escapes()
     {
         var result = ParameterNaming.EscapeString("before\u0001after");
@@ -45,9 +46,9 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().Be("before\\u0001after");
     }
 
-    [Test]
-    [Arguments("uint")]
-    [Arguments("UInt32")]
+    [TestMethod]
+    [DataRow("uint")]
+    [DataRow("UInt32")]
     public void FormatNumericValue_Appends_U_Suffix_For_UInt_Types(string numericType)
     {
         var result = ParameterDefaultValueFormatter.FormatNumericValue(42, numericType);
@@ -55,29 +56,29 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().Be("42U");
     }
 
-    [Test]
-    [Arguments("int")]
-    [Arguments("Int32")]
-    [Arguments("long")]
-    [Arguments("Int64")]
-    [Arguments("short")]
-    [Arguments("Int16")]
-    [Arguments("byte")]
-    [Arguments("Byte")]
-    [Arguments("decimal")]
-    [Arguments("Decimal")]
-    [Arguments("float")]
-    [Arguments("Single")]
-    [Arguments("double")]
-    [Arguments("Double")]
-    [Arguments("sbyte")]
-    [Arguments("SByte")]
-    [Arguments("uint")]
-    [Arguments("UInt32")]
-    [Arguments("ulong")]
-    [Arguments("UInt64")]
-    [Arguments("ushort")]
-    [Arguments("UInt16")]
+    [TestMethod]
+    [DataRow("int")]
+    [DataRow("Int32")]
+    [DataRow("long")]
+    [DataRow("Int64")]
+    [DataRow("short")]
+    [DataRow("Int16")]
+    [DataRow("byte")]
+    [DataRow("Byte")]
+    [DataRow("decimal")]
+    [DataRow("Decimal")]
+    [DataRow("float")]
+    [DataRow("Single")]
+    [DataRow("double")]
+    [DataRow("Double")]
+    [DataRow("sbyte")]
+    [DataRow("SByte")]
+    [DataRow("uint")]
+    [DataRow("UInt32")]
+    [DataRow("ulong")]
+    [DataRow("UInt64")]
+    [DataRow("ushort")]
+    [DataRow("UInt16")]
     public void IsNumericType_Returns_True_For_Supported_Numeric_Types(string numericType)
     {
         var result = ParameterDefaultValueFormatter.IsNumericType(numericType);
@@ -85,11 +86,11 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().BeTrue();
     }
 
-    [Test]
-    [Arguments("string")]
-    [Arguments("Guid")]
-    [Arguments("CustomType")]
-    [Arguments("numbers")]
+    [TestMethod]
+    [DataRow("string")]
+    [DataRow("Guid")]
+    [DataRow("CustomType")]
+    [DataRow("numbers")]
     public void IsNumericType_Returns_False_For_Non_Numeric_Types(string numericType)
     {
         var result = ParameterDefaultValueFormatter.IsNumericType(numericType);
@@ -97,7 +98,7 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void GetAliasAsAttribute_StringOverload_Escapes_Special_Characters()
     {
         var unchanged = ParameterAttributeFormatter.GetAliasAsAttribute("same", "same");
@@ -109,7 +110,7 @@ public class ParameterExtractorPrivateCoverageTests
         withBackslash.Should().Be("AliasAs(\"user\\\\id\")");
     }
 
-    [Test]
+    [TestMethod]
     public void GetCSharpType_Handles_Number_Object_Unknown_And_Nullable_String()
     {
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
@@ -136,7 +137,7 @@ public class ParameterExtractorPrivateCoverageTests
         nullableStringType.Should().Be("string?");
     }
 
-    [Test]
+    [TestMethod]
     public void GetIntegerTypeName_Uses_Explicit_Int_Formats()
     {
         var settings = new RefitGeneratorSettings();
@@ -153,7 +154,7 @@ public class ParameterExtractorPrivateCoverageTests
         int32Type.Should().Be("int");
     }
 
-    [Test]
+    [TestMethod]
     public void GetArrayType_Returns_Object_Array_When_Item_Is_Missing()
     {
         var result = ParameterTypeResolver.GetArrayType(
@@ -163,14 +164,14 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().Be("object[]");
     }
 
-    [Test]
+    [TestMethod]
     public void ReplaceUnsafeCharacters_Delegates_To_ParameterNaming()
     {
         var result = ParameterNaming.ReplaceUnsafeCharacters("unsafe-name!");
         result.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public void ReOrderNullableParameters_Delegates_To_OptionalParameterReorderer()
     {
         var parameterModels = new List<CSharpParameterModel>();
@@ -182,14 +183,14 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().NotBeNull();
     }
 
-    [Test]
+    [TestMethod]
     public void FormatDefaultValue_Adds_PointZero_For_Double_Integer_Values()
     {
         var result = ParameterDefaultValueFormatter.FormatDefaultValue(42, "double");
         result.Should().Be("42.0");
     }
 
-    [Test]
+    [TestMethod]
     public void FormatNumericValue_FallsBack_To_DefaultKeyword_For_NonFormattable_Type()
     {
         var result = ParameterDefaultValueFormatter.FormatNumericValue(new object(), "int");
@@ -198,7 +199,7 @@ public class ParameterExtractorPrivateCoverageTests
 
 
 
-    [Test]
+    [TestMethod]
     public void GetDefaultValueForParameter_Returns_Default_When_No_Matching_Parameter_Found()
     {
         var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
@@ -208,49 +209,49 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().Be("default");
     }
 
-    [Test]
+    [TestMethod]
     public void JoinAttributes_Returns_Empty_For_Empty_Input()
     {
         var result = ParameterAttributeFormatter.JoinAttributes();
         result.Should().Be(string.Empty);
     }
 
-    [Test]
+    [TestMethod]
     public void JoinAttributes_Returns_Combined_Attributes()
     {
         var result = ParameterAttributeFormatter.JoinAttributes("AliasAs(\"name\")", "Query()");
         result.Should().Be("[AliasAs(\"name\"), Query()] ");
     }
 
-    [Test]
+    [TestMethod]
     public void JoinAttributes_Returns_Single_Attribute()
     {
         var result = ParameterAttributeFormatter.JoinAttributes("AliasAs(\"name\")");
         result.Should().Be("[AliasAs(\"name\")] ");
     }
 
-    [Test]
+    [TestMethod]
     public void FindSupportedType_Passes_Through_Type_Name()
     {
         var result = ParameterTypeResolver.FindSupportedType("string");
         result.Should().Be("string");
     }
 
-    [Test]
+    [TestMethod]
     public void ConvertToVariableName_Replaces_Unsafe_Characters()
     {
         var result = ParameterNaming.ConvertToVariableName("field-name");
         result.Should().Be("field_name");
     }
 
-    [Test]
+    [TestMethod]
     public void ConvertToVariableName_Returns_Value_For_Empty_String()
     {
         var result = ParameterNaming.ConvertToVariableName(string.Empty);
         result.Should().Be("value");
     }
 
-    [Test]
+    [TestMethod]
     public void AppendXmlDocComment_Extends_CodeBuilder()
     {
         var codeBuilder = new StringBuilder();

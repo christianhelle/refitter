@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class ItemSchemaStreamingResponseTests
 {
     private const string OpenApi32Spec = """
@@ -62,17 +62,17 @@ public class ItemSchemaStreamingResponseTests
         yield return OpenApi31Spec;
     }
 
-    [Test]
-    [MethodDataSource(nameof(Specs))]
+    [TestMethod]
+    [DynamicData(nameof(Specs))]
     public async Task Uses_Event_Data_As_Item_Type_For_Server_Sent_Events(string spec)
     {
         string generatedCode = await GenerateCode(spec);
         generatedCode.Should().Contain("IAsyncEnumerable<MyStreamData> MyStreamEndpoint(");
     }
 
-    [Test]
-    [Category("Integration")]
-    [MethodDataSource(nameof(Specs))]
+    [TestMethod]
+    [TestCategory("Integration")]
+    [DynamicData(nameof(Specs))]
     public async Task Can_Build_Generated_Code_From_ItemSchema(string spec)
     {
         string generatedCode = await GenerateCode(spec);
@@ -85,7 +85,7 @@ public class ItemSchemaStreamingResponseTests
     // Each JSON line is a whole item, so the item schema itself is the stream's item type
     private static readonly string JsonLinesSpec = OpenApi32Spec.Replace("text/event-stream", "application/jsonl");
 
-    [Test]
+    [TestMethod]
     public async Task Uses_ItemSchema_As_Item_Type_For_Json_Lines()
     {
         string generatedCode = await GenerateCode(JsonLinesSpec);
@@ -96,7 +96,7 @@ public class ItemSchemaStreamingResponseTests
     // Without a data field the event shape is unknown, so the item schema itself is the item type
     private static readonly string EventsWithoutDataSpec = OpenApi32Spec.Replace("\"data\"", "\"payload\"");
 
-    [Test]
+    [TestMethod]
     public async Task Uses_ItemSchema_As_Item_Type_For_Server_Sent_Events_Without_Data()
     {
         string generatedCode = await GenerateCode(EventsWithoutDataSpec);
@@ -109,7 +109,7 @@ public class ItemSchemaStreamingResponseTests
         "#/components/schemas/MyStreamData",
         "#/components/schemas/Missing");
 
-    [Test]
+    [TestMethod]
     public async Task Ignores_ItemSchema_With_Unresolved_Reference()
     {
         string generatedCode = await GenerateCode(UnresolvedReferenceSpec);
@@ -120,7 +120,7 @@ public class ItemSchemaStreamingResponseTests
         "\"text/event-stream\"",
         "\"text/event-stream; charset=utf-8\"");
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Event_Data_As_Item_Type_For_Parameterized_Event_Stream()
     {
         string generatedCode = await GenerateCode(ParameterizedEventStreamSpec);
@@ -139,7 +139,7 @@ public class ItemSchemaStreamingResponseTests
                           "Payload": { "allOf": [ { "$ref": "#/components/schemas/MyStreamData" } ] },
             """);
 
-    [Test]
+    [TestMethod]
     public async Task Resolves_Event_Data_Reference_Into_An_Array()
     {
         // NSwag names the item type after the component that holds the array
@@ -151,7 +151,7 @@ public class ItemSchemaStreamingResponseTests
         "#/components/schemas/Payload/allOf/0",
         "#/components/schemas/Payload/allOf/1");
 
-    [Test]
+    [TestMethod]
     public async Task Ignores_ItemSchema_With_Reference_Past_The_End_Of_An_Array()
     {
         string generatedCode = await GenerateCode(ArrayPointerOutOfRangeSpec);
@@ -181,7 +181,7 @@ public class ItemSchemaStreamingResponseTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Object_For_Boolean_ItemSchema()
     {
         string generatedCode = await GenerateCode(BooleanItemSchemaSpec);
@@ -231,7 +231,7 @@ public class ItemSchemaStreamingResponseTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Event_Data_As_Item_Type_For_Referenced_Event_Envelope()
     {
         string generatedCode = await GenerateCode(ReferencedEnvelopeSpec);
@@ -243,7 +243,7 @@ public class ItemSchemaStreamingResponseTests
         "\"Event\": {",
         "\"Event\": { \"$ref\": \"#/components/schemas/EventAlias\" },\n\"Unused\": {");
 
-    [Test]
+    [TestMethod]
     public async Task Stops_Unwrapping_Referenced_Event_Envelope_Cycle()
     {
         Func<Task> act = () => GenerateCode(ReferenceCycleSpec);
@@ -257,7 +257,7 @@ public class ItemSchemaStreamingResponseTests
                                 "itemSchema": {
         """);
 
-    [Test]
+    [TestMethod]
     public async Task Prefers_Schema_Over_ItemSchema()
     {
         string generatedCode = await GenerateCode(SchemaAndItemSchemaSpec);
@@ -301,7 +301,7 @@ public class ItemSchemaStreamingResponseTests
                   format: int32
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Event_Data_As_Item_Type_For_Yaml_Server_Sent_Events()
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApi32YamlSpec);
@@ -322,7 +322,7 @@ public class ItemSchemaStreamingResponseTests
                           },
         """);
 
-    [Test]
+    [TestMethod]
     public async Task Leaves_Schema_Properties_Named_ItemSchema_Untouched()
     {
         string generatedCode = await GenerateCode(ContentPropertySpec);

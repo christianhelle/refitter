@@ -2,10 +2,10 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class GenerateDisposableClientsEnhancedTests
 {
     private const string OpenApiSpec = @"
@@ -53,22 +53,22 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode(generateDisposableClients: true);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode(generateDisposableClients: true);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_IDisposable()
     {
         string generatedCode = await GenerateCode(generateDisposableClients: true);
@@ -76,22 +76,22 @@ components:
         generatedCode.Should().Contain("interface ITestAPI : IDisposable");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_IDisposable_When_Disabled()
     {
         string generatedCode = await GenerateCode(generateDisposableClients: false);
         generatedCode.Should().NotContain(": IDisposable");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_Without_Disposable()
     {
         string generatedCode = await GenerateCode(generateDisposableClients: false);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Disposable_Code_Contains_Using_System()
     {
         string generatedCode = await GenerateCode(generateDisposableClients: true);

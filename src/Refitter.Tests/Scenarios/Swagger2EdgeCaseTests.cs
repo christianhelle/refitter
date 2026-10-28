@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Swagger 2.0 file uploads, form data, collection formats, x-nullable, body arrays and file responses.
 /// </summary>
+[TestClass]
 public class Swagger2EdgeCaseTests
 {
     private const string OpenApiSpec = """
@@ -61,38 +61,38 @@ public class Swagger2EdgeCaseTests
           Error: { type: object, properties: { message: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Swagger2_Operations()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("Task<HttpResponseMessage> PutBody([Body] IEnumerable<Item> payload);");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_IApiResponse()
     {
         var generatedCode = await GenerateCode(settings => settings.ReturnIApiResponse = true);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_By_Tag()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByTag);

@@ -5,11 +5,11 @@ using NSwag;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class InlineJsonConvertersTests
 {
     private const string OpenApiSpec = @"
@@ -73,14 +73,14 @@ public class InlineJsonConvertersTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -90,7 +90,7 @@ public class InlineJsonConvertersTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_JsonConverter_By_Default()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: true);
@@ -103,7 +103,7 @@ public class InlineJsonConvertersTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Places_JsonConverter_On_Enum_Type_Not_Property()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: true);
@@ -119,7 +119,7 @@ public class InlineJsonConvertersTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Generated_Code_Preserves_CRLF_When_Moving_JsonConverter_Attributes()
     {
         const string contracts = "[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]\r\npublic enum PetStatus\r\n{\r\n}\r\n";
@@ -138,7 +138,7 @@ public class InlineJsonConvertersTests
         Regex.Matches(result, "(?<!\\r)\\n").Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Uses_Generic_JsonStringEnumConverter()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: true);
@@ -153,7 +153,7 @@ public class InlineJsonConvertersTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Injected_Converter_Closes_Over_Each_Enum_It_Is_Applied_To()
     {
         const string contracts =
@@ -173,7 +173,7 @@ public class InlineJsonConvertersTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public void Injecting_Twice_Is_Idempotent()
     {
         const string contracts = "public enum PetStatus\n{\n}\n";
@@ -184,7 +184,7 @@ public class InlineJsonConvertersTests
         twice.Should().Be(once);
     }
 
-    [Test]
+    [TestMethod]
     public void Existing_Non_Generic_Converter_Is_Upgraded_To_Generic()
     {
         const string contracts =
@@ -208,7 +208,7 @@ public class InlineJsonConvertersTests
             },
             contracts);
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Does_Not_Contain_JsonConverter_When_Disabled()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: false);
@@ -224,7 +224,7 @@ public class InlineJsonConvertersTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Without_JsonConverter_Can_Build()
     {
         string generatedCode = await GenerateCode(inlineJsonConverters: false);

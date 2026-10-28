@@ -5,6 +5,7 @@ using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class GenerateJsonSerializerContextReservedTypeNameTests
 {
     private const string OpenApiSpec = """
@@ -48,7 +49,7 @@ public class GenerateJsonSerializerContextReservedTypeNameTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Renames_TypeInfo_Property_For_Options()
     {
         var generatedCode = await GenerateCode();
@@ -57,8 +58,8 @@ public class GenerateJsonSerializerContextReservedTypeNameTests
             "[global::System.Text.Json.Serialization.JsonSerializable(typeof(Options), TypeInfoPropertyName = \"OptionsTypeInfo\")]");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Generated_Code_With_Options_Contract_Can_Build()
     {
         var generatedCode = await GenerateCode();

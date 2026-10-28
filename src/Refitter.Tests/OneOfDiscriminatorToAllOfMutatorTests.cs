@@ -1,14 +1,14 @@
 using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class OneOfDiscriminatorToAllOfMutatorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithOneOfAndDiscriminator_AddsAllOfToSubtypes()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -52,7 +52,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         truck.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == vehicle);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithAnyOfAndDiscriminator_AddsAllOfToSubtypes()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -96,7 +96,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         bankTransfer.AllOf.Should().Contain(a => a.HasReference && a.ActualSchema == payment);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithoutDiscriminator_DoesNotChangeSchemas()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -124,7 +124,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
             .Should().Be(expectedOneOf);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithNoComponentsSchemas_DoesNotThrow()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -141,7 +141,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_WithDiscriminatorButNoUnionSchemas_DoesNotChange()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
@@ -168,7 +168,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
             .Should().Be(NJsonSchema.JsonObjectType.Object);
     }
 
-    [Test]
+    [TestMethod]
     public void Mutate_WithoutComponents_DoesNothing()
     {
         var document = new OpenApiDocument
@@ -183,7 +183,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         act.Should().NotThrow();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_Does_Not_Duplicate_Existing_AllOf_Inheritance()
     {
         // Two union members keep NJsonSchema from collapsing Vehicle.ActualSchema onto the
@@ -231,7 +231,7 @@ public class OneOfDiscriminatorToAllOfMutatorTests
         truck.AllOf.Should().OnlyContain(a => a.HasReference && a.ActualSchema == vehicle);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Mutate_Without_Discriminator_Does_Not_Add_Inheritance()
     {
         var document = await OpenApiDocument.FromJsonAsync("""

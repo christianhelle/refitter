@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class ApizrOptionsAdapterPipelineTests
 {
-    [Test]
+    [TestMethod]
     public void Adapters_Combine_Cache_And_Mapping()
     {
         var settings = new RefitGeneratorSettings
@@ -31,7 +32,7 @@ public class ApizrOptionsAdapterPipelineTests
         result.Should().Contain("Apizr.Integrations.AutoMapper");
     }
 
-    [Test]
+    [TestMethod]
     public void Adapters_Combine_Retry_And_Mediation()
     {
         var settings = new RefitGeneratorSettings
@@ -58,7 +59,7 @@ public class ApizrOptionsAdapterPipelineTests
         result.Should().Contain("using MediatR;");
     }
 
-    [Test]
+    [TestMethod]
     public void Pipeline_Order_Is_Correct()
     {
         var settings = new RefitGeneratorSettings
@@ -104,7 +105,7 @@ public class ApizrOptionsAdapterPipelineTests
         result.Should().Contain("Apizr.Integrations.FileTransfer.MediatR");
     }
 
-    [Test]
+    [TestMethod]
     public void Pipeline_Produces_Compilable_Code_With_All_Features()
     {
         var settings = new RefitGeneratorSettings
@@ -142,7 +143,7 @@ public class ApizrOptionsAdapterPipelineTests
         result.Should().Contain("Apizr.Integrations.FileTransfer.MediatR");
     }
 
-    [Test]
+    [TestMethod]
     public void Pipeline_Generates_Error_For_Extended_Features_Without_DI()
     {
         var settings = new RefitGeneratorSettings

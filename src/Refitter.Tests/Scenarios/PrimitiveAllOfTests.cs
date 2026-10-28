@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class PrimitiveAllOfTests
 {
     private const string OpenApiSpec = @"
@@ -63,21 +63,21 @@ components:
           type: string
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Flattens_Single_Primitive_AllOf_To_Primitive_Property()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("public string Parent");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Derive_Class_From_Sealed_Primitive_Type()
     {
         string generatedCode = await GenerateCode();
@@ -85,7 +85,7 @@ components:
             .NotMatchRegex(@"class \w+ : (string|int|long|double|bool|decimal|float)\b");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Preserves_Enum_From_Single_Primitive_AllOf()
     {
         string generatedCode = await GenerateCode();
@@ -95,7 +95,7 @@ components:
         generatedCode.Should().Contain("High");
     }
 
-    [Test]
+    [TestMethod]
     public async Task PascalCases_Lowercase_Schema_Name()
     {
         string generatedCode = await GenerateCode();
@@ -103,8 +103,8 @@ components:
         generatedCode.Should().NotContain("enum filters");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

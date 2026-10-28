@@ -2,14 +2,14 @@ using AwesomeAssertions;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class MethodAttributeGeneratorTests
 {
-    [Test]
+    [TestMethod]
     public async Task Generate_Includes_Obsolete_When_Deprecated()
     {
         var spec = """
@@ -39,7 +39,7 @@ public class MethodAttributeGeneratorTests
         attributes.Should().Contain("[System.Obsolete]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Includes_Multipart_For_MultipartFormData()
     {
         var spec = """
@@ -78,7 +78,7 @@ public class MethodAttributeGeneratorTests
         attributes.Should().Contain("[Multipart]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Includes_Accept_Header_When_Enabled()
     {
         var spec = """
@@ -111,7 +111,7 @@ public class MethodAttributeGeneratorTests
         attributes.Should().Contain(a => a.Contains("Accept"));
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Includes_ContentType_Header_When_Enabled()
     {
         var spec = """
@@ -149,7 +149,7 @@ public class MethodAttributeGeneratorTests
         attributes.Should().Contain(a => a.Contains("Content-Type"));
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Omits_Accept_Header_When_Disabled()
     {
         var spec = """
@@ -182,7 +182,7 @@ public class MethodAttributeGeneratorTests
         attributes.Should().NotContain(a => a.Contains("Accept"));
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Includes_Authorization_Header_For_Bearer_Auth()
     {
         var spec = """
@@ -221,7 +221,7 @@ public class MethodAttributeGeneratorTests
         attributes.Should().Contain(a => a.Contains("Authorization: Bearer"));
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Omits_ContentType_For_Multipart()
     {
         var spec = """
@@ -260,7 +260,7 @@ public class MethodAttributeGeneratorTests
         attributes.Should().NotContain(a => a.Contains("Content-Type"));
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Returns_Empty_When_No_Attributes()
     {
         var spec = """
@@ -297,7 +297,7 @@ public class MethodAttributeGeneratorTests
         attributes.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generate_Lists_All_Accept_Headers_For_Mixed_Streaming_Response()
     {
         string spec = """

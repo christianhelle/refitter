@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
+[TestClass]
 public class DynamicQueryStringParametersEdgeCasesTests
 {
-    [Test]
+    [TestMethod]
     public async Task Dynamic_QueryString_With_Escaped_String_Defaults()
     {
         const string openApiSpec =
@@ -69,7 +69,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("string? BackslashString { get; set; } = \"path\\\\to\\\\file\"");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Dynamic_QueryString_With_All_Escape_Characters()
     {
         const string openApiSpec =
@@ -140,7 +140,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("string? TabString { get; set; } = \"col1\\tcol2\"");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Dynamic_QueryString_With_Float_And_Decimal_Defaults()
     {
         const string openApiSpec =
@@ -203,7 +203,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("decimal? DecimalValue { get; set; } = 99.99m");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Dynamic_QueryString_With_Boolean_Defaults()
     {
         const string openApiSpec =
@@ -264,7 +264,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("bool? IsDisabled { get; set; } = false");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Dynamic_QueryString_With_Integer_Defaults()
     {
         const string openApiSpec =
@@ -327,8 +327,8 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("long? LongValue { get; set; } = 9999");
     }
 
-    [Category("Integration")]
-    [Test]
+    [TestCategory("Integration")]
+    [TestMethod]
     public async Task Dynamic_QueryString_Generated_Code_Should_Build()
     {
         const string openApiSpec =
@@ -397,7 +397,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Dynamic_QueryString_With_Mixed_Escape_Characters()
     {
         const string openApiSpec =
@@ -448,7 +448,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("string? ComplexString { get; set; } = \"path\\\\to\\\\file with \\\"quotes\\\"\\nand newlines\"");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Dynamic_QueryString_With_Long_And_ULong_Defaults()
     {
         const string openApiSpec =
@@ -511,7 +511,7 @@ public class DynamicQueryStringParametersEdgeCasesTests
         generatedCode.Should().Contain("ulong? UlongValue { get; set; } = 5000000000UL");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Dynamic_QueryString_With_Double_Integer_Value()
     {
         const string openApiSpec =

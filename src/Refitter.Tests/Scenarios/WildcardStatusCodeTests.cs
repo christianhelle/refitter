@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// 2XX/4XX wildcard status codes and operations that only define a default response.
 /// </summary>
+[TestClass]
 public class WildcardStatusCodeTests
 {
     private const string OpenApiSpec = """
@@ -40,14 +40,14 @@ public class WildcardStatusCodeTests
             Err: { type: object, properties: { m: { type: string } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Uses_Wildcard_And_Default_Responses_As_Return_Type()
     {
         var generatedCode = await GenerateCode();
@@ -55,16 +55,16 @@ public class WildcardStatusCodeTests
         generatedCode.Should().Contain("Task<W> GetOnlyDefault();");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_IApiResponse()
     {
         var generatedCode = await GenerateCode(settings => settings.ReturnIApiResponse = true);

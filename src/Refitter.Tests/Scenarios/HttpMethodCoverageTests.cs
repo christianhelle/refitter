@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// HEAD, OPTIONS, PATCH (json-patch), PUT and DELETE operations sharing path-level parameters.
 /// </summary>
+[TestClass]
 public class HttpMethodCoverageTests
 {
     private const string OpenApiSpec = """
@@ -43,14 +43,14 @@ public class HttpMethodCoverageTests
               responses: { '204': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_All_Supported_Http_Methods()
     {
         var generatedCode = await GenerateCode();
@@ -62,24 +62,24 @@ public class HttpMethodCoverageTests
         generatedCode.Should().Contain("Task HeadR(string id);");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Multiple_Interfaces_By_Tag()
     {
         var generatedCode = await GenerateCode(settings => settings.MultipleInterfaces = MultipleInterfaces.ByTag);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_IApiResponse()
     {
         var generatedCode = await GenerateCode(settings => settings.ReturnIApiResponse = true);

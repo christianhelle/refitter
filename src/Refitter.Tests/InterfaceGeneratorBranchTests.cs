@@ -1,10 +1,10 @@
 using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class InterfaceGeneratorBranchTests
 {
     private const string DeprecatedOperationWithOptionalParameterSpec = @"
@@ -47,7 +47,7 @@ paths:
           description: 'successful operation'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Apizr_Optional_Parameter_Overload_Repeats_Method_Attributes()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
@@ -67,7 +67,7 @@ paths:
         CountOccurrences(generatedCode, "[System.Obsolete]").Should().Be(2);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Cookie_Parameters_Are_Modelled_But_Not_Emitted()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(CookieParameterSpec);

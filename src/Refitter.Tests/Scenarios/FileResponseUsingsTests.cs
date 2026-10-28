@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// File responses return HttpResponseMessage, which needs System.Net.Http without implicit usings (#1272).
 /// </summary>
+[TestClass]
 public class FileResponseUsingsTests
 {
     private const string OpenApiSpec = """
@@ -21,21 +21,21 @@ public class FileResponseUsingsTests
               responses: { '200': { description: ok, content: { application/octet-stream: { schema: { type: string, format: binary } } } } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_System_Net_Http_Using()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("using System.Net.Http;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_System_Net_Http_Using_In_Each_File()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
@@ -50,7 +50,7 @@ public class FileResponseUsingsTests
         interfaceFile.Content.Should().Contain("using System.Net.Http;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Generate_System_Net_Http_Using_Without_HttpResponseMessage()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
@@ -63,7 +63,7 @@ public class FileResponseUsingsTests
         generatedCode.Should().NotContain("using System.Net.Http;");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Does_Not_Generate_System_Net_Http_Using_For_Operation_Named_HttpResponseMessage()
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(
@@ -78,16 +78,16 @@ public class FileResponseUsingsTests
         generatedCode.Should().NotContain("using System.Net.Http;");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_Without_Implicit_Usings()
     {
         var generatedCode = await GenerateCode();

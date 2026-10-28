@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class MultipleInterfacesByEndpointTests
 {
     private const string OpenApiSpec = @"
@@ -105,42 +105,42 @@ paths:
           description: 'successful operation'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_IGetAllFooEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IGetAllFoosEndpoint");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_IGetFooDetailsEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IGetFooDetailsEndpoint");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_IGetAllBarEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IGetAllBarsEndpoint");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_IGetBarDetailsEndpoint()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("partial interface IGetBarDetailsEndpoint");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Dynamic_Querystring_Parameters()
     {
         string generatedCode = await GenerateCode(true);
@@ -149,7 +149,7 @@ paths:
         generatedCode.Should().Contain("GetBarDetailsQueryParams");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

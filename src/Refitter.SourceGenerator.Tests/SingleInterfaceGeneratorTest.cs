@@ -1,21 +1,21 @@
 using AwesomeAssertions;
 using Refit;
 using Refitter.Tests.AdditionalFiles.SingeInterface;
-using TUnit.Core;
 
 namespace Refitter.SourceGenerators.Tests;
 
 
+[TestClass]
 public class SingleInterfaceGeneratorTest
 {
-    [Test]
+    [TestMethod]
     public void Should_Type_Exist() =>
         typeof(ISwaggerPetstoreInterface)
             .Namespace
             .Should()
             .Be("Refitter.Tests.AdditionalFiles.SingeInterface");
 
-    [Test]
+    [TestMethod]
     public void Can_Resolve_Refit_Interface()
     {
         var hasRefitAttributes = typeof(ISwaggerPetstoreInterface)

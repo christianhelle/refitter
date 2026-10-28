@@ -4,6 +4,7 @@ using Refitter.Core;
 namespace Refitter.Tests.SettingsFile;
 
 
+[TestClass]
 public class SerializerTests
 {
     private static RefitGeneratorSettings CreateTestSettings() => new()
@@ -14,7 +15,7 @@ public class SerializerTests
         GenerateClients = true
     };
 
-    [Test]
+    [TestMethod]
     public void Can_Serialize_RefitGeneratorSettings()
     {
         var settings = CreateTestSettings();
@@ -24,7 +25,7 @@ public class SerializerTests
             .NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Deserialize_RefitGeneratorSettingsWithoutNameGenerators()
     {
         var settings = CreateTestSettings();
@@ -37,7 +38,7 @@ public class SerializerTests
                 .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
     }
 
-    [Test]
+    [TestMethod]
     public void Deserialize_Is_Case_Insensitive()
     {
         var settings = CreateTestSettings();
@@ -58,7 +59,7 @@ public class SerializerTests
                 .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
     }
 
-    [Test]
+    [TestMethod]
     public void Deserialize_With_Comments()
     {
         var settings = CreateTestSettings();
@@ -73,7 +74,7 @@ public class SerializerTests
                 .Excluding(s => s.CodeGeneratorSettings!.PropertyNameGenerator));
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Deserialize_CodeGeneratorSettings_With_IntegerType_String_Int64()
     {
         const string json = """{"integerType": "Int64"}""";
@@ -82,7 +83,7 @@ public class SerializerTests
         settings.IntegerType.Should().Be(IntegerType.Int64);
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Deserialize_RefitGeneratorSettings_With_PropertyNamingPolicy_String_PreserveOriginal()
     {
         const string json = """{"propertyNamingPolicy": "PreserveOriginal"}""";
@@ -91,10 +92,10 @@ public class SerializerTests
         settings.PropertyNamingPolicy.Should().Be(PropertyNamingPolicy.PreserveOriginal);
     }
 
-    [Test]
-    [Arguments("""{"returnIAsyncEnumerable": false}""", false)]
-    [Arguments("""{"returnIAsyncEnumerable": true}""", true)]
-    [Arguments("{}", true)]
+    [TestMethod]
+    [DataRow("""{"returnIAsyncEnumerable": false}""", false)]
+    [DataRow("""{"returnIAsyncEnumerable": true}""", true)]
+    [DataRow("{}", true)]
     public void Can_Deserialize_RefitGeneratorSettings_With_ReturnIAsyncEnumerable(
         string json,
         bool expected)
@@ -104,7 +105,7 @@ public class SerializerTests
         settings.ReturnIAsyncEnumerable.Should().Be(expected);
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Deserialize_CodeGeneratorSettings_With_IntegerType_String_Int32()
     {
         const string json = """{"integerType": "Int32"}""";
@@ -113,7 +114,7 @@ public class SerializerTests
         settings.IntegerType.Should().Be(IntegerType.Int32);
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Deserialize_CodeGeneratorSettings_With_IntegerType_Numeric_Value()
     {
         const string json = """{"integerType": 1}""";
@@ -122,7 +123,7 @@ public class SerializerTests
         settings.IntegerType.Should().Be(IntegerType.Int64);
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Serialize_CodeGeneratorSettings_With_IntegerType()
     {
         var settings = new CodeGeneratorSettings { IntegerType = IntegerType.Int64 };
@@ -130,7 +131,7 @@ public class SerializerTests
         json.Should().Contain("\"integerType\": \"Int64\"");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Serialize_RefitGeneratorSettings_With_PropertyNamingPolicy()
     {
         var settings = CreateTestSettings();
@@ -141,7 +142,7 @@ public class SerializerTests
         json.Should().Contain("\"propertyNamingPolicy\": \"PreserveOriginal\"");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Serialize_CodeGeneratorSettings_With_JsonLibraryVersion()
     {
         var settings = new CodeGeneratorSettings { JsonLibraryVersion = 9.0m };
@@ -149,7 +150,7 @@ public class SerializerTests
         json.Should().Contain("\"jsonLibraryVersion\": 9");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Deserialize_CodeGeneratorSettings_With_JsonLibraryVersion()
     {
         const string json = """{"jsonLibraryVersion": 9.0}""";
@@ -158,21 +159,21 @@ public class SerializerTests
         settings.JsonLibraryVersion.Should().Be(9.0m);
     }
 
-    [Test]
+    [TestMethod]
     public void Default_JsonLibraryVersion_Should_Be_8_0()
     {
         var settings = new CodeGeneratorSettings();
         settings.JsonLibraryVersion.Should().Be(8.0m);
     }
 
-    [Test]
+    [TestMethod]
     public void Default_Silent_Should_Be_False()
     {
         RefitGeneratorSettings settings = new RefitGeneratorSettings();
         settings.Silent.Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Serialize_RefitGeneratorSettings_With_Silent()
     {
         RefitGeneratorSettings settings = CreateTestSettings();
@@ -183,7 +184,7 @@ public class SerializerTests
         json.Should().Contain("\"silent\": true");
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Deserialize_RefitGeneratorSettings_With_Silent()
     {
         const string json = """{"silent": true}""";
@@ -194,7 +195,7 @@ public class SerializerTests
         settings.Silent.Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void Can_Serialize_RefitGeneratorSettings_With_Default_Silent_Omits_Property()
     {
         RefitGeneratorSettings settings = CreateTestSettings();

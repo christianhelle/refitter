@@ -4,9 +4,10 @@ using Refitter.Core;
 namespace Refitter.Tests.Apizr;
 
 
+[TestClass]
 public class CacheProviderAdapterTests
 {
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_True_When_CacheProvider_Is_Set()
     {
         var settings = new RefitGeneratorSettings
@@ -22,7 +23,7 @@ public class CacheProviderAdapterTests
         adapter.CanApply(settings).Should().BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public void CanApply_Returns_False_When_CacheProvider_Is_None()
     {
         var settings = new RefitGeneratorSettings
@@ -38,7 +39,7 @@ public class CacheProviderAdapterTests
         adapter.CanApply(settings).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_Akavache_To_Options()
     {
         var settings = new RefitGeneratorSettings
@@ -58,7 +59,7 @@ public class CacheProviderAdapterTests
         result.Should().Contain("Apizr.Integrations.Akavache");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_MonkeyCache_To_Options()
     {
         var settings = new RefitGeneratorSettings
@@ -78,7 +79,7 @@ public class CacheProviderAdapterTests
         result.Should().Contain("Apizr.Integrations.MonkeyCache");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_InMemory_Only_With_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -97,7 +98,7 @@ public class CacheProviderAdapterTests
         result.Should().Contain("WithInMemoryCacheHandler()");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Omits_InMemory_Without_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -115,7 +116,7 @@ public class CacheProviderAdapterTests
         result.Should().NotContain("WithInMemoryCacheHandler()");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_DistributedAsString_Only_With_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -134,7 +135,7 @@ public class CacheProviderAdapterTests
         result.Should().Contain("WithDistributedCacheHandler<string>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Omits_DistributedAsString_Without_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -152,7 +153,7 @@ public class CacheProviderAdapterTests
         result.Should().NotContain("WithDistributedCacheHandler<string>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Adds_DistributedAsByteArray_Only_With_DI()
     {
         var settings = new RefitGeneratorSettings
@@ -171,7 +172,7 @@ public class CacheProviderAdapterTests
         result.Should().Contain("WithDistributedCacheHandler<byte[]>()");
     }
 
-    [Test]
+    [TestMethod]
     public void Apply_Omits_DistributedAsByteArray_Without_DI()
     {
         var settings = new RefitGeneratorSettings

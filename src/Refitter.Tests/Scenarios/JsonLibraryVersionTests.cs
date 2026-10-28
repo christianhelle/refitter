@@ -3,7 +3,6 @@ using AwesomeAssertions.Execution;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
@@ -14,6 +13,7 @@ namespace Refitter.Tests.Scenarios;
 /// When JsonLibraryVersion is 8.0 or below (default), enums use [EnumMember] attributes.
 /// </summary>
 
+[TestClass]
 public class JsonLibraryVersionTests
 {
     private const string OpenApiSpec = @"
@@ -71,14 +71,14 @@ public class JsonLibraryVersionTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Default_JsonLibraryVersion_Should_Generate_EnumMember()
     {
         string generatedCode = await GenerateCode();
@@ -91,7 +91,7 @@ public class JsonLibraryVersionTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task JsonLibraryVersion_8_0_Should_Generate_EnumMember()
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 8.0m);
@@ -102,7 +102,7 @@ public class JsonLibraryVersionTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Default_Generated_Code()
     {
         string generatedCode = await GenerateCode();
@@ -112,7 +112,7 @@ public class JsonLibraryVersionTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_JsonLibraryVersion_8_0()
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 8.0m);
@@ -122,7 +122,7 @@ public class JsonLibraryVersionTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_JsonLibraryVersion_9_0()
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
@@ -132,14 +132,14 @@ public class JsonLibraryVersionTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_JsonLibraryVersion_9_0()
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task JsonLibraryVersion_9_0_Should_Generate_JsonStringEnumMemberName()
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
@@ -152,7 +152,7 @@ public class JsonLibraryVersionTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task JsonLibraryVersion_9_0_Should_Also_Generate_EnumMember()
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
@@ -165,7 +165,7 @@ public class JsonLibraryVersionTests
         }
     }
 
-    [Test]
+    [TestMethod]
     public async Task JsonLibraryVersion_9_0_Should_Have_JsonConverter_On_Enum()
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
@@ -175,7 +175,7 @@ public class JsonLibraryVersionTests
         generatedCode.Should().MatchRegex(@"\[JsonConverter\(typeof\(JsonStringEnumConverter<\w+>\)\)\]");
     }
 
-    [Test]
+    [TestMethod]
     public async Task JsonLibraryVersion_9_0_Sets_Value_Correctly()
     {
         var settings = new RefitGeneratorSettings
@@ -191,7 +191,7 @@ public class JsonLibraryVersionTests
         settings.CodeGeneratorSettings.JsonLibraryVersion.Should().Be(9.0m);
     }
 
-    [Test]
+    [TestMethod]
     public async Task JsonLibraryVersion_8_0_Sets_Value_Correctly()
     {
         var settings = new RefitGeneratorSettings

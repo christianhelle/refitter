@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class OperationNameGeneratorTypesTests
 {
     private const string OpenApiSpec = @"
@@ -163,14 +163,14 @@ public class OperationNameGeneratorTypesTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code_With_Default()
     {
         string generatedCode = await GenerateCode(OperationNameGeneratorTypes.Default);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Default()
     {
         string generatedCode = await GenerateCode(OperationNameGeneratorTypes.Default);
@@ -180,25 +180,25 @@ public class OperationNameGeneratorTypesTests
             .BeTrue();
     }
 
-    [Test]
-    [Arguments(OperationNameGeneratorTypes.Default)]
-    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromOperationId)]
-    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromPathSegments)]
-    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationId)]
-    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationName)]
-    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndPathSegments)]
-    [Arguments(OperationNameGeneratorTypes.SingleClientFromOperationId)]
-    [Arguments(OperationNameGeneratorTypes.SingleClientFromPathSegments)]
+    [TestMethod]
+    [DataRow(OperationNameGeneratorTypes.Default)]
+    [DataRow(OperationNameGeneratorTypes.MultipleClientsFromOperationId)]
+    [DataRow(OperationNameGeneratorTypes.MultipleClientsFromPathSegments)]
+    [DataRow(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationId)]
+    [DataRow(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationName)]
+    [DataRow(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndPathSegments)]
+    [DataRow(OperationNameGeneratorTypes.SingleClientFromOperationId)]
+    [DataRow(OperationNameGeneratorTypes.SingleClientFromPathSegments)]
     public async Task Can_Generate_Code_For_Each_OperationNameGenerator_Type(OperationNameGeneratorTypes generatorType)
     {
         string generatedCode = await GenerateCode(generatorType);
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
-    [Arguments(OperationNameGeneratorTypes.Default)]
-    [Arguments(OperationNameGeneratorTypes.MultipleClientsFromOperationId)]
-    [Arguments(OperationNameGeneratorTypes.SingleClientFromOperationId)]
+    [TestMethod]
+    [DataRow(OperationNameGeneratorTypes.Default)]
+    [DataRow(OperationNameGeneratorTypes.MultipleClientsFromOperationId)]
+    [DataRow(OperationNameGeneratorTypes.SingleClientFromOperationId)]
     public async Task Can_Build_Generated_Code_For_OperationId_Based_Generators(OperationNameGeneratorTypes generatorType)
     {
         string generatedCode = await GenerateCode(generatorType);
@@ -208,7 +208,7 @@ public class OperationNameGeneratorTypesTests
             .BeTrue();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Multiple_Interfaces_For_MultipleClientsFromOperationId()
     {
         string generatedCode = await GenerateCode(OperationNameGeneratorTypes.MultipleClientsFromOperationId);
@@ -217,7 +217,7 @@ public class OperationNameGeneratorTypesTests
         generatedCode.Should().Contain("ListOrders");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Single_Interface_For_SingleClientFromOperationId()
     {
         string generatedCode = await GenerateCode(OperationNameGeneratorTypes.SingleClientFromOperationId);
@@ -227,7 +227,7 @@ public class OperationNameGeneratorTypesTests
         generatedCode.Should().Contain("GetPetById");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generated_Code_Contains_Multiple_Interfaces_With_Tag_Based_Naming_For_FirstTag()
     {
         string generatedCode = await GenerateCode(OperationNameGeneratorTypes.MultipleClientsFromFirstTagAndOperationId);

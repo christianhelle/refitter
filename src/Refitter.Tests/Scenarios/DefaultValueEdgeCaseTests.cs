@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Default values containing quotes, backslashes, newlines, extreme integers, exponents and GUIDs.
 /// </summary>
+[TestClass]
 public class DefaultValueEdgeCaseTests
 {
     private const string OpenApiSpec = """
@@ -43,14 +43,14 @@ public class DefaultValueEdgeCaseTests
                 u: { type: string, format: uuid, default: 00000000-0000-0000-0000-000000000000 }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Escapes_Default_Values()
     {
         var generatedCode = await GenerateCode();
@@ -59,7 +59,7 @@ public class DefaultValueEdgeCaseTests
         generatedCode.Should().Contain("= new System.Guid(\"00000000-0000-0000-0000-000000000000\");");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Escapes_Optional_Parameter_Default_Values()
     {
         var generatedCode = await GenerateCode(settings => settings.OptionalParameters = true);
@@ -68,24 +68,24 @@ public class DefaultValueEdgeCaseTests
         generatedCode.Should().Contain("[Query] bool? b = true");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Optional_Parameters()
     {
         var generatedCode = await GenerateCode(settings => settings.OptionalParameters = true);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code_With_Immutable_Records()
     {
         var generatedCode = await GenerateCode(settings => settings.ImmutableRecords = true);

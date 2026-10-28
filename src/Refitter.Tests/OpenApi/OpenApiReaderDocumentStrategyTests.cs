@@ -5,11 +5,12 @@ using Refitter.Core;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class OpenApiReaderDocumentStrategyTests
 {
 
 
-    [Test]
+    [TestMethod]
     public async Task Returns_Null_When_No_External_References()
     {
         var spec = @"{
@@ -24,7 +25,7 @@ public class OpenApiReaderDocumentStrategyTests
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Handles_Json_With_External_References()
     {
         var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -80,7 +81,7 @@ public class OpenApiReaderDocumentStrategyTests
         Directory.Delete(folder, true);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Handles_Yaml_With_External_References()
     {
         var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -125,7 +126,7 @@ paths:
         Directory.Delete(folder, true);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Json_External_References_Are_Resolved_By_The_Round_Trip()
     {
         string folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -189,7 +190,7 @@ paths:
         Directory.Delete(folder, true);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Yaml_External_References_Are_Resolved_By_The_Round_Trip()
     {
         string folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -236,7 +237,7 @@ paths:
         Directory.Delete(folder, true);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Populates_Missing_Info_On_The_Returned_Document()
     {
         string folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -289,7 +290,7 @@ paths:
         Directory.Delete(folder, true);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Returns_Null_On_Invalid_Spec()
     {
         var swaggerFile = await TestFile.CreateSwaggerFile(
@@ -301,7 +302,7 @@ paths:
         result.Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Returns_Null_When_Remote_Document_Cannot_Be_Read()
     {
         // Port 1 refuses the connection, so the reader fails and the NSwag fallback
@@ -311,7 +312,7 @@ paths:
 
         result.Should().BeNull();
     }
-    [Test]
+    [TestMethod]
     public async Task Returns_Null_When_An_External_Reference_Cannot_Be_Resolved()
     {
         var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -366,9 +367,9 @@ paths:
         Directory.Delete(folder, true);
     }
 
-    [Test]
-    [Arguments("yaml")]
-    [Arguments("json")]
+    [TestMethod]
+    [DataRow("yaml")]
+    [DataRow("json")]
     public async Task Clamps_Numeric_Bounds_Outside_Decimal_Range_With_External_References(string extension)
     {
         var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());

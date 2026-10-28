@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 
+[TestClass]
 public class OptionalNullableParametersTests
 {
     private const string OpenApiSpec = @"
@@ -47,45 +47,45 @@ paths:
           description: 'successful operation'
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_Nullable_Directive()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("#nullable");
     }
 
-    [Test]
-    [Arguments("title")]
-    [Arguments("contact")]
-    [Arguments("description")]
+    [TestMethod]
+    [DataRow("title")]
+    [DataRow("contact")]
+    [DataRow("description")]
     public async Task Generates_Nullable_Parameters(string parameterName)
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain($"string? {parameterName} = default");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_CancellationToken_Last()
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("CancellationToken cancellationToken = default);");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Generates_DynamicQuerystring_Param()
     {
         string generatedCode = await GenerateCode(true);
         generatedCode.Should().Contain("string id, [Query] UpdateJobDetailsQueryParams? queryParams = default, CancellationToken cancellationToken = default);");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code()
     {
         string generatedCode = await GenerateCode();

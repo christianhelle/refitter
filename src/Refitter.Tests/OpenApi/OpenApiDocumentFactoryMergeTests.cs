@@ -9,11 +9,12 @@ using Refitter.Tests.TestUtilities;
 namespace Refitter.Tests.OpenApi;
 
 
+[TestClass]
 public class OpenApiDocumentFactoryMergeTests
 {
     private static readonly DocumentEquivalenceComparer Comparer = new();
     private static readonly DocumentMerger Merger = new(Comparer);
-    [Test]
+    [TestMethod]
     public async Task Merge_Preserves_Tags_From_Base_Document()
     {
         // Test that when the base document has tags defined, they are preserved in the merge
@@ -62,7 +63,7 @@ paths:
         merged.Tags.Should().Contain(t => t.Name == "pets");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_Combines_Tags_From_Multiple_Documents()
     {
         // Test that tags from both documents are merged, testing the tag name selector lambda
@@ -117,7 +118,7 @@ paths:
         merged.Tags.Should().Contain(t => t.Name == "orders");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_Does_Not_Duplicate_Tags_With_Same_Name()
     {
         // Test that when multiple documents have the same tag name, it's not duplicated
@@ -168,7 +169,7 @@ paths:
         merged.Tags.Should().Contain(t => t.Name == "shared");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_Creates_Tags_Collection_When_Base_Has_None_But_Second_Does()
     {
         // Test that when base document has no tags but second document does, tags are added
@@ -214,7 +215,7 @@ paths:
         merged.Tags.Should().Contain(t => t.Name == "products");
     }
 
-    [Test]
+    [TestMethod]
     public async Task PopulateMissingRequiredFields_Handles_External_References()
     {
         // Test that external reference handling works correctly
@@ -274,7 +275,7 @@ paths:
         document.Info.Version.Should().Be("1.0.0");
     }
 
-    [Test]
+    [TestMethod]
     public async Task PopulateMissingRequiredFields_Preserves_Existing_Title()
     {
         // Test that when title is present, it's preserved
@@ -334,7 +335,7 @@ paths:
         document.Info.Version.Should().Be("1.0.0");
     }
 
-    [Test]
+    [TestMethod]
     public async Task PopulateMissingRequiredFields_Creates_Info_With_External_Refs()
     {
         // Test that when Info is minimal with external references, it's populated
@@ -394,7 +395,7 @@ paths:
         document.Info.Version.Should().NotBeNullOrEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_Handles_Three_Documents_With_Tags()
     {
         // Test merging more than two documents with various tag scenarios
@@ -458,7 +459,7 @@ paths:
         merged.Tags.Should().Contain(t => t.Name == "orders");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_For_NonConflicting_Documents_Returns_A_New_Document_Without_Mutating_Inputs()
     {
         const string baseSpec = """
@@ -533,7 +534,7 @@ paths:
         secondDocument.Tags.Should().ContainSingle().Which.Name.Should().Be("orders");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_With_Equivalent_Recursive_Schema_Duplicate_Ignores_Duplicate()
     {
         const string baseSpec = """
@@ -635,7 +636,7 @@ paths:
         secondDocument.Paths.Should().ContainSingle().Which.Key.Should().Be("/linked-list");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_With_Collisions_Throws_And_Does_Not_Mutate_Inputs()
     {
         const string baseSpec = """
@@ -720,7 +721,7 @@ paths:
         secondDocument.Tags.Should().Contain(t => t.Name == "orders");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_With_Schema_Collision_Throws_And_Does_Not_Mutate_Inputs()
     {
         const string baseSpec = """
@@ -806,7 +807,7 @@ paths:
         secondDocument.Components.Schemas["Shared"].Properties.Should().ContainKey("email");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_With_Security_Scheme_Collision_Throws_And_Does_Not_Mutate_Inputs()
     {
         const string baseSpec = """
@@ -883,7 +884,7 @@ paths:
         secondDocument.SecurityDefinitions["ApiKey"].Name.Should().Be("X-Second-Key");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_With_Base_Tags_Null_And_Swagger2_Only_Incoming_Document_Merges_Without_Creating_Tags()
     {
         const string baseSpec = """
@@ -952,7 +953,7 @@ paths:
         baseDocument.Definitions.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public void CreateCanonicalSchemaToken_Emits_Complex_Schema_Shape_Without_Nulls()
     {
         var schema = new JsonSchema
@@ -1012,7 +1013,7 @@ paths:
         json["extensions"]!["x-meta"]!["alpha"]!.Value<int>().Should().Be(1);
     }
 
-    [Test]
+    [TestMethod]
     public void CreateCanonicalJsonToken_Falls_Back_To_Schema_Canonicalization_For_ReferenceSchema()
     {
         var schema = new JsonSchema
@@ -1028,7 +1029,7 @@ paths:
         token["type"]!.Value<string>().Should().Be("String");
     }
 
-    [Test]
+    [TestMethod]
     public void CreateCanonicalSchemaToken_For_Visited_Reference_Uses_Placeholder()
     {
         var referencedSchema = new JsonSchema
@@ -1047,7 +1048,7 @@ paths:
         token["$ref"]!.Value<string>().Should().Be("#");
     }
 
-    [Test]
+    [TestMethod]
     public void CreateCanonicalSchemaToken_For_Unvisited_Reference_Canonicalizes_Referenced_Schema()
     {
         var referencedSchema = new JsonSchema
@@ -1064,7 +1065,7 @@ paths:
         token["type"]!.Value<string>().Should().Be("Object");
     }
 
-    [Test]
+    [TestMethod]
     public void CreateCanonicalSchemaToken_When_ActualSchema_Is_Already_Visited_Uses_Placeholder()
     {
         var schema = new JsonSchema
@@ -1077,7 +1078,7 @@ paths:
         token["$ref"]!.Value<string>().Should().Be("#");
     }
 
-    [Test]
+    [TestMethod]
     public void GetDefinitionName_Decodes_Url_Encoded_Names()
     {
         var schema = new JsonSchema();
@@ -1086,7 +1087,7 @@ paths:
         InvokeGetDefinitionName(schema).Should().Be("Problem Details");
     }
 
-    [Test]
+    [TestMethod]
     public void GetDefinitionName_Without_Path_Separator_Returns_Null()
     {
         var schema = new JsonSchema();
@@ -1095,7 +1096,7 @@ paths:
         InvokeGetDefinitionName(schema).Should().BeNull();
     }
 
-    [Test]
+    [TestMethod]
     public async Task CreateOpenApiJson_Serializes_OpenApiDocuments_And_Pocos()
     {
         var document = await ParseJsonDocument("""
@@ -1126,7 +1127,7 @@ paths:
             .Be("""{"Name":"Lambert","Count":2}""");
     }
 
-    [Test]
+    [TestMethod]
     public void AreEquivalent_Returns_False_When_Canonicalization_Throws()
     {
         var left = new SelfReferencingValue();
@@ -1138,7 +1139,7 @@ paths:
         InvokeAreEquivalent(left, right).Should().BeFalse();
     }
 
-    [Test]
+    [TestMethod]
     public void RemoveNullProperties_Removes_Only_Null_Values()
     {
         var json = new JObject
@@ -1157,7 +1158,7 @@ paths:
         normalized.Should().NotContainKeys("format", "description");
     }
 
-    [Test]
+    [TestMethod]
     public async Task AddReferencedSchemas_Does_Not_Overwrite_Existing_Named_Schema()
     {
         var rootSchema = new JsonSchema
@@ -1195,7 +1196,7 @@ paths:
         definitions.Should().ContainSingle().Which.Value.Should().BeSameAs(existingDefinition);
     }
 
-    [Test]
+    [TestMethod]
     public async Task AddReferencedSchemas_Adds_Named_Property_Schema_To_Empty_Definitions()
     {
         var rootSchema = new JsonSchema
@@ -1227,7 +1228,7 @@ paths:
         definitions["NamedChild"].Should().BeSameAs(referencedChildSchema);
     }
 
-    [Test]
+    [TestMethod]
     public void CreateCanonicalSchemaToken_Preserves_Null_And_NonNull_Extension_Values()
     {
         var schema = new JsonSchema
@@ -1249,7 +1250,7 @@ paths:
         token["extensions"]!["x-meta"]!["beta"]!.Value<int>().Should().Be(2);
     }
 
-    [Test]
+    [TestMethod]
     public void AddReferencedSchemas_Adds_Named_Item_Schemas_From_Items_Collection()
     {
         var rootSchema = new JsonSchema
@@ -1275,7 +1276,7 @@ paths:
         definitions["NamedItem"].Should().BeSameAs(referencedItemSchema);
     }
 
-    [Test]
+    [TestMethod]
     public async Task ParseJsonDocument_Normalizes_Missing_Components_Schemas_To_Empty_Collections()
     {
         var document = await ParseJsonDocument("""
@@ -1305,7 +1306,7 @@ paths:
         document.Components.Schemas.Should().BeEmpty();
     }
 
-    [Test]
+    [TestMethod]
     public async Task ParseAndCloneDocument_Normalize_Missing_Tags_To_Empty_Collections()
     {
         var parsedDocument = await ParseJsonDocument("""
@@ -1337,9 +1338,9 @@ paths:
         clonedDocument.Tags.Should().BeEmpty();
     }
 
-    [Test]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV2)]
-    [Arguments(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
+    [TestMethod]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV2)]
+    [DataRow(SampleOpenSpecifications.SwaggerPetstoreJsonV3)]
     public async Task ParseAndCloneDocument_RoundTrips_SchemaType_And_Collections(SampleOpenSpecifications version)
     {
         var parsedDocument = await ParseJsonDocument(EmbeddedResources.GetSwaggerPetstore(version));
@@ -1353,7 +1354,7 @@ paths:
         clonedDocument.SecurityDefinitions.Keys.Should().BeEquivalentTo(parsedDocument.SecurityDefinitions.Keys);
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_Preserves_OpenApi3_Base_SchemaType_For_Cloned_Document()
     {
         var baseDocument = await ParseJsonDocument("""
@@ -1405,7 +1406,7 @@ paths:
         JObject.Parse(merged.ToJson())["openapi"]!.Value<string>().Should().Be("3.0.0");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Merge_Preserves_Swagger2_Base_SchemaType_For_Cloned_Document()
     {
         var baseDocument = await ParseJsonDocument("""
@@ -1460,7 +1461,7 @@ paths:
     private static Task<OpenApiDocument> ParseJsonDocument(string json)
         => OpenApiDocument.FromJsonAsync(json);
 
-    [Test]
+    [TestMethod]
     public void Merge_Throws_On_Null_Documents()
     {
         var act = () => Merger.Merge(null!);
@@ -1468,7 +1469,7 @@ paths:
         act.Should().Throw<ArgumentException>();
     }
 
-    [Test]
+    [TestMethod]
     public void Merge_Throws_On_Empty_Documents()
     {
         var act = () => Merger.Merge([]);

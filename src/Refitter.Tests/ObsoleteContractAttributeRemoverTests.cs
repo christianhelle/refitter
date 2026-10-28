@@ -3,6 +3,7 @@ using Refitter.Core;
 
 namespace Refitter.Tests;
 
+[TestClass]
 public class ObsoleteContractAttributeRemoverTests
 {
     private const string Contracts = """
@@ -41,7 +42,7 @@ public class ObsoleteContractAttributeRemoverTests
         }
         """;
 
-    [Test]
+    [TestMethod]
     public void Removes_Obsolete_Attribute_From_Types_Referenced_By_Interfaces()
     {
         var result = ObsoleteContractAttributeRemover.Remove(Contracts, [Interface]);
@@ -71,7 +72,7 @@ public class ObsoleteContractAttributeRemoverTests
             """);
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Obsolete_Attribute_On_Properties()
     {
         var result = ObsoleteContractAttributeRemover.Remove(Contracts, [Interface]);
@@ -83,7 +84,7 @@ public class ObsoleteContractAttributeRemoverTests
             """);
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Obsolete_Attribute_On_Types_Not_Referenced_By_Interfaces()
     {
         var result = ObsoleteContractAttributeRemover.Remove(Contracts, [Interface]);
@@ -95,7 +96,7 @@ public class ObsoleteContractAttributeRemoverTests
             """);
     }
 
-    [Test]
+    [TestMethod]
     public void Keeps_Obsolete_Attribute_On_Types_Only_Named_In_Routes_Strings_Or_Comments()
     {
         const string interfaceCode = """
@@ -119,11 +120,11 @@ public class ObsoleteContractAttributeRemoverTests
         result.Should().NotContain("[System.Obsolete(\"use E\")]");
     }
 
-    [Test]
-    [Arguments("internal partial class")]
-    [Arguments("public enum")]
-    [Arguments("internal enum")]
-    [Arguments("public sealed partial class")]
+    [TestMethod]
+    [DataRow("internal partial class")]
+    [DataRow("public enum")]
+    [DataRow("internal enum")]
+    [DataRow("public sealed partial class")]
     public void Removes_Obsolete_Attribute_From_Other_Declaration_Forms(string declaration)
     {
         var contracts = $$"""
@@ -142,13 +143,13 @@ public class ObsoleteContractAttributeRemoverTests
         result.Should().Contain($"{declaration} Used");
     }
 
-    [Test]
+    [TestMethod]
     public void Returns_Contracts_Unchanged_Without_Interfaces()
     {
         ObsoleteContractAttributeRemover.Remove(Contracts, []).Should().Be(Contracts);
     }
 
-    [Test]
+    [TestMethod]
     public void Handles_Crlf_Line_Endings()
     {
         var contracts = Contracts.Replace("\r\n", "\n").Replace("\n", "\r\n");

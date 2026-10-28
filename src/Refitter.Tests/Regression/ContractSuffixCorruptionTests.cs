@@ -10,6 +10,7 @@ namespace Refitter.Tests.Regression;
 /// Validates that suffix replacement doesn't corrupt XML comments, string literals, or partial name matches
 /// </summary>
 
+[TestClass]
 public class ContractSuffixCorruptionTests
 {
     private const string OpenApiSpec = @"
@@ -110,7 +111,7 @@ public class ContractSuffixCorruptionTests
 }
 ";
 
-    [Test]
+    [TestMethod]
     public async Task Should_Not_Corrupt_Comments_Or_Descriptions()
     {
         string generatedCode = await GenerateCode("DTO");
@@ -128,7 +129,7 @@ public class ContractSuffixCorruptionTests
         generatedCode.Should().Contain("class PetResponseDTO");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Not_Double_Suffix()
     {
         string generatedCode = await GenerateCode("DTO");
@@ -139,7 +140,7 @@ public class ContractSuffixCorruptionTests
         generatedCode.Should().NotContain("PetResponseDTODTO");
     }
 
-    [Test]
+    [TestMethod]
     public async Task Partial_Name_Should_Not_Corrupt_Longer_Names()
     {
         string generatedCode = await GenerateCode("DTO");
@@ -152,7 +153,7 @@ public class ContractSuffixCorruptionTests
         generatedCode.Should().NotContain("class PetResponse "); // without suffix
     }
 
-    [Test]
+    [TestMethod]
     public async Task Should_Apply_Suffix_To_Type_Declarations_Only()
     {
         string generatedCode = await GenerateCode("Contract");
@@ -166,7 +167,7 @@ public class ContractSuffixCorruptionTests
         generatedCode.Should().NotContain("class Pet "); // ensure it's suffixed
     }
 
-    [Test]
+    [TestMethod]
     public async Task Can_Build_Generated_Code_With_Suffix()
     {
         string generatedCode = await GenerateCode("DTO");

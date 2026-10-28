@@ -2,13 +2,13 @@ using AwesomeAssertions;
 using Refitter.Core;
 using Refitter.Tests.Build;
 using Refitter.Tests.TestUtilities;
-using TUnit.Core;
 
 namespace Refitter.Tests.Scenarios;
 
 /// <summary>
 /// Non-ASCII punctuation in info.title must not leak into the interface name (#1271).
 /// </summary>
+[TestClass]
 public class NonAsciiTitleTests
 {
     private const string OpenApiSpec = """
@@ -21,14 +21,14 @@ public class NonAsciiTitleTests
               responses: { '204': { description: ok } }
         """;
 
-    [Test]
+    [TestMethod]
     public async Task Can_Generate_Code()
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Test]
+    [TestMethod]
     public async Task Removes_Invalid_Characters_From_Interface_Name()
     {
         var generatedCode = await GenerateCode();
@@ -39,8 +39,8 @@ public class NonAsciiTitleTests
         interfaceName.Should().MatchRegex(@"^[\p{L}\p{Nd}_]+$");
     }
 
-    [Test]
-    [Category("Integration")]
+    [TestMethod]
+    [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
     {
         var generatedCode = await GenerateCode();

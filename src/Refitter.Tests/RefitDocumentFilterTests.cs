@@ -1,11 +1,11 @@
 using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
-using TUnit.Core;
 
 namespace Refitter.Tests;
 
 
+[TestClass]
 public class RefitDocumentFilterTests
 {
     private const string OpenApiSpec = @"
@@ -110,7 +110,7 @@ paths:
         return await OpenApiDocument.FromJsonAsync(await json);
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByTags_WithEmptyTags_ReturnsSameDocument()
     {
         var document = await LoadDocument();
@@ -119,7 +119,7 @@ paths:
         result.Paths.Count.Should().Be(document.Paths.Count);
     }
 
-    [Test]
+    [TestMethod]
     public void FilterByTags_Throws_On_Null_Document()
     {
         var act = () => RefitDocumentFilter.FilterByTags(null!, ["Foo"]);
@@ -127,7 +127,7 @@ paths:
         act.Should().Throw<ArgumentNullException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByTags_Throws_On_Null_Tags()
     {
         var document = await LoadDocument();
@@ -137,7 +137,7 @@ paths:
         act.Should().Throw<ArgumentNullException>();
     }
 
-    [Test]
+    [TestMethod]
     public void FilterByPath_Throws_On_Null_Document()
     {
         var act = () => RefitDocumentFilter.FilterByPath(null!, ["^/foo"]);
@@ -145,7 +145,7 @@ paths:
         act.Should().Throw<ArgumentNullException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByPath_Throws_On_Null_Patterns()
     {
         var document = await LoadDocument();
@@ -155,7 +155,7 @@ paths:
         act.Should().Throw<ArgumentNullException>();
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByTags_RemovesNonMatchingOperations()
     {
         var document = await LoadDocument();
@@ -167,7 +167,7 @@ paths:
         result.Paths.Should().NotContainKey("/baz");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByTags_MultipleTags_KeepsAllMatching()
     {
         var document = await LoadDocument();
@@ -180,7 +180,7 @@ paths:
         result.Paths.Should().NotContainKey("/bar/{id}");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByTags_DoesNotMutateOriginalDocument()
     {
         var document = await LoadDocument();
@@ -191,7 +191,7 @@ paths:
         document.Paths.Count.Should().Be(originalCount);
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByPath_WithEmptyPatterns_ReturnsSameDocument()
     {
         var document = await LoadDocument();
@@ -200,7 +200,7 @@ paths:
         result.Paths.Count.Should().Be(document.Paths.Count);
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByPath_KeepsMatchingPaths()
     {
         var document = await LoadDocument();
@@ -212,7 +212,7 @@ paths:
         result.Paths.Should().NotContainKey("/baz");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByPath_MultiplePatterns_KeepsAllMatching()
     {
         var document = await LoadDocument();
@@ -225,7 +225,7 @@ paths:
         result.Paths.Should().NotContainKey("/bar/{id}");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByPath_DoesNotMutateOriginalDocument()
     {
         var document = await LoadDocument();
@@ -236,7 +236,7 @@ paths:
         document.Paths.Count.Should().Be(originalCount);
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByTags_WithSwagger20_RemovesNonMatchingOperations()
     {
         var document = await LoadSwaggerDocument();
@@ -248,7 +248,7 @@ paths:
         result.Paths.Should().NotContainKey("/baz");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByTags_WithSwagger20_MultipleTags_KeepsAllMatching()
     {
         var document = await LoadSwaggerDocument();
@@ -261,7 +261,7 @@ paths:
         result.Paths.Should().NotContainKey("/bar/{id}");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByPath_WithSwagger20_KeepsMatchingPaths()
     {
         var document = await LoadSwaggerDocument();
@@ -273,7 +273,7 @@ paths:
         result.Paths.Should().NotContainKey("/baz");
     }
 
-    [Test]
+    [TestMethod]
     public async Task FilterByTags_RemovesOperationsWithoutTags()
     {
         var document = await OpenApiDocument.FromJsonAsync("""
