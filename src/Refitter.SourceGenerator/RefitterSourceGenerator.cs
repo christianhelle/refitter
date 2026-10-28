@@ -1,7 +1,12 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
 using Refitter.Core;
 
 namespace Refitter.SourceGenerator;
@@ -41,16 +46,286 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             }
         });
 
-        // generate code for each .refitter file and process the results
-        context.RegisterImplementationSourceOutput(refitterFiles.Select(GenerateCode), ProcessResults);
+        // generate code for each .refitter file and add it to the compilation, with hint names
+        // made unique across all .refitter files since Roslyn requires that per generator
+        var generatedCode = refitterFiles
+            .Select(GenerateCode)
+            .Collect()
+            .Select((results, _) => AssignUniqueHintNames(results));
+        context.RegisterSourceOutput(generatedCode, ProcessResults);
+
+        // run the generators that need to see Refitter's output, since generators can't see each other's sources
+        var nestedInputs = context.CompilationProvider
+            .Combine(generatedCode.Select((results, _) => results
+                .SelectMany(code => code.Sources)
+                .ToImmutableArray()
+                .AsEquatableArray()))
+            .Combine(context.ParseOptionsProvider)
+            .Combine(context.AnalyzerConfigOptionsProvider);
+
+        context.RegisterImplementationSourceOutput(
+            nestedInputs,
+            static (spc, input) => RunNestedGenerators(
+                spc,
+                input.Left.Left.Left,
+                input.Left.Left.Right,
+                (CSharpParseOptions)input.Left.Right,
+                input.Right));
     }
 
-    private static void ProcessResults(SourceProductionContext context, GeneratedCode result)
+    private static void RunNestedGenerators(
+        SourceProductionContext context,
+        Compilation compilation,
+        EquatableArray<GeneratedSource> refitterSources,
+        CSharpParseOptions parseOptions,
+        AnalyzerConfigOptionsProvider optionsProvider)
     {
-        foreach (var diagnostic in result.Diagnostics)
+        var refitterTrees = refitterSources
+            .Select(source => CSharpSyntaxTree.ParseText(
+                SourceText.From(source.Content, Encoding.UTF8),
+                parseOptions,
+                source.HintName,
+                context.CancellationToken))
+            .ToArray();
+
+        var augmentedCompilation = compilation.AddSyntaxTrees(refitterTrees);
+
+        RunJsonGenerator(context, compilation, augmentedCompilation, refitterTrees, parseOptions, optionsProvider);
+        RunRefitGenerator(context, compilation, augmentedCompilation, parseOptions, optionsProvider);
+    }
+
+    private static void RunJsonGenerator(
+        SourceProductionContext context,
+        Compilation compilation,
+        Compilation augmentedCompilation,
+        IReadOnlyList<SyntaxTree> refitterTrees,
+        CSharpParseOptions parseOptions,
+        AnalyzerConfigOptionsProvider optionsProvider)
+    {
+        // System.Text.Json's own pass can't see the JsonSerializerContext that Refitter generates
+        var contextNames = new HashSet<string>(
+            refitterTrees
+                .SelectMany(tree => tree.GetRoot(context.CancellationToken).DescendantNodes())
+                .OfType<ClassDeclarationSyntax>()
+                .Where(IsJsonSerializerContext)
+                .Select(declaration => declaration.Identifier.ValueText),
+            StringComparer.Ordinal);
+
+        if (contextNames.Count == 0)
         {
-            context.ReportDiagnostic(CreateDiagnostic(diagnostic));
+            return;
         }
+
+        var generator = LoadedGeneratorLocator.CreateJsonGenerator(compilation);
+        if (generator is null)
+        {
+            context.ReportDiagnostic(CreateDiagnostic(CreateJsonGeneratorNotFoundDiagnostic()));
+            return;
+        }
+
+        // the nested run also covers the project's own contexts, which System.Text.Json already generated
+        RunGenerator(
+            context,
+            compilation,
+            augmentedCompilation,
+            new NestedGenerator(generator, "System.Text.Json", optionsProvider),
+            parseOptions,
+            hintName => contextNames.Any(name => hintName.StartsWith(name + ".", StringComparison.Ordinal)),
+            diagnostic => diagnostic.Location.SourceTree is { } tree && !compilation.ContainsSyntaxTree(tree));
+    }
+
+    private static bool IsJsonSerializerContext(ClassDeclarationSyntax declaration) =>
+        declaration.AttributeLists
+            .SelectMany(list => list.Attributes)
+            .Any(attribute => attribute.Name.ToString().EndsWith("JsonSerializable", StringComparison.Ordinal));
+
+    private static void RunRefitGenerator(
+        SourceProductionContext context,
+        Compilation compilation,
+        Compilation augmentedCompilation,
+        CSharpParseOptions parseOptions,
+        AnalyzerConfigOptionsProvider optionsProvider)
+    {
+        if (!optionsProvider.GlobalOptions.TryGetValue("build_property.RefitterRunsRefitGenerator", out var value) ||
+            !string.Equals(value, "true", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        var generator = LoadedGeneratorLocator.CreateRefitGenerator(compilation);
+        if (generator is null)
+        {
+            context.ReportDiagnostic(CreateDiagnostic(CreateRefitGeneratorNotFoundDiagnostic()));
+            return;
+        }
+
+        RunGenerator(
+            context,
+            compilation,
+            augmentedCompilation,
+            new NestedGenerator(generator, "Refit", new RefitGeneratorOptionsProvider(optionsProvider)),
+            parseOptions,
+            _ => true,
+            _ => true);
+
+        ReportRefitAnalyzerDiagnostics(context, compilation, augmentedCompilation, optionsProvider);
+    }
+
+    private static void ReportRefitAnalyzerDiagnostics(
+        SourceProductionContext context,
+        Compilation compilation,
+        Compilation augmentedCompilation,
+        AnalyzerConfigOptionsProvider optionsProvider)
+    {
+        // Refit's analyzer skips its generation checks (such as RF006) while its generator is disabled,
+        // so report the diagnostics it only finds when the generator is enabled
+        var analyzer = LoadedGeneratorLocator.CreateRefitAnalyzer(compilation);
+        if (analyzer is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var reported = new HashSet<(string, Location, string)>(
+                GetAnalyzerDiagnostics(augmentedCompilation, analyzer, optionsProvider, context.CancellationToken)
+                    .Select(GetDiagnosticKey));
+
+            var diagnostics = GetAnalyzerDiagnostics(
+                augmentedCompilation,
+                analyzer,
+                new RefitGeneratorOptionsProvider(optionsProvider),
+                context.CancellationToken);
+
+            foreach (var diagnostic in diagnostics.Where(d => !reported.Contains(GetDiagnosticKey(d))))
+            {
+                context.ReportDiagnostic(RelocateDiagnostic(compilation, diagnostic));
+            }
+        }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            context.ReportDiagnostic(CreateDiagnostic(CreateNestedGeneratorFailedDiagnostic("Refit analyzer", e)));
+        }
+    }
+
+    private static ImmutableArray<Diagnostic> GetAnalyzerDiagnostics(
+        Compilation compilation,
+        DiagnosticAnalyzer analyzer,
+        AnalyzerConfigOptionsProvider optionsProvider,
+        CancellationToken cancellationToken) =>
+        compilation
+            .WithAnalyzers(
+                ImmutableArray.Create(analyzer),
+                new AnalyzerOptions(ImmutableArray<AdditionalText>.Empty, optionsProvider),
+                cancellationToken)
+            .GetAnalyzerDiagnosticsAsync(cancellationToken)
+            .GetAwaiter()
+            .GetResult();
+
+    private static (string, Location, string) GetDiagnosticKey(Diagnostic diagnostic) =>
+        (diagnostic.Id, diagnostic.Location, diagnostic.GetMessage());
+
+    private static void RunGenerator(
+        SourceProductionContext context,
+        Compilation compilation,
+        Compilation augmentedCompilation,
+        NestedGenerator nestedGenerator,
+        CSharpParseOptions parseOptions,
+        Func<string, bool> includeSource,
+        Func<Diagnostic, bool> includeDiagnostic)
+    {
+        try
+        {
+            var driver = CSharpGeneratorDriver.Create(
+                new[] { nestedGenerator.Generator.AsSourceGenerator() },
+                parseOptions: parseOptions,
+                optionsProvider: nestedGenerator.OptionsProvider);
+
+            var runResult = driver
+                .RunGenerators(augmentedCompilation, context.CancellationToken)
+                .GetRunResult();
+
+            foreach (var diagnostic in runResult.Diagnostics.Where(includeDiagnostic))
+            {
+                context.ReportDiagnostic(RelocateDiagnostic(compilation, diagnostic));
+            }
+
+            foreach (var result in runResult.Results)
+            {
+                if (result.Exception is not null)
+                {
+                    context.ReportDiagnostic(
+                        CreateDiagnostic(CreateNestedGeneratorFailedDiagnostic(nestedGenerator.Name, result.Exception)));
+                }
+
+                foreach (var source in result.GeneratedSources.Where(source => includeSource(source.HintName)))
+                {
+                    context.AddSource(nestedGenerator.Name + "." + source.HintName, source.SourceText);
+                }
+            }
+        }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            context.ReportDiagnostic(CreateDiagnostic(CreateNestedGeneratorFailedDiagnostic(nestedGenerator.Name, e)));
+        }
+    }
+
+    private static Diagnostic RelocateDiagnostic(Compilation compilation, Diagnostic diagnostic)
+    {
+        // diagnostics in syntax trees that only exist in the nested compilation can't be reported as-is
+        var tree = diagnostic.Location.SourceTree;
+        if (tree is null || compilation.ContainsSyntaxTree(tree))
+        {
+            return diagnostic;
+        }
+
+        var descriptor = new DiagnosticDescriptor(
+            diagnostic.Id,
+            diagnostic.Descriptor.Title,
+            "{0}",
+            diagnostic.Descriptor.Category,
+            diagnostic.Severity,
+            isEnabledByDefault: true);
+
+        var lineSpan = diagnostic.Location.GetLineSpan();
+        return Diagnostic.Create(
+            descriptor,
+            Location.None,
+            $"{diagnostic.GetMessage()} ({lineSpan.Path}:{lineSpan.StartLinePosition.Line + 1})");
+    }
+
+    private static void ProcessResults(SourceProductionContext context, EquatableArray<GeneratedCode> results)
+    {
+        foreach (var result in results)
+        {
+            foreach (var diagnostic in result.Diagnostics)
+            {
+                context.ReportDiagnostic(CreateDiagnostic(diagnostic));
+            }
+
+            foreach (var source in result.Sources)
+            {
+                context.AddSource(source.HintName, source.Content);
+                context.ReportDiagnostic(CreateDiagnostic(CreateGeneratedSuccessfullyDiagnostic(source.HintName)));
+            }
+        }
+    }
+
+    internal static EquatableArray<GeneratedCode> AssignUniqueHintNames(ImmutableArray<GeneratedCode> results)
+    {
+        // order by settings file so the same file keeps the same hint name between builds
+        var usedHintNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        return results
+            .OrderBy(result => result.SettingsFilePath, StringComparer.Ordinal)
+            .Select(result => result with
+            {
+                Sources = result.Sources
+                    .Select(source => source with { HintName = MakeUnique(source.HintName, usedHintNames) })
+                    .ToImmutableArray()
+                    .AsEquatableArray()
+            })
+            .ToImmutableArray()
+            .AsEquatableArray();
     }
 
     [SuppressMessage(
@@ -72,7 +347,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var json = TryReadRefitterFile(file, diagnostics, cancellationToken);
             if (json is null)
             {
-                return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+                return CreateFailedResult(file.Path, diagnostics);
             }
 
             diagnostics.Add(CreateFileContentsDiagnostic(json));
@@ -80,7 +355,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var settings = TryDeserialize(json, diagnostics);
             if (settings is null)
             {
-                return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+                return CreateFailedResult(file.Path, diagnostics);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -96,7 +371,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var runner = new RefitterRunner();
             var result = runner.RunAsync(
                     settings,
-                    writer: new SourceGeneratorFileWriter(),
+                    writer: null,
                     validator: null,
                     settingsFilePath: file.Path,
                     cancellationToken: cancellationToken)
@@ -119,25 +394,27 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 }
             }
 
+            var sources = new List<GeneratedSource>();
             if (result.Exception is null)
             {
+                var hintNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var plannedFile in result.GeneratedFiles)
                 {
-                    diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(plannedFile.Path));
+                    var hintName = CreateHintName(file.Path, plannedFile.Path, hintNames);
+                    sources.Add(new GeneratedSource(hintName, plannedFile.Content));
                 }
             }
 
-            var outputPath = result.GeneratedFiles.Count > 0
-                ? result.GeneratedFiles[0].Path
-                : null;
-
-            return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray(), outputPath);
+            return new GeneratedCode(
+                file.Path,
+                diagnostics.ToImmutableArray().AsEquatableArray(),
+                sources.ToImmutableArray().AsEquatableArray());
         }
         catch (Exception e)
         {
             diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to generate code: {e}"));
 
-            return new GeneratedCode(diagnostics.ToImmutableArray().AsEquatableArray());
+            return CreateFailedResult(file.Path, diagnostics);
         }
     }
 
@@ -236,6 +513,27 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
             DiagnosticSeverity.Warning);
 
+    private static GeneratedDiagnostic CreateRefitGeneratorNotFoundDiagnostic() =>
+        new(
+            "REFITTER006",
+            "Refit source generator not found",
+            "Refitter could not find the Refit source generator, so no Refit implementations were generated. Add a direct PackageReference to Refit to the project.",
+            DiagnosticSeverity.Warning);
+
+    private static GeneratedDiagnostic CreateNestedGeneratorFailedDiagnostic(string generatorName, Exception exception) =>
+        new(
+            "REFITTER007",
+            "Source generator failed",
+            $"The {generatorName} source generator failed when run by Refitter: {exception}",
+            DiagnosticSeverity.Error);
+
+    private static GeneratedDiagnostic CreateJsonGeneratorNotFoundDiagnostic() =>
+        new(
+            "REFITTER008",
+            "System.Text.Json source generator not found",
+            "Refitter could not find the System.Text.Json source generator, so the generated JsonSerializerContext was not implemented. Target .NET 6 or later, or add a PackageReference to System.Text.Json.",
+            DiagnosticSeverity.Warning);
+
     private static GeneratedDiagnostic CreateErrorDiagnostic(string message) =>
         new(
             "REFITTER000",
@@ -262,9 +560,70 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         return lastDot >= 0 ? fileName.Substring(0, lastDot) : fileName;
     }
 
+    private static GeneratedCode CreateFailedResult(string settingsFilePath, List<GeneratedDiagnostic> diagnostics) =>
+        new(
+            settingsFilePath,
+            diagnostics.ToImmutableArray().AsEquatableArray(),
+            ImmutableArray<GeneratedSource>.Empty.AsEquatableArray());
+
+    private static string CreateHintName(string settingsFilePath, string plannedFilePath, HashSet<string> usedHintNames)
+    {
+        var settingsName = GetFileNameWithoutExtension(settingsFilePath);
+        var plannedName = GetFileNameWithoutExtension(plannedFilePath);
+        if (plannedName.EndsWith(".g", StringComparison.OrdinalIgnoreCase))
+        {
+            plannedName = plannedName.Substring(0, plannedName.Length - 2);
+        }
+
+        var baseName = SanitizeHintName(
+            string.Equals(settingsName, plannedName, StringComparison.OrdinalIgnoreCase)
+                ? settingsName
+                : settingsName + "." + plannedName);
+
+        return MakeUnique(baseName + ".g.cs", usedHintNames);
+    }
+
+    private static string MakeUnique(string hintName, HashSet<string> usedHintNames)
+    {
+        const string extension = ".g.cs";
+        var baseName = hintName.Substring(0, hintName.Length - extension.Length);
+        var uniqueName = hintName;
+        var counter = 2;
+        while (!usedHintNames.Add(uniqueName))
+        {
+            uniqueName = $"{baseName}{counter}{extension}";
+            counter++;
+        }
+
+        return uniqueName;
+    }
+
+    private static string SanitizeHintName(string name)
+    {
+        var chars = name.ToCharArray();
+        for (var i = 0; i < chars.Length; i++)
+        {
+            var c = chars[i];
+            if (!char.IsLetterOrDigit(c) && c != '.' && c != '_' && c != '-')
+            {
+                chars[i] = '_';
+            }
+        }
+
+        return new string(chars);
+    }
+
     internal readonly record struct GeneratedCode(
+        string SettingsFilePath,
         EquatableArray<GeneratedDiagnostic> Diagnostics,
-        string? OutputPath = null);
+        EquatableArray<GeneratedSource> Sources);
+
+    internal readonly record struct GeneratedSource(string HintName, string Content);
+
+    private readonly record struct NestedGenerator(
+        IIncrementalGenerator Generator,
+        string Name,
+        AnalyzerConfigOptionsProvider OptionsProvider);
 
     [SuppressMessage(
         "Major Code Smell",

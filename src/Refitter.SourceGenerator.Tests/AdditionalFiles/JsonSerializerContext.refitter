@@ -1,0 +1,9 @@
+{
+  "openApiPath": "../Resources/V3/SwaggerPetstore.json",
+  "namespace": "Refitter.Tests.AdditionalFiles.JsonSerializerContext",
+  "generateJsonSerializerContext": true,
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "SwaggerPetstoreWithJsonSerializerContext"
+  }
+}
