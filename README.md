@@ -669,6 +669,22 @@ For the same reason, when `generateJsonSerializerContext` is enabled, Refitter a
 
 If the project sets `DisableRefitSourceGenerator` to `true` itself, for example when using `Refit.Reflection`, Refitter leaves Refit source generation off and only emits its own code.
 
+#### Telemetry
+
+`Refitter.SourceGenerator` collects anonymous usage telemetry, the same as the Refitter CLI and `Refitter.MSBuild`. It reports the contents of each `.refitter` file and the number of `.refitter` files in the project, tagged as coming from the source generator, together with an anonymous support key derived from a hash of the user and machine name.
+
+The source generator itself never makes network calls. Telemetry is sent by a small MSBuild task in the package that runs after the build. It doesn't run in design-time builds (IDE), only sends when the `.refitter` files change (it keeps a stamp file in `obj`), uses a short timeout, and never fails the build.
+
+To opt out, add the following to your `.csproj` file:
+
+```xml
+<PropertyGroup>
+  <RefitterNoLogging>true</RefitterNoLogging>
+</PropertyGroup>
+```
+
+Setting the `DOTNET_CLI_TELEMETRY_OPTOUT` environment variable to `1` or `true` also disables it.
+
 # Using the generated code
 
 Here's an example generated output from the [Swagger Petstore example](https://petstore3.swagger.io) using the default settings
