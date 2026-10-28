@@ -22,6 +22,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Refit" Version="16.4.0" />
         <PackageReference Include="Refit.HttpClientFactory" Version="16.4.0" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.13" />
         <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
@@ -53,5 +54,8 @@
     <ItemGroup>
       <None Remove="README.md" />
     </ItemGroup>
+
+    <!-- A ProjectReference does not import the package build files, so import the generator targets explicitly -->
+    <Import Project="..\Refitter.SourceGenerator\Refitter.SourceGenerator.targets" />
 
 </Project>
