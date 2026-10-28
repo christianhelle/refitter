@@ -45,6 +45,7 @@
     <ItemGroup>
       <AdditionalFiles Include="AdditionalFiles\*.refitter" Exclude="AdditionalFiles\PropertyNamingPolicy.refitter" />
       <AdditionalFiles Include="AdditionalFiles\PropertyNamingPolicy.refitter" Condition="'$(DesignTimeBuild)' != 'true'" />
+      <AdditionalFiles Include="AdditionalFiles\SameName\*.refitter" />
     </ItemGroup>
 
     <ItemGroup>

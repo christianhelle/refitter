@@ -45,14 +45,21 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             }
         });
 
-        // generate code for each .refitter file and add it to the compilation
-        var generatedCode = refitterFiles.Select(GenerateCode);
+        // generate code for each .refitter file and add it to the compilation, with hint names
+        // made unique across all .refitter files since Roslyn requires that per generator
+        var generatedCode = refitterFiles
+            .Select(GenerateCode)
+            .Collect()
+            .Select((results, _) => AssignUniqueHintNames(results));
         context.RegisterSourceOutput(generatedCode, ProcessResults);
 
         // run Refit's generator over the project and the Refitter output so the Refit stubs
         // are produced in the same build, since Refit's own pass cannot see generated sources
         var refitInputs = context.CompilationProvider
-            .Combine(generatedCode.Select((code, _) => code.Sources).Collect())
+            .Combine(generatedCode.Select((results, _) => results
+                .SelectMany(code => code.Sources)
+                .ToImmutableArray()
+                .AsEquatableArray()))
             .Combine(context.ParseOptionsProvider)
             .Combine(context.AnalyzerConfigOptionsProvider);
 
@@ -69,7 +76,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     private static void RunRefitGenerator(
         SourceProductionContext context,
         Compilation compilation,
-        ImmutableArray<EquatableArray<GeneratedSource>> refitterSources,
+        EquatableArray<GeneratedSource> refitterSources,
         ParseOptions parseOptions,
         AnalyzerConfigOptionsProvider optionsProvider)
     {
@@ -89,7 +96,6 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         try
         {
             var syntaxTrees = refitterSources
-                .SelectMany(sources => sources)
                 .Select(source => CSharpSyntaxTree.ParseText(
                     SourceText.From(source.Content, Encoding.UTF8),
                     (CSharpParseOptions)parseOptions,
@@ -153,17 +159,38 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             $"{diagnostic.GetMessage()} ({lineSpan.Path}:{lineSpan.StartLinePosition.Line + 1})");
     }
 
-    private static void ProcessResults(SourceProductionContext context, GeneratedCode result)
+    private static void ProcessResults(SourceProductionContext context, EquatableArray<GeneratedCode> results)
     {
-        foreach (var diagnostic in result.Diagnostics)
+        foreach (var result in results)
         {
-            context.ReportDiagnostic(CreateDiagnostic(diagnostic));
-        }
+            foreach (var diagnostic in result.Diagnostics)
+            {
+                context.ReportDiagnostic(CreateDiagnostic(diagnostic));
+            }
 
-        foreach (var source in result.Sources)
-        {
-            context.AddSource(source.HintName, source.Content);
+            foreach (var source in result.Sources)
+            {
+                context.AddSource(source.HintName, source.Content);
+                context.ReportDiagnostic(CreateDiagnostic(CreateGeneratedSuccessfullyDiagnostic(source.HintName)));
+            }
         }
+    }
+
+    internal static EquatableArray<GeneratedCode> AssignUniqueHintNames(ImmutableArray<GeneratedCode> results)
+    {
+        // order by settings file so the same file keeps the same hint name between builds
+        var usedHintNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        return results
+            .OrderBy(result => result.SettingsFilePath, StringComparer.Ordinal)
+            .Select(result => result with
+            {
+                Sources = result.Sources
+                    .Select(source => source with { HintName = MakeUnique(source.HintName, usedHintNames) })
+                    .ToImmutableArray()
+                    .AsEquatableArray()
+            })
+            .ToImmutableArray()
+            .AsEquatableArray();
     }
 
     [SuppressMessage(
@@ -185,7 +212,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var json = TryReadRefitterFile(file, diagnostics, cancellationToken);
             if (json is null)
             {
-                return CreateFailedResult(diagnostics);
+                return CreateFailedResult(file.Path, diagnostics);
             }
 
             diagnostics.Add(CreateFileContentsDiagnostic(json));
@@ -193,7 +220,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
             var settings = TryDeserialize(json, diagnostics);
             if (settings is null)
             {
-                return CreateFailedResult(diagnostics);
+                return CreateFailedResult(file.Path, diagnostics);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -240,11 +267,11 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 {
                     var hintName = CreateHintName(file.Path, plannedFile.Path, hintNames);
                     sources.Add(new GeneratedSource(hintName, plannedFile.Content));
-                    diagnostics.Add(CreateGeneratedSuccessfullyDiagnostic(hintName));
                 }
             }
 
             return new GeneratedCode(
+                file.Path,
                 diagnostics.ToImmutableArray().AsEquatableArray(),
                 sources.ToImmutableArray().AsEquatableArray());
         }
@@ -252,7 +279,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         {
             diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to generate code: {e}"));
 
-            return CreateFailedResult(diagnostics);
+            return CreateFailedResult(file.Path, diagnostics);
         }
     }
 
@@ -391,8 +418,9 @@ public class RefitterSourceGenerator : IIncrementalGenerator
         return lastDot >= 0 ? fileName.Substring(0, lastDot) : fileName;
     }
 
-    private static GeneratedCode CreateFailedResult(List<GeneratedDiagnostic> diagnostics) =>
+    private static GeneratedCode CreateFailedResult(string settingsFilePath, List<GeneratedDiagnostic> diagnostics) =>
         new(
+            settingsFilePath,
             diagnostics.ToImmutableArray().AsEquatableArray(),
             ImmutableArray<GeneratedSource>.Empty.AsEquatableArray());
 
@@ -410,13 +438,20 @@ public class RefitterSourceGenerator : IIncrementalGenerator
                 ? settingsName
                 : settingsName + "." + plannedName);
 
-        var hintName = baseName + ".g.cs";
-        for (var i = 2; !usedHintNames.Add(hintName); i++)
+        return MakeUnique(baseName + ".g.cs", usedHintNames);
+    }
+
+    private static string MakeUnique(string hintName, HashSet<string> usedHintNames)
+    {
+        const string extension = ".g.cs";
+        var baseName = hintName.Substring(0, hintName.Length - extension.Length);
+        var uniqueName = hintName;
+        for (var i = 2; !usedHintNames.Add(uniqueName); i++)
         {
-            hintName = $"{baseName}{i}.g.cs";
+            uniqueName = $"{baseName}{i}{extension}";
         }
 
-        return hintName;
+        return uniqueName;
     }
 
     private static string SanitizeHintName(string name)
@@ -435,6 +470,7 @@ public class RefitterSourceGenerator : IIncrementalGenerator
     }
 
     internal readonly record struct GeneratedCode(
+        string SettingsFilePath,
         EquatableArray<GeneratedDiagnostic> Diagnostics,
         EquatableArray<GeneratedSource> Sources);
 
