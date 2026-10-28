@@ -51,6 +51,7 @@
       <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
       <ProjectReference Include="..\Refitter\Refitter.csproj" />
       <ProjectReference Include="..\Refitter.MSBuild\Refitter.MSBuild.csproj" />
+      <ProjectReference Include="..\Refitter.SourceGenerator.Telemetry\Refitter.SourceGenerator.Telemetry.csproj" />
     </ItemGroup>
 
 </Project>
