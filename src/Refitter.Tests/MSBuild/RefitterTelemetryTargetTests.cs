@@ -106,6 +106,11 @@ public class RefitterTelemetryTargetTests
         startInfo.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = telemetryOptOut;
         startInfo.Environment["DOTNET_CLI_USE_MSBUILD_SERVER"] = "0";
 
+        // Keep code coverage out of the child build. It would instrument the generator assembly, whose
+        // never-run copy of the Refitter.Core sources then hides the real Refitter.Core coverage.
+        startInfo.Environment["CORECLR_ENABLE_PROFILING"] = "0";
+        startInfo.Environment["DOTNET_ENABLE_PROFILING"] = "0";
+
         using var process = Process.Start(startInfo)!;
         var output = process.StandardOutput.ReadToEndAsync();
         var error = process.StandardError.ReadToEndAsync();
