@@ -243,7 +243,8 @@ internal static class SettingsSanitizer
                         't' => '\t',
                         'b' => '\b',
                         'f' => '\f',
-                        _ => escaped,
+                        '"' or '\\' or '/' => escaped,
+                        _ => throw new FormatException($"Invalid escape sequence '\\{escaped}'"),
                     });
                     continue;
                 }

@@ -70,6 +70,7 @@ public class SettingsSanitizerTests
     [DataRow("{ \"a\": NaN }")]
     [DataRow("{ \"a\": -Infinity }")]
     [DataRow("{ \"a\": 01 }")]
+    [DataRow("{ \"a\": \"\\q\" }")]
     public void Sanitize_Returns_Null_For_Invalid_Settings(string contents) =>
         SettingsSanitizer.Sanitize(contents).Should().BeNull();
 
