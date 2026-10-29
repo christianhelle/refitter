@@ -220,37 +220,37 @@ internal static class SettingsSanitizer
                     return builder.ToString();
                 }
 
-                if (c == '\\')
-                {
-                    var escaped = Peek();
-                    position++;
-                    if (escaped == 'u')
-                    {
-                        if (position + 4 > text.Length)
-                        {
-                            throw new FormatException("Invalid unicode escape");
-                        }
-
-                        builder.Append((char)int.Parse(text.Substring(position, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture));
-                        position += 4;
-                        continue;
-                    }
-
-                    builder.Append(escaped switch
-                    {
-                        'n' => '\n',
-                        'r' => '\r',
-                        't' => '\t',
-                        'b' => '\b',
-                        'f' => '\f',
-                        '"' or '\\' or '/' => escaped,
-                        _ => throw new FormatException($"Invalid escape sequence '\\{escaped}'"),
-                    });
-                    continue;
-                }
-
-                builder.Append(c);
+                builder.Append(c == '\\' ? ReadEscape() : c);
             }
+        }
+
+        /// <summary>Reads the escape sequence after a backslash, rejecting escapes that JSON doesn't allow.</summary>
+        private char ReadEscape()
+        {
+            var escaped = Peek();
+            position++;
+            if (escaped != 'u')
+            {
+                return escaped switch
+                {
+                    'n' => '\n',
+                    'r' => '\r',
+                    't' => '\t',
+                    'b' => '\b',
+                    'f' => '\f',
+                    '"' or '\\' or '/' => escaped,
+                    _ => throw new FormatException($"Invalid escape sequence '\\{escaped}'"),
+                };
+            }
+
+            if (position + 4 > text.Length)
+            {
+                throw new FormatException("Invalid unicode escape");
+            }
+
+            var unicode = (char)int.Parse(text.Substring(position, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            position += 4;
+            return unicode;
         }
 
         private static bool IsJsonNumber(string literal)
