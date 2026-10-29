@@ -1,6 +1,6 @@
 using System.Diagnostics;
+using System.Reflection;
 using AwesomeAssertions;
-using Refitter.SourceGenerator.Telemetry;
 
 namespace Refitter.Tests.MSBuild;
 
@@ -20,14 +20,14 @@ public class RefitterTelemetryTargetTests
     {
         workspace = Path.Combine(Path.GetTempPath(), "refitter-telemetry-target-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(Path.Combine(workspace, "build"));
-        Directory.CreateDirectory(Path.Combine(workspace, "tasks", "netstandard2.0"));
+        Directory.CreateDirectory(Path.Combine(workspace, "analyzers", "dotnet", "cs"));
 
         File.Copy(
             Path.Combine(FindRepositoryRoot(), "src", "Refitter.SourceGenerator", "Refitter.SourceGenerator.targets"),
             Path.Combine(workspace, "build", "Refitter.SourceGenerator.targets"));
         File.Copy(
-            typeof(RefitterTelemetryTask).Assembly.Location,
-            Path.Combine(workspace, "tasks", "netstandard2.0", "Refitter.SourceGenerator.Telemetry.dll"));
+            GetSourceGeneratorAssembly(),
+            Path.Combine(workspace, "analyzers", "dotnet", "cs", "Refitter.SourceGenerator.dll"));
 
         File.WriteAllText(Path.Combine(workspace, "petstore.refitter"), """{ "openApiPath": "./openapi.json" }""");
         File.WriteAllText(
@@ -44,7 +44,22 @@ public class RefitterTelemetryTargetTests
     }
 
     [TestCleanup]
-    public void Cleanup() => Directory.Delete(workspace, true);
+    public void Cleanup()
+    {
+        // MSBuild can keep the loaded task assembly open for a moment after the build exits
+        for (var attempt = 0; attempt < 10; attempt++)
+        {
+            try
+            {
+                Directory.Delete(workspace, true);
+                return;
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                Thread.Sleep(500);
+            }
+        }
+    }
 
     [TestMethod]
     public void Target_Runs_Task_After_Build_And_Task_Honours_Dotnet_Telemetry_Opt_Out()
@@ -89,6 +104,7 @@ public class RefitterTelemetryTargetTests
             CreateNoWindow = true,
         };
         startInfo.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = telemetryOptOut;
+        startInfo.Environment["DOTNET_CLI_USE_MSBUILD_SERVER"] = "0";
 
         using var process = Process.Start(startInfo)!;
         var output = process.StandardOutput.ReadToEndAsync();
@@ -99,6 +115,13 @@ public class RefitterTelemetryTargetTests
         process.ExitCode.Should().Be(0, result);
         return result;
     }
+
+    // The task ships inside the generator assembly, so load it from the built generator rather than the linked sources
+    private static string GetSourceGeneratorAssembly() =>
+        typeof(RefitterTelemetryTargetTests).Assembly
+            .GetCustomAttributes<AssemblyMetadataAttribute>()
+            .Single(attribute => attribute.Key == "RefitterSourceGeneratorAssembly")
+            .Value!;
 
     private static string FindRepositoryRoot()
     {

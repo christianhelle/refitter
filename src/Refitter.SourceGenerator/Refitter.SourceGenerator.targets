@@ -25,7 +25,7 @@
   DOTNET_CLI_TELEMETRY_OPTOUT=1.
   -->
   <PropertyGroup>
-    <_RefitterTelemetryTaskAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)../tasks/netstandard2.0/Refitter.SourceGenerator.Telemetry.dll'))</_RefitterTelemetryTaskAssembly>
+    <_RefitterTelemetryTaskAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)../analyzers/dotnet/cs/Refitter.SourceGenerator.dll'))</_RefitterTelemetryTaskAssembly>
   </PropertyGroup>
 
   <UsingTask TaskName="Refitter.SourceGenerator.Telemetry.RefitterTelemetryTask"

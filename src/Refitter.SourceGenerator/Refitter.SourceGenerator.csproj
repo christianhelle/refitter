@@ -22,31 +22,20 @@
     <PackageReference Include="NSwag.Core.Yaml" Version="14.7.1" PrivateAssets="all" />
     <PackageReference Include="OasReader" Version="3.10.2.21" PrivateAssets="all" />
     <PackageReference Include="Refit" Version="16.4.0" PrivateAssets="all" />
+    <!-- Compile-time only: MSBuild provides these assemblies when it loads the telemetry task -->
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.9.6" PrivateAssets="all" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Built only to be packed as the telemetry MSBuild task, see Refitter.SourceGenerator.targets -->
-    <ProjectReference Include="../Refitter.SourceGenerator.Telemetry/Refitter.SourceGenerator.Telemetry.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <!-- Stop H.Generators.Extensions bundling the MSBuild assemblies next to the generator, MSBuild provides them -->
+    <_SystemLibs Include="Microsoft.Build.Framework;Microsoft.Build.Utilities.Core;Microsoft.NET.StringTools" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_PackRefitterTelemetryTask</TargetsForTfmSpecificContentInPackage>
-  </PropertyGroup>
-
-  <!-- Build the telemetry project and pack its actual output, so packing follows custom output and artifacts paths -->
-  <Target Name="_PackRefitterTelemetryTask">
-    <MSBuild Projects="../Refitter.SourceGenerator.Telemetry/Refitter.SourceGenerator.Telemetry.csproj" Targets="Build">
-      <Output TaskParameter="TargetOutputs" ItemName="_RefitterTelemetryTaskAssembly" />
-    </MSBuild>
-    <ItemGroup>
-      <TfmSpecificPackageFile Include="@(_RefitterTelemetryTaskAssembly)" PackagePath="tasks/netstandard2.0" />
-    </ItemGroup>
-  </Target>
 
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(AssemblyName).props" Pack="true" PackagePath="build" />
-    <None Include="$(AssemblyName).targets" Pack="true" PackagePath="build" />    <Compile Include="../Refitter.Core/*.cs" />
+    <None Include="$(AssemblyName).targets" Pack="true" PackagePath="build" />
+    <Compile Include="../Refitter.Core/*.cs" />
     <Compile Include="../Refitter.Core/Abstractions/*.cs" />
     <Compile Include="../Refitter.Core/Apizr/*.cs" />
     <Compile Include="../Refitter.Core/CodeGeneration/*.cs" />

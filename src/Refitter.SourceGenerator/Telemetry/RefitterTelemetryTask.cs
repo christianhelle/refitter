@@ -21,21 +21,28 @@ public class RefitterTelemetryTask : MSBuildTask
         set => SenderOverride.Value = value;
     }
 
+    /// <summary>The .refitter files in the project.</summary>
     public ITaskItem[] SettingsFiles { get; set; } = [];
 
+    /// <summary>The file that records what telemetry was last sent for.</summary>
     [Required]
     public string StampFile { get; set; } = string.Empty;
 
+    /// <summary>Whether this is a design-time (IDE) build, which never sends telemetry.</summary>
     public bool DesignTimeBuild { get; set; }
 
+    /// <summary>The RefitterNoLogging opt-out.</summary>
     public bool DisableLogging { get; set; }
 
+    /// <summary>The DOTNET_CLI_TELEMETRY_OPTOUT value; 1 or true opts out.</summary>
     public string? TelemetryOptOut { get; set; }
 
+    /// <summary>How long to wait for the telemetry endpoint.</summary>
     public int TimeoutMilliseconds { get; set; } = 3000;
 
     internal static void ResetTestHooks() => SenderOverride.Value = null;
 
+    /// <summary>Sends telemetry when enabled and the settings changed. Always returns true.</summary>
     public override bool Execute()
     {
         try

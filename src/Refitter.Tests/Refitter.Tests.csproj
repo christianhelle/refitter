@@ -43,6 +43,18 @@
     </ItemGroup>
 
     <ItemGroup>
+      <!-- The generator assembly also compiles Refitter.Core, so its telemetry sources are linked rather than referenced -->
+      <Compile Include="..\Refitter.SourceGenerator\Telemetry\*.cs" Link="MSBuild\Telemetry\%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+        <_Parameter1>RefitterSourceGeneratorAssembly</_Parameter1>
+        <_Parameter2>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../Refitter.SourceGenerator/bin/$(Configuration)/netstandard2.0/Refitter.SourceGenerator.dll'))</_Parameter2>
+      </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
       <EmbeddedResource Include="Resources\**\*.json" />
       <EmbeddedResource Include="Resources\**\*.yaml" />
     </ItemGroup>
@@ -51,7 +63,8 @@
       <ProjectReference Include="..\Refitter.Core\Refitter.Core.csproj" />
       <ProjectReference Include="..\Refitter\Refitter.csproj" />
       <ProjectReference Include="..\Refitter.MSBuild\Refitter.MSBuild.csproj" />
-      <ProjectReference Include="..\Refitter.SourceGenerator.Telemetry\Refitter.SourceGenerator.Telemetry.csproj" />
+      <!-- Built for RefitterTelemetryTargetTests, which load the telemetry task from the generator assembly -->
+      <ProjectReference Include="..\Refitter.SourceGenerator\Refitter.SourceGenerator.csproj" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>
