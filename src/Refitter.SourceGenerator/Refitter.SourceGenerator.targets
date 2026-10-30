@@ -17,4 +17,33 @@
     <CompilerVisibleProperty Include="RefitterRunsRefitGenerator" />
   </ItemGroup>
 
+  <!--
+  Usage telemetry runs as an MSBuild task after the build, never inside the source generator,
+  so the compiler and IDE never make network calls. It is skipped in design-time builds, only sends when
+  the .refitter files or the package version change (tracked with a stamp file in obj), uses a short
+  timeout and never fails the build. Opt out with <RefitterNoLogging>true</RefitterNoLogging> or
+  DOTNET_CLI_TELEMETRY_OPTOUT=1.
+  -->
+  <PropertyGroup>
+    <_RefitterTelemetryTaskAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)../analyzers/dotnet/cs/Refitter.SourceGenerator.dll'))</_RefitterTelemetryTaskAssembly>
+  </PropertyGroup>
+
+  <UsingTask TaskName="Refitter.SourceGenerator.Telemetry.RefitterTelemetryTask"
+             AssemblyFile="$(_RefitterTelemetryTaskAssembly)"
+             Condition="Exists('$(_RefitterTelemetryTaskAssembly)')" />
+
+  <Target Name="_RefitterSourceGeneratorTelemetry"
+          AfterTargets="Build"
+          Condition="'$(DesignTimeBuild)' != 'true' and '$(RefitterNoLogging)' != 'true' and Exists('$(_RefitterTelemetryTaskAssembly)')">
+    <ItemGroup>
+      <_RefitterTelemetrySettingsFile Include="@(AdditionalFiles)" Condition="'%(Extension)' == '.refitter'" />
+    </ItemGroup>
+    <RefitterTelemetryTask SettingsFiles="@(_RefitterTelemetrySettingsFile)"
+                           StampFile="$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)', 'refitter.sourcegenerator.telemetry'))"
+                           DesignTimeBuild="$(DesignTimeBuild)"
+                           DisableLogging="$(RefitterNoLogging)"
+                           TelemetryOptOut="$(DOTNET_CLI_TELEMETRY_OPTOUT)"
+                           ContinueOnError="true" />
+  </Target>
+
 </Project>
