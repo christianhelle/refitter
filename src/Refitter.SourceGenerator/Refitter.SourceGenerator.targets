@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <!--
-  Anonymous usage telemetry runs as an MSBuild task after the build, never inside the source generator,
+  Usage telemetry runs as an MSBuild task after the build, never inside the source generator,
   so the compiler and IDE never make network calls. It is skipped in design-time builds, only sends when
   the .refitter files or the package version change (tracked with a stamp file in obj), uses a short
   timeout and never fails the build. Opt out with <RefitterNoLogging>true</RefitterNoLogging> or

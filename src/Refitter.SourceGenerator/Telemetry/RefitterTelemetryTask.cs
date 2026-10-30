@@ -6,7 +6,7 @@ using MSBuildTask = Microsoft.Build.Utilities.Task;
 namespace Refitter.SourceGenerator.Telemetry;
 
 /// <summary>
-/// Reports anonymous usage telemetry for Refitter.SourceGenerator.
+/// Reports usage telemetry for Refitter.SourceGenerator.
 /// This runs as an MSBuild task so that the source generator itself never makes network calls.
 /// Telemetry is only sent when the .refitter files or the package version change and the task never fails the build.
 /// </summary>

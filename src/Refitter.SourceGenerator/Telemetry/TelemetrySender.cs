@@ -33,7 +33,7 @@ internal static class TelemetrySender
         client.Context.Operation.Id = Guid.NewGuid().ToString();
         client.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
 
-        // The SDK reports the machine name as the role instance by default; send the anonymous key instead
+        // The SDK reports the machine name as the role instance by default; send the support key instead
         client.Context.Cloud.RoleInstance = supportKey;
         client.Context.Component.Version = TelemetryPayload.GetVersion();
         client.Context.GlobalProperties["telemetry-source"] = TelemetryPayload.TelemetrySource;
