@@ -46,7 +46,7 @@ internal static class SettingsSanitizer
             values.Add(new KeyValuePair<string, string>(UnknownSettingsKey, unknownSettings.ToString(CultureInfo.InvariantCulture)));
         }
 
-        return "{" + string.Join(",", values.Select(pair => TelemetryPayload.Quote(pair.Key) + ":" + pair.Value)) + "}";
+        return "{" + string.Join(",", values.Select(pair => Quote(pair.Key) + ":" + pair.Value)) + "}";
     }
 
     /// <summary>Adds the known settings to <paramref name="values"/> and returns how many unknown settings were skipped.</summary>
@@ -89,12 +89,41 @@ internal static class SettingsSanitizer
             case Literal literal:
                 return literal.Text;
             case string text when enumMembers is not null:
-                return TelemetryPayload.Quote(FindKnown(enumMembers, text) ?? Redacted);
+                return Quote(FindKnown(enumMembers, text) ?? Redacted);
             case List<object?> array:
-                return TelemetryPayload.Quote($"[{array.Count.ToString(CultureInfo.InvariantCulture)} items]");
+                return Quote($"[{array.Count.ToString(CultureInfo.InvariantCulture)} items]");
             default:
-                return TelemetryPayload.Quote(Redacted);
+                return Quote(Redacted);
         }
+    }
+
+    private static string Quote(string value)
+    {
+        var builder = new StringBuilder("\"");
+        foreach (var c in value)
+        {
+            switch (c)
+            {
+                case '"': builder.Append("\\\""); break;
+                case '\\': builder.Append("\\\\"); break;
+                case '\n': builder.Append("\\n"); break;
+                case '\r': builder.Append("\\r"); break;
+                case '\t': builder.Append("\\t"); break;
+                default:
+                    if (c < ' ')
+                    {
+                        builder.Append("\\u").Append(((int)c).ToString("x4", CultureInfo.InvariantCulture));
+                    }
+                    else
+                    {
+                        builder.Append(c);
+                    }
+
+                    break;
+            }
+        }
+
+        return builder.Append('"').ToString();
     }
 
     /// <summary>A JSON true, false, null or number, kept as written.</summary>

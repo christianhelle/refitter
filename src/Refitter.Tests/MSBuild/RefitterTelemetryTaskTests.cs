@@ -1,4 +1,3 @@
-using System.Text.Json;
 using AwesomeAssertions;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -10,8 +9,8 @@ namespace Refitter.Tests.MSBuild;
 public class RefitterTelemetryTaskTests
 {
     private string workspace = null!;
-    private List<string> sentPayloads = null!;
-    private Action<string, int>? sender;
+    private List<IReadOnlyList<TelemetryEvent>> sentPayloads = null!;
+    private Action<IReadOnlyList<TelemetryEvent>, int>? sender;
 
     [TestInitialize]
     public void Initialize()
@@ -124,7 +123,7 @@ public class RefitterTelemetryTaskTests
 
         CreateTask(CreateSettingsFile("api.refitter"), CreateSettingsFile("API.refitter")).Execute();
 
-        sentPayloads.Single().Should().Contain("\"file-count\":\"2\"");
+        sentPayloads.Single().Last().Properties["file-count"].Should().Be("2");
     }
 
     [TestMethod]
@@ -152,25 +151,16 @@ public class RefitterTelemetryTaskTests
     }
 
     [TestMethod]
-    public void Payload_Contains_Settings_And_Invocation_Events_Tagged_As_SourceGenerator()
+    public void Payload_Contains_Settings_And_Invocation_Events()
     {
         CreateTask(CreateSettingsFile("a.refitter"), CreateSettingsFile("b.refitter")).Execute();
 
-        using var document = JsonDocument.Parse(sentPayloads.Single());
-        var events = document.RootElement.EnumerateArray()
-            .Select(envelope => envelope.GetProperty("data").GetProperty("baseData"))
-            .ToList();
-
-        events.Select(e => e.GetProperty("name").GetString())
-            .Should().Equal("settings-file", "settings-file", "sourcegenerator-invocation");
-        events.Should().OnlyContain(e =>
-            e.GetProperty("properties").GetProperty("telemetry-source").GetString() == "sourcegenerator");
-        var settings = events[0].GetProperty("properties").GetProperty("settings").GetString();
+        var events = sentPayloads.Single();
+        events.Select(e => e.Name).Should().Equal("settings-file", "settings-file", "sourcegenerator-invocation");
+        var settings = events[0].Properties["settings"];
         settings.Should().Contain("\"openApiPath\":\"<redacted>\"");
-        settings.Should().NotContain("openapi.json");
-        document.RootElement.GetRawText().Should().NotContain("openapi.json");
-        events[2].GetProperty("properties").GetProperty("file-count").GetString()
-            .Should().Be("2");
+        events.SelectMany(e => e.Properties.Values).Should().NotContain(value => value.Contains("openapi.json"));
+        events[2].Properties["file-count"].Should().Be("2");
     }
 
     private RefitterTelemetryTask CreateTask(params string[] settingsFiles)

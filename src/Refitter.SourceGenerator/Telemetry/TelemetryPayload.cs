@@ -4,9 +4,16 @@ using System.Text;
 
 namespace Refitter.SourceGenerator.Telemetry;
 
+/// <summary>An Application Insights custom event.</summary>
+internal sealed class TelemetryEvent(string name, IDictionary<string, string> properties)
+{
+    public string Name { get; } = name;
+
+    public IDictionary<string, string> Properties { get; } = properties;
+}
+
 /// <summary>
-/// Builds the Application Insights track request for the same events the Refitter CLI sends,
-/// without taking a dependency on the Application Insights SDK.
+/// Builds the same events the Refitter CLI sends, tagged as coming from the source generator.
 /// </summary>
 internal static class TelemetryPayload
 {
@@ -14,43 +21,21 @@ internal static class TelemetryPayload
     internal const string InvocationEventName = "sourcegenerator-invocation";
     internal const string SettingsFileEventName = "settings-file";
 
-    // Same Application Insights resource as the Refitter CLI (src/Refitter/Analytics.cs)
-    private const string InstrumentationKey = "470c204f-b460-493a-9e31-d9b2f5e25abb";
-
-    public static string Create(IReadOnlyList<string> settingsFileContents, string version)
+    public static IReadOnlyList<TelemetryEvent> Create(IReadOnlyList<string> settingsFileContents)
     {
-        var supportKey = GetSupportKey();
-        var tags = new Dictionary<string, string>
-        {
-            { "ai.user.id", supportKey },
-            { "ai.session.id", Guid.NewGuid().ToString() },
-            { "ai.operation.id", Guid.NewGuid().ToString() },
-            { "ai.device.osVersion", Environment.OSVersion.ToString() },
-            { "ai.application.ver", version },
-        };
-
-        var time = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-        var envelopes = settingsFileContents
-            .Select(contents => CreateEnvelope(
-                SettingsFileEventName,
-                CreateSettingsProperties(contents),
-                tags,
-                supportKey,
-                time))
+        var events = settingsFileContents
+            .Select(contents => new TelemetryEvent(SettingsFileEventName, CreateSettingsProperties(contents)))
             .ToList();
 
-        envelopes.Add(
-            CreateEnvelope(
+        events.Add(
+            new TelemetryEvent(
                 InvocationEventName,
                 new Dictionary<string, string>
                 {
                     { "file-count", settingsFileContents.Count.ToString(CultureInfo.InvariantCulture) }
-                },
-                tags,
-                supportKey,
-                time));
+                }));
 
-        return "[" + string.Join(",", envelopes) + "]";
+        return events;
     }
 
     // Only the sanitized settings are sent, never the raw file contents
@@ -88,60 +73,5 @@ internal static class TelemetryPayload
         {
             return "localhost";
         }
-    }
-
-    private static string CreateEnvelope(
-        string eventName,
-        Dictionary<string, string> properties,
-        Dictionary<string, string> tags,
-        string supportKey,
-        string time)
-    {
-        properties["telemetry-source"] = TelemetrySource;
-        properties["support-key"] = supportKey;
-
-        var builder = new StringBuilder();
-        builder.Append("{\"name\":\"Microsoft.ApplicationInsights.")
-            .Append(InstrumentationKey.Replace("-", string.Empty))
-            .Append(".Event\",\"time\":").Append(Quote(time))
-            .Append(",\"iKey\":").Append(Quote(InstrumentationKey))
-            .Append(",\"tags\":").Append(ToJsonObject(tags))
-            .Append(",\"data\":{\"baseType\":\"EventData\",\"baseData\":{\"ver\":2,\"name\":")
-            .Append(Quote(eventName))
-            .Append(",\"properties\":").Append(ToJsonObject(properties))
-            .Append("}}}");
-        return builder.ToString();
-    }
-
-    private static string ToJsonObject(Dictionary<string, string> values) =>
-        "{" + string.Join(",", values.Select(pair => Quote(pair.Key) + ":" + Quote(pair.Value))) + "}";
-
-    internal static string Quote(string value)
-    {
-        var builder = new StringBuilder("\"");
-        foreach (var c in value)
-        {
-            switch (c)
-            {
-                case '"': builder.Append("\\\""); break;
-                case '\\': builder.Append("\\\\"); break;
-                case '\n': builder.Append("\\n"); break;
-                case '\r': builder.Append("\\r"); break;
-                case '\t': builder.Append("\\t"); break;
-                default:
-                    if (c < ' ')
-                    {
-                        builder.Append("\\u").Append(((int)c).ToString("x4", CultureInfo.InvariantCulture));
-                    }
-                    else
-                    {
-                        builder.Append(c);
-                    }
-
-                    break;
-            }
-        }
-
-        return builder.Append('"').ToString();
     }
 }

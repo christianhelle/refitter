@@ -12,12 +12,11 @@ namespace Refitter.SourceGenerator.Telemetry;
 /// </summary>
 public class RefitterTelemetryTask : MSBuildTask
 {
-    private const string IngestionEndpoint = "https://westeurope-5.in.applicationinsights.azure.com/v2/track";
-    private static readonly AsyncLocal<Action<string, int>?> SenderOverride = new();
+    private static readonly AsyncLocal<Action<IReadOnlyList<TelemetryEvent>, int>?> SenderOverride = new();
 
-    internal static Action<string, int> Sender
+    internal static Action<IReadOnlyList<TelemetryEvent>, int> Sender
     {
-        get => SenderOverride.Value ?? Post;
+        get => SenderOverride.Value ?? TelemetrySender.Send;
         set => SenderOverride.Value = value;
     }
 
@@ -115,15 +114,7 @@ public class RefitterTelemetryTask : MSBuildTask
         File.WriteAllText(StampFile, fingerprint);
 
         TryLogMessage($"Sending Refitter telemetry for {files.Length} .refitter files");
-        Sender(TelemetryPayload.Create(contents, version), TimeoutMilliseconds);
-    }
-
-    private static void Post(string payload, int timeoutMilliseconds)
-    {
-        using var client = new HttpClient();
-        client.Timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
-        using var content = new StringContent(payload, Encoding.UTF8, "application/json");
-        using var response = client.PostAsync(IngestionEndpoint, content).GetAwaiter().GetResult();
+        Sender(TelemetryPayload.Create(contents), TimeoutMilliseconds);
     }
 
     private void TryLogMessage(string text)
