@@ -249,6 +249,11 @@ internal static class SettingsSanitizer
                     return builder.ToString();
                 }
 
+                if (c < ' ')
+                {
+                    throw new FormatException("Unescaped control character in string");
+                }
+
                 builder.Append(c == '\\' ? ReadEscape() : c);
             }
         }
@@ -272,7 +277,7 @@ internal static class SettingsSanitizer
                 };
             }
 
-            if (position + 4 > text.Length)
+            if (position + 4 > text.Length || !text.Skip(position).Take(4).All(Uri.IsHexDigit))
             {
                 throw new FormatException("Invalid unicode escape");
             }

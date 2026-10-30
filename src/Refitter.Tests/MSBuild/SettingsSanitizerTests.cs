@@ -71,6 +71,9 @@ public class SettingsSanitizerTests
     [DataRow("{ \"a\": -Infinity }")]
     [DataRow("{ \"a\": 01 }")]
     [DataRow("{ \"a\": \"\\q\" }")]
+    [DataRow("{ \"a\": \"tab\there\" }")]
+    [DataRow("{ \"a\": \"\\u 1a2\" }")]
+    [DataRow("{ \"a\": \"\\u12g4\" }")]
     public void Sanitize_Returns_Null_For_Invalid_Settings(string contents) =>
         SettingsSanitizer.Sanitize(contents).Should().BeNull();
 
