@@ -1,4 +1,16 @@
 <Project>
+    <!--
+    The released package loads the telemetry task from its analyzers folder. With the local generator, load it from the
+    generator's build output in a task host that exits after the build, so it doesn't lock the generator while you work on it.
+    MSBuild uses the first UsingTask registered for a task, so this one replaces the package's.
+    -->
+    <PropertyGroup Condition="'$(UseProductionRefitter)' != 'true'">
+        <_RefitterTelemetryTaskAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\..\src\Refitter.SourceGenerator\bin\$(Configuration)\netstandard2.0\Refitter.SourceGenerator.dll'))</_RefitterTelemetryTaskAssembly>
+    </PropertyGroup>
+    <UsingTask TaskName="Refitter.SourceGenerator.Telemetry.RefitterTelemetryTask"
+               AssemblyFile="$(_RefitterTelemetryTaskAssembly)"
+               TaskFactory="TaskHostFactory"
+               Condition="'$(UseProductionRefitter)' != 'true'" />
     <!-- The released package imports these targets itself; a ProjectReference to the local generator does not -->
     <Import Project="..\..\src\Refitter.SourceGenerator\Refitter.SourceGenerator.targets" Condition="'$(UseProductionRefitter)' != 'true'" />
 </Project>
