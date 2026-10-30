@@ -11,6 +11,7 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Add opt-out telemetry for Refitter.SourceGenerator via an MSBuild task ([#1365](https://github.com/christianhelle/refitter/pull/1365)) ([@christianhelle](https://github.com/christianhelle/))
 - Run Refit source generator from Refitter source generator ([#1363](https://github.com/christianhelle/refitter/pull/1363)) ([@christianhelle](https://github.com/christianhelle/))
 - Migrate tests from TUnit to MSTest v4.5 ([#1360](https://github.com/christianhelle/refitter/pull/1360)) ([@christianhelle](https://github.com/christianhelle/))
 - Fix JsonSerializerContext build failure for contracts named Options ([#1358](https://github.com/christianhelle/refitter/pull/1358)) ([@christianhelle](https://github.com/christianhelle/))
