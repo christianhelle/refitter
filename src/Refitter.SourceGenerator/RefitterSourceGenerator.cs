@@ -16,7 +16,7 @@ namespace Refitter.SourceGenerator;
 /// </summary>
 [ExcludeFromCodeCoverage]
 [Generator(LanguageNames.CSharp)]
-public class RefitterSourceGenerator : IIncrementalGenerator
+internal sealed class RefitterSourceGenerator : IIncrementalGenerator
 {
     internal const string Category = "Refitter";
     private const string RefitterDiagnosticTitle = Category;
