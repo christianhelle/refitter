@@ -23,7 +23,7 @@
     <PackageReference Include="OasReader" Version="3.10.2.21" PrivateAssets="all" />
     <PackageReference Include="Refit" Version="16.4.0" PrivateAssets="all" />
     <!-- Used only by the telemetry MSBuild task, never by the generator -->
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="3.2.0" PrivateAssets="all" />
     <!-- Compile-time only: MSBuild provides these assemblies when it loads the telemetry task -->
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.9.6" PrivateAssets="all" ExcludeAssets="runtime" />
   </ItemGroup>
