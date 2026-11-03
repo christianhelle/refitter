@@ -24,7 +24,7 @@
   timeout and never fails the build. Opt out with <RefitterNoLogging>true</RefitterNoLogging> or
   DOTNET_CLI_TELEMETRY_OPTOUT=1.
   -->
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(_RefitterTelemetryTaskAssembly)' == ''">
     <_RefitterTelemetryTaskAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)../analyzers/dotnet/cs/Refitter.SourceGenerator.dll'))</_RefitterTelemetryTaskAssembly>
   </PropertyGroup>
 

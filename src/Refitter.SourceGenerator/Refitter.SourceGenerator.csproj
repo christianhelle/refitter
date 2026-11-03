@@ -14,6 +14,11 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <NoWarn>NU1701;RF002</NoWarn>
+    <!--
+    MSBuild can only load the telemetry task when the generator's dependencies sit next to it, as they do in the package.
+    Copy them to the build output too, so projects that reference this project directly (e.g. test/SourceGenerator) can run the task.
+    -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
