@@ -3,6 +3,8 @@
     The released package loads the telemetry task from its analyzers folder. With the local generator, load it from the
     generator's build output in a task host that exits after the build, so it doesn't lock the generator while you work on it.
     MSBuild uses the first UsingTask registered for a task, so this one replaces the package's.
+    UsingTask is read during evaluation, before the generator's output path can be resolved, so this assumes the default
+    output folder. Overriding OutputPath or BaseOutputPath skips telemetry, or runs an older build left in the default folder.
     -->
     <PropertyGroup Condition="'$(UseProductionRefitter)' != 'true'">
         <_RefitterTelemetryTaskAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\..\src\Refitter.SourceGenerator\bin\$(Configuration)\netstandard2.0\Refitter.SourceGenerator.dll'))</_RefitterTelemetryTaskAssembly>
