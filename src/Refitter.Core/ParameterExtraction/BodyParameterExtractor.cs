@@ -3,9 +3,9 @@ using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
 
-internal sealed class BodyParameterExtractor
+internal static class BodyParameterExtractor
 {
-    public IEnumerable<string> Extract(
+    public static IEnumerable<string> Extract(
         CSharpOperationModel operationModel,
         RefitGeneratorSettings settings)
     {

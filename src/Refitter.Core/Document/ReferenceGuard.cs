@@ -54,69 +54,62 @@ internal static class ReferenceGuard
         bool allowRemoteReferences,
         CancellationToken cancellationToken)
     {
-        string content;
-        if (preloadedContent != null)
+        var content = preloadedContent
+            ?? await ReadRemoteContentAsync(url, cancellationToken).ConfigureAwait(false);
+
+        foreach (var reference in ExtractReferences(content).Where(reference => !reference.StartsWith("#", StringComparison.Ordinal)))
         {
-            content = preloadedContent;
+            ValidateRemoteReference(reference, url, allowRemoteReferences);
         }
-        else
+    }
+
+    private static async Task<string> ReadRemoteContentAsync(string url, CancellationToken cancellationToken)
+    {
+        try
         {
-            try
-            {
-                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-                using var httpResponse = await client.SendAsync(
-                    new HttpRequestMessage(HttpMethod.Get, url),
-                    cancellationToken).ConfigureAwait(false);
-                content = await httpResponse.Content
-                    .ReadAsStringWithCancellationAsync(cancellationToken)
-                    .ConfigureAwait(false);
-            }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                throw new ReferenceResolutionException(
-                    $"Failed to read OpenAPI document from '{url}' during reference validation: {ex.Message}", ex);
-            }
+            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+            using var httpResponse = await client.SendAsync(
+                new HttpRequestMessage(HttpMethod.Get, url),
+                cancellationToken).ConfigureAwait(false);
+            return await httpResponse.Content
+                .ReadAsStringWithCancellationAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            throw new ReferenceResolutionException(
+                $"Failed to read OpenAPI document from '{url}' during reference validation: {ex.Message}", ex);
+        }
+    }
+
+    private static void ValidateRemoteReference(string reference, string url, bool allowRemoteReferences)
+    {
+        Uri? resolvedUri = null;
+        if (Uri.TryCreate(reference, UriKind.Absolute, out var absoluteUri))
+        {
+            resolvedUri = absoluteUri;
+        }
+        else if (Uri.TryCreate(new Uri(url), reference.Split('#')[0], out var relativeUri))
+        {
+            resolvedUri = relativeUri;
         }
 
-        foreach (var reference in ExtractReferences(content))
+        if (resolvedUri != null && !string.IsNullOrEmpty(resolvedUri.Scheme))
         {
-            if (reference.StartsWith("#", StringComparison.Ordinal))
-                continue;
+            var isHttpScheme = resolvedUri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
+                               resolvedUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
 
-            Uri? resolvedUri = null;
-            if (Uri.TryCreate(reference, UriKind.Absolute, out var absoluteUri))
-            {
-                resolvedUri = absoluteUri;
-            }
-            else if (Uri.TryCreate(new Uri(url), reference.Split('#')[0], out var relativeUri))
-            {
-                resolvedUri = relativeUri;
-            }
-
-            if (resolvedUri != null && !string.IsNullOrEmpty(resolvedUri.Scheme))
-            {
-                var isHttpScheme = resolvedUri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
-                                   resolvedUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
-
-                if (isHttpScheme)
-                {
-                    if (!allowRemoteReferences)
-                        throw RemoteBlocked(reference, url);
-                }
-                else
-                {
-                    // Non-HTTP schemes (file:, data:, etc.) are always blocked
-                    throw RemoteBlocked(reference, url);
-                }
-            }
-            else if (!reference.StartsWith("/", StringComparison.Ordinal) &&
-                     !reference.StartsWith("./", StringComparison.Ordinal) &&
-                     !reference.StartsWith("../", StringComparison.Ordinal))
-            {
-                // Relative references from remote documents treated as remote
-                if (!allowRemoteReferences)
-                    throw RemoteBlocked(reference, url);
-            }
+            // Non-HTTP schemes (file:, data:, etc.) are always blocked
+            if (!isHttpScheme || !allowRemoteReferences)
+                throw RemoteBlocked(reference, url);
+        }
+        else if (!reference.StartsWith("/", StringComparison.Ordinal) &&
+                 !reference.StartsWith("./", StringComparison.Ordinal) &&
+                 !reference.StartsWith("../", StringComparison.Ordinal) &&
+                 !allowRemoteReferences)
+        {
+            // Relative references from remote documents treated as remote
+            throw RemoteBlocked(reference, url);
         }
     }
 
@@ -145,11 +138,8 @@ internal static class ReferenceGuard
 
         string currentDirectory = Path.GetDirectoryName(filePath);
 
-        foreach (var reference in ExtractReferences(content))
+        foreach (var reference in ExtractReferences(content).Where(reference => !reference.StartsWith("#", StringComparison.Ordinal)))
         {
-            if (reference.StartsWith("#", StringComparison.Ordinal))
-                continue;
-
             if (PathUtilities.IsHttp(reference))
             {
                 if (!allowRemoteReferences)
@@ -157,31 +147,35 @@ internal static class ReferenceGuard
                 continue;
             }
 
-            var fileRef = reference.Split('#')[0];
-            if (string.IsNullOrWhiteSpace(fileRef))
-                continue;
-
-            var resolved = Path.GetFullPath(Path.Combine(currentDirectory, fileRef));
-            if (!IsWithin(rootDirectory, resolved))
-            {
-                throw new ReferenceResolutionException(
-                    $"Local '$ref' \"{reference}\" resolves to \"{resolved}\", outside the input directory " +
-                    $"\"{rootDirectory}\". Refitter confines local references to the input document's directory tree.");
-            }
-
+            var resolved = ResolveLocalReference(reference, currentDirectory, rootDirectory);
             await ValidateLocalFileAsync(resolved, rootDirectory, allowRemoteReferences, visited, cancellationToken)
                 .ConfigureAwait(false);
         }
     }
 
+    private static string ResolveLocalReference(string reference, string currentDirectory, string rootDirectory)
+    {
+        // Same-document "#..." references are filtered out by the caller, so a file part is always present
+        var fileRef = reference.Split('#')[0];
+        var resolved = Path.GetFullPath(Path.Combine(currentDirectory, fileRef));
+        if (!IsWithin(rootDirectory, resolved))
+        {
+            throw new ReferenceResolutionException(
+                $"Local '$ref' \"{reference}\" resolves to \"{resolved}\", outside the input directory " +
+                $"\"{rootDirectory}\". Refitter confines local references to the input document's directory tree.");
+        }
+
+        return resolved;
+    }
+
     private static IEnumerable<string> ExtractReferences(string content)
     {
-        foreach (Match match in RefPattern.Matches(content))
+        foreach (var groups in RefPattern.Matches(content).Cast<Match>().Select(match => match.Groups))
         {
             // Group 1 = quoted value, Group 2 = unquoted YAML scalar
-            var value = !string.IsNullOrEmpty(match.Groups[1].Value)
-                ? match.Groups[1].Value.Trim()
-                : match.Groups[2].Value.Trim();
+            var value = !string.IsNullOrEmpty(groups[1].Value)
+                ? groups[1].Value.Trim()
+                : groups[2].Value.Trim();
             if (value.Length > 0)
                 yield return value;
         }

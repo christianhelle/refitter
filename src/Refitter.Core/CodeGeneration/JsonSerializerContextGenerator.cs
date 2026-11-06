@@ -399,7 +399,9 @@ internal static class JsonSerializerContextGenerator
         string Name,
         int Arity)
     {
+#pragma warning disable S2325 // False positive: Containers and Name are positional record properties
         public string RelativeName => string.Join(".", Containers.Append(Name));
+#pragma warning restore S2325
 
         public string FullyQualifiedName => $"{Namespace}.{RelativeName}".TrimStart('.');
 

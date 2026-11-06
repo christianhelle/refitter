@@ -18,7 +18,9 @@ public class RefitterRunner
     /// <param name="outputPath">Optional CLI output path override.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A <see cref="RunResult"/> containing generated files, warnings, diagnostics, and the exit code.</returns>
+#pragma warning disable S2325 // Instance method kept for public API compatibility
     public async Task<RunResult> RunAsync(
+#pragma warning restore S2325
         RefitGeneratorSettings settings,
         IFileWriter? writer = null,
         IValidator? validator = null,
@@ -114,23 +116,20 @@ public class RefitterRunner
         CancellationToken cancellationToken)
     {
         var openApiPaths = GetOpenApiPaths(settings);
-        foreach (var specPath in openApiPaths)
+        foreach (var specPath in openApiPaths.Where(path => !string.IsNullOrWhiteSpace(path)))
         {
-            if (!string.IsNullOrWhiteSpace(specPath))
-            {
-                var validationResult = await validator.ValidateAsync(
-                    specPath,
-                    settings.AllowRemoteReferences,
-                    cancellationToken);
+            var validationResult = await validator.ValidateAsync(
+                specPath,
+                settings.AllowRemoteReferences,
+                cancellationToken);
 
-                foreach (var error in validationResult.Diagnostics.Errors)
-                    diagnostics.Add(new RunnerDiagnostic(error.Message, IsError: true));
+            foreach (var error in validationResult.Diagnostics.Errors)
+                diagnostics.Add(new RunnerDiagnostic(error.Message, IsError: true));
 
-                foreach (var warning in validationResult.Diagnostics.Warnings)
-                    diagnostics.Add(new RunnerDiagnostic(warning.Message, IsError: false));
+            foreach (var warning in validationResult.Diagnostics.Warnings)
+                diagnostics.Add(new RunnerDiagnostic(warning.Message, IsError: false));
 
-                validationResult.ThrowIfInvalid();
-            }
+            validationResult.ThrowIfInvalid();
         }
     }
 

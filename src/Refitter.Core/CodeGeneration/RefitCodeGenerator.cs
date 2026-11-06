@@ -7,12 +7,12 @@ namespace Refitter.Core;
 /// Generates Refit client and interface code from an OpenAPI document.
 /// Handles both single-file and multi-file output modes.
 /// </summary>
-internal sealed class RefitCodeGenerator
+internal static class RefitCodeGenerator
 {
     /// <summary>
     /// Generates all Refit code as a single string.
     /// </summary>
-    public string Generate(OpenApiDocument document, RefitGeneratorSettings settings)
+    public static string Generate(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
         return FormatSingleFile(result, settings, settings, settings);
@@ -21,7 +21,7 @@ internal sealed class RefitCodeGenerator
     /// <summary>
     /// Generates Refit code as multiple files (interfaces, contracts, DI, serializer context).
     /// </summary>
-    public GeneratorOutput GenerateMultipleFiles(OpenApiDocument document, RefitGeneratorSettings settings)
+    public static GeneratorOutput GenerateMultipleFiles(OpenApiDocument document, RefitGeneratorSettings settings)
     {
         var result = RunPipeline(document, settings);
         return new(FormatMultipleFiles(result, settings, settings, document));

@@ -37,9 +37,10 @@ internal sealed class UniqueEnumNameGenerator : IEnumNameGenerator
 
             var candidate = defaultGenerator.Generate(i, GetOriginalName(schema, i, value), value, schema);
             var uniqueName = candidate;
-            for (var suffix = 2; !usedNames.Add(uniqueName); suffix++)
+            var suffix = 2;
+            while (!usedNames.Add(uniqueName))
             {
-                uniqueName = candidate + suffix;
+                uniqueName = candidate + suffix++;
             }
 
             names[i] = uniqueName;

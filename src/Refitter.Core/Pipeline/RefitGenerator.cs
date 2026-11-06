@@ -9,8 +9,6 @@ public class RefitGenerator(
     RefitGeneratorSettings settings,
     OpenApiDocument document)
 {
-    private static readonly RefitCodeGenerator CodeGenerator = new();
-
     /// <summary>
     /// OpenAPI specifications used to generate Refit clients and interfaces.
     /// This is the filtered/cleaned document after pipeline processing.
@@ -90,11 +88,11 @@ public class RefitGenerator(
     /// and returns the generated code as a string.
     /// </summary>
     /// <returns>The generated code as a string.</returns>
-    public string Generate() => CodeGenerator.Generate(document, settings);
+    public string Generate() => RefitCodeGenerator.Generate(document, settings);
 
     /// <summary>
     /// Generates multiple files containing Refit interfaces and contracts.
     /// </summary>
     /// <returns>A GeneratorOutput containing all generated code files.</returns>
-    public GeneratorOutput GenerateMultipleFiles() => CodeGenerator.GenerateMultipleFiles(document, settings);
+    public GeneratorOutput GenerateMultipleFiles() => RefitCodeGenerator.GenerateMultipleFiles(document, settings);
 }

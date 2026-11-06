@@ -66,8 +66,7 @@ paths:
             OpenApiPath = swaggerFile
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.Generate(document, settings);
+        var result = RefitCodeGenerator.Generate(document, settings);
 
         result.Should().NotBeNullOrWhiteSpace();
         result.Should().Contain("TestNamespace");
@@ -85,8 +84,7 @@ paths:
             OpenApiPath = swaggerFile
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.Generate(filtered, settings);
+        var result = RefitCodeGenerator.Generate(filtered, settings);
 
         result.Should().Contain("\"/bar\"");
         result.Should().NotContain("\"/foo\"");
@@ -106,8 +104,7 @@ paths:
             GenerateClients = true
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.Generate(document, settings);
+        var result = RefitCodeGenerator.Generate(document, settings);
 
         BuildHelper.BuildCSharp(result).Should().BeTrue();
     }
@@ -126,8 +123,7 @@ paths:
             GenerateClients = true
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.GenerateMultipleFiles(document, settings);
+        var result = RefitCodeGenerator.GenerateMultipleFiles(document, settings);
 
         result.Files.Should().NotBeEmpty();
         result.Files.Should().Contain(f => f.TypeName == "Contracts");
@@ -144,8 +140,7 @@ paths:
             OpenApiPath = swaggerFile
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.Generate(document, settings);
+        var result = RefitCodeGenerator.Generate(document, settings);
 
         result.Should().NotBeNullOrWhiteSpace();
         result.Should().Contain("TestNamespace");
@@ -165,8 +160,7 @@ paths:
             GenerateClients = true
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.GenerateMultipleFiles(document, settings);
+        var result = RefitCodeGenerator.GenerateMultipleFiles(document, settings);
 
         result.Files.Should().NotBeEmpty();
         result.Files.Should().Contain(f => f.TypeName == "Contracts");

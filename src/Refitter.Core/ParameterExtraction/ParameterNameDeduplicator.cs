@@ -51,9 +51,10 @@ internal static class ParameterNameDeduplicator
             }
 
             var uniqueName = name;
-            for (var suffix = 2; !usedNames.Add(uniqueName); suffix++)
+            var suffix = 2;
+            while (!usedNames.Add(uniqueName))
             {
-                uniqueName = name + suffix;
+                uniqueName = name + suffix++;
             }
 
             result.Add(Rename(parameter, name, uniqueName));
