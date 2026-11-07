@@ -1,4 +1,3 @@
-using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -40,10 +39,7 @@ internal static class SanitizerJson
 
         var lineStarts = GetLineStarts(json);
         foreach (var value in container.Descendants().OfType<JValue>().Where(v => v.Type == JTokenType.Float).ToList())
-        {
-            if (GetLiteral(json, lineStarts, value) is { } literal)
-                value.Replace(new JRaw(literal));
-        }
+            value.Replace(new JRaw(GetLiteral(json, lineStarts, value)));
 
         return document;
     }
@@ -52,38 +48,29 @@ internal static class SanitizerJson
     private static List<int> GetLineStarts(string json)
     {
         var lineStarts = new List<int> { 0 };
-        for (var index = 0; index < json.Length; index++)
+        var index = 0;
+        while (index < json.Length)
         {
-            if (json[index] == '\r' && index + 1 < json.Length && json[index + 1] == '\n')
+            var c = json[index++];
+            if (c == '\r' && index < json.Length && json[index] == '\n')
                 index++;
 
-            if (json[index] is '\r' or '\n')
-                lineStarts.Add(index + 1);
+            if (c is '\r' or '\n')
+                lineStarts.Add(index);
         }
 
         return lineStarts;
     }
 
-    // The number literal ending where the reader reported the value, or null when it cannot be found
-    private static string? GetLiteral(string json, List<int> lineStarts, JValue value)
+    // The reader reports the position just after a value, so the literal is the number ending there
+    private static string GetLiteral(string json, List<int> lineStarts, IJsonLineInfo lineInfo)
     {
-        var lineInfo = (IJsonLineInfo)value;
-        if (!lineInfo.HasLineInfo() || lineInfo.LineNumber < 1 || lineInfo.LineNumber > lineStarts.Count)
-            return null;
-
-        var end = Math.Min(lineStarts[lineInfo.LineNumber - 1] + lineInfo.LinePosition, json.Length);
-        while (end > 0 && !IsNumberCharacter(json[end - 1]))
-            end--;
-
+        var end = lineStarts[lineInfo.LineNumber - 1] + lineInfo.LinePosition;
         var start = end;
         while (start > 0 && IsNumberCharacter(json[start - 1]))
             start--;
 
-        var literal = json.Substring(start, end - start);
-        return double.TryParse(literal, NumberStyles.Float, CultureInfo.InvariantCulture, out var number) &&
-               number.Equals(Convert.ToDouble(value.Value, CultureInfo.InvariantCulture))
-            ? literal
-            : null;
+        return json.Substring(start, end - start);
     }
 
     private static bool IsNumberCharacter(char c) =>
