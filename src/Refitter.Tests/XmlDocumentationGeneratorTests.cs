@@ -146,6 +146,27 @@ public class XmlDocumentationGeneratorTests
     }
 
     [TestMethod]
+    public void Obsolete_String_Overload_Reads_Names_And_Aliases()
+    {
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Parameters = { new OpenApiParameter { Name = "page-size", Kind = OpenApiParameterKind.Query, Description = "Page size" } },
+        });
+
+#pragma warning disable CS0618
+        this.generator.AppendMethodDocumentation(
+            method,
+            ["[Query, AliasAs(\"page-size\")] int pageSize", "[Query] string @class"],
+            false,
+            docs);
+#pragma warning restore CS0618
+
+        docs.ToString().Should().Contain("/// <param name=\"pageSize\">Page size</param>");
+        docs.ToString().Should().Contain("/// <param name=\"class\">class parameter</param>");
+    }
+
+    [TestMethod]
     public void Can_Generate_ApizrRequestOptions_Param()
     {
         var docs = new StringBuilder();
