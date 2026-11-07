@@ -68,6 +68,14 @@ public class RefitterSettingsFileTests
     }
 
     [TestMethod]
+    public void GetSettingsDirectory_Returns_Empty_For_A_Root_Path()
+    {
+        var root = Path.GetPathRoot(Path.GetTempPath())!;
+
+        RefitterSettingsLoader.GetSettingsDirectory(root).Should().BeEmpty();
+    }
+
+    [TestMethod]
     public void GetSettingsDirectory_Treats_Backslash_As_A_File_Name_Character_Off_Windows()
     {
         if (OperatingSystem.IsWindows())
