@@ -47,8 +47,14 @@ internal static class NumericBoundsSanitizer
         // Written as a string, like every scalar in documents NSwag converts from YAML: Newtonsoft
         // parses strings to decimal exactly, while a number literal can be read back as a double that
         // rounds above decimal.MaxValue. Assigning in place also avoids JProperty comparing the old
-        // double with the new value, which overflows.
-        value.Value = clampedValue.ToString(CultureInfo.InvariantCulture);
+        // double with the new value, which overflows. A number literal kept as raw text is replaced, since
+        // giving it a string value would still write it as a number literal.
+        var clampedText = clampedValue.ToString(CultureInfo.InvariantCulture);
+        if (value is JRaw)
+            property.Value = new JValue(clampedText);
+        else
+            value.Value = clampedText;
+
         return true;
     }
 

@@ -112,6 +112,49 @@ public class OpenApiJsonNormalizerTests
     }
 
     [TestMethod]
+    [DataRow("1e-30")]
+    [DataRow("1.5E-40")]
+    [DataRow("123456789012345678901234567890.5")]
+    public void NormalizeDocument_Keeps_Numbers_Decimal_Cannot_Represent(string number)
+    {
+        var json = $$"""
+            {
+              "paths": { "/items": { "$ref": "#/components/pathItems/Items" } },
+              "components": {
+                "pathItems": { "Items": { "get": { "operationId": "GetItems" } } },
+                "schemas": { "Rate": { "type": "number", "default": {{number}} } }
+              }
+            }
+            """;
+
+        OpenApiJsonNormalizer.NormalizeDocument(json)
+            .Should()
+            .Contain($"\"default\":{number}");
+    }
+
+    [TestMethod]
+    public void NormalizeDocument_Keeps_Other_Numbers_Exact_When_Clamping_Bounds()
+    {
+        const string json = """
+            {
+              "components": {
+                "schemas": {
+                  "Big": { "type": "number", "maximum": 1.7976931348623157E+308 },
+                  "Rate": { "type": "number", "minimum": 0.12345678901234567890123 }
+                }
+              }
+            }
+            """;
+
+        var result = OpenApiJsonNormalizer.NormalizeDocument(json);
+
+        result.Should().Contain("\"minimum\":0.12345678901234567890123");
+        JObject.Parse(result)["components"]!["schemas"]!["Big"]!["maximum"]!.Value<decimal>()
+            .Should()
+            .Be(decimal.MaxValue);
+    }
+
+    [TestMethod]
     public void NormalizeDocument_Inlines_Path_Items_Spelled_With_Unicode_Escapes()
     {
         const string json = """
