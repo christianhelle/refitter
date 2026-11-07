@@ -10,7 +10,11 @@ internal static class HintNames
     {
         var settingsName = GetFileNameWithoutExtension(settingsFilePath);
         var plannedName = GetFileNameWithoutExtension(plannedFilePath);
-        if (plannedName.EndsWith(".g", StringComparison.OrdinalIgnoreCase))
+
+        // The planned file is named after the settings file unless a name like Contracts says otherwise. A
+        // settings file named like api.g.refitter plans api.g.cs, so match the name before stripping .g
+        if (!string.Equals(settingsName, plannedName, StringComparison.OrdinalIgnoreCase) &&
+            plannedName.EndsWith(".g", StringComparison.OrdinalIgnoreCase))
         {
             plannedName = plannedName.Substring(0, plannedName.Length - 2);
         }
