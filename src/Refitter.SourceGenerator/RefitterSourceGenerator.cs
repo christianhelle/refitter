@@ -352,18 +352,10 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
 
             diagnostics.Add(CreateFileContentsDiagnostic(json));
 
-            var settings = TryDeserialize(json, diagnostics);
+            var settings = TryLoadSettingsFile(json, file.Path, diagnostics);
             if (settings is null)
             {
                 return CreateFailedResult(file.Path, diagnostics);
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-            ResolveRelativeSpecPaths(file.Path, settings);
-
-            if (string.IsNullOrWhiteSpace(settings.OutputFilename))
-            {
-                settings.OutputFilename = GetFileNameWithoutExtension(file.Path) + ".g.cs";
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -441,11 +433,14 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static RefitGeneratorSettings? TryDeserialize(string json, List<GeneratedDiagnostic> diagnostics)
+    private static RefitGeneratorSettings? TryLoadSettingsFile(
+        string json,
+        string settingsFilePath,
+        List<GeneratedDiagnostic> diagnostics)
     {
         try
         {
-            return Serializer.Deserialize<RefitGeneratorSettings>(json);
+            return RefitterSettingsLoader.LoadSettingsFile(json, settingsFilePath);
         }
         catch (Exception e)
         {
@@ -453,29 +448,6 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
 
             return null;
         }
-    }
-
-    private static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings settings)
-    {
-        var lastSep = settingsFilePath.LastIndexOfAny(new[] { '/', '\\' });
-        string settingsFileDirectory;
-        if (lastSep < 0)
-        {
-            settingsFileDirectory = string.Empty;
-        }
-        else if (lastSep == 0)
-        {
-            settingsFileDirectory = settingsFilePath.Substring(0, 1);
-        }
-        else if (lastSep == 2 && settingsFilePath.Length > 1 && settingsFilePath[1] == ':')
-        {
-            settingsFileDirectory = settingsFilePath.Substring(0, lastSep + 1);
-        }
-        else
-        {
-            settingsFileDirectory = settingsFilePath.Substring(0, lastSep);
-        }
-        RefitterSettingsLoader.ResolveRelativeSpecPaths(settings, settingsFileDirectory);
     }
 
     internal static GeneratedDiagnostic CreateNoRefitterFilesFoundDiagnostic() =>
