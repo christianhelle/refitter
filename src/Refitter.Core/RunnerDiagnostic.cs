@@ -5,4 +5,10 @@ namespace Refitter.Core;
 /// </summary>
 /// <param name="Message">The diagnostic message text.</param>
 /// <param name="IsError">Whether this diagnostic represents an error (true) or a warning (false).</param>
-public record RunnerDiagnostic(string Message, bool IsError);
+public record RunnerDiagnostic(string Message, bool IsError)
+{
+    /// <summary>
+    /// Identifies the diagnostic, so hosts can react to it without matching its text.
+    /// </summary>
+    public RunnerDiagnosticKind Kind { get; init; }
+}

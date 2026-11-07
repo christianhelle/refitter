@@ -155,7 +155,10 @@ public class RefitterRunner
         {
             diagnostics.Add(new RunnerDiagnostic(
                 $"All paths were filtered out by include path patterns: [{string.Join(", ", settings.IncludePathMatches)}]",
-                IsError: false));
+                IsError: false)
+            {
+                Kind = RunnerDiagnosticKind.AllPathsFiltered,
+            });
         }
     }
 
