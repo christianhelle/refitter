@@ -121,4 +121,12 @@ public class ParameterNameDeduplicatorTests
 
     private static IEnumerable<string> Deduplicate(IReadOnlyList<MethodParameter> parameters, bool hasAppendedParameter) =>
         ParameterNameDeduplicator.Deduplicate(parameters, hasAppendedParameter).Select(parameter => parameter.Render());
+
+    [TestMethod]
+    public void Renames_Names_That_Only_Differ_By_Formatting_Characters()
+    {
+        Deduplicate([new("string", "id"), new("string", "i\u200Cd")], hasAppendedParameter: false)
+            .Should()
+            .Equal("string id", "[AliasAs(\"id\")] string id2");
+    }
 }

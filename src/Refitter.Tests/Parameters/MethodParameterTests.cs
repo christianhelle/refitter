@@ -120,4 +120,13 @@ public class MethodParameterTests
             .Should()
             .Be("[Query] long id");
     }
+
+    [TestMethod]
+    public void Identifier_Drops_Formatting_Characters_Like_The_Compiler()
+    {
+        new MethodParameter("string", "i\u200Cd")
+            .Identifier
+            .Should()
+            .Be("id");
+    }
 }

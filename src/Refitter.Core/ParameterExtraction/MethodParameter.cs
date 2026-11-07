@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Refitter.Core;
 
 /// <summary>
@@ -36,9 +38,11 @@ internal sealed record MethodParameter(string Type, string Name)
     public string? DefaultValue { get; init; }
 
     /// <summary>
-    /// The parameter name without the <c>@</c> that escapes a C# keyword.
+    /// The parameter name as the compiler compares it: without the <c>@</c> that escapes a keyword and without
+    /// Unicode formatting characters, which C# ignores in identifiers.
     /// </summary>
-    public string Identifier => Name.TrimStart('@');
+    public string Identifier =>
+        new(Name.TrimStart('@').Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.Format).ToArray());
 
     /// <summary>
     /// The name Refit binds the parameter by, like a route placeholder or query key.
