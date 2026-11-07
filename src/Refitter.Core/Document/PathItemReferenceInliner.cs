@@ -13,16 +13,24 @@ internal static class PathItemReferenceInliner
 
     public static string Inline(string json)
     {
-        // A cheap check before parsing. References can be written with JSON escapes (e.g. "#\/components"),
-        // so look for the pathItems name rather than the whole prefix.
-        if (json.IndexOf("pathItems", StringComparison.Ordinal) < 0)
+        if (!IsCandidate(json) || SanitizerJson.Parse(json) is not JContainer document)
             return json;
 
-        if (SanitizerJson.Parse(json) is not JObject document ||
-            document["paths"] is not JObject paths ||
-            document["components"]?["pathItems"] is not JObject pathItems)
+        return Rewrite(document) ? document.ToString(Formatting.None) : json;
+    }
+
+    // A cheap check before parsing. References can be written with JSON escapes (e.g. "#\/components"),
+    // so look for the pathItems name rather than the whole prefix.
+    public static bool IsCandidate(string json) =>
+        json.IndexOf("pathItems", StringComparison.Ordinal) >= 0;
+
+    public static bool Rewrite(JContainer document)
+    {
+        if (document is not JObject root ||
+            root["paths"] is not JObject paths ||
+            root["components"]?["pathItems"] is not JObject pathItems)
         {
-            return json;
+            return false;
         }
 
         var inlined = false;
@@ -36,7 +44,7 @@ internal static class PathItemReferenceInliner
             }
         }
 
-        return inlined ? document.ToString(Formatting.None) : json;
+        return inlined;
     }
 
     private static bool TryResolve(

@@ -52,6 +52,10 @@ internal static class ItemSchemaSanitizer
     public static string Sanitize(string json) =>
         SanitizerJson.Rewrite(json, CandidateRegex, TryConvert);
 
+    public static bool IsCandidate(string json) => CandidateRegex.IsMatch(json);
+
+    public static bool Rewrite(JContainer document) => SanitizerJson.RewriteProperties(document, TryConvert);
+
     private static bool TryConvert(JProperty property)
     {
         if (!ItemSchemaKeywords.Contains(property.Name))

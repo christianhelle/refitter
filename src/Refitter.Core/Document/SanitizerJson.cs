@@ -19,21 +19,31 @@ internal static class SanitizerJson
         if (!candidateRegex.IsMatch(json))
             return json;
 
-        var document = Parse(json);
+        if (Parse(json) is not JContainer document)
+            return json;
 
+        return RewriteProperties(document, tryConvert) ? document.ToString(Formatting.None) : json;
+    }
+
+    /// <summary>
+    /// Offers every property of <paramref name="document"/> to <paramref name="tryConvert"/>, which rewrites it in
+    /// place, and returns whether any property was rewritten.
+    /// </summary>
+    public static bool RewriteProperties(JContainer document, Func<JProperty, bool> tryConvert)
+    {
         var converted = false;
         foreach (var property in document.Descendants().OfType<JProperty>().ToList())
             converted |= tryConvert(property);
 
-        return converted ? document.ToString(Formatting.None) : json;
+        return converted;
     }
 
     /// <summary>
-    /// Parses a JSON document whose root is an object or array.
+    /// Parses a JSON document.
     /// </summary>
     // Numbers are read as decimals so that re-serializing keeps them exact. Only a document with a number
     // outside the decimal range falls back to doubles, the way NumericBoundsSanitizer reads documents.
-    public static JContainer Parse(string json)
+    public static JToken Parse(string json)
     {
         try
         {
@@ -45,7 +55,7 @@ internal static class SanitizerJson
         }
     }
 
-    private static JContainer Parse(string json, FloatParseHandling floatParseHandling)
+    private static JToken Parse(string json, FloatParseHandling floatParseHandling)
     {
         using var reader = new JsonTextReader(new StringReader(json))
         {
@@ -53,7 +63,6 @@ internal static class SanitizerJson
             FloatParseHandling = floatParseHandling,
         };
 
-        // The sanitizers' candidate scans only match a property name, so the root is an object or array
-        return (JContainer)JToken.ReadFrom(reader);
+        return JToken.ReadFrom(reader);
     }
 }

@@ -29,40 +29,36 @@ internal static class NumericBoundsSanitizer
 
     public static string Sanitize(string json)
     {
-        var hasCandidate = CandidateBoundRegex
+        if (!IsCandidate(json) || SanitizerJson.Parse(json) is not JContainer document)
+            return json;
+
+        return Rewrite(document) ? document.ToString(Formatting.None) : json;
+    }
+
+    public static bool IsCandidate(string json) =>
+        CandidateBoundRegex
             .Matches(json)
             .Cast<Match>()
             .Any(match => !IsWithinDecimalRange(match.Groups["number"].Value));
 
-        if (!hasCandidate)
-            return json;
+    public static bool Rewrite(JContainer document) =>
+        SanitizerJson.RewriteProperties(document, TryClamp);
 
-        using var reader = new JsonTextReader(new StringReader(json))
+    private static bool TryClamp(JProperty property)
+    {
+        if (!BoundKeywords.Contains(property.Name) ||
+            property.Value is not JValue value ||
+            !TryClamp(value, out var clampedValue))
         {
-            DateParseHandling = DateParseHandling.None,
-            FloatParseHandling = FloatParseHandling.Double,
-        };
-
-        if (JToken.ReadFrom(reader) is not JContainer document)
-            return json;
-
-        var clamped = false;
-        foreach (var property in document.Descendants().OfType<JProperty>().ToList())
-        {
-            if (BoundKeywords.Contains(property.Name) &&
-                property.Value is JValue value &&
-                TryClamp(value, out var clampedValue))
-            {
-                // Written as a string, like every scalar in documents NSwag converts from YAML: Newtonsoft
-                // parses strings to decimal exactly, while a number literal can be read back as a double that
-                // rounds above decimal.MaxValue. Assigning in place also avoids JProperty comparing the old
-                // double with the new value, which overflows.
-                value.Value = clampedValue.ToString(CultureInfo.InvariantCulture);
-                clamped = true;
-            }
+            return false;
         }
 
-        return clamped ? document.ToString(Formatting.None) : json;
+        // Written as a string, like every scalar in documents NSwag converts from YAML: Newtonsoft
+        // parses strings to decimal exactly, while a number literal can be read back as a double that
+        // rounds above decimal.MaxValue. Assigning in place also avoids JProperty comparing the old
+        // double with the new value, which overflows.
+        value.Value = clampedValue.ToString(CultureInfo.InvariantCulture);
+        return true;
     }
 
     private static bool TryClamp(JValue value, out decimal clampedValue)
