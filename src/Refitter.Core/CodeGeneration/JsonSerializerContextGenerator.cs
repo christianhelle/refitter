@@ -163,33 +163,8 @@ internal static class JsonSerializerContextGenerator
     /// </summary>
     /// <param name="namingConfiguration">The naming configuration</param>
     /// <param name="documentTitle">The OpenAPI document title used when UseOpenApiTitle is enabled</param>
-    public static string GetContextTypeName(INamingConfiguration namingConfiguration, string? documentTitle = null)
-    {
-        string interfaceName;
-
-        if (namingConfiguration.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(documentTitle))
-        {
-            // Derive from the OpenAPI title, matching how the Refit interface name is derived
-            interfaceName = documentTitle!.Sanitize().CapitalizeFirstCharacter();
-        }
-        else
-        {
-            interfaceName = namingConfiguration.Naming.InterfaceName;
-            if (string.IsNullOrWhiteSpace(interfaceName))
-            {
-                interfaceName = NamingSettings.DefaultInterfaceName;
-            }
-
-            if (interfaceName.Length > 1 &&
-                interfaceName[0] == 'I' &&
-                char.IsUpper(interfaceName[1]))
-            {
-                interfaceName = interfaceName.Substring(1);
-            }
-        }
-
-        return $"{interfaceName}SerializerContext";
-    }
+    public static string GetContextTypeName(INamingConfiguration namingConfiguration, string? documentTitle = null) =>
+        ClientNaming.Create(namingConfiguration.Naming, documentTitle).SerializerContextTypeName;
 
     /// <summary>
     /// Extracts serializable type names from generated contracts.
