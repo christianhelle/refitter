@@ -14,7 +14,7 @@ internal class InterfaceGenerator
     private readonly XmlDocumentationGenerator docGenerator;
     private readonly IReturnTypeGenerator returnTypeGenerator;
     private readonly IMethodAttributeGenerator methodAttributeGenerator;
-    private readonly IMethodSignatureGenerator methodSignatureGenerator;
+    private readonly ParameterListBuilder parameterListBuilder;
 
     internal InterfaceGenerator(
         RefitGeneratorSettings settings,
@@ -28,7 +28,7 @@ internal class InterfaceGenerator
             docGenerator,
             new ReturnTypeGenerator(settings, generator),
             new MethodAttributeGenerator(settings, document),
-            new MethodSignatureGenerator(settings))
+            new ParameterListBuilder(settings))
     {
     }
 
@@ -39,7 +39,7 @@ internal class InterfaceGenerator
         XmlDocumentationGenerator docGenerator,
         IReturnTypeGenerator returnTypeGenerator,
         IMethodAttributeGenerator methodAttributeGenerator,
-        IMethodSignatureGenerator methodSignatureGenerator)
+        ParameterListBuilder parameterListBuilder)
     {
         this.settings = settings;
         this.document = document;
@@ -47,7 +47,7 @@ internal class InterfaceGenerator
         this.docGenerator = docGenerator;
         this.returnTypeGenerator = returnTypeGenerator;
         this.methodAttributeGenerator = methodAttributeGenerator;
-        this.methodSignatureGenerator = methodSignatureGenerator;
+        this.parameterListBuilder = parameterListBuilder;
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
@@ -245,7 +245,7 @@ internal class InterfaceGenerator
             knownTypeIdentifiers,
             ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType));
 
-        var methodSignature = methodSignatureGenerator.Generate(
+        var parameterList = parameterListBuilder.Build(
             operationModel,
             operation,
             dynamicQuerystringParameterType,
@@ -257,7 +257,7 @@ internal class InterfaceGenerator
         {
             docGenerator.AppendMethodDocumentation(
                 operationModel,
-                methodSignature.Parameters,
+                parameterList.Parameters.Select(parameter => parameter.Render()).ToList(),
                 isApiResponseType,
                 code,
                 dynamicQuerystringParameterType);
@@ -268,18 +268,19 @@ internal class InterfaceGenerator
             code.AppendLine($"{Separator}{Separator}{attribute}");
         }
 
-        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(methodSignature.Path)}\")]")
-            .AppendLine($"{Separator}{Separator}{returnType} {methodName}({methodSignature.ParametersString});")
+        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(parameterList.Path)}\")]")
+            .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parameterList.Render()});")
             .AppendLine();
 
-        if (methodSignature.ParametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
+        if (parameterList.Parameters.Any(parameter => parameter.IsNullable) &&
+            settings is { OptionalParameters: true, ApizrSettings: not null })
         {
-            var nonOptionalParameters = methodSignature.Parameters.Where(parameter => !parameter.Contains("?")).ToList();
+            var nonOptionalParameters = parameterList.Parameters.Where(parameter => !parameter.IsNullable).ToList();
             if (settings.GenerateXmlDocCodeComments)
             {
                 docGenerator.AppendMethodDocumentation(
                     operationModel,
-                    nonOptionalParameters,
+                    nonOptionalParameters.Select(parameter => parameter.Render()).ToList(),
                     isApiResponseType,
                     code,
                     dynamicQuerystringParameterType);
@@ -290,15 +291,15 @@ internal class InterfaceGenerator
                 code.AppendLine($"{Separator}{Separator}{attribute}");
             }
 
-            var nonOptionalParametersString = string.Join(", ", nonOptionalParameters);
+            var nonOptionalParametersString = MethodParameter.Render(nonOptionalParameters);
 
-            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(methodSignature.Path)}\")]")
+            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(parameterList.Path)}\")]")
                 .AppendLine($"{Separator}{Separator}{returnType} {methodName}({nonOptionalParametersString});")
                 .AppendLine();
         }
 
         var parameterTypes = new List<GeneratedCode>();
-        if (methodSignature.DynamicQuerystringParameters is { } dynamicQuerystringParameters &&
+        if (parameterList.DynamicQuerystringCode is { } dynamicQuerystringParameters &&
             !string.IsNullOrWhiteSpace(dynamicQuerystringParameters))
         {
             parameterTypes.Add(new GeneratedCode(dynamicQuerystringParameterType, dynamicQuerystringParameters)
@@ -307,7 +308,7 @@ internal class InterfaceGenerator
             });
         }
 
-        if (methodSignature.FormObjectParameters is { } formObjectParameters &&
+        if (parameterList.FormObjectCode is { } formObjectParameters &&
             !string.IsNullOrWhiteSpace(formObjectParameters))
         {
             knownTypeIdentifiers.Add(formObjectParameterType);

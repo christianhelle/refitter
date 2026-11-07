@@ -60,7 +60,7 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
                 .Select(p => p.Name)
                 .ToList());
 
-        return new ParameterList(path, uniqueParameters.Select(parameter => parameter.Render()).ToList(), dynamicQuerystringCode)
+        return new ParameterList(path, uniqueParameters, dynamicQuerystringCode)
         {
             FormObjectCode = formObjectCode,
         };
