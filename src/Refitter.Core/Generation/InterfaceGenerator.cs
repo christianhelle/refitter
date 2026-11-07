@@ -257,7 +257,7 @@ internal class InterfaceGenerator
         {
             docGenerator.AppendMethodDocumentation(
                 operationModel,
-                parameterList.Parameters.Select(parameter => parameter.Render()).ToList(),
+                parameterList.Parameters,
                 isApiResponseType,
                 code,
                 dynamicQuerystringParameterType);
@@ -280,7 +280,7 @@ internal class InterfaceGenerator
             {
                 docGenerator.AppendMethodDocumentation(
                     operationModel,
-                    nonOptionalParameters.Select(parameter => parameter.Render()).ToList(),
+                    nonOptionalParameters,
                     isApiResponseType,
                     code,
                     dynamicQuerystringParameterType);
