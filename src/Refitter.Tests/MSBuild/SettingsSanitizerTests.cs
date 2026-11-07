@@ -89,6 +89,16 @@ public class SettingsSanitizerTests
         settings["namespace"].GetString().Should().Be(SettingsSanitizer.Redacted);
     }
 
+    [TestMethod]
+    [DataRow("{ \"includeTags\": [] }", "[0 items]")]
+    [DataRow("{ \"includeTags\": [ \"Pet\", ] }", "[1 items]")]
+    public void Sanitize_Reports_Array_Lengths(string contents, string expected)
+    {
+        var settings = Parse(SettingsSanitizer.Sanitize(contents)!);
+
+        settings["includeTags"].GetString().Should().Be(expected);
+    }
+
     private static Dictionary<string, JsonElement> Parse(string json) =>
         JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json)!;
 }
