@@ -76,13 +76,15 @@ public static class Analytics
                 .ForEach(attribute => LogFeatureUsage(attribute, property));
         }
 
-        if (settings.SettingsFilePath is not null)
+        // Like the source generator, report which settings are used but never paths, URLs or other free text
+        if (settings.SettingsFilePath is not null &&
+            SettingsSanitizer.Sanitize(Serializer.Serialize(refitGeneratorSettings)) is { } sanitizedSettings)
         {
             telemetryClient.TrackEvent(
                 "settings-file",
                 new Dictionary<string, string>
                 {
-                    { "settings", Serializer.Serialize(refitGeneratorSettings) }
+                    { "settings", sanitizedSettings }
                 });
             telemetryClient.Flush();
         }

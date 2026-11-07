@@ -117,6 +117,40 @@ public class AnalyticsTests
 
     [TestMethod]
     [DoNotParallelize]
+    public void LogFeatureUsage_Should_Send_Sanitized_Settings_File()
+    {
+        var previousClient = Analytics.GetTelemetryClient();
+        var captured = new List<ITelemetry>();
+        Analytics.SetTelemetryClient(CreateTelemetryClient(captured));
+
+        try
+        {
+            var settings = new Settings { SettingsFilePath = "petstore.refitter" };
+            var refitSettings = new RefitGeneratorSettings
+            {
+                OpenApiPath = "https://user:password@example.com/openapi.json",
+                Namespace = "Contoso.Secret",
+                MultipleInterfaces = MultipleInterfaces.ByTag,
+            };
+
+            Analytics.LogFeatureUsage(settings, refitSettings);
+
+            var reported = captured
+                .OfType<EventTelemetry>()
+                .Single(e => e.Name == "settings-file" && e.Properties.ContainsKey("settings"))
+                .Properties["settings"];
+            reported.Should().NotContain("password").And.NotContain("Contoso");
+            reported.Should().Contain("\"namespace\":\"<redacted>\"");
+            reported.Should().Contain("\"multipleInterfaces\":\"ByTag\"");
+        }
+        finally
+        {
+            Analytics.SetTelemetryClient(previousClient);
+        }
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
     public async Task LogError_Should_Apply_Msbuild_Telemetry_Source()
     {
         var previousClient = Analytics.GetTelemetryClient();
