@@ -13,6 +13,12 @@ internal static class ParameterAttributeFormatter
             ? string.Empty
             : $"AliasAs(\"{ParameterNaming.EscapeString(originalName)}\")";
 
+    /// <summary>
+    /// The wire name to alias a parameter as, or <see langword="null"/> when it is the parameter name.
+    /// </summary>
+    public static string? GetAlias(string originalName, string variableName) =>
+        string.Equals(originalName, variableName, StringComparison.Ordinal) ? null : originalName;
+
     public static string JoinAttributes(params string[] attributes)
     {
         var filteredAttributes = attributes

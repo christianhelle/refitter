@@ -20,27 +20,27 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
         string dynamicQuerystringParameterType,
         string? formObjectParameterType = null)
     {
-        var parameters = new List<string>();
+        var extracted = new List<MethodParameter>();
 
-        parameters.AddRange(RouteParameterExtractor.Extract(operationModel));
+        extracted.AddRange(RouteParameterExtractor.Extract(operationModel));
 
         var (queryParameters, dynamicQuerystringCode) = queryExtractor.Extract(
             operationModel,
             settings,
             dynamicQuerystringParameterType);
-        parameters.AddRange(queryParameters);
+        extracted.AddRange(queryParameters);
 
-        parameters.AddRange(bodyExtractor.Extract(operationModel, settings));
-        parameters.AddRange(headerExtractor.Extract(operationModel, operation, settings));
+        extracted.AddRange(bodyExtractor.Extract(operationModel, settings));
+        extracted.AddRange(headerExtractor.Extract(operationModel, operation, settings));
         var (formParameters, formObjectCode) = FormParameterExtractor.Extract(
             operationModel,
             operation,
             settings,
             formObjectParameterType ?? ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType));
-        parameters.AddRange(formParameters);
+        extracted.AddRange(formParameters);
 
-        parameters = OptionalParameterReorderer.Reorder(
-            parameters,
+        var parameters = OptionalParameterReorderer.Reorder(
+            extracted.Select(parameter => parameter.Render()).ToList(),
             settings,
             operationModel.Parameters);
 

@@ -5,7 +5,7 @@ namespace Refitter.Core;
 
 internal sealed class BodyParameterExtractor
 {
-    public IEnumerable<string> Extract(
+    public IEnumerable<MethodParameter> Extract(
         CSharpOperationModel operationModel,
         RefitGeneratorSettings settings)
     {
@@ -14,7 +14,11 @@ internal sealed class BodyParameterExtractor
             .Select(p =>
             {
                 var variableName = ParameterNaming.GetVariableName(p);
-                return $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetBodyAttribute(p, operationModel.Consumes, settings), ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{ParameterTypeResolver.GetParameterType(p, settings)} {variableName}";
+                return new MethodParameter(ParameterTypeResolver.GetParameterType(p, settings), variableName)
+                {
+                    Attributes = [ParameterAttributeFormatter.GetBodyAttribute(p, operationModel.Consumes, settings)],
+                    Alias = ParameterAttributeFormatter.GetAlias(p.Name, variableName),
+                };
             })
             .ToList();
 
@@ -23,12 +27,10 @@ internal sealed class BodyParameterExtractor
             .Select(p =>
             {
                 var variableName = ParameterNaming.GetVariableName(p);
-                var aliasAsAttribute = ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName);
-                var generatedAliasAsAttribute = string.IsNullOrWhiteSpace(aliasAsAttribute)
-                    ? string.Empty
-                    : $"[{aliasAsAttribute}]";
-
-                return $"{generatedAliasAsAttribute}StreamPart {variableName}";
+                return new MethodParameter("StreamPart", variableName)
+                {
+                    Alias = ParameterAttributeFormatter.GetAlias(p.Name, variableName),
+                };
             })
             .ToList();
 
