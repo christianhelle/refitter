@@ -182,7 +182,10 @@ public class RefitterRunner
             warnings.Add(
                 new Warning(
                     "Date Format Override",
-                    "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true"));
+                    "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true")
+                {
+                    Kind = WarningKind.DateFormatOverride,
+                });
         }
 
 #pragma warning disable CS0618
@@ -192,7 +195,10 @@ public class RefitterRunner
             warnings.Add(
                 new Warning(
                     "Deprecated Setting",
-                    "The 'usePolly' property is deprecated. Use 'transientErrorHandler: Polly' instead"));
+                    "The 'usePolly' property is deprecated. Use 'transientErrorHandler: Polly' instead")
+                {
+                    Kind = WarningKind.DeprecatedSetting,
+                });
         }
     }
 }
