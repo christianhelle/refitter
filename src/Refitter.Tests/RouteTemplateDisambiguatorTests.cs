@@ -86,6 +86,25 @@ public class RouteTemplateDisambiguatorTests
         Render(result).Should().Equal("[AliasAs(\"class3\")] string @class", "[Query, AliasAs(\"Class\")] string class2");
     }
 
+    [TestMethod]
+    public void Replaces_Alias_When_Parameter_Name_Is_Taken()
+    {
+        var (path, result) = RouteTemplateDisambiguator.Disambiguate(
+            "/v1/{Id}/items/{id}",
+            [
+                new("string", "idPath") { Alias = "Id" },
+                new("string", "idPath2") { Alias = "id" },
+                new("string", "idpath") { Attributes = ["Query"] },
+            ],
+            ["Id", "id"]);
+
+        path.Should().Be("/v1/{idPath3}/items/{id}");
+        Render(result).Should().Equal(
+            "[AliasAs(\"idPath3\")] string idPath",
+            "[AliasAs(\"id\")] string idPath2",
+            "[Query] string idpath");
+    }
+
     private static IEnumerable<string> Render(IEnumerable<MethodParameter> parameters) =>
         parameters.Select(parameter => parameter.Render());
 }
