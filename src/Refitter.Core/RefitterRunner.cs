@@ -38,8 +38,7 @@ public class RefitterRunner
 
             var output = GenerateCode(generator, settings);
 
-            var planner = new OutputPlannerAdapter();
-            var plannedFiles = planner.Plan(
+            var plannedFiles = OutputPlanner.Plan(
                 output,
                 settings,
                 settingsFilePath,

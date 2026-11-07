@@ -5,10 +5,8 @@ namespace Refitter.Tests;
 
 
 [TestClass]
-public class OutputPlannerAdapterTests
+public class OutputPlannerPlanTests
 {
-    private static readonly IOutputPlanner planner = new OutputPlannerAdapter();
-
     [TestMethod]
     public void Plan_SingleFile_DirectCli_Explicit_Output_Is_Used()
     {
@@ -24,7 +22,7 @@ public class OutputPlannerAdapterTests
             new("GeneratedType", "// code")
         });
 
-        var planned = planner.Plan(
+        var planned = OutputPlanner.Plan(
             output,
             config,
             settingsFilePath: null,
@@ -50,7 +48,7 @@ public class OutputPlannerAdapterTests
             new("GeneratedType", "// code")
         });
 
-        var planned = planner.Plan(
+        var planned = OutputPlanner.Plan(
             output,
             config,
             settingsFilePath: null,
@@ -77,7 +75,7 @@ public class OutputPlannerAdapterTests
             new("GeneratedType", "// code")
         });
 
-        var planned = planner.Plan(
+        var planned = OutputPlanner.Plan(
             output,
             config,
             settingsFilePath,
@@ -103,7 +101,7 @@ public class OutputPlannerAdapterTests
             new("RefitInterfaces", "// interfaces"),
         });
 
-        var planned = planner.Plan(
+        var planned = OutputPlanner.Plan(
             output,
             config,
             settingsFilePath: null,
@@ -129,7 +127,7 @@ public class OutputPlannerAdapterTests
             new("RefitInterfaces", "// interfaces"),
         });
 
-        var planned = planner.Plan(
+        var planned = OutputPlanner.Plan(
             output,
             config,
             settingsFilePath,
@@ -158,7 +156,7 @@ public class OutputPlannerAdapterTests
             new(TypenameConstants.Contracts, "// contracts"),
         });
 
-        var planned = planner.Plan(
+        var planned = OutputPlanner.Plan(
             output,
             config,
             settingsFilePath,
@@ -186,7 +184,7 @@ public class OutputPlannerAdapterTests
             new("Interface2", "// content 2"),
         });
 
-        var planned = planner.Plan(
+        var planned = OutputPlanner.Plan(
             output,
             config,
             settingsFilePath: null,
@@ -207,7 +205,7 @@ public class OutputPlannerAdapterTests
             GenerateMultipleFiles = false,
         };
 
-        var planned = planner.Plan(
+        var planned = OutputPlanner.Plan(
             new GeneratorOutput(new List<GeneratedCode>()),
             config,
             settingsFilePath: null,
@@ -215,5 +213,20 @@ public class OutputPlannerAdapterTests
 
         planned.Should().ContainSingle();
         planned[0].Content.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void Obsolete_Adapter_Delegates_To_Plan()
+    {
+        var config = new RefitGeneratorSettings { GenerateMultipleFiles = false };
+        var output = new GeneratorOutput(new List<GeneratedCode> { new("GeneratedType", "// code") });
+
+#pragma warning disable CS0618
+        IOutputPlanner planner = new OutputPlannerAdapter();
+#pragma warning restore CS0618
+
+        planner.Plan(output, config, settingsFilePath: null, cliOutputPath: null)
+            .Should()
+            .Equal(OutputPlanner.Plan(output, config, settingsFilePath: null, cliOutputPath: null));
     }
 }

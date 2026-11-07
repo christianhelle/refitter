@@ -20,6 +20,31 @@ public static class OutputPlanner
     public const string DefaultOutputPath = "Output.cs";
 
     /// <summary>
+    /// Plans the output files of a generation run: one file, or one per generated type when
+    /// <see cref="IOutputConfiguration.GenerateMultipleFiles"/> is set.
+    /// </summary>
+    /// <param name="output">The generator output containing generated files.</param>
+    /// <param name="config">The output configuration.</param>
+    /// <param name="settingsFilePath">The path to the settings file, or <c>null</c> for direct CLI generation.</param>
+    /// <param name="cliOutputPath">The output path specified via CLI, or <c>null</c>.</param>
+    /// <returns>A read-only list of planned files with resolved paths and content.</returns>
+    public static IReadOnlyList<PlannedFile> Plan(
+        GeneratorOutput output,
+        IOutputConfiguration config,
+        string? settingsFilePath,
+        string? cliOutputPath)
+    {
+        if (config.GenerateMultipleFiles)
+            return PlanMultipleFiles(settingsFilePath, cliOutputPath, config, output);
+
+        var code = output.Files.Count > 0
+            ? output.Files[0].Content
+            : string.Empty;
+
+        return [PlanSingleFile(settingsFilePath, cliOutputPath, config, code)];
+    }
+
+    /// <summary>
     /// Plans a single output file, determining its path based on the generation mode.
     /// </summary>
     /// <param name="settingsFilePath">The path to the settings file, or <c>null</c> for direct CLI generation.</param>
