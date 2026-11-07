@@ -81,15 +81,4 @@ public class ClientNamingTests
             .Should()
             .Be($"{NamingSettings.DefaultInterfaceName}SerializerContext");
     }
-
-    [TestMethod]
-    public void SerializerContextTypeName_Matches_JsonSerializerContextGenerator()
-    {
-        var settings = new RefitGeneratorSettings();
-
-        ClientNaming.Create(settings.Naming, "Swagger Petstore")
-            .SerializerContextTypeName
-            .Should()
-            .Be(JsonSerializerContextGenerator.GetContextTypeName(settings, "Swagger Petstore"));
-    }
 }

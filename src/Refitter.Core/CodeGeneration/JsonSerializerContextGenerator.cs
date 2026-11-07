@@ -27,7 +27,7 @@ internal static class JsonSerializerContextGenerator
         if (typeNames.Count == 0)
             return string.Empty;
 
-        var contextName = GetContextTypeName(namingConfiguration, documentTitle);
+        var contextName = ClientNaming.Create(namingConfiguration.Naming, documentTitle).SerializerContextTypeName;
         var sb = new StringBuilder();
 
         sb.AppendLine($"namespace {contextNamespace}");
@@ -157,14 +157,6 @@ internal static class JsonSerializerContextGenerator
         "TryGetTypeInfoForRuntimeCustomConverter",
         "GetConverterForNullableProperty",
     };
-
-    /// <summary>
-    /// Gets the generated JsonSerializerContext type name.
-    /// </summary>
-    /// <param name="namingConfiguration">The naming configuration</param>
-    /// <param name="documentTitle">The OpenAPI document title used when UseOpenApiTitle is enabled</param>
-    public static string GetContextTypeName(INamingConfiguration namingConfiguration, string? documentTitle = null) =>
-        ClientNaming.Create(namingConfiguration.Naming, documentTitle).SerializerContextTypeName;
 
     /// <summary>
     /// Extracts serializable type names from generated contracts.
