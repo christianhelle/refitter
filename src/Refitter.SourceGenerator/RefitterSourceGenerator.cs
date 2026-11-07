@@ -380,7 +380,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
 
             foreach (var warning in result.Warnings)
             {
-                if (warning.Title == "Date Format Override")
+                if (warning.Kind == WarningKind.DateFormatOverride)
                 {
                     diagnostics.Add(CreateIsoDateFormatOverrideDiagnostic());
                 }
