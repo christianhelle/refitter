@@ -40,21 +40,21 @@ internal sealed class ParameterListBuilder(RefitGeneratorSettings settings)
         extracted.AddRange(formParameters);
 
         var parameters = OptionalParameterReorderer.Reorder(
-            extracted.Select(parameter => parameter.Render()).ToList(),
+            extracted,
             settings,
             operationModel.Parameters);
 
         var hasAppendedParameter = true;
         if (settings.ApizrSettings?.WithRequestOptions == true)
-            parameters.Add("[RequestOptions] IApizrRequestOptions options");
+            parameters.Add(new MethodParameter("IApizrRequestOptions", "options") { Attributes = ["RequestOptions"] });
         else if (settings.UseCancellationTokens)
-            parameters.Add("CancellationToken cancellationToken = default");
+            parameters.Add(new MethodParameter("CancellationToken", "cancellationToken") { DefaultValue = "default" });
         else
             hasAppendedParameter = false;
 
         var (path, uniqueParameters) = RouteTemplateDisambiguator.Disambiguate(
             operationModel.Path,
-            ParameterNameDeduplicator.Deduplicate(parameters, hasAppendedParameter),
+            ParameterNameDeduplicator.Deduplicate(parameters.Select(parameter => parameter.Render()).ToList(), hasAppendedParameter),
             operationModel.Parameters
                 .Where(p => p.Kind == OpenApiParameterKind.Path)
                 .Select(p => p.Name)

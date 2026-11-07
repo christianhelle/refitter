@@ -11,7 +11,7 @@ namespace Refitter.Tests.Parameters;
 public class ParameterExtractorPrivateCoverageTests
 {
     [TestMethod]
-    public void GetDefaultValueForParameter_Returns_Default_For_Empty_Parameter_String()
+    public void GetDefaultValueForParameter_Returns_Default_For_Empty_Parameter_Name()
     {
         var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
             string.Empty,
@@ -172,18 +172,6 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [TestMethod]
-    public void ReOrderNullableParameters_Delegates_To_OptionalParameterReorderer()
-    {
-        var parameterModels = new List<CSharpParameterModel>();
-        var result = OptionalParameterReorderer.Reorder(
-            new List<string> { "string a", "int? b = default" },
-            new RefitGeneratorSettings(),
-            parameterModels);
-
-        result.Should().NotBeNull();
-    }
-
-    [TestMethod]
     public void FormatDefaultValue_Adds_PointZero_For_Double_Integer_Values()
     {
         var result = ParameterDefaultValueFormatter.FormatDefaultValue(42, "double");
@@ -203,7 +191,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetDefaultValueForParameter_Returns_Default_When_No_Matching_Parameter_Found()
     {
         var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
-            "int paramName",
+            "paramName",
             new List<CSharpParameterModel>());
 
         result.Should().Be("default");
