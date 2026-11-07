@@ -8,11 +8,14 @@ namespace Refitter.Tests.Scenarios;
 [TestClass]
 public class ByTagWithoutOpenApiTitleTests
 {
+    private const string EmptyTitle = "  title: ''";
+    private const string WhitespaceTitle = "  title: '   '";
+
     private const string OpenApiSpec = @"
 openapi: '3.0.0'
 info:
   version: 'v1'
-  title: ''
+{0}
 paths:
   /jobs:
     get:
@@ -31,9 +34,11 @@ paths:
 ";
 
     [TestMethod]
-    public async Task Untagged_Operations_Use_InterfaceName_When_Title_Is_Empty()
+    [DataRow(EmptyTitle)]
+    [DataRow(WhitespaceTitle)]
+    public async Task Untagged_Operations_Use_InterfaceName_When_Title_Is_Blank(string titleLine)
     {
-        string generatedCode = await GenerateCode();
+        string generatedCode = await GenerateCode(titleLine);
         generatedCode.Should().Contain("partial interface IMyClientApi");
     }
 
@@ -55,9 +60,9 @@ paths:
             .BeTrue();
     }
 
-    private static async Task<string> GenerateCode()
+    private static async Task<string> GenerateCode(string titleLine = EmptyTitle)
     {
-        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(string.Format(OpenApiSpec, titleLine));
         var settings = new RefitGeneratorSettings
         {
             OpenApiPath = swaggerFile,
