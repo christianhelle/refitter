@@ -12,8 +12,8 @@ internal class InterfaceGenerator
     private readonly OpenApiDocument document;
     private readonly CustomCSharpClientGenerator generator;
     private readonly XmlDocumentationGenerator docGenerator;
-    private readonly IReturnTypeGenerator returnTypeGenerator;
-    private readonly IMethodAttributeGenerator methodAttributeGenerator;
+    private readonly ReturnTypeGenerator returnTypeGenerator;
+    private readonly MethodAttributeGenerator methodAttributeGenerator;
     private readonly ParameterListBuilder parameterListBuilder;
 
     internal InterfaceGenerator(
@@ -21,33 +21,14 @@ internal class InterfaceGenerator
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
         XmlDocumentationGenerator docGenerator)
-        : this(
-            settings,
-            document,
-            generator,
-            docGenerator,
-            new ReturnTypeGenerator(settings, generator),
-            new MethodAttributeGenerator(settings, document),
-            new ParameterListBuilder(settings))
-    {
-    }
-
-    private InterfaceGenerator(
-        RefitGeneratorSettings settings,
-        OpenApiDocument document,
-        CustomCSharpClientGenerator generator,
-        XmlDocumentationGenerator docGenerator,
-        IReturnTypeGenerator returnTypeGenerator,
-        IMethodAttributeGenerator methodAttributeGenerator,
-        ParameterListBuilder parameterListBuilder)
     {
         this.settings = settings;
         this.document = document;
         this.generator = generator;
         this.docGenerator = docGenerator;
-        this.returnTypeGenerator = returnTypeGenerator;
-        this.methodAttributeGenerator = methodAttributeGenerator;
-        this.parameterListBuilder = parameterListBuilder;
+        returnTypeGenerator = new ReturnTypeGenerator(settings, generator);
+        methodAttributeGenerator = new MethodAttributeGenerator(settings, document);
+        parameterListBuilder = new ParameterListBuilder(settings);
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
