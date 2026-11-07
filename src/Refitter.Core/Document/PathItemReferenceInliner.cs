@@ -11,9 +11,11 @@ internal static class PathItemReferenceInliner
     private const string ComponentsPathItemsPrefix = "#/components/pathItems/";
 
     // A cheap check before parsing. References can be written with JSON escapes (e.g. "#\/components"),
-    // so look for the pathItems name rather than the whole prefix.
+    // so look for the pathItems name rather than the whole prefix. A \u escape could spell the name the
+    // check cannot see, so documents with one are always parsed.
     public static bool IsCandidate(string json) =>
-        json.IndexOf("pathItems", StringComparison.Ordinal) >= 0;
+        json.IndexOf("pathItems", StringComparison.Ordinal) >= 0 ||
+        json.IndexOf("\\u", StringComparison.Ordinal) >= 0;
 
     public static bool Rewrite(JContainer document)
     {

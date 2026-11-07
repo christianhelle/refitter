@@ -110,4 +110,22 @@ public class OpenApiJsonNormalizerTests
 
         OpenApiJsonNormalizer.NormalizeDocument(json).Should().BeSameAs(json);
     }
+
+    [TestMethod]
+    public void NormalizeDocument_Inlines_Path_Items_Spelled_With_Unicode_Escapes()
+    {
+        const string json = """
+            {
+              "paths": { "/items": { "$ref": "#/components/path\u0049tems/Items" } },
+              "components": {
+                "path\u0049tems": { "Items": { "get": { "operationId": "GetItems" } } }
+              }
+            }
+            """;
+
+        var result = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
+
+        result["paths"]!["/items"]!["$ref"].Should().BeNull();
+        result["paths"]!["/items"]!["get"]!["operationId"]!.Value<string>().Should().Be("GetItems");
+    }
 }
