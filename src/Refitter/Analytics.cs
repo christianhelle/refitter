@@ -76,9 +76,10 @@ public static class Analytics
                 .ForEach(attribute => LogFeatureUsage(attribute, property));
         }
 
-        // Like the source generator, report which settings are used but never paths, URLs or other free text
+        // Like the source generator, report which settings the file uses but never paths, URLs or other free text
         if (settings.SettingsFilePath is not null &&
-            SettingsSanitizer.Sanitize(Serializer.Serialize(refitGeneratorSettings)) is { } sanitizedSettings)
+            ReadSettingsFile(settings.SettingsFilePath) is { } contents &&
+            SettingsSanitizer.Sanitize(contents) is { } sanitizedSettings)
         {
             telemetryClient.TrackEvent(
                 "settings-file",
@@ -90,6 +91,18 @@ public static class Analytics
         }
 
         LogMsbuildInvocation(settings);
+    }
+
+    private static string? ReadSettingsFile(string settingsFilePath)
+    {
+        try
+        {
+            return File.ReadAllText(settingsFilePath);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
     }
 
     private static void LogFeatureUsage(CommandOptionAttribute attribute, PropertyInfo property)

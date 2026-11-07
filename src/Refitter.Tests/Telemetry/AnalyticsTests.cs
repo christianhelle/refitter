@@ -122,18 +122,23 @@ public class AnalyticsTests
         var previousClient = Analytics.GetTelemetryClient();
         var captured = new List<ITelemetry>();
         Analytics.SetTelemetryClient(CreateTelemetryClient(captured));
+        var settingsFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.refitter");
 
         try
         {
-            var settings = new Settings { SettingsFilePath = "petstore.refitter" };
-            var refitSettings = new RefitGeneratorSettings
-            {
-                OpenApiPath = "https://user:password@example.com/openapi.json",
-                Namespace = "Contoso.Secret",
-                MultipleInterfaces = MultipleInterfaces.ByTag,
-            };
+            File.WriteAllText(
+                settingsFile,
+                """
+                {
+                  "openApiPath": "https://user:password@example.com/openapi.json",
+                  "namespace": "Contoso.Secret",
+                  "multipleInterfaces": "ByTag",
+                  "customKey": true
+                }
+                """);
+            var settings = new Settings { SettingsFilePath = settingsFile };
 
-            Analytics.LogFeatureUsage(settings, refitSettings);
+            Analytics.LogFeatureUsage(settings, new RefitGeneratorSettings());
 
             var reported = captured
                 .OfType<EventTelemetry>()
@@ -142,10 +147,13 @@ public class AnalyticsTests
             reported.Should().NotContain("password").And.NotContain("Contoso");
             reported.Should().Contain("\"namespace\":\"<redacted>\"");
             reported.Should().Contain("\"multipleInterfaces\":\"ByTag\"");
+            reported.Should().Contain("\"unknown-settings\":1");
+            reported.Should().NotContain("generateContracts", "settings the file leaves out are not reported");
         }
         finally
         {
             Analytics.SetTelemetryClient(previousClient);
+            File.Delete(settingsFile);
         }
     }
 
