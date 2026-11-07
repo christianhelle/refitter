@@ -45,6 +45,7 @@
     <ItemGroup>
       <!-- The generator assembly also compiles Refitter.Core, so its telemetry sources are linked rather than referenced -->
       <Compile Include="..\Refitter.SourceGenerator\Telemetry\*.cs" Link="MSBuild\Telemetry\%(Filename)%(Extension)" />
+      <Compile Include="..\Refitter.SourceGenerator\HintNames.cs" Link="SourceGenerator\HintNames.cs" />
     </ItemGroup>
 
     <ItemGroup>

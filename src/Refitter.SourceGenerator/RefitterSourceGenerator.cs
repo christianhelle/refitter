@@ -320,7 +320,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
             .Select(result => result with
             {
                 Sources = result.Sources
-                    .Select(source => source with { HintName = MakeUnique(source.HintName, usedHintNames) })
+                    .Select(source => source with { HintName = HintNames.MakeUnique(source.HintName, usedHintNames) })
                     .ToImmutableArray()
                     .AsEquatableArray()
             })
@@ -392,7 +392,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
                 var hintNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var plannedFile in result.GeneratedFiles)
                 {
-                    var hintName = CreateHintName(file.Path, plannedFile.Path, hintNames);
+                    var hintName = HintNames.Create(file.Path, plannedFile.Path, hintNames);
                     sources.Add(new GeneratedSource(hintName, plannedFile.Content));
                 }
             }
@@ -524,66 +524,11 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
                 diagnostic.EnabledByDefault),
             Location.None);
 
-    private static string GetFileNameWithoutExtension(string path)
-    {
-        var lastSep = path.LastIndexOfAny(new[] { '/', '\\' });
-        var fileName = lastSep >= 0 ? path.Substring(lastSep + 1) : path;
-        var lastDot = fileName.LastIndexOf('.');
-        return lastDot >= 0 ? fileName.Substring(0, lastDot) : fileName;
-    }
-
     private static GeneratedCode CreateFailedResult(string settingsFilePath, List<GeneratedDiagnostic> diagnostics) =>
         new(
             settingsFilePath,
             diagnostics.ToImmutableArray().AsEquatableArray(),
             ImmutableArray<GeneratedSource>.Empty.AsEquatableArray());
-
-    private static string CreateHintName(string settingsFilePath, string plannedFilePath, HashSet<string> usedHintNames)
-    {
-        var settingsName = GetFileNameWithoutExtension(settingsFilePath);
-        var plannedName = GetFileNameWithoutExtension(plannedFilePath);
-        if (plannedName.EndsWith(".g", StringComparison.OrdinalIgnoreCase))
-        {
-            plannedName = plannedName.Substring(0, plannedName.Length - 2);
-        }
-
-        var baseName = SanitizeHintName(
-            string.Equals(settingsName, plannedName, StringComparison.OrdinalIgnoreCase)
-                ? settingsName
-                : settingsName + "." + plannedName);
-
-        return MakeUnique(baseName + ".g.cs", usedHintNames);
-    }
-
-    private static string MakeUnique(string hintName, HashSet<string> usedHintNames)
-    {
-        const string extension = ".g.cs";
-        var baseName = hintName.Substring(0, hintName.Length - extension.Length);
-        var uniqueName = hintName;
-        var counter = 2;
-        while (!usedHintNames.Add(uniqueName))
-        {
-            uniqueName = $"{baseName}{counter}{extension}";
-            counter++;
-        }
-
-        return uniqueName;
-    }
-
-    private static string SanitizeHintName(string name)
-    {
-        var chars = name.ToCharArray();
-        for (var i = 0; i < chars.Length; i++)
-        {
-            var c = chars[i];
-            if (!char.IsLetterOrDigit(c) && c != '.' && c != '_' && c != '-')
-            {
-                chars[i] = '_';
-            }
-        }
-
-        return new string(chars);
-    }
 
     internal readonly record struct GeneratedCode(
         string SettingsFilePath,
