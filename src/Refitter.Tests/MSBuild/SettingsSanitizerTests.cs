@@ -74,8 +74,20 @@ public class SettingsSanitizerTests
     [DataRow("{ \"a\": \"tab\there\" }")]
     [DataRow("{ \"a\": \"\\u 1a2\" }")]
     [DataRow("{ \"a\": \"\\u12g4\" }")]
+    [DataRow("{ \"a\": 1 \"b\": 2 }")]
+    [DataRow("{ \"a\" 1 }")]
     public void Sanitize_Returns_Null_For_Invalid_Settings(string contents) =>
         SettingsSanitizer.Sanitize(contents).Should().BeNull();
+
+    [TestMethod]
+    [DataRow("{ \"namespace\": \"a\\nb\\rc\\td\\be\\ff\\/g\\\"h\\\\i\\u0041\" } // trailing comment")]
+    [DataRow("{ \"namespace\": \"Acme\" } /* unterminated comment")]
+    public void Sanitize_Reads_Escapes_And_Comments(string contents)
+    {
+        var settings = Parse(SettingsSanitizer.Sanitize(contents)!);
+
+        settings["namespace"].GetString().Should().Be(SettingsSanitizer.Redacted);
+    }
 
     private static Dictionary<string, JsonElement> Parse(string json) =>
         JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json)!;
