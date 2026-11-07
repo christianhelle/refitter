@@ -67,9 +67,7 @@ internal class InterfaceGenerator
 
         // Interfaces share the namespace with the contracts, so they must not reuse a contract type name
         var knownInterfaceIdentifiers = new HashSet<string>(GetContractTypeNames());
-        var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
-            ? document.Info!.Title.Sanitize()
-            : settings.Naming.InterfaceName;
+        var title = ClientNaming.Create(settings.Naming, document.Info?.Title).Title;
 
         if (partitioning.IsSingleInterface)
         {
