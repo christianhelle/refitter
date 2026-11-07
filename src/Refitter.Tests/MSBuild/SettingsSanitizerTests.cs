@@ -1,6 +1,6 @@
 using System.Text.Json;
 using AwesomeAssertions;
-using Refitter.SourceGenerator.Telemetry;
+using Refitter.Core;
 
 namespace Refitter.Tests.MSBuild;
 

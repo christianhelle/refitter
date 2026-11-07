@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Refitter.SourceGenerator.Telemetry;
+namespace Refitter.Core;
 
 /// <summary>
 /// Reduces a .refitter file to which settings are used, so that telemetry never carries
