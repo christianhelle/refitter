@@ -59,14 +59,25 @@ public class RefitterSettingsFileTests
     }
 
     [TestMethod]
-    [DataRow("petstore.refitter", "")]
-    [DataRow("/petstore.refitter", "/")]
-    [DataRow("/work/api/petstore.refitter", "/work/api")]
-    [DataRow(@"C:\petstore.refitter", @"C:\")]
-    [DataRow(@"C:\work\api\petstore.refitter", @"C:\work\api")]
-    [DataRow(@"work\petstore.refitter", "work")]
-    public void GetSettingsDirectory_Handles_Both_Separators(string settingsFilePath, string expected)
+    public void GetSettingsDirectory_Returns_The_Directory_Of_The_Settings_File()
     {
-        RefitterSettingsLoader.GetSettingsDirectory(settingsFilePath).Should().Be(expected);
+        var directory = Path.Combine(SettingsDirectory, "api");
+
+        RefitterSettingsLoader.GetSettingsDirectory(Path.Combine(directory, "petstore.refitter")).Should().Be(directory);
+        RefitterSettingsLoader.GetSettingsDirectory("petstore.refitter").Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void GetSettingsDirectory_Treats_Backslash_As_A_File_Name_Character_Off_Windows()
+    {
+        if (OperatingSystem.IsWindows())
+            return;
+
+        RefitterSettingsLoader.GetSettingsDirectory(@"configs\petstore.refitter").Should().BeEmpty();
+        RefitterSettingsLoader
+            .LoadSettingsFile("{}", Path.Combine(SettingsDirectory, @"configs\petstore.refitter"))
+            .OutputFilename
+            .Should()
+            .Be(@"configs\petstore.cs");
     }
 }
