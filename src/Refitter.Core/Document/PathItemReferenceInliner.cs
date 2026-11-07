@@ -18,13 +18,7 @@ internal static class PathItemReferenceInliner
         if (json.IndexOf("pathItems", StringComparison.Ordinal) < 0)
             return json;
 
-        using var reader = new JsonTextReader(new StringReader(json))
-        {
-            DateParseHandling = DateParseHandling.None,
-            FloatParseHandling = FloatParseHandling.Double,
-        };
-
-        if (JToken.ReadFrom(reader) is not JObject document ||
+        if (SanitizerJson.Parse(json) is not JObject document ||
             document["paths"] is not JObject paths ||
             document["components"]?["pathItems"] is not JObject pathItems)
         {

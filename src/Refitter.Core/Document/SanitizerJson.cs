@@ -28,9 +28,12 @@ internal static class SanitizerJson
         return converted ? document.ToString(Formatting.None) : json;
     }
 
+    /// <summary>
+    /// Parses a JSON document whose root is an object or array.
+    /// </summary>
     // Numbers are read as decimals so that re-serializing keeps them exact. Only a document with a number
     // outside the decimal range falls back to doubles, the way NumericBoundsSanitizer reads documents.
-    private static JContainer Parse(string json)
+    public static JContainer Parse(string json)
     {
         try
         {

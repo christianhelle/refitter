@@ -137,4 +137,28 @@ public class PathItemReferenceInlinerTests
     {
         PathItemReferenceInliner.Inline(json).Should().BeSameAs(json);
     }
+
+    [TestMethod]
+    public void Keeps_Numbers_Exact_When_Inlining()
+    {
+        const string json = """
+            {
+              "paths": {
+                "/items": { "$ref": "#/components/pathItems/Items" }
+              },
+              "components": {
+                "pathItems": {
+                  "Items": { "get": { "operationId": "GetItems" } }
+                },
+                "schemas": {
+                  "Rate": { "type": "number", "default": 0.12345678901234567890123 }
+                }
+              }
+            }
+            """;
+
+        PathItemReferenceInliner.Inline(json)
+            .Should()
+            .Contain("0.12345678901234567890123");
+    }
 }
