@@ -97,34 +97,9 @@ internal static class SettingsSanitizer
         }
     }
 
-    private static string Quote(string value)
-    {
-        var builder = new StringBuilder("\"");
-        foreach (var c in value)
-        {
-            switch (c)
-            {
-                case '"': builder.Append("\\\""); break;
-                case '\\': builder.Append("\\\\"); break;
-                case '\n': builder.Append("\\n"); break;
-                case '\r': builder.Append("\\r"); break;
-                case '\t': builder.Append("\\t"); break;
-                default:
-                    if (c < ' ')
-                    {
-                        builder.Append("\\u").Append(((int)c).ToString("x4", CultureInfo.InvariantCulture));
-                    }
-                    else
-                    {
-                        builder.Append(c);
-                    }
-
-                    break;
-            }
-        }
-
-        return builder.Append('"').ToString();
-    }
+    // Only known setting names, enum member names, the redaction marker and item counts are quoted, and none of
+    // them contain characters that need escaping in JSON
+    private static string Quote(string value) => "\"" + value + "\"";
 
     /// <summary>A JSON true, false, null or number, kept as written.</summary>
     private sealed class Literal(string text)
