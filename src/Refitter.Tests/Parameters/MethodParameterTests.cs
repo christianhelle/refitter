@@ -111,4 +111,13 @@ public class MethodParameterTests
             .Should()
             .Be(expected);
     }
+
+    [TestMethod]
+    public void ToString_Renders_The_Parameter()
+    {
+        new MethodParameter("long", "id") { Attributes = ["Query"] }
+            .ToString()
+            .Should()
+            .Be("[Query] long id");
+    }
 }
