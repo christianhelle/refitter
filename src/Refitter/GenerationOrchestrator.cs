@@ -62,7 +62,7 @@ public sealed class GenerationOrchestrator
                 reporter.ReportConfigurationWarnings(result.Warnings);
 
             var filteredPaths = result.Diagnostics
-                .FirstOrDefault(d => d.Message.Contains("All paths were filtered"));
+                .FirstOrDefault(d => d.Kind == RunnerDiagnosticKind.AllPathsFiltered);
             if (filteredPaths != null)
                 reporter.ReportAllPathsFilteredWarning(generatorSettings.IncludePathMatches);
 
