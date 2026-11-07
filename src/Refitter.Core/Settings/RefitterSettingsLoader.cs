@@ -30,6 +30,52 @@ public static class RefitterSettingsLoader
     }
 
     /// <summary>
+    /// Loads the contents of a <c>.refitter</c> settings file the way every Refitter host does: deserializes the
+    /// settings, applies the settings file defaults (see <see cref="ApplyDefaults"/>) and resolves relative OpenAPI
+    /// specification paths against the directory the settings file lives in.
+    /// </summary>
+    /// <param name="json">The raw contents of the <c>.refitter</c> settings file.</param>
+    /// <param name="settingsFilePath">The path of the settings file. Both <c>/</c> and <c>\</c> separate directories.</param>
+    /// <returns>The settings, ready to generate from.</returns>
+    /// <exception cref="System.Text.Json.JsonException">Thrown when <paramref name="json"/> cannot be deserialized.</exception>
+    public static RefitGeneratorSettings LoadSettingsFile(string json, string settingsFilePath)
+    {
+        var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+        PrepareSettings(settings, settingsFilePath);
+        return settings;
+    }
+
+    /// <summary>
+    /// Applies the settings file defaults (see <see cref="ApplyDefaults"/>) to settings read from a <c>.refitter</c>
+    /// file and resolves their relative OpenAPI specification paths against the directory the file lives in.
+    /// </summary>
+    /// <param name="settings">The settings read from the settings file.</param>
+    /// <param name="settingsFilePath">The path of the settings file. Both <c>/</c> and <c>\</c> separate directories.</param>
+    public static void PrepareSettings(RefitGeneratorSettings settings, string settingsFilePath)
+    {
+        ApplyDefaults(settingsFilePath, settings);
+        ResolveRelativeSpecPaths(settings, GetSettingsDirectory(settingsFilePath));
+    }
+
+    /// <summary>
+    /// Gets the directory of a settings file path. Both <c>/</c> and <c>\</c> separate directories, whatever the
+    /// operating system, since the source generator receives the paths the compiler reports.
+    /// </summary>
+    /// <param name="settingsFilePath">The path of the settings file.</param>
+    /// <returns>The directory, or an empty string when the path has none.</returns>
+    public static string GetSettingsDirectory(string settingsFilePath)
+    {
+        var lastSeparator = settingsFilePath.LastIndexOfAny(new[] { '/', '\\' });
+        if (lastSeparator < 0)
+            return string.Empty;
+
+        // Keep the separator of a root, like / or C:\
+        var isRoot = lastSeparator == 0 ||
+                     (lastSeparator == 2 && settingsFilePath[1] == ':');
+        return settingsFilePath.Substring(0, isRoot ? lastSeparator + 1 : lastSeparator);
+    }
+
+    /// <summary>
     /// Resolves any relative OpenAPI specification paths on <paramref name="settings"/> against
     /// <paramref name="baseDirectory"/>. URLs and already-rooted paths are left untouched.
     /// </summary>
