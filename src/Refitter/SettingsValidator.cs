@@ -101,9 +101,7 @@ public static class SettingsValidator
             return fileAndOutputResult;
         }
 
-        RefitterSettingsLoader.ApplyDefaults(settings.SettingsFilePath!, refitGeneratorSettings);
-        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settings.SettingsFilePath!)) ?? string.Empty;
-        RefitterSettingsLoader.ResolveRelativeSpecPaths(refitGeneratorSettings, settingsFileDirectory);
+        RefitterSettingsLoader.PrepareSettings(refitGeneratorSettings, settings.SettingsFilePath!);
         refitSettings = refitGeneratorSettings;
 
         // Then populate settings.OpenApiPath and validate file existence
