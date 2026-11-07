@@ -81,4 +81,17 @@ public class ClientNamingTests
             .Should()
             .Be($"{NamingSettings.DefaultInterfaceName}SerializerContext");
     }
+
+    [TestMethod]
+    [DataRow("My Client", "MyClientSerializerContext")]
+    [DataRow("My-Client", "MyClientSerializerContext")]
+    public void SerializerContextTypeName_Is_A_Valid_Identifier(string interfaceName, string expected)
+    {
+        var naming = new NamingSettings { UseOpenApiTitle = false, InterfaceName = interfaceName };
+
+        ClientNaming.Create(naming, null)
+            .SerializerContextTypeName
+            .Should()
+            .Be(expected);
+    }
 }

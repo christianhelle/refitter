@@ -35,8 +35,9 @@ internal sealed class ClientNaming
 
     private static string GetSerializerContextTypeName(string title, bool isDocumentTitle)
     {
+        // The interface name is not sanitized, so a name like "My Client" still makes a valid type name
         var name = isDocumentTitle ? title.CapitalizeFirstCharacter() : WithoutInterfacePrefix(title);
-        return $"{name}SerializerContext";
+        return $"{name}SerializerContext".Sanitize();
     }
 
     private static string WithoutInterfacePrefix(string interfaceName)
