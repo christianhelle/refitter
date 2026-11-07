@@ -89,14 +89,14 @@ public class RefitGenerator(
     /// and returns the generated code as a string.
     /// </summary>
     /// <returns>The generated code as a string.</returns>
-    public string Generate() => FormatSingleFile(RunPipeline(document, settings), settings, settings, settings);
+    public string Generate() => FormatSingleFile(RunPipeline(document, settings), settings);
 
     /// <summary>
     /// Generates multiple files containing Refit interfaces and contracts.
     /// </summary>
     /// <returns>A GeneratorOutput containing all generated code files.</returns>
     public GeneratorOutput GenerateMultipleFiles() =>
-        new(FormatMultipleFiles(RunPipeline(document, settings), settings, settings, document));
+        new(FormatMultipleFiles(RunPipeline(document, settings), settings, document));
 
     private static GenerationResult RunPipeline(
         OpenApiDocument document,
@@ -119,11 +119,9 @@ public class RefitGenerator(
 
     private static string FormatSingleFile(
         GenerationResult result,
-        RefitGeneratorSettings settings,
-        ICodeGenerationConfiguration codeGeneration,
-        INamingConfiguration naming)
+        RefitGeneratorSettings settings)
     {
-        var contracts = codeGeneration.GenerateClients
+        var contracts = settings.GenerateClients
             ? RefitInterfaceImports
                 .GetImportedNamespaces(settings)
                 .Aggregate(
@@ -133,28 +131,27 @@ public class RefitGenerator(
 
         var output = new StringBuilder()
             .AppendLine(
-                codeGeneration.GenerateClients
+                settings.GenerateClients
                     ? string.Join("", result.Interfaces.Select(c => c.Content))
                     : string.Empty)
             .AppendLine()
-            .AppendLine(codeGeneration.GenerateContracts ? contracts : string.Empty)
+            .AppendLine(settings.GenerateContracts ? contracts : string.Empty)
             .AppendLine(result.SerializerContext)
             .AppendLine(result.DependencyInjectionCode)
             .ToString()
             .TrimEnd();
 
-        return ApplyContractTypeSuffix(output, naming);
+        return ApplyContractTypeSuffix(output, settings);
     }
 
     private static IReadOnlyList<GeneratedCode> FormatMultipleFiles(
         GenerationResult result,
-        ICodeGenerationConfiguration codeGeneration,
-        INamingConfiguration naming,
+        RefitGeneratorSettings settings,
         OpenApiDocument document)
     {
         var generatedFiles = new List<GeneratedCode>(result.Interfaces);
 
-        if (codeGeneration.GenerateContracts)
+        if (settings.GenerateContracts)
         {
             generatedFiles.Add(new(TypenameConstants.Contracts, result.Contracts));
         }
@@ -163,7 +160,7 @@ public class RefitGenerator(
         {
             generatedFiles.Add(
                 new(
-                    JsonSerializerContextGenerator.GetContextTypeName(naming, document.Info?.Title),
+                    JsonSerializerContextGenerator.GetContextTypeName(settings, document.Info?.Title),
                     result.SerializerContext));
         }
 
@@ -175,7 +172,7 @@ public class RefitGenerator(
                     result.DependencyInjectionCode));
         }
 
-        return ApplyContractTypeSuffix(generatedFiles, naming);
+        return ApplyContractTypeSuffix(generatedFiles, settings);
     }
 
     private static string ApplyContractTypeSuffix(string content, INamingConfiguration naming)
