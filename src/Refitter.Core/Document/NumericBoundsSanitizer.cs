@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Refitter.Core;
@@ -26,14 +25,6 @@ internal static class NumericBoundsSanitizer
         """["']?(?:minimum|maximum|exclusiveMinimum|exclusiveMaximum)["']?\s*:\s*["']?(?<number>-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)""",
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(5));
-
-    public static string Sanitize(string json)
-    {
-        if (!IsCandidate(json) || SanitizerJson.Parse(json) is not JContainer document)
-            return json;
-
-        return Rewrite(document) ? document.ToString(Formatting.None) : json;
-    }
 
     public static bool IsCandidate(string json) =>
         CandidateBoundRegex

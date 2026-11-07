@@ -26,7 +26,7 @@ public class PathItemReferenceInlinerTests
             }
             """;
 
-        var result = JObject.Parse(PathItemReferenceInliner.Inline(json));
+        var result = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
 
         result["paths"]!["/items/{id}"]!["$ref"].Should().BeNull();
         result["paths"]!["/items/{id}"]!["get"]!["operationId"]!.Value<string>().Should().Be("GetItem");
@@ -50,7 +50,7 @@ public class PathItemReferenceInlinerTests
             }
             """;
 
-        var path = JObject.Parse(PathItemReferenceInliner.Inline(json))["paths"]!["/a"]!;
+        var path = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json))["paths"]!["/a"]!;
 
         path["summary"]!.Value<string>().Should().Be("Overridden");
         path["description"]!.Value<string>().Should().Be("Kept");
@@ -72,7 +72,7 @@ public class PathItemReferenceInlinerTests
             }
             """;
 
-        var path = JObject.Parse(PathItemReferenceInliner.Inline(json))["paths"]!["/a"]!;
+        var path = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json))["paths"]!["/a"]!;
 
         path["$ref"].Should().BeNull();
         path["get"]!["operationId"]!.Value<string>().Should().Be("GetB");
@@ -90,7 +90,7 @@ public class PathItemReferenceInlinerTests
             }
             """;
 
-        var path = JObject.Parse(PathItemReferenceInliner.Inline(json))["paths"]!["/a"]!;
+        var path = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json))["paths"]!["/a"]!;
 
         path["get"]!["operationId"]!.Value<string>().Should().Be("GetA");
     }
@@ -105,7 +105,7 @@ public class PathItemReferenceInlinerTests
             }
             """;
 
-        var path = JObject.Parse(PathItemReferenceInliner.Inline(json))["paths"]!["/a"]!;
+        var path = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json))["paths"]!["/a"]!;
 
         path["get"]!["operationId"]!.Value<string>().Should().Be("GetA");
     }
@@ -122,7 +122,7 @@ public class PathItemReferenceInlinerTests
             }
             """;
 
-        var path = JObject.Parse(PathItemReferenceInliner.Inline(json))["paths"]!["/a"]!;
+        var path = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json))["paths"]!["/a"]!;
 
         path["$ref"]!.Value<string>().Should().Be(reference);
     }
@@ -135,7 +135,7 @@ public class PathItemReferenceInlinerTests
     [DataRow("""["#/components/pathItems/A"]""")]
     public void Returns_Same_Instance_When_Nothing_To_Inline(string json)
     {
-        PathItemReferenceInliner.Inline(json).Should().BeSameAs(json);
+        OpenApiJsonNormalizer.NormalizeDocument(json).Should().BeSameAs(json);
     }
 
     [TestMethod]
@@ -157,7 +157,7 @@ public class PathItemReferenceInlinerTests
             }
             """;
 
-        PathItemReferenceInliner.Inline(json)
+        OpenApiJsonNormalizer.NormalizeDocument(json)
             .Should()
             .Contain("0.12345678901234567890123");
     }

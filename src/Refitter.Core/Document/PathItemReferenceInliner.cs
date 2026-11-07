@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Refitter.Core;
@@ -10,14 +9,6 @@ namespace Refitter.Core;
 internal static class PathItemReferenceInliner
 {
     private const string ComponentsPathItemsPrefix = "#/components/pathItems/";
-
-    public static string Inline(string json)
-    {
-        if (!IsCandidate(json) || SanitizerJson.Parse(json) is not JContainer document)
-            return json;
-
-        return Rewrite(document) ? document.ToString(Formatting.None) : json;
-    }
 
     // A cheap check before parsing. References can be written with JSON escapes (e.g. "#\/components"),
     // so look for the pathItems name rather than the whole prefix.

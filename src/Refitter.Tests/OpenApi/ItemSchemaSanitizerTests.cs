@@ -35,7 +35,7 @@ public class ItemSchemaSanitizerTests
             }
             """;
 
-        ItemSchemaSanitizer.Sanitize(json).Should().Be(json);
+        OpenApiJsonNormalizer.NormalizeDocument(json).Should().Be(json);
     }
 
     [TestMethod]
@@ -44,7 +44,7 @@ public class ItemSchemaSanitizerTests
     [DataRow("""{ "text/event-stream": { "itemSchema": { "type": "string" } } }""")]
     public void Leaves_ItemSchema_Outside_A_Content_Map_Untouched(string json)
     {
-        ItemSchemaSanitizer.Sanitize(json).Should().Be(json);
+        OpenApiJsonNormalizer.NormalizeDocument(json).Should().Be(json);
     }
 
     // Example values, defaults and extensions are literal JSON that can look like a content map
@@ -65,7 +65,7 @@ public class ItemSchemaSanitizerTests
             }
             """;
 
-        ItemSchemaSanitizer.Sanitize(json).Should().Be(json);
+        OpenApiJsonNormalizer.NormalizeDocument(json).Should().Be(json);
     }
 
     // "default" is also a response code, an entry of the responses map rather than a literal value
@@ -82,7 +82,7 @@ public class ItemSchemaSanitizerTests
             }
             """;
 
-        var result = JObject.Parse(ItemSchemaSanitizer.Sanitize(json));
+        var result = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
 
         var mediaType = result["responses"]!["default"]!["content"]!["text/event-stream"]!;
         mediaType["itemSchema"].Should().BeNull();
@@ -110,7 +110,7 @@ public class ItemSchemaSanitizerTests
             }
             """;
 
-        ItemSchemaSanitizer.Sanitize(json).Should().Be(json);
+        OpenApiJsonNormalizer.NormalizeDocument(json).Should().Be(json);
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class ItemSchemaSanitizerTests
             }
             """;
 
-        var result = JObject.Parse(ItemSchemaSanitizer.Sanitize(json));
+        var result = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
 
         result["requestBody"]!["content"]!["text/event-stream"]!["schema"]!["type"]!.Value<string>()
             .Should().Be("array");
@@ -147,6 +147,6 @@ public class ItemSchemaSanitizerTests
             }
             """;
 
-        ItemSchemaSanitizer.Sanitize(json).Should().Be(json);
+        OpenApiJsonNormalizer.NormalizeDocument(json).Should().Be(json);
     }
 }
