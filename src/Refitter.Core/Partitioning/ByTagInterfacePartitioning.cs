@@ -11,10 +11,9 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
     public ByTagInterfacePartitioning(RefitGeneratorSettings settings, OpenApiDocument document)
     {
         this.settings = settings;
-        ungroupedTitle = settings.Naming.UseOpenApiTitle
-            ? (document.Info?.Title ?? "ApiClient").Sanitize()
-            : settings.Naming.InterfaceName;
-        ungroupedTitle = ungroupedTitle.CapitalizeFirstCharacter();
+        ungroupedTitle = ClientNaming.Create(settings.Naming, document.Info?.Title)
+            .Title
+            .CapitalizeFirstCharacter();
     }
 
     public string GetGroupKey(OpenApiOperationInfo operation)
