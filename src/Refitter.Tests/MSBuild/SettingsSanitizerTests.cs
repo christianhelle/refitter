@@ -82,6 +82,7 @@ public class SettingsSanitizerTests
     [TestMethod]
     [DataRow("{ \"namespace\": \"a\\nb\\rc\\td\\be\\ff\\/g\\\"h\\\\i\\u0041\" } // trailing comment")]
     [DataRow("{ \"namespace\": \"Acme\" } /* unterminated comment")]
+    [DataRow("{ \"name\\u0073pace\": \"secret\" }")]
     public void Sanitize_Reads_Escapes_And_Comments(string contents)
     {
         var settings = Parse(SettingsSanitizer.Sanitize(contents)!);
