@@ -90,6 +90,12 @@ public static class SettingsValidator
                 $"  - See documentation for valid values: https://refitter.github.io");
         }
 
+        if (refitGeneratorSettings is null)
+        {
+            refitSettings = null;
+            return ValidationResult.Error("The settings file does not contain any settings");
+        }
+
         // First validate the file/output settings (includes check for both OpenApiPath and OpenApiPaths)
         var fileAndOutputResult = ValidateFileAndOutputSettings(
             settings,

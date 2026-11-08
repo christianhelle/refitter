@@ -40,7 +40,9 @@ public static class RefitterSettingsLoader
     /// <exception cref="System.Text.Json.JsonException">Thrown when <paramref name="json"/> cannot be deserialized.</exception>
     public static RefitGeneratorSettings LoadSettingsFile(string json, string settingsFilePath)
     {
-        var settings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+        // A file containing only null deserializes without error, but has no settings to apply defaults to
+        var settings = Serializer.Deserialize<RefitGeneratorSettings>(json) ??
+                       throw new System.Text.Json.JsonException("The .refitter file does not contain any settings");
         PrepareSettings(settings, settingsFilePath);
         return settings;
     }

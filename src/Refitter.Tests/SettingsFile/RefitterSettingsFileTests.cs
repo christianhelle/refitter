@@ -51,6 +51,14 @@ public class RefitterSettingsFileTests
     }
 
     [TestMethod]
+    public void LoadSettingsFile_Throws_When_The_File_Contains_Null()
+    {
+        var act = () => RefitterSettingsLoader.LoadSettingsFile("null", SettingsFilePath);
+
+        act.Should().Throw<System.Text.Json.JsonException>().WithMessage("*does not contain any settings*");
+    }
+
+    [TestMethod]
     public void LoadSettingsFile_Throws_On_Invalid_Json()
     {
         var act = () => RefitterSettingsLoader.LoadSettingsFile("{ not valid json", SettingsFilePath);
