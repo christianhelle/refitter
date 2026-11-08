@@ -12,6 +12,7 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Convert snake_case tags to PascalCase in ByTag interface names ([#1380](https://github.com/christianhelle/refitter/pull/1380)) ([@christianhelle](https://github.com/christianhelle/))
 - Collapse pass-through generator modules ([#1375](https://github.com/christianhelle/refitter/pull/1375)) ([@christianhelle](https://github.com/christianhelle/))
 - Build method parameters as records and render them to C# once ([#1373](https://github.com/christianhelle/refitter/pull/1373)) ([@christianhelle](https://github.com/christianhelle/))
 - Load .refitter files and read run results the same way in every host ([#1372](https://github.com/christianhelle/refitter/pull/1372)) ([@christianhelle](https://github.com/christianhelle/))
