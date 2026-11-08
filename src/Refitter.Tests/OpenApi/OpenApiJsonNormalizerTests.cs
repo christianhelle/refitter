@@ -106,7 +106,7 @@ public class OpenApiJsonNormalizerTests
     public void Returns_Same_Instance_When_Candidates_Need_No_Change()
     {
         // The \u escape makes the document a candidate, but nothing in it needs rewriting
-        const string json = """{"info":{"title":"Café"},"paths":{}}""";
+        const string json = """{"info":{"title":"Caf\u00e9"},"paths":{}}""";
 
         OpenApiJsonNormalizer.NormalizeDocument(json).Should().BeSameAs(json);
     }
