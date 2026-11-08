@@ -77,8 +77,8 @@ public static class Analytics
         }
 
         // Like the source generator, report which settings the file uses but never paths, URLs or other free text
-        if (settings.SettingsFilePath is not null &&
-            ReadSettingsFile(settings.SettingsFilePath) is { } contents &&
+        if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath) &&
+            ReadSettingsFile(settings.SettingsFilePath!) is { } contents &&
             SettingsSanitizer.Sanitize(contents) is { } sanitizedSettings)
         {
             telemetryClient.TrackEvent(

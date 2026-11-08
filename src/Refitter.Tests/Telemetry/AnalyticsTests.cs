@@ -160,6 +160,31 @@ public class AnalyticsTests
 
     [TestMethod]
     [DoNotParallelize]
+    [DataRow("")]
+    [DataRow("   ")]
+    public void LogFeatureUsage_Should_Skip_Settings_File_Event_Without_A_Path(string settingsFilePath)
+    {
+        var previousClient = Analytics.GetTelemetryClient();
+        var captured = new List<ITelemetry>();
+        Analytics.SetTelemetryClient(CreateTelemetryClient(captured));
+
+        try
+        {
+            var action = () => Analytics.LogFeatureUsage(
+                new Settings { SettingsFilePath = settingsFilePath },
+                new RefitGeneratorSettings());
+
+            action.Should().NotThrow();
+            captured.OfType<EventTelemetry>().Should().NotContain(e => e.Properties.ContainsKey("settings"));
+        }
+        finally
+        {
+            Analytics.SetTelemetryClient(previousClient);
+        }
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
     public async Task LogError_Should_Apply_Msbuild_Telemetry_Source()
     {
         var previousClient = Analytics.GetTelemetryClient();
