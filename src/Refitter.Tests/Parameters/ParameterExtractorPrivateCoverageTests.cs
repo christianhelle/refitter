@@ -111,6 +111,16 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [TestMethod]
+    public void Aliases_Names_With_Formatting_Characters_The_Compiler_Drops()
+    {
+        // C# drops formatting characters from the compiled parameter name, so Refit would send "id"
+        ParameterAttributeFormatter.GetAlias("i\u200Cd", "i\u200Cd").Should().Be("i\u200Cd");
+        ParameterAttributeFormatter.GetAliasAsAttribute("i\u200Cd", "i\u200Cd").Should().Be("AliasAs(\"i\u200Cd\")");
+        ParameterAttributeFormatter.GetAlias("id", "id").Should().BeNull();
+        ParameterAttributeFormatter.GetAliasAsAttribute("id", "id").Should().BeEmpty();
+    }
+
+    [TestMethod]
     public void GetCSharpType_Handles_Number_Object_Unknown_And_Nullable_String()
     {
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
