@@ -81,7 +81,7 @@ public class ParameterListBuilderTests
 
         result.DynamicQuerystringCode.Should().NotBeNullOrWhiteSpace();
         result.Parameters.Should().ContainSingle()
-            .Which.Should().Contain("[Query] TestQueryParams").And.Contain("queryParams");
+            .Which.Render().Should().Contain("[Query] TestQueryParams").And.Contain("queryParams");
     }
 
     [TestMethod]
@@ -109,7 +109,7 @@ public class ParameterListBuilderTests
             .Build(operationModel, operation, string.Empty);
 
         result.Parameters.Should().ContainSingle()
-            .Which.Should().Be("CancellationToken cancellationToken = default");
+            .Which.Render().Should().Be("CancellationToken cancellationToken = default");
     }
 
     [TestMethod]
@@ -123,7 +123,7 @@ public class ParameterListBuilderTests
             .Build(operationModel, operation, string.Empty);
 
         result.Parameters.Should().ContainSingle()
-            .Which.Should().Contain("IApizrRequestOptions options");
+            .Which.Render().Should().Contain("IApizrRequestOptions options");
     }
 
     [TestMethod]
@@ -136,7 +136,7 @@ public class ParameterListBuilderTests
         var result = new ParameterListBuilder(settings)
             .Build(operationModel, operation, "TestQueryParams");
 
-        result.Parameters.Last().Should().Contain("limit").And.Contain("= default");
+        result.Parameters.Last().Render().Should().Contain("limit").And.Contain("= default");
     }
 
     private static async Task<(CSharpOperationModel OperationModel, OpenApiOperation Operation, RefitGeneratorSettings Settings)> SetupAsync(

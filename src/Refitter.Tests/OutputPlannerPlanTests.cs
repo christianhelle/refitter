@@ -1,0 +1,232 @@
+using AwesomeAssertions;
+using Refitter.Core;
+
+namespace Refitter.Tests;
+
+
+[TestClass]
+public class OutputPlannerPlanTests
+{
+    [TestMethod]
+    public void Plan_SingleFile_DirectCli_Explicit_Output_Is_Used()
+    {
+        var config = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "Output.cs",
+            GenerateMultipleFiles = false,
+        };
+
+        var output = new GeneratorOutput(new List<GeneratedCode>
+        {
+            new("GeneratedType", "// code")
+        });
+
+        var planned = OutputPlanner.Plan(
+            output,
+            config,
+            settingsFilePath: null,
+            cliOutputPath: Path.Combine("GeneratedCode", "Petstore.cs"));
+
+        planned.Should().ContainSingle();
+        planned[0].Path.Should().Be(Path.Combine("GeneratedCode", "Petstore.cs"));
+        planned[0].Content.Should().Be("// code");
+    }
+
+    [TestMethod]
+    public void Plan_SingleFile_DirectCli_Default_Uses_DefaultOutputPath()
+    {
+        var config = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "Output.cs",
+            GenerateMultipleFiles = false,
+        };
+
+        var output = new GeneratorOutput(new List<GeneratedCode>
+        {
+            new("GeneratedType", "// code")
+        });
+
+        var planned = OutputPlanner.Plan(
+            output,
+            config,
+            settingsFilePath: null,
+            cliOutputPath: OutputPlanner.DefaultOutputPath);
+
+        planned.Should().ContainSingle();
+        planned[0].Path.Should().Be(OutputPlanner.DefaultOutputPath);
+        planned[0].Content.Should().Be("// code");
+    }
+
+    [TestMethod]
+    public void Plan_SingleFile_SettingsFile_Roots_Relative_To_Settings_Directory()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var config = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "Output.cs",
+            GenerateMultipleFiles = false,
+        };
+
+        var output = new GeneratorOutput(new List<GeneratedCode>
+        {
+            new("GeneratedType", "// code")
+        });
+
+        var planned = OutputPlanner.Plan(
+            output,
+            config,
+            settingsFilePath,
+            cliOutputPath: null);
+
+        planned.Should().ContainSingle();
+        var expected = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./Generated", "Output.cs");
+        planned[0].Path.Should().Be(expected);
+        planned[0].Content.Should().Be("// code");
+    }
+
+    [TestMethod]
+    public void Plan_MultiFile_DirectCli_Combines_Output_Directory_And_Filename()
+    {
+        var config = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            GenerateMultipleFiles = true,
+        };
+
+        var output = new GeneratorOutput(new List<GeneratedCode>
+        {
+            new("RefitInterfaces", "// interfaces"),
+        });
+
+        var planned = OutputPlanner.Plan(
+            output,
+            config,
+            settingsFilePath: null,
+            cliOutputPath: Path.Combine("GeneratedCode", "MultipleFiles"));
+
+        planned.Should().ContainSingle();
+        planned[0].Path.Should().Be(Path.Combine("GeneratedCode", "MultipleFiles", "RefitInterfaces.cs"));
+        planned[0].Content.Should().Be("// interfaces");
+    }
+
+    [TestMethod]
+    public void Plan_MultiFile_SettingsFile_Roots_Explicit_Cli_Override()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var config = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            GenerateMultipleFiles = true,
+        };
+
+        var output = new GeneratorOutput(new List<GeneratedCode>
+        {
+            new("RefitInterfaces", "// interfaces"),
+        });
+
+        var planned = OutputPlanner.Plan(
+            output,
+            config,
+            settingsFilePath,
+            cliOutputPath: Path.Combine("GeneratedCode", "MultipleFiles"));
+
+        planned.Should().ContainSingle();
+        var expected = Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "GeneratedCode", "MultipleFiles", "RefitInterfaces.cs");
+        planned[0].Path.Should().Be(expected);
+        planned[0].Content.Should().Be("// interfaces");
+    }
+
+    [TestMethod]
+    public void Plan_MultiFile_Reroutes_Contracts_To_Separate_Folder()
+    {
+        var settingsFilePath = Path.Combine(Path.GetTempPath(), "Projects", "MyApi", "petstore.refitter");
+        var config = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            ContractsOutputFolder = "./Contracts",
+            GenerateMultipleFiles = true,
+        };
+
+        var output = new GeneratorOutput(new List<GeneratedCode>
+        {
+            new("RefitInterfaces", "// interfaces"),
+            new(TypenameConstants.Contracts, "// contracts"),
+        });
+
+        var planned = OutputPlanner.Plan(
+            output,
+            config,
+            settingsFilePath,
+            cliOutputPath: null);
+
+        planned.Should().HaveCount(2);
+        planned[0].Content.Should().Be("// interfaces");
+        planned[1].Content.Should().Be("// contracts");
+
+        var contractsFolder = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(settingsFilePath)!, "./Contracts"));
+        planned[1].Path.Should().Be(Path.Combine(contractsFolder, $"{TypenameConstants.Contracts}.cs"));
+    }
+
+    [TestMethod]
+    public void Plan_Preserves_Content_For_Each_File()
+    {
+        var config = new RefitGeneratorSettings
+        {
+            GenerateMultipleFiles = true,
+        };
+
+        var output = new GeneratorOutput(new List<GeneratedCode>
+        {
+            new("Interface1", "// content 1"),
+            new("Interface2", "// content 2"),
+        });
+
+        var planned = OutputPlanner.Plan(
+            output,
+            config,
+            settingsFilePath: null,
+            cliOutputPath: null);
+
+        planned.Should().HaveCount(2);
+        planned[0].Content.Should().Be("// content 1");
+        planned[1].Content.Should().Be("// content 2");
+    }
+
+    [TestMethod]
+    public void Plan_SingleFile_With_No_Generated_Files_Plans_Empty_Content()
+    {
+        var config = new RefitGeneratorSettings
+        {
+            OutputFolder = "./Generated",
+            OutputFilename = "Output.cs",
+            GenerateMultipleFiles = false,
+        };
+
+        var planned = OutputPlanner.Plan(
+            new GeneratorOutput(new List<GeneratedCode>()),
+            config,
+            settingsFilePath: null,
+            cliOutputPath: null);
+
+        planned.Should().ContainSingle();
+        planned[0].Content.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void Obsolete_Adapter_Delegates_To_Plan()
+    {
+        var config = new RefitGeneratorSettings { GenerateMultipleFiles = false };
+        var output = new GeneratorOutput(new List<GeneratedCode> { new("GeneratedType", "// code") });
+
+#pragma warning disable CS0618
+        IOutputPlanner planner = new OutputPlannerAdapter();
+#pragma warning restore CS0618
+
+        planner.Plan(output, config, settingsFilePath: null, cliOutputPath: null)
+            .Should()
+            .Equal(OutputPlanner.Plan(output, config, settingsFilePath: null, cliOutputPath: null));
+    }
+}

@@ -12,42 +12,23 @@ internal class InterfaceGenerator
     private readonly OpenApiDocument document;
     private readonly CustomCSharpClientGenerator generator;
     private readonly XmlDocumentationGenerator docGenerator;
-    private readonly IReturnTypeGenerator returnTypeGenerator;
-    private readonly IMethodAttributeGenerator methodAttributeGenerator;
-    private readonly IMethodSignatureGenerator methodSignatureGenerator;
+    private readonly ReturnTypeGenerator returnTypeGenerator;
+    private readonly MethodAttributeGenerator methodAttributeGenerator;
+    private readonly ParameterListBuilder parameterListBuilder;
 
     internal InterfaceGenerator(
         RefitGeneratorSettings settings,
         OpenApiDocument document,
         CustomCSharpClientGenerator generator,
         XmlDocumentationGenerator docGenerator)
-        : this(
-            settings,
-            document,
-            generator,
-            docGenerator,
-            new ReturnTypeGenerator(settings, generator),
-            new MethodAttributeGenerator(settings, document),
-            new MethodSignatureGenerator(settings))
-    {
-    }
-
-    private InterfaceGenerator(
-        RefitGeneratorSettings settings,
-        OpenApiDocument document,
-        CustomCSharpClientGenerator generator,
-        XmlDocumentationGenerator docGenerator,
-        IReturnTypeGenerator returnTypeGenerator,
-        IMethodAttributeGenerator methodAttributeGenerator,
-        IMethodSignatureGenerator methodSignatureGenerator)
     {
         this.settings = settings;
         this.document = document;
         this.generator = generator;
         this.docGenerator = docGenerator;
-        this.returnTypeGenerator = returnTypeGenerator;
-        this.methodAttributeGenerator = methodAttributeGenerator;
-        this.methodSignatureGenerator = methodSignatureGenerator;
+        returnTypeGenerator = new ReturnTypeGenerator(settings, generator);
+        methodAttributeGenerator = new MethodAttributeGenerator(settings, document);
+        parameterListBuilder = new ParameterListBuilder(settings);
         generator.BaseSettings.OperationNameGenerator = new OperationNameGenerator(document, settings);
     }
 
@@ -67,9 +48,7 @@ internal class InterfaceGenerator
 
         // Interfaces share the namespace with the contracts, so they must not reuse a contract type name
         var knownInterfaceIdentifiers = new HashSet<string>(GetContractTypeNames());
-        var title = settings.Naming.UseOpenApiTitle && !string.IsNullOrWhiteSpace(document.Info?.Title)
-            ? document.Info!.Title.Sanitize()
-            : settings.Naming.InterfaceName;
+        var title = ClientNaming.Create(settings.Naming, document.Info?.Title).Title;
 
         if (partitioning.IsSingleInterface)
         {
@@ -245,7 +224,7 @@ internal class InterfaceGenerator
             knownTypeIdentifiers,
             ParameterNaming.GetFormObjectParameterType(dynamicQuerystringParameterType));
 
-        var methodSignature = methodSignatureGenerator.Generate(
+        var parameterList = parameterListBuilder.Build(
             operationModel,
             operation,
             dynamicQuerystringParameterType,
@@ -257,7 +236,7 @@ internal class InterfaceGenerator
         {
             docGenerator.AppendMethodDocumentation(
                 operationModel,
-                methodSignature.Parameters,
+                parameterList.Parameters,
                 isApiResponseType,
                 code,
                 dynamicQuerystringParameterType);
@@ -268,13 +247,14 @@ internal class InterfaceGenerator
             code.AppendLine($"{Separator}{Separator}{attribute}");
         }
 
-        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(methodSignature.Path)}\")]")
-            .AppendLine($"{Separator}{Separator}{returnType} {methodName}({methodSignature.ParametersString});")
+        code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(parameterList.Path)}\")]")
+            .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parameterList.Render()});")
             .AppendLine();
 
-        if (methodSignature.ParametersString.Contains("?") && settings is { OptionalParameters: true, ApizrSettings: not null })
+        if (parameterList.Parameters.Any(parameter => parameter.IsNullable) &&
+            settings is { OptionalParameters: true, ApizrSettings: not null })
         {
-            var nonOptionalParameters = methodSignature.Parameters.Where(parameter => !parameter.Contains("?")).ToList();
+            var nonOptionalParameters = parameterList.Parameters.Where(parameter => !parameter.IsNullable).ToList();
             if (settings.GenerateXmlDocCodeComments)
             {
                 docGenerator.AppendMethodDocumentation(
@@ -290,15 +270,15 @@ internal class InterfaceGenerator
                 code.AppendLine($"{Separator}{Separator}{attribute}");
             }
 
-            var nonOptionalParametersString = string.Join(", ", nonOptionalParameters);
+            var nonOptionalParametersString = MethodParameter.Render(nonOptionalParameters);
 
-            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(methodSignature.Path)}\")]")
+            code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(parameterList.Path)}\")]")
                 .AppendLine($"{Separator}{Separator}{returnType} {methodName}({nonOptionalParametersString});")
                 .AppendLine();
         }
 
         var parameterTypes = new List<GeneratedCode>();
-        if (methodSignature.DynamicQuerystringParameters is { } dynamicQuerystringParameters &&
+        if (parameterList.DynamicQuerystringCode is { } dynamicQuerystringParameters &&
             !string.IsNullOrWhiteSpace(dynamicQuerystringParameters))
         {
             parameterTypes.Add(new GeneratedCode(dynamicQuerystringParameterType, dynamicQuerystringParameters)
@@ -307,7 +287,7 @@ internal class InterfaceGenerator
             });
         }
 
-        if (methodSignature.FormObjectParameters is { } formObjectParameters &&
+        if (parameterList.FormObjectCode is { } formObjectParameters &&
             !string.IsNullOrWhiteSpace(formObjectParameters))
         {
             knownTypeIdentifiers.Add(formObjectParameterType);

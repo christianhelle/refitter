@@ -1,12 +1,8 @@
 ## Source Generator
 
-> **Recommendation:** Consider using [Refitter.MSBuild](https://www.nuget.org/packages/Refitter.MSBuild) instead to ensure that the code is generated pre-compile which allows the Refit source generator to work without rebuilding the project.
-
 Refitter is available as a C# Source Generator that uses the [Refitter.Core](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core) library for generating a REST API Client using the [Refit](https://github.com/reactiveui/refit) library. Refitter can generate the Refit interface from OpenAPI specifications. Refitter could format the generated Refit interface to be managed by [Apizr](https://www.apizr.net) (v6+) and generate some registration helpers too.
 
-The Refitter source generator creates a folder called `Generated` in the same location as the `.refitter` file and generates files to disk under the `Generated` folder (can be changed with `outputFolder`). The source generator output should be included in the project and committed to source control. This is done because there is no other way to trigger the Refit source generator to pickup the Refitter generated code
-
-***(Translation: I couldn't for the life of me figure how to get that to work, sorry)***
+The source generator emits code in-memory and also generates the Refit implementations for it, so a single build is enough and nothing needs to be committed to source control.
 
 ### Installation
 
@@ -24,6 +20,32 @@ dotnet add package Refit
 After installing the package, add one or more `.refitter` files to your project.
 
 `Refitter.SourceGenerator` automatically includes `**/*.refitter` as Roslyn `AdditionalFiles` via its package props, so you do not need to add manual `<AdditionalFiles Include="..." />` entries unless you intentionally override that default behavior.
+
+The generated code is added to the compilation in memory, together with the Refit implementations, in a single build. Nothing is written to disk and nothing needs to be committed to source control. The `outputFolder`, `outputFilename`, and `contractsOutputFolder` settings don't create files when using the source generator. To inspect the generated code on disk, set `<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>` in the project file.
+
+#### How it works with the Refit source generator
+
+Roslyn runs every source generator against the same input, so the Refit source generator can't see the interfaces that Refitter generates. To produce everything in one build, `Refitter.SourceGenerator` sets `DisableRefitSourceGenerator` to `true` for the regular compiler pass and runs the Refit source generator from the project's own `Refit` package itself, over the project code plus the Refitter output. Hand-written Refit interfaces in the same project are generated as before. Refit analyzer checks that only run while the Refit source generator is enabled, such as `RF006` (and `RefitRequireGeneratedRequests`), are still reported.
+
+For the same reason, when `generateJsonSerializerContext` is enabled, Refitter also runs the System.Text.Json source generator over the `JsonSerializerContext` it generates.
+
+If the project sets `DisableRefitSourceGenerator` to `true` itself, for example when using `Refit.Reflection`, Refitter leaves Refit source generation off and only emits its own code.
+
+#### Telemetry
+
+`Refitter.SourceGenerator` collects usage telemetry, the same as the Refitter CLI and `Refitter.MSBuild`. It reports which settings each `.refitter` file uses and the number of `.refitter` files in the project, tagged as coming from the source generator, together with a support key. The support key is the same one the Refitter CLI sends: the first 7 characters of a SHA-256 hash of your user name and machine name. Neither name is sent, but the key isn't random, so anyone who knows both names can compute it and match it to your events. Only setting names, boolean and number values, and known enum values (such as `multipleInterfaces`) are sent. Paths, URLs, namespaces, other text values and comments are redacted and never leave the machine, and settings that Refitter doesn't recognize are only counted, never named.
+
+The source generator itself never makes network calls. Telemetry is sent by a small MSBuild task in the package that runs after the build. It doesn't run in design-time builds (IDE), only sends when the `.refitter` files or the package version change (it keeps a stamp file in `obj`), uses a short timeout, and never fails the build.
+
+To opt out, add the following to your `.csproj` file:
+
+```xml
+<PropertyGroup>
+  <RefitterNoLogging>true</RefitterNoLogging>
+</PropertyGroup>
+```
+
+Setting the `DOTNET_CLI_TELEMETRY_OPTOUT` environment variable to `1` or `true` also disables it.
 
 ### .Refitter File format
 
@@ -192,10 +214,10 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
 - `useCancellationTokens` - Use cancellation tokens in the generated methods. Default is `false`
 - `useIsoDateFormat` - Set to `true` to explicitly format date query string parameters in ISO 8601 standard date format using delimiters (for example: 2023-06-15). Default is `false`
 - `multipleInterfaces` - Set to `ByEndpoint` to generate an interface for each endpoint, or `ByTag` to group Endpoints by their Tag (like SwaggerUI groups them).
-- `outputFolder` - a string describing a relative path to a desired output folder. Default is `./Generated`
-- `outputFilename` - Output filename. Default is `Output.cs` when used from the CLI tool, otherwise its the .refitter filename. So `Petstore.refitter` becomes `Petstore.cs`.
-- `contractsOutputFolder` - a relative contracts output folder. Default is `NULL`
-- `generateMultipleFiles` - generates multiple disk files. Default is `false`
+- `outputFolder` - not used by the source generator, which doesn't write files to disk
+- `outputFilename` - not used by the source generator, which doesn't write files to disk
+- `contractsOutputFolder` - not used by the source generator, which doesn't write files to disk
+- `generateMultipleFiles` - splits the generated code into multiple sources. Default is `false`
 - `additionalNamespaces` - A collection of additional namespaces to include in the generated file. A use case for this is when you want to reuse contracts from a different namespace than the generated code. Default is empty
 - `excludeNamespaces` - A collection of regular expressions to exclude namespaces from the generated file. A use case for this is when your project has global usings where these namespaces would be redundant. Default is empty
 - `includeTags` - A collection of tags to use a filter for including endpoints that contain this tag.

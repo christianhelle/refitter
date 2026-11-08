@@ -43,6 +43,24 @@ public class GenerateCommandTests
     }
 
     [TestMethod]
+    public void Validate_Should_Fail_When_Settings_File_Contains_Null()
+    {
+        var settingsFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.refitter");
+        File.WriteAllText(settingsFile, "null");
+        try
+        {
+            var result = SettingsValidator.Validate(new Settings { SettingsFilePath = settingsFile, NoLogging = true });
+
+            result.Successful.Should().BeFalse();
+            result.Message.Should().Contain("does not contain any settings");
+        }
+        finally
+        {
+            File.Delete(settingsFile);
+        }
+    }
+
+    [TestMethod]
     public void Validate_Should_Fail_When_MultipleFiles_Uses_FileLike_Output()
     {
         var settings = new Settings

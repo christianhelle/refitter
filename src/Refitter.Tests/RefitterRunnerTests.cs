@@ -447,7 +447,7 @@ public class RefitterRunnerTests
                 cancellationToken: default);
 
             result.ExitCode.Should().Be(0);
-            result.Diagnostics.Should().Contain(d => !d.IsError && d.Message.Contains("Something looks odd"));
+            result.Diagnostics.Should().Contain(d => !d.IsError && d.Message.Contains("Something looks odd") && d.Kind == RunnerDiagnosticKind.Other);
         }
         finally
         {

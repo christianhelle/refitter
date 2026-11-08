@@ -1,0 +1,252 @@
+using AwesomeAssertions;
+using NSwag;
+using Refitter.Core;
+
+namespace Refitter.Tests.Parameters;
+
+
+[TestClass]
+public class ParameterListBuilderRenderingTests
+{
+    [TestMethod]
+    public async Task Generate_Returns_Route_Parameter()
+    {
+        var spec = """
+            openapi: 3.0.0
+            info:
+              title: Test
+              version: "1.0"
+            paths:
+              /test/{id}:
+                get:
+                  operationId: getTest
+                  parameters:
+                    - name: id
+                      in: path
+                      required: true
+                      schema:
+                        type: integer
+                  responses:
+                    '200':
+                      description: Success
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ParameterListBuilder(settings);
+
+        var operation = document.Paths["/test/{id}"]["get"];
+        var operationModel = generator.CreateOperationModel(operation);
+        operationModel.Path = "/test/{id}";
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
+
+        parametersString.Should().Contain("int id");
+    }
+
+    [TestMethod]
+    public async Task Generate_Returns_Query_Parameter()
+    {
+        var spec = """
+            openapi: 3.0.0
+            info:
+              title: Test
+              version: "1.0"
+            paths:
+              /test:
+                get:
+                  operationId: getTest
+                  parameters:
+                    - name: search
+                      in: query
+                      schema:
+                        type: string
+                  responses:
+                    '200':
+                      description: Success
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ParameterListBuilder(settings);
+
+        var operation = document.Paths["/test"]["get"];
+        var operationModel = generator.CreateOperationModel(operation);
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
+
+        parametersString.Should().Contain("string search");
+    }
+
+    [TestMethod]
+    public async Task Generate_Includes_Body_Parameter()
+    {
+        var spec = """
+            openapi: 3.0.0
+            info:
+              title: Test
+              version: "1.0"
+            paths:
+              /test:
+                post:
+                  operationId: createTest
+                  requestBody:
+                    required: true
+                    content:
+                      application/json:
+                        schema:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                  responses:
+                    '201':
+                      description: Created
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings();
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ParameterListBuilder(settings);
+
+        var operation = document.Paths["/test"]["post"];
+        var operationModel = generator.CreateOperationModel(operation);
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
+
+        parametersString.Should().Contain("body");
+    }
+
+    [TestMethod]
+    public async Task Generate_With_CancellationToken_Includes_CancellationToken()
+    {
+        var spec = """
+            openapi: 3.0.0
+            info:
+              title: Test
+              version: "1.0"
+            paths:
+              /test:
+                get:
+                  operationId: getTest
+                  responses:
+                    '200':
+                      description: Success
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings { UseCancellationTokens = true };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ParameterListBuilder(settings);
+
+        var operation = document.Paths["/test"]["get"];
+        var operationModel = generator.CreateOperationModel(operation);
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
+
+        parametersString.Should().Contain("CancellationToken");
+    }
+
+    [TestMethod]
+    public async Task Generate_With_DynamicQuerystring_Returns_Generated_Code()
+    {
+        var spec = """
+            openapi: 3.0.0
+            info:
+              title: Test
+              version: "1.0"
+            paths:
+              /test:
+                get:
+                  operationId: getTest
+                  parameters:
+                    - name: page
+                      in: query
+                      schema:
+                        type: integer
+                    - name: limit
+                      in: query
+                      schema:
+                        type: integer
+                  responses:
+                    '200':
+                      description: Success
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings { UseDynamicQuerystringParameters = true };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ParameterListBuilder(settings);
+
+        var operation = document.Paths["/test"]["get"];
+        var operationModel = generator.CreateOperationModel(operation);
+        var dynamicQs = sut.Build(operationModel, operation, "TestQueryParams").DynamicQuerystringCode;
+
+        dynamicQs.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public async Task Generate_With_Apizr_RequestOptions_Includes_Options_Parameter()
+    {
+        var spec = """
+            openapi: 3.0.0
+            info:
+              title: Test
+              version: "1.0"
+            paths:
+              /test:
+                get:
+                  operationId: getTest
+                  responses:
+                    '200':
+                      description: Success
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings
+        {
+            ApizrSettings = new ApizrSettings { WithRequestOptions = true }
+        };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ParameterListBuilder(settings);
+
+        var operation = document.Paths["/test"]["get"];
+        var operationModel = generator.CreateOperationModel(operation);
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
+
+        parametersString.Should().Contain("IApizrRequestOptions");
+    }
+
+    [TestMethod]
+    public async Task Generate_Returns_Parameters_List_For_Apizr_Overload_Filtering()
+    {
+        var spec = """
+            openapi: 3.0.0
+            info:
+              title: Test
+              version: "1.0"
+            paths:
+              /test:
+                get:
+                  operationId: getTest
+                  parameters:
+                    - name: search
+                      in: query
+                      required: false
+                      schema:
+                        type: string
+                  responses:
+                    '200':
+                      description: Success
+            """;
+
+        var document = await OpenApiYamlDocument.FromYamlAsync(spec);
+        var settings = new RefitGeneratorSettings { OptionalParameters = true };
+        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
+        var sut = new ParameterListBuilder(settings);
+
+        var operation = document.Paths["/test"]["get"];
+        var operationModel = generator.CreateOperationModel(operation);
+        var parameters = sut.Build(operationModel, operation, string.Empty).Parameters;
+
+        parameters.Should().NotBeEmpty();
+    }
+}

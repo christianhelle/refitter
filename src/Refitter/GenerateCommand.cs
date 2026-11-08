@@ -68,12 +68,10 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         else if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath))
         {
             var json = await File.ReadAllTextAsync(settings.SettingsFilePath, cancellationToken);
-            refitGeneratorSettings = Serializer.Deserialize<RefitGeneratorSettings>(json);
+            refitGeneratorSettings = RefitterSettingsLoader.LoadSettingsFile(json, settings.SettingsFilePath);
 
             if (!string.IsNullOrWhiteSpace(settings.OpenApiPath))
                 refitGeneratorSettings.OpenApiPath = settings.OpenApiPath;
-
-            RefitterSettingsLoader.ApplyDefaults(settings.SettingsFilePath, refitGeneratorSettings);
         }
         else
         {

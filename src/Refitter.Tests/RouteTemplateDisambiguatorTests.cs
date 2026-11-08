@@ -9,7 +9,12 @@ public class RouteTemplateDisambiguatorTests
     [TestMethod]
     public void Returns_Path_And_Parameters_Unchanged_Without_Collisions()
     {
-        string[] parameters = ["long id", "[Query] string name", "CancellationToken cancellationToken = default"];
+        MethodParameter[] parameters =
+        [
+            new("long", "id"),
+            new("string", "name") { Attributes = ["Query"] },
+            new("CancellationToken", "cancellationToken") { DefaultValue = "default" },
+        ];
 
         var (path, result) = RouteTemplateDisambiguator.Disambiguate("/items/{id}", parameters, ["id"]);
 
@@ -22,11 +27,11 @@ public class RouteTemplateDisambiguatorTests
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(
             "/api/parent/{id}/child",
-            ["int id", "[Query, AliasAs(\"ID\")] int? iD"],
+            [new("int", "id"), new("int?", "iD") { Attributes = ["Query"], Alias = "ID" }],
             ["id"]);
 
         path.Should().Be("/api/parent/{id2}/child");
-        result.Should().Equal("[AliasAs(\"id2\")] int id", "[Query, AliasAs(\"ID\")] int? iD");
+        Render(result).Should().Equal("[AliasAs(\"id2\")] int id", "[Query, AliasAs(\"ID\")] int? iD");
     }
 
     [TestMethod]
@@ -34,11 +39,11 @@ public class RouteTemplateDisambiguatorTests
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(
             "/v1/{Id}/items/{id}",
-            ["[AliasAs(\"Id\")] string idPath", "[AliasAs(\"id\")] string idPath2"],
+            [new("string", "idPath") { Alias = "Id" }, new("string", "idPath2") { Alias = "id" }],
             ["Id", "id"]);
 
         path.Should().Be("/v1/{idPath}/items/{id}");
-        result.Should().Equal("string idPath", "[AliasAs(\"id\")] string idPath2");
+        Render(result).Should().Equal("string idPath", "[AliasAs(\"id\")] string idPath2");
     }
 
     [TestMethod]
@@ -46,11 +51,11 @@ public class RouteTemplateDisambiguatorTests
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(
             "/v1/{Id}/items/{id}",
-            ["[Required, AliasAs(\"Id\")] string idPath", "[AliasAs(\"id\")] string idPath2"],
+            [new("string", "idPath") { Attributes = ["Required"], Alias = "Id" }, new("string", "idPath2") { Alias = "id" }],
             ["Id", "id"]);
 
         path.Should().Be("/v1/{idPath}/items/{id}");
-        result.Should().Equal("[Required] string idPath", "[AliasAs(\"id\")] string idPath2");
+        Render(result).Should().Equal("[Required] string idPath", "[AliasAs(\"id\")] string idPath2");
     }
 
     [TestMethod]
@@ -58,11 +63,15 @@ public class RouteTemplateDisambiguatorTests
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(
             "/upload/{id}",
-            ["string id", "[AliasAs(\"id\")] string id2", "StreamPart file"],
+            [
+                new("string", "id"),
+                new("string", "id2") { Alias = "id", IsAliasSeparate = true },
+                new("StreamPart", "file"),
+            ],
             ["id"]);
 
         path.Should().Be("/upload/{id3}");
-        result.Should().Equal("[AliasAs(\"id3\")] string id", "[AliasAs(\"id\")] string id2", "StreamPart file");
+        Render(result).Should().Equal("[AliasAs(\"id3\")] string id", "[AliasAs(\"id\")] string id2", "StreamPart file");
     }
 
     [TestMethod]
@@ -70,10 +79,32 @@ public class RouteTemplateDisambiguatorTests
     {
         var (path, result) = RouteTemplateDisambiguator.Disambiguate(
             "/classes/{class}",
-            ["string @class", "[Query, AliasAs(\"Class\")] string class2"],
+            [new("string", "@class"), new("string", "class2") { Attributes = ["Query"], Alias = "Class" }],
             ["class"]);
 
         path.Should().Be("/classes/{class3}");
-        result.Should().Equal("[AliasAs(\"class3\")] string @class", "[Query, AliasAs(\"Class\")] string class2");
+        Render(result).Should().Equal("[AliasAs(\"class3\")] string @class", "[Query, AliasAs(\"Class\")] string class2");
     }
+
+    [TestMethod]
+    public void Replaces_Alias_When_Parameter_Name_Is_Taken()
+    {
+        var (path, result) = RouteTemplateDisambiguator.Disambiguate(
+            "/v1/{Id}/items/{id}",
+            [
+                new("string", "idPath") { Alias = "Id" },
+                new("string", "idPath2") { Alias = "id" },
+                new("string", "idpath") { Attributes = ["Query"] },
+            ],
+            ["Id", "id"]);
+
+        path.Should().Be("/v1/{idPath3}/items/{id}");
+        Render(result).Should().Equal(
+            "[AliasAs(\"idPath3\")] string idPath",
+            "[AliasAs(\"id\")] string idPath2",
+            "[Query] string idpath");
+    }
+
+    private static IEnumerable<string> Render(IEnumerable<MethodParameter> parameters) =>
+        parameters.Select(parameter => parameter.Render());
 }

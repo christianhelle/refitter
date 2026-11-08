@@ -5,14 +5,14 @@ namespace Refitter.Core;
 
 internal static class HeaderParameterExtractor
 {
-    public static IEnumerable<string> Extract(
+    public static IEnumerable<MethodParameter> Extract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
     {
         var headerParameters = settings.GenerateOperationHeaders
             ? GetOperationHeaderParameters(operationModel, settings)
-            : new List<string>();
+            : new List<MethodParameter>();
 
         if (settings.AuthenticationHeaderStyle == AuthenticationHeaderStyle.Parameter)
         {
@@ -22,7 +22,7 @@ internal static class HeaderParameterExtractor
         return headerParameters;
     }
 
-    private static List<string> GetOperationHeaderParameters(
+    private static List<MethodParameter> GetOperationHeaderParameters(
         CSharpOperationModel operationModel,
         RefitGeneratorSettings settings)
     {
@@ -39,12 +39,15 @@ internal static class HeaderParameterExtractor
             .Select(p =>
             {
                 var variableName = ParameterNaming.GetVariableName(p);
-                return $"{ParameterAttributeFormatter.JoinAttributes($"Header(\"{ParameterNaming.EscapeString(p.Name)}\")")}{ParameterTypeResolver.GetHeaderParameterType(p, settings)} {variableName}";
+                return new MethodParameter(ParameterTypeResolver.GetHeaderParameterType(p, settings), variableName)
+                {
+                    Attributes = [GetHeaderAttribute(p.Name)],
+                };
             })
             .ToList();
     }
 
-    private static IEnumerable<string> GetAuthenticationHeaderParameters(
+    private static IEnumerable<MethodParameter> GetAuthenticationHeaderParameters(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
@@ -62,13 +65,22 @@ internal static class HeaderParameterExtractor
                 && securityScheme.In == OpenApiSecurityApiKeyLocation.Header
                 && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
             {
-                yield return $"[Header(\"{ParameterNaming.EscapeString(securityScheme.Name)}\")] string {ParameterNaming.ReplaceUnsafeCharacters(securityScheme.Name)}";
+                yield return new MethodParameter("string", ParameterNaming.ReplaceUnsafeCharacters(securityScheme.Name))
+                {
+                    Attributes = [GetHeaderAttribute(securityScheme.Name)],
+                };
             }
             else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http }
                 && string.Equals(securityScheme.Scheme, "bearer", StringComparison.OrdinalIgnoreCase))
             {
-                yield return @"[Header(""Authorization: Bearer"")] string bearerToken";
+                yield return new MethodParameter("string", "bearerToken")
+                {
+                    Attributes = [GetHeaderAttribute("Authorization: Bearer")],
+                };
             }
         }
     }
+
+    private static string GetHeaderAttribute(string name) =>
+        $"Header(\"{ParameterNaming.EscapeString(name)}\")";
 }

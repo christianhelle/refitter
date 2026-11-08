@@ -283,4 +283,39 @@ public class FlattenPrimitiveAllOfMutatorTests
 
         priority.EnumerationNames.Should().BeEquivalentTo(new[] { "Low", "Medium", "High" });
     }
+
+    [TestMethod]
+    public async Task Mutate_WithNestedPrimitiveAllOf_CollapsesInOnePass()
+    {
+        var document = await OpenApiDocument.FromJsonAsync("""
+            {
+              "openapi": "3.0.1",
+              "info": { "title": "Test", "version": "1.0" },
+              "paths": {},
+              "components": {
+                "schemas": {
+                  "TestModel": {
+                    "type": "object",
+                    "properties": {
+                      "parent": {
+                        "allOf": [
+                          { "allOf": [ { "type": "string", "format": "uuid" } ] }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """);
+
+        new FlattenPrimitiveAllOfMutator().Mutate(document);
+
+        var parent = document.Components!.Schemas["TestModel"]
+            .ActualSchema.Properties["parent"].ActualSchema;
+
+        parent.Type.Should().Be(JsonObjectType.String);
+        parent.Format.Should().Be("uuid");
+        parent.AllOf.Should().BeEmpty();
+    }
 }

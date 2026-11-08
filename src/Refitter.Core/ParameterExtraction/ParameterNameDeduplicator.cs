@@ -1,6 +1,3 @@
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Refitter.Core;
 
 /// <summary>
@@ -10,16 +7,6 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ParameterNameDeduplicator
 {
-    private const string Prefix = "interface I { void M(";
-
-    // Parameters whose wire name does not come from the parameter name
-    private static readonly HashSet<string> NameIndependentAttributes = new(StringComparer.Ordinal)
-    {
-        "AliasAs",
-        "Header",
-        "Body",
-    };
-
     /// <summary>
     /// Renames later parameters that reuse an earlier name by adding a numeric suffix. A renamed parameter
     /// that Refit binds by name (route, query or multipart) gets an <c>AliasAs</c> attribute with its
@@ -30,23 +17,24 @@ internal static class ParameterNameDeduplicator
     /// Whether the last parameter is the cancellation token or request options argument Refitter appends,
     /// which keeps its well-known name.
     /// </param>
-    public static IReadOnlyList<string> Deduplicate(IReadOnlyList<string> parameters, bool hasAppendedParameter)
+    public static IReadOnlyList<MethodParameter> Deduplicate(
+        IReadOnlyList<MethodParameter> parameters,
+        bool hasAppendedParameter)
     {
-        var parsed = parameters.Select(Parse).ToList();
-        var appendedIndex = hasAppendedParameter ? parsed.Count - 1 : -1;
+        var appendedIndex = hasAppendedParameter ? parameters.Count - 1 : -1;
 
         var usedNames = new HashSet<string>(StringComparer.Ordinal);
         if (appendedIndex >= 0)
-            usedNames.Add(parsed[appendedIndex].Syntax.Identifier.ValueText);
+            usedNames.Add(parameters[appendedIndex].Identifier);
 
-        var result = new List<string>(parameters.Count);
-        for (var index = 0; index < parsed.Count; index++)
+        var result = new List<MethodParameter>(parameters.Count);
+        for (var index = 0; index < parameters.Count; index++)
         {
-            var parameter = parsed[index];
-            var name = parameter.Syntax.Identifier.ValueText;
+            var parameter = parameters[index];
+            var name = parameter.Identifier;
             if (index == appendedIndex || usedNames.Add(name))
             {
-                result.Add(parameter.Text);
+                result.Add(parameter);
                 continue;
             }
 
@@ -57,30 +45,11 @@ internal static class ParameterNameDeduplicator
                 uniqueName = name + suffix++;
             }
 
-            result.Add(Rename(parameter, name, uniqueName));
+            result.Add(parameter.IsBoundByName
+                ? parameter with { Name = uniqueName, Alias = parameter.WireName, IsAliasSeparate = true }
+                : parameter with { Name = uniqueName });
         }
 
         return result;
-    }
-
-    private static (string Text, ParameterSyntax Syntax) Parse(string parameter)
-    {
-        var tree = CSharpSyntaxTree.ParseText($"{Prefix}{parameter}); }}");
-        return (parameter, tree.GetRoot().DescendantNodes().OfType<ParameterSyntax>().First());
-    }
-
-    private static string Rename((string Text, ParameterSyntax Syntax) parameter, string name, string uniqueName)
-    {
-        var identifier = parameter.Syntax.Identifier.Span;
-        var start = identifier.Start - Prefix.Length;
-        var renamed = parameter.Text.Substring(0, start) + uniqueName + parameter.Text.Substring(start + identifier.Length);
-
-        var isBoundByName = !parameter.Syntax.AttributeLists
-            .SelectMany(list => list.Attributes)
-            .Any(attribute => NameIndependentAttributes.Contains(attribute.Name.ToString()));
-
-        return isBoundByName
-            ? $"[AliasAs(\"{name}\")] {renamed}"
-            : renamed;
     }
 }

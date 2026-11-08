@@ -3,11 +3,26 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- Update dependency AutoMapper to 16.3.0 ([#1368](https://github.com/christianhelle/refitter/pull/1368)) (@renovate[bot])
+- Update dependency Polly to 8.9.0 ([#1362](https://github.com/christianhelle/refitter/pull/1362)) (@renovate[bot])
+- Update dependency MSTest to 4.5.2 ([#1361](https://github.com/christianhelle/refitter/pull/1361)) (@renovate[bot])
+- Update dependency Polly to 8.8.1 ([#1356](https://github.com/christianhelle/refitter/pull/1356)) (@renovate[bot])
 - Update NuGet packages ([#1353](https://github.com/christianhelle/refitter/pull/1353)) ([@christianhelle](https://github.com/christianhelle/))
 - Generate changelog with chlogr ([#1352](https://github.com/christianhelle/refitter/pull/1352)) ([@christianhelle](https://github.com/christianhelle/))
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Collapse pass-through generator modules ([#1375](https://github.com/christianhelle/refitter/pull/1375)) ([@christianhelle](https://github.com/christianhelle/))
+- Build method parameters as records and render them to C# once ([#1373](https://github.com/christianhelle/refitter/pull/1373)) ([@christianhelle](https://github.com/christianhelle/))
+- Load .refitter files and read run results the same way in every host ([#1372](https://github.com/christianhelle/refitter/pull/1372)) ([@christianhelle](https://github.com/christianhelle/))
+- Share one settings sanitizer between CLI and source generator telemetry ([#1374](https://github.com/christianhelle/refitter/pull/1374)) ([@christianhelle](https://github.com/christianhelle/))
+- Derive client names from the OpenAPI title in one place ([#1370](https://github.com/christianhelle/refitter/pull/1370)) ([@christianhelle](https://github.com/christianhelle/))
+- Normalize OpenAPI documents in one parse with exact numbers ([#1371](https://github.com/christianhelle/refitter/pull/1371)) ([@christianhelle](https://github.com/christianhelle/))
+- Find the System.Text.Json generator on source-built .NET SDKs ([#1376](https://github.com/christianhelle/refitter/pull/1376)) ([@christianhelle](https://github.com/christianhelle/))
+- Lay out the generator dependencies in the telemetry target tests ([#1377](https://github.com/christianhelle/refitter/pull/1377)) ([@christianhelle](https://github.com/christianhelle/))
+- Run source generator telemetry in the test/SourceGenerator sample ([#1367](https://github.com/christianhelle/refitter/pull/1367)) ([@christianhelle](https://github.com/christianhelle/))
+- Add opt-out telemetry for Refitter.SourceGenerator via an MSBuild task ([#1365](https://github.com/christianhelle/refitter/pull/1365)) ([@christianhelle](https://github.com/christianhelle/))
+- Run Refit source generator from Refitter source generator ([#1363](https://github.com/christianhelle/refitter/pull/1363)) ([@christianhelle](https://github.com/christianhelle/))
 - Migrate tests from TUnit to MSTest v4.5 ([#1360](https://github.com/christianhelle/refitter/pull/1360)) ([@christianhelle](https://github.com/christianhelle/))
 - Fix JsonSerializerContext build failure for contracts named Options ([#1358](https://github.com/christianhelle/refitter/pull/1358)) ([@christianhelle](https://github.com/christianhelle/))
 - Support OpenAPI 3.2 itemSchema for streaming responses ([#1355](https://github.com/christianhelle/refitter/pull/1355)) ([@christianhelle](https://github.com/christianhelle/))

@@ -1,8 +1,9 @@
 namespace Refitter.Core;
 
 /// <summary>
-/// Adapts the static <see cref="OutputPlanner"/> methods to the <see cref="IOutputPlanner"/> interface.
+/// Adapts <see cref="OutputPlanner.Plan"/> to the <see cref="IOutputPlanner"/> interface.
 /// </summary>
+[Obsolete("Use OutputPlanner.Plan. This adapter will be removed in a future version.")]
 public class OutputPlannerAdapter : IOutputPlanner
 {
     /// <inheritdoc />
@@ -10,28 +11,6 @@ public class OutputPlannerAdapter : IOutputPlanner
         GeneratorOutput output,
         IOutputConfiguration config,
         string? settingsFilePath,
-        string? cliOutputPath)
-    {
-        if (config.GenerateMultipleFiles)
-        {
-            return OutputPlanner.PlanMultipleFiles(
-                settingsFilePath,
-                cliOutputPath,
-                config,
-                output);
-        }
-
-        var code = output.Files.Count > 0
-            ? output.Files[0].Content
-            : string.Empty;
-
-        return
-        [
-            OutputPlanner.PlanSingleFile(
-                settingsFilePath,
-                cliOutputPath,
-                config,
-                code)
-        ];
-    }
+        string? cliOutputPath) =>
+        OutputPlanner.Plan(output, config, settingsFilePath, cliOutputPath);
 }

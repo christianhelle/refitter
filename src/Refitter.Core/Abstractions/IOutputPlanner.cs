@@ -4,6 +4,7 @@ namespace Refitter.Core;
 /// Resolves a <see cref="GeneratorOutput"/> into a list of <see cref="PlannedFile"/> instances.
 /// Pure logic — no I/O.
 /// </summary>
+[Obsolete("Use OutputPlanner.Plan. This interface will be removed in a future version.")]
 public interface IOutputPlanner
 {
     /// <summary>

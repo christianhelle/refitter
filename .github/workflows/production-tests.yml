@@ -74,12 +74,7 @@ jobs:
           9.0.x
           10.0.x
 
-    - name: 🛠️ Generate code
-      run: dotnet build -p:UseProductionRefitter=true
-      working-directory: test/SourceGenerator/Net8
-      continue-on-error: true
-
-    - name: 🛠️ Build generated code
+    - name: 🛠️ Build
       run: dotnet build -p:UseProductionRefitter=true
       working-directory: test/SourceGenerator/Net8
 

@@ -76,18 +76,33 @@ public static class Analytics
                 .ForEach(attribute => LogFeatureUsage(attribute, property));
         }
 
-        if (settings.SettingsFilePath is not null)
+        // Like the source generator, report which settings the file uses but never paths, URLs or other free text
+        if (!string.IsNullOrWhiteSpace(settings.SettingsFilePath) &&
+            ReadSettingsFile(settings.SettingsFilePath!) is { } contents &&
+            SettingsSanitizer.Sanitize(contents) is { } sanitizedSettings)
         {
             telemetryClient.TrackEvent(
                 "settings-file",
                 new Dictionary<string, string>
                 {
-                    { "settings", Serializer.Serialize(refitGeneratorSettings) }
+                    { "settings", sanitizedSettings }
                 });
             telemetryClient.Flush();
         }
 
         LogMsbuildInvocation(settings);
+    }
+
+    private static string? ReadSettingsFile(string settingsFilePath)
+    {
+        try
+        {
+            return File.ReadAllText(settingsFilePath);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
     }
 
     private static void LogFeatureUsage(CommandOptionAttribute attribute, PropertyInfo property)

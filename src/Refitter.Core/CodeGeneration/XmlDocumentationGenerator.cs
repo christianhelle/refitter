@@ -103,9 +103,36 @@ public class XmlDocumentationGenerator
     /// <param name="dynamicQuerystringParameterType">
     /// The type of the dynamic querystring wrapper parameter, when the method may have one.
     /// </param>
+    [Obsolete("Refitter no longer uses this overload. It parses the parameter list it is given and will be removed in a future version.")]
     public void AppendMethodDocumentation(
         CSharpOperationModel method,
         IReadOnlyList<string> parameters,
+        bool hasApiResponse,
+        StringBuilder code,
+        string? dynamicQuerystringParameterType = null) =>
+        AppendMethodDocumentation(
+            method,
+            ParseParameters(parameters),
+            hasApiResponse,
+            code,
+            dynamicQuerystringParameterType);
+
+    /// <summary>
+    /// Appends XML docs for the given method to the given code builder.
+    /// </summary>
+    /// <param name="method">The NSwag model of the method's OpenAPI definition.</param>
+    /// <param name="parameters">
+    /// The parameters the method is emitted with. The param tags are written for exactly these,
+    /// so they always match the signature.
+    /// </param>
+    /// <param name="hasApiResponse">Indicates whether the method returns an <c>ApiResponse</c>.</param>
+    /// <param name="code">The builder to append the documentation to.</param>
+    /// <param name="dynamicQuerystringParameterType">
+    /// The type of the dynamic querystring wrapper parameter, when the method may have one.
+    /// </param>
+    internal void AppendMethodDocumentation(
+        CSharpOperationModel method,
+        IReadOnlyList<MethodParameter> parameters,
         bool hasApiResponse,
         StringBuilder code,
         string? dynamicQuerystringParameterType = null)
@@ -119,15 +146,15 @@ public class XmlDocumentationGenerator
         if (!string.IsNullOrWhiteSpace(method.Description))
             AppendXmlCommentBlock("remarks", EscapeSymbols(method.Description), code);
 
-        foreach (var (name, type, alias) in GetEmittedParameters(parameters))
+        foreach (var parameter in parameters)
         {
             AppendXmlCommentBlock(
                 ParamKeyword,
-                GetParameterDescription(method, name, type, alias, dynamicQuerystringParameterType),
+                GetParameterDescription(method, parameter.Identifier, parameter.Type, parameter.Alias, dynamicQuerystringParameterType),
                 code,
                 new()
                 {
-                    ["name"] = name
+                    ["name"] = parameter.Identifier
                 });
         }
 
@@ -296,8 +323,8 @@ public class XmlDocumentationGenerator
         return description.ToString();
     }
 
-    // Reads the parameter names (without any @ keyword escape), types and AliasAs names from the emitted parameter list
-    private static IEnumerable<(string Name, string Type, string? Alias)> GetEmittedParameters(IReadOnlyList<string> parameters)
+    // Reads the parameter names, types and AliasAs names of an emitted parameter list, for the obsolete overload
+    private static IReadOnlyList<MethodParameter> ParseParameters(IReadOnlyList<string> parameters)
     {
         if (parameters.Count == 0)
             return [];
@@ -306,7 +333,11 @@ public class XmlDocumentationGenerator
         return tree.GetRoot()
             .DescendantNodes()
             .OfType<ParameterSyntax>()
-            .Select(parameter => (parameter.Identifier.ValueText, parameter.Type!.ToString(), GetAlias(parameter)));
+            .Select(parameter => new MethodParameter(parameter.Type!.ToString(), parameter.Identifier.ValueText)
+            {
+                Alias = GetAlias(parameter),
+            })
+            .ToList();
     }
 
     private static string? GetAlias(ParameterSyntax parameter) =>

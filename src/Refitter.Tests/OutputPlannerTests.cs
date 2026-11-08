@@ -509,4 +509,27 @@ public class OutputPlannerTests
                 new GeneratedCode("RefitInterfaces", "// code"))
             .Should().Be(Path.Combine("CustomCli", "MultipleFiles", "RefitInterfaces.cs"));
     }
+
+    [TestMethod]
+    public void Settings_File_At_A_Root_Resolves_Paths_Like_A_Settings_File_Without_Directory()
+    {
+        var root = Path.GetPathRoot(Path.GetTempPath())!;
+        var config = new RefitGeneratorSettings
+        {
+            OutputFolder = "Generated",
+            OutputFilename = "Petstore.cs",
+            ContractsOutputFolder = "Contracts",
+        };
+        var contracts = new GeneratedCode(TypenameConstants.Contracts, "// contracts");
+
+        OutputPlanner.GetSingleFileOutputPath(root, null, config)
+            .Should()
+            .Be(OutputPlanner.GetSingleFileOutputPath("petstore.refitter", null, config));
+        OutputPlanner.GetMultiFileOutputPath(root, null, config, contracts)
+            .Should()
+            .Be(OutputPlanner.GetMultiFileOutputPath("petstore.refitter", null, config, contracts));
+        OutputPlanner.GetContractsOutputPath(root, config, contracts)
+            .Should()
+            .Be(OutputPlanner.GetContractsOutputPath("petstore.refitter", config, contracts));
+    }
 }
