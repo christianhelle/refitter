@@ -2,11 +2,11 @@ using AwesomeAssertions;
 using NSwag;
 using Refitter.Core;
 
-namespace Refitter.Tests;
+namespace Refitter.Tests.Parameters;
 
 
 [TestClass]
-public class MethodSignatureGeneratorTests
+public class ParameterListBuilderRenderingTests
 {
     [TestMethod]
     public async Task Generate_Returns_Route_Parameter()
@@ -34,12 +34,12 @@ public class MethodSignatureGeneratorTests
         var document = await OpenApiYamlDocument.FromYamlAsync(spec);
         var settings = new RefitGeneratorSettings();
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new MethodSignatureGenerator(settings);
+        var sut = new ParameterListBuilder(settings);
 
         var operation = document.Paths["/test/{id}"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
         operationModel.Path = "/test/{id}";
-        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
 
         parametersString.Should().Contain("int id");
     }
@@ -69,11 +69,11 @@ public class MethodSignatureGeneratorTests
         var document = await OpenApiYamlDocument.FromYamlAsync(spec);
         var settings = new RefitGeneratorSettings();
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new MethodSignatureGenerator(settings);
+        var sut = new ParameterListBuilder(settings);
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
 
         parametersString.Should().Contain("string search");
     }
@@ -107,11 +107,11 @@ public class MethodSignatureGeneratorTests
         var document = await OpenApiYamlDocument.FromYamlAsync(spec);
         var settings = new RefitGeneratorSettings();
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new MethodSignatureGenerator(settings);
+        var sut = new ParameterListBuilder(settings);
 
         var operation = document.Paths["/test"]["post"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
 
         parametersString.Should().Contain("body");
     }
@@ -136,11 +136,11 @@ public class MethodSignatureGeneratorTests
         var document = await OpenApiYamlDocument.FromYamlAsync(spec);
         var settings = new RefitGeneratorSettings { UseCancellationTokens = true };
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new MethodSignatureGenerator(settings);
+        var sut = new ParameterListBuilder(settings);
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
 
         parametersString.Should().Contain("CancellationToken");
     }
@@ -174,11 +174,11 @@ public class MethodSignatureGeneratorTests
         var document = await OpenApiYamlDocument.FromYamlAsync(spec);
         var settings = new RefitGeneratorSettings { UseDynamicQuerystringParameters = true };
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new MethodSignatureGenerator(settings);
+        var sut = new ParameterListBuilder(settings);
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (_, _, _, dynamicQs) = sut.Generate(operationModel, operation, "TestQueryParams");
+        var dynamicQs = sut.Build(operationModel, operation, "TestQueryParams").DynamicQuerystringCode;
 
         dynamicQs.Should().NotBeNull();
     }
@@ -206,11 +206,11 @@ public class MethodSignatureGeneratorTests
             ApizrSettings = new ApizrSettings { WithRequestOptions = true }
         };
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new MethodSignatureGenerator(settings);
+        var sut = new ParameterListBuilder(settings);
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (_, parametersString, _, _) = sut.Generate(operationModel, operation, string.Empty);
+        var parametersString = sut.Build(operationModel, operation, string.Empty).Render();
 
         parametersString.Should().Contain("IApizrRequestOptions");
     }
@@ -241,11 +241,11 @@ public class MethodSignatureGeneratorTests
         var document = await OpenApiYamlDocument.FromYamlAsync(spec);
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
         var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new MethodSignatureGenerator(settings);
+        var sut = new ParameterListBuilder(settings);
 
         var operation = document.Paths["/test"]["get"];
         var operationModel = generator.CreateOperationModel(operation);
-        var (_, _, parameters, _) = sut.Generate(operationModel, operation, string.Empty);
+        var parameters = sut.Build(operationModel, operation, string.Empty).Parameters;
 
         parameters.Should().NotBeEmpty();
     }

@@ -5,7 +5,7 @@ namespace Refitter.Core;
 
 internal sealed class QueryParameterExtractor
 {
-    public (IReadOnlyList<string> Parameters, string? DynamicQuerystringCode) Extract(
+    public (IReadOnlyList<MethodParameter> Parameters, string? DynamicQuerystringCode) Extract(
         CSharpOperationModel operationModel,
         RefitGeneratorSettings settings,
         string dynamicQuerystringParameterType)
@@ -19,7 +19,7 @@ internal sealed class QueryParameterExtractor
             : (ExtractSimple(queryParameters, settings), null);
     }
 
-    private static (IReadOnlyList<string> Parameters, string? DynamicQuerystringCode) ExtractDynamic(
+    private static (IReadOnlyList<MethodParameter> Parameters, string? DynamicQuerystringCode) ExtractDynamic(
         List<CSharpParameterModel> queryParameters,
         RefitGeneratorSettings settings,
         string dynamicQuerystringParameterType)
@@ -36,15 +36,17 @@ internal sealed class QueryParameterExtractor
         var allNullable = queryParameters.All(p =>
             ParameterTypeResolver.GetQueryParameterType(p, settings).EndsWith("?"));
 
-        var dynamicQuerystringParameter = $"[Query] {dynamicQuerystringParameterType}";
-        if (allNullable)
-            dynamicQuerystringParameter += "?";
-        dynamicQuerystringParameter += " queryParams";
+        var dynamicQuerystringParameter = new MethodParameter(
+            allNullable ? $"{dynamicQuerystringParameterType}?" : dynamicQuerystringParameterType,
+            "queryParams")
+        {
+            Attributes = ["Query"],
+        };
 
         return (new[] { dynamicQuerystringParameter }, code);
     }
 
-    private static List<string> ExtractSimple(
+    private static List<MethodParameter> ExtractSimple(
         List<CSharpParameterModel> queryParameters,
         RefitGeneratorSettings settings)
     {
@@ -52,7 +54,11 @@ internal sealed class QueryParameterExtractor
             .Select(p =>
             {
                 var variableName = ParameterNaming.GetVariableName(p);
-                return $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetQueryAttribute(p, settings), ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{ParameterTypeResolver.GetQueryParameterType(p, settings)} {variableName}";
+                return new MethodParameter(ParameterTypeResolver.GetQueryParameterType(p, settings), variableName)
+                {
+                    Attributes = [ParameterAttributeFormatter.GetQueryAttribute(p, settings)],
+                    Alias = ParameterAttributeFormatter.GetAlias(p.Name, variableName),
+                };
             })
             .ToList();
     }

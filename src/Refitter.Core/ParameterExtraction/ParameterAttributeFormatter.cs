@@ -1,3 +1,4 @@
+using System.Globalization;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
 
@@ -9,9 +10,19 @@ namespace Refitter.Core;
 internal static class ParameterAttributeFormatter
 {
     public static string GetAliasAsAttribute(string originalName, string variableName) =>
-        string.Equals(originalName, variableName, StringComparison.Ordinal)
-            ? string.Empty
-            : $"AliasAs(\"{ParameterNaming.EscapeString(originalName)}\")";
+        GetAlias(originalName, variableName) is { } alias
+            ? $"AliasAs(\"{ParameterNaming.EscapeString(alias)}\")"
+            : string.Empty;
+
+    /// <summary>
+    /// The wire name to alias a parameter as, or <see langword="null"/> when Refit already sends the parameter
+    /// name. The compiled name drops Unicode formatting characters, so a name containing them is aliased too.
+    /// </summary>
+    public static string? GetAlias(string originalName, string variableName) =>
+        string.Equals(originalName, variableName, StringComparison.Ordinal) &&
+        !variableName.Any(c => CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Format)
+            ? null
+            : originalName;
 
     public static string JoinAttributes(params string[] attributes)
     {

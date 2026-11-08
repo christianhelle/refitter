@@ -6,7 +6,6 @@ namespace Refitter.Core;
 internal class MethodAttributeGenerator(
     RefitGeneratorSettings settings,
     OpenApiDocument document)
-    : IMethodAttributeGenerator
 {
 
     public string[] Generate(OpenApiOperation operation, CSharpOperationModel operationModel)

@@ -7,7 +7,6 @@ namespace Refitter.Core;
 internal class ReturnTypeGenerator(
     ICodeGenerationConfiguration codeGeneration,
     CustomCSharpClientGenerator generator)
-    : IReturnTypeGenerator
 {
     private static readonly Regex HttpResponseMessageTypeRegex = new(
         "(Task|IObservable)<HttpResponseMessage>",

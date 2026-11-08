@@ -5,12 +5,12 @@ namespace Refitter.Core;
 
 internal sealed class HeaderParameterExtractor
 {
-    public IEnumerable<string> Extract(
+    public IEnumerable<MethodParameter> Extract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings)
     {
-        var headerParameters = new List<string>();
+        var headerParameters = new List<MethodParameter>();
 
         if (settings.GenerateOperationHeaders)
         {
@@ -27,7 +27,10 @@ internal sealed class HeaderParameterExtractor
                 .Select(p =>
                 {
                     var variableName = ParameterNaming.GetVariableName(p);
-                    return $"{ParameterAttributeFormatter.JoinAttributes($"Header(\"{ParameterNaming.EscapeString(p.Name)}\")")}{ParameterTypeResolver.GetHeaderParameterType(p, settings)} {variableName}";
+                    return new MethodParameter(ParameterTypeResolver.GetHeaderParameterType(p, settings), variableName)
+                    {
+                        Attributes = [GetHeaderAttribute(p.Name)],
+                    };
                 })
                 .ToList();
         }
@@ -47,16 +50,27 @@ internal sealed class HeaderParameterExtractor
                     && securityScheme.In == OpenApiSecurityApiKeyLocation.Header
                     && !operationModel.Parameters.Any(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader && p.Name == securityScheme.Name))
                 {
-                    headerParameters.Add($"[Header(\"{ParameterNaming.EscapeString(securityScheme.Name)}\")] string {ParameterNaming.ReplaceUnsafeCharacters(securityScheme.Name)}");
+                    headerParameters.Add(
+                        new MethodParameter("string", ParameterNaming.ReplaceUnsafeCharacters(securityScheme.Name))
+                        {
+                            Attributes = [GetHeaderAttribute(securityScheme.Name)],
+                        });
                 }
                 else if (securityScheme is { Type: OpenApiSecuritySchemeType.Http }
                     && string.Equals(securityScheme.Scheme, "bearer", StringComparison.OrdinalIgnoreCase))
                 {
-                    headerParameters.Add(@"[Header(""Authorization: Bearer"")] string bearerToken");
+                    headerParameters.Add(
+                        new MethodParameter("string", "bearerToken")
+                        {
+                            Attributes = [GetHeaderAttribute("Authorization: Bearer")],
+                        });
                 }
             }
         }
 
         return headerParameters;
     }
+
+    private static string GetHeaderAttribute(string name) =>
+        $"Header(\"{ParameterNaming.EscapeString(name)}\")";
 }

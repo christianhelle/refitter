@@ -1,6 +1,3 @@
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Refitter.Core;
 
 /// <summary>
@@ -10,8 +7,6 @@ namespace Refitter.Core;
 /// </summary>
 internal static class RouteTemplateDisambiguator
 {
-    private const string Prefix = "interface I { void M(";
-
     /// <summary>
     /// Renames route placeholders that collide case-insensitively with the name of another parameter.
     /// Placeholder names are not sent over the wire, so the request is unchanged.
@@ -19,9 +14,9 @@ internal static class RouteTemplateDisambiguator
     /// <param name="path">The route template of the method.</param>
     /// <param name="parameters">The parameters of the method.</param>
     /// <param name="routeParameterNames">The names of the path parameters in the OpenAPI operation.</param>
-    public static (string Path, IReadOnlyList<string> Parameters) Disambiguate(
+    public static (string Path, IReadOnlyList<MethodParameter> Parameters) Disambiguate(
         string path,
-        IReadOnlyList<string> parameters,
+        IReadOnlyList<MethodParameter> parameters,
         IReadOnlyList<string> routeParameterNames)
     {
         if (string.IsNullOrEmpty(path))
@@ -35,28 +30,27 @@ internal static class RouteTemplateDisambiguator
         for (var placeholderIndex = 0; placeholderIndex < placeholders.Count; placeholderIndex++)
         {
             var placeholder = placeholders[placeholderIndex];
-            var parsed = result.Select(Parse).ToList();
 
             // Route parameters are extracted first and keep their name when deduplicated,
             // so the first parameter bound to the placeholder is the route parameter
-            var routeIndex = parsed.FindIndex(parameter => GetUrlName(parameter.Syntax) == placeholder);
+            var routeIndex = result.FindIndex(parameter => parameter.BoundName == placeholder);
             if (routeIndex < 0)
                 continue;
 
-            var otherParameters = parsed.Where((_, index) => index != routeIndex).ToList();
+            var otherParameters = result.Where((_, index) => index != routeIndex).ToList();
             var otherPlaceholders = placeholders.Where((_, index) => index != placeholderIndex).ToList();
 
             var collidingNames = new HashSet<string>(
-                otherParameters.Select(parameter => GetUrlName(parameter.Syntax)).Concat(otherPlaceholders),
+                otherParameters.Select(parameter => parameter.BoundName).Concat(otherPlaceholders),
                 StringComparer.OrdinalIgnoreCase);
             if (!collidingNames.Contains(placeholder))
                 continue;
 
             var usedNames = new HashSet<string>(
-                collidingNames.Concat(otherParameters.Select(parameter => parameter.Syntax.Identifier.ValueText)),
+                collidingNames.Concat(otherParameters.Select(parameter => parameter.Identifier)),
                 StringComparer.OrdinalIgnoreCase);
 
-            var name = parsed[routeIndex].Syntax.Identifier.ValueText;
+            var name = result[routeIndex].Identifier;
             var uniqueName = name;
             var suffix = 2;
             while (usedNames.Contains(uniqueName))
@@ -66,49 +60,21 @@ internal static class RouteTemplateDisambiguator
 
             path = path.Replace($"{{{placeholder}}}", $"{{{uniqueName}}}");
             placeholders[placeholderIndex] = uniqueName;
-            result[routeIndex] = WithAlias(parsed[routeIndex], uniqueName);
+            result[routeIndex] = WithAlias(result[routeIndex], uniqueName);
         }
 
         return (path, result);
     }
 
-    private static (string Text, ParameterSyntax Syntax) Parse(string parameter)
-    {
-        var tree = CSharpSyntaxTree.ParseText($"{Prefix}{parameter}); }}");
-        return (parameter, tree.GetRoot().DescendantNodes().OfType<ParameterSyntax>().First());
-    }
-
-    // The name Refit binds the parameter by. Refitter always emits AliasAs with a string literal
-    private static string GetUrlName(ParameterSyntax parameter) =>
-        GetAliasAttribute(parameter) is { } aliasAttribute
-            ? aliasAttribute.DescendantNodes().OfType<LiteralExpressionSyntax>().First().Token.ValueText
-            : parameter.Identifier.ValueText;
-
-    private static AttributeSyntax? GetAliasAttribute(ParameterSyntax parameter) =>
-        parameter.AttributeLists
-            .SelectMany(list => list.Attributes)
-            .FirstOrDefault(attribute => attribute.Name.ToString() == "AliasAs");
-
     // Binds the parameter to the alias, which is redundant when it equals the parameter name
-    private static string WithAlias((string Text, ParameterSyntax Syntax) parameter, string alias)
+    private static MethodParameter WithAlias(MethodParameter parameter, string alias)
     {
         // A parameter without an alias is bound by its name, which collides, so its alias is never redundant
-        var aliasAttribute = GetAliasAttribute(parameter.Syntax);
-        if (aliasAttribute == null)
-            return $"[AliasAs(\"{alias}\")] {parameter.Text}";
+        if (parameter.Alias is null)
+            return parameter with { Alias = alias, IsAliasSeparate = true };
 
-        var isRedundant = alias == parameter.Syntax.Identifier.ValueText;
-
-        var attributeList = parameter.Syntax.AttributeLists.First(list => list.Attributes.Contains(aliasAttribute));
-        var attributes = attributeList.Attributes
-            .Where(attribute => attribute != aliasAttribute || !isRedundant)
-            .Select(attribute => attribute == aliasAttribute ? $"AliasAs(\"{alias}\")" : attribute.ToString())
-            .ToList();
-
-        // Removing the only attribute of a list also removes the whitespace after it
-        var start = attributeList.Span.Start - Prefix.Length;
-        var end = (attributes.Count == 0 ? attributeList.FullSpan.End : attributeList.Span.End) - Prefix.Length;
-        var replacement = attributes.Count == 0 ? string.Empty : $"[{string.Join(", ", attributes)}]";
-        return parameter.Text.Substring(0, start) + replacement + parameter.Text.Substring(end);
+        return alias == parameter.Identifier
+            ? parameter with { Alias = null, IsAliasSeparate = false }
+            : parameter with { Alias = alias };
     }
 }

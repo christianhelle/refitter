@@ -61,15 +61,9 @@ internal static class ParameterDefaultValueFormatter
     }
 
     public static string GetDefaultValueForParameter(
-        string parameterString,
+        string variableName,
         ICollection<CSharpParameterModel> parameterModels)
     {
-        var parts = parameterString.Split([' '], StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length == 0)
-            return DefaultKeyword;
-
-        var variableName = parts[parts.Length - 1].TrimEnd(';', ',');
-
         var parameterModel = parameterModels.FirstOrDefault(p => p.VariableName == variableName);
         parameterModel ??= parameterModels.FirstOrDefault(p => ParameterNaming.GetVariableName(p) == variableName);
         if (parameterModel?.Schema?.Default != null && !string.IsNullOrEmpty(parameterModel.Type))
