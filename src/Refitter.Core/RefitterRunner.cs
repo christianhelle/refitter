@@ -154,7 +154,10 @@ public class RefitterRunner
         {
             diagnostics.Add(new RunnerDiagnostic(
                 $"All paths were filtered out by include path patterns: [{string.Join(", ", settings.IncludePathMatches)}]",
-                IsError: false));
+                IsError: false)
+            {
+                Kind = RunnerDiagnosticKind.AllPathsFiltered,
+            });
         }
     }
 
@@ -181,7 +184,10 @@ public class RefitterRunner
             warnings.Add(
                 new Warning(
                     "Date Format Override",
-                    "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true"));
+                    "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true")
+                {
+                    Kind = WarningKind.DateFormatOverride,
+                });
         }
 
 #pragma warning disable CS0618
@@ -191,7 +197,10 @@ public class RefitterRunner
             warnings.Add(
                 new Warning(
                     "Deprecated Setting",
-                    "The 'usePolly' property is deprecated. Use 'transientErrorHandler: Polly' instead"));
+                    "The 'usePolly' property is deprecated. Use 'transientErrorHandler: Polly' instead")
+                {
+                    Kind = WarningKind.DeprecatedSetting,
+                });
         }
     }
 }

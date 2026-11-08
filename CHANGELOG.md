@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- Update dependency AutoMapper to 16.3.0 ([#1368](https://github.com/christianhelle/refitter/pull/1368)) (@renovate[bot])
 - Update dependency Polly to 8.9.0 ([#1362](https://github.com/christianhelle/refitter/pull/1362)) (@renovate[bot])
 - Update dependency MSTest to 4.5.2 ([#1361](https://github.com/christianhelle/refitter/pull/1361)) (@renovate[bot])
 - Update dependency Polly to 8.8.1 ([#1356](https://github.com/christianhelle/refitter/pull/1356)) (@renovate[bot])
@@ -11,6 +12,12 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Load .refitter files and read run results the same way in every host ([#1372](https://github.com/christianhelle/refitter/pull/1372)) ([@christianhelle](https://github.com/christianhelle/))
+- Share one settings sanitizer between CLI and source generator telemetry ([#1374](https://github.com/christianhelle/refitter/pull/1374)) ([@christianhelle](https://github.com/christianhelle/))
+- Derive client names from the OpenAPI title in one place ([#1370](https://github.com/christianhelle/refitter/pull/1370)) ([@christianhelle](https://github.com/christianhelle/))
+- Normalize OpenAPI documents in one parse with exact numbers ([#1371](https://github.com/christianhelle/refitter/pull/1371)) ([@christianhelle](https://github.com/christianhelle/))
+- Find the System.Text.Json generator on source-built .NET SDKs ([#1376](https://github.com/christianhelle/refitter/pull/1376)) ([@christianhelle](https://github.com/christianhelle/))
+- Lay out the generator dependencies in the telemetry target tests ([#1377](https://github.com/christianhelle/refitter/pull/1377)) ([@christianhelle](https://github.com/christianhelle/))
 - Run source generator telemetry in the test/SourceGenerator sample ([#1367](https://github.com/christianhelle/refitter/pull/1367)) ([@christianhelle](https://github.com/christianhelle/))
 - Add opt-out telemetry for Refitter.SourceGenerator via an MSBuild task ([#1365](https://github.com/christianhelle/refitter/pull/1365)) ([@christianhelle](https://github.com/christianhelle/))
 - Run Refit source generator from Refitter source generator ([#1363](https://github.com/christianhelle/refitter/pull/1363)) ([@christianhelle](https://github.com/christianhelle/))

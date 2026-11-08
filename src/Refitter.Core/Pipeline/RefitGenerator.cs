@@ -160,7 +160,7 @@ public class RefitGenerator(
         {
             generatedFiles.Add(
                 new(
-                    JsonSerializerContextGenerator.GetContextTypeName(settings, document.Info?.Title),
+                    ClientNaming.Create(settings.Naming, document.Info?.Title).SerializerContextTypeName,
                     result.SerializerContext));
         }
 

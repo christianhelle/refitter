@@ -1,6 +1,6 @@
 using System.Text.Json;
 using AwesomeAssertions;
-using Refitter.SourceGenerator.Telemetry;
+using Refitter.Core;
 
 namespace Refitter.Tests.MSBuild;
 
@@ -74,8 +74,65 @@ public class SettingsSanitizerTests
     [DataRow("{ \"a\": \"tab\there\" }")]
     [DataRow("{ \"a\": \"\\u 1a2\" }")]
     [DataRow("{ \"a\": \"\\u12g4\" }")]
+    [DataRow("{ \"a\": 1 \"b\": 2 }")]
+    [DataRow("{ \"a\" 1 }")]
+    [DataRow("{")]
+    [DataRow("{ \"a\": 1,")]
+    [DataRow("{ \"a\": [ 1,")]
+    [DataRow("{ \"a")]
     public void Sanitize_Returns_Null_For_Invalid_Settings(string contents) =>
         SettingsSanitizer.Sanitize(contents).Should().BeNull();
+
+    [TestMethod]
+    [DataRow("{ \"namespace\": \"a\\nb\\rc\\td\\be\\ff\\/g\\\"h\\\\i\\u0041\" } // trailing comment")]
+    [DataRow("{ \"namespace\": \"Acme\" } /* unterminated comment")]
+    [DataRow("{ \"name\\u0073pace\": \"secret\" }")]
+    public void Sanitize_Reads_Escapes_And_Comments(string contents)
+    {
+        var settings = Parse(SettingsSanitizer.Sanitize(contents)!);
+
+        settings["namespace"].GetString().Should().Be(SettingsSanitizer.Redacted);
+    }
+
+    [TestMethod]
+    [DataRow("{ \"includeTags\": [] }", "[0 items]")]
+    [DataRow("{ \"includeTags\": [ \"Pet\", ] }", "[1 items]")]
+    public void Sanitize_Reports_Array_Lengths(string contents, string expected)
+    {
+        var settings = Parse(SettingsSanitizer.Sanitize(contents)!);
+
+        settings["includeTags"].GetString().Should().Be(expected);
+    }
+
+    [TestMethod]
+    [DataRow("0")]
+    [DataRow("-0")]
+    [DataRow("0.5")]
+    [DataRow("12")]
+    [DataRow("-1.5")]
+    [DataRow("1e5")]
+    [DataRow("1E+5")]
+    [DataRow("2.5e-3")]
+    public void Sanitize_Keeps_Json_Numbers(string number)
+    {
+        var settings = Parse(SettingsSanitizer.Sanitize($$"""{ "dependencyInjectionSettings": { "maxRetryCount": {{number}} } }""")!);
+
+        settings["dependencyInjectionSettings.maxRetryCount"].GetRawText().Should().Be(number);
+    }
+
+    [TestMethod]
+    [DataRow("1.")]
+    [DataRow(".5")]
+    [DataRow("1e")]
+    [DataRow("1e+")]
+    [DataRow("-")]
+    [DataRow("--1")]
+    [DataRow("-01")]
+    [DataRow("1.5.2")]
+    [DataRow("1x")]
+    [DataRow("1-2")]
+    public void Sanitize_Rejects_Malformed_Numbers(string number) =>
+        SettingsSanitizer.Sanitize($$"""{ "dependencyInjectionSettings": { "maxRetryCount": {{number}} } }""").Should().BeNull();
 
     private static Dictionary<string, JsonElement> Parse(string json) =>
         JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json)!;
