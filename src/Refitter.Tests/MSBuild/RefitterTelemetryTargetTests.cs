@@ -142,13 +142,19 @@ public class RefitterTelemetryTargetTests
 
     private static void ExtractPackage(string package, string destination)
     {
+        var root = Path.GetFullPath(destination) + Path.DirectorySeparatorChar;
         using var archive = ZipFile.OpenRead(package);
         foreach (var entry in archive.Entries.Where(entry =>
                      entry.Name.Length > 0 &&
                      (entry.FullName.StartsWith("analyzers/dotnet/cs/", StringComparison.Ordinal) ||
                       entry.FullName.StartsWith("build/", StringComparison.Ordinal))))
         {
-            entry.ExtractToFile(Path.Combine(destination, entry.FullName.Replace('/', Path.DirectorySeparatorChar)), overwrite: true);
+            // Never write outside the workspace, whatever the entry name contains
+            var path = Path.GetFullPath(Path.Combine(root, entry.FullName));
+            if (!path.StartsWith(root, StringComparison.Ordinal))
+                throw new InvalidOperationException($"Package entry '{entry.FullName}' is outside the package");
+
+            entry.ExtractToFile(path, overwrite: true);
         }
     }
 
