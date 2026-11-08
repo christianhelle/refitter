@@ -9,10 +9,8 @@ using OpenApiDocument = NSwag.OpenApiDocument;
 namespace Refitter.Core;
 
 /// <summary>
-/// Parses OpenAPI documents the way NSwag does, but first clamps numeric bounds that do not fit in a
-/// <see cref="decimal"/> and converts object-valued <c>x-enumDescriptions</c> to arrays, both in the document
-/// and in the local files it references (#1273, #1336), and inlines path items referenced from OpenAPI 3.1
-/// <c>components/pathItems</c> (#1274).
+/// Parses OpenAPI documents the way NSwag does, but first normalizes the document and the local files it
+/// references into a form NSwag can read (see <see cref="OpenApiJsonNormalizer"/>).
 /// </summary>
 internal static class OpenApiDocumentParser
 {
@@ -27,7 +25,7 @@ internal static class OpenApiDocumentParser
         bool isYaml,
         CancellationToken cancellationToken = default)
     {
-        var json = PathItemReferenceInliner.Inline(Sanitize(isYaml ? ConvertYamlToJson(content) : content));
+        var json = OpenApiJsonNormalizer.NormalizeDocument(isYaml ? ConvertYamlToJson(content) : content);
         return OpenApiDocument.FromJsonAsync(
             json,
             documentPath!,
@@ -57,12 +55,9 @@ internal static class OpenApiDocumentParser
         CancellationToken cancellationToken)
     {
         var content = File.ReadAllText(filePath);
-        var json = Sanitize(isYaml ? ConvertYamlToJson(content) : content);
+        var json = OpenApiJsonNormalizer.NormalizeReferencedFile(isYaml ? ConvertYamlToJson(content) : content);
         return JsonSchema.FromJsonAsync(json, filePath, _ => referenceResolver, cancellationToken);
     }
-
-    private static string Sanitize(string json) =>
-        ItemSchemaSanitizer.Sanitize(EnumExtensionsSanitizer.Sanitize(NumericBoundsSanitizer.Sanitize(json)));
 
     private sealed class SanitizingJsonReferenceResolver(JsonSchemaAppender schemaAppender)
         : JsonReferenceResolver(schemaAppender)
