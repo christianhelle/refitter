@@ -25,9 +25,7 @@ public class RefitterTelemetryTargetTests
         File.Copy(
             Path.Combine(FindRepositoryRoot(), "src", "Refitter.SourceGenerator", "Refitter.SourceGenerator.targets"),
             Path.Combine(workspace, "build", "Refitter.SourceGenerator.targets"));
-        File.Copy(
-            GetSourceGeneratorAssembly(),
-            Path.Combine(workspace, "analyzers", "dotnet", "cs", "Refitter.SourceGenerator.dll"));
+        CopySourceGeneratorPackageAssemblies(Path.Combine(workspace, "analyzers", "dotnet", "cs"));
 
         File.WriteAllText(Path.Combine(workspace, "petstore.refitter"), """{ "openApiPath": "./openapi.json" }""");
         File.WriteAllText(
@@ -119,6 +117,20 @@ public class RefitterTelemetryTargetTests
         var result = output.GetAwaiter().GetResult() + error.GetAwaiter().GetResult();
         process.ExitCode.Should().Be(0, result);
         return result;
+    }
+
+    // The package ships the generator's dependencies next to it, and MSBuild may need them to load the task
+    // assembly (for example to resolve the base types of its public types), so lay them out the same way.
+    // The compiler provides Roslyn, so the package leaves it out.
+    private static void CopySourceGeneratorPackageAssemblies(string analyzersDirectory)
+    {
+        var buildOutput = Path.GetDirectoryName(GetSourceGeneratorAssembly())!;
+        foreach (var assembly in Directory.GetFiles(buildOutput, "*.dll"))
+        {
+            var fileName = Path.GetFileName(assembly);
+            if (!fileName.StartsWith("Microsoft.CodeAnalysis", StringComparison.Ordinal))
+                File.Copy(assembly, Path.Combine(analyzersDirectory, fileName));
+        }
     }
 
     // The task ships inside the generator assembly, so load it from the built generator rather than the linked sources
