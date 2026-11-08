@@ -86,9 +86,14 @@ public class SnakeCaseTagTests
     {
         var generatedCode = await GenerateCode();
         generatedCode.Should().Contain("interface IUserProfileApi");
-        generatedCode.Should().NotContain("interface IUserProfileApi2");
-        generatedCode.Should().Contain("GetMergedSnake");
-        generatedCode.Should().Contain("GetMergedPascal");
+        generatedCode.Should().NotContain("interface IUserProfile2Api");
+
+        var start = generatedCode.IndexOf("interface IUserProfileApi", StringComparison.Ordinal);
+        var end = generatedCode.IndexOf("interface ", start + 1, StringComparison.Ordinal);
+        var mergedInterface = end < 0 ? generatedCode.Substring(start) : generatedCode.Substring(start, end - start);
+
+        mergedInterface.Should().Contain("GetMergedSnake");
+        mergedInterface.Should().Contain("GetMergedPascal");
     }
 
     [TestMethod]
