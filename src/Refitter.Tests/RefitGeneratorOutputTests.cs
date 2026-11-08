@@ -7,7 +7,7 @@ using Refitter.Tests.TestUtilities;
 namespace Refitter.Tests;
 
 [TestClass]
-public class RefitCodeGeneratorTests
+public class RefitGeneratorOutputTests
 {
     private const string OpenApiSpec = @"
 openapi: '3.0.0'
@@ -66,8 +66,8 @@ paths:
             OpenApiPath = swaggerFile
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.Generate(document, settings);
+        var sut = new RefitGenerator(settings, document);
+        var result = sut.Generate();
 
         result.Should().NotBeNullOrWhiteSpace();
         result.Should().Contain("TestNamespace");
@@ -85,8 +85,8 @@ paths:
             OpenApiPath = swaggerFile
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.Generate(filtered, settings);
+        var sut = new RefitGenerator(settings, filtered);
+        var result = sut.Generate();
 
         result.Should().Contain("\"/bar\"");
         result.Should().NotContain("\"/foo\"");
@@ -106,8 +106,8 @@ paths:
             GenerateClients = true
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.Generate(document, settings);
+        var sut = new RefitGenerator(settings, document);
+        var result = sut.Generate();
 
         BuildHelper.BuildCSharp(result).Should().BeTrue();
     }
@@ -126,8 +126,8 @@ paths:
             GenerateClients = true
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.GenerateMultipleFiles(document, settings);
+        var sut = new RefitGenerator(settings, document);
+        var result = sut.GenerateMultipleFiles();
 
         result.Files.Should().NotBeEmpty();
         result.Files.Should().Contain(f => f.TypeName == "Contracts");
@@ -144,8 +144,8 @@ paths:
             OpenApiPath = swaggerFile
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.Generate(document, settings);
+        var sut = new RefitGenerator(settings, document);
+        var result = sut.Generate();
 
         result.Should().NotBeNullOrWhiteSpace();
         result.Should().Contain("TestNamespace");
@@ -165,8 +165,8 @@ paths:
             GenerateClients = true
         };
 
-        var sut = new RefitCodeGenerator();
-        var result = sut.GenerateMultipleFiles(document, settings);
+        var sut = new RefitGenerator(settings, document);
+        var result = sut.GenerateMultipleFiles();
 
         result.Files.Should().NotBeEmpty();
         result.Files.Should().Contain(f => f.TypeName == "Contracts");
