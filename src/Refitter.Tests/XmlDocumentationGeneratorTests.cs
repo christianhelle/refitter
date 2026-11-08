@@ -80,7 +80,7 @@ public class XmlDocumentationGeneratorTests
     {
         var docs = new StringBuilder();
         var method = CreateOperationModel(new OpenApiOperation { Summary = "Test <tag> & content", });
-        this.generator.AppendMethodDocumentation(method, [], false, docs);
+        this.generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
         docs.ToString().Trim().Should().StartWith("/// <summary>Test &lt;tag&gt; &amp; content</summary>");
     }
 
@@ -89,7 +89,7 @@ public class XmlDocumentationGeneratorTests
     {
         var docs = new StringBuilder();
         var method = CreateOperationModel(new OpenApiOperation { Summary = "TestSummary", });
-        this.generator.AppendMethodDocumentation(method, [], false, docs);
+        this.generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
         docs.ToString().Trim().Should().StartWith("/// <summary>TestSummary</summary>");
     }
 
@@ -98,7 +98,7 @@ public class XmlDocumentationGeneratorTests
     {
         var docs = new StringBuilder();
         var method = CreateOperationModel(new OpenApiOperation { Description = "TestDescription", });
-        this.generator.AppendMethodDocumentation(method, [], false, docs);
+        this.generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
         docs.ToString().Should().Contain("/// <remarks>TestDescription</remarks>");
     }
 
@@ -110,7 +110,7 @@ public class XmlDocumentationGeneratorTests
         {
             Parameters = { new OpenApiParameter { OriginalName = "testParam", Description = "TestParameter" } },
         });
-        this.generator.AppendMethodDocumentation(method, ["string testParam"], false, docs);
+        this.generator.AppendMethodDocumentation(method, [new MethodParameter("string", "testParam")], false, docs);
         docs.ToString().Should().Contain("/// <param name=\"testParam\">TestParameter</param>");
     }
 
@@ -122,7 +122,7 @@ public class XmlDocumentationGeneratorTests
         {
             Parameters = { new OpenApiParameter { Name = "class", Kind = OpenApiParameterKind.Query, Description = "The class" } },
         });
-        this.generator.AppendMethodDocumentation(method, ["[Query] string @class"], false, docs);
+        this.generator.AppendMethodDocumentation(method, [new MethodParameter("string", "@class") { Attributes = ["Query"] }], false, docs);
         docs.ToString().Should().Contain("/// <param name=\"class\">The class</param>");
         docs.ToString().Should().NotContain("@class");
     }
@@ -139,10 +139,61 @@ public class XmlDocumentationGeneratorTests
                 new OpenApiParameter { Name = "session", Kind = OpenApiParameterKind.Cookie, Description = "Dropped" },
             },
         });
-        this.generator.AppendMethodDocumentation(method, ["[Query] string kept", "[AliasAs(\"extra\")] string extra"], false, docs);
+        this.generator.AppendMethodDocumentation(method, [new MethodParameter("string", "kept") { Attributes = ["Query"] }, new MethodParameter("string", "extra") { Alias = "extra" }], false, docs);
         docs.ToString().Should().Contain("/// <param name=\"kept\">Kept</param>");
         docs.ToString().Should().Contain("/// <param name=\"extra\">extra parameter</param>");
         docs.ToString().Should().NotContain("session");
+    }
+
+    [TestMethod]
+    public void Obsolete_String_Overload_Decodes_Escaped_Aliases()
+    {
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Parameters = { new OpenApiParameter { Name = "page\"size", Kind = OpenApiParameterKind.Query, Description = "Page size" } },
+        });
+
+#pragma warning disable CS0618
+        this.generator.AppendMethodDocumentation(method, ["[AliasAs(\"page\\\"size\")] int pageSize"], false, docs);
+#pragma warning restore CS0618
+
+        docs.ToString().Should().Contain("/// <param name=\"pageSize\">Page size</param>");
+    }
+
+    [TestMethod]
+    public void Obsolete_String_Overload_Returns_Early_When_Disabled()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings { GenerateXmlDocCodeComments = false });
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation { Summary = "Test Summary" });
+
+#pragma warning disable CS0618
+        generator.AppendMethodDocumentation(method, ["[Query] string @class"], false, docs);
+#pragma warning restore CS0618
+
+        docs.ToString().Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void Obsolete_String_Overload_Reads_Names_And_Aliases()
+    {
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Parameters = { new OpenApiParameter { Name = "page-size", Kind = OpenApiParameterKind.Query, Description = "Page size" } },
+        });
+
+#pragma warning disable CS0618
+        this.generator.AppendMethodDocumentation(
+            method,
+            ["[Query, AliasAs(\"page-size\")] int pageSize", "[Query] string @class"],
+            false,
+            docs);
+#pragma warning restore CS0618
+
+        docs.ToString().Should().Contain("/// <param name=\"pageSize\">Page size</param>");
+        docs.ToString().Should().Contain("/// <param name=\"class\">class parameter</param>");
     }
 
     [TestMethod]
@@ -153,7 +204,7 @@ public class XmlDocumentationGeneratorTests
         {
             Parameters = { new OpenApiParameter { OriginalName = "testParam", Description = "TestParameter" } },
         });
-        this.generator.AppendMethodDocumentation(method, ["string testParam", "[RequestOptions] IApizrRequestOptions options"], false, docs);
+        this.generator.AppendMethodDocumentation(method, [new MethodParameter("string", "testParam"), new MethodParameter("IApizrRequestOptions", "options") { Attributes = ["RequestOptions"] }], false, docs);
         docs.ToString().Should().Contain("/// <param name=\"options\">The <see cref=\"IApizrRequestOptions\"/> instance to pass through the request.</param>");
     }
 
@@ -165,7 +216,7 @@ public class XmlDocumentationGeneratorTests
         {
             Parameters = { new OpenApiParameter { OriginalName = "testParam", Description = "TestParameter" } },
         });
-        this.generator.AppendMethodDocumentation(method, ["[Query] TestQueryParams queryParams"], false, docs, "TestQueryParams");
+        this.generator.AppendMethodDocumentation(method, [new MethodParameter("TestQueryParams", "queryParams") { Attributes = ["Query"] }], false, docs, "TestQueryParams");
         docs.ToString().Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
     }
 
@@ -177,7 +228,7 @@ public class XmlDocumentationGeneratorTests
         {
             Parameters = { new OpenApiParameter { Name = "queryParams", Kind = OpenApiParameterKind.Query, Description = "Folded" } },
         });
-        this.generator.AppendMethodDocumentation(method, ["[Query] TestQueryParams? queryParams"], false, docs, "TestQueryParams");
+        this.generator.AppendMethodDocumentation(method, [new MethodParameter("TestQueryParams?", "queryParams") { Attributes = ["Query"] }], false, docs, "TestQueryParams");
         docs.ToString().Should().Contain("/// <param name=\"queryParams\">The dynamic querystring parameter wrapping all others.</param>");
     }
 
@@ -189,7 +240,7 @@ public class XmlDocumentationGeneratorTests
         {
             Parameters = { new OpenApiParameter { Name = "queryParams", Kind = OpenApiParameterKind.Query, Description = "Real parameter" } },
         });
-        this.generator.AppendMethodDocumentation(method, ["[Query] string queryParams"], false, docs);
+        this.generator.AppendMethodDocumentation(method, [new MethodParameter("string", "queryParams") { Attributes = ["Query"] }], false, docs);
         docs.ToString().Should().Contain("/// <param name=\"queryParams\">Real parameter</param>");
     }
 
@@ -203,7 +254,7 @@ public class XmlDocumentationGeneratorTests
         });
         this.generator.AppendMethodDocumentation(
             method,
-            ["[AliasAs(\"cancellationToken\")] [Query] string cancellationToken2", "CancellationToken cancellationToken = default"],
+            [new MethodParameter("string", "cancellationToken2") { Attributes = ["Query"], Alias = "cancellationToken", IsAliasSeparate = true }, new MethodParameter("CancellationToken", "cancellationToken") { DefaultValue = "default" }],
             false,
             docs);
         docs.ToString().Should().Contain("/// <param name=\"cancellationToken2\">Query token</param>");
@@ -218,7 +269,7 @@ public class XmlDocumentationGeneratorTests
         {
             Parameters = { new OpenApiParameter { OriginalName = "testParam", Description = "TestParameter" } },
         });
-        this.generator.AppendMethodDocumentation(method, ["string testParam", "CancellationToken cancellationToken = default"], false, docs);
+        this.generator.AppendMethodDocumentation(method, [new MethodParameter("string", "testParam"), new MethodParameter("CancellationToken", "cancellationToken") { DefaultValue = "default" }], false, docs);
         docs.ToString().Should().Contain("/// <param name=\"cancellationToken\">The cancellation token to cancel the request.</param>");
     }
 
@@ -238,7 +289,7 @@ public class XmlDocumentationGeneratorTests
             },
             Produces = ["application/json"],
         });
-        this.generator.AppendMethodDocumentation(method, [], false, docs);
+        this.generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
         docs.ToString().Should().Contain("/// <returns>TestResponse</returns>");
     }
 
@@ -254,7 +305,7 @@ public class XmlDocumentationGeneratorTests
             },
             Produces = ["application/json"],
         });
-        this.generator.AppendMethodDocumentation(method, [], false, docs);
+        this.generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
         docs.ToString().Should().Contain("/// <returns>")
             .And.Contain("Task");
     }
@@ -264,7 +315,7 @@ public class XmlDocumentationGeneratorTests
     {
         var docs = new StringBuilder();
         var method = CreateOperationModel(new OpenApiOperation());
-        this.generator.AppendMethodDocumentation(method, [], false, docs);
+        this.generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
         docs.ToString().Should().Contain("/// <returns>")
             .And.Contain("Task");
     }
@@ -274,7 +325,7 @@ public class XmlDocumentationGeneratorTests
     {
         var docs = new StringBuilder();
         var method = CreateOperationModel(new OpenApiOperation());
-        this.generator.AppendMethodDocumentation(method, [], false, docs);
+        this.generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
         docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">");
     }
 
@@ -291,7 +342,7 @@ public class XmlDocumentationGeneratorTests
         {
             Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
         });
-        generator.AppendMethodDocumentation(method, [], false, docs);
+        generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
         docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">")
             .And.Contain("<term>400</term>");
     }
@@ -310,7 +361,7 @@ public class XmlDocumentationGeneratorTests
             Responses = { ["400"] = new OpenApiResponse { Description = "Ошибка запроса" } },
         });
 
-        generator.AppendMethodDocumentation(method, [], false, docs);
+        generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
 
         docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">")
             .And.Contain("<term>400</term>")
@@ -331,7 +382,7 @@ public class XmlDocumentationGeneratorTests
         {
             Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
         });
-        generator.AppendMethodDocumentation(method, [], false, docs);
+        generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
         docs.ToString().Should().Contain("/// <exception cref=\"ApiException\">")
             .And.NotContain("<term>400</term>");
     }
@@ -349,7 +400,7 @@ public class XmlDocumentationGeneratorTests
         {
             Responses = { ["400"] = new OpenApiResponse { Description = "TestResponse" } },
         });
-        generator.AppendMethodDocumentation(method, [], true, docs);
+        generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), true, docs);
         docs.ToString().Should().NotContain("/// <exception cref=\"ApiException\">")
             .And.Contain("/// <returns>")
             .And.Contain("<term>400</term>");
@@ -384,7 +435,7 @@ public class XmlDocumentationGeneratorTests
         // If NSwag escapes it, it will look like "\u..."
         // Our generator should decode it back.
 
-        generator.AppendMethodDocumentation(method, [], false, docs);
+        generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, docs);
 
         docs.ToString().Should().Contain("/// <returns>")
             .And.Contain("Ошибка ответа")
@@ -438,7 +489,7 @@ public class XmlDocumentationGeneratorTests
         var operation = new OpenApiOperation { Summary = "Test Summary", Description = "Test Description" };
         var method = csharpGenerator.CreateOperationModel(operation);
 
-        generator.AppendMethodDocumentation(method, [], false, code);
+        generator.AppendMethodDocumentation(method, Array.Empty<MethodParameter>(), false, code);
 
         code.ToString().Should().BeEmpty();
     }

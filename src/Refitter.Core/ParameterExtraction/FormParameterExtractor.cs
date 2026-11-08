@@ -6,7 +6,7 @@ namespace Refitter.Core;
 
 internal static class FormParameterExtractor
 {
-    public static (IReadOnlyList<string> Parameters, string? FormObjectCode) Extract(
+    public static (IReadOnlyList<MethodParameter> Parameters, string? FormObjectCode) Extract(
         CSharpOperationModel operationModel,
         OpenApiOperation operation,
         RefitGeneratorSettings settings,
@@ -25,7 +25,10 @@ internal static class FormParameterExtractor
         }
 
         var formObjectCode = FormObjectParameterBuilder.Build(wrappedFields, formObjectParameterType, settings);
-        var parameters = new List<string> { $"[FormObject] {formObjectParameterType} formData" };
+        var parameters = new List<MethodParameter>
+        {
+            new(formObjectParameterType, "formData") { Attributes = ["FormObject"] },
+        };
         parameters.AddRange(formFields.Where(f => f.IsFile || f.IsComplex).Select(f => f.ToParameter()));
         return (parameters, formObjectCode);
     }
@@ -166,7 +169,7 @@ internal sealed record FormField(
         Type.TrimEnd('?') is var type &&
         (type == "StreamPart" || type.EndsWith("<StreamPart>", StringComparison.Ordinal));
 
-    public string ToParameter() =>
-        $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetAliasAsAttribute(Name, VariableName))}{Type} {VariableName}";
+    public MethodParameter ToParameter() =>
+        new(Type, VariableName) { Alias = ParameterAttributeFormatter.GetAlias(Name, VariableName) };
 #pragma warning restore S2325
 }

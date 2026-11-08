@@ -11,7 +11,7 @@ namespace Refitter.Tests.Parameters;
 public class ParameterExtractorPrivateCoverageTests
 {
     [TestMethod]
-    public void GetDefaultValueForParameter_Returns_Default_For_Empty_Parameter_String()
+    public void GetDefaultValueForParameter_Returns_Default_For_Empty_Parameter_Name()
     {
         var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
             string.Empty,
@@ -111,6 +111,16 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [TestMethod]
+    public void Aliases_Names_With_Formatting_Characters_The_Compiler_Drops()
+    {
+        // C# drops formatting characters from the compiled parameter name, so Refit would send "id"
+        ParameterAttributeFormatter.GetAlias("i\u200Cd", "i\u200Cd").Should().Be("i\u200Cd");
+        ParameterAttributeFormatter.GetAliasAsAttribute("i\u200Cd", "i\u200Cd").Should().Be("AliasAs(\"i\u200Cd\")");
+        ParameterAttributeFormatter.GetAlias("id", "id").Should().BeNull();
+        ParameterAttributeFormatter.GetAliasAsAttribute("id", "id").Should().BeEmpty();
+    }
+
+    [TestMethod]
     public void GetCSharpType_Handles_Number_Object_Unknown_And_Nullable_String()
     {
         var settings = new RefitGeneratorSettings { OptionalParameters = true };
@@ -172,18 +182,6 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [TestMethod]
-    public void ReOrderNullableParameters_Delegates_To_OptionalParameterReorderer()
-    {
-        var parameterModels = new List<CSharpParameterModel>();
-        var result = OptionalParameterReorderer.Reorder(
-            new List<string> { "string a", "int? b = default" },
-            new RefitGeneratorSettings(),
-            parameterModels);
-
-        result.Should().NotBeNull();
-    }
-
-    [TestMethod]
     public void FormatDefaultValue_Adds_PointZero_For_Double_Integer_Values()
     {
         var result = ParameterDefaultValueFormatter.FormatDefaultValue(42, "double");
@@ -203,7 +201,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void GetDefaultValueForParameter_Returns_Default_When_No_Matching_Parameter_Found()
     {
         var result = ParameterDefaultValueFormatter.GetDefaultValueForParameter(
-            "int paramName",
+            "paramName",
             new List<CSharpParameterModel>());
 
         result.Should().Be("default");

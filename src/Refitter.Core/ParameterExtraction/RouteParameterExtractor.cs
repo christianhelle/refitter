@@ -5,7 +5,7 @@ namespace Refitter.Core;
 
 internal static class RouteParameterExtractor
 {
-    public static IEnumerable<string> Extract(CSharpOperationModel operationModel)
+    public static IEnumerable<MethodParameter> Extract(CSharpOperationModel operationModel)
     {
         var path = operationModel.Path;
 
@@ -15,7 +15,10 @@ internal static class RouteParameterExtractor
             .Select(p =>
             {
                 var variableName = ParameterNaming.GetVariableName(p);
-                return $"{ParameterAttributeFormatter.JoinAttributes(ParameterAttributeFormatter.GetAliasAsAttribute(p.Name, variableName))}{p.Type} {variableName}";
+                return new MethodParameter(p.Type, variableName)
+                {
+                    Alias = ParameterAttributeFormatter.GetAlias(p.Name, variableName),
+                };
             })
             .ToList();
     }

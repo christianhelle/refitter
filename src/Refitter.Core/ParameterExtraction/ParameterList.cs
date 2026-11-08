@@ -9,8 +9,13 @@ namespace Refitter.Core;
 internal sealed record ParameterList(
 #pragma warning restore S1186
     string Path,
-    IReadOnlyList<string> Parameters,
+    IReadOnlyList<MethodParameter> Parameters,
     string? DynamicQuerystringCode)
 {
     public string? FormObjectCode { get; init; }
+
+    /// <summary>
+    /// The parameters as they appear between the parentheses of the method declaration.
+    /// </summary>
+    public string Render() => MethodParameter.Render(Parameters);
 }
