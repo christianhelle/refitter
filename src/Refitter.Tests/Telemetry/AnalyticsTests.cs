@@ -145,6 +145,7 @@ public class AnalyticsTests
                 .Single(e => e.Name == "settings-file" && e.Properties.ContainsKey("settings"))
                 .Properties["settings"];
             reported.Should().NotContain("password").And.NotContain("Contoso");
+            reported.Should().Contain("\"openApiPath\":\"<redacted>\"");
             reported.Should().Contain("\"namespace\":\"<redacted>\"");
             reported.Should().Contain("\"multipleInterfaces\":\"ByTag\"");
             reported.Should().Contain("\"unknown-settings\":1");
