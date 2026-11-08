@@ -22,9 +22,14 @@ internal sealed class FlattenPrimitiveAllOfMutator : IOpenApiDocumentMutator
         SchemaWalker.TraverseDocumentSchemas(document, Flatten);
     }
 
-    private static void Flatten(JsonSchema schema)
+    private static void Flatten(JsonSchema schema) =>
+        Flatten(schema, new HashSet<JsonSchema>());
+
+    // The walker can reach a wrapper before the wrapper it wraps, so inner wrappers are flattened first to give the
+    // same result in one pass. The visited set stops at allOf references that lead back to the schema.
+    private static void Flatten(JsonSchema schema, HashSet<JsonSchema> visited)
     {
-        if (schema.AllOf.Count != 1)
+        if (schema.AllOf.Count != 1 || !visited.Add(schema))
             return;
 
         if (schema.Type == JsonObjectType.Object ||
@@ -34,7 +39,11 @@ internal sealed class FlattenPrimitiveAllOfMutator : IOpenApiDocumentMutator
             return;
 
         JsonSchema? inner = schema.AllOf.First().ActualSchema;
-        if (inner == null || !IsPrimitive(inner.Type))
+        if (inner == null)
+            return;
+
+        Flatten(inner, visited);
+        if (!IsPrimitive(inner.Type))
             return;
 
         schema.Type = inner.Type;
